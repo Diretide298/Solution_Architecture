@@ -294,6 +294,14 @@ components:
         - QUEUE_REDEEM                # admit a party at the ride
         - QUEUE_OVERRIDE              # admit against a failed redemption. Audited
 
+        # --- Transport --- (decided 29 September, rev 3 REV3-21)
+        - TRANSPORT_VIEW              # stations, routes, timetables, departure board, pass types, network imports: read
+        - TRANSPORT_MANAGE            # stations, routes and stops, network import, timetables publish/withdraw, departure coach and capacity
+        - TRANSPORT_PRICE             # fare tables, passenger types, pass types and their prices
+        # **`PRICE` is separate from `MANAGE`** because the person who edits a timetable is
+        # not the one who sets fares, the same split as `RENTAL_PRICE`. Guests need none of
+        # these: guest reads of the published network are permission-null.
+
         # --- Maintenance & safety ---
         - ASSET_VIEW
         - ASSET_MANAGE                # register, amend, take out of / return to service

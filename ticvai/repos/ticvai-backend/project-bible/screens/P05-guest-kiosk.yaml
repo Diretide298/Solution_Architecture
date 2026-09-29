@@ -843,7 +843,7 @@ screens:
         provenance: contract orders.yaml POST /payments
       - kind: textField
         label: tenderedAmount
-        bindsTo: CreatePaymentRequest.tenderedAmount
+        bindsTo: CreatePaymentRequest.tenderAmount
         provenance: contract orders.yaml POST /payments
       - kind: textField
         label: walletAuthorisationId

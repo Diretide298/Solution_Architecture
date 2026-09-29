@@ -5,50 +5,33 @@
 | | |
 |---|---|
 | Screens | 30 |
-| Operations | 143 |
+| Operations | 144 |
 | Contracts | 20 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 212 |
+| Operations with no screen | 151 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 212 operations with no screen here
+### 151 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `enrolFaceTag` | access | POST | Capture a same-visit facial model that dies at close of day |
+| `approveManualOverrideSupervisor` | access | PUT | Manual Override & Supervisor Approval |
 | `listAccessChanges` | access | GET | Changes made to an entitlement's access |
 | `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
-| `setEntryRulePoints` | access | PUT | Set the access points an admission rule covers |
 | `verifyIdentity` | access | POST | Check the person presenting against the person entitled |
+| `approveMatrixMultiLevel` | approvals | PUT | Approval Matrix & Multi-Level Approval Configuration |
+| `approveRoleAuthorityDelegation` | approvals | PUT | Roles, Authority, Delegation & Approval Limits |
+| `approveUnifiedDecision` | approvals | PUT | Unified Approval Inbox & Decision Workspace |
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
-| `assessProductChange` | catalogue | POST | What a change would touch, before making it |
-| `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
-| `cloneProduct` | catalogue | POST | Copy a product as a new draft |
-| `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
-| `createDonationCampaign` | catalogue | POST | Create a campaign |
-| `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
 | `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
-| `getDynamicPriceRule` | catalogue | GET | One rule with its conditions and actions |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
-| `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
-| `listDynamicPriceRules` | catalogue | GET | Dynamic pricing rules |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
-| `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
-| `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
-| `reinstateEntitlement` | catalogue | POST | Lift a suspension |
-| `restoreProductVersion` | catalogue | POST | Put a previous version back |
-| `setDynamicPriceRule` | catalogue | PUT | Replace a rule, its conditions and its actions |
-| `setMembershipBenefit` | catalogue | PUT | Define a benefit |
-| `setMembershipProgramme` | catalogue | PUT | Define a membership programme |
-| `setPlanBenefits` | catalogue | PUT | Replace the benefits a plan grants |
-| `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
-| `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `calculateTax` | finance | POST | Compute tax for a set of lines |
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
@@ -57,10 +40,27 @@
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
 | `setFxProvider` | finance | PUT | Which provider serves which purpose |
-| `attachModifierGroup` | fnb | PUT | Give an item its choices |
-| `closeCorrectiveAction` | fnb | POST | Close a signed finding |
-| `createCombo` | fnb | POST | A meal deal, priced as one thing |
-| … | | | 172 more |
+| `getAllergenVerification` | fnb | GET | The last allergen verdict recorded for a dish |
+| `getFnbReservationPolicy` | fnb | GET | How long a table is held, by party size |
+| `getFnbServiceChargePolicy` | fnb | GET | The service charge a venue applies, and on what |
+| `listFnbRecommendations` | fnb | GET | Upsell and pairing suggestions for F&B |
+| `listIngredientSubstitutes` | fnb | GET | Approved substitutions for a recipe's ingredients |
+| `listMenuSchedules` | fnb | GET | What is scheduled to go live, and when |
+| `listMenuVersions` | fnb | GET | Every published version of a menu |
+| `listTemperatureCheckpoints` | fnb | GET | The units that get read, and the range each must hold |
+| `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
+| `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
+| `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
+| `evaluateAccess` | identity | POST | Decide, now, and say why |
+| `getAccessPolicy` | identity | GET | One policy, at a version |
+| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| `getMembership` | identity | GET | A membership with its history, usage and renewals |
+| `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
+| `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
+| `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
+| `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
+| `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
+| … | | | 111 more |
 
 ### 2 modules split across waves
 
@@ -87,7 +87,7 @@
 | `POS-002` | Sell — Ticket Catalogue | Sell | 1 | 42 | yes |
 | `POS-003` | Sell — Timed Entry | Sell | 1 | 10 | yes |
 | `POS-004` | Sell — Seat Map | Sell | 2 | 11 | yes |
-| `POS-005` | Payment | Payment | 1 | 11 | yes |
+| `POS-005` | Payment | Payment | 1 | 12 | yes |
 | `POS-006` | Held Orders | Sell | 1 | 14 | yes |
 | `POS-007` | Close Shift | Shift | 1 | 17 | yes |
 | `POS-008` | Reports | Reports | 2 | 7 | yes |

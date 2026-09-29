@@ -1,5 +1,5 @@
 id: LLD-venue-map
-title: venue-map — 13 operations
+title: venue-map — 15 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -67,6 +67,7 @@ operations:
   - assets.media_asset
   - venuemap.map
   - venuemap.path
+  - venuemap.placed_resource
   - venuemap.point
   writes: []
 - operation: getVenueMapGraph
@@ -127,6 +128,17 @@ operations:
   - venuemap.import_job
   - venuemap.path
   - venuemap.point
+- operation: listBookableVenueMaps
+  verb: GET
+  path: /bookable-venue-maps
+  scope: venue
+  permission: VENUE_MAP_VIEW
+  audience:
+  - staff
+  - guest
+  offline: true
+  reads: []
+  writes: []
 - operation: listVenueMaps
   verb: GET
   path: /venue-maps
@@ -174,6 +186,18 @@ operations:
   - cache:resolution
   - venuemap.map
   - venuemap.path
+- operation: setPlacedResource
+  verb: POST
+  path: /venue-maps/{mapId}/resources
+  scope: venue
+  permission: VENUE_MAP_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - venuemap.placed_resource
+  writes:
+  - venuemap.placed_resource
 - operation: setVenuePoint
   verb: POST
   path: /venue-maps/{mapId}/points

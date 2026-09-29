@@ -1,0 +1,37 @@
+# Transport network import — state model
+# Contract: transport.TransportNetworkImportStatus
+# Checked by tools/check-states.py.
+# Added 29 September: the transport network is operator configuration, entered in Venue
+# Management one item at a time or in bulk (decided 29 September, rev 3 REV3-21).
+
+entity: Transport network import
+contract: transport
+enum: TransportNetworkImportStatus
+enumKind: named
+enumSchema: TransportNetworkImportStatus
+owner: transport
+initial:
+- validating
+terminal:
+- failed
+- applied
+- expired
+transitions:
+- from: validating
+  to: previewReady
+  trigger: job
+  guard: The file was read and a preview with counts and findings exists. Nothing is written to the network yet
+- from: validating
+  to: failed
+  trigger: job
+  guard: The file could not be read, a required file or header is missing, or nothing was found (`nothingFound`). The reason is recorded as a finding
+- from: previewReady
+  to: applied
+  operation: applyTransportNetworkImport
+  trigger: operation
+  guard: '**A person applies.** No error finding, and the network has not changed since validation. Routes and timetables land as `draft`; nothing goes on sale'
+- from: previewReady
+  to: expired
+  trigger: timer
+  guard: Unapplied 7 days after validation (proposed, client to correct). Import the file again for a fresh preview
+notes: '**Applied is not on sale.** A route is activated with `setTransportRouteStatus` and a timetable published with `publishTransportTimetable`, the same two-step rule as a venue map import and its publish.'

@@ -24,7 +24,7 @@ Nothing outside itself.
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | floor | [`lookupMerchandise`](#lookupmerchandise) | GET | `/merchandise/lookup` | core | 1 | BO-048, BO-114, EMP-069, GST-026, KSK-017, POS-002 … |
-| floor | [`lookupShopAndDrop`](#lookupshopanddrop) | GET | `/shop-and-drop/lookup` | core | 2 | GST-062, KSK-011, WEB-042 |
+| floor | [`lookupShopAndDrop`](#lookupshopanddrop) | GET | `/shop-and-drop/lookup` | core | 2 | BO-143, GST-062, KSK-011, WEB-042 |
 | floor | [`reserveMerchandise`](#reservemerchandise) | POST | `/outlets/{outletId}/reserve` | core | 1 | BO-044, EMP-068, GST-026, KSK-017, POS-012 |
 | merchandise | [`createMerchandise`](#createmerchandise) | POST | `/merchandise` | setup | 1 | BO-007, BO-048 |
 | merchandise | [`listMerchandise`](#listmerchandise) | GET | `/merchandise` | core | 1 | BO-007, BO-044, BO-048, BO-116, GST-026, KSK-017 … |
@@ -119,7 +119,7 @@ Scanned at the collection point. Accepts the entitlement, the drop reference, or
 | Read routing | primary |
 | Reads | `retail.shop_and_drop`, `retail.shop_and_drop_line` |
 | Writes | - |
-| Called by | GST-062, KSK-011, WEB-042 |
+| Called by | BO-143, GST-062, KSK-011, WEB-042 |
 
 **Parameters**
 

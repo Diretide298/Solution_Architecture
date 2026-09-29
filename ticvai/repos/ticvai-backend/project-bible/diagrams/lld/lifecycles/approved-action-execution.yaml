@@ -1,0 +1,72 @@
+id: LLD-Approved action execution
+title: Approved action execution — 10 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/approved-action-execution.yaml
+entity: Approved action execution
+contract: approvals
+enum: ApprovedActionExecutionView.status
+enumKind: inline
+enumSchema: ApprovedActionExecutionView
+enumProperty: status
+owner: approvals
+description: '**Whether an approved action actually ran** (decided 29 September, VM close-out; pack
+  Approval Workflows and Governance p.37, BO-382). The approval request is the authorisation and is
+  immutable once decided; this is the execution of the transaction behind it, which the requesting contract
+  performs and reports. An approval that was granted and then failed to execute is visible here rather
+  than assumed done.'
+initial:
+- queued
+terminal:
+- succeeded
+transitions:
+- from: queued
+  to: executing
+  trigger: job
+  guard: The requesting contract picked the approved action up and started it under the approver's permission
+- from: executing
+  to: succeeded
+  trigger: job
+  guard: The requesting contract reported success
+- from: executing
+  to: failed
+  trigger: job
+  guard: The requesting contract reported a failure, with its reason
+- from: failed
+  to: queued
+  operation: resolveApprovedActionExecution
+  trigger: operation
+  guard: action retry. Sent back to the requesting contract to run again; the approval is not reopened
+- from: failed
+  to: investigating
+  operation: resolveApprovedActionExecution
+  trigger: operation
+  guard: action investigate, with an assignee
+- from: failed
+  to: escalated
+  operation: resolveApprovedActionExecution
+  trigger: operation
+  guard: action escalate, with an assignee at the next level
+- from: investigating
+  to: queued
+  operation: resolveApprovedActionExecution
+  trigger: operation
+  guard: action retry, once the cause is fixed
+- from: investigating
+  to: escalated
+  operation: resolveApprovedActionExecution
+  trigger: operation
+  guard: action escalate
+- from: escalated
+  to: queued
+  operation: resolveApprovedActionExecution
+  trigger: operation
+  guard: action retry
+- from: escalated
+  to: investigating
+  operation: resolveApprovedActionExecution
+  trigger: operation
+  guard: action investigate, reassigned
+openQuestions: null
+notes: '**There is no cancelled state on purpose.** The pack offers Retry, Investigate and Escalate;
+  an approved action nobody will run is withdrawn on the approval side, not abandoned here.'

@@ -12,19 +12,19 @@ Areas covered: Kitchen, Payment, Reports, Sell, Shift.
 
 ### Guest App - Web
 
-45 screens: 21 in wave 1, 20 in wave 2, 4 in wave 3.
+49 screens: 21 in wave 1, 21 in wave 2, 7 in wave 3.
 
-Areas covered: Account & Self-Service, Booking & Selection, Cart & Checkout, Discovery & Browse, Engagement & Support, High-Demand Access, In-venue Services, Membership, Loyalty & Value, Promotions, Retail, Support, System States, Ticketing.
+Areas covered: Account & Self-Service, Booking & Selection, Cart & Checkout, Discovery & Browse, Engagement & Support, High-Demand Access, In-venue Services, Membership, Loyalty & Value, Promotions, Retail, Support, System States, Ticketing, Transport.
 
 ### Guest App - Mobile
 
-65 screens: 20 in wave 1, 34 in wave 2, 11 in wave 3.
+72 screens: 20 in wave 1, 35 in wave 2, 17 in wave 3.
 
-Areas covered: Account & Self-Service, Booking & Selection, Cart & Checkout, Discovery, Discovery & Browse, Engagement & Support, High-Demand Access, In-Venue Experience, In-venue Services, Marketing, Membership, Loyalty & Value, Promotions, Retail, Support, System States, Ticketing.
+Areas covered: Account & Self-Service, Booking & Selection, Cart & Checkout, Discovery, Discovery & Browse, Engagement & Support, High-Demand Access, In-Venue Experience, In-venue Services, Marketing, Membership, Loyalty & Value, Promotions, Retail, Support, System States, Ticketing, Transport.
 
 ### White Labelling
 
-22 screens: 22 in wave 2.
+23 screens: 23 in wave 2.
 
 Areas covered: Branding & Localisation, White Label.
 

@@ -258,6 +258,7 @@ CREATE TABLE IF NOT EXISTS seating.section (
     name                              text NOT NULL,
     row_count                         integer NOT NULL,
     seat_count                        integer NOT NULL,
+    view_asset_id                     uuid,
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );

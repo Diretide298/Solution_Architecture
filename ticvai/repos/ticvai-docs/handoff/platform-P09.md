@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 676 |
-| Operations | 538 |
+| Operations | 547 |
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 211 |
+| Operations with no screen | 163 |
 | Waves | wave1 12 · wave2 16 · wave3 648 |
 
 ## Gaps
 
-### 211 operations with no screen here
+### 163 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -30,37 +30,37 @@
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
 | `setSuggestionProvider` | ai | PUT |  |
+| `approveMatrixMultiLevel` | approvals | PUT | Approval Matrix & Multi-Level Approval Configuration |
+| `approveRoleAuthorityDelegation` | approvals | PUT | Roles, Authority, Delegation & Approval Limits |
+| `approveUnifiedDecision` | approvals | PUT | Unified Approval Inbox & Decision Workspace |
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
-| `assessProductChange` | catalogue | POST | What a change would touch, before making it |
-| `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
-| `cloneProduct` | catalogue | POST | Copy a product as a new draft |
-| `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
-| `createDonationCampaign` | catalogue | POST | Create a campaign |
-| `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
 | `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
-| `getDynamicPriceRule` | catalogue | GET | One rule with its conditions and actions |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
-| `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
-| `listDynamicPriceRules` | catalogue | GET | Dynamic pricing rules |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
-| `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
-| `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
-| `reinstateEntitlement` | catalogue | POST | Lift a suspension |
-| `restoreProductVersion` | catalogue | POST | Put a previous version back |
-| `setDynamicPriceRule` | catalogue | PUT | Replace a rule, its conditions and its actions |
-| `setMembershipBenefit` | catalogue | PUT | Define a benefit |
-| `setMembershipProgramme` | catalogue | PUT | Define a membership programme |
-| `setPlanBenefits` | catalogue | PUT | Replace the benefits a plan grants |
-| `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
-| `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `authoriseWalletSpend` | cross-region | POST | Hold funds against the guest's home-cell balance |
 | `captureWalletAuthorisation` | cross-region | POST | Capture a held amount |
-| `getWalletAllocation` | cross-region | GET | The consuming cell's bounded offline allocation |
 | `listCellConnections` | cross-region | GET | Which cells may talk to which |
 | `listCrossCellRequests` | cross-region | GET | Calls that had to leave a cell |
 | `relinquishWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
-| … | | | 171 more |
+| `calculateTax` | finance | POST | Compute tax for a set of lines |
+| `disputeObligation` | finance | POST | One entity disagrees with the amount |
+| `getForeignTenderReport` | finance | GET | What was taken in which currency |
+| `listInterEntityObligations` | finance | GET | What one entity owes another |
+| `recordWriteOff` | finance | POST | Write off an uncollectable balance |
+| `resolveObligationDispute` | finance | POST | Agree what is actually owed |
+| `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
+| `setFxProvider` | finance | PUT | Which provider serves which purpose |
+| `evaluateAccess` | identity | POST | Decide, now, and say why |
+| `getAccessPolicy` | identity | GET | One policy, at a version |
+| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| `getMembership` | identity | GET | A membership with its history, usage and renewals |
+| `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
+| `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
+| `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
+| `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
+| `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
+| … | | | 123 more |
 
 ### 4 modules split across waves
 
@@ -96,7 +96,7 @@
 |---|---|---|---|---|---|
 | `ADM-001` | Platform Login / MFA | Access & Identity | 1 | 12 | yes |
 | `ADM-002` | Platform Dashboard | Overview & Health | 1 | 6 | yes |
-| `ADM-003` | Cross-Tenant Health Dashboard | Overview & Health | 2 | 10 | yes |
+| `ADM-003` | Cross-Tenant Health Dashboard | Overview & Health | 2 | 12 | yes |
 | `ADM-004` | Platform Audit Log | Overview & Health | 2 | 1 | yes |
 | `ADM-005` | Tenant Directory | Tenants & Licensing | 1 | 16 | yes |
 | `ADM-006` | Tenant Hierarchy Explorer | Tenants & Licensing | 1 | 9 | yes |
@@ -151,7 +151,7 @@
 | `ADM-055` | Price Hierarchy & Inheritance Configuration | Commercial | 3 | 1 | yes |
 | `ADM-056` | Price List Templates, Clone & Reuse | Commercial | 3 | 1 | yes |
 | `ADM-057` | Commercial Pricing Structure Validation | Commercial | 3 | 1 | yes |
-| `ADM-058` | Pricing Rule Command Center | Commercial | 3 | 2 | yes |
+| `ADM-058` | Pricing Rule Command Center | Commercial | 3 | 3 | yes |
 | `ADM-059` | Customer Segment & Profile Pricing Rules | Commercial | 3 | 1 | yes |
 | `ADM-060` | Membership & Loyalty Pricing Rules | Commercial | 3 | 1 | yes |
 | `ADM-061` | Residency, Nationality & Market Pricing Rules | Commercial | 3 | 1 | yes |
@@ -160,7 +160,7 @@
 | `ADM-064` | Quantity, Group & Volume Pricing Rules | Commercial | 3 | 1 | yes |
 | `ADM-065` | Effective Date, Season & Day-Based Pricing Rules | Commercial | 3 | 1 | yes |
 | `ADM-066` | Timeslot, Performance & Time-of-Day Pricing Rules | Commercial | 3 | 1 | yes |
-| `ADM-067` | Pricing Rule Priority, Conflict Resolution & Testing | Commercial | 3 | 1 | yes |
+| `ADM-067` | Pricing Rule Priority, Conflict Resolution & Testing | Commercial | 3 | 3 | yes |
 | `ADM-068` | Tax, Fee & Calculation Command Center | Commercial | 3 | 1 | yes |
 | `ADM-069` | Tax Profile & Jurisdiction Configuration | Commercial | 3 | 1 | yes |
 | `ADM-070` | Tax Rule & Treatment Builder | Commercial | 3 | 1 | yes |
@@ -171,8 +171,8 @@
 | `ADM-075` | Currency Precision, Rounding & Monetary Rules | Commercial | 3 | 1 | yes |
 | `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | Commercial | 3 | 1 | yes |
 | `ADM-077` | Calculation Validation, Reconciliation & Service Interface | Commercial | 3 | 1 | yes |
-| `ADM-078` | Pricing Governance Command Center | Commercial | 3 | 1 | yes |
-| `ADM-079` | Pricing Change Request & Workspace | Commercial | 3 | 1 | yes |
+| `ADM-078` | Pricing Governance Command Center | Commercial | 3 | 2 | yes |
+| `ADM-079` | Pricing Change Request & Workspace | Commercial | 3 | 3 | yes |
 | `ADM-080` | Bulk Pricing Update, Import & Mass Maintenance | Commercial | 3 | 1 | yes |
 | `ADM-081` | Pricing Version & Baseline Management | Commercial | 3 | 1 | yes |
 | `ADM-082` | Pricing Change Impact Analysis | Commercial | 3 | 2 | yes |
@@ -190,7 +190,7 @@
 | `ADM-094` | Dynamic Price Bands, Ladders & Adjustment Matrix | Commercial | 3 | 1 | yes |
 | `ADM-095` | Dynamic Pricing Guardrails & Commercial Protection | Commercial | 3 | 1 | yes |
 | `ADM-096` | Dynamic Pricing Automation Policy & Control | Commercial | 3 | 1 | yes |
-| `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | Commercial | 3 | 1 | yes |
+| `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | Commercial | 3 | 2 | yes |
 | `ADM-098` | AI Pricing Intelligence Command Center | Commercial | 3 | 1 | yes |
 | `ADM-099` | Internal Demand & Booking Signal Hub | Commercial | 3 | 1 | yes |
 | `ADM-100` | Weather Intelligence & Demand Impact Configuration | Commercial | 3 | 1 | yes |
@@ -206,7 +206,7 @@
 | `ADM-110` | Scenario Modeling & What-If Analysis | Commercial | 3 | 1 | yes |
 | `ADM-111` | A/B Pricing Experiment Studio | Commercial | 3 | 1 | yes |
 | `ADM-112` | Revenue & Demand Impact Forecasting | Commercial | 3 | 1 | yes |
-| `ADM-113` | AI Recommendation Review & Decision Queue | Commercial | 3 | 1 | yes |
+| `ADM-113` | AI Recommendation Review & Decision Queue | Commercial | 3 | 2 | yes |
 | `ADM-114` | Automation Policy & Autonomous Pricing Orchestrator | Commercial | 3 | 1 | yes |
 | `ADM-115` | Live Dynamic Price Execution & Deployment Monitor | Commercial | 3 | 1 | yes |
 | `ADM-116` | Dynamic Pricing Performance & Optimization Analytics | Commercial | 3 | 1 | yes |
@@ -218,7 +218,7 @@
 | `ADM-122` | Product Import / Export & Environment Transfer | Catalogue | 3 | 1 | yes |
 | `ADM-123` | Product Context, Ownership & Assignment | Catalogue | 3 | 1 | yes |
 | `ADM-124` | Channel Publication & Availability | Catalogue | 3 | 1 | yes |
-| `ADM-125` | Publication & Activation Scheduler | Catalogue | 3 | 1 | yes |
+| `ADM-125` | Publication & Activation Scheduler | Catalogue | 3 | 2 | yes |
 | `ADM-126` | Product Duplication & Template Library | Catalogue | 3 | 1 | yes |
 | `ADM-127` | AI Catalogue Builder & Configuration Review | Catalogue | 3 | 1 | yes |
 | `ADM-128` | Product Governance Command Center | Catalogue | 3 | 1 | yes |
@@ -335,14 +335,14 @@
 | `ADM-239` | Visual Business Rule Builder | Platform | 3 | 1 | yes |
 | `ADM-240` | Conditions, Decision Logic & Decision Tables | Platform | 3 | 1 | yes |
 | `ADM-241` | Visual Workflow Designer | Platform | 3 | 1 | yes |
-| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | Platform | 3 | 1 | yes |
-| `ADM-243` | Roles, Authority, Delegation & Approval Limits | Platform | 3 | 1 | yes |
+| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | Platform | 3 | 2 | yes |
+| `ADM-243` | Roles, Authority, Delegation & Approval Limits | Platform | 3 | 3 | yes |
 | `ADM-244` | SLA, Escalation, Reminder & Timeout Rules | Platform | 3 | 1 | yes |
 | `ADM-245` | Trigger, Action & Cross-Module Orchestration Configuration | Platform | 3 | 1 | yes |
 | `ADM-246` | Workflow Testing, Simulation & Impact Analysis | Platform | 3 | 1 | yes |
 | `ADM-247` | Versioning, Governance, Approval & Publication | Platform | 3 | 1 | yes |
 | `ADM-248` | Workflow Operations Command Center | Platform | 3 | 1 | yes |
-| `ADM-249` | Unified Approval Inbox & Decision Workspace | Platform | 3 | 1 | yes |
+| `ADM-249` | Unified Approval Inbox & Decision Workspace | Platform | 3 | 2 | yes |
 | `ADM-250` | Workflow Instance Monitor & Process Timeline | Platform | 3 | 1 | yes |
 | `ADM-251` | Workflow Exception, Failure & Recovery Center | Platform | 3 | 1 | yes |
 | `ADM-252` | SLA, Escalation & Bottleneck Monitor | Platform | 3 | 1 | yes |
@@ -376,7 +376,7 @@
 | `ADM-280` | Resale Policy & Marketplace Settings | Commercial | 3 | 1 | yes |
 | `ADM-281` | Listing Creation & Seller Configuration | Commercial | 3 | 1 | yes |
 | `ADM-282` | Resale Pricing & Price Guardrails | Commercial | 3 | 1 | yes |
-| `ADM-283` | Resale Fees, Commission & Seller Proceeds | Commercial | 3 | 2 | yes |
+| `ADM-283` | Resale Fees, Commission & Seller Proceeds | Commercial | 3 | 4 | yes |
 | `ADM-284` | Listing Approval & Moderation | Commercial | 3 | 1 | yes |
 | `ADM-285` | Resale Inventory & Availability Management | Commercial | 3 | 1 | yes |
 | `ADM-286` | Listing Lifecycle, Expiry & Cancellation | Commercial | 3 | 1 | yes |

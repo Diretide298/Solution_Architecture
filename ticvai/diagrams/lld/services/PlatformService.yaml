@@ -1,5 +1,5 @@
 id: LLD-PlatformService
-title: PlatformService — 184 operations, 64 tables
+title: PlatformService — 186 operations, 64 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -13,7 +13,7 @@ why: '**Three contracts, two schemas, 64 tables.** Subscription, platform operat
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 184
+  operations: 186
   inAFlow: 87
   percent: 47%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -1333,7 +1333,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: public-api
-  count: 22
+  count: 24
   operations:
   - operation: certifyIntegration
     verb: POST
@@ -1479,6 +1479,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setApiClientStatus
+    verb: POST
+    path: /api-clients/{clientId}/status
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: setApiLicensing
     verb: PUT
     path: /api-licensing
@@ -1511,6 +1519,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: testWebhookSubscription
+    verb: POST
+    path: /webhook-subscriptions/{subscriptionId}/test
+    scope: tenant
+    permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
 tables:
 - store: cache:idempotency
   kind: cache
@@ -1873,7 +1889,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.release
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -1991,7 +2007,7 @@ tables:
   - platform-ops
   foreignWriters: null
 - table: control.webhook_delivery
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -2206,6 +2222,10 @@ screens:
 - P08:BO-1076 Concurrency, Idempotency & Limits
 - P08:BO-1077 Mapping & Transformation
 - P08:BO-1078 Monitoring, Retry & Reconciliation
+- P08:BO-1173 Wallet Integration Command Center
+- P08:BO-1176 Wallet Events, Webhooks & Notification Orchestration
+- P08:BO-1177 API Security, Access & Integration Permissions
+- P08:BO-1179 Integration Monitoring & Exception Workbench
 - P08:BO-126 Deployment, Preview & Audit
 - P08:BO-284 Membership & Annual Pass Command Center
 - P08:BO-285 Membership Product & Tier Builder

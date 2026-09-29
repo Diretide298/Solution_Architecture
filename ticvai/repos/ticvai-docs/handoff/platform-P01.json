@@ -10,28 +10,35 @@
  "generated": "2026-09-29",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 46,
-  "operations": 155,
-  "contracts": 18,
-  "modules": 13,
+  "screens": 49,
+  "operations": 186,
+  "contracts": 19,
+  "modules": 14,
   "undrawn": 0,
   "operationsWithNoScreen": 18
  },
  "waves": {
   "wave1": 21,
-  "wave2": 20,
-  "wave3": 4,
-  "wave4": 1
+  "wave2": 21,
+  "wave3": 7
  },
  "modules": [
+  {
+   "module": "Booking & Selection",
+   "screens": 7,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
   {
    "module": "Engagement & Support",
    "screens": 6,
    "waves": [
     1,
     2,
-    3,
-    4
+    3
    ]
   },
   {
@@ -39,15 +46,6 @@
    "screens": 6,
    "waves": [
     2
-   ]
-  },
-  {
-   "module": "Booking & Selection",
-   "screens": 5,
-   "waves": [
-    1,
-    2,
-    3
    ]
   },
   {
@@ -122,6 +120,13 @@
    "waves": [
     2
    ]
+  },
+  {
+   "module": "Transport",
+   "screens": 1,
+   "waves": [
+    3
+   ]
   }
  ],
  "contracts": [
@@ -131,27 +136,39 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 30
+   "operations": 33
+  },
+  {
+   "contract": "identity",
+   "operations": 21
   },
   {
    "contract": "catalogue",
-   "operations": 16
+   "operations": 17
   },
   {
    "contract": "fnb",
    "operations": 15
   },
   {
-   "contract": "identity",
-   "operations": 15
+   "contract": "transport",
+   "operations": 12
   },
   {
    "contract": "access",
    "operations": 9
   },
   {
+   "contract": "resources",
+   "operations": 7
+  },
+  {
    "contract": "promotions",
    "operations": 6
+  },
+  {
+   "contract": "white-label",
+   "operations": 5
   },
   {
    "contract": "queue",
@@ -162,16 +179,12 @@
    "operations": 4
   },
   {
+   "contract": "seating",
+   "operations": 4
+  },
+  {
    "contract": "wallet",
    "operations": 4
-  },
-  {
-   "contract": "white-label",
-   "operations": 4
-  },
-  {
-   "contract": "seating",
-   "operations": 3
   },
   {
    "contract": "retail",
@@ -179,22 +192,18 @@
   },
   {
    "contract": "venue-map",
-   "operations": 2
+   "operations": 3
   },
   {
    "contract": "payments",
    "operations": 2
   },
   {
-   "contract": "games",
-   "operations": 1
-  },
-  {
    "contract": "finance",
    "operations": 1
   },
   {
-   "contract": "resources",
+   "contract": "games",
    "operations": 1
   }
  ],
@@ -214,7 +223,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/discovery-and-browse/event-and-attraction-listing",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -241,7 +250,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/booking-and-selection/ticket-type-selection",
-   "operations": 2,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -250,7 +259,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/booking-and-selection/date-and-session-selection",
-   "operations": 4,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -259,7 +268,7 @@
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/booking-and-selection/seat-map-selection",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -286,7 +295,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/shopping-cart",
-   "operations": 11,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -295,7 +304,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/guest-details-and-attendee-forms",
-   "operations": 11,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -340,7 +349,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/login-register",
-   "operations": 11,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -412,7 +421,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 3,
    "route": "/membership-loyalty-and-value/loyalty-and-rewards",
-   "operations": 15,
+   "operations": 19,
    "drawn": true
   },
   {
@@ -520,7 +529,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/fandb--browse-and-order",
-   "operations": 13,
+   "operations": 14,
    "drawn": true
   },
   {
@@ -601,16 +610,43 @@
    "module": "Support",
    "wave": 2,
    "route": "/help-centre-and-accessibility",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
    "id": "WEB-046",
    "name": "In-Venue Notifications",
    "module": "Engagement & Support",
-   "wave": 4,
+   "wave": 2,
    "route": "/in-venue-notifications",
-   "operations": 1,
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "WEB-047",
+   "name": "Map Booking \u2014 Cabanas & Spots",
+   "module": "Booking & Selection",
+   "wave": 3,
+   "route": "/booking-and-selection/map-booking",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "WEB-048",
+   "name": "Book a Space by the Hour",
+   "module": "Booking & Selection",
+   "wave": 3,
+   "route": "/booking-and-selection/space-by-the-hour",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "WEB-049",
+   "name": "Transport \u2014 Route & Schedule",
+   "module": "Transport",
+   "wave": 3,
+   "route": "/transport/route-and-schedule",
+   "operations": 13,
    "drawn": true
   }
  ],
@@ -739,8 +775,7 @@
     "waves": [
      1,
      2,
-     3,
-     4
+     3
     ]
    },
    {

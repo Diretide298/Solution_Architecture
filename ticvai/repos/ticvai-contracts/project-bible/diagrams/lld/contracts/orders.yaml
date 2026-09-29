@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 192 operations
+title: orders — 206 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -34,11 +34,17 @@ operations:
   - catalogue.channel_capacity
   - catalogue.performance
   - catalogue.variant
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - marketing.consent_question
+  - marketing.consent_question_version
   - orders.cart
   - orders.cart_line
   writes:
   - cache:idempotency
   - catalogue.inventory_hold
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.cart
   - orders.cart_line
 - operation: addTip
@@ -67,6 +73,8 @@ operations:
   reads:
   - access.entitlement
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment
@@ -87,6 +95,10 @@ operations:
   - partner
   offline: false
   reads:
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - marketing.consent_question
+  - marketing.consent_question_version
   - orders.cart
   - orders.cart_line
   writes: []
@@ -101,6 +113,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment
@@ -230,6 +244,8 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.inventory_hold
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.cart
   - orders.cart_line
   - orders.order_line
@@ -251,6 +267,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - marketing.consent_question
+  - marketing.consent_question_version
   - orders.cart
   - orders.cart_line
   - pii.subject
@@ -274,6 +294,29 @@ operations:
   - access.entitlement
   - cache:idempotency
   - orders.ticket_transfer
+- operation: cleanupFailedPayment
+  verb: POST
+  path: /payments/{paymentId}/cleanup
+  scope: venue
+  permission: ORDER_VOID
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.payment
+  writes: []
+- operation: cloneTicketTemplate
+  verb: POST
+  path: /ticket-templates/{templateId}/clone
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.ticket_template
+  - orders.ticket_template_channel
+  writes: []
 - operation: convertReservation
   verb: POST
   path: /reservations/{reservationId}/convert
@@ -284,6 +327,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment
@@ -304,6 +349,8 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.product
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment
@@ -336,6 +383,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - marketing.consent_question
+  - marketing.consent_question_version
   - orders.cart
   - orders.cart_line
   - pii.subject
@@ -359,6 +410,17 @@ operations:
   writes:
   - cache:idempotency
   - orders.group_booking
+- operation: createGroupEnquiry
+  verb: POST
+  path: /group-enquiry-opportunity
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.group_enquiry
+  writes: []
 - operation: createListingSeller
   verb: POST
   path: /listing-seller
@@ -368,6 +430,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: createMemberException
+  verb: POST
+  path: /memberships/{membershipId}/exceptions
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.member_exception
   writes: []
 - operation: createOrder
   verb: POST
@@ -381,12 +454,16 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.payment
   - orders.sales_order
@@ -501,10 +578,14 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.reservation
   - orders.reservation_line
   writes:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.reservation
   - orders.reservation_line
 - operation: createTicketTemplate
@@ -546,6 +627,8 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.sales_order
 - operation: extendCart
   verb: POST
@@ -558,6 +641,10 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.inventory_hold
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - marketing.consent_question
+  - marketing.consent_question_version
   - orders.cart
   - orders.cart_line
   writes:
@@ -574,6 +661,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.reservation
   - orders.reservation_line
   writes:
@@ -618,6 +707,10 @@ operations:
   reads:
   - catalogue.channel_capacity
   - catalogue.inventory_hold
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - marketing.consent_question
+  - marketing.consent_question_version
   - orders.cart
   - orders.cart_line
   - promotions.promotion
@@ -632,6 +725,7 @@ operations:
   offline: false
   reads:
   - orders.deposit_policy
+  - orders.deposit_policy (dining_* columns)
   writes: []
 - operation: getGroupBooking
   verb: GET
@@ -673,6 +767,8 @@ operations:
   - partner
   offline: true
   reads:
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment
@@ -717,6 +813,8 @@ operations:
   - anonymous
   offline: false
   reads:
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment_link
@@ -759,6 +857,8 @@ operations:
   - guest
   offline: false
   reads:
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.reservation
   - orders.reservation_line
   writes: []
@@ -784,6 +884,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment
@@ -793,6 +895,18 @@ operations:
   - orders.order_line
   - orders.payment
   - orders.sales_order
+- operation: importTicketTemplate
+  verb: POST
+  path: /ticket-templates/imports
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.ticket_template
+  - orders.ticket_template_channel
+  writes: []
 - operation: inquirePaymentStatus
   verb: POST
   path: /payments/{paymentId}/inquiry
@@ -1199,6 +1313,8 @@ operations:
   - guest
   offline: false
   reads:
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment
@@ -1577,6 +1693,8 @@ operations:
   - guest
   offline: false
   reads:
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.reservation
   - orders.reservation_line
   writes: []
@@ -1735,6 +1853,17 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: migrateMembership
+  verb: POST
+  path: /memberships/{membershipId}/migrations
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.membership_migration
+  writes: []
 - operation: modifyOrder
   verb: POST
   path: /orders/{orderId}/modify
@@ -1746,12 +1875,16 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment
   - orders.sales_order
   writes:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.payment
   - orders.sales_order
@@ -1889,6 +2022,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - marketing.consent_question
+  - marketing.consent_question_version
   - orders.cart
   - orders.cart_line
   writes:
@@ -1972,6 +2109,17 @@ operations:
   - cache:idempotency
   - marketing.message_dispatch
   - orders.payment_link
+- operation: resolveMembershipActivation
+  verb: POST
+  path: /memberships/{membershipId}/activation/resolve
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.membership_activation_action
+  writes: []
 - operation: resolveSyncRejection
   verb: POST
   path: /sync/rejections/{rejectionId}/resolve
@@ -2012,6 +2160,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment
@@ -2098,8 +2248,10 @@ operations:
   offline: false
   reads:
   - orders.deposit_policy
+  - orders.deposit_policy (dining_* columns)
   writes:
   - orders.deposit_policy
+  - orders.deposit_policy (dining_* columns)
 - operation: setFraudRules
   verb: PUT
   path: /fraud-rules
@@ -2125,6 +2277,19 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setGroupCustomerOrganization
+  verb: PUT
+  path: /group-customer-organization
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.group_customer_organization
+  - orders.group_customer_organization_contact
+  writes:
+  - orders.group_customer_organization_contact
 - operation: setGroupOperationalPlanning
   verb: PUT
   path: /group-operational-planning
@@ -2145,6 +2310,19 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setGroupPaymentSchedule
+  verb: PUT
+  path: /group-bookings/{groupBookingId}/payment-schedule
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.group_payment_milestone
+  - orders.group_payment_schedule
+  writes:
+  - orders.group_payment_milestone
 - operation: setGroupQuotationProposal
   verb: PUT
   path: /group-quotation-proposal
@@ -2154,6 +2332,30 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: setGroupTicketAllocation
+  verb: PUT
+  path: /group-bookings/{groupBookingId}/allocation
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.group_ticket_allocation
+  - orders.group_ticket_allocation_line
+  writes:
+  - orders.group_ticket_allocation
+- operation: setGroupTicketFulfillment
+  verb: PUT
+  path: /group-bookings/{groupBookingId}/fulfillment
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.group_ticket_fulfillment
   writes: []
 - operation: setMultiPaymentSplit
   verb: PUT
@@ -2195,6 +2397,19 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setParticipantGuestList
+  verb: PUT
+  path: /group-bookings/{groupBookingId}/participants
+  scope: venue
+  permission: ORDER_MODIFY
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.group_participant
+  - orders.group_participant_list
+  writes:
+  - orders.group_participant
 - operation: setPaymentProvider
   verb: PUT
   path: /payment-providers
@@ -2219,6 +2434,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: setRefundCalculationPolicy
+  verb: PUT
+  path: /refund-calculation-policy
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.refund_calculation_policy
   writes: []
 - operation: setRefundPolicy
   verb: PUT
@@ -2365,6 +2591,8 @@ operations:
   reads:
   - orders.sales_order
   writes:
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.sales_order
 - operation: transferOrderTickets
   verb: POST
@@ -2394,6 +2622,10 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.channel_capacity
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
+  - marketing.consent_question
+  - marketing.consent_question_version
   - orders.cart
   - orders.cart_line
   writes:
@@ -2430,6 +2662,17 @@ operations:
   writes:
   - cache:idempotency
   - orders.ticket_template
+- operation: voidEntitlement
+  verb: POST
+  path: /entitlements/{entitlementId}/void
+  scope: venue
+  permission: ORDER_VOID
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.entitlement
+  writes: []
 - operation: voidOrder
   verb: POST
   path: /orders/{orderId}/voids
@@ -2441,6 +2684,8 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - embedded as attributes (jsonb) on orders.cart_line and orders.order_line
+  - embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line
   - orders.order_line
   - orders.order_line_eligibility
   - orders.payment

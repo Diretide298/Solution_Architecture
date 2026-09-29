@@ -1037,6 +1037,14 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: >
+            A counted line names an unknown or inactive denomination (`unknown-denomination`), repeats
+            one (`duplicate-denomination`), or sends a `total` that disagrees with count times face
+            value (`count-total-mismatch`) (decided 29 September, readiness close-out; `CountedDenominationLine`).
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
   /shifts/{shiftId}/accept-variance:
     parameters:
@@ -1536,6 +1544,38 @@ components:
       items: { $ref: '#/components/schemas/CashCountLine' }
       minItems: 1
 
+    CountedDenominationLine:
+      type: object
+      x-ticvai-persistence: none — request only; lands as `CashCountLine` rows
+      description: >
+        **One line of a cash count as the cashier types it: which note or coin, how many, and what
+        they come to** (decided 29 September, readiness close-out; our build plan). The shape of the
+        blind count on close (`closeShift`) and of the count columns on the till screens (POS-007,
+        POS-011). It is the request side of `CashCountLine`, which is the stored row and adds the
+        shift, the count kind, who counted and when.
+
+        **`total` is shown to the cashier and checked, not trusted**: the server recomputes `count`
+        times the denomination's face value and refuses a line whose `total` disagrees with 422
+        `count-total-mismatch`. An inactive or unknown denomination is refused with 422
+        `unknown-denomination`.
+      required: [denominationId, count]
+      properties:
+        denominationId:
+          type: string
+          format: uuid
+          description: "References `platform.denomination` (`Denomination.id`) — face value, kind and counting order live there."
+        count:
+          type: integer
+          minimum: 0
+          maximum: 100000
+          description: "**How many of this note or coin were counted.** Zero is a line, not an omission: a denomination counted and found empty."
+        total:
+          allOf:
+            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: >
+            `count` times the face value, in the denomination's currency. Optional on the way in (the
+            server computes it) and checked when sent.
+
     CashCountLine:
       x-ticvai-persistence: "orders.cash_count_line"
       type: object
@@ -1624,7 +1664,15 @@ components:
       type: object
       required: [countedCash, recordedAt]
       properties:
-        countedCash: { $ref: '#/components/schemas/DenominationCount' }
+        countedCash:
+          type: array
+          minItems: 1
+          description: >
+            **The cashier's blind count, one line per denomination counted** (decided 29 September,
+            readiness close-out; our build plan). The server writes each line as one `CashCountLine`
+            (`countKind` close) against the shift, taking the face value from `platform.denomination`.
+            A denomination may appear once; a repeat is refused with 422 `duplicate-denomination`.
+          items: { $ref: '#/components/schemas/CountedDenominationLine' }
         nonCashDeclared:
           type: array
           description: >

@@ -14,4 +14,6 @@ Reference data, not narrative. These change as decisions land.
 | [external-dependencies](external-dependencies.md) | Hardware, third-party software, on-location |
 | [conflicts](conflicts.md) | Open and closed decisions — feeds [adr](../adr/) |
 | [audit-decisions](audit-decisions.md) | The 77 Block A audit questions, adopted on our recommendation 28 September, awaiting client confirmation |
+| [rev3-decisions](rev3-decisions.md) | The client's rev 3 prototype feedback, decided point by point 29 September; four replace an audit decision |
+| [readiness-closeout](readiness-closeout.md) | The 577 operations that waited for sign-off: 574 agreed on 29 September with their evidence, 3 questions kept for the client |
 | [deviations](deviations.md) | Knowingly-unimplemented requirements, surfaced at UAT |

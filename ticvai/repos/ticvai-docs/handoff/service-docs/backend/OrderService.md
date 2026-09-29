@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 79 of 254 |
+| Operations in the slice | 79 of 268 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -29,7 +29,7 @@
 | [CatalogueService](CatalogueService.md) | `catalogue.channel_capacity`, `catalogue.entitlement_template`, `catalogue.group_package`, `catalogue.inventory_hold`, `catalogue.performance`, `catalogue.product`, `catalogue.variant`, `promotions.promotion` |
 | [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `pii.subject` |
 | [LedgerService](LedgerService.md) | `ledger.fx_rate`, `ledger.posting` |
-| [MarketingService](MarketingService.md) | `marketing.consent_record` |
+| [MarketingService](MarketingService.md) | `marketing.consent_question`, `marketing.consent_question_version`, `marketing.consent_record` |
 | [TenancyService](TenancyService.md) | `platform.denomination`, `platform.region_settings`, `platform.scope`, `platform.venue_settings`, `platform.workstation` |
 
 ## Operations in the first release
@@ -37,13 +37,13 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | cart | [`abandonCart`](#abandoncart) | DELETE | `/carts/{cartId}` | core | 1 | GST-041, WEB-010 |
-| cart | [`addCartLine`](#addcartline) | POST | `/carts/{cartId}/lines` | core | 1 | GST-009, GST-026, GST-027, GST-032, GST-048, GST-050 … |
+| cart | [`addCartLine`](#addcartline) | POST | `/carts/{cartId}/lines` | core | 1 | GST-007, GST-008, GST-009, GST-026, GST-027, GST-032 … |
 | cart | [`applyCartPromoCode`](#applycartpromocode) | POST | `/carts/{cartId}/promo-codes` | core | 1 | GST-041, WEB-010 |
 | cart | [`checkoutCart`](#checkoutcart) | POST | `/carts/{cartId}/checkout` | core | 1 | GST-009, GST-026, GST-027, GST-032, GST-041, KSK-006 … |
 | cart | [`claimCart`](#claimcart) | POST | `/carts/{cartId}/claim` | core | 1 | GST-041, WEB-016 |
 | cart | [`createCart`](#createcart) | POST | `/carts` | core | 1 | WEB-010 |
 | cart | [`extendCart`](#extendcart) | POST | `/carts/{cartId}/extend` | core | 1 | GST-041, WEB-010 |
-| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-009, GST-032, GST-041, KSK-006, POS-010, PTR-010 … |
+| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-009, GST-032, GST-041, KSK-006, POS-010 … |
 | cart | [`removeCartLine`](#removecartline) | DELETE | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
 | cart | [`updateCartLine`](#updatecartline) | PATCH | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
 | cash | [`createCashMovement`](#createcashmovement) | POST | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-039, BO-040, BO-041, EMP-009, POS-001, POS-007 … |
@@ -62,13 +62,13 @@
 | order | [`getVisitReminder`](#getvisitreminder) | GET | `/orders/{orderId}/reminder` | core | 3 | GST-018 |
 | order | [`holdOrder`](#holdorder) | POST | `/orders/{orderId}/hold` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | order | [`listOrders`](#listorders) | GET | `/orders` | core | 1 | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-082 … |
-| order | [`modifyOrder`](#modifyorder) | POST | `/orders/{orderId}/modify` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
+| order | [`modifyOrder`](#modifyorder) | POST | `/orders/{orderId}/modify` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, EMP-014 … |
 | order | [`reprintOrder`](#reprintorder) | POST | `/orders/{orderId}/reprints` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
-| order | [`rescheduleOrder`](#rescheduleorder) | POST | `/orders/{orderId}/reschedule` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
+| order | [`rescheduleOrder`](#rescheduleorder) | POST | `/orders/{orderId}/reschedule` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, EMP-014 … |
 | order | [`resumeOrder`](#resumeorder) | POST | `/orders/{orderId}/resume` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | order | [`setVisitReminder`](#setvisitreminder) | PUT | `/orders/{orderId}/reminder` | core | 3 | GST-018 |
-| order | [`transferOrderTickets`](#transferordertickets) | POST | `/orders/{orderId}/transfer` | core | 1 | GST-008, GST-009, GST-010, GST-012, GST-013, GST-014 … |
-| order | [`voidOrder`](#voidorder) | POST | `/orders/{orderId}/voids` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
+| order | [`transferOrderTickets`](#transferordertickets) | POST | `/orders/{orderId}/transfer` | core | 1 | GST-009, GST-010, GST-012, GST-013, GST-014, GST-019 … |
+| order | [`voidOrder`](#voidorder) | POST | `/orders/{orderId}/voids` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-014 … |
 | orders | [`createResaleListing`](#createresalelisting) | POST | `/resale-listings` | core | 1 | GST-067, WEB-030 |
 | orders | [`createTicketTemplate`](#createtickettemplate) | POST | `/ticket-templates` | setup | 1 | BO-346 |
 | orders | [`getBillingStatement`](#getbillingstatement) | GET | `/billing-statements/{statementId}` | core | 2 | GST-015, WEB-023 |
@@ -160,6 +160,12 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 **The window is 15 minutes** (decided 28 September, audit R169): the cart lease is acquired for 900 seconds unless the venue sets otherwise, and `extendCart` adds to it.
 **Parking is sold here like any other line** (decided 28 September, audit R166). A parking product goes through the cart and `checkoutCart`, so the parking entitlement is issued at payment carrying this order's id. There is no live space count in the first release: a car park at its capacity refuses the line with `soldOutForDay`.
 **Refused rather than added where capacity has gone.** A line added optimistically and removed at checkout is a guest who thinks they bought something.
+**An hourly product carries its booked window** (decided 29 September, rev 3 REV3-13). A meeting room is a product with a `length` variant, and the line sends `bookedWindow` `{startsAt, endsAt}`, which must span exactly the variant's length. The lease holds capacity of that room type for the window; the room is picked at checkout by `resources.allocateResources`.
+**A table deposit is a line only where the venue enabled one** (decided 29 September, rev 3 REV3-8b and REV3-8). The line names the booking in `tableReservationId` and is priced from its deposit; a table booking with no deposit is confirmed by `fnb.createTableReservation` and never added here.
+**A resource picked on a venue map is a line carrying its hold** (decided 29 September, rev 3 REV3-15 and GAP-C2). The guest held cabana B09 with `resources.createResourceHold`; the line sends `resourceHoldId` with `variantId` = the placed resource's price-band variant (for the Coastal Aqua cabanas: Family 6, Medium 10, Large 15, XL 20) and `quantity` 1. **The hold is the capacity**: no catalogue inventory hold is taken and `catalogue.getAvailability` is not consulted for this line, and the line's `leaseExpiresAt` is the hold's `expiresAt`, so the one countdown the guest sees (audit R169) is the hold's. A hold that has expired, been converted or released, or is not the caller's is refused 409 `resourceHoldInvalid`.
+**An information-only product is never added** (decided 29 September, rev 3 REV3-14). A variant whose product has `catalogue.Product.guestListing` `infoOnly` is refused 409 `productInfoOnly` (problem type `product-info-only`); the guest screens open its details instead. A `hidden` product is refused the same way here, since only a staff channel sells it.
+**Seats per guest booking are a venue setting** (decided 29 September, rev 3 REV3-7). On a guest channel the seats across the cart's lines for one performance may not exceed `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50); above it the line is refused 422 `seatLimitExceeded`, the same limit and problem type (`seat-limit-exceeded`) as `seating.createSeatHold`. Staff and POS keep 10 per sale (audit R080 (c)).
+**A transport trip or pass is a line with `attributes.transport`** (decided 29 September, rev 3 REV3-21; see `TransportLineAttributes`). The unit price is not read from the variant's price list: the order service calls `transport.quoteTransportFare` (service to service) for the route, the two stations and the passenger type, and a refused quote refuses the line 422 `transportFareUnavailable`. A one-way trip carries `variantId` = the passenger type's `catalogueVariantId` and `performanceId` = the departure's performance, and holds a seat with the inventory lease like any timed ticket (`seatIds` where the departure has a seat map). A pass carries the pass type's `openDated` product variant and no `performanceId`. A seat reserved with a pass the guest already owns (`passEntitlementId`) is a zero-priced line, refused 422 `passNotValidForTrip` unless the pass covers the two stations, has an entry left and is within its validity.
 Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:00 already in the cart and karting at 13:00 being added is a prompt, not a refusal, because a party of four may legitimately split.
 
 |  |  |
@@ -170,9 +176,9 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.variant`, `orders.cart`, `orders.cart_line` |
-| Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart`, `orders.cart_line` |
-| Called by | GST-009, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, KSK-005, KSK-006, KSK-017, POS-002, POS-021, POS-023, PTR-010, WEB-006, WEB-008, WEB-010, WEB-033, WEB-041, WEB-042 |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.performance`, `catalogue.variant`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
+| Writes | `cache:idempotency`, `catalogue.inventory_hold`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.cart`, `orders.cart_line` |
+| Called by | GST-007, GST-008, GST-009, GST-026, GST-027, GST-032, GST-048, GST-050, GST-056, GST-070, GST-074, GST-075, GST-077, GST-078, KSK-005, KSK-006, KSK-017, POS-002, POS-021, POS-023, PTR-010, WEB-006, WEB-008, WEB-010, WEB-033, WEB-036, WEB-041, WEB-042, WEB-047, WEB-048, WEB-049 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active`, `expired` -> `active` |
 
 **Parameters**
@@ -189,9 +195,21 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | variantId | string (uuid) | yes |  |
 | quantity | integer | yes | (min 1) |
 | performanceId | string (uuid) |  |  |
-| seatIds | array of string |  | At most 10 seats per sale (decided 28 September, audit R080 (c)). (max items 10) |
+| bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| bookedWindow.startsAt | string (date-time) | yes |  |
+| bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| tableReservationId | string (uuid) |  | A table deposit line (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation in awaitingDeposit this pays for, sent with variantId set to the booking's deposit.variantId and quantity 1. (nullable) |
+| seatIds | array of string |  | At most VenueSettings.seating.maxSeatsPerGuestOrder seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit… (max items 50) |
+| resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant and quantity is 1. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 | parentLineId | string (uuid) |  | For an add-on attaching to a ticket already in the cart. (nullable) |
-| attributes | object |  |  |
+| attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
+| attributes.transport.routeId | string | yes | The transport.TransportRoute. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| attributes.transport.fromStationId | string | yes | Boarding station, a stop of the route. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| attributes.transport.toStationId | string | yes | Alighting station, a later stop of the route. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| attributes.transport.passengerTypeCode | string |  | The fare table's passenger type (adult, child, ...). (pattern ^[a-z][a-zA-Z0-9]{0,31}$; nullable) |
+| attributes.transport.passTypeId | string |  | Pass purchase only. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| attributes.transport.passEntitlementId | string |  | A seat reserved with a pass already owned. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
 
 **Response**: `Cart`
 
@@ -209,7 +227,14 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | lines[].productName | string |  | (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
-| lines[].seatIds | array of string |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
+| lines[].seatIds | array of string |  | (max items 50) |
+| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -229,10 +254,24 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | lines[].leaseExpiresAt | string (date-time) |  | Shown to the guest. (nullable) |
 | lines[].isAvailable | boolean |  | Re-checked on every read. (read-only) |
 | conflicts | array of CartConflict |  |  |
-| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite) |  |  |
+| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite, consentBlocksBooking) |  |  |
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
+| consentQuestions[].helpText | object |  | (nullable) |
+| consentQuestions[].version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| consentQuestions[].scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| consentQuestions[].required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| consentQuestions[].blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| consentQuestions[].status | enum (active, retired) | yes | (default active) |
+| consentQuestions[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| consentQuestions[].updatedAt | string (date-time) |  | (read-only) |
+| consentQuestions[].lineIds | array of string (uuid) |  | The cart lines that ask it. |
+| consentQuestions[].answered | boolean |  | Every person (for perPerson) or the booking (for perBooking) has an answer. |
 | subtotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | subtotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | subtotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -264,6 +303,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 |---|---|---|
 | 200 |  | Added, and the cart re-priced |
 | 409 |  | No capacity, or the product is not sellable on this channel (notSellableOnChannel). |
+| 422 |  | The booked window is missing, not allowed or the wrong length for the variant (windowRequired, windowNotAllowed, windowLengthMismatch; rev 3 REV3-13), or a table deposit line names a booking that is… |
 
 ### applyCartPromoCode
 
@@ -281,7 +321,7 @@ Applying a code the cart already holds returns the cart unchanged.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `orders.cart`, `orders.cart_line` |
+| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | - |
 | Called by | GST-041, WEB-010 |
 
@@ -314,7 +354,14 @@ Applying a code the cart already holds returns the cart unchanged.
 | lines[].productName | string |  | (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
-| lines[].seatIds | array of string |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
+| lines[].seatIds | array of string |  | (max items 50) |
+| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -334,10 +381,24 @@ Applying a code the cart already holds returns the cart unchanged.
 | lines[].leaseExpiresAt | string (date-time) |  | Shown to the guest. (nullable) |
 | lines[].isAvailable | boolean |  | Re-checked on every read. (read-only) |
 | conflicts | array of CartConflict |  |  |
-| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite) |  |  |
+| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite, consentBlocksBooking) |  |  |
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
+| consentQuestions[].helpText | object |  | (nullable) |
+| consentQuestions[].version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| consentQuestions[].scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| consentQuestions[].required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| consentQuestions[].blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| consentQuestions[].status | enum (active, retired) | yes | (default active) |
+| consentQuestions[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| consentQuestions[].updatedAt | string (date-time) |  | (read-only) |
+| consentQuestions[].lineIds | array of string (uuid) |  | The cart lines that ask it. |
+| consentQuestions[].answered | boolean |  | Every person (for perPerson) or the booking (for perBooking) has an answer. |
 | subtotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | subtotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | subtotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -383,6 +444,9 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 **A verified contact that matches an existing profile attaches the order to it automatically** (ADR-0045 section 4; decided 28 September, audit R120 (b)). The guest is not asked, and gets no session on that profile: they see this order and nothing else of its history until they sign in as its owner. Only a verified contact attaches automatically; any other candidate match goes to staff review.
 **A promotion whose budget this order would exceed is not applied** (decided 28 September, audit R101 (8)). At checkout each promotion's remaining `budgetCap` is checked against the discount this order would take from it; where the discount would exceed it, the order is re-priced without that promotion, and the order names it in `droppedPromotions` so the guest sees why the price changed before paying. Budget is refused at checkout, not only reported.
 **Merchandise bought for collection is paid here, online, first** (decided 28 September, audit R236). When the order is paid, each retail line marked for collection becomes a shop-and-drop (`retail.createShopAndDrop`) for the guest to collect on the way out. Nothing is reserved unpaid from this channel.
+**Consent questions are answered before the order exists** (decided 29 September, rev 3 REV3-26). While a required question in `Cart.consentQuestions` has no answer the call is refused 422 `consentRequired`; where an answer is the one the venue set to block the booking it is refused 422 `consentAnswerBlocks`, naming the lines. On success the answers are bound to the new order, so each consent record names the order and line it was given for.
+**A table deposit line becomes an `orders.deposit` row, not revenue** (rev 3 REV3-8b): authorised or taken as `DepositPolicy.dining.collection` says, with the booking's id, and the booking moves from `awaitingDeposit` to `booked` when the payment is authorised. **A booked window is carried to the order line** (rev 3 REV3-13) and `resources.allocateResources` assigns the room for it.
+**A line carrying `resourceHoldId` keeps its hold into the order** (rev 3 REV3-15): the hold is converted to a `ResourceBooking` as `createOrder` describes, never released and re-taken. An expired hold is refused 409 `resourceHoldInvalid`, naming the line. **A transport line keeps its `attributes.transport`** on the order line (rev 3 REV3-21), so the ticket shows the route, the stations and the departure.
 
 |  |  |
 |---|---|
@@ -392,7 +456,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart`, `orders.cart_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `catalogue.inventory_hold`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.cart`, `orders.cart_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.cart`, `orders.order_line`, `orders.sales_order` |
 | Called by | GST-009, GST-026, GST-027, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-033, WEB-041, WEB-042 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `active` -> `checkedOut`, `expiring` -> `checkedOut`<br/>Order ([states/order.yaml](../../../states/order.yaml)): created as `pending` |
@@ -453,14 +517,20 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
 | lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
-| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
 | lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
 | lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
 | lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -533,7 +603,8 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 |---|---|---|
 | 201 |  | An order, pending payment |
 | 403 |  | The contact the tickets would go to is not proven — an unverified session (sessionNotVerified), or a guest checkout with no confirmed one-time code (contactNotConfirmed). |
-| 409 |  | A lease expired between the last read and checkout (leaseExpired). |
+| 409 |  | A lease expired between the last read and checkout (leaseExpired), or a resource hold did (resourceHoldInvalid, rev 3 REV3-15). |
+| 422 |  | A required consent question is unanswered (consentRequired), or an answer blocks the booking (consentAnswerBlocks), with the lines in lineIds (decided 29 September, rev 3 REV3-26). |
 
 ### claimCart
 
@@ -550,7 +621,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.cart`, `orders.cart_line`, `pii.subject` |
+| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `pii.subject` |
 | Writes | `cache:idempotency`, `orders.cart`, `orders.cart_line` |
 | Called by | GST-041, WEB-016 |
 
@@ -578,7 +649,11 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart.lines[].productName | string |  | (read-only) |
 | cart.lines[].quantity | integer | yes | (min 1) |
 | cart.lines[].performanceId | string (uuid) |  | (nullable) |
-| cart.lines[].seatIds | array of string |  |  |
+| cart.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| cart.lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
+| cart.lines[].seatIds | array of string |  | (max items 50) |
+| cart.lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| cart.lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | cart.lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | cart.lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | cart.lines[].overrideReason | enum (priceMatch, serviceRecovery, negotiated, damagedGoods, staffSale, error) |  | BL-085. (nullable) |
@@ -589,10 +664,24 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart.lines[].leaseExpiresAt | string (date-time) |  | Shown to the guest. (nullable) |
 | cart.lines[].isAvailable | boolean |  | Re-checked on every read. (read-only) |
 | cart.conflicts | array of CartConflict |  |  |
-| cart.conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite) |  |  |
+| cart.conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite, consentBlocksBooking) |  |  |
 | cart.conflicts[].lineIds | array of string (uuid) |  |  |
 | cart.conflicts[].message | string |  |  |
 | cart.conflicts[].isBlocking | boolean |  | Most are not. |
+| cart.consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| cart.consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| cart.consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| cart.consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
+| cart.consentQuestions[].helpText | object |  | (nullable) |
+| cart.consentQuestions[].version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| cart.consentQuestions[].scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| cart.consentQuestions[].required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| cart.consentQuestions[].blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| cart.consentQuestions[].status | enum (active, retired) | yes | (default active) |
+| cart.consentQuestions[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| cart.consentQuestions[].updatedAt | string (date-time) |  | (read-only) |
+| cart.consentQuestions[].lineIds | array of string (uuid) |  | The cart lines that ask it. |
+| cart.consentQuestions[].answered | boolean |  | Every person (for perPerson) or the booking (for perBooking) has an answer. |
 | cart.subtotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | cart.subtotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | cart.subtotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -644,7 +733,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.cart`, `orders.cart_line`, `pii.subject`, `platform.scope` |
+| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `pii.subject`, `platform.scope` |
 | Writes | `cache:idempotency`, `orders.cart` |
 | Called by | WEB-010 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): created as `active` |
@@ -680,7 +769,14 @@ Created against a guest subject where one is known, or an anonymous token where 
 | lines[].productName | string |  | (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
-| lines[].seatIds | array of string |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
+| lines[].seatIds | array of string |  | (max items 50) |
+| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -700,10 +796,24 @@ Created against a guest subject where one is known, or an anonymous token where 
 | lines[].leaseExpiresAt | string (date-time) |  | Shown to the guest. (nullable) |
 | lines[].isAvailable | boolean |  | Re-checked on every read. (read-only) |
 | conflicts | array of CartConflict |  |  |
-| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite) |  |  |
+| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite, consentBlocksBooking) |  |  |
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
+| consentQuestions[].helpText | object |  | (nullable) |
+| consentQuestions[].version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| consentQuestions[].scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| consentQuestions[].required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| consentQuestions[].blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| consentQuestions[].status | enum (active, retired) | yes | (default active) |
+| consentQuestions[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| consentQuestions[].updatedAt | string (date-time) |  | (read-only) |
+| consentQuestions[].lineIds | array of string (uuid) |  | The cart lines that ask it. |
+| consentQuestions[].answered | boolean |  | Every person (for perPerson) or the booking (for perBooking) has an answer. |
 | subtotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | subtotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | subtotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -751,7 +861,7 @@ Offered once, typically, and the interface should say it is the last extension r
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart`, `orders.cart_line` |
+| Reads | `cache:idempotency`, `catalogue.inventory_hold`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart` |
 | Called by | GST-041, WEB-010 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `expiring` -> `active` |
@@ -779,7 +889,14 @@ Offered once, typically, and the interface should say it is the last extension r
 | lines[].productName | string |  | (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
-| lines[].seatIds | array of string |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
+| lines[].seatIds | array of string |  | (max items 50) |
+| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -799,10 +916,24 @@ Offered once, typically, and the interface should say it is the last extension r
 | lines[].leaseExpiresAt | string (date-time) |  | Shown to the guest. (nullable) |
 | lines[].isAvailable | boolean |  | Re-checked on every read. (read-only) |
 | conflicts | array of CartConflict |  |  |
-| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite) |  |  |
+| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite, consentBlocksBooking) |  |  |
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
+| consentQuestions[].helpText | object |  | (nullable) |
+| consentQuestions[].version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| consentQuestions[].scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| consentQuestions[].required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| consentQuestions[].blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| consentQuestions[].status | enum (active, retired) | yes | (default active) |
+| consentQuestions[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| consentQuestions[].updatedAt | string (date-time) |  | (read-only) |
+| consentQuestions[].lineIds | array of string (uuid) |  | The cart lines that ask it. |
+| consentQuestions[].answered | boolean |  | Every person (for perPerson) or the booking (for perBooking) has an answer. |
 | subtotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | subtotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | subtotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -851,9 +982,9 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `orders.cart`, `orders.cart_line`, `promotions.promotion` |
+| Reads | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.promotion` |
 | Writes | - |
-| Called by | GST-009, GST-032, GST-041, KSK-006, POS-010, PTR-010, WEB-010 |
+| Called by | GST-007, GST-009, GST-032, GST-041, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011 |
 
 **Parameters**
 
@@ -877,7 +1008,14 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | lines[].productName | string |  | (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
-| lines[].seatIds | array of string |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
+| lines[].seatIds | array of string |  | (max items 50) |
+| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -897,10 +1035,24 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | lines[].leaseExpiresAt | string (date-time) |  | Shown to the guest. (nullable) |
 | lines[].isAvailable | boolean |  | Re-checked on every read. (read-only) |
 | conflicts | array of CartConflict |  |  |
-| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite) |  |  |
+| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite, consentBlocksBooking) |  |  |
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
+| consentQuestions[].helpText | object |  | (nullable) |
+| consentQuestions[].version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| consentQuestions[].scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| consentQuestions[].required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| consentQuestions[].blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| consentQuestions[].status | enum (active, retired) | yes | (default active) |
+| consentQuestions[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| consentQuestions[].updatedAt | string (date-time) |  | (read-only) |
+| consentQuestions[].lineIds | array of string (uuid) |  | The cart lines that ask it. |
+| consentQuestions[].answered | boolean |  | Every person (for perPerson) or the booking (for perBooking) has an answer. |
 | subtotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | subtotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | subtotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -947,7 +1099,7 @@ Releases its lease immediately.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.cart`, `orders.cart_line` |
+| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart_line` |
 | Called by | GST-041, PTR-010, WEB-010 |
 
@@ -975,7 +1127,14 @@ Releases its lease immediately.
 | lines[].productName | string |  | (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
-| lines[].seatIds | array of string |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
+| lines[].seatIds | array of string |  | (max items 50) |
+| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -995,10 +1154,24 @@ Releases its lease immediately.
 | lines[].leaseExpiresAt | string (date-time) |  | Shown to the guest. (nullable) |
 | lines[].isAvailable | boolean |  | Re-checked on every read. (read-only) |
 | conflicts | array of CartConflict |  |  |
-| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite) |  |  |
+| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite, consentBlocksBooking) |  |  |
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
+| consentQuestions[].helpText | object |  | (nullable) |
+| consentQuestions[].version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| consentQuestions[].scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| consentQuestions[].required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| consentQuestions[].blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| consentQuestions[].status | enum (active, retired) | yes | (default active) |
+| consentQuestions[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| consentQuestions[].updatedAt | string (date-time) |  | (read-only) |
+| consentQuestions[].lineIds | array of string (uuid) |  | The cart lines that ask it. |
+| consentQuestions[].answered | boolean |  | Every person (for perPerson) or the booking (for perBooking) has an answer. |
 | subtotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | subtotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | subtotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1045,7 +1218,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `orders.cart`, `orders.cart_line` |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line` |
 | Writes | `cache:idempotency`, `catalogue.inventory_hold`, `orders.cart_line` |
 | Called by | GST-041, PTR-010, WEB-010 |
 
@@ -1079,7 +1252,14 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | lines[].productName | string |  | (read-only) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].performanceId | string (uuid) |  | (nullable) |
-| lines[].seatIds | array of string |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
+| lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
+| lines[].seatIds | array of string |  | (max items 50) |
+| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
 | lines[].overridePrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1099,10 +1279,24 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | lines[].leaseExpiresAt | string (date-time) |  | Shown to the guest. (nullable) |
 | lines[].isAvailable | boolean |  | Re-checked on every read. (read-only) |
 | conflicts | array of CartConflict |  |  |
-| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite) |  |  |
+| conflicts[].kind | enum (overlappingTime, sameSessionDifferentVenue, exceedsPartySize, requiresPrerequisite, consentBlocksBooking) |  |  |
 | conflicts[].lineIds | array of string (uuid) |  |  |
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
+| consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of the booking flow's white-label.BookingFlowConf… (read-only) |
+| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
+| consentQuestions[].helpText | object |  | (nullable) |
+| consentQuestions[].version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| consentQuestions[].scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| consentQuestions[].required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| consentQuestions[].blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| consentQuestions[].status | enum (active, retired) | yes | (default active) |
+| consentQuestions[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| consentQuestions[].updatedAt | string (date-time) |  | (read-only) |
+| consentQuestions[].lineIds | array of string (uuid) |  | The cart lines that ask it. |
+| consentQuestions[].answered | boolean |  | Every person (for perPerson) or the booking (for perBooking) has an answer. |
 | subtotal | Money |  | On the wire this is three fields; in the database it is one column. |
 | subtotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | subtotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1447,7 +1641,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `access.entitlement`, `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `access.entitlement`, `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `access.entitlement`, `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-027, CMS-010, EMP-036, POS-010 |
 
@@ -1512,8 +1706,11 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].performanceId | string (uuid) |  |  |
+| order.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| order.lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| order.lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | order.lines[].quantity | integer | yes | (min 1) |
 | order.lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | order.lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -1598,7 +1795,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
@@ -1665,14 +1862,20 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
 | lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
-| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
 | lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
 | lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
 | lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1807,6 +2010,8 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 The client submits lines with the prices it quoted from its local bundle. **The server re-prices every line** and returns both figures.
 Where they differ the order is still accepted at the quoted price and `priceVariance` is populated. The client shows nothing; the variance is a finance concern, not a cashier concern.
 **A promotion whose budget cap this order would exceed is not applied** (decided 28 September, audit R101 (8)), as at `checkoutCart`: an order created online is priced without it and names it in `droppedPromotions`. An order replayed from an offline till keeps the price the cashier quoted, as above, and the overrun is recorded against the promotion's budget as a variance.
+**A line carrying `resourceHoldId` converts the hold** (decided 29 September, rev 3 REV3-15). The order service calls `resources` to write a `ResourceBooking` in `reserved` for the hold's resource and window, with `holdId` and this order's id, and sets the hold to `converted`, **without releasing it first**, as seat holds are converted: nobody takes the cabana between the two calls. A hold that is expired, already converted or released, or is not the caller's refuses the order 409 `resourceHoldInvalid`. Not offline: a hold is a live reservation.
+**Seat limits** (decided 29 September, rev 3 REV3-7): on a guest channel the seats of one performance may not exceed `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50); on staff and POS channels, 10 per sale (audit R080 (c)). Over the limit is 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`, as `seating.createSeatHold`), no longer 400.
 Offline-capable. The client writes to its local journal, acknowledges the cashier, and replays through `/sync/orders` on reconnect.
 
 |  |  |
@@ -1817,10 +2022,10 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-130, EMP-014, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012 |
-| State model | Order ([states/order.yaml](../../../states/order.yaml)): created as `pending`<br/>Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `converted` |
+| State model | Order ([states/order.yaml](../../../states/order.yaml)): created as `pending`<br/>Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): moves `held` -> `converted`<br/>Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `converted` |
 
 **Parameters**
 
@@ -1843,14 +2048,20 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
 | lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
-| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
 | lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
 | lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
 | lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1900,14 +2111,20 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
 | lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
-| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
 | lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
 | lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
 | lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1982,6 +2199,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | A lease covering a line has expired (leaseExpired), capacity is exhausted (capacityExhausted), or the catalogue bundle the client priced from is beyond its staleness bound (bundleStale). |
+| 422 |  | More seats for one performance than the channel allows (seatLimitExceeded, decided 29 September, rev 3 REV3-7). |
 
 ### exchangeOrderLines
 
@@ -2000,7 +2218,7 @@ The replacement is held before the original is released, never the other way rou
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-010, POS-011, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
@@ -2020,14 +2238,20 @@ The replacement is held before the original is released, never the other way rou
 | incomingLines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | incomingLines[].variantId | string (uuid) | yes |  |
 | incomingLines[].performanceId | string (uuid) |  |  |
+| incomingLines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| incomingLines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| incomingLines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | incomingLines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| incomingLines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| incomingLines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| incomingLines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| incomingLines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| incomingLines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | incomingLines[].quantity | integer | yes | (min 1) |
 | incomingLines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | incomingLines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | incomingLines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
 | incomingLines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
-| incomingLines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | (nullable) |
+| incomingLines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
 | incomingLines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
 | incomingLines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
 | incomingLines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -2141,7 +2365,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | - |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, GST-010, GST-018, GST-019, GST-028, KSK-009, KSK-011, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-012, WEB-013, WEB-019 |
 
@@ -2191,14 +2415,20 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
 | lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
-| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
 | lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
 | lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
 | lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -2435,7 +2665,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
-| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `held` |
@@ -2495,14 +2725,20 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
 | lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
-| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
 | lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
 | lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
 | lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -2655,9 +2891,9 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-281, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
 
@@ -2675,14 +2911,20 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | addLines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | addLines[].variantId | string (uuid) | yes |  |
 | addLines[].performanceId | string (uuid) |  |  |
+| addLines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| addLines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| addLines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | addLines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| addLines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| addLines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| addLines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| addLines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| addLines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | addLines[].quantity | integer | yes | (min 1) |
 | addLines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | addLines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | addLines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
 | addLines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
-| addLines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | (nullable) |
+| addLines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
 | addLines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
 | addLines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
 | addLines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -2735,8 +2977,11 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].performanceId | string (uuid) |  |  |
+| order.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| order.lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| order.lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | order.lines[].quantity | integer | yes | (min 1) |
 | order.lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | order.lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -2858,6 +3103,7 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 
 The common case of an exchange, and worth its own operation because it is what a call centre agent does forty times a day. Same product, different date or time.
 Where the new performance is priced differently, the balance settles as for an exchange. Where the venue charges a rescheduling fee, it appears as a line.
+**A transport trip moves to another departure of the same route** (decided 29 September, rev 3 REV3-21): the prototype's "Change your trip free up to two hours before departure" is the proposed value of a transport venue's `rescheduleCutoffHours` (2, with no rescheduling fee), client to correct.
 
 |  |  |
 |---|---|
@@ -2869,7 +3115,7 @@ Where the new performance is priced differently, the balance settles as for an e
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-281, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
 **Parameters**
 
@@ -2936,7 +3182,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `held` -> `pending` |
@@ -2989,8 +3235,11 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].performanceId | string (uuid) |  |  |
+| order.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| order.lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| order.lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | order.lines[].quantity | integer | yes | (min 1) |
 | order.lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | order.lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -3127,7 +3376,7 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 | Conflict policy | serverWins |
 | Reads | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer` |
 | Writes | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer` |
-| Called by | GST-008, GST-009, GST-010, GST-012, GST-013, GST-014, GST-019, GST-045, GST-055, KSK-009, KSK-010, KSK-012, WEB-012, WEB-013, WEB-018, WEB-019, WEB-023, WEB-030 |
+| Called by | GST-009, GST-010, GST-012, GST-013, GST-014, GST-019, GST-045, GST-055, KSK-009, KSK-010, KSK-012, WEB-012, WEB-013, WEB-018, WEB-019, WEB-023, WEB-030 |
 | State model | Entitlement ([states/entitlement-status.yaml](../../../states/entitlement-status.yaml)): moves `issued` -> `surrendered`<br/>Ticket transfer ([states/ticket-transfer.yaml](../../../states/ticket-transfer.yaml)): moves `offered` -> `cancelled` |
 
 **Parameters**
@@ -3187,9 +3436,9 @@ Only before settlement and only within the same shift. After that it is a refund
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
+| Reads | `cache:idempotency`, `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_line`, `orders.payment`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
+| Called by | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-014, EMP-034, POS-002, POS-006, POS-014, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 | State model | Order ([states/order.yaml](../../../states/order.yaml)): moves `pending` -> `voided` |
 
 **Parameters**
@@ -3248,14 +3497,20 @@ Only before settlement and only within the same shift. After that it is a refund
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
 | lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
-| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
 | lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
 | lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
 | lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -3336,7 +3591,7 @@ Only before settlement and only within the same shift. After that it is a refund
 
 **`POST /resale-listings`**: List an entitlement for resale
 
-BL-060. **A resale is a transfer with money attached, and the venue stays in the middle** — the seller's entitlement is voided and a new one issued to the buyer, so **the ticket that admits is always one the venue issued.** That is what stops a screenshot at the gate.
+BL-060. **A resale is a transfer with money attached, and the venue stays in the middle** — **the virtual ticket ID is kept and only the owner and the media change** (decided MoM 1 Sep 4.14): the buyer becomes the owner of the same entitlement, its QR or other media is re-issued so the seller's copy stops admitting, and the transfer is appended to the ownership change log (`/ticket-ownership-transfer`, `/resale-ownership`). Reporting, finance and access keep one stable ID through any number of resales. **The media that admits is always one the venue issued**, which is what stops a screenshot at the gate. (Corrected 29 September, readiness close-out: this said the entitlement was voided and a new one issued, against the minutes.)
 Refuses where the entitlement is partly consumed, name-bound, or past its resale window.
 **The resale window is a venue setting with a tenant default**, `resaleCutoffHours`: listing closes that many hours before the performance starts (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): 24 hours.**
 
@@ -3597,7 +3852,7 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `orders.order_line`, `orders.order_line_eligibility`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `platform.scope` |
+| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `platform.scope` |
 | Writes | - |
 | Called by | ADM-593, GST-009, WEB-014 |
 
@@ -3619,14 +3874,20 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
 | lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
-| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
 | lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
 | lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
 | lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -3801,7 +4062,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order`, `pii.subject` |
+| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.order_line`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order`, `pii.subject` |
 | Writes | - |
 | Called by | GST-019, WEB-019 |
 
@@ -3854,8 +4115,11 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].lines[].variantId | string (uuid) | yes |  |
 | items[].lines[].performanceId | string (uuid) |  |  |
+| items[].lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | items[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| items[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| items[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| items[].lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | items[].lines[].quantity | integer | yes | (min 1) |
 | items[].lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | items[].lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -5053,7 +5317,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `orders.reservation`, `orders.reservation_line` |
+| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.reservation`, `orders.reservation_line` |
 | Writes | - |
 | Called by | GST-016, GST-017, WEB-031 |
 
@@ -5075,14 +5339,20 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].performanceId | string (uuid) |  |  |
+| lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
+| lines[].bookedWindow.startsAt | string (date-time) | yes |  |
+| lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
+| lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | lines[].eligibilityDeclaration[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | lines[].eligibilityDeclaration[].ageYears | integer |  | (nullable) |
 | lines[].eligibilityDeclaration[].heightBandIndex | integer |  | (nullable) |
-| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | (nullable) |
+| lines[].eligibilityDeclaration[].confidentSwimmer | boolean |  | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). (nullable) |
 | lines[].eligibilityDeclaration[].guardianSigned | boolean |  |  |
 | lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
 | lines[].quotedUnitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -5116,7 +5386,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `orders.reservation`, `orders.reservation_line` |
+| Reads | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.reservation`, `orders.reservation_line` |
 | Writes | - |
 | Called by | GST-016, WEB-031 |
 
@@ -5142,8 +5412,11 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | items[].lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | items[].lines[].variantId | string (uuid) | yes |  |
 | items[].lines[].performanceId | string (uuid) |  |  |
+| items[].lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | items[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| items[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| items[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| items[].lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | items[].lines[].quantity | integer | yes | (min 1) |
 | items[].lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | items[].lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -5709,21 +5982,13 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| countedCash | array of CashCountLine | yes | A count is a list of lines and the line is the row. (min items 1) |
-| countedCash[].id | string (uuid) |  |  |
-| countedCash[].shiftId | string | yes | A ULID, as Shift.id and orders.pos_shift.id are. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| countedCash[].depositBoxId | string (uuid) |  | (nullable) |
-| countedCash[].countKind | enum (openingFloat, close, movement) |  | Which count this line belongs to — the opening float (openShift), the close (closeShift) or a lift or add (createCashMovement). |
-| countedCash[].cashMovementId | string |  | The movement this line counts, where countKind is movement. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
-| countedCash[].denominationId | string (uuid) | yes | References platform.denomination — face value, kind and sort order live there. |
-| countedCash[].countedQuantity | integer | yes | How many of this note or coin were in the drawer. (min 0) |
-| countedCash[].countedValue | Money |  | On the wire this is three fields; in the database it is one column. |
-| countedCash[].countedValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| countedCash[].countedValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| countedCash[].countedValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| countedCash[].countedBy | string (uuid) |  | (nullable) |
-| countedCash[].countedAt | string (date-time) |  |  |
-| countedCash[].recountOf | string (uuid) |  | A recount points at what it replaces rather than overwriting it. (nullable) |
+| countedCash | array of CountedDenominationLine | yes | The cashier's blind count, one line per denomination counted (decided 29 September, readiness close-out; our build plan). (min items 1) |
+| countedCash[].denominationId | string (uuid) | yes | References platform.denomination (Denomination.id) — face value, kind and counting order live there. |
+| countedCash[].count | integer | yes | How many of this note or coin were counted. (min 0; max 100000) |
+| countedCash[].total | object |  | count times the face value, in the denomination's currency. |
+| countedCash[].total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| countedCash[].total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| countedCash[].total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | nonCashDeclared | array of object |  | Declared totals per non-cash tender, for reconciliation against captured payments. |
 | nonCashDeclared[].tender | string | yes |  |
 | nonCashDeclared[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -5832,6 +6097,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | Shift is not open or suspended — already closing or closed (problem type shift-not-open) — or open orders remain (open-orders-remain) |
+| 422 |  | A counted line names an unknown or inactive denomination (unknown-denomination), repeats one (duplicate-denomination), or sends a total that disagrees with count times face value (count-total-mismatc… |
 
 ### getCurrentShift
 
@@ -6897,7 +7163,7 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | Offline | no |
 | Conflict policy | append |
 | Reads | `orders.sales_order` |
-| Writes | `orders.sales_order` |
+| Writes | `embedded as attributes (jsonb) on orders.cart_line and orders.order_line`, `embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line`, `orders.sales_order` |
 | Called by | BO-037, BO-130, BO-132, EMP-017, POS-002, POS-013, SCN-014 |
 
 **Parameters**
@@ -6923,8 +7189,11 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | orders[].lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | orders[].lines[].variantId | string (uuid) | yes |  |
 | orders[].lines[].performanceId | string (uuid) |  |  |
+| orders[].lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | orders[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| orders[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 10) |
+| orders[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
+| orders[].lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| orders[].lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | orders[].lines[].quantity | integer | yes | (min 1) |
 | orders[].lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
 | orders[].lines[].quotedUnitPrice | object | yes | What the client charged, from its local bundle. |
@@ -7010,7 +7279,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | product_name | text | no |  |
 | quantity | integer | yes |  |
 | performance_id | uuid | no |  |
+| booked_window | jsonb | no |  |
+| table_reservation_id | uuid | no | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. |
 | seat_ids | text[] | no |  |
+| resource_hold_id | text | no | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). |
+| attributes | jsonb | no |  |
 | parent_line_id | uuid | no | The line this add-on is attached to, from AddCartLineRequest.parentLineId. |
 | override_price | numeric(18,4) | no |  |
 | override_reason | text | no | BL-085. |
@@ -7021,6 +7294,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | lease_expires_at | timestamptz | no | Shown to the guest. |
 | is_available | boolean | no | Re-checked on every read. |
 | cart_id | uuid | yes | Points at orders.cart. |
+| attributes_id | uuid | no | Points at embedded as attributes (jsonb) on orders.cart_line and orders.order_line. |
+| booked_window_id | uuid | no | Points at embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line. |
 
 ### `orders.cash_count_line`
 
@@ -7147,8 +7422,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | text | yes | Client-generated ULID of the line. |
 | variant_id | uuid | yes |  |
 | performance_id | uuid | no |  |
+| booked_window | jsonb | no |  |
 | inventory_hold_id | text | no | Lease the units were drawn from — a catalogue.InventoryHold.id. |
 | seat_ids | text[] | no | Seated products only, as seating.Seat.id. |
+| resource_hold_id | text | no | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. |
+| attributes | jsonb | no |  |
 | quantity | integer | yes |  |
 | quoted_unit_price | numeric(18,4) | yes | What the client charged, from its local bundle. |
 | holder_name | text | no |  |
@@ -7161,6 +7439,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | entitlement_ids | text[] | no | The entitlements this line issued. |
 | cross_region_right_ids | text[] | no | Redemption rights propagated to other cells for this line. |
 | reprint_count | integer | no | How many times this line's tickets were reprinted or resent. |
+| attributes_id | uuid | no | Points at embedded as attributes (jsonb) on orders.cart_line and orders.order_line. |
+| booked_window_id | uuid | no | Points at embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line. |
 
 ### `orders.order_line_eligibility`
 
@@ -7170,7 +7450,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | age_band | text | no | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | age_years | integer | no |  |
 | height_band_index | integer | no |  |
-| confident_swimmer | boolean | no |  |
+| confident_swimmer | boolean | no | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). |
 | is_guardian_signed | boolean | no |  |
 | id | uuid | yes | Synthesised key. |
 
@@ -7347,12 +7627,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | text | yes | Client-generated ULID of the line. |
 | variant_id | uuid | yes |  |
 | performance_id | uuid | no |  |
+| booked_window | jsonb | no |  |
 | inventory_hold_id | text | no | Lease the units were drawn from — a catalogue.InventoryHold.id. |
 | seat_ids | text[] | no | Seated products only, as seating.Seat.id. |
+| resource_hold_id | text | no | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. |
+| attributes | jsonb | no |  |
 | quantity | integer | yes |  |
 | quoted_unit_price | numeric(18,4) | yes | What the client charged, from its local bundle. |
 | holder_name | text | no |  |
 | data_mask_values | jsonb | no | Deliberately open. |
+| attributes_id | uuid | no | Points at embedded as attributes (jsonb) on orders.cart_line and orders.order_line. |
+| booked_window_id | uuid | no | Points at embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line. |
 
 ### `orders.sales_order`
 
@@ -7514,7 +7799,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-175 operations, added to this service in later releases without changing any of the above.
+189 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -7522,9 +7807,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | cart | `listAbandonedCarts` |
 | drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupArrivalCheck`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
 | order | `getDepositPolicy`, `listTicketTransfers`, `setDepositPolicy` |
-| orders | `authoriseStoredValue`, `captureStoredValue`, `convertToTermProduct`, `createGroupBooking`, `createPaymentLink`, `getResaleFeePolicy`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setResaleFeePolicy`, `splitOrder`, `updateGroupBooking`, `voidPayment` |
+| orders | `authoriseStoredValue`, `captureStoredValue`, `cleanupFailedPayment`, `cloneTicketTemplate`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getResaleFeePolicy`, `importTicketTemplate`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
 | payments | `createB2bCreditAccount`, `createPaymentMethod`, `createPaymentProviderConnection`, `getDunningPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `recordDepositActivity`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
-| policy | `getRefundPolicy` |
+| policy | `getRefundPolicy`, `setRefundCalculationPolicy` |
 | refund | `approveRefund`, `createBulkRefund` |
 | reservation | `convertReservation`, `createReservation`, `extendReservation` |
 | shift | `approveShiftClose` |

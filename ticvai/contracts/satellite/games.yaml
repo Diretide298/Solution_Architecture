@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Games & Redemption
   version: 0.1.0
-  x-ticvai-screen-count: 35
+  x-ticvai-screen-count: 39
   x-ticvai-tier: satellite
   x-ticvai-module: 10 — Games & F&B Integration
   x-ticvai-requirements: 25
@@ -293,6 +293,8 @@ paths:
     post:
       operationId: createGame
       x-ticvai-consumed-by:
+        - "P08 BO-394 Game & Ride Operations Dashboard"
+        - "P08 BO-395 Game & Ride Directory"
         - "P08 BO-396 Attraction Profile"
       x-ticvai-audience:
       - staff
@@ -337,6 +339,8 @@ paths:
       operationId: updateGame
       x-ticvai-consumed-by:
         - "P08 BO-069 Asset Register"
+        - "P08 BO-394 Game & Ride Operations Dashboard"
+        - "P08 BO-395 Game & Ride Directory"
         - "P08 BO-396 Attraction Profile"
       x-ticvai-audience:
       - staff
@@ -540,6 +544,7 @@ paths:
       operationId: listPrizes
       x-ticvai-consumed-by:
         - "P08 BO-445 Redemption Credit Rule Configuration"
+        - "P08 BO-449 Redemption Counter / Prize Checkout"
         - "P08 BO-450 Prize Catalogue & Credit Cost Configuration"
         - "P08 BO-491 Redemption Balance & Prize Discovery"
       x-ticvai-audience:
@@ -622,6 +627,7 @@ paths:
     post:
       operationId: redeemPrize
       x-ticvai-consumed-by:
+        - "P08 BO-449 Redemption Counter / Prize Checkout"
         - "P08 BO-450 Prize Catalogue & Credit Cost Configuration"
       x-ticvai-audience:
       - staff
@@ -861,6 +867,7 @@ paths:
       operationId: setReaderConfiguration
       x-ticvai-consumed-by:
         - "P08 BO-400 Attraction / Reader Mapping"
+        - "P08 BO-405 Reader Directory"
         - "P08 BO-407 Reader Credit & Payment Configuration"
         - "P08 BO-408 Reader / Attraction Assignment"
         - "P08 BO-409 Retap Delay & Transaction Protection"
@@ -954,6 +961,7 @@ paths:
     post:
       operationId: testReader
       x-ticvai-consumed-by:
+        - "P08 BO-400 Attraction / Reader Mapping"
         - "P08 BO-413 Balance Check Reader & Device Test Console"
         - "P08 BO-482 Device Diagnostics & Integration Logs"
       summary: Prove a reader works before a guest finds out it does not
@@ -1275,6 +1283,7 @@ paths:
     put:
       operationId: setRedemptionRules
       x-ticvai-consumed-by:
+        - "P08 BO-445 Redemption Credit Rule Configuration"
         - "P08 BO-446 Ticket-Based Redemption / Ticket-Eater Integration"
         - "P08 BO-447 Ticketless Redemption Game Integration"
         - "P08 BO-449 Redemption Counter / Prize Checkout"
@@ -1640,9 +1649,319 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameKioskConfig'
+  /games/{gameId}/clone:
+    parameters:
+    - name: gameId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: cloneGame
+      x-ticvai-consumed-by:
+        - "P08 BO-395 Game & Ride Directory"
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Game_and_Ride_Module.pdf'' board 1 p.4 (Clone);
+        shape follows catalogue cloneProduct'
+      summary: Copy a game or ride as a new one
+      description: 'Board 1, p.4. **A new machine of a kind the venue already runs is configured by
+        copying one**, not by re-entering credit cost, payout range, operational settings and pricing.
+
+        The clone gets a new `code` and `name` and is created `outOfService` (states/game.yaml), so it
+        accepts no play until an operator puts it in service. It is not bound to the source''s asset or
+        readers unless `includeReaders` is true, in which case the reader configurations are copied onto
+        no device until `cloneReaderConfiguration` or `setReaderConfiguration` assigns them. **Plays,
+        transactions and history never come with it** (decided 29 September, readiness close-out).
+
+        '
+      tags:
+      - game
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - code
+              - name
+              properties:
+                code:
+                  type: string
+                  maxLength: 64
+                name:
+                  type: string
+                  maxLength: 200
+                includeReaders:
+                  type: boolean
+                  default: false
+                includePricing:
+                  type: boolean
+                  default: true
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Cloned, out of service
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: '`code` already used by another game in the venue.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /game-configuration-validations:
+    post:
+      operationId: validateGameConfiguration
+      x-ticvai-consumed-by:
+        - "P08 BO-402 Configuration Health & Validation"
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Game_and_Ride_Module.pdf'' board 1 p.10 (Validate
+        Again); shape follows simulateGameplayAuthorisation'
+      summary: Re-run the configuration health checks for some or all games
+      description: 'Board 1, p.10. **`simulateGameplayAuthorisation` tests one tap; this tests the whole
+        set-up.** For each game: a price that resolves, at least one reader mapped and deployed, a
+        reader configuration not older than the edge package expiry, entitlements that cover it, a
+        redemption rule where it pays out, and an asset that is in service.
+
+        Nothing is changed. An empty `gameIds` checks every game in the venue. Each finding names the
+        game, the check, its severity and the screen that fixes it.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - venueId
+              properties:
+                venueId:
+                  type: string
+                  format: uuid
+                gameIds:
+                  type: array
+                  maxItems: 500
+                  description: Empty or absent means every game in the venue.
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '200':
+          description: Health, per game and per check
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameConfigurationHealth'
+  /readers/{readerId}/clone:
+    parameters:
+    - name: readerId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: cloneReaderConfiguration
+      x-ticvai-consumed-by:
+        - "P08 BO-405 Reader Directory"
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Game_and_Ride_Module.pdf'' board 2 p.14 (Clone
+        Configuration); shape follows setReaderConfiguration'
+      summary: Copy one reader's configuration onto other readers
+      description: 'Board 2, p.14. **Forty identical readers on one row of machines are configured once.**
+        Credit and payment settings, retap delay, display, theme and I/O mapping are copied from this
+        reader to each target; each target keeps its own `deviceId` and its own game assignment.
+
+        The copy is **not deployed**: each target still needs `deployReaderConfiguration`, so a bad copy
+        never reaches a machine by itself. A target in another venue is refused (422). Returns the source
+        reader; the targets are read back with `listReaders`.
+
+        '
+      tags:
+      - games
+      x-ticvai-permission: DEVICE_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - targetReaderIds
+              properties:
+                targetReaderIds:
+                  type: array
+                  minItems: 1
+                  maxItems: 200
+                  uniqueItems: true
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Copied, not yet deployed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reader'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: A target is the source reader, does not exist, or is in another venue.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /prizes/lookup:
+    get:
+      operationId: lookupPrize
+      x-ticvai-consumed-by:
+        - "P08 BO-449 Redemption Counter / Prize Checkout"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Game_and_Ride_Module.pdf'' board 6 p.58 (Scan
+        Prize Barcode); shape follows inventory lookupInventoryItem'
+      summary: Look up a prize by barcode or SKU
+      description: 'Board 6, p.58. The redemption counter''s scanner path. `code` is matched first against
+        the prize''s own `barcode`, then against the barcode or SKU of the linked retail item
+        (`merchandiseId`). Offline-capable, like `lookupInventoryItem`, so a counter can still identify a
+        prize with no signal.
+
+        '
+      tags:
+      - prize
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: code
+        in: query
+        required: true
+        description: The scanned prize barcode, or a SKU.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 64
+      - name: venueId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Prize
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Prize'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
 
 components:
   schemas:
+    GameConfigurationHealth:
+      x-ticvai-persistence: none — computed
+      type: object
+      description: Board 1, p.10. The result of `validateGameConfiguration`; nothing is stored.
+      required:
+      - venueId
+      - checkedAt
+      - games
+      properties:
+        venueId:
+          type: string
+          format: uuid
+        checkedAt:
+          type: string
+          format: date-time
+        games:
+          type: array
+          items:
+            type: object
+            required:
+            - gameId
+            - health
+            properties:
+              gameId:
+                type: string
+                format: uuid
+              health:
+                type: string
+                enum:
+                - healthy
+                - warning
+                - blocking
+              findings:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - check
+                  - severity
+                  properties:
+                    check:
+                      type: string
+                      enum:
+                      - priceResolves
+                      - readerMapped
+                      - readerDeployed
+                      - edgePackageCurrent
+                      - entitlementCoverage
+                      - redemptionRule
+                      - assetInService
+                    severity:
+                      type: string
+                      enum:
+                      - warning
+                      - blocking
+                    message:
+                      type: string
+                    readerId:
+                      type: string
+                      format: uuid
+                      nullable: true
+                    fixOn:
+                      type: string
+                      nullable: true
+                      description: The screen that fixes it, e.g. BO-407.
     AttractionType:
       type: object
       x-ticvai-persistence: games.attraction_type
@@ -2866,6 +3185,12 @@ components:
         imageAssetRef:
           type: string
           nullable: true
+        barcode:
+          type: string
+          maxLength: 64
+          nullable: true
+          description: The prize's own barcode, read by `lookupPrize` before the linked retail item's
+            barcode or SKU. Unique within the venue (VM close-out, 29 September).
         isActive:
           type: boolean
     PrizeConflictProblem:

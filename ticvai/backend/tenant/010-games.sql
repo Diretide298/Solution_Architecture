@@ -196,6 +196,7 @@ CREATE TABLE IF NOT EXISTS games.prize (
     is_available                      boolean,
     tier                              text,
     image_asset_ref                   text,
+    barcode                           text CONSTRAINT prize_barcode_chk CHECK (char_length(barcode) <= 64),
     is_active                         boolean
 );
 

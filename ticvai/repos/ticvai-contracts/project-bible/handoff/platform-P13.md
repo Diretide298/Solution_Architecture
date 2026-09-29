@@ -4,28 +4,26 @@
 
 | | |
 |---|---|
-| Screens | 99 |
-| Operations | 123 |
-| Contracts | 7 |
+| Screens | 100 |
+| Operations | 141 |
+| Contracts | 9 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 109 |
-| Waves | wave2 19 · wave3 80 |
+| Operations with no screen | 111 |
+| Waves | wave2 20 · wave3 80 |
 
 ## Gaps
 
-### 109 operations with no screen here
+### 111 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `attachModifierGroup` | fnb | PUT | Give an item its choices |
-| `closeCorrectiveAction` | fnb | POST | Close a signed finding |
-| `createCombo` | fnb | POST | A meal deal, priced as one thing |
-| `createModifierGroup` | fnb | POST | Create a modifier group |
-| `createTable` | fnb | POST | A table as a thing, not an inference |
-| `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
+| `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
+| `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
+| `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
+| `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
 | `getAllergenVerification` | fnb | GET | The last allergen verdict recorded for a dish |
 | `getFnbReservationPolicy` | fnb | GET | How long a table is held, by party size |
 | `getFnbServiceChargePolicy` | fnb | GET | The service charge a venue applies, and on what |
@@ -34,20 +32,9 @@
 | `listMenuSchedules` | fnb | GET | What is scheduled to go live, and when |
 | `listMenuVersions` | fnb | GET | Every published version of a menu |
 | `listTemperatureCheckpoints` | fnb | GET | The units that get read, and the range each must hold |
-| `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
-| `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
-| `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
-| `setFnbReservationPolicy` | fnb | PUT | Set turn times and seating buffers |
-| `setFnbServiceChargePolicy` | fnb | PUT | Set the service charge |
-| `setIngredientSubstitutes` | fnb | PUT | Define approved substitutions |
-| `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
-| `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
-| `setTemperatureCheckpoint` | fnb | PUT | Define a checkpoint and its safe range |
-| `updateTable` | fnb | PUT | Change what a table is |
-| `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
 | `getAccessPolicy` | identity | GET | One policy, at a version |
 | `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
@@ -60,7 +47,20 @@
 | `listCapabilityTemplates` | identity | GET | Saved tick-sets |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
-| … | | | 69 more |
+| `listModules` | identity | GET | The module tree permissions are grouped under |
+| `listPermissions` | identity | GET | Every permission key the contracts enforce |
+| `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
+| `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
+| `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
+| `actOnWaiverRequirements` | marketing-crm | POST | Send, resend or correct participant waiver requirements, one or in bulk |
+| `getCaseInvestigationResolution` | marketing-crm | GET | Read the case workspace |
+| `getDigitalWaiverForm` | marketing-crm | GET | Load the layout of a waiver version |
+| `getForm` | marketing-crm | GET | One form, to fill in or to edit |
+| `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
+| `getLocalizationBrandingCustomer` | marketing-crm | GET | Load a waiver version's languages, branding and channels |
+| `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
+| `getLoyaltyRules` | marketing-crm | GET | Every rule a loyalty programme runs on |
+| … | | | 71 more |
 
 ## Modules
 
@@ -68,7 +68,7 @@
 |---|---|---|
 | Policy | 40 | 3 |
 | Media Library | 40 | 3 |
-| White Label | 19 | 2 |
+| White Label | 20 | 2 |
 
 ## Screens
 
@@ -80,18 +80,18 @@
 | `CMS-004` | Logo & Assets | White Label | 2 | 4 | yes |
 | `CMS-005` | Theme Editor | White Label | 2 | 2 | yes |
 | `CMS-006` | Component Preview | White Label | 2 | 5 | yes |
-| `CMS-007` | Page Builder | White Label | 2 | 7 | yes |
-| `CMS-008` | Content Blocks | White Label | 2 | 7 | yes |
-| `CMS-009` | Navigation & Menus | White Label | 2 | 5 | yes |
+| `CMS-007` | Page Builder | White Label | 2 | 9 | yes |
+| `CMS-008` | Content Blocks | White Label | 2 | 8 | yes |
+| `CMS-009` | Navigation & Menus | White Label | 2 | 6 | yes |
 | `CMS-010` | Media Library | White Label | 2 | 12 | yes |
 | `CMS-011` | Translations | White Label | 2 | 1 | yes |
 | `CMS-012` | RTL Preview | White Label | 2 | 2 | yes |
 | `CMS-013` | SEO & Metadata | White Label | 2 | 1 | yes |
 | `CMS-014` | Publishing Workflow | White Label | 2 | 3 | yes |
 | `CMS-015` | Version History | White Label | 2 | 3 | yes |
-| `CMS-016` | Site Settings | White Label | 2 | 3 | yes |
+| `CMS-016` | Site Settings | White Label | 2 | 5 | yes |
 | `CMS-017` | Domain & Certificate | White Label | 2 | 4 | yes |
-| `CMS-018` | Consent & Legal | White Label | 2 | 4 | yes |
+| `CMS-018` | Consent & Legal | White Label | 2 | 8 | yes |
 | `CMS-019` | User Access | White Label | 2 | 2 | yes |
 | `CMS-021` | Privacy & Consent Configuration Command Center | Policy | 3 | 2 | yes |
 | `CMS-022` | Data Processing Purpose & Lawful Basis Registry | Policy | 3 | 1 | yes |
@@ -173,4 +173,5 @@
 | `CMS-098` | Delivery Monitoring & Integration Health | Media Library | 3 | 1 | yes |
 | `CMS-099` | Asset Usage & Performance Analytics | Media Library | 3 | 1 | yes |
 | `CMS-100` | Distribution Intelligence, AI Insights & Optimization | Media Library | 3 | 1 | yes |
+| `CMS-101` | Help Me Choose | White Label | 2 | 9 | yes |
 

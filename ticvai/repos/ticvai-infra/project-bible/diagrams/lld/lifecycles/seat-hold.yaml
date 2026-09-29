@@ -27,7 +27,8 @@ transitions:
   to: released
   operation: relinquishSeatHold
   trigger: operation
-  guard: Given up deliberately
+  guard: Given up deliberately, by staff at the venue or by the guest who placed it (their own hold
+    only; decided 29 September, readiness close-out)
 - from: held
   to: expired
   trigger: timer

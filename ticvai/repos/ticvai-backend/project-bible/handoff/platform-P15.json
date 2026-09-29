@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 10,
-  "operations": 24,
+  "operations": 26,
   "contracts": 3,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 45
+  "operationsWithNoScreen": 23
  },
  "waves": {
   "wave2": 10
@@ -32,7 +32,7 @@
  "contracts": [
   {
    "contract": "fnb",
-   "operations": 21
+   "operations": 23
   },
   {
    "contract": "reporting",
@@ -86,7 +86,7 @@
    "module": "Kitchen",
    "wave": 2,
    "route": "/kitchen/kitchen-station-workload-dynamic-routing",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -122,7 +122,7 @@
    "module": "Kitchen",
    "wave": 2,
    "route": "/kitchen/sla-priority-service-rules",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -137,42 +137,6 @@
  ],
  "gaps": {
   "operationsWithNoScreen": [
-   {
-    "operation": "attachModifierGroup",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Give an item its choices"
-   },
-   {
-    "operation": "closeCorrectiveAction",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Close a signed finding"
-   },
-   {
-    "operation": "createCombo",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "A meal deal, priced as one thing"
-   },
-   {
-    "operation": "createModifierGroup",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Create a modifier group"
-   },
-   {
-    "operation": "createTable",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "A table as a thing, not an inference"
-   },
-   {
-    "operation": "escalateCorrectiveAction",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Escalate a finding"
-   },
    {
     "operation": "getAllergenVerification",
     "contract": "fnb",
@@ -222,18 +186,6 @@
     "summary": "The units that get read, and the range each must hold"
    },
    {
-    "operation": "rebalanceStationLoad",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Move work between stations mid-service"
-   },
-   {
-    "operation": "recordCorrectiveAction",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Record what was done about a finding"
-   },
-   {
     "operation": "resolveBookingConflict",
     "contract": "fnb",
     "verb": "GET",
@@ -250,60 +202,6 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Tell the guest where their order is"
-   },
-   {
-    "operation": "setComboSlots",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "What the guest chooses, and what it costs extra"
-   },
-   {
-    "operation": "setFnbReservationPolicy",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Set turn times and seating buffers"
-   },
-   {
-    "operation": "setFnbServiceChargePolicy",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Set the service charge"
-   },
-   {
-    "operation": "setIngredientSubstitutes",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Define approved substitutions"
-   },
-   {
-    "operation": "setKitchenSla",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "How long a ticket may sit before it is late"
-   },
-   {
-    "operation": "setSectionLayout",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Divide the floor into sections and give each a server"
-   },
-   {
-    "operation": "setTemperatureCheckpoint",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Define a checkpoint and its safe range"
-   },
-   {
-    "operation": "updateTable",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Change what a table is"
-   },
-   {
-    "operation": "deleteDashboard",
-    "contract": "reporting",
-    "verb": "DELETE",
-    "summary": "Archive a dashboard"
    },
    {
     "operation": "listAlertRules",
@@ -342,12 +240,6 @@
     "summary": "Read an outlet"
    },
    {
-    "operation": "issueDeviceCredential",
-    "contract": "tenancy",
-    "verb": "POST",
-    "summary": "Give the device an identity it can prove"
-   },
-   {
     "operation": "listCellEndpoints",
     "contract": "tenancy",
     "verb": "GET",
@@ -366,12 +258,6 @@
     "summary": "What was done to this device, and what it did"
    },
    {
-    "operation": "listDeviceFirmware",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Firmware and software versions, and what is running where"
-   },
-   {
     "operation": "listDeviceTamperEvents",
     "contract": "tenancy",
     "verb": "GET",
@@ -388,24 +274,6 @@
     "contract": "tenancy",
     "verb": "POST",
     "summary": "A device reports interference"
-   },
-   {
-    "operation": "revokeDeviceCredential",
-    "contract": "tenancy",
-    "verb": "DELETE",
-    "summary": "Cut a device off now"
-   },
-   {
-    "operation": "rollbackDeviceFirmware",
-    "contract": "tenancy",
-    "verb": "POST",
-    "summary": "Put the fleet back on the previous version"
-   },
-   {
-    "operation": "startDeviceFirmwareRollout",
-    "contract": "tenancy",
-    "verb": "POST",
-    "summary": "Push an update to a fleet, in waves"
    }
   ],
   "modulesSplitAcrossWaves": [],

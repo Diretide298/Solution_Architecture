@@ -17,8 +17,8 @@ contract, state model, screen, table and document it touches says the same thing
 | R057 | Cloud and CI platform | Azure in a UAE region, since the existing Terraform scaffold already targets azurerm, and GitHub Actions, since the repositories already ship workflows there. | Client IT / infrastructure | yes | applied 28 September |
 | R065 | Payment sandbox access | A named owner delivers both sandboxes by a fixed date, which we add to the plan as a task. For the reconciler threshold, we propose using each provider's own recommended status-poll interval. Confirm or correct it. | Client finance / payments owner | yes | applied 28 September, one value open: Sandbox dependency (Stripe and Network International) recorded with a [client to name] owner and [client to set] date; plan task handed off. Missing: the owner' |
 | R070 | Row-level security coverage | Confirm the proposal as written: no tenant or PII table is exempt from RLS. | Client security | yes | applied: F6 (102223b) |
-| R073 | Screen promises to keep | (a) Add a guest password sign-in, since registration already takes a password. (b) Add a minimum supported app version to the app status. (c) Cabanas stay staff-booked and GST-070 becomes table-only. (d) Add a guest leave-waitlist. (e) Add apply-promo-code to the cart. (f) Add contact details and a sold-out/closed flag to the app status. | Client product | yes | applied 28 September |
-| R077 | Guest rules left open | (a) No deposit and no no-show fee in the first release. (b) The SDK of the facial-reader vendor you have contracted, named by you. (c) Rotating code with countdown. No screenshot blocking on web. | Client product (with client counsel for b) | yes | applied 28 September, one value open: Face-capture SDK and template format are the client's contracted facial-reader vendor's; the client must name the vendor. |
+| R073 | Screen promises to keep | (a) Add a guest password sign-in, since registration already takes a password. (b) Add a minimum supported app version to the app status. (c) Cabanas stay staff-booked and GST-070 becomes table-only. (d) Add a guest leave-waitlist. (e) Add apply-promo-code to the cart. (f) Add contact details and a sold-out/closed flag to the app status. | Client product | yes | applied 28 September · **superseded in part** |
+| R077 | Guest rules left open | (a) No deposit and no no-show fee in the first release. (b) The SDK of the facial-reader vendor you have contracted, named by you. (c) Rotating code with countdown. No screenshot blocking on web. | Client product (with client counsel for b) | yes | applied 28 September, one value open: Face-capture SDK and template format are the client's contracted facial-reader vendor's; the client must name the vendor. · **superseded in part** |
 | R080 | Contradictions to resolve | (a) Card or wallet. (b) Shown with a caveat, as the contract says. (c) 10 per sale. (d) All five. (e) A supervisor accepts the variance on the till (acceptShiftVariance). The other two paths are removed. | Client product / client operations | yes | applied 28 September |
 | R091 | Permission splits | Yes to all six. | Client operations / security | yes | applied 28 September |
 | R094 | Configured limits: values | Each is a venue setting with a tenant-level default. We send a sheet with proposed values for you to correct. | Client operations (client finance for the variance and journal thresholds) | yes | applied 28 September |
@@ -51,7 +51,7 @@ contract, state model, screen, table and document it touches says the same thing
 | R163 | White-label rules | (1) The iOS and Android store sets, plus web favicons. (2) Immediate on web. (3) Current only, with history on request. (4) We publish the mapping for review. (5) Published pages may only be archived; end must follow start. (6) Arabic is listed in the tenant's languages; a secondary Arabic face is required whenever a secondary Latin face is set. (7) A scheduled job. (8) Tenant configuration. | Client product / client design | yes | applied 28 September |
 | R165 | Glossary: Session | It is a Performance. Rename to Performance and hang the resources manifest off a Performance. | Client product | yes | applied 28 September |
 | R166 | Guest parking scope | Parking is sold through the normal cart and checkout (so the entitlement gets its orderId). No live availability in the first release: a full car park is shown only when capacity is reached. | Client product | yes | applied 28 September |
-| R167 | Guest SSO sign-in | No SSO for guests and no guest MFA at sign-in. Guests use one-time code, social sign-in and UAE Pass. | Client product | yes | applied 28 September |
+| R167 | Guest SSO sign-in | No SSO for guests and no guest MFA at sign-in. Guests use one-time code, social sign-in and UAE Pass. | Client product | yes | applied 28 September · **superseded in part** |
 | R169 | Hold lengths | Seat hold 8 minutes, extendable to 30. Cart lease 15 minutes. Merchandise reservation until the end of the visit day. Stored-value authorisation 300 seconds. | Client operations | yes | applied 28 September |
 | R171 | Inventory rules | (1) Yes. (2) By line. (3) Approved and later. (4) Adjustments and waste need a reason, and the kind decides the direction. (5) Allocated is reserved for orders; available is on-hand minus allocated. (6) Yes. (7) Yes, with blind counts hiding the figure. (8) From the quotation, editable with a reason; PO numbers per venue, in sequence. | Client operations | yes | applied 28 September |
 | R183 | Ownership level | Upsell rules are owned at region and read at venue. Suppliers are owned at tenant, and venues may quote against them. Both venues see a transfer between them. A venue sets only its own matrix, tighter than the level above. | Client operations | yes | applied 28 September |
@@ -75,7 +75,7 @@ contract, state model, screen, table and document it touches says the same thing
 | R230 | Offline ticket QR | It rotates offline. The app holds a time-based seed fetched while online, and gates verify the code offline. | Client product / client security | yes | applied 28 September |
 | R236 | Guest shop-and-collect | Paid online at checkout, which creates the shop-and-drop for collection. | Client product | yes | applied 28 September |
 | R241 | Allergen verification | Automatic after every change. The Verify button stays as a manual re-check. | Client operations (food safety) | no | applied 28 September |
-| R242 | Guest notifications feed | Not in the first release. Take GST-030 and WEB-046 out of Block A. Queue calls and order status show on the queue and order screens that already poll for them. | Client product | yes | applied 28 September |
+| R242 | Guest notifications feed | Not in the first release. Take GST-030 and WEB-046 out of Block A. Queue calls and order status show on the queue and order screens that already poll for them. | Client product | yes | applied 28 September · **superseded in part** |
 | R251 | Screen navigation | Confirm the proposal as written. | Client design | yes | applied 28 September |
 | R252 | Wireframe sign-off | One named design reviewer, with sign-off within 3 working days of each batch. | Client design | yes | applied 28 September, one value open: Rule recorded: one named design reviewer, sign-off within 3 working days of each batch. Missing: the reviewer's name. |
 | R254 | Screen operations | Confirm the proposal as written. | Client product | yes | applied 28 September |
@@ -153,6 +153,8 @@ contract, state model, screen, table and document it touches says the same thing
 
 **Client confirms.** Client product
 
+**Superseded.** Part (c) superseded 29 September (rev 3 REV3-15, GAP-C2): cabanas, loungers and non-dining tables placed on an ingested venue map are chosen and bought by the guest, like seats. See docs/registers/rev3-decisions.md.
+
 ### R077: Guest rules left open
 
 **Question.** Three guest-facing rules we cannot settle from the package: (a) Table reservations: is there a deposit or no-show fee, and how much (open item CF-85)? (b) Face Pass enrolment (GST-069): which face-capture SDK and template format does the app use? (c) WEB-018 asks for an 'anti-screenshot' dynamic QR, which a browser cannot enforce. Is a rotating code with a visible countdown enough?
@@ -164,6 +166,8 @@ contract, state model, screen, table and document it touches says the same thing
 **Decided (28 September, our recommendation).** (a) No deposit and no no-show fee in the first release. (b) The SDK of the facial-reader vendor you have contracted, named by you. (c) Rotating code with countdown. No screenshot blocking on web.
 
 **Client confirms.** Client product (with client counsel for b)
+
+**Superseded.** Part (a) superseded 29 September (rev 3 REV3-8b): the dining deposit ships as a venue option, off unless the venue enables it; basis and amount are venue configuration.
 
 ### R080: Contradictions to resolve
 
@@ -561,6 +565,8 @@ contract, state model, screen, table and document it touches says the same thing
 
 **Client confirms.** Client product
 
+**Superseded.** Part 2 superseded 29 September (rev 3 GAP-B1): guest two-step verification is a per-venue setting, off by default. Part 1 stands: guests never use enterprise SSO.
+
 ### R169: Hold lengths
 
 **Question.** What are the default and maximum hold lengths for: a seat hold (the contract allows 60 to 1800 seconds; POS copy says eight minutes), a cart capacity lease (30 to 3600 seconds), a merchandise reservation for collection, and a stored-value authorisation (default 300 seconds)?
@@ -848,6 +854,8 @@ contract, state model, screen, table and document it touches says the same thing
 **Decided (28 September, our recommendation).** Not in the first release. Take GST-030 and WEB-046 out of Block A. Queue calls and order status show on the queue and order screens that already poll for them.
 
 **Client confirms.** Client product
+
+**Superseded.** The notifications-feed deferral is reversed 29 September (rev 3 GAP-C1): the in-venue notifications feed (GST-030, WEB-046) is in the first release.
 
 ### R251: Screen navigation
 

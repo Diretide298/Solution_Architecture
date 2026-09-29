@@ -1172,6 +1172,7 @@ paths:
       operationId: setReconciliationSource
       x-ticvai-consumed-by:
         - "P09 ADM-620 Reconciliation Source & Import Manager\t141"
+      x-ticvai-config-scope: tenant
       summary: Define a settlement or statement feed
       tags:
       - payments

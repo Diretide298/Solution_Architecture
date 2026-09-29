@@ -11,6 +11,7 @@ enumSchema: GameStatus
 owner: games
 initial:
 - inService
+- outOfService
 terminal:
 - retired
 transitions:
@@ -56,5 +57,9 @@ transitions:
   trigger: operation
   guard: Removed permanently
   requiresApproval: true
-notes: Bound to a maintenance asset. The cascade is the point — a chiller failing takes the game with
-  it, and nobody has to remember to switch it off.
+notes: '`outOfService` is also initial: `cloneGame` creates the copy out of service, so it accepts no
+  play until an operator puts it in service (VM close-out, 29 September).
+
+
+  Bound to a maintenance asset. The cascade is the point — a chiller failing takes the game with it,
+  and nobody has to remember to switch it off.'

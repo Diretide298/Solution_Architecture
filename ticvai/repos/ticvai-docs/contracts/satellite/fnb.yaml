@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 88
+  x-ticvai-screen-count: 106
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
   x-ticvai-requirements: 151
@@ -119,6 +119,8 @@ paths:
                 $ref: '#/components/schemas/FnbReservationPolicy'
     put:
       operationId: setFnbReservationPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-733 Service Channel Configuration"
       summary: Set turn times and seating buffers
       description: '**The booking keeps its own duration as the snapshot.** A turn time revised in
         March must not shorten a reservation already made in February — the same rule-and-record
@@ -184,6 +186,8 @@ paths:
                 $ref: '#/components/schemas/FnbServiceChargePolicy'
     put:
       operationId: setFnbServiceChargePolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-733 Service Channel Configuration"
       summary: Set the service charge
       description: '**A service charge is revenue, not a tip** — `orders` already separates the two
         deliberately, *"it is revenue in most jurisdictions, and pooling it with tips is how a payroll
@@ -643,6 +647,9 @@ paths:
   /tables:
     post:
       operationId: createTable
+      x-ticvai-consumed-by:
+        - "P06 EMP-053 Table & Seating Configuration"
+        - "P08 BO-729 Create / Edit Outlet"
       summary: A table as a thing, not an inference
       description: 'Board 4C, 24 August. **The package inferred a table from a visit and from `setTableLayout`**,
         and `setSectionLayout` and `setTableCombinations` — both built this week — reference a table that
@@ -691,6 +698,9 @@ paths:
         format: uuid
     put:
       operationId: updateTable
+      x-ticvai-consumed-by:
+        - "P06 EMP-053 Table & Seating Configuration"
+        - "P08 BO-729 Create / Edit Outlet"
       summary: Change what a table is
       description: 'Board 4C. **Capacity, label, section, whether it is out of service** (`isOutOfService`).
 
@@ -1030,6 +1040,8 @@ paths:
   /combos:
     post:
       operationId: createCombo
+      x-ticvai-consumed-by:
+        - "P08 BO-011 Packages & Bundles"
       summary: A meal deal, priced as one thing
       description: 'Board 2G. **`listCatalogueBundles` bundles ticketing products, both fixed.** A burger
         with a choice of side and a choice of drink is a different shape, and the package could not express
@@ -1075,6 +1087,8 @@ paths:
         format: uuid
     put:
       operationId: setComboSlots
+      x-ticvai-consumed-by:
+        - "P08 BO-011 Packages & Bundles"
       summary: What the guest chooses, and what it costs extra
       description: 'Board 2G. **The whole slot set in one call** — a combo edited slot by slot spends
         time in states that cannot be sold, and a till that reads it mid-edit offers a meal with no main.
@@ -1126,6 +1140,8 @@ paths:
         format: uuid
     put:
       operationId: attachModifierGroup
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
       summary: Give an item its choices
       description: 'Board 2E. **Attachment is separate from definition** because that is what makes the
         group reusable — the same *cooked how* group on nine steaks, defined once.
@@ -1245,6 +1261,8 @@ paths:
   /kitchen-stations/rebalance:
     post:
       operationId: rebalanceStationLoad
+      x-ticvai-consumed-by:
+        - "P15 KIT-005 Kitchen Station Workload & Dynamic Routing"
       summary: Move work between stations mid-service
       description: 'Board 3. **A grill twenty tickets deep and a cold section idle.** The routing rules
         that put them there were set at configuration time and the service does not match them.
@@ -1373,6 +1391,9 @@ paths:
         format: uuid
     put:
       operationId: setKitchenSla
+      x-ticvai-consumed-by:
+        - "P08 BO-134 Kitchen & Preparation Stations"
+        - "P15 KIT-009 SLA, Priority & Service Rules"
       summary: How long a ticket may sit before it is late
       description: 'Board 3. **`getKitchenSla` was drawn on the board and nothing set the target.** A
         rail that colours tickets red needs a number, and the package had none.
@@ -1536,6 +1557,9 @@ paths:
         format: uuid
     put:
       operationId: setSectionLayout
+      x-ticvai-consumed-by:
+        - "P06 EMP-053 Table & Seating Configuration"
+        - "P08 BO-729 Create / Edit Outlet"
       summary: Divide the floor into sections and give each a server
       description: 'Board 4. **`setTableLayout` places tables and nothing groups them.** A section is
         how a restaurant actually assigns work — a server takes a section, not fourteen table ids.
@@ -2878,6 +2902,8 @@ paths:
                           $ref: '#/components/schemas/TemperatureCheckpoint'
     put:
       operationId: setTemperatureCheckpoint
+      x-ticvai-consumed-by:
+        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
       summary: Define a checkpoint and its safe range
       description: '**The range is the configuration; the reading is the record.** `TemperatureLog`
         keeps `minCelsius` and `maxCelsius` as the snapshot in force when it was taken, for the reason
@@ -3408,6 +3434,10 @@ paths:
         **A guest who leaves is not a guest who was served**, and `walkedAway` exists so that distinction
         survives into the report a manager reads about wait times.
 
+        **Joining takes no payment and never enters the cart** (decided 29 September, rev 3 REV3-8): the
+        guest sees the confirmation straight after this call. A waitlist entry never holds a deposit, even
+        where the venue''s `DepositPolicy.dining` is on, because it is not a promise of a table.
+
         '
       tags:
       - fnb
@@ -3557,9 +3587,29 @@ paths:
         table 7 at booking time means every later booking is refused against a constraint that did not
         need to exist. A table may be named where a guest asked for one.
 
-        **No deposit and no no-show fee in the first release** (decided 28 September, audit R077 (a)).
-        Booking takes no payment, and cancelling or not arriving costs the guest nothing; GST-070 says
-        so at booking and at cancel.
+        **Dining tables only** (decided 29 September, rev 3 GAP-C2). A table on a venue map is a
+        `resources.Resource` of kind `table`: a non-dining spot, such as a beach or event table, picked on
+        the map and sold like a cabana (`resources.createResourceHold`, then the order). A restaurant
+        table is booked here, with the waitlist (audit R073 (d)), and is never placed on a venue map as a
+        bookable resource.
+
+        **No deposit unless the venue switches one on** (decided 29 September, rev 3 REV3-8b, which
+        supersedes audit R077 (a) "no table deposit in the first release": the capability ships, disabled
+        by default). The venue''s `orders.DepositPolicy.dining` says whether a table deposit is held, from
+        what party size, and how much (per guest, per table, or a percentage of a minimum spend); nothing
+        about the amount is fixed in code. **With `dining.enabled` false, the default, or a party below
+        `dining.appliesFromPartySize`, the booking takes no payment and never enters the cart**: it is
+        created `booked` and the guest sees a "no card needed" confirmation straight after this call
+        (decided 29 September, rev 3 REV3-8). A basket line for a free table is prototype-only.
+
+        **Where a deposit applies, the booking is created `awaitingDeposit`** and `deposit` carries the
+        amount, the basis and `holdExpiresAt`. The cover is held while the guest pays: the client adds
+        the deposit to the cart with `orders.addCartLine` (`variantId` from `deposit.variantId`, and
+        `tableReservationId`) and pays
+        through `checkoutCart` like any other line. When the payment is authorised the booking moves to
+        `booked`; if `holdExpiresAt` passes first, it is `cancelled` and the cover released
+        (states/table-reservation.yaml). The deposit is an `orders.deposit` row, held and later released,
+        applied to the bill or forfeited under the policy; it is not a sale.
 
         '
       tags:
@@ -3581,7 +3631,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Booked
+          description: '`booked` where no deposit applies (no card, no cart; REV3-8), or
+            `awaitingDeposit` with `deposit` filled where the venue''s dining deposit applies (REV3-8b).'
           content:
             application/json:
               schema:
@@ -3622,8 +3673,12 @@ paths:
       description: 'Party size, time, or cancelled. **A reduced party size releases cover immediately**
         — four seats returned at 18:00 can be sold for the same evening.
 
-        **Cancelling is free** (decided 28 September, audit R077 (a)): no deposit is held and no
-        no-show or late-cancel fee is charged in the first release.
+        **Cancelling is free where no deposit is held** (decided 29 September, rev 3 REV3-8b, superseding
+        audit R077 (a)). Where the venue''s `DepositPolicy.dining` took a deposit, cancelling at least
+        `dining.refundableUntilHours` before `startsAt` releases it in full; later, or a `noShow`, keeps it
+        as `dining.onLateCancelOrNoShow` says. A party size change re-prices the deposit only where the
+        basis is per guest: a larger party is asked for the difference, a smaller one has the excess
+        released. Cancelling an `awaitingDeposit` booking releases the cover and nothing is charged.
 
         '
       tags:
@@ -4909,6 +4964,8 @@ paths:
         `createModifierGroup` and `attachModifierGroup` stay staff-only.'
     post:
       operationId: createModifierGroup
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
       x-ticvai-audience:
       - staff
       summary: Create a modifier group
@@ -6397,6 +6454,8 @@ paths:
         format: uuid
     post:
       operationId: recordCorrectiveAction
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       summary: Record what was done about a finding
       description: 'What somebody did about it — discard, re-chill, recalibrate. **Distinct from signing
         it**: recording the action and attesting to it are two acts and often two people, which is the
@@ -6436,6 +6495,8 @@ paths:
         format: uuid
     post:
       operationId: escalateCorrectiveAction
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       summary: Escalate a finding
       description: 'Raised above the person who found it — a critical reading, or one nobody actioned
         in time. **Escalation is not a failure state**: it is how a finding reaches somebody with the
@@ -6486,6 +6547,8 @@ paths:
         format: uuid
     post:
       operationId: closeCorrectiveAction
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       summary: Close a signed finding
       description: '**The transition that had no operation.** A signed finding stayed signed forever because
         nothing could close it — which for a food-safety corrective action means an inspector reads an
@@ -6554,6 +6617,8 @@ paths:
                           $ref: '#/components/schemas/FnbIngredientSubstitute'
     put:
       operationId: setIngredientSubstitutes
+      x-ticvai-consumed-by:
+        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
       summary: Define approved substitutions
       description: >
         Set whole per recipe: a substitution list is reviewed as a list, usually against an allergen
@@ -6704,8 +6769,236 @@ paths:
                     refusedReason:
                       enum:
                       - illegalStatusTransition
+  /outlet-templates:
+    get:
+      operationId: listOutletTemplates
+      x-ticvai-consumed-by:
+        - "P08 BO-730 Outlet Types & Templates"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '29 September: VM close-out; BO-730 lists templates, and listMenus is not that list; shape follows listMenus'
+      summary: List outlet templates
+      description: '**The templates BO-730 shows** (decided 29 September, readiness close-out). An outlet
+        template is the starting configuration a new outlet copies: its type, service model, default menus,
+        coursing, kitchen targets and delivery policy. Ordered by `name`, then `id`.
+
+        '
+      tags:
+      - outlet
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: outletType
+        in: query
+        required: false
+        schema:
+          $ref: '#/components/schemas/OutletTemplateType'
+      - name: includeInactive
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Outlet templates
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OutletTemplate'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    put:
+      operationId: setOutletTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-730 Outlet Types & Templates"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-config-scope: venue
+      x-ticvai-agreed: '29 September: VM close-out; pack label on BO-730 (+ Create Template); no outlet-template operation existed; shape follows createMenu'
+      summary: Create or replace an outlet template
+      description: '**+ Create Template on BO-730** (decided 29 September, readiness close-out). Keyed by
+        `code`, unique per venue: a new code creates a template, an existing one replaces it whole. A
+        template is configuration a new outlet is created from and **copies at creation**; changing a
+        template later never changes the outlets already made from it, because an outlet''s menus, coursing
+        and kitchen targets are its own from then on (CF-138).
+
+        The references must resolve at this venue: `defaultMenuIds` to active menus, `deliveryPolicyId` to a
+        delivery policy; otherwise `422`. `courseRules` and `kitchenSlaMinutes` are the defaults the outlet
+        starts with (`setCourseRules` and `setKitchenSla` change them per outlet afterwards).
+
+        '
+      tags:
+      - outlet
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutletTemplateInput'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutletTemplate'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '422':
+          description: A `defaultMenuIds` entry that is not an active menu at this venue (`unknownMenu`), or a
+            `deliveryPolicyId` that does not exist (`unknownDeliveryPolicy`).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+
 components:
   schemas:
+    OutletTemplateType:
+      type: string
+      enum:
+      - restaurant
+      - bar
+      - cafe
+      - kiosk
+      - mobile
+      description: The F&B kinds of `tenancy.OutletKind`, repeated here because a satellite does not
+        reference another contract's schema.
+    OutletTemplateInput:
+      type: object
+      x-ticvai-persistence: none — request only
+      description: What `setOutletTemplate` takes (decided 29 September, readiness close-out).
+      required:
+      - code
+      - name
+      - outletType
+      - serviceModel
+      properties:
+        code:
+          type: string
+          maxLength: 64
+          pattern: ^[A-Za-z0-9_-]+$
+          x-ticvai-unique: venue
+        name:
+          type: string
+          maxLength: 200
+        outletType:
+          $ref: '#/components/schemas/OutletTemplateType'
+        serviceModel:
+          type: array
+          minItems: 1
+          description: The service modes the outlet offers, e.g. `[tableService, collection]`.
+          items:
+            $ref: '#/components/schemas/ServiceMode'
+        defaultMenuIds:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+            format: uuid
+        courseRules:
+          type: object
+          nullable: true
+          description: The coursing default a new outlet starts with; the same shape `setCourseRules` stores per outlet.
+          properties:
+            defaultCoursing:
+              $ref: '#/components/schemas/CoursingPolicy'
+        kitchenSlaMinutes:
+          type: integer
+          minimum: 1
+          maximum: 240
+          nullable: true
+          description: The default ticket target, in minutes, before `setKitchenSla` sets per-mode targets.
+        deliveryPolicyId:
+          type: string
+          format: uuid
+          nullable: true
+        isActive:
+          type: boolean
+          default: true
+    OutletTemplate:
+      type: object
+      x-ticvai-persistence: fnb.outlet_template
+      description: '**The configuration a new outlet is created from** (decided 29 September, readiness
+        close-out; BO-730). New table. Copied into the outlet at creation and never linked after, so
+        changing a template does not change existing outlets.
+
+        '
+      required:
+      - id
+      - code
+      - name
+      - outletType
+      - serviceModel
+      - scopePath
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        code:
+          type: string
+          maxLength: 64
+          x-ticvai-unique: venue
+        name:
+          type: string
+          maxLength: 200
+        outletType:
+          $ref: '#/components/schemas/OutletTemplateType'
+        serviceModel:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceMode'
+        defaultMenuIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        courseRules:
+          type: object
+          nullable: true
+          properties:
+            defaultCoursing:
+              $ref: '#/components/schemas/CoursingPolicy'
+        kitchenSlaMinutes:
+          type: integer
+          nullable: true
+        deliveryPolicyId:
+          type: string
+          format: uuid
+          nullable: true
+        isActive:
+          type: boolean
+        scopePath:
+          type: string
+          readOnly: true
+          description: The venue it belongs to; server-set.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     AllergenVerdict:
       x-ticvai-persistence: fnb.allergen_verdict
       type: object
@@ -7120,7 +7413,10 @@ components:
           format: date-time
     TableReservationStatus:
       type: string
+      description: '`awaitingDeposit` only where the venue''s dining deposit applies (decided 29 September,
+        rev 3 REV3-8b); a booking with no deposit starts `booked`.'
       enum:
+      - awaitingDeposit
       - booked
       - confirmed
       - seated
@@ -8018,10 +8314,62 @@ components:
           pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
           nullable: true
           readOnly: true
+        deposit:
+          $ref: '#/components/schemas/TableReservationDeposit'
         createdAt:
           type: string
           format: date-time
           readOnly: true
+    TableReservationDeposit:
+      type: object
+      nullable: true
+      readOnly: true
+      x-ticvai-persistence: fnb.table_reservation   # the deposit_* columns; the money itself is orders.deposit
+      description: '**The deposit this booking holds, snapshotted from `orders.DepositPolicy.dining` when it
+        was made** (decided 29 September, rev 3 REV3-8b). Null where no deposit applied, which is every
+        booking while the venue leaves `dining.enabled` false (the default). A later change to the policy
+        does not re-price a booking already made.
+
+        '
+      required:
+      - amount
+      - basis
+      properties:
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        basis:
+          type: string
+          enum:
+          - fixedPerGuest
+          - fixedPerTable
+          - percentOfMinimumSpend
+        holdExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: While `awaitingDeposit`, when the held cover is released if the deposit has not been
+            authorised. The cart lease of the deposit line (15 minutes, audit R169).
+        refundableUntil:
+          type: string
+          format: date-time
+          nullable: true
+          description: '`startsAt` less `dining.refundableUntilHours`. Cancelling before it releases the
+            deposit in full.'
+        variantId:
+          type: string
+          format: uuid
+          description: The venue's table-deposit variant, `DepositPolicy.dining.depositVariantId`, which
+            the client sends to `addCartLine` with this booking's id.
+        cartLineId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The `orders.CartLine` carrying the deposit, once added.
+        depositId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The `orders.deposit` row, once the payment is authorised.
     GuestOrderingMethod:
       x-ticvai-persistence: none — enum
       type: string
@@ -9120,6 +9468,9 @@ components:
     TableDefinition:
       x-ticvai-persistence: fnb.dining_table
       type: object
+      description: A restaurant (dining) table, reserved with `createTableReservation`. Not a map-bookable
+        `resources` table, which is a non-dining spot sold like a cabana (decided 29 September, rev 3
+        GAP-C2).
       required:
       - id
       - label

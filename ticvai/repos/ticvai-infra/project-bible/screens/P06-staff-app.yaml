@@ -547,8 +547,8 @@ screens:
         so the edge carries nothing and EMP-052 opens cold
     - to: EMP-053
       trigger: Table & Seating Configuration
-      provenance: derived — EMP-053 declares entryState.params outletId and EMP-003 holds none of them,
-        so the edge carries nothing and EMP-053 opens cold
+      provenance: derived — EMP-053 declares entryState.params outletId, tableId and EMP-003 holds none
+        of them, so the edge carries nothing and EMP-053 opens cold
     - to: EMP-054
       trigger: Reservation Calendar & Timeline
       provenance: derived — EMP-054 declares entryState.params  and EMP-003 holds none of them, so the
@@ -7220,7 +7220,7 @@ screens:
         provenance: contract orders.yaml POST /payments
       - kind: textField
         label: tenderedAmount
-        bindsTo: CreatePaymentRequest.tenderedAmount
+        bindsTo: CreatePaymentRequest.tenderAmount
         provenance: contract orders.yaml POST /payments
       - kind: textField
         label: walletAuthorisationId
@@ -12186,7 +12186,7 @@ screens:
         - TableReservation.partySize
         - TableReservation.startsAt
         - TableReservation.durationMinutes
-        - TableReservation.tableIds
+        - TableReservation.tables[].tableId
         - TableReservation.status
         - TableReservation.groupId
         - TableReservation.notes
@@ -12511,12 +12511,29 @@ screens:
     contract: fnb
     purpose: Configure the table layout
     trigger: onAction
+  - operationId: createTable
+    contract: fnb
+    purpose: Add a table to the floor
+    trigger: onAction
+    provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: updateTable
+    contract: fnb
+    purpose: Change a table's covers, shape or section
+    trigger: onAction
+    provenance: decided 29 September, VM close-out (venue management and configuration)
+  - operationId: setSectionLayout
+    contract: fnb
+    purpose: Arrange the outlet's sections
+    trigger: onAction
+    provenance: decided 29 September, VM close-out (venue management and configuration)
   entryState:
     params:
     - name: venueId
       from: session
     - name: outletId
       from: EMP-003
+    - name: tableId
+      from: navigation
     coldEntry: '**Resolves from the session and the shift.** A handheld is signed into at the start of
       a shift, not navigated to.'
   wireframe:
@@ -12589,7 +12606,7 @@ screens:
         - TableReservation.partySize
         - TableReservation.startsAt
         - TableReservation.durationMinutes
-        - TableReservation.tableIds
+        - TableReservation.tables[].tableId
         - TableReservation.status
         - TableReservation.groupId
         - TableReservation.notes
@@ -12619,7 +12636,7 @@ screens:
         - TableReservation.partySize
         - TableReservation.startsAt
         - TableReservation.durationMinutes
-        - TableReservation.tableIds
+        - TableReservation.tables[].tableId
         - TableReservation.status
         - TableReservation.groupId
         - TableReservation.notes
@@ -12740,7 +12757,7 @@ screens:
         provenance: contract fnb.yaml POST /table-reservations
       - kind: textField
         label: tableIds
-        bindsTo: TableReservation.tableIds
+        bindsTo: TableReservation.tables[].tableId
         provenance: contract fnb.yaml POST /table-reservations
       - kind: textField
         label: status
@@ -12792,8 +12809,15 @@ screens:
         label: Create table reservation
         operation: createTableReservation
         provenance: contract fnb.yaml POST /table-reservations
-        notes: 'Takes no deposit, and the confirmation and cancel copy name no no-show or cancellation
-          fee: none exists in the first release (decided 28 September, audit R077 (a)).'
+        notes: '**No deposit unless the venue switched the table deposit on** (decided 29 September, rev
+          3 REV3-8b, superseding audit R077 (a) "no table deposit in the first release"; the venue sets
+          it on BO-327). With it off, or a party below its size, the booking is `booked`, takes no payment
+          and the copy names no fee. Where it applies, `createTableReservation` returns `awaitingDeposit`
+          with the deposit amount, basis and `holdExpiresAt`: the screen shows them, says the cover is
+          held until then, and names the refund cut-off and the late-cancel and no-show terms from the
+          policy. The deposit is paid through the cart (`addCartLine` with `tableReservationId`, then
+          `checkoutCart`), at a till or by the guest; unpaid by `holdExpiresAt`, the booking is cancelled
+          and the cover released.'
       - kind: duplicateMatch
         label: Possible existing guest
         notes: '**Runs while the booking is being typed, not after it is saved.** A duplicate created
@@ -13222,6 +13246,11 @@ screens:
     contract: marketing-crm
     purpose: Merge a proposed duplicate into this profile, once a person has decided
     trigger: onAction
+  - operationId: addGuestNote
+    contract: marketing-crm
+    purpose: What the floor needs to know about this table
+    trigger: onAction
+    provenance: decided 29 September, VM close-out (venue management and configuration)
   entryState:
     params:
     - name: venueId
@@ -14134,7 +14163,7 @@ screens:
         - TableReservation.partySize
         - TableReservation.startsAt
         - TableReservation.durationMinutes
-        - TableReservation.tableIds
+        - TableReservation.tables[].tableId
         - TableReservation.status
         - TableReservation.groupId
         - TableReservation.notes
@@ -16607,20 +16636,15 @@ screens:
       a connection, and no minute has decided it.
   gaps:
   - operation: null
-    source: pack Rental_Management.pdf, page 69 §Support
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
-      Asset, Reservation, Checkout inspection. Each needs an operation, or needs removing from the screen;
-      this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
-  - operation: null
-    source: pack Rental_Management.pdf, page 69
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
       it is built.'
-  - operation: null
     source: pack Rental_Management.pdf, page 69
+  - operation: null
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
+    source: pack Rental_Management.pdf, page 69
   apis:
   - contract: rental
     invalidates:
@@ -16631,7 +16655,9 @@ screens:
     trigger: onAction
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 69. 0 of 0 labels bound to a
     contract property; 3 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked
-    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions
+    reconciled 29 September (VM close-out):** Asset, Reservation, Checkout inspection are choices sent
+    by `recordRentalInspection` (assetId, bookingId (path), phase preRental).
   navigation:
     entryFrom:
     - EMP-071
@@ -17286,10 +17312,59 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions:
-    - components: []
-      name: contentBody
     template: split
+    regions:
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: Current rental
+        columns:
+        - Start
+        - Expected return
+        - Current duration
+        notes: No rental read is bound; these are the pack's labels.
+        provenance: pack Rental_Management.pdf, page 81
+    - name: contentBody
+      slot: fields
+      components:
+      - kind: selectField
+        label: Additional duration
+        notes: +30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`.
+        operation: getRentalAvailability
+        provenance: contract rental.yaml GET /rental-availability
+      - kind: textField
+        label: Requested new return
+        notes: Computed from expected return plus the added duration; read-only.
+        provenance: pack Rental_Management.pdf, page 81
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Extension check
+        bindsTo: RentalAvailability
+        columns:
+        - RentalAvailability.windows[].availableQuantity
+        - RentalAvailability.blockedWindows[].from
+        - RentalAvailability.blockedWindows[].to
+        - RentalAvailability.blockedWindows[].reason
+        - Blocking asset
+        operation: getRentalAvailability
+        notes: EXTENSION AVAILABLE when the window stays open; otherwise the first blocking window's reason.
+          The pack names the blocking asset (BIKE-017); no field does.
+        provenance: pack Rental_Management.pdf, page 81
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: secondaryButton
+        label: Check availability
+        operation: getRentalAvailability
+        notes: Re-reads availability for the extended window.
+        provenance: contract rental.yaml GET /rental-availability
+      - kind: primaryButton
+        label: Continue to pricing
+        notes: Hands over to Extension Pricing & Confirmation (pack page 82).
+        provenance: pack Rental_Management.pdf, page 82
   states:
     emptyFirstRun: No rental extension request yet. Carries the create action; distinct from a filter
       that matched nothing.
@@ -17303,24 +17378,21 @@ screens:
       a connection, and no minute has decided it.
   gaps:
   - operation: null
-    source: pack Rental_Management.pdf, page 81
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-  - operation: null
-    source: pack Rental_Management.pdf, page 81
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
+    source: pack Rental_Management.pdf, page 81
   apis:
   - contract: rental
     operationId: getRentalAvailability
     provenance: board reading, 19 September 2026
     purpose: Can it be extended
     trigger: onLoad
-  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 81. 0 of 0 labels bound to a
+  apisNote: 'Regenerated 9 September 2026 from Rental_Management.pdf page 81. 0 of 0 labels bound to a
     contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked
-    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout
+    drafted 29 September (VM close-out)** from pack Rental_Management.pdf p.81; pack Rental_Management.pdf
+    p.82; contract rental.yaml GET /rental-availability. Pack labels with no schema field yet (shown as
+    plain labels): Rental start, Expected return, Current duration, Blocking asset (e.g. BIKE-017).'
   navigation:
     entryFrom:
     - EMP-081

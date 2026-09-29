@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 206 operations
+title: catalogue — 214 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -65,7 +65,8 @@ operations:
   - catalogue.product
   - orders.cart
   - orders.sales_order
-  writes: []
+  writes:
+  - catalogue.product_media
 - operation: assignPerformanceMedia
   verb: POST
   path: /performances/{performanceId}/media
@@ -140,6 +141,7 @@ operations:
   offline: false
   reads:
   - catalogue.product
+  - catalogue.product_media
   - catalogue.variant
   writes:
   - cache:idempotency
@@ -305,9 +307,42 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.product
+  - catalogue.product_media
   writes:
   - cache:idempotency
   - catalogue.product
+  - catalogue.product_media
+- operation: decidePricingChangeRequest
+  verb: POST
+  path: /pricing-change-request/{changeId}/decision
+  scope: venue
+  permission: PRODUCT_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: decidePricingRecommendation
+  verb: POST
+  path: /recommendation-review-decision/{recommendationId}/decision
+  scope: venue
+  permission: AI_APPROVE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.pricing_recommendation_decision
+  writes: []
+- operation: estimateEventResourceCost
+  verb: GET
+  path: /events/{eventId}/resource-cost
+  scope: venue
+  permission: EVENT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: forceReleaseInventoryHold
   verb: POST
   path: /inventory-holds/{inventoryHoldId}/force-release
@@ -493,6 +528,7 @@ operations:
   offline: true
   reads:
   - catalogue.product
+  - catalogue.product_media
   writes: []
 - operation: getProductEligibilityRule
   verb: GET
@@ -1431,6 +1467,7 @@ operations:
   offline: true
   reads:
   - catalogue.product
+  - catalogue.product_media
   writes: []
 - operation: listQuantityGroupVolume
   verb: GET
@@ -1525,6 +1562,16 @@ operations:
 - operation: listScenarioModelingWhat
   verb: GET
   path: /scenario-modeling-what
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listScheduledLifecycleActions
+  verb: GET
+  path: /activation-scheduler
   scope: venue
   permission: PRODUCT_VIEW
   audience:
@@ -1774,6 +1821,7 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.product
+  - catalogue.product_media
   - catalogue.product_version
   writes:
   - cache:idempotency
@@ -1790,6 +1838,7 @@ operations:
   reads:
   - catalogue.event
   - catalogue.product
+  - catalogue.product_media
   - catalogue.variant
   writes: []
 - operation: setAlternativeCodes
@@ -2208,6 +2257,16 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setRulePriorityConflict
+  verb: PUT
+  path: /rule-priority-conflict
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setSpace
   verb: PUT
   path: /spaces
@@ -2250,6 +2309,16 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: submitPricingChangeRequest
+  verb: POST
+  path: /pricing-change-request/{changeId}/submit
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: suspendEntitlement
   verb: POST
   path: /entitlements/{entitlementId}/suspend
@@ -2265,6 +2334,16 @@ operations:
   writes:
   - access.entitlement
   - cache:idempotency
+- operation: testPricingRule
+  verb: POST
+  path: /pricing-rule/{ruleId}/test
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: transitionProductLifecycle
   verb: POST
   path: /products/{productId}/lifecycle
@@ -2277,6 +2356,7 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.product
+  - catalogue.product_media
   writes:
   - cache:idempotency
   - catalogue.product
@@ -2365,6 +2445,19 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.product
+  - catalogue.product_media
   writes:
   - cache:idempotency
   - catalogue.product
+  - catalogue.product_media
+- operation: updateProductVariant
+  verb: PATCH
+  path: /products/{productId}/variants/{variantId}
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.variant
+  writes: []

@@ -47,19 +47,24 @@ steps:
   - listPerformances
   outcome: Understands what is included and roughly when it is available
 - step: 3
+  screen: WEB-006
+  action: Picks a date, then a time
+  operations:
+  - listPerformances
+  - getAvailability
+  outcome: 'Holds nothing yet. Availability is read live, never cached, in one call for every time of the
+    event in the window (`eventId`, `from`, `to`). **Date first, then time, then tickets** (decided 29
+    September, rev 3 REV3-2): the times stay hidden until a date is picked, per
+    `BookingFlowConfig.performanceReveal` (default `dateTimeTicket`)'
+  duration: Availability must return in under 400ms or guests reload and double-book
+- step: 4
   screen: WEB-005
   action: Chooses ticket types and quantities
   operations:
   - listProductVariants
   - evaluatePromotions
-  outcome: Sees a running total that already reflects any applicable promotion
-- step: 4
-  screen: WEB-006
-  action: Picks a date and session
-  operations:
-  - getAvailability
-  outcome: Holds nothing yet. Availability is read live, never cached
-  duration: Availability must return in under 400ms or guests reload and double-book
+  outcome: 'Sees a running total that already reflects any applicable promotion. The tickets appear once a
+    time is picked and Continue stays off until both are chosen (decided 29 September, rev 3 REV3-2)'
 - step: 5
   screen: WEB-010
   action: Reviews the cart and may enter a promotion code
@@ -96,7 +101,7 @@ steps:
   - reprintOrder
   outcome: Order number visible immediately, tickets delivered by the chosen channel
 branches:
-- at: 4
+- at: 3
   condition: The session sells out between loading the page and selecting it
   behaviour: 'Selection is refused with the next available session offered. Availability is read live
     precisely so this is caught here rather than at payment.
@@ -104,7 +109,26 @@ branches:
     '
   severity: recoverable
   resolvedBy: WEB-006
+- at: 3
+  condition: The venue attached consent questions to the flow or to a product in the cart
+  behaviour: 'Asked once, right after the session or date is picked (e.g. *Are you able to swim?*), per
+    person or once per booking as each question says, and recorded as consent records by
+    `recordConsentAnswers`. A blocking answer marks the lines it blocks; `checkoutCart` refuses while a
+    required question is unanswered (decided 29 September, rev 3 REV3-26).
+
+    '
+  severity: recoverable
+  resolvedBy: recordConsentAnswers
 - at: 4
+  condition: The guest is not signed in and leaves the ticket step (or Add-ons, where the booking has one)
+  behaviour: 'With `BookingFlowConfig.signInAt` `afterAddOns` (the default) the guest is asked to sign in,
+    or for a guest code when guest checkout is on, before the cart; with `atPayment` the gate is at
+    WEB-012. The basket is kept either way (decided 29 September, rev 3 REV3-3).
+
+    '
+  severity: recoverable
+  resolvedBy: WEB-016
+- at: 3
   condition: The session shows sold out online while counter allocation remains
   behaviour: 'Correct behaviour, not a defect. Availability is per channel under channel allocation
     — web has exhausted its share. Worth stating because it will be raised as a bug.

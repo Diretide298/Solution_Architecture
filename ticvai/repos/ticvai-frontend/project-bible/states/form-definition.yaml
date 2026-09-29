@@ -15,24 +15,31 @@ terminal:
 transitions:
 - from: draft
   to: published
+  operation: approveWaiverTesting
   trigger: operation
   guard: '**Immutable from here.** A change creates a new version, because 2.15.13 requires the exact
-    accepted version retained'
+    accepted version retained. Action `publish` (now, scheduled or to a selected scope), only when the
+    pre-publication checklist has no critical failure and the final approver is not the submitter
+    (decided 29 September, readiness close-out)'
 - from: published
   to: superseded
+  operation: approveWaiverTesting
   trigger: operation
   guard: A newer version published. **This one stays readable forever** — submissions against it must
-    still resolve
+    still resolve. Performed by the new version's `publish` once its rollout covers every association
 - from: published
   to: retired
+  operation: approveWaiverTesting
   trigger: operation
   guard: Withdrawn with no replacement
 - from: superseded
   to: retired
+  operation: approveWaiverTesting
   trigger: operation
   guard: No longer offered
 - from: draft
   to: retired
+  operation: approveWaiverTesting
   trigger: operation
   guard: Abandoned before publication
 notes: '**`superseded` is not `retired`.** A superseded version is not offered and is still the version

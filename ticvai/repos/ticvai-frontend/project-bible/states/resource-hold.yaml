@@ -1,0 +1,40 @@
+# Resource hold — state model
+# Contract: resources.ResourceHold.status
+# Checked by tools/check-states.py.
+
+entity: Resource hold
+contract: resources
+enum: ResourceHold.status
+enumKind: inline
+enumSchema: ResourceHold
+enumProperty: status
+owner: resources
+initial:
+- held
+terminal:
+- converted
+- released
+- expired
+transitions:
+- from: held
+  to: converted
+  operation: createOrder
+  trigger: operation
+  guard: '**Became an order, and the hold becomes a `ResourceBooking` in `reserved`** without being
+    released first, so no other guest takes the cabana between the calls (decided 29 September, rev 3
+    REV3-15)'
+- from: held
+  to: released
+  operation: relinquishResourceHold
+  trigger: operation
+  guard: Given up deliberately. The guest picked another resource or left the map
+- from: held
+  to: expired
+  trigger: timer
+  guard: '**The resource returns to the map.** Past `expiresAt`, which is 8 minutes by default and never
+    more than 30 from creation with extensions (audit R169)'
+notes: '**A guest''s pick on a venue map, held while they pay** (decided 29 September, rev 3 REV3-15 and
+  GAP-C2, superseding audit R073 (c) for resources on an ingested map). The counterpart of the seat hold
+  and modelled the same way: `extendResourceHold` moves `expiresAt` and not the state, and while a hold
+  is `held` the resource shows as `held` in `getMapResourceAvailability` and is a conflict for
+  `bookResource` and `allocateResources`.'

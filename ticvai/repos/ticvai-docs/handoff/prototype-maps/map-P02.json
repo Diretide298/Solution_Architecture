@@ -570,6 +570,54 @@
    "view": "Account → All screens → Wave 2 → Security & sign-in",
    "evidence": "scrDefs.security: devices, \"Trust this device\", \"Two-step verification · An authenticator code as well\", Recovery, \"Lost a phone? Sign it out\"",
    "differences": "Prototype offers two-step verification and a trusted-device skip, but the YAML says guests have no second factor (R167). Either remove the toggle from the prototype or reopen the decision."
+  },
+  {
+   "id": "GST-074",
+   "name": "Map Booking — Cabanas & Spots",
+   "match": "exact",
+   "view": "Account → All screens → Rev 3 feedback → Cabana map (r3cabmap)",
+   "evidence": "added 29 September with the rev 3 decisions (group S1)",
+   "differences": ""
+  },
+  {
+   "id": "GST-075",
+   "name": "Book a Space by the Hour",
+   "match": "exact",
+   "view": "Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room)",
+   "evidence": "added 29 September with the rev 3 decisions (group S1)",
+   "differences": ""
+  },
+  {
+   "id": "GST-076",
+   "name": "Intercity Trip — Route & Schedule",
+   "match": "exact",
+   "view": "Account → All screens → Rev 3 feedback → Intercity bus · one-way (r3bus)",
+   "evidence": "added 29 September with the rev 3 decisions (group S1)",
+   "differences": ""
+  },
+  {
+   "id": "GST-077",
+   "name": "Intercity Trip — Route & Passengers",
+   "match": "exact",
+   "view": "Account → All screens → Rev 3 feedback → Bus route & passengers (r3route)",
+   "evidence": "added 29 September with the rev 3 decisions (group S1)",
+   "differences": ""
+  },
+  {
+   "id": "GST-078",
+   "name": "Intercity Trip — Multi-trip Passes",
+   "match": "exact",
+   "view": "Account → All screens → Rev 3 feedback → Bus multi-trip cards (r3busmulti)",
+   "evidence": "added 29 September with the rev 3 decisions (group S1)",
+   "differences": ""
+  },
+  {
+   "id": "GST-079",
+   "name": "Intercity Trip — Favourite Routes",
+   "match": "exact",
+   "view": "Account → All screens → Rev 3 feedback → Bus favourite routes (r3busfav)",
+   "evidence": "added 29 September with the rev 3 decisions (group S1)",
+   "differences": ""
   }
  ],
  "unmappedViews": [

@@ -172,7 +172,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: true
-    reads: 2
+    reads: 3
     writes: 0
   - operation: getMembership
     verb: GET
@@ -236,7 +236,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: guestSocialLogin
     verb: POST
@@ -244,7 +244,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: guestUaePassLogin
     verb: POST
@@ -252,7 +252,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 2
+    reads: 3
     writes: 4
   - operation: linkGuestCheckout
     verb: POST
@@ -468,7 +468,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 2
+    reads: 3
     writes: 4
   - operation: removeMfaMethod
     verb: DELETE
@@ -612,7 +612,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: verifyMfaChallenge
     verb: POST
@@ -1030,6 +1030,7 @@ screens:
 - P08:BO-1066 Roles, Permissions & Masking
 - P08:BO-1177 API Security, Access & Integration Permissions
 - P08:BO-142 Store Rules, Controls & Permissions
+- P08:BO-295 Member 360° Membership Account Workspace
 - P08:BO-385 Delegation Management
 - P08:BO-873 Staff Resource Directory
 - P08:BO-874 Staff Resource Profile

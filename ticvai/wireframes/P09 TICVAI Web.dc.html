@@ -278,7 +278,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getCellHealth · cancelDecommission · decommissionCell · getCell +6</div>
+          <div><b>OPERATIONS</b> &middot; getCellHealth · cancelDecommission · decommissionCell · getCell +8</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink, rightId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i><br><a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-004">ADM-004</a> </div>
@@ -3285,7 +3285,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; reinventoryHoldId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i><br><a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-027">ADM-027</a>  &mdash; <i>Plans the migrations the release requires</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRejectRelease &middot; <i>Reject release</i></div><div class="ov"><b>confirmDialog</b> confirmWithdrawRelease &middot; <i>Withdraw release</i></div><div class="ov"><b>modal</b> formCreateRelease &middot; <i>Create release</i> &middot; <b>Create release</b> &middot; Cancel <span class="dis">discards components · note · requiredMigrations · breakingChanges</span></div><div class="ov"><b>modal</b> formPromoteRelease &middot; <i>Promote release</i> &middot; <b>Promote release</b> &middot; Cancel <span class="dis">discards targetEnvironment · note · approverPrincipalId · stepUpToken</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRejectRelease &middot; <i>Reject release</i></div><div class="ov"><b>confirmDialog</b> confirmWithdrawRelease &middot; <i>Withdraw release</i></div><div class="ov"><b>modal</b> formCreateRelease &middot; <i>Create release</i> &middot; <b>Create release</b> &middot; Cancel <span class="dis">discards components · note · requiredMigrations · breakingChanges · guestReleaseNotes</span></div><div class="ov"><b>modal</b> formPromoteRelease &middot; <i>Promote release</i> &middot; <b>Promote release</b> &middot; Cancel <span class="dis">discards targetEnvironment · note · approverPrincipalId · stepUpToken</span></div></div>
         </div>
       </div>
       <div id="adm-023" class="scr">
@@ -4065,7 +4065,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; approveMatrixMultiLevel</div>
+          <div><b>OPERATIONS</b> &middot; listApprovalMatrices · setApprovalMatrix</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-238">ADM-238</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -4095,7 +4095,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; approveRoleAuthorityDelegation</div>
+          <div><b>OPERATIONS</b> &middot; listApprovalDelegations · createApprovalDelegation · setApprovalMatrix</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-238">ADM-238</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -4275,9 +4275,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; approveUnifiedDecision</div>
+          <div><b>OPERATIONS</b> &middot; listApprovalRequests · decideApprovalRequest</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; requestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-248">ADM-248</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -4545,7 +4545,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWorkflow · approveWorkflow</div>
+          <div><b>OPERATIONS</b> &middot; listRuleWorkflow · approveWorkflow</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="#adm-241">ADM-241</a>  &mdash; <i>Visual Workflow Designer</i><br><a href="#adm-320">ADM-320</a>  &mdash; <i>Create Approval Workflow</i><br><a href="#adm-322">ADM-322</a>  &mdash; <i>Approval Stage Configuration</i><br><a href="#adm-323">ADM-323</a>  &mdash; <i>Condition &amp; Decision Rule Builder</i><br><a href="#adm-324">ADM-324</a>  &mdash; <i>Approval Sequence &amp; Parallel Routing</i><br><a href="#adm-325">ADM-325</a>  &mdash; <i>Workflow Outcome &amp; Action Configuration</i><br><a href="#adm-326">ADM-326</a>  &mdash; <i>Workflow Validation &amp; Simulation</i><br><a href="#adm-327">ADM-327</a>  &mdash; <i>Workflow Publication &amp; Lifecycle</i><br><a href="#adm-328">ADM-328</a>  &mdash; <i>Workflow Versioning &amp; Change History</i></div>
@@ -4755,7 +4755,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listWorkflow · setVisualWorkflow</div>
+          <div><b>OPERATIONS</b> &middot; listRuleWorkflow · setVisualWorkflow</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-319">ADM-319</a>  &mdash; <i>Back to Approval Workflow Library</i></div>
@@ -4785,7 +4785,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listVersioningEffectiveDate · listWorkflow</div>
+          <div><b>OPERATIONS</b> &middot; listVersioningEffectiveDate · listRuleWorkflow</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-319">ADM-319</a>  &mdash; <i>Back to Approval Workflow Library</i></div>
@@ -5200,7 +5200,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Permissions that require MFA</b><div class="chip">Permissions that require MFA</div><span class="why">**MFA is required by permission (decided 28 September, audit R135).** A principal holding any permission listed here must present a second factor at sign-in and keep an a</span></div></div><div class="side"><div class="panel"><b>Save MFA requirement</b><div class="chip cta">Save MFA requirement</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Permissions that require MFA</b><div class="chip">Permissions that require MFA</div><span class="why">**MFA is required by permission (decided 28 September, audit R135).** A principal holding any permission listed here must present a second factor at sign-in and keep an a</span></div></div><div class="side"><div class="panel"><b>Save MFA requirement</b><div class="chip cta">Save MFA requirement</div><span class="why">**Staff factors only.** Guest two-step verification is not set here: it is a per-venue option in Venue Management (`VenueSettings.identity.guestTwoStep`, BO-065), off unl</span></div></div></div>
             </div>
           </div>
         </div>
@@ -8415,10 +8415,10 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPricingRule · listPricingRulePriority</div>
+          <div><b>OPERATIONS</b> &middot; listPricingRule · listPricingRulePriority · testPricingRule</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
-          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-059">ADM-059</a>  &mdash; <i>Works in Customer Segment &amp; Profile Pricing </i><br><a href="#adm-060">ADM-060</a>  &mdash; <i>Works in Membership &amp; Loyalty Pricing Rules</i><br><a href="#adm-061">ADM-061</a>  &mdash; <i>Works in Residency, Nationality &amp; Market Pri</i><br><a href="#adm-062">ADM-062</a>  &mdash; <i>Works in Channel-Based Pricing Rules</i><br><a href="#adm-063">ADM-063</a>  &mdash; <i>Works in Location, Venue &amp; Event Pricing Rul</i><br><a href="#adm-064">ADM-064</a>  &mdash; <i>Works in Quantity, Group &amp; Volume Pricing Ru</i><br><a href="#adm-065">ADM-065</a>  &mdash; <i>Works in Effective Date, Season &amp; Day-Based </i><br><a href="#adm-066">ADM-066</a>  &mdash; <i>Works in Timeslot, Performance &amp; Time-of-Day</i><br><a href="#adm-067">ADM-067</a>  &mdash; <i>Works in Pricing Rule Priority, Conflict Res</i></div>
+          <div><b>ARRIVES WITH</b> &middot; ruleId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-059">ADM-059</a>  &mdash; <i>Works in Customer Segment &amp; Profile Pricing </i><br><a href="#adm-060">ADM-060</a>  &mdash; <i>Works in Membership &amp; Loyalty Pricing Rules</i><br><a href="#adm-061">ADM-061</a>  &mdash; <i>Works in Residency, Nationality &amp; Market Pri</i><br><a href="#adm-062">ADM-062</a>  &mdash; <i>Works in Channel-Based Pricing Rules</i><br><a href="#adm-063">ADM-063</a>  &mdash; <i>Works in Location, Venue &amp; Event Pricing Rul</i><br><a href="#adm-064">ADM-064</a>  &mdash; <i>Works in Quantity, Group &amp; Volume Pricing Ru</i><br><a href="#adm-065">ADM-065</a>  &mdash; <i>Works in Effective Date, Season &amp; Day-Based </i><br><a href="#adm-066">ADM-066</a>  &mdash; <i>Works in Timeslot, Performance &amp; Time-of-Day</i><br><a href="#adm-067">ADM-067</a>  &mdash; <i>Works in Pricing Rule Priority, Conflict Res</i> <span class="car">ruleId</span></div>
           
           
         </div>
@@ -8448,7 +8448,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listCustomerSegmentProfile</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">ruleId</span></div>
           
           
         </div>
@@ -8478,7 +8478,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listMembershipLoyaltyPricing</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">ruleId</span></div>
           
           
         </div>
@@ -8508,7 +8508,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listResidencyNationalityMarket</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">ruleId</span></div>
           
           
         </div>
@@ -8538,7 +8538,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listChannelBasedPricing</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">ruleId</span></div>
           
           
         </div>
@@ -8568,7 +8568,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listLocationVenueEvent</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">ruleId</span></div>
           
           
         </div>
@@ -8598,7 +8598,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listQuantityGroupVolume</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">ruleId</span></div>
           
           
         </div>
@@ -8628,7 +8628,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listEffectiveDateSeason</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">ruleId</span></div>
           
           
         </div>
@@ -8658,7 +8658,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listTimeslotPerformanceTime</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">ruleId</span></div>
           
           
         </div>
@@ -8685,10 +8685,10 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPricingRulePriority</div>
+          <div><b>OPERATIONS</b> &middot; listPricingRulePriority · listPricingRule · testPricingRule</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
-          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a> </div>
+          <div><b>ARRIVES WITH</b> &middot; ruleId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-058">ADM-058</a>  &mdash; <i>Pricing Rule Command Center</i> <span class="car">ruleId</span></div>
           
           
         </div>
@@ -9015,10 +9015,10 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPricingGovernance</div>
+          <div><b>OPERATIONS</b> &middot; listPricingGovernance · decidePricingChangeRequest</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
-          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-079">ADM-079</a>  &mdash; <i>Works in Pricing Change Request &amp; Workspace</i><br><a href="#adm-080">ADM-080</a>  &mdash; <i>Works in Bulk Pricing Update, Import &amp; Mass </i><br><a href="#adm-081">ADM-081</a>  &mdash; <i>Works in Pricing Version &amp; Baseline Manageme</i><br><a href="#adm-082">ADM-082</a>  &mdash; <i>Works in Pricing Change Impact Analysis</i><br><a href="#adm-083">ADM-083</a>  &mdash; <i>Works in Pricing Approval Workflow &amp; Authori</i><br><a href="#adm-084">ADM-084</a>  &mdash; <i>Works in Pricing Publication &amp; Effective-Dat</i><br><a href="#adm-085">ADM-085</a>  &mdash; <i>Works in Pricing Distribution, Synchronizati</i><br><a href="#adm-086">ADM-086</a>  &mdash; <i>Works in Pricing Rollback &amp; Emergency Contro</i><br><a href="#adm-087">ADM-087</a>  &mdash; <i>Works in Pricing History, Audit &amp; Compliance</i></div>
+          <div><b>ARRIVES WITH</b> &middot; changeId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-079">ADM-079</a>  &mdash; <i>Works in Pricing Change Request &amp; Workspace</i> <span class="car">changeId</span><br><a href="#adm-080">ADM-080</a>  &mdash; <i>Works in Bulk Pricing Update, Import &amp; Mass </i><br><a href="#adm-081">ADM-081</a>  &mdash; <i>Works in Pricing Version &amp; Baseline Manageme</i><br><a href="#adm-082">ADM-082</a>  &mdash; <i>Works in Pricing Change Impact Analysis</i><br><a href="#adm-083">ADM-083</a>  &mdash; <i>Works in Pricing Approval Workflow &amp; Authori</i><br><a href="#adm-084">ADM-084</a>  &mdash; <i>Works in Pricing Publication &amp; Effective-Dat</i><br><a href="#adm-085">ADM-085</a>  &mdash; <i>Works in Pricing Distribution, Synchronizati</i><br><a href="#adm-086">ADM-086</a>  &mdash; <i>Works in Pricing Rollback &amp; Emergency Contro</i><br><a href="#adm-087">ADM-087</a>  &mdash; <i>Works in Pricing History, Audit &amp; Compliance</i></div>
           
           
         </div>
@@ -9045,10 +9045,10 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setPricingChangeRequest</div>
+          <div><b>OPERATIONS</b> &middot; setPricingChangeRequest · submitPricingChangeRequest · decidePricingChangeRequest</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
-          <div><b>GOES TO</b> &middot; <a href="#adm-078">ADM-078</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
+          <div><b>ARRIVES WITH</b> &middot; changeId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-078">ADM-078</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i> <span class="car">changeId</span></div>
           
           
         </div>
@@ -9288,7 +9288,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listPricingCompliance</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-078">ADM-078</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-078">ADM-078</a>  &mdash; <i>Pricing Governance Command Center</i></div>
           
           
         </div>
@@ -9585,7 +9585,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listRulePriorityConflict</div>
+          <div><b>OPERATIONS</b> &middot; listRulePriorityConflict · setRulePriorityConflict</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-088">ADM-088</a> </div>
@@ -9918,7 +9918,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listRevenue</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-109">ADM-109</a>  &mdash; <i>Works in Pricing Simulation Studio</i><br><a href="#adm-110">ADM-110</a>  &mdash; <i>Works in Scenario Modeling &amp; What-If Analysi</i><br><a href="#adm-111">ADM-111</a>  &mdash; <i>Works in A/B Pricing Experiment Studio</i><br><a href="#adm-112">ADM-112</a>  &mdash; <i>Works in Revenue &amp; Demand Impact Forecasting</i><br><a href="#adm-113">ADM-113</a>  &mdash; <i>Works in AI Recommendation Review &amp; Decision</i><br><a href="#adm-114">ADM-114</a>  &mdash; <i>Works in Automation Policy &amp; Autonomous Pric</i><br><a href="#adm-115">ADM-115</a>  &mdash; <i>Works in Live Dynamic Price Execution &amp; Depl</i><br><a href="#adm-116">ADM-116</a>  &mdash; <i>Works in Dynamic Pricing Performance &amp; Optim</i><br><a href="#adm-117">ADM-117</a>  &mdash; <i>Works in AI Learning, Model Performance &amp; Op</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-109">ADM-109</a>  &mdash; <i>Works in Pricing Simulation Studio</i><br><a href="#adm-110">ADM-110</a>  &mdash; <i>Works in Scenario Modeling &amp; What-If Analysi</i><br><a href="#adm-111">ADM-111</a>  &mdash; <i>Works in A/B Pricing Experiment Studio</i><br><a href="#adm-112">ADM-112</a>  &mdash; <i>Works in Revenue &amp; Demand Impact Forecasting</i><br><a href="#adm-113">ADM-113</a>  &mdash; <i>Works in AI Recommendation Review &amp; Decision</i> <span class="car">recommendationId</span><br><a href="#adm-114">ADM-114</a>  &mdash; <i>Works in Automation Policy &amp; Autonomous Pric</i><br><a href="#adm-115">ADM-115</a>  &mdash; <i>Works in Live Dynamic Price Execution &amp; Depl</i><br><a href="#adm-116">ADM-116</a>  &mdash; <i>Works in Dynamic Pricing Performance &amp; Optim</i><br><a href="#adm-117">ADM-117</a>  &mdash; <i>Works in AI Learning, Model Performance &amp; Op</i></div>
           
           
         </div>
@@ -10065,9 +10065,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listRecommendationReviewDecision</div>
+          <div><b>OPERATIONS</b> &middot; listRecommendationReviewDecision · decidePricingRecommendation</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; recommendationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-108">ADM-108</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -10308,7 +10308,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listPromotionLifecycleStatus</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-138">ADM-138</a>  &mdash; <i>Promotion Command Center Dashboard</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-138">ADM-138</a>  &mdash; <i>Promotion Command Center Dashboard</i> <span class="car">promotionId</span></div>
           
           
         </div>
@@ -10338,7 +10338,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listCampaignCalendarTimeline</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-138">ADM-138</a>  &mdash; <i>Promotion Command Center Dashboard</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-138">ADM-138</a>  &mdash; <i>Promotion Command Center Dashboard</i> <span class="car">promotionId</span></div>
           
           
         </div>
@@ -10398,7 +10398,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listPromotionAlertException</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-138">ADM-138</a>  &mdash; <i>Promotion Command Center Dashboard</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-138">ADM-138</a>  &mdash; <i>Promotion Command Center Dashboard</i> <span class="car">promotionId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmSuspendCampaign &middot; <i>Suspend campaign</i></div></div>
         </div>
@@ -10488,7 +10488,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listPromotionActivityVersion</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-138">ADM-138</a>  &mdash; <i>Promotion Command Center Dashboard</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-138">ADM-138</a>  &mdash; <i>Promotion Command Center Dashboard</i> <span class="car">promotionId</span></div>
           
           
         </div>
@@ -13965,7 +13965,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listResaleFeeCommission · listFeeSellerProceed</div>
+          <div><b>OPERATIONS</b> &middot; listResaleFeeCommission · listFeeSellerProceed · getResaleFeePolicy · setResaleFeePolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-278">ADM-278</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -19420,12 +19420,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Calendar</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Every scheduled lifecycle action in the range, on a calendar**: upcoming as scheduled, done as executed, failed with its reason, so failed jobs and conflicts show where</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; publishActivationScheduler</div>
+          <div><b>OPERATIONS</b> &middot; publishActivationScheduler · listScheduledLifecycleActions</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-118">ADM-118</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -19518,7 +19518,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listProductGovernance</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-129">ADM-129</a>  &mdash; <i>Works in Approval Workflow Designer</i><br><a href="#adm-130">ADM-130</a>  &mdash; <i>Works in Approval Review &amp; Decision Workspac</i><br><a href="#adm-131">ADM-131</a>  &mdash; <i>Product Version Management</i><br><a href="#adm-132">ADM-132</a>  &mdash; <i>Works in Rollback &amp; Recovery Management</i><br><a href="#adm-133">ADM-133</a>  &mdash; <i>Works in Change Impact Analysis</i><br><a href="#adm-134">ADM-134</a>  &mdash; <i>Works in Change Propagation &amp; Dependency Con</i><br><a href="#adm-135">ADM-135</a>  &mdash; <i>Works in Product Retirement, Suspension &amp; Ar</i><br><a href="#adm-136">ADM-136</a>  &mdash; <i>Works in Product Audit Trail &amp; Change Histor</i><br><a href="#adm-137">ADM-137</a>  &mdash; <i>Works in Governance Risk, AI Monitoring &amp; Co</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-129">ADM-129</a>  &mdash; <i>Works in Approval Workflow Designer</i><br><a href="#adm-130">ADM-130</a>  &mdash; <i>Works in Approval Review &amp; Decision Workspac</i><br><a href="#adm-131">ADM-131</a>  &mdash; <i>Product Version Management</i> <span class="car">productId</span><br><a href="#adm-132">ADM-132</a>  &mdash; <i>Works in Rollback &amp; Recovery Management</i><br><a href="#adm-133">ADM-133</a>  &mdash; <i>Works in Change Impact Analysis</i><br><a href="#adm-134">ADM-134</a>  &mdash; <i>Works in Change Propagation &amp; Dependency Con</i><br><a href="#adm-135">ADM-135</a>  &mdash; <i>Works in Product Retirement, Suspension &amp; Ar</i><br><a href="#adm-136">ADM-136</a>  &mdash; <i>Works in Product Audit Trail &amp; Change Histor</i><br><a href="#adm-137">ADM-137</a>  &mdash; <i>Works in Governance Risk, AI Monitoring &amp; Co</i></div>
           
           
         </div>

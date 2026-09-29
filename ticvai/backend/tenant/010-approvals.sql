@@ -1,4 +1,4 @@
--- approvals — 15 tables
+-- approvals — 16 tables
 -- **Derived. Do not hand-edit.**
 
 -- The badge an approved accreditation actually issues, held apart from the request that granted
@@ -15,6 +15,25 @@ CREATE TABLE IF NOT EXISTS approvals.accreditation_badge (
     issued_at                         timestamptz,
     expires_at                        timestamptz,
     revoked_reason                    text
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS approvals.approved_action_execution (
+    id                                text PRIMARY KEY NOT NULL,
+    approval_request_id               text NOT NULL,
+    source_module                     text NOT NULL,
+    action_type                       text NOT NULL,
+    subject_ref                       text,
+    status                            text NOT NULL CONSTRAINT approved_action_execution_status_chk CHECK (status IN ('queued', 'executing', 'succeeded', 'failed', 'investigating', 'escalated')),
+    attempts                          integer,
+    last_attempt_at                   timestamptz,
+    failure_reason                    text,
+    assignee_id                       text,
+    last_action                       text CONSTRAINT approved_action_execution_last_action_chk CHECK (last_action IN ('retry', 'investigate', 'escalate')),
+    note                              text,
+    updated_at                        timestamptz,
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -139,7 +158,7 @@ CREATE TABLE IF NOT EXISTS approvals.matrix (
 
 -- One request per action needing authorisation. The subject is a reference, never a copy Hangs
 -- off: a root — nothing above it in its schema; references identity.principal. Reached by: 8
--- operations read it and 8 write it; 18 tables reference it; written by 3 contracts — approvals,
+-- operations read it and 8 write it; 23 tables reference it; written by 3 contracts — approvals,
 -- subscription, workforce.
 CREATE TABLE IF NOT EXISTS approvals.request (
     id                                text PRIMARY KEY NOT NULL,
@@ -148,7 +167,7 @@ CREATE TABLE IF NOT EXISTS approvals.request (
     out_of_office_delegate_id         uuid,
     allow_email_approval              boolean DEFAULT false,
     reopened_from                     uuid,
-    status                            text NOT NULL CONSTRAINT request_status_chk CHECK (status IN ('draft', 'pending', 'escalated', 'approved', 'rejected', 'withdrawn', 'expired', 'cancelled')),
+    status                            text NOT NULL CONSTRAINT request_status_chk CHECK (status IN ('draft', 'pending', 'escalated', 'returned', 'informationRequested', 'approved', 'rejected', 'withdrawn', 'expired', 'cancelled')),
     subject_contract                  text,
     subject_type                      text,
     subject_id                        text,

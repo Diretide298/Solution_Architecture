@@ -15,6 +15,7 @@ because its absence produced a specific failure, and each is named.
 |---|---|---|
 | **The plan** | **DWG or DXF** preferred · PDF accepted · SVG accepted | **Send native CAD if you have it.** Exporting to PDF flattens layer names, and the layer names are what the import reads |
 | **The seating manifest** | **XLSX**, one sheet per section | The definitive list of seats. The plan says where; this says what |
+| **The resource manifest** | **XLSX**, one sheet | Only where guests book cabanas, loungers or tables from the map. See §3a |
 | **The illustrated map** | PNG or JPG, plus the source if you have it | What guests see. Separate from the plan — see §6 |
 | **Georeference points** | Two rows in a spreadsheet, or a note | Without these the map is a picture. See §5 |
 
@@ -45,6 +46,7 @@ right.** They say what the geometry means. Keep doing that.
 | Stage or focal point | `Stage`, `Screen`, `Pitch` | |
 | Exits | `Exits`, `Egress` | |
 | Emergency exits | `EmergencyExits`, `FireExits` | **Send separately — see §7** |
+| Bookable resources | `VC-Resources`, `Cabanas`, `Loungers`, `Tables` | Only where guests book them from the map. One closed shape per cabana, lounger or table, labelled — see §3a |
 
 ### You do not have to draw the walkways
 
@@ -118,6 +120,44 @@ the join, and §4 is about the one way it silently fails.
 
 **Blank rows between sections.** Harmless, and they make the count ambiguous when you check the
 import against your own figure.
+
+---
+
+## 3a. Bookable resources — cabanas, loungers, tables
+
+**Added 29 September** (decided 29 September, rev 3 REV3-15 and GAP-C2): guests now pick a specific
+cabana, lounger or table on the map, hold it and buy it, the way they pick a seat. That needs the
+same two files as seating: **the drawing says where each one is; a manifest says what it is.**
+
+**In the drawing:** one closed shape per resource on a resource layer (`VC-Resources`, or one layer
+each: `Cabanas`, `Loungers`, `Tables`), **each labelled with its code in Western digits** — `B09`,
+`R01`, `T08` — as text inside or on the shape. The label is what the guest sees and taps.
+
+**The resource manifest:** one sheet, header on row 3, five columns:
+
+| Label | Kind | Zone | Capacity | Price band |
+|---|---|---|---|---|
+| B09 | cabana | Beach | 15 | Large |
+| R01 | cabana | River | 6 | Family |
+
+**`Label`** — must match the label in the drawing **character for character** (after digit
+normalisation, §4). **`Kind`** — `cabana`, `lounger`, `table`, `pitch` or `other`. A `table` here
+is a beach or event table sold like a cabana; restaurant tables are not placed as resources, they
+are booked as table reservations. **`Zone`** — the area a guest reads it by. **`Capacity`** — the
+most people it takes. **`Price band`** — a band name, the same across the sheet (`Family`,
+`Medium`, `Large`, `XL` at Coastal Aqua); **each band is mapped to a product variant at import**,
+which is where its price comes from. The map holds no prices.
+
+### What the import reports
+
+| Finding | Meaning |
+|---|---|
+| `resourceLabelMissing` | A shape on the resource layer has no label |
+| `resourceLabelDuplicate` | Two shapes carry the same label |
+| `resourceManifestMissingFromPlan` | A manifest row has no shape in the drawing |
+| `resourcePlanMissingFromManifest` | A shape in the drawing has no manifest row |
+| `resourceCodeUnmatched` | A label names no resource set up at the venue (unless the import is told to create missing ones) |
+| `resourcePriceBandUnknown` | A price band not mapped to a product variant |
 
 ---
 

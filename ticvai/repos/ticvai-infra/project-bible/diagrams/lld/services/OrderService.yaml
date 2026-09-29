@@ -1,9 +1,9 @@
 id: LLD-OrderService
-title: OrderService — 254 operations, 70 tables
+title: OrderService — 268 operations, 85 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
-why: '**The transactional core.** 254 operations, 70 tables, and the highest write rate in the platform.
+why: '**The transactional core.** 268 operations, 85 tables, and the highest write rate in the platform.
   Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday
   morning.
 
@@ -27,17 +27,17 @@ why: '**The transactional core.** 254 operations, 70 tables, and the highest wri
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 254
+  operations: 268
   inAFlow: 142
-  percent: 56%
+  percent: 53%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: orders
-  tables: 45
+  tables: 60
   stores:
   - postgres
-  largestTable: orders.pos_shift
+  largestTable: orders.order_line
 - schema: payments
   tables: 25
   stores:
@@ -45,7 +45,7 @@ schemas:
   largestTable: payments.fee_rule
 operationsByContract:
 - contract: orders
-  count: 192
+  count: 206
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -61,8 +61,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 6
-    writes: 4
+    reads: 10
+    writes: 6
   - operation: addTip
     verb: POST
     path: /payments/{paymentId}/tip
@@ -77,7 +77,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 6
+    reads: 8
     writes: 5
   - operation: applyCartPromoCode
     verb: POST
@@ -85,7 +85,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 2
+    reads: 6
     writes: 0
   - operation: applyManualDiscount
     verb: POST
@@ -93,7 +93,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_DISCOUNT
     offline: true
-    reads: 5
+    reads: 7
     writes: 4
   - operation: approveExceptionServiceRecovery
     verb: PUT
@@ -165,7 +165,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 8
+    reads: 10
     writes: 4
   - operation: claimCart
     verb: POST
@@ -173,7 +173,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 4
+    reads: 8
     writes: 3
   - operation: claimTicketTransfer
     verb: POST
@@ -183,13 +183,29 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: cleanupFailedPayment
+    verb: POST
+    path: /payments/{paymentId}/cleanup
+    scope: venue
+    permission: ORDER_VOID
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: cloneTicketTemplate
+    verb: POST
+    path: /ticket-templates/{templateId}/clone
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 0
   - operation: convertReservation
     verb: POST
     path: /reservations/{reservationId}/convert
     scope: workstation
     permission: ORDER_CREATE
     offline: false
-    reads: 5
+    reads: 7
     writes: 4
   - operation: convertToTermProduct
     verb: POST
@@ -197,7 +213,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 6
+    reads: 8
     writes: 2
   - operation: createBulkRefund
     verb: POST
@@ -213,7 +229,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 5
+    reads: 9
     writes: 2
   - operation: createGroupBooking
     verb: POST
@@ -223,6 +239,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 2
+  - operation: createGroupEnquiry
+    verb: POST
+    path: /group-enquiry-opportunity
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: createListingSeller
     verb: POST
     path: /listing-seller
@@ -231,14 +255,22 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: createMemberException
+    verb: POST
+    path: /memberships/{membershipId}/exceptions
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 1
+    writes: 0
   - operation: createOrder
     verb: POST
     path: /orders
     scope: workstation
     permission: ORDER_CREATE
     offline: true
-    reads: 5
-    writes: 4
+    reads: 7
+    writes: 6
   - operation: createOrderSourceChannel
     verb: POST
     path: /order-source-channel
@@ -293,8 +325,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 3
-    writes: 3
+    reads: 5
+    writes: 5
   - operation: createTicketTemplate
     verb: POST
     path: /ticket-templates
@@ -318,14 +350,14 @@ operationsByContract:
     permission: ORDER_EXCHANGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 4
   - operation: extendCart
     verb: POST
     path: /carts/{cartId}/extend
     scope: venue
     permission: null
     offline: false
-    reads: 4
+    reads: 8
     writes: 3
   - operation: extendReservation
     verb: POST
@@ -333,7 +365,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 3
+    reads: 5
     writes: 2
   - operation: getB2bCredit
     verb: GET
@@ -357,7 +389,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 5
+    reads: 9
     writes: 0
   - operation: getDepositPolicy
     verb: GET
@@ -365,7 +397,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getGroupBooking
     verb: GET
@@ -389,7 +421,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: true
-    reads: 4
+    reads: 6
     writes: 0
   - operation: getOrderCalendarEvent
     verb: GET
@@ -413,7 +445,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 6
+    reads: 8
     writes: 0
   - operation: getRefundPolicy
     verb: GET
@@ -437,7 +469,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 2
+    reads: 4
     writes: 0
   - operation: getVisitReminder
     verb: GET
@@ -453,8 +485,16 @@ operationsByContract:
     scope: workstation
     permission: ORDER_MODIFY
     offline: true
-    reads: 5
+    reads: 7
     writes: 4
+  - operation: importTicketTemplate
+    verb: POST
+    path: /ticket-templates/imports
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 0
   - operation: inquirePaymentStatus
     verb: POST
     path: /payments/{paymentId}/inquiry
@@ -749,7 +789,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 5
+    reads: 7
     writes: 0
   - operation: listOfficialResaleMarketplace
     verb: GET
@@ -1037,7 +1077,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 2
+    reads: 4
     writes: 0
   - operation: listSellerSettlementPayout
     verb: GET
@@ -1159,14 +1199,22 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: migrateMembership
+    verb: POST
+    path: /memberships/{membershipId}/migrations
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 1
+    writes: 0
   - operation: modifyOrder
     verb: POST
     path: /orders/{orderId}/modify
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 5
-    writes: 4
+    reads: 7
+    writes: 6
   - operation: openGuestCreditAccount
     verb: POST
     path: /guest-credit-accounts
@@ -1237,7 +1285,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 3
+    reads: 7
     writes: 3
   - operation: renewMembership
     verb: POST
@@ -1279,6 +1327,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: resolveMembershipActivation
+    verb: POST
+    path: /memberships/{membershipId}/activation/resolve
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 1
+    writes: 0
   - operation: resolveSyncRejection
     verb: POST
     path: /sync/rejections/{rejectionId}/resolve
@@ -1301,7 +1357,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_MODIFY
     offline: false
-    reads: 5
+    reads: 7
     writes: 4
   - operation: revokeEntitlementShare
     verb: POST
@@ -1357,8 +1413,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 1
-    writes: 1
+    reads: 2
+    writes: 2
   - operation: setFraudRules
     verb: PUT
     path: /fraud-rules
@@ -1375,6 +1431,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setGroupCustomerOrganization
+    verb: PUT
+    path: /group-customer-organization
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 1
   - operation: setGroupOperationalPlanning
     verb: PUT
     path: /group-operational-planning
@@ -1391,6 +1455,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setGroupPaymentSchedule
+    verb: PUT
+    path: /group-bookings/{groupBookingId}/payment-schedule
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 1
   - operation: setGroupQuotationProposal
     verb: PUT
     path: /group-quotation-proposal
@@ -1398,6 +1470,22 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 0
+    writes: 0
+  - operation: setGroupTicketAllocation
+    verb: PUT
+    path: /group-bookings/{groupBookingId}/allocation
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 1
+  - operation: setGroupTicketFulfillment
+    verb: PUT
+    path: /group-bookings/{groupBookingId}/fulfillment
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 1
     writes: 0
   - operation: setMultiPaymentSplit
     verb: PUT
@@ -1431,6 +1519,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setParticipantGuestList
+    verb: PUT
+    path: /group-bookings/{groupBookingId}/participants
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 1
   - operation: setPaymentProvider
     verb: PUT
     path: /payment-providers
@@ -1446,6 +1542,14 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 0
+    writes: 0
+  - operation: setRefundCalculationPolicy
+    verb: PUT
+    path: /refund-calculation-policy
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
     writes: 0
   - operation: setRefundPolicy
     verb: PUT
@@ -1534,7 +1638,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 1
-    writes: 1
+    writes: 3
   - operation: transferOrderTickets
     verb: POST
     path: /orders/{orderId}/transfer
@@ -1549,7 +1653,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 4
+    reads: 8
     writes: 3
   - operation: updateGroupBooking
     verb: PATCH
@@ -1567,13 +1671,21 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: voidEntitlement
+    verb: POST
+    path: /entitlements/{entitlementId}/void
+    scope: venue
+    permission: ORDER_VOID
+    offline: false
+    reads: 1
+    writes: 0
   - operation: voidOrder
     verb: POST
     path: /orders/{orderId}/voids
     scope: venue
     permission: ORDER_VOID
     offline: true
-    reads: 5
+    reads: 7
     writes: 4
   - operation: voidPayment
     verb: POST
@@ -2284,7 +2396,7 @@ tables:
   foreignWriters:
   - marketing-crm
 - table: orders.cart_line
-  columns: 16
+  columns: 22
   store: postgres
   parent: orders.cart
   writtenBy:
@@ -2319,7 +2431,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.deposit
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy: []
@@ -2346,7 +2458,14 @@ tables:
   - shift
   foreignWriters: null
 - table: orders.deposit_policy
-  columns: 10
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.deposit_policy (dining_* columns)
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -2372,6 +2491,70 @@ tables:
   writtenBy:
   - orders
   foreignWriters: null
+- table: orders.group_customer_organization
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: orders.group_customer_organization_contact
+  columns: 6
+  store: postgres
+  parent: orders.group_customer_organization
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.group_enquiry
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: orders.group_participant
+  columns: 7
+  store: postgres
+  parent: orders.group_participant_list
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.group_participant_list
+  columns: 5
+  store: postgres
+  parent: orders.group_booking
+  writtenBy: []
+  foreignWriters: null
+- table: orders.group_payment_milestone
+  columns: 6
+  store: postgres
+  parent: orders.group_payment_schedule
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.group_payment_schedule
+  columns: 5
+  store: postgres
+  parent: orders.group_booking
+  writtenBy: []
+  foreignWriters: null
+- table: orders.group_ticket_allocation
+  columns: 6
+  store: postgres
+  parent: orders.group_booking
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.group_ticket_allocation_line
+  columns: 6
+  store: postgres
+  parent: orders.group_ticket_allocation
+  writtenBy: []
+  foreignWriters: null
+- table: orders.group_ticket_fulfillment
+  columns: 7
+  store: postgres
+  parent: orders.group_booking
+  writtenBy: []
+  foreignWriters: null
 - table: orders.invitation
   columns: 12
   store: postgres
@@ -2385,6 +2568,24 @@ tables:
   parent: null
   writtenBy:
   - orders
+  foreignWriters: null
+- table: orders.member_exception
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: orders.membership_activation_action
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: orders.membership_migration
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: orders.membership_renewal
   columns: 11
@@ -2407,7 +2608,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: orders.order_line
-  columns: 21
+  columns: 26
   store: postgres
   parent: promotions.promotion
   writtenBy:
@@ -2477,6 +2678,12 @@ tables:
   parent: null
   writtenBy: []
   foreignWriters: null
+- table: orders.refund_calculation_policy
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: orders.refund_policy
   columns: 8
   store: postgres
@@ -2513,7 +2720,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.reservation_line
-  columns: 10
+  columns: 15
   store: postgres
   parent: orders.reservation
   writtenBy:
@@ -2767,15 +2974,15 @@ readsFrom:
 - service: CatalogueService
   operations: 15
 - service: AccessService
-  operations: 11
+  operations: 12
+- service: MarketingService
+  operations: 9
 - service: TenancyService
   operations: 8
 - service: LedgerService
   operations: 5
 - service: CrossRegionService
   operations: 2
-- service: MarketingService
-  operations: 1
 - service: WalletService
   operations: 1
 writesOutside:
@@ -2925,6 +3132,7 @@ screens:
 - P01:WEB-006 Date & Performance Selection
 - P01:WEB-008 Add-ons & Upsell
 - P01:WEB-010 Shopping Cart
+- P01:WEB-011 Guest Details & Attendee Forms
 - P01:WEB-012 Checkout — Payment
 - P01:WEB-013 Booking Confirmation
 - P01:WEB-014 Pay for a Booking
@@ -2936,8 +3144,13 @@ screens:
 - P01:WEB-030 Ticket Transfer
 - P01:WEB-031 My Reservations
 - P01:WEB-033 Shop
+- P01:WEB-036 F&B – Browse & Order
 - P01:WEB-041 Parking – Reserve & Pay
 - P01:WEB-042 Retail & Shop and Drop
+- P01:WEB-047 Map Booking — Cabanas & Spots
+- P01:WEB-048 Book a Space by the Hour
+- P01:WEB-049 Transport — Route & Schedule
+- P02:GST-007 Select Date & Time
 - P02:GST-008 Tickets & Add-ons
 - P02:GST-009 Review & Payment
 - P02:GST-010 Booking Confirmation
@@ -2961,8 +3174,13 @@ screens:
 - P02:GST-055 Dynamic QR Ticket
 - P02:GST-056 Bundle Package
 - P02:GST-067 Refunds & Resale
+- P02:GST-070 Reserve a Table
 - P02:GST-071 Payment Methods
 - P02:GST-072 Share & Group Booking
+- P02:GST-074 Map Booking — Cabanas & Spots
+- P02:GST-075 Book a Space by the Hour
+- P02:GST-077 Intercity Trip — Route & Passengers
+- P02:GST-078 Intercity Trip — Multi-trip Passes
 - P04:POS-001 Begin Shift
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-004 Sell — Seat Map
@@ -3053,6 +3271,10 @@ screens:
 - P08:BO-281 Group Amendments, Cancellation & Refund Operations
 - P08:BO-282 Group Booking Reconciliation, Closure & Performance
 - P08:BO-283 Group Sales Analytics & AI Intelligence Center
+- P08:BO-296 Membership Activation, Assignment & Credential Management
+- P08:BO-299 Membership Upgrade, Downgrade & Product Migration Operations
+- P08:BO-300 Renewal Operations & Auto-Renewal Management
+- P08:BO-301 Member Exceptions, Overrides & Service Recovery
 - P08:BO-304 Order & Reservation Command Center
 - P08:BO-305 Order Detail & Transaction Workspace
 - P08:BO-306 Reservation & Hold Policy Configuration
@@ -3082,6 +3304,7 @@ screens:
 - P08:BO-331 Payment Reconciliation & Exception Management
 - P08:BO-332 Financial Traceability, Control & Audit Explorer
 - P08:BO-333 Order Financial Analytics & AI Reconciliation Intelligence
+- P08:BO-344 Media Design Studio Command Center
 - P08:BO-346 PDF, Printable & POS Ticket Designer
 - P08:BO-778 Abandoned Cart Recovery
 - P09:ADM-199 Eligibility Rule Builder

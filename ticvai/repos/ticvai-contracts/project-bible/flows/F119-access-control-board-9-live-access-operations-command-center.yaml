@@ -65,7 +65,7 @@ steps:
   screen: BO-228
   action: Works in Manual Override & Supervisor Approval
   operations:
-  - approveManualOverrideSupervisor
+  - overrideAccess
   outcome: Allow authorized staff to bypass selected access restrictions when operationally justified.
     The matrix explicitly requires Allow Override and operator-based ticket override.
 - step: 9

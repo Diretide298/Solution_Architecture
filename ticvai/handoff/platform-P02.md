@@ -4,13 +4,13 @@
 
 | | |
 |---|---|
-| Screens | 71 |
-| Operations | 157 |
-| Contracts | 17 |
-| Modules | 16 |
+| Screens | 77 |
+| Operations | 188 |
+| Contracts | 19 |
+| Modules | 17 |
 | Undrawn | 0 |
 | Operations with no screen | 18 |
-| Waves | wave1 20 · wave2 34 · wave3 11 · wave4 6 |
+| Waves | wave1 20 · wave2 35 · wave3 17 · wave4 5 |
 
 ## Gaps
 
@@ -56,10 +56,11 @@
 |---|---|---|
 | Account & Self-Service | 14 | 1, 2, 3 |
 | Engagement & Support | 12 | 2, 3, 4 |
+| Booking & Selection | 10 | 1, 2, 3 |
 | In-venue Services | 10 | 2, 3 |
-| Booking & Selection | 8 | 1, 2, 3 |
 | Discovery & Browse | 7 | 1, 2 |
 | Ticketing | 4 | 2 |
+| Transport | 4 | 3 |
 | Cart & Checkout | 3 | 1 |
 | Membership, Loyalty & Value | 3 | 2 |
 | System States | 2 | 1 |
@@ -76,13 +77,13 @@
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
 | `GST-001` | Home – Default | Discovery & Browse | 1 | 5 | yes |
-| `GST-002` | Explore Categories | Discovery & Browse | 1 | 1 | yes |
+| `GST-002` | Explore Categories | Discovery & Browse | 1 | 2 | yes |
 | `GST-003` | Event & Attraction Listing | Discovery & Browse | 1 | 4 | yes |
 | `GST-004` | Attraction Details | Discovery & Browse | 1 | 5 | yes |
 | `GST-005` | What's On | Discovery & Browse | 1 | 2 | yes |
 | `GST-006` | Event / Exhibition Details | Discovery & Browse | 1 | 2 | yes |
-| `GST-007` | Select Date & Time | Booking & Selection | 1 | 3 | yes |
-| `GST-008` | Tickets & Add-ons | Booking & Selection | 1 | 1 | yes |
+| `GST-007` | Select Date & Time | Booking & Selection | 1 | 8 | yes |
+| `GST-008` | Tickets & Add-ons | Booking & Selection | 1 | 5 | yes |
 | `GST-009` | Review & Payment | Cart & Checkout | 1 | 9 | yes |
 | `GST-010` | Booking Confirmation | Cart & Checkout | 1 | 3 | yes |
 | `GST-011` | Wallet Overview | Membership, Loyalty & Value | 2 | 2 | yes |
@@ -104,7 +105,7 @@
 | `GST-027` | Parking – Reserve & Pay | In-venue Services | 3 | 5 | yes |
 | `GST-028` | Parking – Reservation Confirmed | In-venue Services | 3 | 2 | yes |
 | `GST-029` | Venue Info & Services | In-venue Services | 2 | 3 | yes |
-| `GST-030` | In-Venue Notifications | Engagement & Support | 4 | 1 | yes |
+| `GST-030` | In-Venue Notifications | Engagement & Support | 2 | 3 | yes |
 | `GST-031` | AI Concierge – Home | Engagement & Support | 2 | 5 | yes |
 | `GST-032` | AI Concierge – Chat | Engagement & Support | 2 | 8 | yes |
 | `GST-033` | AI Concierge – Contextual Help | Engagement & Support | 2 | 1 | yes |
@@ -114,16 +115,16 @@
 | `GST-037` | Offers & Promotions | Promotions | 2 | 3 | yes |
 | `GST-038` | Digital Companion Mode | In-venue Services | 3 | 3 | yes |
 | `GST-039` | Profile | Account & Self-Service | 1 | 2 | yes |
-| `GST-040` | Help & Support | Engagement & Support | 2 | 5 | yes |
-| `GST-041` | Checkout Entry | Cart & Checkout | 1 | 9 | yes |
-| `GST-042` | Simple Registration & OTP | Account & Self-Service | 1 | 10 | yes |
+| `GST-040` | Help & Support | Engagement & Support | 2 | 6 | yes |
+| `GST-041` | Checkout Entry | Cart & Checkout | 1 | 11 | yes |
+| `GST-042` | Simple Registration & OTP | Account & Self-Service | 1 | 12 | yes |
 | `GST-043` | Arabic / RTL Experience | System States | 1 | 0 | yes |
 | `GST-044` | Multi-Currency & Pricing | Ticketing | 2 | 2 | yes |
 | `GST-045` | Ticket Delivery & Sharing | Account & Self-Service | 2 | 1 | yes |
 | `GST-046` | Branded Queue / Waiting Room | High-Demand Access | 1 | 3 | yes |
 | `GST-047` | Maintenance / Upgrade Page | System States | 1 | 1 | yes |
 | `GST-048` | Upsell / Cross-Sell | Booking & Selection | 2 | 2 | yes |
-| `GST-049` | Interactive Seat Selection | Booking & Selection | 2 | 3 | yes |
+| `GST-049` | Interactive Seat Selection | Booking & Selection | 2 | 5 | yes |
 | `GST-050` | Resource Booking – Cabana | Booking & Selection | 3 | 3 | yes |
 | `GST-051` | Plan Your Adventure – Start | Engagement & Support | 4 | 2 | yes |
 | `GST-052` | Suggested Itineraries | Engagement & Support | 4 | 2 | yes |
@@ -142,8 +143,14 @@
 | `GST-067` | Refunds & Resale | Account & Self-Service | 2 | 3 | yes |
 | `GST-068` | Help & My Cases | Engagement & Support | 2 | 3 | yes |
 | `GST-069` | Face Pass | Account & Self-Service | 2 | 4 | yes |
-| `GST-070` | Reserve a Table | In-venue Services | 2 | 6 | yes |
+| `GST-070` | Reserve a Table | In-venue Services | 2 | 7 | yes |
 | `GST-071` | Payment Methods | Account & Self-Service | 2 | 5 | yes |
 | `GST-072` | Share & Group Booking | Booking & Selection | 2 | 8 | yes |
-| `GST-073` | Security & Sign-in | Account & Self-Service | 2 | 6 | yes |
+| `GST-073` | Security & Sign-in | Account & Self-Service | 2 | 12 | yes |
+| `GST-074` | Map Booking — Cabanas & Spots | Booking & Selection | 3 | 8 | yes |
+| `GST-075` | Book a Space by the Hour | Booking & Selection | 3 | 4 | yes |
+| `GST-076` | Intercity Trip — Route & Schedule | Transport | 3 | 4 | yes |
+| `GST-077` | Intercity Trip — Route & Passengers | Transport | 3 | 6 | yes |
+| `GST-078` | Intercity Trip — Multi-trip Passes | Transport | 3 | 3 | yes |
+| `GST-079` | Intercity Trip — Favourite Routes | Transport | 3 | 2 | yes |
 

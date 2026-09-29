@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 40 of 213 |
+| Operations in the slice | 47 of 248 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -33,10 +33,15 @@
 |---|---|---|---|---|---|---|
 | case | [`createCase`](#createcase) | POST | `/cases` | core | 1 | BO-806, EMP-028, EMP-029, GST-068, PTR-021, SUP-002 … |
 | case | [`listCases`](#listcases) | GET | `/cases` | core | 1 | BO-804, BO-805, BO-813, EMP-028, EMP-029, GST-068 … |
+| consent | [`createConsentQuestion`](#createconsentquestion) | POST | `/consent-questions` | core | 2 | CMS-018 |
 | consent | [`getGuestConsents`](#getguestconsents) | GET | `/guests/{subjectId}/consents` | core | 2 | BO-749, GST-066, WEB-024 |
+| consent | [`listConsentAnswers`](#listconsentanswers) | GET | `/consent-answers` | core | 2 | CMS-018 |
 | consent | [`listConsentPurposes`](#listconsentpurposes) | GET | `/consent-purposes` | core | 1 | BO-747, CMS-018, GST-065, WEB-011, WEB-020 |
+| consent | [`listConsentQuestions`](#listconsentquestions) | GET | `/consent-questions` | core | 2 | BO-008, CMS-016, CMS-018 |
 | consent | [`recordConsent`](#recordconsent) | POST | `/guests/{subjectId}/consents` | core | 1 | BO-748, GST-039, GST-065, WEB-011, WEB-017, WEB-020 … |
+| consent | [`recordConsentAnswers`](#recordconsentanswers) | POST | `/consent-answers` | core | 1 | GST-007, WEB-006, WEB-011 |
 | consent | [`setConsentPurposes`](#setconsentpurposes) | PUT | `/consent-purposes` | core | 2 | BO-747, CMS-018, CMS-023 |
+| consent | [`updateConsentQuestion`](#updateconsentquestion) | PATCH | `/consent-questions/{questionId}` | core | 2 | CMS-018 |
 | feedback | [`submitReview`](#submitreview) | POST | `/reviews` | core | 3 | GST-035, WEB-026 |
 | guest | [`addToWishlist`](#addtowishlist) | POST | `/guests/{subjectId}/wishlist` | core | 1 | GST-020, WEB-009, WEB-011, WEB-017, WEB-024, WEB-027 |
 | guest | [`getGuestProfile`](#getguestprofile) | GET | `/guests/{subjectId}` | core | 1 | ADM-680, BO-735, BO-738, BO-740, EMP-057, GST-001 … |
@@ -48,10 +53,10 @@
 | guest | [`searchGuests`](#searchguests) | GET | `/guests` | core | 1 | BO-734, BO-735, POS-027 |
 | loyalty | [`createLoyaltyProgramme`](#createloyaltyprogramme) | POST | `/loyalty/programmes` | setup | 1 | BO-827, BO-828 |
 | loyalty | [`listLoyaltyProgrammes`](#listloyaltyprogrammes) | GET | `/loyalty/programmes` | core | 2 | BO-833, GST-036, WEB-043 |
-| loyalty | [`setLoyaltyRules`](#setloyaltyrules) | PUT | `/loyalty/programmes/{programmeId}/rules` | setup | 1 |  |
+| loyalty | [`setLoyaltyRules`](#setloyaltyrules) | PUT | `/loyalty/programmes/{programmeId}/rules` | setup | 1 | BO-827 |
 | marketing | [`createChallenge`](#createchallenge) | POST | `/challenges` | setup | 1 | BO-825, BO-826, BO-829 |
 | marketing | [`createForm`](#createform) | POST | `/forms` | setup | 2 | BO-618, BO-815, BO-817, BO-838 |
-| marketing | [`createInvitationCampaign`](#createinvitationcampaign) | POST | `/invitation-campaigns` | setup | 1 |  |
+| marketing | [`createInvitationCampaign`](#createinvitationcampaign) | POST | `/invitation-campaigns` | setup | 1 | BO-766 |
 | marketing | [`createReferral`](#createreferral) | POST | `/referrals` | core | 2 | BO-830, GST-072, WEB-043 |
 | marketing | [`getLoyaltyPosition`](#getloyaltyposition) | GET | `/loyalty/position` | core | 1 | BO-831, GST-036, POS-002, WEB-043 |
 | marketing | [`getMarketingSubscription`](#getmarketingsubscription) | GET | `/marketing-subscriptions` | core | 2 | BO-788, GST-065, WEB-027 |
@@ -71,6 +76,8 @@
 | marketing | [`updateGuestPreferences`](#updateguestpreferences) | PUT | `/guests/{subjectId}/preferences` | core | 1 | BO-740, GST-066, WEB-020 |
 | marketing | [`updateMyProfile`](#updatemyprofile) | PATCH | `/guests/me/profile` | core | 1 | GST-039, WEB-011, WEB-020 |
 | marketing | [`uploadGuestDocument`](#uploadguestdocument) | POST | `/guest-documents` | core | 1 | BO-743, GST-066, WEB-011 |
+| message | [`listMyNotifications`](#listmynotifications) | GET | `/me/notifications` | core | 2 | GST-030, WEB-046 |
+| message | [`markMyNotificationsRead`](#markmynotificationsread) | POST | `/me/notifications/read` | core | 2 | GST-030, WEB-046 |
 
 ## Group: case
 
@@ -215,6 +222,71 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 
 ## Group: consent
 
+### createConsentQuestion
+
+**`POST /consent-questions`**: Define a consent question
+
+**A venue's own question, with its own text, version and scope** (decided 29 September, rev 3 REV3-26). `scope` says whether it is asked for each person (`perPerson`) or once for the booking (`perBooking`); `required` whether checkout waits for it; `blockingAnswer` which answer, if any, stops the booking (a `no` to "Are you able to swim?" on a deep-water product). Attaching it to a product is the catalogue's (`catalogue.Product.consentQuestionIds`), and to a booking flow the white-label flow configuration's. Created at version 1.
+
+|  |  |
+|---|---|
+| Permission | `GUEST_MANAGE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `marketing.consent_question`, `marketing.consent_question_version` |
+| Writes | `marketing.consent_question`, `marketing.consent_question_version` |
+| Called by | CMS-018 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ConsentQuestion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| text | object | yes | The question as the guest reads it, per locale. |
+| helpText | object |  | (nullable) |
+| version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| status | enum (active, retired) | yes | (default active) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `ConsentQuestion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| text | object | yes | The question as the guest reads it, per locale. |
+| helpText | object |  | (nullable) |
+| version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| status | enum (active, retired) | yes | (default active) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created, at version 1 |
+| 400 | BadRequest | Validation failed |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
 ### getGuestConsents
 
 **`GET /guests/{subjectId}/consents`**: Read a guest's consent state
@@ -260,6 +332,70 @@ Current position per purpose and channel, with the version of the notice consent
 | 200 |  | Consent state |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
+### listConsentAnswers
+
+**`GET /consent-answers`**: The consent records given at booking
+
+**What was asked, at which version, what was answered, for whom, by whom and when** (decided 29 September, rev 3 REV3-26). Staff read it at the gate and when a booking is questioned. Filter by order, guest or question. Oldest first, by `answeredAt` then `id`; the cursor is keyset on that pair. A superseded answer is listed with `supersededAt` set.
+
+|  |  |
+|---|---|
+| Permission | `GUEST_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `marketing.booking_consent_record` |
+| Writes | - |
+| Called by | CMS-018 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| orderId | query |  | string |  |
+| subjectId | query |  | string (uuid) |  |
+| questionId | query |  | string |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of BookingConsentRecord | yes |  |
+| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| items[].questionId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].questionVersion | integer | yes | (min 1) |
+| items[].questionKind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| items[].answer | enum (yes, no) | yes |  |
+| items[].scope | enum (perPerson, perBooking) | yes |  |
+| items[].blocksBooking | boolean |  | The answer is the question's blockingAnswer at that version. (read-only) |
+| items[].cartId | string (uuid) |  | (nullable) |
+| items[].cartLineId | string (uuid) |  | (nullable) |
+| items[].orderId | string |  | Set by orders.checkoutCart when the cart becomes an order. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| items[].orderLineId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| items[].personIndex | integer |  | (min 0; nullable) |
+| items[].personName | string |  | (max length 120; nullable) |
+| items[].personSubjectId | string (uuid) |  | (nullable) |
+| items[].answeredBySubjectId | string (uuid) |  | The guest who answered, from the session. (read-only; nullable) |
+| items[].answeredByPrincipalId | string (uuid) |  | The staff member who answered on the guest's behalf. (read-only; nullable) |
+| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded) | yes |  |
+| items[].answeredAt | string (date-time) | yes |  |
+| items[].supersededAt | string (date-time) |  | (read-only; nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Consent records |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
 ### listConsentPurposes
 
 **`GET /consent-purposes`**: Configured consent purposes
@@ -304,6 +440,60 @@ Current position per purpose and channel, with the version of the notice consent
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Purposes |
+
+### listConsentQuestions
+
+**`GET /consent-questions`**: The consent questions a venue asks at booking
+
+**Decided 29 September, rev 3 REV3-26: the swim question is a consent, not a data field.** A venue defines its own questions ("Are you able to swim?", "Do you hold a scuba certification?", "I accept the risk") and attaches one or several to a product or a booking flow. This lists them for Venue Management; a guest meets them through `orders.Cart.consentQuestions`, never by listing. Newest first, by `updatedAt` descending then `id`; the cursor is keyset on that pair.
+
+|  |  |
+|---|---|
+| Permission | `GUEST_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `marketing.consent_question`, `marketing.consent_question_version` |
+| Writes | - |
+| Called by | BO-008, CMS-016, CMS-018 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| kind | query |  | ConsentQuestionKind: enum (swim, scuba, risk, custom) |  |
+| status | query |  | enum (active, retired) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of ConsentQuestion | yes |  |
+| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| items[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| items[].text | object | yes | The question as the guest reads it, per locale. |
+| items[].helpText | object |  | (nullable) |
+| items[].version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| items[].scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| items[].required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| items[].blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| items[].status | enum (active, retired) | yes | (default active) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| items[].updatedAt | string (date-time) |  | (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Questions |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 
 ### recordConsent
 
@@ -365,6 +555,83 @@ Every record captures the notice version, the channel, the purpose, the source a
 | 201 |  | Recorded |
 | 400 |  | Notice version unknown, or the purpose is not configured |
 
+### recordConsentAnswers
+
+**`POST /consent-answers`**: Answer the consent questions a booking asks
+
+**Each answer is a consent record: the question and its version, the answer, the person or the booking it covers, who answered and when** (decided 29 September, rev 3 REV3-26). Answered at booking, against the cart, for the questions `orders.Cart.consentQuestions` lists; `checkoutCart` binds them to the order. **Append-only**: changing an answer is a new record that supersedes the old one, so the history survives.
+**A `perPerson` question is answered per declared person** (`cartLineId` and `personIndex`, the person's row in the line's `eligibilityDeclaration`); a `perBooking` one once, and it covers everyone on the booking. For a `swim` question the answer fills `orders.CreateOrderLine.eligibilityDeclaration.confidentSwimmer`, which is now derived from it.
+**An answer the venue set to block the booking is recorded, not refused**: the cart then shows a blocking `consentBlocksBooking` conflict on the lines it covers, and `checkoutCart` refuses until the lines are removed or the answer changes. A guest answers only on their own cart; staff at a till answer on a guest's behalf with `ORDER_CREATE`, and the record names them.
+
+|  |  |
+|---|---|
+| Permission | `ORDER_CREATE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | append |
+| Guest callable | True |
+| Reads | `marketing.booking_consent_record` |
+| Writes | - |
+| Called by | GST-007, WEB-006, WEB-011 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `RecordConsentAnswersRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| cartId | string (uuid) | yes | The cart the answers are given for. |
+| answers | array of object | yes | (min items 1; max items 200) |
+| answers[].questionId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| answers[].questionVersion | integer | yes | The version the guest was shown, from Cart.consentQuestions. (min 1) |
+| answers[].answer | enum (yes, no) | yes |  |
+| answers[].cartLineId | string (uuid) |  | For a perPerson question, the line the person is on. (nullable) |
+| answers[].personIndex | integer |  | For a perPerson question, the person's row in that line's eligibilityDeclaration, counting from 0. (min 0; nullable) |
+| answers[].personName | string |  | (max length 120; nullable) |
+| answers[].personSubjectId | string (uuid) |  | Where the person is a known guest, such as the booker or a family member. (nullable) |
+| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded) | yes |  |
+| answeredAt | string (date-time) | yes |  |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of BookingConsentRecord | yes |  |
+| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| items[].questionId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].questionVersion | integer | yes | (min 1) |
+| items[].questionKind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| items[].answer | enum (yes, no) | yes |  |
+| items[].scope | enum (perPerson, perBooking) | yes |  |
+| items[].blocksBooking | boolean |  | The answer is the question's blockingAnswer at that version. (read-only) |
+| items[].cartId | string (uuid) |  | (nullable) |
+| items[].cartLineId | string (uuid) |  | (nullable) |
+| items[].orderId | string |  | Set by orders.checkoutCart when the cart becomes an order. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| items[].orderLineId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| items[].personIndex | integer |  | (min 0; nullable) |
+| items[].personName | string |  | (max length 120; nullable) |
+| items[].personSubjectId | string (uuid) |  | (nullable) |
+| items[].answeredBySubjectId | string (uuid) |  | The guest who answered, from the session. (read-only; nullable) |
+| items[].answeredByPrincipalId | string (uuid) |  | The staff member who answered on the guest's behalf. (read-only; nullable) |
+| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded) | yes |  |
+| items[].answeredAt | string (date-time) | yes |  |
+| items[].supersededAt | string (date-time) |  | (read-only; nullable) |
+| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Recorded |
+| 409 |  | The question has changed since the cart was read (questionVersionSuperseded); the client re-reads the cart and asks the current version. |
+| 422 |  | A perPerson question answered without a person (personRequired), a question this cart does not ask (questionNotAsked), or a retired one (questionRetired). |
+
 ### setConsentPurposes
 
 **`PUT /consent-purposes`**: Configure consent purposes
@@ -408,6 +675,72 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Configured |
+
+### updateConsentQuestion
+
+**`PATCH /consent-questions/{questionId}`**: Reword, re-scope or retire a consent question
+
+**A change to what the guest is asked is a new version, never an edit** (decided 29 September, rev 3 REV3-26). Changing `text`, `scope`, `required` or `blockingAnswer` raises `version` by one; every answer already given keeps the version it was given against, which is the evidence if the answer is ever questioned. A cart that asked the old version asks the new one on its next read. Setting `status` to `retired` stops it being asked and changes no version.
+
+|  |  |
+|---|---|
+| Permission | `GUEST_MANAGE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `marketing.consent_question`, `marketing.consent_question_version` |
+| Writes | `marketing.consent_question`, `marketing.consent_question_version` |
+| Called by | CMS-018 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| questionId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `ConsentQuestion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| text | object | yes | The question as the guest reads it, per locale. |
+| helpText | object |  | (nullable) |
+| version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| status | enum (active, retired) | yes | (default active) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `ConsentQuestion`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
+| text | object | yes | The question as the guest reads it, per locale. |
+| helpText | object |  | (nullable) |
+| version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). (min 1; read-only) |
+| scope | enum (perPerson, perBooking) | yes | Asked for each declared person, or once for the whole booking. (default perPerson) |
+| required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). (default True) |
+| blockingAnswer | enum (yes, no, none) | yes | The answer that stops the booking, for the person or the booking it covers. (default none) |
+| status | enum (active, retired) | yes | (default active) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated, at a new version where the question changed |
+| 400 | BadRequest | Validation failed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 
 ## Group: feedback
@@ -1099,7 +1432,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Conflict policy | serverWins |
 | Reads | `marketing.loyalty_rule`, `marketing.points_redemption_rule`, `marketing.programme_tier` |
 | Writes | `marketing.loyalty_rule`, `marketing.points_redemption_rule`, `marketing.programme_tier` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-827 |
 
 **Parameters**
 
@@ -1397,7 +1730,7 @@ BL-150 and CF-74's issuance half. **A campaign broadcasts; an invitation is addr
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.event`, `catalogue.product`, `marketing.invitation_campaign` |
 | Writes | `cache:idempotency`, `marketing.invitation_campaign` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-766 |
 | State model | Invitation campaign ([states/invitation-campaign.yaml](../../../states/invitation-campaign.yaml)): created as `draft` |
 
 **Parameters**
@@ -2558,6 +2891,106 @@ BL-133. **Deliberately not `assets`.** A guest's passport scan is not a marketin
 |---|---|---|
 | 201 |  | Stored |
 
+
+## Group: message
+
+### listMyNotifications
+
+**`GET /me/notifications`**: The signed-in guest's notification feed
+
+**The in-venue notifications feed** (decided 29 September, rev 3 GAP-C1: the feed is in the first release, reversing the R242 deferral). Every in-app message dispatched to this guest — queue calls, order ready, booking changes, venue alerts — newest first. It reads the same `marketing.message_dispatch` rows a push or SMS is sent from, filtered to channel `inApp`, so a notification the guest sees is always one the venue actually sent.
+**Scoped to the caller, not filtered by it**, like `/me/cases`: there is no subject parameter. `unreadOnly` returns only what the guest has not opened. Agreed 29 September, our build plan.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Guest callable | True |
+| Reads | - |
+| Writes | - |
+| Called by | GST-030, WEB-046 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| unreadOnly | query |  | boolean |  |
+| venueId | query |  | string (uuid) | Only notifications from this venue. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of GuestNotification | yes |  |
+| items[].id | string | yes |  |
+| items[].kind | enum (queueCall, orderReady, bookingChange, venueAlert, offer, other) |  |  |
+| items[].title | LocalisedText | yes | Text keyed by locale code, one entry per locale the venue publishes. |
+| items[].body | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
+| items[].venueId | string (uuid) |  | (nullable) |
+| items[].deepLink | string |  | Where tapping the notification leads in the app (an order, a queue ticket, a booking). (nullable) |
+| items[].queuedAt | string (date-time) | yes |  |
+| items[].read | boolean | yes |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+| unreadCount | integer |  | (min 0) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Notifications, newest first — by queuedAt descending, then id; the cursor is keyset on that pair |
+
+### markMyNotificationsRead
+
+**`POST /me/notifications/read`**: Mark the signed-in guest's notifications read
+
+Marks the given notifications, or all of them when `all` is true, as opened. Only the caller's own notifications can be marked; an id that is not theirs is ignored, never an error, so the call cannot probe for other guests' messages. Agreed 29 September, our build plan.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | yes |
+| Conflict policy | lastWriteWins |
+| Guest callable | True |
+| Reads | - |
+| Writes | - |
+| Called by | GST-030, WEB-046 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| ids | array of string |  | (max items 200) |
+| all | boolean |  | (default False) |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| unreadCount | integer | yes | (min 0) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Marked. |
+
 ## Tables
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
@@ -2573,6 +3006,31 @@ Every table this service owns that the slice reads or writes, with its columns a
 | queue_ids | text[] | no |  |
 | expires_at | timestamptz | no | When this state lapses on its own — availability expires rather than persisting through a closed laptop. |
 | updated_at | timestamptz | no |  |
+
+### `marketing.booking_consent_record`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | text | yes |  |
+| question_id | text | yes |  |
+| question_version | integer | yes |  |
+| question_kind | text | yes |  |
+| answer | text | yes |  |
+| scope | text | yes |  |
+| blocks_booking | boolean | no | The answer is the question's blockingAnswer at that version. |
+| cart_id | uuid | no |  |
+| cart_line_id | uuid | no |  |
+| order_id | text | no | Set by orders.checkoutCart when the cart becomes an order. |
+| order_line_id | text | no |  |
+| person_index | integer | no |  |
+| person_name | text | no |  |
+| person_subject_id | uuid | no |  |
+| answered_by_subject_id | uuid | no | The guest who answered, from the session. |
+| answered_by_principal_id | uuid | no | The staff member who answered on the guest's behalf. |
+| source | text | yes |  |
+| answered_at | timestamptz | yes |  |
+| superseded_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
 
 ### `marketing.case`
 
@@ -2670,6 +3128,33 @@ Every table this service owns that the slice reads or writes, with its columns a
 | channel | text | yes | One value from MessageChannel. |
 | id | uuid | yes | Synthesised key. |
 
+### `marketing.consent_question`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | text | yes |  |
+| kind | text | yes |  |
+| text | jsonb | yes | The question as the guest reads it, per locale. |
+| help_text | jsonb | no |  |
+| version | integer | yes | Raised by one each time the question changes (updateConsentQuestion). |
+| scope | text | yes | Asked for each declared person, or once for the whole booking. |
+| is_required | boolean | yes | Checkout waits until it is answered (orders.checkoutCart 422 consentRequired). |
+| blocking_answer | text | yes | The answer that stops the booking, for the person or the booking it covers. |
+| status | text | yes |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
+
+### `marketing.consent_question_version`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| question_id | text | yes |  |
+| version | integer | yes |  |
+| text | jsonb | yes |  |
+| published_at | timestamptz | yes |  |
+| published_by | uuid | no |  |
+
 ### `marketing.consent_record`
 
 | Column | Type | Required | Notes |
@@ -2756,16 +3241,28 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| form_definition_id | uuid | yes | The parent row. |
-| key | text | yes |  |
-| label | text | yes |  |
 | label_localised | jsonb | no |  |
 | type | text | yes |  |
 | options | text[] | no |  |
 | is_required | boolean | no |  |
-| is_personal_data | boolean | no | Marked at the field, because retention is decided at the field. |
 | consent_purpose_id | uuid | no |  |
 | show_when | jsonb | no |  |
+| form_definition_id | uuid | yes | The parent row. |
+| form_id | uuid | yes |  |
+| form_version | integer | yes |  |
+| key | text | yes |  |
+| label | jsonb | yes |  |
+| help_text | jsonb | no |  |
+| field_type | text | yes |  |
+| standard_field | text | no | Set when the field is one of the reusable standard fields. |
+| requirement | text | yes | conditional needs conditions; autoPopulated and readOnly need mapsTo. |
+| validation | jsonb | no |  |
+| maps_to | text | no | The existing TICVAI record the field reads from, where the caller may read it. |
+| is_personal_data | boolean | no |  |
+| sort_order | integer | no |  |
+| is_deleted | boolean | no | True removes the field from the draft version. |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
 | id | uuid | yes | Synthesised key. |
 
 ### `marketing.form_submission`
@@ -3045,18 +3542,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-173 operations, added to this service in later releases without changing any of the above.
+201 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | campaign | `createCampaign`, `getCampaign`, `getCampaignPerformance`, `launchCampaign`, `listCampaigns`, `pauseCampaign`, `stopCampaign`, `testSendCampaign`, `unscheduleCampaign`, `updateCampaign` |
-| case | `addCaseMessage`, `escalateCase`, `getCase`, `reopenCase`, `updateCase` |
-| consent | `addSuppression`, `getConsentHistory`, `getSuppressionList` |
-| drafted | `approvePrivacyTesting`, `approveWaiverTesting`, `createCaseClassificationIntelligent`, `listAgentWorkloadAvailability`, `listBusinessEventNotification`, `listCaseResolutionClosure`, `listCommunicationService`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listContact`, `listContactAutomation`, `listCookieBannerPreference`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listCustomerSatisfactionFeedback`, `listCustomerService`, `listCustomerServiceProfile`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listProviderHealthUsage`, `listQualityAgentEvaluation`, `listRoutingPriorityThrottling`, `listServiceRootCause`, `listSiteWaiverException`, `listSlaPolicyService`, `listSystemTransactionalTemplate`, `listUnifiedInteractionCommunication`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `setCaseInvestigationResolution`, `setChannelProvider`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCustomerServiceCopilot`, `setDataDiscoveryAccess`, `setDigitalWaiverForm`, `setIntelligentRoutingSkill`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setOrderBookingTicket`, `setPrivacyComplianceException`, `setRefundCompensationService`, `setSenderIdentityDomain`, `setSignatorySignatureGuardian`, `setWaiverVerificationValidation` |
-| feedback | `listReviews`, `respondToReview` |
+| case | `addCaseMessage`, `createCaseClassificationIntelligent`, `escalateCase`, `getCase`, `getCaseInvestigationResolution`, `listAgentWorkloadAvailability`, `listCaseResolutionClosure`, `listContact`, `listContactAutomation`, `listCustomerService`, `listCustomerServiceProfile`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listIntelligentRoutingSkills`, `listQualityAgentEvaluation`, `listServiceRootCause`, `listSlaPolicyService`, `listUnifiedInteractionCommunication`, `reopenCase`, `setAgentServiceProfile`, `setCaseInternalRequest`, `setCaseInvestigationResolution`, `setCaseResolution`, `setContactAutomation`, `setCustomerServiceCopilot`, `setIntelligentRoutingSkill`, `setOrderBookingTicket`, `setQualityEvaluation`, `setRefundCompensationService`, `updateCase` |
+| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listSiteWaiverException`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieBannerDesign`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setDynamicFieldQuestion`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnology`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
+| feedback | `listCustomerSatisfactionFeedback`, `listReviews`, `respondToReview` |
 | guest | `mergeGuestProfiles`, `updateGuestProfile` |
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |
 | loyalty | `adjustLoyaltyPoints`, `awardBadge`, `getGuestLoyalty`, `getLoyaltyRules`, `issueReward`, `listBadges`, `listCustomerBadges`, `listLeaderboard`, `listLoyaltyCampaigns`, `listLoyaltyPointEntries`, `listRewardAssignments`, `listRewards`, `setBadge`, `setLeaderboardNickname`, `setLoyaltyCampaign`, `setReward` |
 | marketing | `accrueLoyaltyPoints`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `createUrlRedirect`, `endKioskAssist`, `getConversation`, `getForm`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `getMyProfile`, `getSeoMetadata`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordLostItem`, `recordPrivacyIncident`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `submitForm`, `transferConversation` |
-| message | `createMessageTemplate`, `getMessageStatus`, `listMessageTemplates`, `sendTransactionalMessage` |
+| message | `createMessageTemplate`, `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
 | segment | `createSegment`, `listSegmentMembers`, `listSegments`, `previewSegment` |

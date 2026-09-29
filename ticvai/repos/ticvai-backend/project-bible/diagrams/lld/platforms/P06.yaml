@@ -47,13 +47,13 @@ servicesCalled:
 - service: OrderService
   operationCalls: 70
 - service: FnbService
-  operationCalls: 47
+  operationCalls: 50
 - service: TenancyService
   operationCalls: 35
 - service: AccessService
   operationCalls: 23
 - service: MarketingService
-  operationCalls: 19
+  operationCalls: 20
 - service: IdentityService
   operationCalls: 18
 - service: InventoryService
@@ -1623,7 +1623,10 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - createTable
+  - setSectionLayout
   - setTableLayout
+  - updateTable
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1634,6 +1637,7 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
+  - tableId<-navigation
   goesTo: []
   boardFrames:
   - FnB Board 4.dc.html#fnb-4c
@@ -1716,6 +1720,7 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - addGuestNote
   - getGuestProfile
   - listOrders
   - matchGuest

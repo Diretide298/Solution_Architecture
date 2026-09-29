@@ -1,4 +1,4 @@
--- orders — 44 tables
+-- orders — 59 tables
 -- **Derived. Do not hand-edit.**
 
 -- A partner’s credit line, drawn against and settled periodically
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS orders.b2b_credit (
 
 -- A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on
 -- something Hangs off: reaches orders.sales_order through its keys; references pii.subject,
--- platform.scope. Reached by: 16 operations read it and 7 write it; 3 tables reference it; written
+-- platform.scope. Reached by: 16 operations read it and 7 write it; 4 tables reference it; written
 -- by 2 contracts — marketing-crm, orders.
 CREATE TABLE IF NOT EXISTS orders.cart (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -45,14 +45,18 @@ CREATE TABLE IF NOT EXISTS orders.cart (
 -- One line, with the lease that holds its capacity. Null lease for a product with no capacity
 -- Hangs off: a child of orders.cart; reaches orders.sales_order through its keys; references
 -- catalogue.inventory_hold, catalogue.performance, catalogue.variant. Reached by: 10 operations
--- read it and 4 write it; 1 tables reference it.
+-- read it and 4 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS orders.cart_line (
     id                                uuid PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
     product_name                      text,
     quantity                          integer NOT NULL,
     performance_id                    uuid,
+    booked_window                     jsonb,
+    table_reservation_id              uuid,
     seat_ids                          text[],
+    resource_hold_id                  text,
+    attributes                        jsonb,
     parent_line_id                    uuid,
     override_price                    numeric(18,4),
     override_reason                   text CONSTRAINT cart_line_override_reason_chk CHECK (override_reason IN ('priceMatch', 'serviceRecovery', 'negotiated', 'damagedGoods', 'staffSale', 'error')),
@@ -62,7 +66,9 @@ CREATE TABLE IF NOT EXISTS orders.cart_line (
     inventory_hold_id                 text,
     lease_expires_at                  timestamptz,
     is_available                      boolean,
-    cart_id                           uuid NOT NULL
+    cart_id                           uuid NOT NULL,
+    attributes_id                     uuid,
+    booked_window_id                  uuid
 );
 
 -- a denomination and a count from a blind till count Hangs off: reaches orders.sales_order through
@@ -137,6 +143,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit (
     order_id                          text NOT NULL,
     customer_id                       uuid,
     rental_agreement_id               uuid,
+    table_reservation_id              uuid,
     currency_code                     text NOT NULL CONSTRAINT deposit_currency_code_chk CHECK (char_length(currency_code) <= 10),
     required_amount                   numeric(18,4) NOT NULL,
     authorized_amount                 numeric(18,4) NOT NULL,
@@ -198,6 +205,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit_box_opening_denomination (
 CREATE TABLE IF NOT EXISTS orders.deposit_policy (
     id                                uuid PRIMARY KEY,
     applies_to                        text[],
+    dining_id                         uuid,
     basis                             text NOT NULL CONSTRAINT deposit_policy_basis_chk CHECK (basis IN ('fixedPerBooking', 'fixedPerGuest', 'percentOfTotal', 'perBand')),
     amount                            numeric(18,4),
     percent                           numeric(18,4),
@@ -206,6 +214,24 @@ CREATE TABLE IF NOT EXISTS orders.deposit_policy (
     balance_due_days_before           integer,
     refundable_until_hours            integer DEFAULT 24,
     scope_path                        ltree NOT NULL
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS orders.deposit_policy (dining_* columns) (
+    is_enabled                        boolean DEFAULT false,
+    basis                             text DEFAULT 'fixedPerGuest' CONSTRAINT deposit_policy (dining_* columns)_basis_chk CHECK (basis IN ('fixedPerGuest', 'fixedPerTable', 'percentOfMinimumSpend')),
+    amount                            numeric(18,4),
+    percent                           numeric(18,4),
+    minimum_spend_per_guest           numeric(18,4),
+    applies_from_party_size           integer DEFAULT 1,
+    outlet_ids                        text[],
+    collection                        text DEFAULT 'authorisationHold' CONSTRAINT deposit_policy (dining_* columns)_collection_chk CHECK (collection IN ('authorisationHold', 'charge')),
+    deposit_variant_id                uuid,
+    refundable_until_hours            integer DEFAULT 24,
+    on_late_cancel_or_no_show         text DEFAULT 'forfeit' CONSTRAINT deposit_policy (dining_* columns)_on_late_cancel_or_no_show_chk CHECK (on_late_cancel_or_no_show IN ('forfeit', 'release')),
+    on_arrival                        text DEFAULT 'releaseHold' CONSTRAINT deposit_policy (dining_* columns)_on_arrival_chk CHECK (on_arrival IN ('releaseHold', 'applyToBill')),
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -260,6 +286,119 @@ CREATE TABLE IF NOT EXISTS orders.group_booking (
     status                            text NOT NULL CONSTRAINT group_booking_status_chk CHECK (status IN ('provisional', 'confirmed', 'namesPending', 'complete', 'cancelled'))
 );
 
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS orders.group_customer_organization (
+    id                                uuid PRIMARY KEY NOT NULL,
+    name                              text NOT NULL CONSTRAINT group_customer_organization_name_chk CHECK (char_length(name) <= 200),
+    organisation_type                 text NOT NULL CONSTRAINT group_customer_organization_organisation_type_chk CHECK (organisation_type IN ('school', 'corporate', 'travelAgent', 'eventOrganizer', 'association', 'government', 'other')),
+    billing_details                   jsonb,
+    tax_details                       jsonb,
+    updated_at                        timestamptz
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.group_customer_organization_contact (
+    group_customer_organization_id    uuid NOT NULL,
+    role                              text NOT NULL,
+    name                              text NOT NULL,
+    email                             text,
+    phone                             text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS orders.group_enquiry (
+    id                                uuid PRIMARY KEY NOT NULL,
+    source                            text NOT NULL CONSTRAINT group_enquiry_source_chk CHECK (source IN ('website', 'salesTeam', 'campaign', 'existingCustomer', 'partner', 'manualEntry')),
+    organisation_id                   uuid,
+    contact                           jsonb NOT NULL,
+    group_size                        integer NOT NULL,
+    preferred_dates                   text[],
+    requirements                      text CONSTRAINT group_enquiry_requirements_chk CHECK (char_length(requirements) <= 2000),
+    created_by                        uuid,
+    created_at                        timestamptz NOT NULL
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.group_participant (
+    group_participant_list_id         uuid NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    full_name                         text NOT NULL,
+    role                              text,
+    email                             text,
+    phone                             text,
+    date_of_birth                     date
+);
+
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS orders.group_participant_list (
+    group_booking_id                  uuid NOT NULL,
+    source                            text NOT NULL CONSTRAINT group_participant_list_source_chk CHECK (source IN ('manualEntry', 'csvExcelImport', 'customerUpload', 'api')),
+    file_ref                          uuid,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.group_payment_milestone (
+    group_payment_schedule_id         uuid NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    due_date                          date NOT NULL,
+    amount                            numeric(18,4) NOT NULL,
+    label                             text,
+    status                            text NOT NULL
+);
+
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS orders.group_payment_schedule (
+    group_booking_id                  uuid NOT NULL,
+    schedule_type                     text NOT NULL CONSTRAINT group_payment_schedule_schedule_type_chk CHECK (schedule_type IN ('depositThenBalance', 'milestonePayment', 'finalBalance', 'customSchedule')),
+    total                             numeric(18,4),
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS orders.group_ticket_allocation (
+    group_booking_id                  uuid NOT NULL,
+    allocation_mode                   text NOT NULL CONSTRAINT group_ticket_allocation_allocation_mode_chk CHECK (allocation_mode IN ('individualTicket', 'bulkTicket', 'namedTicket', 'quantityBasedTicket', 'zoneAllocation')),
+    keep_group_together               boolean,
+    vip_allocation                    boolean,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS orders.group_ticket_allocation_line (
+    group_ticket_allocation_id        uuid NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    product_id                        uuid NOT NULL,
+    quantity                          integer NOT NULL,
+    zone_id                           uuid,
+    participant_id                    uuid
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS orders.group_ticket_fulfillment (
+    group_booking_id                  uuid NOT NULL,
+    method                            text NOT NULL CONSTRAINT group_ticket_fulfillment_method_chk CHECK (method IN ('email', 'sms', 'wallet', 'bulkPdf', 'posPrint', 'physicalCollection')),
+    recipients                        text NOT NULL CONSTRAINT group_ticket_fulfillment_recipients_chk CHECK (recipients IN ('organiser', 'eachParticipant')),
+    release_at                        timestamptz,
+    released_at                       timestamptz,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- A complimentary entitlement issued outside the order path (8.1.3–8.1.5). No payment is expected,
 -- so nothing waits for one. Hangs off: reaches orders.sales_order through its keys; references
 -- catalogue.performance, catalogue.product, identity.principal. Reached by: 2 operations read it
@@ -291,6 +430,54 @@ CREATE TABLE IF NOT EXISTS orders.invitation_allowance (
     used                              integer NOT NULL,
     remaining                         integer,
     requires_approval_above           integer
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS orders.member_exception (
+    id                                uuid PRIMARY KEY NOT NULL,
+    membership_id                     uuid NOT NULL,
+    kind                              text NOT NULL CONSTRAINT member_exception_kind_chk CHECK (kind IN ('eligibilityOverride', 'expiryExtension', 'complimentaryRenewal', 'complimentaryBenefit', 'entitlementAdjustment', 'freezeException', 'suspensionOverride', 'replacementCredential')),
+    reason                            text NOT NULL CONSTRAINT member_exception_reason_chk CHECK (char_length(reason) <= 500),
+    approval_request_id               uuid,
+    extend_days                       integer,
+    benefit_id                        uuid,
+    quantity                          integer,
+    new_expiry_at                     timestamptz,
+    recorded_by                       uuid,
+    recorded_at                       timestamptz NOT NULL
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS orders.membership_activation_action (
+    id                                uuid PRIMARY KEY NOT NULL,
+    membership_id                     uuid NOT NULL,
+    action                            text NOT NULL CONSTRAINT membership_activation_action_action_chk CHECK (action IN ('activate', 'block', 'review', 'replace', 'link', 'escalate')),
+    credential_id                     uuid,
+    media_code                        text CONSTRAINT membership_activation_action_media_code_chk CHECK (char_length(media_code) <= 100),
+    subject_id                        uuid,
+    reason                            text CONSTRAINT membership_activation_action_reason_chk CHECK (char_length(reason) <= 500),
+    membership_status                 text CONSTRAINT membership_activation_action_membership_status_chk CHECK (char_length(membership_status) <= 30),
+    recorded_by                       uuid,
+    recorded_at                       timestamptz NOT NULL
+);
+
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS orders.membership_migration (
+    id                                uuid PRIMARY KEY NOT NULL,
+    membership_id                     uuid NOT NULL,
+    from_product_id                   uuid NOT NULL,
+    target_product_id                 uuid NOT NULL,
+    direction                         text NOT NULL CONSTRAINT membership_migration_direction_chk CHECK (direction IN ('upgrade', 'downgrade', 'migration')),
+    effective_timing                  text NOT NULL CONSTRAINT membership_migration_effective_timing_chk CHECK (effective_timing IN ('immediate', 'nextVisit', 'nextRenewal', 'endOfCurrentTerm')),
+    pro_rata                          boolean,
+    pro_rata_amount                   numeric(18,4),
+    order_id                          text,
+    effective_at                      timestamptz,
+    status                            text NOT NULL CONSTRAINT membership_migration_status_chk CHECK (status IN ('scheduled', 'applied')),
+    created_at                        timestamptz
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -349,8 +536,11 @@ CREATE TABLE IF NOT EXISTS orders.order_line (
     id                                text PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
     performance_id                    uuid,
+    booked_window                     jsonb,
     inventory_hold_id                 text,
     seat_ids                          text[],
+    resource_hold_id                  text,
+    attributes                        jsonb,
     quantity                          integer NOT NULL,
     quoted_unit_price                 numeric(18,4) NOT NULL,
     holder_name                       text,
@@ -362,7 +552,9 @@ CREATE TABLE IF NOT EXISTS orders.order_line (
     gross_amount                      numeric(18,4) NOT NULL,
     entitlement_ids                   text[],
     cross_region_right_ids            text[],
-    reprint_count                     integer DEFAULT 0
+    reprint_count                     integer DEFAULT 0,
+    attributes_id                     uuid,
+    booked_window_id                  uuid
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
@@ -519,6 +711,18 @@ CREATE TABLE IF NOT EXISTS orders.refund_batch (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS orders.refund_calculation_policy (
+    id                                uuid PRIMARY KEY,
+    refund_types                      text[] NOT NULL,
+    refund_destinations               text[] NOT NULL,
+    percentage                        numeric(18,4),
+    non_refundable_fees               text[],
+    scope                             jsonb,
+    updated_at                        timestamptz
+);
+
 -- When a refund is allowed and what it costs. Scoped, so a venue may be stricter than its tenant
 CREATE TABLE IF NOT EXISTS orders.refund_policy (
     id                                uuid PRIMARY KEY,
@@ -596,12 +800,17 @@ CREATE TABLE IF NOT EXISTS orders.reservation_line (
     id                                text PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
     performance_id                    uuid,
+    booked_window                     jsonb,
     inventory_hold_id                 text,
     seat_ids                          text[],
+    resource_hold_id                  text,
+    attributes                        jsonb,
     quantity                          integer NOT NULL,
     quoted_unit_price                 numeric(18,4) NOT NULL,
     holder_name                       text,
-    data_mask_values                  jsonb
+    data_mask_values                  jsonb,
+    attributes_id                     uuid,
+    booked_window_id                  uuid
 );
 
 -- The sale. What was bought, by whom, through which channel, at what scope. Every payment, refund,
@@ -646,7 +855,7 @@ CREATE TABLE IF NOT EXISTS orders.stored_value_authorisation (
 );
 
 -- Ticket artwork and media selection (BL-102). A venue changing its artwork had no path that was
--- not a code change. Hangs off: reaches orders.sales_order through its keys. Reached by: 5
+-- not a code change. Hangs off: reaches orders.sales_order through its keys. Reached by: 7
 -- operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS orders.ticket_template (
     id                                uuid PRIMARY KEY NOT NULL,

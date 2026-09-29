@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Finance & Ledger
   version: 0.1.0
-  x-ticvai-screen-count: 48
+  x-ticvai-screen-count: 49
   x-ticvai-tier: spine
   x-ticvai-module: 5 — F&B & Guest Management (accounting and revenue recognition)
   x-ticvai-requirements: 327
@@ -306,6 +306,15 @@ paths:
         **A partial forfeit returns the remainder to the guest** (decided 28 September, audit R127 (2)):
         the deposit less `amount` is paid back as `return` would pay it, and only `amount` is income.
 
+        **A table deposit settles here too** (decided 29 September, rev 3 REV3-8b: the dining deposit
+        ships as a venue option, off by default). A deposit taken for a `fnb.TableReservation`
+        (`orders.deposit.tableReservationId`) is settled by the service, under the venue''s
+        `orders.DepositPolicy.dining`, when the booking ends: **`return`** on a cancel at least
+        `refundableUntilHours` before the booking, or on arrival where `onArrival` is `releaseHold`;
+        **`convertToRevenue`** when it is applied to the bill (`onArrival` `applyToBill`); **`forfeit`**
+        on a later cancel or a `noShow` where `onLateCancelOrNoShow` is `forfeit` (`return` where it is
+        `release`). An authorisation hold that is returned is released, never captured.
+
         '
       tags:
       - finance
@@ -381,6 +390,7 @@ paths:
       operationId: getUnifiedReconciliation
       x-ticvai-consumed-by:
         - "P08 BO-1081 Finance Dashboard"
+        - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
         - "P09 ADM-627 Reconciliation Audit, Trace & Evidence Center\t149"
         - "P09 ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor\t150"
       summary: Every money source against the ledger, in one view
@@ -2755,6 +2765,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
         - "P08 BO-1170 Wallet Financial Period & Closing Controls"
+        - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2803,6 +2814,7 @@ paths:
       operationId: beginPeriodClose
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
+        - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
       x-ticvai-audience:
       - staff
       summary: Begin closing a period
@@ -2992,6 +3004,7 @@ paths:
       operationId: closeFiscalPeriod
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
+        - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
       x-ticvai-audience:
       - staff
       summary: Close a period and lock postings
@@ -3298,6 +3311,97 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FxProviderAssignment'
+  /tax-exemptions/{exemptionId}/verify:
+    parameters:
+    - name: exemptionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: verifyTaxExemption
+      x-ticvai-consumed-by:
+        - "P08 BO-075 Account Mapping"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: VM close-out follow-up; our build plan'
+      summary: Record that a tax exemption's evidence was checked
+      description: 'Tax Exemption Evidence after the grant. An exemption granted `pending` does not exempt
+        a line until its evidence is checked; this records the result: `verified` or `rejected`, with the
+        evidence document if one arrived after the grant. `verifiedBy` and `verifiedAt` are set from the
+        caller and the time of the call, never sent.
+
+        Allowed from `pending` and `rejected` (new evidence may be verified after a rejection), and from
+        `verified` to `rejected` (evidence found to be false). An exemption whose `validTo` has passed is
+        `expired` and refused (409): a new exemption is granted instead. `verified` without an evidence
+        document, on the record or in the request, is refused (422) unless the exemption is
+        `notRequired`, which cannot be verified or rejected (409). `note` is required with `rejected`.
+        Takes effect on tax calculated after the call; postings already made are not repriced (decided 29
+        September, VM close-out follow-up).
+
+        '
+      tags:
+      - tax
+      x-ticvai-permission: TAX_CONFIGURE
+      x-ticvai-scope-level: region
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - verificationStatus
+              properties:
+                verificationStatus:
+                  type: string
+                  enum:
+                  - verified
+                  - rejected
+                evidenceDocumentId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: Replaces the evidence document on the record when given.
+                certificateReference:
+                  type: string
+                  maxLength: 100
+                  nullable: true
+                note:
+                  type: string
+                  maxLength: 500
+                  description: Required with `rejected`.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Verification recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxExemption'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The exemption is `expired`, or `notRequired`.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`verified` with no evidence document on the record or in the request, or `rejected`
+            without a `note`.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+
 components:
   schemas:
     AccountType:
@@ -3838,17 +3942,75 @@ components:
         reason:
           type: string
           maxLength: 500
+        exemptionType:
+          type: string
+          enum:
+          - diplomatic
+          - export
+          - businessToBusiness
+          - charity
+          - governmentEntity
+          - freeZone
+          - zeroRated
+          - other
+          description: 'Tax Exemption Evidence: exemption type (pack ''Pricing___Revenue_Management_Reference.pdf''
+            p.47). Moved here from catalogue `listFeeWaiverTax`, whose rule now only says `evidenceRequired`
+            (decided 29 September, readiness close-out). Which types a jurisdiction recognises is the
+            client''s tax configuration; the list names the kinds, it does not grant any. **Proposed values: tax configuration per
+            jurisdiction, client to correct.**'
         certificateReference:
           type: string
+          maxLength: 100
           nullable: true
+          description: 'Tax Exemption Evidence: reference, e.g. the exemption certificate, diplomatic card or
+            export declaration number.'
+        evidenceDocumentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'Tax Exemption Evidence: the uploaded document (certificate scan, declaration). Kept for
+            the retention period of the postings it exempted, not of the exemption.'
+        verificationStatus:
+          type: string
+          enum:
+          - notRequired
+          - pending
+          - verified
+          - rejected
+          - expired
+          default: pending
+          description: 'Tax Exemption Evidence: verification status. **Only `verified` and `notRequired` exempt
+            a line**; `calculateTax` treats `pending`, `rejected` and `expired` as no exemption and records
+            the exemption id on the line so the refusal is explainable. `expired` is set by the server
+            once `validTo` has passed; evidence checked after the grant is recorded with
+            `verifyTaxExemption`. The granter sends `verified` on `createTaxExemption` when the
+            evidence was checked at the grant; `verifiedBy` and `verifiedAt` are then set from the caller.'
+        verifiedBy:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        verifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        verificationNote:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: The `note` given to `verifyTaxExemption`; required when evidence was rejected.
         validFrom:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'Tax Exemption Evidence: validity, first day. A day in the region''s time zone, local
+            midnight to local midnight.'
         validTo:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'Tax Exemption Evidence: validity, last day. A day in the region''s time zone, local
+            midnight to local midnight.'
           nullable: true
     CalculateTaxRequest:
       type: object

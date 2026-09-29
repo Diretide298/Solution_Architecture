@@ -52,10 +52,10 @@ CREATE TABLE IF NOT EXISTS queue.queue (
     capacity_per_cycle                integer NOT NULL,
     cycle_minutes                     numeric(18,4) NOT NULL,
     max_party_size                    integer DEFAULT 6,
-    return_window_minutes             integer DEFAULT 15,
     height_requirement_cm             integer,
     fast_pass_allocation_percent      numeric(18,4) DEFAULT 0,
     zone                              text,
+    fast_pass_id                      uuid,
     id                                uuid PRIMARY KEY NOT NULL,
     status                            text NOT NULL CONSTRAINT queue_status_chk CHECK (status IN ('open', 'paused', 'closed', 'atCapacity')),
     status_reason                     text,
@@ -70,7 +70,11 @@ CREATE TABLE IF NOT EXISTS queue.queue (
     now_serving_party_number          integer,
     last_called_at                    timestamptz,
     throughput_last_hour              integer,
-    no_show_rate_percent              numeric(18,4)
+    no_show_rate_percent              numeric(18,4),
+    entitlement_product_ids           text[] NOT NULL,
+    return_window_minutes             integer DEFAULT 60,
+    max_per_guest_per_day             integer,
+    allowed_access_point_ids          text[]
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing

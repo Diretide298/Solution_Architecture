@@ -1,4 +1,4 @@
--- wallet — 25 tables
+-- wallet — 28 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 3 columns. No description has been written for this table — the name is the only thing
@@ -22,6 +22,13 @@ CREATE TABLE IF NOT EXISTS wallet.adjustment (
     approved_by                       uuid,
     at                                timestamptz,
     scope_path                        ltree NOT NULL
+);
+
+-- Holds 2 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS wallet.authentication_policy (
+    scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -153,8 +160,12 @@ CREATE TABLE IF NOT EXISTS wallet.dispute (
     description                       text NOT NULL,
     raised_by                         uuid,
     raised_at                         timestamptz,
-    status                            text CONSTRAINT dispute_status_chk CHECK (status IN ('open', 'investigating', 'upheld', 'rejected', 'withdrawn')),
+    status                            text CONSTRAINT dispute_status_chk CHECK (status IN ('open', 'investigating', 'escalated', 'upheld', 'rejected', 'withdrawn')),
     resolution                        text,
+    escalated_to_role_id              uuid,
+    reprocessed_transaction_ids       text[],
+    resolved_by                       uuid,
+    resolved_at                       timestamptz,
     adjustment_id                     uuid,
     scope_path                        ltree NOT NULL
 );
@@ -222,6 +233,23 @@ CREATE TABLE IF NOT EXISTS wallet.hold (
     created_at                        timestamptz NOT NULL,
     captured_at                       timestamptz,
     released_at                       timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS wallet.integration_mapping (
+    api_client_id                     uuid NOT NULL,
+    date_time_format                  text DEFAULT 'ISO-8601',
+    time_zone                         text,
+    scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 2 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS wallet.reconciliation_source (
+    scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
 

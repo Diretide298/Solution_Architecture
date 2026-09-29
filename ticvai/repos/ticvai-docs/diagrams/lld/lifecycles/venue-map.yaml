@@ -21,7 +21,9 @@ transitions:
   trigger: operation
   guard: '**Refuses on an unresolved proposal, a broken link or a disconnected graph** (a disconnected
     map is never published, decided 28 September, audit R106 (8)). A restaurant point pointing at a
-    closed outlet is worse than no point, because a guest walks there'
+    closed outlet is worse than no point, because a guest walks there. **Also refuses on a placed resource
+    a guest could not buy**: unlinked, no price band, or a duplicate label (decided 29 September, rev
+    3 REV3-15)'
 - from: published
   to: draft
   operation: createVenueMap
@@ -33,8 +35,9 @@ transitions:
   to: published
   operation: publishVenueMap
   trigger: operation
-  guard: Republished, under the same refusals as the first publish (audit R106 (8)). **Creates a version
-    rather than replacing one**, so a guest mid-route on version 3 finishes on version 3
+  guard: Republished, under the same refusals as the first publish (audit R106 (8); placed resources,
+    rev 3 REV3-15). **Creates a version rather than replacing one**, so a guest mid-route on version
+    3 finishes on version 3
 - from: published
   to: archived
   operation: createVenueMap

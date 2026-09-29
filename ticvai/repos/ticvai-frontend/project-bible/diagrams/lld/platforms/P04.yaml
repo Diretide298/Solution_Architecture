@@ -37,7 +37,7 @@ servicesCalled:
 - service: CatalogueService
   operationCalls: 31
 - service: TenancyService
-  operationCalls: 22
+  operationCalls: 23
 - service: FnbService
   operationCalls: 22
 - service: RetailService
@@ -342,6 +342,7 @@ screens:
   - createOrder
   - createPayment
   - createRetailSale
+  - enrolFaceTag
   - getRetailSale
   - inquirePaymentStatus
   - listRetailSales
@@ -752,7 +753,7 @@ screens:
   - configureWorkstation
   - listDevices
   - recordDeviceHeartbeat
-  - setReaderScannerPeripheral
+  - setDeviceAssignment
   states:
   - emptyFirstRun
   - emptyNoAccess

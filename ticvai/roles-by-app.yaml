@@ -7,10 +7,10 @@ description: '**Derived from what each app''s screens call, not decided here.** 
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
   decision and a plausible answer written here would be read as one they made.'
 theTwoVocabularies:
-  onOperations: 162
+  onOperations: 167
   inRolesYaml: 43
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 162 permission keys across 2042 operations; `roles.yaml`
+  note: '**Zero shared keys.** The contracts carry 167 permission keys across 2177 operations; `roles.yaml`
     grants 43, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file
@@ -29,8 +29,8 @@ apps:
     - P01
     - P02
     - P05
-    screens: 134
-    operations: 161
+    screens: 143
+    operations: 192
     permissions: 24
     tiers:
       read:
@@ -72,10 +72,13 @@ apps:
     - claimTicketTransfer
     - createCart
     - createGuestFnbOrder
+    - createMfaChallenge
     - createRefundRequest
     - createTableReservation
+    - deleteFavouriteRoute
     - deleteGuestAccount
     - endKioskAssist
+    - enrolMfaMethod
     - extendCart
     - getBillingStatement
     - getCart
@@ -85,7 +88,12 @@ apps:
     - getGuestOrderStatus
     - getGuestSession
     - getLoyaltyPosition
+    - getNextTransportDeparture
+    - getPublishedGuidedChoice
     - getTenantAppStatus
+    - getTransportFareTable
+    - getTransportRoute
+    - getTransportRouteMap
     - getWaitTimes
     - getWaitingGuest
     - getWishlist
@@ -93,15 +101,7 @@ apps:
     - guestPasswordLogin
     - guestSocialLogin
     - guestUaePassLogin
-    - handoverToAgent
-    - joinQueue
-    - joinWaitlist
-    - leaveQueue
-    - leaveWaitlist
-    - linkGuestCheckout
-    - listBillingStatements
-    - listDeliveryLocations
-    operationsWithNoPermissionCount: 66
+    operationsWithNoPermissionCount: 87
   ticvai-control:
     name: TICVAI Control
     platforms:
@@ -111,8 +111,8 @@ apps:
     - P14
     - P17
     screens: 767
-    operations: 662
-    permissions: 79
+    operations: 671
+    permissions: 81
     tiers:
       read:
       - AI_AUDIT_VIEW
@@ -140,6 +140,7 @@ apps:
       - WALLET_VIEW
       - WORKFORCE_VIEW
       operate:
+      - AI_APPROVE
       - APPROVAL_ACT
       - APPROVAL_DECIDE
       - APPROVAL_REQUEST
@@ -160,6 +161,7 @@ apps:
       - PLATFORM_RELEASE_PROMOTE
       - PLATFORM_TENANT_ACCESS
       - PLATFORM_TENANT_TERMINATE
+      - PRODUCT_APPROVE
       - REPORT_VIEW_VENUE
       - SESSION_FORCE_LOGOUT
       - SETTLEMENT_RECONCILE
@@ -223,9 +225,9 @@ apps:
     - P12
     - P13
     - P16
-    screens: 1374
-    operations: 1238
-    permissions: 138
+    screens: 1383
+    operations: 1441
+    permissions: 142
     tiers:
       read:
       - ACCREDITATION_VIEW
@@ -257,6 +259,7 @@ apps:
       - SCOPE_VIEW
       - SETTLEMENT_VIEW
       - TENANT_VIEW
+      - TRANSPORT_VIEW
       - VENUE_MAP_VIEW
       - WALLET_VIEW
       - WORKFORCE_VIEW
@@ -295,6 +298,7 @@ apps:
       - ORDER_RESCHEDULE
       - ORDER_VOID
       - OVERSHORT_ACCEPT
+      - PAYMENT_VOID
       - PLATFORM_RELEASE_PROMOTE
       - PROCUREMENT_RECEIVE
       - PROCUREMENT_REQUEST
@@ -316,6 +320,7 @@ apps:
       - SHIFT_REOPEN
       - SHIFT_SUSPEND
       - TICKET_LOOKUP
+      - TRANSPORT_PRICE
       - TURNSTILE_MODE_SET
       - WALLET_OPERATE
       - WORK_ORDER_VERIFY
@@ -361,6 +366,7 @@ apps:
       - TAX_CONFIGURE
       - TENANT_CONFIGURE
       - TENANT_PUBLISH
+      - TRANSPORT_MANAGE
       - USER_MANAGE
       - VENUE_MAP_MANAGE
       - VENUE_MAP_PUBLISH
@@ -377,6 +383,8 @@ apps:
     - getGuestOrderStatus
     - getLoyaltyPosition
     - getTenantAppStatus
+    - getTransportFareTable
+    - getTransportRoute
     - getWaitTimes
     - handoverToAgent
     - listDeliveryLocations
@@ -384,7 +392,10 @@ apps:
     - listMfaMethods
     - listMyCases
     - listSsoProviders
+    - listTransportRoutes
+    - listTransportStations
     - login
+    - quoteTransportFare
     - raiseMyCase
     - recordConsent
     - recordDeviceHeartbeat
@@ -392,15 +403,15 @@ apps:
     - sendTransactionalMessage
     - syncGamePlays
     - verifyMfaChallenge
-    operationsWithNoPermissionCount: 23
+    operationsWithNoPermissionCount: 28
   venue-pos:
     name: TICVAI POS
     platforms:
     - P04
     - P15
     screens: 40
-    operations: 159
-    permissions: 47
+    operations: 162
+    permissions: 48
     tiers:
       read:
       - APPROVAL_VIEW
@@ -443,7 +454,8 @@ apps:
       - SHIFT_SUSPEND
       - WALLET_OPERATE
       configure:
-      - ACCESS_POINT_CONFIGURE
+      - DEVICE_MANAGE
+      - GUEST_MANAGE
       - PERFORMANCE_CONFIGURE
       - PRODUCT_CONFIGURE
       - QUEUE_MANAGE
@@ -471,7 +483,7 @@ apps:
     - P06
     - P07
     screens: 107
-    operations: 215
+    operations: 219
     permissions: 63
     tiers:
       read:

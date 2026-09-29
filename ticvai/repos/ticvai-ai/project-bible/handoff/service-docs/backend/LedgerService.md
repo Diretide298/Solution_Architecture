@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `finance` |
 | Schemas owned | `ledger` |
-| Operations in the slice | 7 of 56 |
+| Operations in the slice | 7 of 57 |
 | Scale | Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs. |
 | If it is down | Correctness over availability. A ledger that is briefly unavailable is recoverable; one that is briefly wrong is not. |
 
@@ -588,7 +588,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-49 operations, added to this service in later releases without changing any of the above.
+50 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -600,5 +600,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recognition | `createRecognitionSchedule`, `getDeferredRevenue`, `listRecognitionSchedules`, `runRecognition` |
 | reporting | `getForeignTenderReport` |
 | settlement | `getSettlement`, `ingestSettlementFile`, `listSettlementExceptions`, `listSettlements`, `resolveSettlementException` |
-| tax | `calculateTax`, `createTaxCode`, `createTaxExemption`, `listTaxCodes`, `listTaxExemptions`, `updateTaxCode` |
+| tax | `calculateTax`, `createTaxCode`, `createTaxExemption`, `listTaxCodes`, `listTaxExemptions`, `updateTaxCode`, `verifyTaxExemption` |
 | variance | `listPriceVariances`, `reviewPriceVariance` |

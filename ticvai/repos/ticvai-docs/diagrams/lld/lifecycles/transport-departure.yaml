@@ -1,0 +1,56 @@
+id: LLD-Transport departure
+title: Transport departure — 8 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/transport-departure.yaml
+entity: Transport departure
+contract: transport
+enum: TransportDepartureStatus
+enumKind: named
+enumSchema: TransportDepartureStatus
+owner: transport
+initial:
+- scheduled
+- onSale
+terminal:
+- departed
+- cancelled
+transitions:
+- from: scheduled
+  to: onSale
+  trigger: job
+  guard: The nightly release job reached its date within the timetable's `releaseHorizonDays`. A departure
+    released by `publishTransportTimetable` is created already on sale
+- from: onSale
+  to: soldOut
+  trigger: cascade
+  guard: '**Computed, not set.** The catalogue performance behind it has no capacity left'
+- from: soldOut
+  to: onSale
+  trigger: cascade
+  guard: Seats returned — a hold expired or an order was refunded
+  isReversal: true
+- from: onSale
+  to: departed
+  trigger: timer
+  guard: The departure time at the first stop has passed
+- from: soldOut
+  to: departed
+  trigger: timer
+  guard: As from onSale
+- from: scheduled
+  to: cancelled
+  trigger: externalEvent
+  guard: '`performance-cancelled` for its performance (`cancelPerformance` in catalogue, with its approval
+    rule). Guests are refunded and told there'
+- from: onSale
+  to: cancelled
+  trigger: externalEvent
+  guard: As from scheduled
+- from: soldOut
+  to: cancelled
+  trigger: externalEvent
+  guard: As from scheduled
+notes: 'Mirrors the catalogue performance in the words a coach operator uses. **Cancellation is catalogue''s
+  act, not this context''s** — one cancel path, one refund path. A departure removed unsold when a timetable
+  is superseded or withdrawn is deleted, not cancelled: nobody holds a ticket for it.'

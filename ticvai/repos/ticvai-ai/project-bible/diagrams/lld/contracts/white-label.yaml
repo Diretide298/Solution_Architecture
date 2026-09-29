@@ -1,5 +1,5 @@
 id: LLD-white-label
-title: white-label — 52 operations
+title: white-label — 60 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -63,6 +63,22 @@ operations:
   writes:
   - cache:idempotency
   - whitelabel.content_page
+- operation: createGuidedChoice
+  verb: POST
+  path: /venues/{venueId}/guided-choices
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
+  - whitelabel.guided_choice_question
+  writes:
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
+  - whitelabel.guided_choice_question
 - operation: createPreview
   verb: POST
   path: /tenant-config/preview
@@ -119,6 +135,16 @@ operations:
   writes:
   - cache:idempotency
   - whitelabel.tenant_config
+- operation: deleteGuidedChoice
+  verb: DELETE
+  path: /guided-choices/{guidedChoiceId}
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: deletePromoBlock
   verb: DELETE
   path: /tenant-config/promo-blocks/{promoBlockId}
@@ -241,6 +267,19 @@ operations:
   - whitelabel.navigation_item
   writes:
   - cache:resolution
+- operation: getPublishedGuidedChoice
+  verb: GET
+  path: /venues/{venueId}/guided-choice
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: true
+  reads:
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
+  - whitelabel.guided_choice_question
+  writes: []
 - operation: getTenantAppStatus
   verb: GET
   path: /tenant-config/status
@@ -346,6 +385,19 @@ operations:
   - whitelabel.faq_category
   - whitelabel.faq_entry
   writes: []
+- operation: listGuidedChoices
+  verb: GET
+  path: /venues/{venueId}/guided-choices
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
+  - whitelabel.guided_choice_question
+  writes: []
 - operation: listPolicies
   verb: GET
   path: /tenant-config/policies
@@ -368,6 +420,22 @@ operations:
   reads:
   - whitelabel.promo_block
   writes: []
+- operation: proposeGuidedChoice
+  verb: POST
+  path: /venues/{venueId}/guided-choice-suggestions
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
+  - whitelabel.guided_choice_question
+  writes:
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
+  - whitelabel.guided_choice_question
 - operation: publishContentBlock
   verb: POST
   path: /content-blocks/{blockId}/publish
@@ -384,6 +452,19 @@ operations:
   - cache:idempotency
   - cache:resolution
   - control.content_block
+- operation: publishGuidedChoice
+  verb: POST
+  path: /guided-choices/{guidedChoiceId}/publish
+  scope: venue
+  permission: TENANT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
+  - whitelabel.guided_choice_question
+  writes: []
 - operation: publishTenantConfig
   verb: POST
   path: /tenant-config/publish
@@ -663,6 +744,19 @@ operations:
   - cache:idempotency
   - cache:resolution
   - whitelabel.tenant_config
+- operation: unpublishGuidedChoice
+  verb: POST
+  path: /guided-choices/{guidedChoiceId}/unpublish
+  scope: venue
+  permission: TENANT_PUBLISH
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
+  - whitelabel.guided_choice_question
+  writes: []
 - operation: updateBanner
   verb: PATCH
   path: /tenant-config/banners/{bannerId}
@@ -691,6 +785,20 @@ operations:
   writes:
   - cache:idempotency
   - whitelabel.content_page
+- operation: updateGuidedChoice
+  verb: PATCH
+  path: /guided-choices/{guidedChoiceId}
+  scope: venue
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - whitelabel.guided_choice
+  - whitelabel.guided_choice_answer
+  - whitelabel.guided_choice_question
+  writes:
+  - whitelabel.guided_choice_question
 - operation: updatePromoBlock
   verb: PATCH
   path: /tenant-config/promo-blocks/{promoBlockId}

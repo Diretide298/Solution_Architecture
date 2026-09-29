@@ -1,31 +1,31 @@
 id: LLD-MarketingService
-title: MarketingService — 213 operations, 70 tables
+title: MarketingService — 248 operations, 113 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 index: diagrams/hld/02-services.yaml
-why: '**213 operations and 70 tables — the biggest thing in the package, and probably two services eventually.**
-  CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely;
-  a campaign send is a burst of millions of rows nobody reads again.
+why: '**248 operations and 113 tables — the biggest thing in the package, and probably two services
+  eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
+  and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
 
   **Kept as one for now** because splitting a service before it has a load profile is guessing.'
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 213
+  operations: 248
   inAFlow: 102
-  percent: 48%
+  percent: 41%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: marketing
-  tables: 70
+  tables: 113
   stores:
   - postgres
-  largestTable: marketing.guest_profile
+  largestTable: marketing.privacy_request
 operationsByContract:
 - contract: marketing-crm
-  count: 213
+  count: 248
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -35,6 +35,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 2
+  - operation: actOnWaiverRequirements
+    verb: POST
+    path: /participant-waiver-statu
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: activateAudience
     verb: POST
     path: /audience-activations
@@ -97,7 +105,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: approveWaiverTesting
     verb: PUT
@@ -105,7 +113,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
+    reads: 2
     writes: 0
   - operation: awardBadge
     verb: POST
@@ -170,6 +178,14 @@ operationsByContract:
     permission: MARKETING_MANAGE
     offline: false
     reads: 4
+    writes: 2
+  - operation: createConsentQuestion
+    verb: POST
+    path: /consent-questions
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 2
     writes: 2
   - operation: createForm
     verb: POST
@@ -299,6 +315,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: getCaseInvestigationResolution
+    verb: GET
+    path: /case-investigation-resolution
+    scope: venue
+    permission: CASE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getConsentHistory
     verb: GET
     path: /guests/{subjectId}/consents/history
@@ -314,6 +338,14 @@ operationsByContract:
     permission: CASE_VIEW
     offline: false
     reads: 4
+    writes: 0
+  - operation: getDigitalWaiverForm
+    verb: GET
+    path: /digital-waiver-form
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: getForm
     verb: GET
@@ -411,6 +443,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 0
+  - operation: getLocalizationBrandingCustomer
+    verb: GET
+    path: /localization-branding-customer
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getLostItemMatches
     verb: GET
     path: /lost-items/{itemId}/matches
@@ -475,6 +515,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: getSignatorySignatureGuardian
+    verb: GET
+    path: /signatory-signature-guardian
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 2
+    writes: 0
   - operation: getSuppressionList
     verb: GET
     path: /consent/suppression-list
@@ -490,6 +538,14 @@ operationsByContract:
     permission: GUEST_VIEW
     offline: true
     reads: 4
+    writes: 0
+  - operation: getWaiverTesting
+    verb: GET
+    path: /waiver-testing
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 2
     writes: 0
   - operation: getWishlist
     verb: GET
@@ -593,7 +649,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listCases
     verb: GET
@@ -619,6 +675,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listConsentAnswers
+    verb: GET
+    path: /consent-answers
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listConsentEvidenceWithdrawal
     verb: GET
     path: /consent-evidence-withdrawal
@@ -643,6 +707,14 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 1
+  - operation: listConsentQuestions
+    verb: GET
+    path: /consent-questions
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 2
+    writes: 0
   - operation: listContact
     verb: GET
     path: /contact
@@ -657,7 +729,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listConversations
     verb: GET
@@ -673,7 +745,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listCookieTrackingDigital
     verb: GET
@@ -681,7 +753,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listCustomerBadges
     verb: GET
@@ -729,7 +801,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listDataRetentionExpiry
     verb: GET
@@ -737,7 +809,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listDataSubjectCustomer
     verb: GET
@@ -745,7 +817,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listDeletionAnonymizationRestriction
     verb: GET
@@ -753,7 +825,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listDeliveryCommunicationPlatform
     verb: GET
@@ -793,7 +865,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 2
     writes: 0
   - operation: listEscalationCollaborationInternal
     verb: GET
@@ -801,7 +873,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listEscalationCriticalCase
     verb: GET
@@ -834,6 +906,14 @@ operationsByContract:
     permission: GUEST_VIEW
     offline: false
     reads: 2
+    writes: 0
+  - operation: listIntelligentRoutingSkills
+    verb: GET
+    path: /intelligent-routing-skill
+    scope: venue
+    permission: CASE_VIEW
+    offline: false
+    reads: 1
     writes: 0
   - operation: listJourneys
     verb: GET
@@ -923,6 +1003,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: listMyNotifications
+    verb: GET
+    path: /me/notifications
+    scope: tenant
+    permission: null
+    offline: true
+    reads: 0
+    writes: 0
   - operation: listParticipantWaiverStatus
     verb: GET
     path: /participant-waiver-statu
@@ -947,6 +1035,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listPrivacyComplianceExceptions
+    verb: GET
+    path: /privacy-compliance-exception
+    scope: venue
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listPrivacyConsent
     verb: GET
     path: /privacy-consent
@@ -961,7 +1057,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listPrivacyNoticePolicy
     verb: GET
@@ -977,7 +1073,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listProviderHealthUsage
     verb: GET
@@ -993,7 +1089,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listReviews
     verb: GET
@@ -1025,7 +1121,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listSegmentMembers
     verb: GET
@@ -1057,7 +1153,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listSlaPolicies
     verb: GET
@@ -1145,7 +1241,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: listWaiverTriggerEligibility
     verb: GET
@@ -1153,6 +1249,22 @@ operationsByContract:
     scope: venue
     permission: MARKETING_VIEW
     offline: false
+    reads: 1
+    writes: 0
+  - operation: listWaiverVerificationQueue
+    verb: GET
+    path: /waiver-verification-validation
+    scope: venue
+    permission: GUEST_VIEW_PII
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: markMyNotificationsRead
+    verb: POST
+    path: /me/notifications/read
+    scope: tenant
+    permission: null
+    offline: true
     reads: 0
     writes: 0
   - operation: matchGuest
@@ -1219,6 +1331,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: recordConsentAnswers
+    verb: POST
+    path: /consent-answers
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: recordLostItem
     verb: POST
     path: /lost-items
@@ -1355,6 +1475,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: setAgentServiceProfile
+    verb: PUT
+    path: /agent-workload-availability
+    scope: venue
+    permission: CASE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setBadge
     verb: PUT
     path: /badges
@@ -1363,6 +1491,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setBusinessEventMapping
+    verb: PUT
+    path: /business-event-notification
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setCallDisposition
     verb: POST
     path: /conversations/{conversationId}/disposition
@@ -1371,37 +1507,61 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: setCaseInternalRequest
+    verb: PUT
+    path: /escalation-collaboration-internal
+    scope: venue
+    permission: CASE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setCaseInvestigationResolution
     verb: PUT
     path: /case-investigation-resolution
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
+  - operation: setCaseResolution
+    verb: PUT
+    path: /case-resolution-closure
+    scope: venue
+    permission: CASE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setChannelProvider
     verb: PUT
     path: /channel-provider
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: setCommunicationPreferenceMarketing
     verb: PUT
     path: /communication-preference-marketing
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
+  - operation: setCommunicationRoutingRule
+    verb: PUT
+    path: /routing-priority-throttling
+    scope: venue
+    permission: MARKETING_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setConsentCapturePoint
     verb: PUT
     path: /consent-capture-point
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: setConsentPurposes
     verb: PUT
@@ -1411,22 +1571,46 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 4
+  - operation: setContactAutomation
+    verb: PUT
+    path: /contact-automation
+    scope: venue
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setCookieBannerDesign
+    verb: PUT
+    path: /cookie-banner-preference
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setCustomerServiceCopilot
     verb: PUT
     path: /customer-service-copilot
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: setDataDiscoveryAccess
     verb: PUT
     path: /data-discovery-access
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
+  - operation: setDataProcessingPurpose
+    verb: PUT
+    path: /data-processing-purpose
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setDataRetentionPolicy
     verb: PUT
     path: /retention-policies
@@ -1441,8 +1625,16 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
+  - operation: setDynamicFieldQuestion
+    verb: PUT
+    path: /dynamic-field-question
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: setGuestAttributeModel
     verb: PUT
     path: /guest-attribute-model
@@ -1497,8 +1689,8 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: setLeaderboardNickname
     verb: PUT
     path: /loyalty/leaderboard-nickname
@@ -1507,14 +1699,22 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: setLegalHold
+    verb: PUT
+    path: /data-retention-expiry
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setLocalizationBrandingCustomer
     verb: PUT
     path: /localization-branding-customer
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: setLoyaltyCampaign
     verb: PUT
     path: /loyalty/campaigns
@@ -1553,7 +1753,7 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: setOrderBookingTicket
     verb: PUT
@@ -1561,24 +1761,56 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
+  - operation: setPrivacyAction
+    verb: PUT
+    path: /deletion-anonymization-restriction
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setPrivacyComplianceException
     verb: PUT
     path: /privacy-compliance-exception
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
+  - operation: setPrivacyRequest
+    verb: PUT
+    path: /data-subject-customer
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setPrivacyRequestTypes
+    verb: PUT
+    path: /privacy
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setQualityEvaluation
+    verb: PUT
+    path: /quality-agent-evaluation
+    scope: venue
+    permission: CASE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setRefundCompensationService
     verb: PUT
     path: /refund-compensation-service
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: setReward
     verb: PUT
     path: /loyalty/rewards
@@ -1593,8 +1825,8 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 1
+    writes: 1
   - operation: setSeoMetadata
     verb: PUT
     path: /seo-metadata
@@ -1609,13 +1841,53 @@ operationsByContract:
     scope: venue
     permission: MARKETING_MANAGE
     offline: false
-    reads: 0
-    writes: 0
+    reads: 2
+    writes: 2
   - operation: setSlaPolicy
     verb: PUT
     path: /sla-policies
     scope: venue
     permission: CASE_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setTrackingTechnology
+    verb: PUT
+    path: /cookie-tracking-digital
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWaiverAssociation
+    verb: PUT
+    path: /product-event-experience
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWaiverException
+    verb: PUT
+    path: /site-waiver-exception
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWaiverTemplateMaster
+    verb: PUT
+    path: /waiver-template-master
+    scope: venue
+    permission: GUEST_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWaiverTriggerRule
+    verb: PUT
+    path: /waiver-trigger-eligibility
+    scope: venue
+    permission: GUEST_MANAGE
     offline: false
     reads: 1
     writes: 1
@@ -1626,7 +1898,7 @@ operationsByContract:
     permission: MARKETING_MANAGE
     offline: false
     reads: 0
-    writes: 0
+    writes: 1
   - operation: startKioskAssist
     verb: POST
     path: /kiosk-assists
@@ -1696,6 +1968,14 @@ operationsByContract:
     path: /cases/{caseId}
     scope: venue
     permission: CASE_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateConsentQuestion
+    verb: PATCH
+    path: /consent-questions/{questionId}
+    scope: venue
+    permission: GUEST_MANAGE
     offline: false
     reads: 2
     writes: 2
@@ -1901,6 +2181,13 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.agent_service_profile
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.attribution_touch
   columns: 8
   store: postgres
@@ -1928,6 +2215,12 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.booking_consent_record
+  columns: 20
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: marketing.campaign
   columns: 19
   store: postgres
@@ -1948,8 +2241,50 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.case_compensation_request
+  columns: 17
+  store: postgres
+  parent: marketing.case
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.case_internal_request
+  columns: 17
+  store: postgres
+  parent: marketing.case
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.case_linked_record
+  columns: 9
+  store: postgres
+  parent: marketing.case
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.case_message
   columns: 11
+  store: postgres
+  parent: marketing.case
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.case_resolution
+  columns: 14
+  store: postgres
+  parent: marketing.case
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.case_routing_rule
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.case_service_action
+  columns: 17
   store: postgres
   parent: marketing.case
   writtenBy:
@@ -1968,6 +2303,32 @@ tables:
   parent: marketing.challenge
   writtenBy: []
   foreignWriters: null
+- table: marketing.communication_preference_type
+  columns: 17
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.communication_provider
+  columns: 21
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.communication_routing_rule
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.consent_capture_point
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: marketing.consent_purpose
   columns: 8
   store: postgres
@@ -1979,6 +2340,20 @@ tables:
   columns: 3
   store: postgres
   parent: marketing.consent_purpose
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.consent_question
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.consent_question_version
+  columns: 6
+  store: postgres
+  parent: marketing.consent_question
   writtenBy:
   - marketing-crm
   foreignWriters: null
@@ -1999,6 +2374,13 @@ tables:
   parent: marketing.consent_record
   writtenBy: []
   foreignWriters: null
+- table: marketing.contact_automation
+  columns: 22
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.conversation
   columns: 21
   store: postgres
@@ -2017,6 +2399,13 @@ tables:
   columns: 4
   store: postgres
   parent: marketing.conversation_message
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.cookie_banner_design
+  columns: 16
+  store: postgres
+  parent: null
   writtenBy:
   - marketing-crm
   foreignWriters: null
@@ -2041,7 +2430,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.form_definition_field
-  columns: 11
+  columns: 23
   store: postgres
   parent: marketing.form_definition
   writtenBy:
@@ -2185,6 +2574,13 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.legal_hold
+  columns: 16
+  store: postgres
+  parent: wallet.hold
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.lost_item
   columns: 17
   store: postgres
@@ -2264,6 +2660,12 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.minor_privacy_rule
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: marketing.points_earning_rule
   columns: 6
   store: postgres
@@ -2278,6 +2680,39 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.privacy_action
+  columns: 16
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.privacy_audit_event
+  columns: 17
+  store: postgres
+  parent: catalogue.event
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.privacy_change_set
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.privacy_exception
+  columns: 24
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.privacy_export_package
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.privacy_incident
   columns: 12
   store: postgres
@@ -2285,8 +2720,43 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.privacy_request
+  columns: 29
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.privacy_request_deadline
+  columns: 3
+  store: postgres
+  parent: marketing.privacy_request_type
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.privacy_request_type
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.processing_purpose
+  columns: 26
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.programme_tier
   columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.quality_evaluation
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -2347,6 +2817,20 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.sender_identity
+  columns: 22
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.service_copilot_config
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.sla_policy
   columns: 12
   store: postgres
@@ -2375,7 +2859,96 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.tracking_technology
+  columns: 23
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.waiver_association
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.waiver_exception
+  columns: 19
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.waiver_field_rule
+  columns: 5
+  store: postgres
+  parent: marketing.form_definition_field
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.waiver_form_layout
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.waiver_localisation
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.waiver_master
+  columns: 26
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.waiver_signatory_rule
+  columns: 20
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)
+  columns: 20
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.waiver_signature
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.waiver_trigger_rule
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.waiver_verification
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
+- table: marketing.waiver_version_control
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)
   columns: 15
   store: postgres
   parent: null
@@ -2458,6 +3031,7 @@ writesOutside:
     tables:
     - platform.outbox
 screens:
+- P01:WEB-006 Date & Performance Selection
 - P01:WEB-009 Wishlist
 - P01:WEB-011 Guest Details & Attendee Forms
 - P01:WEB-017 My Account Dashboard
@@ -2469,8 +3043,11 @@ screens:
 - P01:WEB-034 Lost & Found
 - P01:WEB-043 Loyalty & Rewards
 - P01:WEB-044 AI Concierge – Home
+- P01:WEB-046 In-Venue Notifications
 - P02:GST-001 Home – Default
+- P02:GST-007 Select Date & Time
 - P02:GST-020 Saved Items / Wishlist
+- P02:GST-030 In-Venue Notifications
 - P02:GST-031 AI Concierge – Home
 - P02:GST-032 AI Concierge – Chat
 - P02:GST-034 Lost & Found
@@ -2496,6 +3073,7 @@ screens:
 - P06:EMP-057 Guest Profile & Dining History
 - P06:EMP-088 Overdue Rental Management
 - P08:BO-005 Queue Monitor
+- P08:BO-008 Product Detail & Variants
 - P08:BO-073 Lost & Found Register
 - P08:BO-107 Guests & Marketing
 - P08:BO-118 Campaign & Audience Management
@@ -2549,6 +3127,7 @@ screens:
 - P08:BO-776 Trigger Event Catalog
 - P08:BO-777 Decision Logic & Timing
 - P08:BO-779 Lifecycle Journeys
+- P08:BO-780 Guest Engagement Journeys
 - P08:BO-781 Cross-Sell & Service Recovery
 - P08:BO-782 AI Journey Optimization
 - P08:BO-783 Journey Analytics & Audit
@@ -2656,6 +3235,7 @@ screens:
 - P12:SUP-027 Service Analytics & Root-Cause Intelligence
 - P12:SUP-028 AI Contact Center Intelligence & Automation Studio
 - P13:CMS-013 SEO & Metadata
+- P13:CMS-016 Site Settings
 - P13:CMS-018 Consent & Legal
 - P13:CMS-021 Privacy & Consent Configuration Command Center
 - P13:CMS-022 Data Processing Purpose & Lawful Basis Registry

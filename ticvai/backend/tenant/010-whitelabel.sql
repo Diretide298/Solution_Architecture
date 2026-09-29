@@ -1,4 +1,4 @@
--- whitelabel — 16 tables
+-- whitelabel — 19 tables
 -- **Derived. Do not hand-edit.**
 
 -- A notice on a tenant storefront, scheduled
@@ -121,6 +121,40 @@ CREATE TABLE IF NOT EXISTS whitelabel.footer_config_social_link (
     platform                          text,
     url                               text,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 7 operations read it and 2 write it; 2 tables reference it.
+CREATE TABLE IF NOT EXISTS whitelabel.guided_choice (
+    id                                text PRIMARY KEY NOT NULL,
+    venue_id                          uuid NOT NULL,
+    name                              text NOT NULL CONSTRAINT guided_choice_name_chk CHECK (char_length(name) <= 80),
+    mode                              text NOT NULL DEFAULT 'button' CONSTRAINT guided_choice_mode_chk CHECK (mode IN ('button', 'popupOnArrival', 'off')),
+    show_banner                       boolean DEFAULT true,
+    status                            text NOT NULL,
+    source                            text NOT NULL CONSTRAINT guided_choice_source_chk CHECK (source IN ('manual', 'aiSuggested')),
+    suggestion_ref                    text,
+    published_at                      timestamptz,
+    published_by                      uuid,
+    updated_at                        timestamptz
+);
+
+-- Holds 4 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_answer (
+    guided_choice_id                  text NOT NULL,
+    id                                text PRIMARY KEY,
+    title                             jsonb NOT NULL,
+    sort_order                        integer NOT NULL
+);
+
+-- Holds 4 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_question (
+    guided_choice_id                  text NOT NULL,
+    id                                text PRIMARY KEY,
+    title                             jsonb NOT NULL,
+    sort_order                        integer NOT NULL
 );
 
 -- A block on a tenant homepage, ordered. A section naming a disabled module must not render at all

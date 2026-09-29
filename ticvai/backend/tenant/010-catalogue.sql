@@ -1,4 +1,4 @@
--- catalogue — 32 tables
+-- catalogue — 34 tables
 -- **Derived. Do not hand-edit.**
 
 -- Another way to name the same product — a barcode, a supplier code, a legacy id
@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS catalogue.entitlement_template (
     blackout_dates                    text[],
     fast_track_tier                   text CONSTRAINT entitlement_template_fast_track_tier_chk CHECK (fast_track_tier IN ('none', 'priority', 'express', 'unlimited')),
     entries_allowed                   integer,
+    transport_restriction             jsonb,
     is_reentry_allowed                boolean DEFAULT false,
     purchase_eligibility              jsonb,
     person_type                       text CONSTRAINT entitlement_template_person_type_chk CHECK (person_type IN ('adult', 'child', 'infant', 'senior', 'student', 'resident', 'staff')),
@@ -283,7 +284,9 @@ CREATE TABLE IF NOT EXISTS catalogue.performance (
     requires_approval_to_cancel       boolean DEFAULT true,
     status                            text NOT NULL CONSTRAINT performance_status_chk CHECK (status IN ('scheduled', 'onSale', 'soldOut', 'suspended', 'cancelled', 'completed')),
     admission_rules_id                uuid,
-    seat_map_id                       uuid
+    seat_map_id                       uuid,
+    language                          text CONSTRAINT performance_language_chk CHECK (char_length(language) <= 35),
+    format                            text CONSTRAINT performance_format_chk CHECK (char_length(format) <= 40)
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -352,11 +355,30 @@ CREATE TABLE IF NOT EXISTS catalogue.price_list (
     priority                          integer
 );
 
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS catalogue.pricing_recommendation_decision (
+    id                                text PRIMARY KEY NOT NULL,
+    recommendation_id                 text NOT NULL,
+    decision                          text NOT NULL CONSTRAINT pricing_recommendation_decision_decision_chk CHECK (decision IN ('accept', 'modify', 'reject', 'schedule', 'sendForApproval')),
+    rejection_reason                  text CONSTRAINT pricing_recommendation_decision_rejection_reason_chk CHECK (rejection_reason IN ('commercialJudgment', 'brandPositioning', 'customerSensitivity', 'eventStrategy', 'incorrectSignal', 'dataConcern', 'other')),
+    rejection_note                    text,
+    recommended_price                 numeric(18,4),
+    human_selected_price              numeric(18,4),
+    scheduled_for                     timestamptz,
+    approval_request_id               uuid,
+    execution_id                      text,
+    decided_by_principal_id           uuid NOT NULL,
+    decided_at                        timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
+);
+
 -- What a venue sells — admission, a session, a bundle, a membership, a locker. Not the instance: a
 -- product is the offer and catalogue.performance is the occasion
 CREATE TABLE IF NOT EXISTS catalogue.product (
     id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL CONSTRAINT product_code_chk CHECK (char_length(code) <= 64),
+    family_key                        text CONSTRAINT product_family_key_chk CHECK (char_length(family_key) <= 64),
     name                              text NOT NULL CONSTRAINT product_name_chk CHECK (char_length(name) <= 200),
     description                       text,
     kind                              text NOT NULL CONSTRAINT product_kind_chk CHECK (kind IN ('admission', 'timedAdmission', 'datedAdmission', 'openDated', 'seated', 'membership', 'bundle', 'fnb', 'retail', 'rental', 'addOn', 'giftCard')),
@@ -378,7 +400,11 @@ CREATE TABLE IF NOT EXISTS catalogue.product (
     channels                          text[],
     entitlement_template_id           uuid,
     blocked_offline                   boolean,
-    data_mask_values                  jsonb
+    data_mask_values                  jsonb,
+    guest_listing                     text DEFAULT 'bookable' CONSTRAINT product_guest_listing_chk CHECK (guest_listing IN ('bookable', 'infoOnly', 'hidden')),
+    not_bookable_label                jsonb,
+    consent_question_ids              text[],
+    requires_time_window              boolean DEFAULT false
 );
 
 -- The merchandise hierarchy — categories, brands, collections (Retail Board 2, 20 August).
@@ -394,6 +420,7 @@ CREATE TABLE IF NOT EXISTS catalogue.product_category (
     scope_path                        ltree NOT NULL,
     display_order                     integer DEFAULT 100,
     image_asset_id                    uuid,
+    description                       jsonb,
     is_active                         boolean DEFAULT true
 );
 
@@ -415,6 +442,17 @@ CREATE TABLE IF NOT EXISTS catalogue.product_eligibility_rule (
     swim_ability                      text DEFAULT 'notRequired' CONSTRAINT product_eligibility_rule_swim_ability_chk CHECK (swim_ability IN ('notRequired', 'confident')),
     refundable_if_ineligible_at_gate  boolean DEFAULT false,
     scope_path                        ltree NOT NULL
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 8 operations read it and 3 write it.
+CREATE TABLE IF NOT EXISTS catalogue.product_media (
+    asset_id                          uuid NOT NULL,
+    kind                              text NOT NULL CONSTRAINT product_media_kind_chk CHECK (kind IN ('image', 'video')),
+    is_primary                        boolean NOT NULL DEFAULT false,
+    display_order                     integer DEFAULT 100,
+    alt_text                          jsonb,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Version history for a product (BL-030, BL-047, BL-058). A restore creates a new version rather
@@ -475,7 +513,8 @@ CREATE TABLE IF NOT EXISTS catalogue.variant (
     name                              text CONSTRAINT variant_name_chk CHECK (char_length(name) <= 150),
     barcode                           text CONSTRAINT variant_barcode_chk CHECK (char_length(barcode) <= 64),
     is_default                        boolean DEFAULT false,
-    is_active                         boolean NOT NULL
+    is_active                         boolean NOT NULL,
+    description                       jsonb
 );
 
 -- The axis a product varies along — size, colour, session length. A t-shirt has one; a timed

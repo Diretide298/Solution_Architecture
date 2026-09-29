@@ -169,6 +169,12 @@ paths:
       description: 'A release names the component versions that ship together and the migrations they
         require. Nothing is deployed by creating one — it is a manifest, not an action.
 
+        **It also carries the guest-facing "what''s new"** (decided 29 September, rev 3 GAP-B2):
+        `guestReleaseNotes`, localised, written for guests and public. `note` stays internal. The notes of
+        the releases a tenant''s cell is running are what the guest Help screen reads, through the public
+        guest view of `white-label.getTenantAppStatus`; a release with no guest-visible change leaves them
+        null and shows nothing.
+
         '
       tags:
       - release
@@ -1679,10 +1685,28 @@ components:
           type: string
           minLength: 3
           maxLength: 2000
+          description: Internal. Never shown to guests; `guestReleaseNotes` is.
+        guestReleaseNotes:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: >
+            **The public, localised "what's new" for guests** (decided 29 September, rev 3 GAP-B2), one
+            short text per locale, written for a guest and naming no person. Public once the release
+            reaches the tenant's cell; read by the guest Help screen (WEB-025, WEB-045, GST-040) through
+            `white-label.getTenantAppStatus`. Distinct from the staff-only `TenantAppStatus.recentChanges`,
+            which names the principal behind each change and stays staff only.
         breakingChanges:
           type: array
           items:
             type: string
+    LocalisedText:
+      x-ticvai-persistence: none — jsonb column
+      type: object
+      description: Text keyed by locale code.
+      additionalProperties:
+        type: string
+        maxLength: 2000
     Release:
       allOf:
       - $ref: '#/components/schemas/CreateReleaseRequest'

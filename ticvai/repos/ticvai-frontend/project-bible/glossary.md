@@ -18,7 +18,7 @@ Sources: client-supplied reference definitions · MoM decisions 30 Jul – 12 Au
 | Term | Definition | Never say |
 |---|---|---|
 | **Event** | A named happening that has one or more Performances. Carries the identity a guest-app recognises | Show, Occasion |
-| **Performance** | A dated, timed instance of an Event. The thing capacity attaches to. **"Session" in the design** (Session Calendar, Session Template, session time, the resources manifest) **means a Performance** (decided 28 September, audit R165): `PerformanceTemplate`, `/performances/{performanceId}/manifest` | Showtime, Session, Slot |
+| **Performance** | A dated, timed instance of an Event. The thing capacity attaches to. **"Session" in the design** (Session Calendar, Session Template, session time, the resources manifest) **means a Performance** (decided 28 September, audit R165): `PerformanceTemplate`, `/performances/{performanceId}/manifest`. **Guest-facing copy may say "session"** (decided 29 September, rev 3 CFG-10; see Recorded exceptions) | Showtime, Session (except guest-facing copy), Slot |
 | **Product** | The sellable thing. May be a ticket, membership, rental or bundle, and it is what a Menu Item or a Merchandise Item sells (decided 28 September, audit R131) | Item (bare), Article |
 | **Menu Item** | An F&B Product variant as it appears on a menu: its name, price, station and modifiers. `MenuItem` in `fnb.yaml`, pointing at a `productVariantId` (decided 28 September, audit R131) | Dish, F&B item |
 | **Merchandise Item** | A retail Product variant as a shop sells it, with its SKU, barcode and return rules. `MerchandiseItem` in `retail.yaml` (decided 28 September, audit R131) | Retail item, Article |
@@ -137,6 +137,7 @@ A word the table above bans may appear only where this list allows it. Each exce
 |---|---|---|---|
 | **Booking** | Guest-facing labels only: *Booking Confirmation*, *Group Booking* | An Order (or a Reservation) as a guest reads it. Code and contracts use Order and Reservation | 28 September, audit R145 |
 | **Release hold** | Guest-facing and staff-facing labels | Releasing a Reservation. Code says Reservation | 28 September, audit R145 |
+| **Session** | Guest-facing copy only, e.g. *Pick a session*, *Surf sessions*, *Sunset swim session* | A Performance as the guest reads it. **Code, contracts and DDL keep Performance** (`Performance`, `performanceId`, `createPerformances`), and staff screens keep Performance as R165 decided | 29 September, rev 3 CFG-10 |
 | **Till** | Staff-facing copy | The Workstation. Never the Deposit Box | 28 September, audit R156 |
 | **POS**, **drawer** | Staff-facing copy (the POS app, the cash drawer) | The Workstation's app; the Deposit Box. **Out of code, contracts and DDL** | 28 September, audit R156 |
 | **QR** | Guest-facing copy only, e.g. GST-055 *Dynamic QR Ticket* | The Media Code as the guest sees it | 28 September, audit R210 |

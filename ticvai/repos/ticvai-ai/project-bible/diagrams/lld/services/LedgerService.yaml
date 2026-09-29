@@ -1,18 +1,18 @@
 id: LLD-LedgerService
-title: LedgerService — 56 operations, 20 tables
+title: LedgerService — 57 operations, 20 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
-why: '**Money, and it is append-only.** 56 operations over 20 tables that are never updated and never
+why: '**Money, and it is append-only.** 57 operations over 20 tables that are never updated and never
   deleted — a different discipline from everything around it, and one that should not share a deploy
   with anything that does mutate.'
 scale: Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs.
 ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable; one
   that is briefly wrong is not.'
 coverage:
-  operations: 56
+  operations: 57
   inAFlow: 33
-  percent: 59%
+  percent: 58%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -23,7 +23,7 @@ schemas:
   largestTable: ledger.settlement
 operationsByContract:
 - contract: finance
-  count: 56
+  count: 57
   operations:
   - operation: abandonPeriodClose
     verb: POST
@@ -473,6 +473,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: verifyTaxExemption
+    verb: POST
+    path: /tax-exemptions/{exemptionId}/verify
+    scope: region
+    permission: TAX_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
 tables:
 - store: cache:idempotency
   kind: cache
@@ -689,7 +697,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.tax_exemption
-  columns: 8
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -745,6 +753,7 @@ screens:
 - P08:BO-1029 Quote, Deposit & Payment
 - P08:BO-1081 Finance Dashboard
 - P08:BO-1170 Wallet Financial Period & Closing Controls
+- P08:BO-1172 Finance Validation, Reporting & Audit Center
 - P09:ADM-411 Billing & Legal Entity Information
 - P09:ADM-619 Reconciliation & Settlement Command Center\t139
 - P09:ADM-620 Reconciliation Source & Import Manager\t141

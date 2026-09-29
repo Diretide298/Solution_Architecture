@@ -10,15 +10,15 @@
  "generated": "2026-09-29",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 99,
-  "operations": 123,
-  "contracts": 7,
+  "screens": 100,
+  "operations": 141,
+  "contracts": 9,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 109
+  "operationsWithNoScreen": 111
  },
  "waves": {
-  "wave2": 19,
+  "wave2": 20,
   "wave3": 80
  },
  "modules": [
@@ -38,7 +38,7 @@
   },
   {
    "module": "White Label",
-   "screens": 19,
+   "screens": 20,
    "waves": [
     2
    ]
@@ -47,11 +47,11 @@
  "contracts": [
   {
    "contract": "white-label",
-   "operations": 43
+   "operations": 53
   },
   {
    "contract": "marketing-crm",
-   "operations": 42
+   "operations": 46
   },
   {
    "contract": "assets",
@@ -66,8 +66,16 @@
    "operations": 4
   },
   {
+   "contract": "catalogue",
+   "operations": 3
+  },
+  {
    "contract": "orders",
    "operations": 2
+  },
+  {
+   "contract": "tenancy",
+   "operations": 1
   },
   {
    "contract": "maintenance",
@@ -135,7 +143,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/page-builder",
-   "operations": 7,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -144,7 +152,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/content-blocks",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -153,7 +161,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/navigation-menus",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -216,7 +224,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/site-settings",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -234,7 +242,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/consent-legal",
-   "operations": 4,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -965,45 +973,42 @@
    "route": "/media-library/distribution-intelligence-ai-insights-optimization-cms-100",
    "operations": 1,
    "drawn": true
+  },
+  {
+   "id": "CMS-101",
+   "name": "Help Me Choose",
+   "module": "White Label",
+   "wave": 2,
+   "route": "/white-label/help-me-choose",
+   "operations": 9,
+   "drawn": true
   }
  ],
  "gaps": {
   "operationsWithNoScreen": [
    {
-    "operation": "attachModifierGroup",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Give an item its choices"
+    "operation": "getCatalogueImportJob",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Progress and findings of a catalogue import"
    },
    {
-    "operation": "closeCorrectiveAction",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Close a signed finding"
+    "operation": "getPlanBenefits",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Which benefits a plan grants, and how much of each"
    },
    {
-    "operation": "createCombo",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "A meal deal, priced as one thing"
+    "operation": "listMembershipBenefits",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Benefits a plan can grant"
    },
    {
-    "operation": "createModifierGroup",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Create a modifier group"
-   },
-   {
-    "operation": "createTable",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "A table as a thing, not an inference"
-   },
-   {
-    "operation": "escalateCorrectiveAction",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Escalate a finding"
+    "operation": "listMembershipProgrammes",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Membership schemes, the level above a plan"
    },
    {
     "operation": "getAllergenVerification",
@@ -1054,18 +1059,6 @@
     "summary": "The units that get read, and the range each must hold"
    },
    {
-    "operation": "rebalanceStationLoad",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Move work between stations mid-service"
-   },
-   {
-    "operation": "recordCorrectiveAction",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Record what was done about a finding"
-   },
-   {
     "operation": "resolveBookingConflict",
     "contract": "fnb",
     "verb": "GET",
@@ -1082,60 +1075,6 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Tell the guest where their order is"
-   },
-   {
-    "operation": "setComboSlots",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "What the guest chooses, and what it costs extra"
-   },
-   {
-    "operation": "setFnbReservationPolicy",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Set turn times and seating buffers"
-   },
-   {
-    "operation": "setFnbServiceChargePolicy",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Set the service charge"
-   },
-   {
-    "operation": "setIngredientSubstitutes",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Define approved substitutions"
-   },
-   {
-    "operation": "setKitchenSla",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "How long a ticket may sit before it is late"
-   },
-   {
-    "operation": "setSectionLayout",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Divide the floor into sections and give each a server"
-   },
-   {
-    "operation": "setTemperatureCheckpoint",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Define a checkpoint and its safe range"
-   },
-   {
-    "operation": "updateTable",
-    "contract": "fnb",
-    "verb": "PUT",
-    "summary": "Change what a table is"
-   },
-   {
-    "operation": "createEmergencyAccessOverride",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Bypass the policy, loudly"
    },
    {
     "operation": "evaluateAccess",
@@ -1234,58 +1173,28 @@
     "summary": "Who already holds a conflicting pair"
    },
    {
-    "operation": "recordBenefitUsage",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Consume a benefit"
-   },
-   {
-    "operation": "setAccessPolicyState",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Submit, approve, activate or retire a policy"
-   },
-   {
-    "operation": "setCapabilityTemplate",
-    "contract": "identity",
-    "verb": "PUT",
-    "summary": "Save a tick-set under a name"
-   },
-   {
     "operation": "setPrincipalModuleAccess",
     "contract": "identity",
     "verb": "PUT",
     "summary": "Tick what they may do"
    },
    {
-    "operation": "updateAccessPolicy",
-    "contract": "identity",
-    "verb": "PUT",
-    "summary": "Change a policy, as a new version"
-   },
-   {
-    "operation": "addGuestNote",
+    "operation": "actOnWaiverRequirements",
     "contract": "marketing-crm",
     "verb": "POST",
-    "summary": "What the floor needs to know about this table"
+    "summary": "Send, resend or correct participant waiver requirements, one or in bulk"
    },
    {
-    "operation": "addSuppression",
+    "operation": "getCaseInvestigationResolution",
     "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Suppress an address"
+    "verb": "GET",
+    "summary": "Read the case workspace"
    },
    {
-    "operation": "awardBadge",
+    "operation": "getDigitalWaiverForm",
     "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Award a badge"
-   },
-   {
-    "operation": "createInvitationCampaign",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "A quota-bounded, addressed invitation"
+    "verb": "GET",
+    "summary": "Load the layout of a waiver version"
    },
    {
     "operation": "getForm",
@@ -1298,6 +1207,12 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "What a guest answered"
+   },
+   {
+    "operation": "getLocalizationBrandingCustomer",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Load a waiver version's languages, branding and channels"
    },
    {
     "operation": "getLostItemMatches",
@@ -1318,10 +1233,22 @@
     "summary": "The metadata in force for one page"
    },
    {
+    "operation": "getSignatorySignatureGuardian",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Load the signatory rules of a waiver version"
+   },
+   {
     "operation": "getSuppressionList",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
+   },
+   {
+    "operation": "getWaiverTesting",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Checklist, rule simulation and approval record of a waiver version"
    },
    {
     "operation": "issueReward",
@@ -1354,6 +1281,12 @@
     "summary": "Venue-defined guest fields and their options"
    },
    {
+    "operation": "listIntelligentRoutingSkills",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List case routing rules"
+   },
+   {
     "operation": "listLoyaltyCampaigns",
     "contract": "marketing-crm",
     "verb": "GET",
@@ -1364,6 +1297,12 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "The ledger behind a points balance"
+   },
+   {
+    "operation": "listPrivacyComplianceExceptions",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "The privacy exception queue"
    },
    {
     "operation": "listRewardAssignments",
@@ -1396,28 +1335,64 @@
     "summary": "Signed waivers"
    },
    {
-    "operation": "recordLostItem",
+    "operation": "listWaiverVerificationQueue",
     "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Report something lost, or hand something in"
+    "verb": "GET",
+    "summary": "The waiver submissions awaiting or given verification"
    },
    {
-    "operation": "setBadge",
+    "operation": "setAgentServiceProfile",
     "contract": "marketing-crm",
     "verb": "PUT",
-    "summary": "Define a badge"
+    "summary": "Set an agent's skills, languages, team and queues"
    },
    {
-    "operation": "setCallDisposition",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Why the conversation ended, and any callback"
-   },
-   {
-    "operation": "setGuestExtraFields",
+    "operation": "setBusinessEventMapping",
     "contract": "marketing-crm",
     "verb": "PUT",
-    "summary": "Define the extra guest fields"
+    "summary": "Create or change a business-event mapping"
+   },
+   {
+    "operation": "setCaseInternalRequest",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Raise or update an internal request on a case"
+   },
+   {
+    "operation": "setCaseResolution",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Record a case's resolution"
+   },
+   {
+    "operation": "setCommunicationRoutingRule",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Create or change a routing rule"
+   },
+   {
+    "operation": "setContactAutomation",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Create or change a governed contact-centre automation"
+   },
+   {
+    "operation": "setCookieBannerDesign",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Save a cookie banner design as a new version"
+   },
+   {
+    "operation": "setDataProcessingPurpose",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Create or change a processing purpose"
+   },
+   {
+    "operation": "setDynamicFieldQuestion",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Create, change or remove one field of a draft waiver version"
    },
    {
     "operation": "setGuestExtraValues",
@@ -1426,34 +1401,64 @@
     "summary": "Record a guest's answers"
    },
    {
-    "operation": "setLoyaltyCampaign",
+    "operation": "setLegalHold",
     "contract": "marketing-crm",
     "verb": "PUT",
-    "summary": "Define a loyalty campaign and its window"
+    "summary": "Place, approve or release a legal or operational hold"
    },
    {
-    "operation": "setLoyaltyRules",
+    "operation": "setPrivacyAction",
     "contract": "marketing-crm",
     "verb": "PUT",
-    "summary": "Replace a programme's rules as one set"
+    "summary": "Plan, approve or cancel a privacy action"
    },
    {
-    "operation": "setReward",
+    "operation": "setPrivacyRequest",
     "contract": "marketing-crm",
     "verb": "PUT",
-    "summary": "Define a reward and its points cost"
+    "summary": "Raise or progress a privacy request"
    },
    {
-    "operation": "setSlaPolicy",
+    "operation": "setPrivacyRequestTypes",
     "contract": "marketing-crm",
     "verb": "PUT",
-    "summary": "Define an SLA policy"
+    "summary": "Configure a privacy request type"
    },
    {
-    "operation": "startKioskAssist",
+    "operation": "setQualityEvaluation",
     "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "A staff member helps a guest at a kiosk, remotely"
+    "verb": "PUT",
+    "summary": "Record or advance a quality evaluation"
+   },
+   {
+    "operation": "setTrackingTechnology",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Add, classify or retire a tracking technology"
+   },
+   {
+    "operation": "setWaiverAssociation",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Attach a waiver to a product, event or scope, or remove it"
+   },
+   {
+    "operation": "setWaiverException",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Request, approve, reject or revoke a waiver exception"
+   },
+   {
+    "operation": "setWaiverTemplateMaster",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Create or change a waiver's master record"
+   },
+   {
+    "operation": "setWaiverTriggerRule",
+    "contract": "marketing-crm",
+    "verb": "PUT",
+    "summary": "Create or change a waiver trigger rule"
    },
    {
     "operation": "submitForm",
@@ -1484,12 +1489,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Extend a reservation"
-   },
-   {
-    "operation": "getResaleFeePolicy",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "The commission and price cap a resale listing is created under"
    },
    {
     "operation": "issueInvitation",
@@ -1558,12 +1557,6 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "renewMembership",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Renew a membership"
-   },
-   {
     "operation": "resolveSyncRejection",
     "contract": "orders",
     "verb": "POST",
@@ -1582,22 +1575,70 @@
     "summary": ""
    },
    {
-    "operation": "setResaleFeePolicy",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": "Set resale commission and the price ceiling"
+    "operation": "getConfigurationProfile",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "One profile, at its latest version or at a named one"
    },
    {
-    "operation": "deleteBanner",
-    "contract": "white-label",
-    "verb": "DELETE",
-    "summary": "Delete a banner"
+    "operation": "getConnectivityPolicy",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "The connectivity thresholds saved at one scope node"
    },
    {
-    "operation": "deleteContentPage",
-    "contract": "white-label",
-    "verb": "DELETE",
-    "summary": "Delete a content page"
+    "operation": "getDevice",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read one registered device"
+   },
+   {
+    "operation": "getOfflinePolicy",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "The offline policy saved at one scope node"
+   },
+   {
+    "operation": "getOutlet",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Read an outlet"
+   },
+   {
+    "operation": "listCellEndpoints",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Where each service answers inside a cell"
+   },
+   {
+    "operation": "listConfigurationProfiles",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Every configuration profile, at its current version"
+   },
+   {
+    "operation": "listDeviceAuditRecords",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "What was done to this device, and what it did"
+   },
+   {
+    "operation": "listDeviceTamperEvents",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Devices that report having been interfered with"
+   },
+   {
+    "operation": "listProfileDeployments",
+    "contract": "tenancy",
+    "verb": "GET",
+    "summary": "Recent deployments, with a date, a target and an outcome"
+   },
+   {
+    "operation": "recordDeviceTamperEvent",
+    "contract": "tenancy",
+    "verb": "POST",
+    "summary": "A device reports interference"
    },
    {
     "operation": "getNavigation",
@@ -1610,18 +1651,6 @@
     "contract": "white-label",
     "verb": "POST",
     "summary": "Publish now, or schedule it"
-   },
-   {
-    "operation": "setHeader",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Configure the header"
-   },
-   {
-    "operation": "setNavigation",
-    "contract": "white-label",
-    "verb": "PUT",
-    "summary": "Set main and overflow navigation"
    }
   ],
   "modulesSplitAcrossWaves": [],

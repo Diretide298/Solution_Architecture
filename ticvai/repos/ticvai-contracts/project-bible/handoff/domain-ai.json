@@ -1227,6 +1227,12 @@
    "mentions": 7
   },
   {
+   "file": "docs\\active\\design-pack-coverage.md",
+   "title": "Design pack coverage: the 40 \"undrafted\" PDFs",
+   "status": "",
+   "mentions": 11
+  },
+  {
    "file": "docs\\active\\dump-audit-3-september.md",
    "title": "Audit \u2014 the 3 September dump, its checks, and what trickles down",
    "status": "",
@@ -1586,7 +1592,7 @@
   "tables": 51,
   "screens": 37,
   "flows": 10,
-  "documents": 42,
+  "documents": 43,
   "openConflicts": 1
  }
 }

@@ -105,6 +105,7 @@ paths:
     get:
       operationId: searchMedia
       x-ticvai-consumed-by:
+        - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-838 Content, Media & Forms"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-061 Digital Asset Management Command Center"
@@ -371,6 +372,8 @@ paths:
     post:
       operationId: createUpload
       x-ticvai-consumed-by:
+        - "P08 BO-1189 Transport Network Import"
+        - "P08 BO-955 Sections & Zones"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-063 Upload & Asset Ingestion Workspace"
@@ -427,6 +430,8 @@ paths:
     post:
       operationId: completeUpload
       x-ticvai-consumed-by:
+        - "P08 BO-1189 Transport Network Import"
+        - "P08 BO-955 Sections & Zones"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-063 Upload & Asset Ingestion Workspace"
@@ -1887,6 +1892,11 @@ components:
     MediaUsage:
       x-ticvai-persistence: "assets.media_usage"
       type: object
+      description: >
+        One place an asset is used. **`surface: product` is written by catalogue** for each item of
+        `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and
+        `isLive` is true while the product is listed to guests, which is what stops an asset in use on
+        a ticket card being archived from under it.
       required: [surface, referenceId]
       properties:
         extractedText:

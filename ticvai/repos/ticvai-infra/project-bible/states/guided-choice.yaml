@@ -1,0 +1,34 @@
+# Guided choice ("Help me choose") — state model
+# Contract: white-label.GuidedChoiceStatus
+# Checked by tools/check-states.py.
+# Added 29 September: Help me choose is a venue configuration, and an AI proposal is only ever
+# a draft a person reviews (decided 29 September, rev 3 REV3-11).
+
+entity: Guided choice
+contract: white-label
+enum: GuidedChoiceStatus
+enumKind: named
+enumSchema: GuidedChoiceStatus
+owner: white-label
+initial:
+- draft
+terminal: []
+transitions:
+- from: draft
+  to: published
+  operation: publishGuidedChoice
+  trigger: operation
+  guard: '**A person publishes, always.** A staff session holding `TENANT_PUBLISH`; a service caller (the AI that proposed it) is refused. Every answer''s target is on sale or enabled, else 422 naming the answer'
+- from: published
+  to: draft
+  operation: unpublishGuidedChoice
+  trigger: operation
+  guard: Taken down by a person. Guests stop seeing it at once
+  isReversal: true
+- from: published
+  to: draft
+  operation: publishGuidedChoice
+  trigger: cascade
+  guard: '**One published choice per venue.** Publishing another choice of the same venue returns this one to `draft`'
+  isReversal: true
+notes: '**Edits and deletes only in `draft`.** `updateGuidedChoice` and `deleteGuidedChoice` answer 409 on a `published` choice, so what guests see is never changed under them; unpublish, edit, publish again. An AI-proposed choice (`proposeGuidedChoice`) is created in `draft` and never leaves it without a person.'

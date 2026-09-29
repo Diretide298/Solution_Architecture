@@ -74,8 +74,8 @@ steps:
   operations:
   - getWaitingGuest
   outcome: '**The queue screen tells them, by polling its own status**, and a push reaches a guest who
-    has the app closed. There is no in-app notifications feed in the first release (decided 28 September,
-    audit R242; GST-030 is a later release). A virtual queue that does not tell you is a queue you have
+    has the app closed. The call also lands in the in-venue notifications feed (GST-030), which is back in
+    the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242). A virtual queue that does not tell you is a queue you have
     to watch, which is the thing it was meant to replace.'
   crossesDevice: true
 exitStates:

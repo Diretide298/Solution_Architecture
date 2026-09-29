@@ -1,5 +1,5 @@
 id: LLD-WalletService
-title: WalletService — 50 operations, 25 tables
+title: WalletService — 59 operations, 28 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -17,20 +17,20 @@ ifDown: '**It holds a liability owed to a customer.** A wallet that double-spend
   not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than
   per caller.'
 coverage:
-  operations: 50
+  operations: 59
   inAFlow: 3
-  percent: 6%
+  percent: 5%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: wallet
-  tables: 25
+  tables: 28
   stores:
   - postgres
   largestTable: wallet.wallet_type
 operationsByContract:
 - contract: wallet
-  count: 50
+  count: 59
   operations:
   - operation: activateGiftCard
     verb: POST
@@ -104,6 +104,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: diffWalletConfigurationVersion
+    verb: GET
+    path: /wallet-configuration/versions/{version}/diff
+    scope: tenant
+    permission: WALLET_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: expireCreditLots
     verb: POST
     path: /credit-lots/expire
@@ -216,6 +224,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listWalletConfigurationVersions
+    verb: GET
+    path: /wallet-configuration/versions
+    scope: tenant
+    permission: WALLET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listWalletDisputes
     verb: GET
     path: /wallet-disputes
@@ -288,6 +304,22 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: resolveWalletDispute
+    verb: POST
+    path: /wallet-disputes/{disputeId}/resolve
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: restoreWalletConfigurationVersion
+    verb: POST
+    path: /wallet-configuration/versions/{version}/restore
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: reverseWalletFunding
     verb: POST
     path: /wallet-funding/reversals
@@ -336,6 +368,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setWalletAuthenticationPolicy
+    verb: PUT
+    path: /wallet-authentication-policy
+    scope: venue
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setWalletChannelRules
     verb: PUT
     path: /wallet-channel-rules
@@ -348,6 +388,22 @@ operationsByContract:
     verb: PUT
     path: /wallet-funding-rules
     scope: venue
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWalletIntegrationMapping
+    verb: PUT
+    path: /wallet-integration-mappings
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setWalletReconciliationSources
+    verb: PUT
+    path: /wallet-reconciliation-sources
+    scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
     reads: 1
@@ -368,6 +424,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setWalletRiskRuleStatus
+    verb: POST
+    path: /wallet-risk-rules/{ruleCode}/status
+    scope: tenant
+    permission: WALLET_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: setWalletRiskRules
     verb: PUT
     path: /wallet-risk-rules
@@ -432,6 +496,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: withdrawWalletDispute
+    verb: POST
+    path: /wallet-disputes/{disputeId}/withdraw
+    scope: venue
+    permission: WALLET_OPERATE
+    offline: false
+    reads: 1
+    writes: 0
 tables:
 - store: cache:idempotency
   kind: cache
@@ -482,6 +554,13 @@ tables:
   store: postgres
   parent: null
   writtenBy: []
+  foreignWriters: null
+- table: wallet.authentication_policy
+  columns: 2
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
   foreignWriters: null
 - table: wallet.balance
   columns: 9
@@ -537,7 +616,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.dispute
-  columns: 11
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -569,6 +648,20 @@ tables:
   store: postgres
   parent: null
   writtenBy: []
+  foreignWriters: null
+- table: wallet.integration_mapping
+  columns: 5
+  store: postgres
+  parent: control.api_client
+  writtenBy:
+  - wallet
+  foreignWriters: null
+- table: wallet.reconciliation_source
+  columns: 2
+  store: postgres
+  parent: null
+  writtenBy:
+  - wallet
   foreignWriters: null
 - table: wallet.refund_policy
   columns: 7

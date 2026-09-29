@@ -1,5 +1,5 @@
 id: LLD-fnb
-title: fnb — 115 operations
+title: fnb — 117 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -340,10 +340,12 @@ operations:
   - fnb.dining_table
   - fnb.reservation_table
   - fnb.table_reservation
+  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
   writes:
   - cache:idempotency
   - fnb.reservation_table
   - fnb.table_reservation
+  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
 - operation: enterCountLine
   verb: POST
   path: /stock-counts/{countId}/lines
@@ -758,6 +760,17 @@ operations:
   - fnb.modifier_group
   - fnb.modifier_option
   writes: []
+- operation: listOutletTemplates
+  verb: GET
+  path: /outlet-templates
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.outlet_template
+  writes: []
 - operation: listProductionRuns
   verb: GET
   path: /production-runs
@@ -795,6 +808,7 @@ operations:
   - fnb.dining_table
   - fnb.reservation_table
   - fnb.table_reservation
+  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
   writes: []
 - operation: listTemperatureCheckpoints
   verb: GET
@@ -1243,6 +1257,7 @@ operations:
   - fnb.dining_table
   - fnb.reservation_table
   - fnb.table_reservation
+  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
   writes:
   - cache:idempotency
   - fnb.table_reservation
@@ -1433,6 +1448,17 @@ operations:
   - fnb.menu
   - fnb.menu_item
   - fnb.menu_section
+- operation: setOutletTemplate
+  verb: PUT
+  path: /outlet-templates
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - fnb.outlet_template
+  writes: []
 - operation: setRecipe
   verb: PUT
   path: /recipes
@@ -1649,10 +1675,12 @@ operations:
   - cache:idempotency
   - fnb.reservation_table
   - fnb.table_reservation
+  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
   writes:
   - cache:idempotency
   - fnb.reservation_table
   - fnb.table_reservation
+  - fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
 - operation: updateTableVisit
   verb: PATCH
   path: /table-visits/{visitId}

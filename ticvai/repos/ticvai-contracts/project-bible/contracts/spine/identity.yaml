@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 51
+  x-ticvai-screen-count: 56
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -474,6 +474,8 @@ paths:
                   $ref: '#/components/schemas/CapabilityTemplate'
     put:
       operationId: setCapabilityTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-054 Role Assignment"
       summary: Save a tick-set under a name
       tags:
       - administration
@@ -1861,6 +1863,13 @@ paths:
                   maxLength: 10
                 deviceId:
                   type: string
+                venueId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The venue the guest app or booking is in. Identity reads that venue's
+                    `VenueSettings.identity.guestTwoStep` to decide whether a second factor is asked
+                    (decided 29 September, rev 3 GAP-B1, per venue).
       responses:
         '200':
           headers:
@@ -1902,8 +1911,15 @@ paths:
         tool. **Failed attempts count against `PasswordPolicy.lockoutAfterAttempts`** and lock the
         account for `lockoutMinutes`, never permanently; the guest can still use a one-time code.
 
-        **No second factor at sign-in** (audit R167): a guest signs in with this, a code, a social
-        provider or UAE Pass, never with enterprise SSO and never with MFA. **One session per device**
+        **A second factor only in a venue that enabled guest two-step verification** (decided 29
+        September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest MFA").
+        The venue comes from `venueId` in the body, the venue the guest app or booking is in. Where
+        that venue''s `VenueSettings.identity.guestTwoStep.enabled` is false, the default, a guest signs
+        in with this, a code, a social provider or UAE Pass and nothing more. Where it is on and the
+        guest has an enrolled method, the returned `GuestSession` has `requiresMfa` true and is not
+        usable until `createMfaChallenge` (`action: signIn`) and `verifyMfaChallenge` succeed. With no
+        `venueId`, an enrolled guest is asked when any venue of the tenant has it on (fail closed). Never with enterprise SSO (R167, first part, stands).
+        **One session per device**
         (audit R126): signing in on a device ends that device''s previous guest session.
 
         An unverified account signs in and may browse and fill a cart; the checkout gate on
@@ -1941,6 +1957,13 @@ paths:
                 deviceId:
                   type: string
                   description: Names the device; a new sign-in here ends the previous session on it.
+                venueId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The venue the guest app or booking is in. Identity reads that venue's
+                    `VenueSettings.identity.guestTwoStep` to decide whether a second factor is asked
+                    (decided 29 September, rev 3 GAP-B1, per venue).
       responses:
         '200':
           headers:
@@ -2008,6 +2031,13 @@ paths:
                   type: string
                 deviceId:
                   type: string
+                venueId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The venue the guest app or booking is in. Identity reads that venue's
+                    `VenueSettings.identity.guestTwoStep` to decide whether a second factor is asked
+                    (decided 29 September, rev 3 GAP-B1, per venue).
       responses:
         '200':
           headers:
@@ -2066,6 +2096,13 @@ paths:
                   type: string
                 deviceId:
                   type: string
+                venueId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The venue the guest app or booking is in. Identity reads that venue's
+                    `VenueSettings.identity.guestTwoStep` to decide whether a second factor is asked
+                    (decided 29 September, rev 3 GAP-B1, per venue).
       responses:
         '200':
           headers:
@@ -2305,7 +2342,8 @@ paths:
       x-ticvai-read-routing: replica
       summary: Begin an SSO flow
       description: '**Staff and partner sign-in only — guests never use enterprise SSO** (decided 28
-        September, audit R167). A guest signs in with a one-time code, a password, Apple or Google, or
+        September, audit R167, first part; its second part, no guest MFA, was superseded on 29 September
+        by rev 3 GAP-B1, which made guest two-step verification a per-venue option). A guest signs in with a one-time code, a password, Apple or Google, or
         UAE Pass, each returning a `GuestSession`; this flow maps groups to roles and returns a staff
         session, which a guest surface cannot use.
 
@@ -2484,6 +2522,8 @@ paths:
     get:
       operationId: listMfaMethods
       x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-001 Sign in"
         - "P06 EMP-002 Select venue & role"
         - "P06 EMP-042 Profile"
@@ -2496,10 +2536,16 @@ paths:
       x-ticvai-audience:
       - staff
       - partner
-      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
-        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
-        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
-        which no longer calls any MFA operation.
+      - guest
+      x-ticvai-audience-note: '29 September: `guest` restored (decided 29 September, rev 3 GAP-B1, which
+        supersedes the second part of audit R167, "no guest MFA"). **Guest two-step verification is a
+        venue setting, off by default** (`VenueSettings.identity.guestTwoStep.enabled` in tenancy,
+        decided 29 September, rev 3 GAP-B1, per venue). While no venue of the tenant has it on, a guest
+        caller is refused 403 `guest-two-step-disabled` here, as before. Enrolment is tenant-wide (one
+        guest account across the tenant''s venues): once any venue enables it a guest may enrol, and the
+        factor is then asked at sign-in and as a step-up for the actions that venue''s
+        `guestTwoStep.stepUpActions` lists, only in the context of a venue that has it on. A guest acts on their own subject only. The first
+        part of R167 stands: guests never use enterprise SSO.
 
         '
       x-ticvai-read-routing: replica
@@ -2523,16 +2569,24 @@ paths:
     post:
       operationId: enrolMfaMethod
       x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
         - "P09 ADM-001 Platform Login / MFA"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
       - partner
-      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
-        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
-        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
-        which no longer calls any MFA operation.
+      - guest
+      x-ticvai-audience-note: '29 September: `guest` restored (decided 29 September, rev 3 GAP-B1, which
+        supersedes the second part of audit R167, "no guest MFA"). **Guest two-step verification is a
+        venue setting, off by default** (`VenueSettings.identity.guestTwoStep.enabled` in tenancy,
+        decided 29 September, rev 3 GAP-B1, per venue). While no venue of the tenant has it on, a guest
+        caller is refused 403 `guest-two-step-disabled` here, as before. Enrolment is tenant-wide (one
+        guest account across the tenant''s venues): once any venue enables it a guest may enrol, and the
+        factor is then asked at sign-in and as a step-up for the actions that venue''s
+        `guestTwoStep.stepUpActions` lists, only in the context of a venue that has it on. A guest acts on their own subject only. The first
+        part of R167 stands: guests never use enterprise SSO.
 
         '
       summary: Enrol an MFA method
@@ -2542,6 +2596,13 @@ paths:
         **Staff enrol an authenticator app (`totp`), with email (`emailOtp`) as the fallback** (decided 28
         September, audit R126 (5)). A staff or partner principal asking for `smsOtp`, `biometric` or
         `hardwareToken` is refused `422`.
+
+        **A guest may enrol only where at least one venue of the tenant enabled guest two-step
+        verification** (`VenueSettings.identity.guestTwoStep.enabled`, decided 29 September, rev 3 GAP-B1,
+        per venue): the same kinds as staff, `totp` with `emailOtp` as the fallback. The enrolment belongs
+        to the guest account and is tenant-wide; it is used only in venues that have the setting on. Any
+        other kind is refused `422`; enrolling while no venue has the setting on is refused `403`
+        `guest-two-step-disabled`.
 
         '
       tags:
@@ -2577,9 +2638,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MfaEnrolment'
+        '403':
+          description: A guest caller while no venue of the tenant has guest two-step verification on
+            (rev 3 GAP-B1, per venue).
+          x-ticvai-problem-types:
+          - guest-two-step-disabled
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          description: A kind staff may not enrol. Staff use `totp`, with `emailOtp` as the fallback
-            (audit R126).
+          description: A kind the caller may not enrol. Staff use `totp`, with `emailOtp` as the fallback
+            (audit R126); a guest the same (rev 3 GAP-B1).
           x-ticvai-problem-types:
           - mfa-kind-not-allowed
           content:
@@ -2597,16 +2667,24 @@ paths:
     post:
       operationId: verifyMfaEnrolment
       x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
         - "P09 ADM-001 Platform Login / MFA"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
       - partner
-      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
-        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
-        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
-        which no longer calls any MFA operation.
+      - guest
+      x-ticvai-audience-note: '29 September: `guest` restored (decided 29 September, rev 3 GAP-B1, which
+        supersedes the second part of audit R167, "no guest MFA"). **Guest two-step verification is a
+        venue setting, off by default** (`VenueSettings.identity.guestTwoStep.enabled` in tenancy,
+        decided 29 September, rev 3 GAP-B1, per venue). While no venue of the tenant has it on, a guest
+        caller is refused 403 `guest-two-step-disabled` here, as before. Enrolment is tenant-wide (one
+        guest account across the tenant''s venues): once any venue enables it a guest may enrol, and the
+        factor is then asked at sign-in and as a step-up for the actions that venue''s
+        `guestTwoStep.stepUpActions` lists, only in the context of a venue that has it on. A guest acts on their own subject only. The first
+        part of R167 stands: guests never use enterprise SSO.
 
         '
       summary: Complete enrolment
@@ -2653,16 +2731,24 @@ paths:
     delete:
       operationId: removeMfaMethod
       x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
         - "P09 ADM-001 Platform Login / MFA"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
       - partner
-      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
-        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
-        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
-        which no longer calls any MFA operation.
+      - guest
+      x-ticvai-audience-note: '29 September: `guest` restored (decided 29 September, rev 3 GAP-B1, which
+        supersedes the second part of audit R167, "no guest MFA"). **Guest two-step verification is a
+        venue setting, off by default** (`VenueSettings.identity.guestTwoStep.enabled` in tenancy,
+        decided 29 September, rev 3 GAP-B1, per venue). While no venue of the tenant has it on, a guest
+        caller is refused 403 `guest-two-step-disabled` here, as before. Enrolment is tenant-wide (one
+        guest account across the tenant''s venues): once any venue enables it a guest may enrol, and the
+        factor is then asked at sign-in and as a step-up for the actions that venue''s
+        `guestTwoStep.stepUpActions` lists, only in the context of a venue that has it on. A guest acts on their own subject only. The first
+        part of R167 stands: guests never use enterprise SSO.
 
         '
       summary: Remove an MFA method
@@ -2698,6 +2784,9 @@ paths:
     post:
       operationId: createMfaChallenge
       x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
+        - "P02 GST-073 Security & Sign-in"
         - "P04 POS-000 Sign In"
         - "P06 EMP-001 Sign in"
         - "P07 SCN-001 Sign in"
@@ -2708,10 +2797,16 @@ paths:
       x-ticvai-audience:
       - staff
       - partner
-      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
-        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
-        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
-        which no longer calls any MFA operation.
+      - guest
+      x-ticvai-audience-note: '29 September: `guest` restored (decided 29 September, rev 3 GAP-B1, which
+        supersedes the second part of audit R167, "no guest MFA"). **Guest two-step verification is a
+        venue setting, off by default** (`VenueSettings.identity.guestTwoStep.enabled` in tenancy,
+        decided 29 September, rev 3 GAP-B1, per venue). While no venue of the tenant has it on, a guest
+        caller is refused 403 `guest-two-step-disabled` here, as before. Enrolment is tenant-wide (one
+        guest account across the tenant''s venues): once any venue enables it a guest may enrol, and the
+        factor is then asked at sign-in and as a step-up for the actions that venue''s
+        `guestTwoStep.stepUpActions` lists, only in the context of a venue that has it on. A guest acts on their own subject only. The first
+        part of R167 stands: guests never use enterprise SSO.
 
         '
       summary: Second factor at staff sign-in, and step-up for a sensitive action
@@ -2723,8 +2818,15 @@ paths:
         `action: signIn` on the pending session and then `verifyMfaChallenge`; until that succeeds the
         session is not usable. POS-000, EMP-001, SCN-001, ADM-001, PTR-001 and SUP-001 do this.
 
-        **Never for guests** (decided 28 September, audit R167): a guest is not asked for a second factor
-        and cannot enrol one.
+        **For a guest only in a venue that enabled guest two-step verification** (decided 29 September,
+        rev 3 GAP-B1, per venue, superseding the second part of audit R167). The venue is `venueId` in
+        the body: for `signIn` the venue the guest signed in from, for a step-up the venue of the booking,
+        cart or ticket being acted on (the calling client or service passes it). Where that venue''s
+        `VenueSettings.identity.guestTwoStep.enabled` is on, an enrolled guest uses `action: signIn` after
+        a guest sign-in answered `requiresMfa`, and a step-up before any action listed in that venue''s
+        `guestTwoStep.stepUpActions`; the token is bound to that venue. Where it is off (the default) a
+        guest caller is refused 403 `guest-two-step-disabled`. **A guest who signed in with an email code
+        cannot use `emailOtp` as the second factor**: the same inbox twice is one factor.
 
         A session that authenticated hours ago is not the same as a person present at the keyboard now,
         and for those actions the difference matters.
@@ -2756,6 +2858,13 @@ paths:
                 methodId:
                   type: string
                   format: uuid
+                venueId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: For a guest, the venue whose `VenueSettings.identity.guestTwoStep` applies
+                    (sign-in venue, or the venue of the booking being acted on). Ignored for staff and
+                    partners (decided 29 September, rev 3 GAP-B1, per venue).
       responses:
         '200':
           headers:
@@ -2782,6 +2891,9 @@ paths:
     post:
       operationId: verifyMfaChallenge
       x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
+        - "P02 GST-042 Simple Registration & OTP"
+        - "P02 GST-073 Security & Sign-in"
         - "P04 POS-000 Sign In"
         - "P06 EMP-001 Sign in"
         - "P07 SCN-001 Sign in"
@@ -2792,10 +2904,16 @@ paths:
       x-ticvai-audience:
       - staff
       - partner
-      x-ticvai-audience-note: '28 September: `guest` removed again (decided 28 September, audit R167).
-        Guests are never asked for a second factor and cannot enrol one; they sign in with a one-time
-        code, a password, Apple or Google, or UAE Pass. The 24 August widening was made for `WEB-016`,
-        which no longer calls any MFA operation.
+      - guest
+      x-ticvai-audience-note: '29 September: `guest` restored (decided 29 September, rev 3 GAP-B1, which
+        supersedes the second part of audit R167, "no guest MFA"). **Guest two-step verification is a
+        venue setting, off by default** (`VenueSettings.identity.guestTwoStep.enabled` in tenancy,
+        decided 29 September, rev 3 GAP-B1, per venue). While no venue of the tenant has it on, a guest
+        caller is refused 403 `guest-two-step-disabled` here, as before. Enrolment is tenant-wide (one
+        guest account across the tenant''s venues): once any venue enables it a guest may enrol, and the
+        factor is then asked at sign-in and as a step-up for the actions that venue''s
+        `guestTwoStep.stepUpActions` lists, only in the context of a venue that has it on. A guest acts on their own subject only. The first
+        part of R167 stands: guests never use enterprise SSO.
 
         '
       summary: Complete a sign-in or step-up challenge
@@ -3138,6 +3256,8 @@ paths:
                 $ref: '#/components/schemas/AccessPolicy'
     put:
       operationId: updateAccessPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
       summary: Change a policy, as a new version
       description: '3.3.24 and 3.3.39. **Every change is a version and the old one is kept.** An access
         policy is the thing an investigation asks about months later — *what was in force on the night*
@@ -3179,6 +3299,8 @@ paths:
         format: uuid
     post:
       operationId: setAccessPolicyState
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
       summary: Submit, approve, activate or retire a policy
       description: '3.3.26. **A policy change is an authorisation change**, so it goes through the same
         approval machinery as anything else that moves money or opens a door — routed to `approvals`
@@ -3473,6 +3595,8 @@ paths:
   /access-overrides:
     post:
       operationId: createEmergencyAccessOverride
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
       summary: Bypass the policy, loudly
       description: '3.3.6. *"Authorized users may temporarily bypass restrictions with full audit
         logging."*
@@ -3799,6 +3923,8 @@ paths:
   /memberships/{membershipId}/benefit-usage:
     post:
       operationId: recordBenefitUsage
+      x-ticvai-consumed-by:
+        - "P08 BO-295 Member 360° Membership Account Workspace"
       summary: Consume a benefit
       description: '**`remaining_quantity` is written on the row, not computed on read.** A counter
         asking whether a guest has a free coffee left must not sum a usage history across a cell
@@ -4698,6 +4824,21 @@ components:
           type: string
           nullable: true
           description: Present where the guest is linked across cells (ADR-0010).
+        requiresMfa:
+          type: boolean
+          default: false
+          description: >
+            True only where the sign-in venue enabled guest two-step verification
+            (`VenueSettings.identity.guestTwoStep`, in tenancy) and this guest has an active method
+            (decided 29 September, rev 3 GAP-B1, per venue). The session is then
+            not usable until `verifyMfaChallenge` succeeds on a `signIn` challenge. Always false for a UAE
+            Pass sign-in, which is already a verified two-factor identity (proposed, client to correct).
+        mfaMethods:
+          type: array
+          description: The guest's active methods, so the client can offer the right one. Empty when
+            `requiresMfa` is false.
+          items:
+            $ref: '#/components/schemas/MfaMethod'
         homeCellName:
           type: string
           nullable: true

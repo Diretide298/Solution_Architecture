@@ -1,0 +1,88 @@
+# Wallet dispute — state model
+# Contract: wallet.WalletDispute.status
+
+entity: Wallet dispute
+contract: wallet
+enum: WalletDispute.status
+enumKind: inline
+enumSchema: WalletDispute
+enumProperty: status
+owner: wallet
+initial:
+- open
+terminal:
+- upheld
+- rejected
+- withdrawn
+transitions:
+- from: open
+  to: investigating
+  operation: resolveWalletDispute
+  trigger: operation
+  guard: '`action: reprocess` — the contested movement is re-run, typically after a mapping was
+    corrected'
+- from: escalated
+  to: investigating
+  operation: resolveWalletDispute
+  trigger: operation
+  guard: '`action: reprocess` by the role it was escalated to'
+- from: open
+  to: escalated
+  operation: resolveWalletDispute
+  trigger: operation
+  guard: '`action: escalate` with `escalateToRoleId`'
+- from: investigating
+  to: escalated
+  operation: resolveWalletDispute
+  trigger: operation
+  guard: '`action: escalate` with `escalateToRoleId`'
+- from: open
+  to: upheld
+  operation: resolveWalletDispute
+  trigger: operation
+  guard: '`action: resolve`, `outcome: upheld`, with a resolution note. Money moves through
+    `adjustWallet`, referenced in `adjustmentId`'
+- from: investigating
+  to: upheld
+  operation: resolveWalletDispute
+  trigger: operation
+  guard: '`action: resolve`, `outcome: upheld`'
+- from: escalated
+  to: upheld
+  operation: resolveWalletDispute
+  trigger: operation
+  guard: '`action: resolve`, `outcome: upheld`'
+- from: open
+  to: rejected
+  operation: resolveWalletDispute
+  trigger: operation
+  guard: '`action: resolve`, `outcome: rejected`, with a resolution note'
+- from: investigating
+  to: rejected
+  operation: resolveWalletDispute
+  trigger: operation
+  guard: '`action: resolve`, `outcome: rejected`'
+- from: escalated
+  to: rejected
+  operation: resolveWalletDispute
+  trigger: operation
+  guard: '`action: resolve`, `outcome: rejected`'
+- from: open
+  to: withdrawn
+  operation: withdrawWalletDispute
+  trigger: operation
+  guard: By the guest who raised it, or by staff
+- from: investigating
+  to: withdrawn
+  operation: withdrawWalletDispute
+  trigger: operation
+  guard: By the guest who raised it, or by staff
+- from: escalated
+  to: withdrawn
+  operation: withdrawWalletDispute
+  trigger: operation
+  guard: By the guest who raised it, or by staff
+notes: '**Internal, and the venue decides it** — unlike a card chargeback, which has a scheme deadline.
+  Created `open` by `raiseWalletDispute`. `upheld`, `rejected` and `withdrawn` are closed and the record
+  stays, so an audit can still answer who decided what (VM close-out follow-up, 29 September; our build
+  plan).'

@@ -1,0 +1,48 @@
+# Transport route — state model
+# Contract: transport.TransportRouteStatus
+# Checked by tools/check-states.py.
+# Added 29 September: transport ticketing is in scope (decided 29 September, rev 3 REV3-21).
+
+entity: Transport route
+contract: transport
+enum: TransportRouteStatus
+enumKind: named
+enumSchema: TransportRouteStatus
+owner: transport
+initial:
+- draft
+terminal:
+- retired
+transitions:
+- from: draft
+  to: active
+  operation: setTransportRouteStatus
+  trigger: operation
+  guard: The route has at least two stops and a fare table. Its catalogue event and trip product exist from creation
+- from: active
+  to: suspended
+  operation: setTransportRouteStatus
+  trigger: operation
+  guard: New sales stop. **Tickets already sold stay valid** — suspending is not cancelling
+- from: suspended
+  to: active
+  operation: setTransportRouteStatus
+  trigger: operation
+  guard: Sales resume on the departures still ahead
+  isReversal: true
+- from: active
+  to: retired
+  operation: setTransportRouteStatus
+  trigger: operation
+  guard: '**No departure on sale has sold seats.** Those are cancelled first (`cancelPerformance`), so every guest is refunded and told'
+- from: suspended
+  to: retired
+  operation: setTransportRouteStatus
+  trigger: operation
+  guard: As from active
+- from: draft
+  to: retired
+  operation: setTransportRouteStatus
+  trigger: operation
+  guard: A draft abandoned. Nothing was sold
+notes: 'A line run in both directions is two routes paired by `pairedRouteId`; each has its own status.'

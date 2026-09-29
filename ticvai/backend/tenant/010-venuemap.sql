@@ -1,4 +1,4 @@
--- venuemap — 5 tables
+-- venuemap — 6 tables
 -- **Derived. Do not hand-edit.**
 
 -- Two-phase geometry extraction, following seating.ImportJob. A job that finds nothing is not a
@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS venuemap.import_job (
     layers_found                      text[],
     unmapped_layers                   text[],
     manifest_rows_read                integer,
+    resources_found                   integer,
+    resource_rows_joined              integer,
     manifest_rows_joined              integer
 );
 
@@ -61,6 +63,22 @@ CREATE TABLE IF NOT EXISTS venuemap.path (
     is_indoor                         boolean DEFAULT false,
     restricted_by_point_id            uuid,
     closed_reason                     text
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS venuemap.placed_resource (
+    id                                uuid PRIMARY KEY NOT NULL,
+    map_id                            uuid NOT NULL,
+    resource_id                       uuid NOT NULL,
+    label                             text NOT NULL CONSTRAINT placed_resource_label_chk CHECK (char_length(label) <= 40),
+    kind                              text NOT NULL CONSTRAINT placed_resource_kind_chk CHECK (kind IN ('cabana', 'lounger', 'table', 'pitch', 'other')),
+    zone                              text NOT NULL CONSTRAINT placed_resource_zone_chk CHECK (char_length(zone) <= 80),
+    capacity                          integer NOT NULL,
+    price_band_code                   text NOT NULL CONSTRAINT placed_resource_price_band_code_chk CHECK (char_length(price_band_code) <= 40),
+    variant_id                        uuid,
+    position                          jsonb NOT NULL,
+    is_bookable                       boolean DEFAULT true
 );
 
 -- What a venue places on the map (19.2.57–19.2.60) — rides, restaurants, toilets, exits.

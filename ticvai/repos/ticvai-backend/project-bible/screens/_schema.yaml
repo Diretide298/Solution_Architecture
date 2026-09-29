@@ -124,7 +124,7 @@ properties:
           type: string
           enum: [core, ticketing, access, fnb, retail, inventory, seating, membership, marketing,
                  resources, queue, games, maintenance, accreditation, partner, developerApi,
-                 analytics, ai]
+                 analytics, ai, transport]
           description: >
             **Which licensed module this screen belongs to.** Declared 24 August, and it is the
             join that did not exist: `moduleKey` was a free string on the licence and `module` was
@@ -554,12 +554,13 @@ properties:
                 exists — a generated frame is a frame nobody has reviewed.
             provenance:
               type: string
-              enum: [generated, designed]
+              enum: [generated, designed, client-verified]
               description: >
                 **How the frame came to exist.** `generated` is the tool's output from the
                 screen's own name and operations; `designed` is a frame a person drew. A
                 generated frame agreeing with the operation it was generated from is not
-                corroboration.
+                corroboration. `client-verified` (added 29 September) means the client signed off
+                a prototype that shows this screen; `prototype` says which view.
             board:
               type: string
               description: The frame this screen renders as, as `<board file>#<anchor>`.
@@ -578,6 +579,24 @@ properties:
             note: { type: string }
             figmaNodeId: { type: string }
             owner: { type: string }
+            prototype:
+              type: object
+              additionalProperties: false
+              required: [file, rev, match]
+              description: >
+                **The client's prototype view for this screen** (added 29 September, when the POS
+                terminal and the guest web and mobile rev 3 prototypes were mapped screen by screen,
+                handoff/prototype-maps/). A developer builds the layout from this view. `match: none`
+                means the prototype does not show the screen: it is built from this definition.
+                check-wireframes enforces the rest.
+              properties:
+                file: { type: string, description: The prototype file, relative to the package root. }
+                rev: { type: string }
+                verified: { type: string, description: The date the client signed the prototype off. }
+                match: { type: string, enum: [exact, partial, none] }
+                view: { type: string, description: How a reviewer reaches the view in the prototype. }
+                differences: { type: string, description: What the prototype does that this definition does not, or the reverse. }
+                note: { type: string }
         notes: { type: string }
         openQuestions:
           type: array

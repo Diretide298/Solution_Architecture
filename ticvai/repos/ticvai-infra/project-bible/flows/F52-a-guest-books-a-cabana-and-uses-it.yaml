@@ -9,31 +9,35 @@ criticality: revenue
 primaryContract: resources
 contracts:
 - resources
+- venue-map
 - orders
 - catalogue
 platforms:
 - P02
 trigger:
-  description: A guest wants a cabana for the afternoon. **They do not want cabana seven — they want
-    a cabana**, and F25 established that the guest side had never been walked.
+  description: 'A guest wants a cabana for the day and **picks the one they want on the venue map** — B09 on
+    the beach, not whichever cabana is free. **Rewritten 29 September** (decided 29 September, rev 3 REV3-15 and
+    GAP-C2, superseding audit R073 (c) for resources on an ingested map): cabana maps work like the stadium
+    seat map. Until then this flow sold a cabana by kind and assigned the unit (GST-058, GST-050), which stays
+    the path at a venue with no map. The web runs the same flow on WEB-047.'
 offlineBehaviour: '**Availability needs the network.** Contended inventory cannot be judged from a cache.'
 steps:
 - step: 1
-  screen: GST-058
-  action: They check what is free.
+  screen: GST-074
+  action: They open the venue map for the day and see which cabanas are free.
   operations:
-  - getAvailability
-  - listProducts
-  outcome: '**By kind, not by unit.** A guest choosing between eleven identical cabanas is a guest the
-    model has leaked itself to.'
+  - getVenueMap
+  - getMapResourceAvailability
+  outcome: '**Every spot in one call**, joined to the map on `resourceId`: number, zone, capacity, price
+    band, and held, booked or unavailable ones greyed.'
 - step: 2
-  screen: GST-050
-  action: They book and pay.
+  screen: GST-074
+  action: They tap a cabana, hold it and add it to the basket.
   operations:
-  - getAvailability
+  - createResourceHold
   - addCartLine
-  outcome: '**The unit is assigned at booking, not chosen.** The venue keeps the ability to shuffle
-    assignments until the day.'
+  outcome: '**The guest chooses the unit** and it is held (`ResourceHold`, a remaining-time counter from
+    `expiresAt`) until the order converts the hold into a booking, so nobody takes it in between.'
   crossesDevice: true
 - step: 3
   screen: GST-016
@@ -53,11 +57,17 @@ steps:
   crossesDevice: true
 branches:
 - at: 2
-  condition: Everything of that kind is taken.
-  behaviour: '**Alternatives by kind and by time**, not an empty list. A guest told *no cabanas* at
-    2pm would often take one at 3pm.'
+  condition: Someone else holds or books the tapped cabana first, or everything in the area is taken.
+  behaviour: '**`409` names the cabana and the clash**; the map refreshes and offers another cabana, another
+    area or another day, not an empty list (rev 3 REV3-15).'
   severity: medium
-  resolvedBy: getAvailability
+  resolvedBy: getMapResourceAvailability
+- at: 2
+  condition: The hold runs out before the guest pays.
+  behaviour: 'The cabana is released and the guest is told; `extendResourceHold` keeps it longer while paying,
+    within the seat-hold bounds (audit R169).'
+  severity: medium
+  resolvedBy: extendResourceHold
 - at: 4
   condition: They cancel on the day.
   behaviour: '`cancelReservation` against the venue policy. **The unit returns to availability immediately**

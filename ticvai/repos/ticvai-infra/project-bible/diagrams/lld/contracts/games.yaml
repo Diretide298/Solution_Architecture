@@ -1,5 +1,5 @@
 id: LLD-games
-title: games — 35 operations
+title: games — 39 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -15,6 +15,28 @@ operations:
   offline: true
   reads:
   - games.authorisation
+  writes: []
+- operation: cloneGame
+  verb: POST
+  path: /games/{gameId}/clone
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.game
+  writes: []
+- operation: cloneReaderConfiguration
+  verb: POST
+  path: /readers/{readerId}/clone
+  scope: venue
+  permission: DEVICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - games.reader
   writes: []
 - operation: createGame
   verb: POST
@@ -200,6 +222,17 @@ operations:
   offline: false
   reads:
   - games.reader
+  writes: []
+- operation: lookupPrize
+  verb: GET
+  path: /prizes/lookup
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - games.prize
   writes: []
 - operation: recordGamePlay
   verb: POST
@@ -429,3 +462,13 @@ operations:
   writes:
   - cache:idempotency
   - games.game
+- operation: validateGameConfiguration
+  verb: POST
+  path: /game-configuration-validations
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []

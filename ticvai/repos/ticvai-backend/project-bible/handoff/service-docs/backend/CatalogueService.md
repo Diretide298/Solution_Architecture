@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `catalogue`, `promotions`, `seating` |
 | Schemas owned | `catalogue`, `pricing`, `promotions`, `seating` |
-| Operations in the slice | 69 of 407 |
+| Operations in the slice | 73 of 415 |
 | Scale | Read-heavy, bundle-published to tills. The catalogue bundle is this service's output (ADR-0013). |
 | If it is down | A bad publish reaches every workstation. Versioned and rollback-able for that reason. |
 
@@ -21,7 +21,7 @@
 |---|---|
 | [AccessService](AccessService.md) | `access.entitlement` |
 | [MarketingService](MarketingService.md) | `marketing.loyalty_position` |
-| [OrderService](OrderService.md) | `orders.sales_order` |
+| [OrderService](OrderService.md) | `orders.cart`, `orders.sales_order` |
 | [TenancyService](TenancyService.md) | `platform.workstation` |
 
 ## Operations in the first release
@@ -34,19 +34,22 @@
 | bundle | [`getLatestBundle`](#getlatestbundle) | GET | `/catalogue/bundles/latest` | core | 1 | BO-011, BO-037, EMP-018, POS-002 |
 | bundle | [`listCatalogueBundles`](#listcataloguebundles) | GET | `/catalogue/bundles` | core | 2 | BO-011, BO-037, EMP-018, GST-056, WEB-008 |
 | bundle | [`publishBundle`](#publishbundle) | POST | `/catalogue/bundles` | setup | 1 | BO-011, BO-013, BO-014, BO-037 |
-| bundle | [`updateBundle`](#updatebundle) | PATCH | `/bundles/{bundleId}` | setup | 2 |  |
+| bundle | [`updateBundle`](#updatebundle) | PATCH | `/bundles/{bundleId}` | setup | 2 | BO-011 |
 | capacity | [`createChannelCapacity`](#createchannelcapacity) | POST | `/channel-capacities` | setup | 1 | BO-013, BO-017, EMP-033, PTR-005 |
 | capacity | [`getAvailability`](#getavailability) | GET | `/availability` | core | 1 | GST-004, GST-007, GST-050, GST-058, KSK-004, KSK-005 … |
 | capacity | [`updateChannelCapacity`](#updatechannelcapacity) | PATCH | `/channel-capacities/{channelCapacityId}` | setup | 1 | BO-013, BO-017, EMP-033, PTR-005 |
-| catalogue | [`bulkChangePrices`](#bulkchangeprices) | POST | `/products/bulk-price` | setup | 1 |  |
-| catalogue | [`cloneProduct`](#cloneproduct) | POST | `/products/{productId}/clone` | setup | 1 |  |
-| catalogue | [`commitCatalogueImport`](#commitcatalogueimport) | POST | `/products/import/{jobId}/commit` | setup | 1 |  |
+| catalogue | [`assessProductChange`](#assessproductchange) | POST | `/products/{productId}/change-impact` | setup | 1 | BO-008 |
+| catalogue | [`bulkChangePrices`](#bulkchangeprices) | POST | `/products/bulk-price` | setup | 1 | BO-009 |
+| catalogue | [`cloneProduct`](#cloneproduct) | POST | `/products/{productId}/clone` | setup | 1 | BO-008 |
+| catalogue | [`commitCatalogueImport`](#commitcatalogueimport) | POST | `/products/import/{jobId}/commit` | setup | 1 | BO-117 |
 | catalogue | [`getMyMemberships`](#getmymemberships) | GET | `/guests/me/memberships` | core | 2 | GST-015, WEB-022, WEB-023 |
 | catalogue | [`joinWaitlist`](#joinwaitlist) | POST | `/waitlist-entries` | core | 2 | GST-070, WEB-040 |
 | catalogue | [`leaveWaitlist`](#leavewaitlist) | DELETE | `/waitlist-entries/{entryId}` | core | 2 | GST-070, WEB-040 |
 | catalogue | [`listGuestMemberships`](#listguestmemberships) | GET | `/guest/memberships` | core | 2 | GST-015, WEB-022, WEB-023 |
-| catalogue | [`restoreProductVersion`](#restoreproductversion) | POST | `/products/{productId}/versions/{version}/restore` | setup | 1 |  |
+| catalogue | [`listProductCategories`](#listproductcategories) | GET | `/product-categories` | core | 1 | BO-115, CMS-101, GST-002, GST-007, GST-008, WEB-002 … |
+| catalogue | [`restoreProductVersion`](#restoreproductversion) | POST | `/products/{productId}/versions/{version}/restore` | setup | 1 | BO-008 |
 | catalogue | [`searchCatalogue`](#searchcatalogue) | GET | `/search` | core | 1 | GST-001, GST-003, GST-063, WEB-002, WEB-003 |
+| catalogue | [`setProductCategories`](#setproductcategories) | PUT | `/product-categories` | setup | 1 | BO-115 |
 | category | [`createSeatCategory`](#createseatcategory) | POST | `/seat-categories` | setup | 2 | BO-1045, BO-985 |
 | coupon | [`createCouponCampaign`](#createcouponcampaign) | POST | `/coupon-campaigns` | setup | 1 | BO-010 |
 | coupon | [`generateCouponCodes`](#generatecouponcodes) | POST | `/coupon-campaigns/{campaignId}/codes` | setup | 1 | BO-010 |
@@ -54,21 +57,22 @@
 | entitlement | [`createEntitlementTemplate`](#createentitlementtemplate) | POST | `/entitlement-templates` | setup | 1 | BO-012 |
 | evaluation | [`evaluatePromotions`](#evaluatepromotions) | POST | `/promotions/evaluate` | core | 1 | BO-010, KSK-006, POS-002, POS-021, POS-023, PTR-010 … |
 | event | [`createEvent`](#createevent) | POST | `/events` | setup | 1 | BO-001, BO-015, BO-019, BO-063 |
-| event | [`getPerformance`](#getperformance) | GET | `/performances/{performanceId}` | core | 1 | BO-002, BO-015, BO-019, BO-063, GST-006, POS-004 … |
+| event | [`getPerformance`](#getperformance) | GET | `/performances/{performanceId}` | core | 1 | BO-002, BO-015, BO-019, BO-063, GST-006, GST-041 … |
+| event | [`listEvents`](#listevents) | GET | `/events` | core | 2 | BO-001, BO-015, BO-019, BO-063, BO-694, CMS-101 |
 | event | [`listPerformances`](#listperformances) | GET | `/events/{eventId}/performances` | core | 1 | BO-001, BO-015, BO-019, BO-063, GST-003, GST-004 … |
 | event | [`updateEvent`](#updateevent) | PATCH | `/events/{eventId}` | setup | 1 | BO-001, BO-015, BO-019, BO-063 |
 | event | [`updatePerformance`](#updateperformance) | PATCH | `/performances/{performanceId}` | core | 2 | BO-002, BO-015, BO-019, BO-063, POS-004 |
 | hold | [`createSeatHold`](#createseathold) | POST | `/seat-holds` | core | 2 | BO-994, GST-049, POS-004, WEB-007 |
 | hold | [`extendSeatHold`](#extendseathold) | POST | `/seat-holds/{holdId}/extend` | core | 2 | BO-998, POS-004 |
 | hold | [`getSeatHold`](#getseathold) | GET | `/seat-holds/{holdId}` | core | 2 | BO-987, BO-999, POS-004 |
-| hold | [`relinquishSeatHold`](#relinquishseathold) | DELETE | `/seat-holds/{holdId}` | core | 2 | BO-998, BO-999, POS-004 |
+| hold | [`relinquishSeatHold`](#relinquishseathold) | DELETE | `/seat-holds/{holdId}` | core | 2 | BO-998, BO-999, GST-049, POS-004, WEB-007 |
 | lease | [`acquireInventoryHold`](#acquireinventoryhold) | POST | `/inventory-holds` | core | 1 | BO-018, POS-003 |
 | lease | [`listInventoryHolds`](#listinventoryholds) | GET | `/inventory-holds` | core | 1 | BO-018, BO-1057, POS-003 |
 | lease | [`relinquishInventoryHold`](#relinquishinventoryhold) | DELETE | `/inventory-holds/{inventoryHoldId}` | core | 1 | BO-018, POS-003 |
 | lease | [`renewInventoryHold`](#renewinventoryhold) | POST | `/inventory-holds/{inventoryHoldId}/renew` | core | 1 | BO-018, POS-003 |
 | pricing | [`copyPriceList`](#copypricelist) | POST | `/price-lists/{priceListId}/copy` | setup | 1 | BO-009, PTR-006 |
 | pricing | [`createPriceList`](#createpricelist) | POST | `/price-lists` | setup | 1 | BO-009, PTR-006 |
-| pricing | [`setPrices`](#setprices) | PUT | `/price-lists/{priceListId}/prices` | setup | 1 | BO-009, BO-601, PTR-006 |
+| pricing | [`setPrices`](#setprices) | PUT | `/price-lists/{priceListId}/prices` | setup | 1 | BO-009, BO-291, BO-601, PTR-006 |
 | pricing | [`updatePriceList`](#updatepricelist) | PATCH | `/price-lists/{priceListId}` | setup | 1 | BO-009, PTR-006 |
 | product | [`checkBookingEligibility`](#checkbookingeligibility) | POST | `/eligibility-checks` | core | 1 | GST-007, WEB-006 |
 | product | [`createProduct`](#createproduct) | POST | `/products` | setup | 1 | ADM-119, BO-007, BO-012, BO-014, PTR-006 |
@@ -77,7 +81,7 @@
 | product | [`getProductEligibilityRule`](#getproducteligibilityrule) | GET | `/products/{productId}/eligibility-rule` | core | 1 | BO-161, GST-004, WEB-004 |
 | product | [`listAlternativeCodes`](#listalternativecodes) | GET | `/products/{productId}/alternative-codes` | core | 1 | BO-007, BO-012, BO-014, EMP-034, POS-002, POS-003 … |
 | product | [`listGroupPackages`](#listgrouppackages) | GET | `/group-packages` | core | 2 | GST-072, WEB-031 |
-| product | [`listProductVariants`](#listproductvariants) | GET | `/products/{productId}/variants` | core | 1 | BO-007, BO-008, BO-012, BO-014, EMP-034, GST-041 … |
+| product | [`listProductVariants`](#listproductvariants) | GET | `/products/{productId}/variants` | core | 1 | BO-007, BO-008, BO-012, BO-014, EMP-034, GST-008 … |
 | product | [`listProducts`](#listproducts) | GET | `/products` | core | 1 | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-125 … |
 | product | [`resolveProductByCode`](#resolveproductbycode) | GET | `/products/resolve` | core | 1 | BO-007, BO-012, BO-014, EMP-034, POS-002, POS-003 … |
 | product | [`setAlternativeCodes`](#setalternativecodes) | PUT | `/products/{productId}/alternative-codes` | setup | 1 | BO-007, BO-012, BO-014, EMP-034, PTR-006 |
@@ -92,10 +96,10 @@
 | promotion | [`listPromotions`](#listpromotions) | GET | `/promotions` | core | 1 | ADM-138, ADM-140, ADM-145, BO-010, GST-036, GST-037 … |
 | promotion | [`publishPromotion`](#publishpromotion) | POST | `/promotions/{promotionId}/publish` | setup | 1 | BO-010 |
 | promotion | [`updatePromotion`](#updatepromotion) | PATCH | `/promotions/{promotionId}` | setup | 1 | BO-010 |
-| promotions | [`setPromotionVariants`](#setpromotionvariants) | PUT | `/promotions/{promotionId}/variants` | setup | 1 |  |
+| promotions | [`setPromotionVariants`](#setpromotionvariants) | PUT | `/promotions/{promotionId}/variants` | setup | 1 | BO-010 |
 | recommendation | [`recommendSeats`](#recommendseats) | POST | `/performances/{performanceId}/seat-recommendations` | core | 2 | BO-002, BO-015, BO-019, BO-063, BO-1001, BO-1002 … |
-| upsell | [`createUpsellRule`](#createupsellrule) | POST | `/upsell-rules` | setup | 2 |  |
-| upsell | [`deleteUpsellRule`](#deleteupsellrule) | DELETE | `/upsell-rules/{ruleId}` | setup | 2 |  |
+| upsell | [`createUpsellRule`](#createupsellrule) | POST | `/upsell-rules` | setup | 2 | BO-119 |
+| upsell | [`deleteUpsellRule`](#deleteupsellrule) | DELETE | `/upsell-rules/{ruleId}` | setup | 2 | BO-119 |
 | upsell | [`getUpsellSuggestions`](#getupsellsuggestions) | POST | `/upsell-suggestions` | core | 2 | BO-102, BO-119, GST-048, WEB-008 |
 
 ## Group: availability
@@ -152,6 +156,13 @@ Every seat with its current state — available, held, sold, blocked or buffered
 | byCategory[].price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | byCategory[].price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | byCategory[].price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| sections | array of object |  | The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise null and the client renders the… |
+| sections[].code | string | yes |  |
+| sections[].name | string | yes |  |
+| sections[].viewAssetId | string (uuid) |  | As Section.viewAssetId. (nullable) |
+| sections[].boundary | array of Point |  | As Section.boundary. (nullable) |
+| sections[].boundary[].x | number | yes |  |
+| sections[].boundary[].y | number | yes |  |
 | seats | array of object | yes |  |
 | seats[].seatId | string | yes |  |
 | seats[].status | SeatStatus: enum (available, held, sold, blocked, buffered, unavailable) | yes |  |
@@ -535,7 +546,7 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
 | Writes | `cache:idempotency`, `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_component` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-011 |
 
 **Parameters**
 
@@ -678,6 +689,8 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 **`GET /availability`**: Live remaining capacity
 
 Display only. A terminal shows this to a guest but does not decide a sale on it — that is what leases are for. Under load this value is already stale by the time it renders.
+**Every performance of an event in a window, in one call** (decided 29 September, rev 3 REV3-1). A guest date-and-time step draws up to 64 time tiles at once, paged `timesPerPage` at a time (`white-label.BookingFlowConfig.timesPerPage`) with day-part chips and their counts, and one request per performance is 64 round trips before the first tile. So `eventId` with `from` and `to` returns the remaining count of every performance of the event starting in that window, ordered by `startsAt`. `from` and `to` are required with `eventId` and the window is at most 31 days, else `400`. Exactly one of `performanceId`, `channelCapacityId` or `eventId` is given.
+**The response is named** (`PerformanceAvailabilityPage` of `PerformanceAvailability`, rev 3 REV3-1), so screens bind to a schema rather than to an inline shape, and it is a `Page` like every list: a single `performanceId` is a one-page answer.
 
 |  |  |
 |---|---|
@@ -698,12 +711,38 @@ Display only. A terminal shows this to a guest but does not decide a sale on it 
 |---|---|---|---|---|
 | performanceId | query |  | string (uuid) |  |
 | channelCapacityId | query |  | string (uuid) |  |
+| eventId | query |  | string (uuid) | Every performance of this event starting between from and to (rev 3 REV3-1). |
+| from | query |  | string (date-time) | Required with eventId. |
+| to | query |  | string (date-time) | Required with eventId. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `PerformanceAvailabilityPage`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of PerformanceAvailability | yes |  |
+| items[].channelCapacityId | string (uuid) | yes |  |
+| items[].performanceId | string (uuid) | yes | The performance this channel capacity belongs to (ChannelCapacity.performanceId), so rows for several performances can be told apart. |
+| items[].startsAt | string (date-time) |  | The performance's start, so a time tile and its day part (morning, afternoon, evening, split at the venue's BookingFlowConfig.dayPartBoundaries) come from this one call (rev 3 REV3-1). (read-only) |
+| items[].capacity | integer | yes |  |
+| items[].sold | integer | yes |  |
+| items[].leased | integer | yes | Held by terminals but not yet sold. |
+| items[].remaining | integer | yes |  |
+| items[].byChannel | array of object |  | Per-channel position. |
+| items[].byChannel[].channel | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) |  |  |
+| items[].byChannel[].allocated | integer |  |  |
+| items[].byChannel[].sold | integer |  |  |
+| items[].byChannel[].remaining | integer |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Availability |
+| 200 |  | Availability, one row per channel capacity, by performance start |
+| 400 | BadRequest | Validation failed |
 
 ### updateChannelCapacity
 
@@ -765,6 +804,75 @@ Capacity may be increased freely. Reducing it below what has already sold is ref
 
 ## Group: catalogue
 
+### assessProductChange
+
+**`POST /products/{productId}/change-impact`**: What a change would touch, before making it
+
+1.4.4 and 1.4.16. **The package already knows how to do this and does it in four places** — `PerformanceCancellationResult`, `RecognitionRunResult`, `FxRevaluationResult` and `PeriodCloseResult` all carry a dry run with an impact count.
+Changing a product that has sold is the same shape of act: **somebody needs to know how many tickets are affected before they press the button, not after.**
+Answers both halves of 1.4 — the impact, and **whether the change propagates to what has already been sold.** A name correction should; a price change must not.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.product_media` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `access.entitlement`, `catalogue.product`, `orders.cart`, `orders.sales_order` |
+| Writes | `catalogue.product_media` |
+| Called by | BO-008 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| productId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| change | object | yes | The proposed patch, in the shape updateProduct accepts. |
+| change.familyKey | string |  | The product family across the tenant's venues (decided 29 September, rev 3 REV3-18); see Product.familyKey. (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
+| change.name | string |  | (max length 200) |
+| change.description | string |  |  |
+| change.channels | array of Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) |  |  |
+| change.dataMaskValues | object |  |  |
+| change.guestListing | GuestListing: enum (bookable, infoOnly, hidden) |  | How a product appears to a guest (decided 29 September, rev 3 REV3-14). (default bookable) |
+| change.notBookableLabel | object |  | (nullable) |
+| change.displayTags | array of ProductDisplayTag |  | (max items 6) |
+| change.displayTags[].kind | enum (clock, height, free, calendar, id) | yes | clock a duration, height a height rule, free something included free, calendar a validity, id a document the guest must bring. |
+| change.displayTags[].label | object | yes | What the guest reads, e.g. |
+| change.displayTags[].derived | boolean |  | True on a tag the server derived on read because the venue set none. (default False; read-only) |
+| change.media | array of ProductMedia |  | (max items 20) |
+| change.media[].assetId | string (uuid) | yes | A MediaAsset of assets.yaml, in status ready. |
+| change.media[].kind | enum (image, video) | yes |  |
+| change.media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
+| change.media[].displayOrder | integer |  | (default 100) |
+| change.media[].altText | object |  | (nullable) |
+| change.consentQuestionIds | array of string (uuid) |  | (max items 10) |
+| change.requiresTimeWindow | boolean |  |  |
+
+**Response**: `ProductChangeImpact`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| entitlementsIssued | integer | yes | How many live entitlements came from this product. |
+| ordersAffected | integer | yes |  |
+| futurePerformances | integer |  |  |
+| openCarts | integer |  | A guest with this product in a cart while its price changes underneath them is the case nobody thinks about until it happens. |
+| propagates | boolean | yes | Whether the change reaches what has already been sold. |
+| blockedBy | array of string |  | Reasons the change would be refused outright. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Impact |
+
 ### bulkChangePrices
 
 **`POST /products/bulk-price`**: Reprice a category or a whole catalogue
@@ -783,7 +891,7 @@ Repricing every adult admission before a season is routine and currently means o
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.price_list`, `catalogue.product` |
 | Writes | `cache:idempotency`, `catalogue.price_list`, `catalogue.product_version` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-009 |
 
 **Parameters**
 
@@ -839,9 +947,9 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `catalogue.product`, `catalogue.variant` |
+| Reads | `catalogue.product`, `catalogue.product_media`, `catalogue.variant` |
 | Writes | `cache:idempotency`, `catalogue.product`, `catalogue.variant` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-008 |
 | State model | Product ([states/product.yaml](../../../states/product.yaml)): created as `draft` |
 
 **Parameters**
@@ -866,6 +974,7 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | code | string | yes | (max length 64) |
+| familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -888,6 +997,20 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | entitlementTemplateId | string (uuid) |  | What the buyer receives. (nullable) |
 | blockedOffline | boolean |  | True for seated and retail. |
 | dataMaskValues | object |  | Custom fields. |
+| guestListing | GuestListing: enum (bookable, infoOnly, hidden) |  | How a product appears to a guest (decided 29 September, rev 3 REV3-14). (default bookable) |
+| notBookableLabel | object |  | The label a guest reads on an infoOnly product, e.g. (nullable) |
+| displayTags | array of ProductDisplayTag |  | Short facts a guest reads on the ticket card and under *Read more*: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). (max items 6) |
+| displayTags[].kind | enum (clock, height, free, calendar, id) | yes | clock a duration, height a height rule, free something included free, calendar a validity, id a document the guest must bring. |
+| displayTags[].label | object | yes | What the guest reads, e.g. |
+| displayTags[].derived | boolean |  | True on a tag the server derived on read because the venue set none. (default False; read-only) |
+| media | array of ProductMedia |  | The product's own photos and video (decided 29 September, 23SEP-4). (max items 20) |
+| media[].assetId | string (uuid) | yes | A MediaAsset of assets.yaml, in status ready. |
+| media[].kind | enum (image, video) | yes |  |
+| media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
+| media[].displayOrder | integer |  | (default 100) |
+| media[].altText | object |  | (nullable) |
+| consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
+| requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
 
 **Responses**
 
@@ -912,7 +1035,7 @@ Refuses a job whose `outcome` is `nothingFound` or `unreadable`. **A commit that
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.import_job` |
 | Writes | `cache:idempotency`, `catalogue.import_job`, `catalogue.product`, `catalogue.variant` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-117 |
 | State model | Catalogue import job ([states/catalogue-import-job.yaml](../../../states/catalogue-import-job.yaml)): moves `previewReady` -> `committing` |
 
 **Parameters**
@@ -1137,6 +1260,33 @@ Lapsed terms are included — **a guest who let a pass expire is the guest most 
 |---|---|---|
 | 200 |  | Memberships, current first |
 
+### listProductCategories
+
+**`GET /product-categories`**: The merchandise hierarchy — categories, brands, collections
+
+Retail Board 2. **`listSeatCategories` existed and a product category did not** — a seat category prices a seat; this groups a catalogue.
+**Returned as a tree, not a flat list with parent ids.** A merchandiser reading a hierarchy five levels deep should not have to reassemble it, and every caller that does will reassemble it differently.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Guest callable | True |
+| Reads | `catalogue.product`, `catalogue.product_category` |
+| Writes | - |
+| Called by | BO-115, CMS-101, GST-002, GST-007, GST-008, WEB-002, WEB-005 |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The tree. |
+
 ### restoreProductVersion
 
 **`POST /products/{productId}/versions/{version}/restore`**: Put a previous version back
@@ -1152,9 +1302,9 @@ Lapsed terms are included — **a guest who let a pass expire is the guest most 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.product_version` |
+| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.product_media`, `catalogue.product_version` |
 | Writes | `cache:idempotency`, `catalogue.product`, `catalogue.product_version` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-008 |
 
 **Parameters**
 
@@ -1176,6 +1326,7 @@ Lapsed terms are included — **a guest who let a pass expire is the guest most 
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | code | string | yes | (max length 64) |
+| familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -1198,6 +1349,20 @@ Lapsed terms are included — **a guest who let a pass expire is the guest most 
 | entitlementTemplateId | string (uuid) |  | What the buyer receives. (nullable) |
 | blockedOffline | boolean |  | True for seated and retail. |
 | dataMaskValues | object |  | Custom fields. |
+| guestListing | GuestListing: enum (bookable, infoOnly, hidden) |  | How a product appears to a guest (decided 29 September, rev 3 REV3-14). (default bookable) |
+| notBookableLabel | object |  | The label a guest reads on an infoOnly product, e.g. (nullable) |
+| displayTags | array of ProductDisplayTag |  | Short facts a guest reads on the ticket card and under *Read more*: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). (max items 6) |
+| displayTags[].kind | enum (clock, height, free, calendar, id) | yes | clock a duration, height a height rule, free something included free, calendar a validity, id a document the guest must bring. |
+| displayTags[].label | object | yes | What the guest reads, e.g. |
+| displayTags[].derived | boolean |  | True on a tag the server derived on read because the venue set none. (default False; read-only) |
+| media | array of ProductMedia |  | The product's own photos and video (decided 29 September, 23SEP-4). (max items 20) |
+| media[].assetId | string (uuid) | yes | A MediaAsset of assets.yaml, in status ready. |
+| media[].kind | enum (image, video) | yes |  |
+| media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
+| media[].displayOrder | integer |  | (default 100) |
+| media[].altText | object |  | (nullable) |
+| consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
+| requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
 
 **Responses**
 
@@ -1211,7 +1376,7 @@ Lapsed terms are included — **a guest who let a pass expire is the guest most 
 
 **The guest app browses by category and cannot search.** On a venue with two hundred products that is the difference between finding a thing and giving up.
 Distinct from `semanticSearch`, which is AI and retrieves from documents. This is a keyword search over the sellable catalogue, and it works with no AI configured — a venue without an assistant still needs a search box.
-Scoped to what is on sale at the venue and channel, so a guest never finds a product they cannot buy.
+Scoped to what is on sale at the venue and channel, so a guest never finds a product they cannot buy, **with one exception: information-only products** (decided 29 September, rev 3 REV3-14). A product with `guestListing: infoOnly` is returned whether or not it is on sale, flagged with its `guestListing` and `notBookableLabel`, so a guest finds it, reads it and is told it cannot be booked online; the result opens the product's details and never offers to add it to the basket. The old rule *a guest never finds what they cannot buy* still holds for `bookable` products and is superseded for `infoOnly` ones. A `hidden` product is never returned to a guest. When the venue's `BookingFlowConfig.showInfoOnly` is off, `infoOnly` products are left out as well.
 
 |  |  |
 |---|---|
@@ -1222,7 +1387,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `catalogue.event`, `catalogue.product`, `catalogue.variant` |
+| Reads | `catalogue.event`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant` |
 | Writes | - |
 | Called by | GST-001, GST-003, GST-063, WEB-002, WEB-003 |
 
@@ -1240,6 +1405,58 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Results |
+
+### setProductCategories
+
+**`PUT /product-categories`**: Define the hierarchy, in the order a guest sees it
+
+**The whole tree in one call.** A hierarchy edited node by node is a hierarchy that spends time in states nobody intended — a category reparented before its new parent exists.
+**Refuses a cycle**, and refuses deleting a category that names products: **a category with a season behind it still names what was sold under it**, and removing it rewrites last year's report. Deactivate instead.
+**What the PUT does.** The body is the venue's whole hierarchy, flat, each category naming its parent by `parentId`, and matched on `id`: a category whose `id` is new is created, one whose `id` exists is replaced by what is sent, and one left out of the body is deleted. Leaving out a category that products name is the deletion refused above — send it with `isActive: false`.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.product_category` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `catalogue.product_category` |
+| Writes | `cache:idempotency`, `cache:resolution`, `catalogue.product_category` |
+| Called by | BO-115 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| categories | array of ProductCategory | yes |  |
+| categories[].id | string (uuid) | yes |  |
+| categories[].name | string | yes |  |
+| categories[].code | string |  | Taken from their category tables, 20 September. (max length 64; nullable) |
+| categories[].nameLocalised | object |  |  |
+| categories[].kind | enum (category, brand, collection, season, department) | yes |  |
+| categories[].parentId | string (uuid) |  | One tree, not four. (nullable) |
+| categories[].scopePath | string |  | Set by the server from the venue the caller acts at; not sent. (read-only) |
+| categories[].displayOrder | integer |  | (default 100) |
+| categories[].imageAssetId | string (uuid) |  | (nullable) |
+| categories[].description | object |  | The short line a guest reads under a category option, e.g. (nullable) |
+| categories[].isActive | boolean |  | Deactivated rather than deleted. (default True) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 400 |  | The body contains a cycle — a category that is its own ancestor — or a parentId that names no category in the body. |
+| 409 |  | The body leaves out a category that products name (send it with isActive false rather than deleting it), or a category code is already used in this tenant, in the body or by another venue's category… |
 
 
 ## Group: category
@@ -1643,6 +1860,11 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | blackoutDates | array of string (date) |  | Calendar exceptions on the entitlement. (nullable) |
 | fastTrackTier | enum (none, priority, express, unlimited) |  | 19.2.20, BL-015. (nullable) |
 | entriesAllowed | integer |  | Null means unlimited. (nullable) |
+| transportRestriction | object |  | The journey a transport pass is good for (decided 29 September, rev 3 REV3-21). (nullable) |
+| transportRestriction.fromStationId | string | yes | A transport.Station. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| transportRestriction.toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| transportRestriction.bothDirections | boolean |  | Valid from either station to the other, as the prototype sells it. (default True) |
+| transportRestriction.routeIds | array of string |  | The routes it may be used on. |
 | reentryAllowed | boolean |  | (default False) |
 | purchaseEligibility | object |  | 1.1.38, 1.1.121, 1.1.125, 1.1.126. (nullable) |
 | purchaseEligibility.minAgeYears | integer |  | (nullable) |
@@ -1692,6 +1914,11 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | blackoutDates | array of string (date) |  | Calendar exceptions on the entitlement. (nullable) |
 | fastTrackTier | enum (none, priority, express, unlimited) |  | 19.2.20, BL-015. (nullable) |
 | entriesAllowed | integer |  | Null means unlimited. (nullable) |
+| transportRestriction | object |  | The journey a transport pass is good for (decided 29 September, rev 3 REV3-21). (nullable) |
+| transportRestriction.fromStationId | string | yes | A transport.Station. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| transportRestriction.toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| transportRestriction.bothDirections | boolean |  | Valid from either station to the other, as the prototype sells it. (default True) |
+| transportRestriction.routeIds | array of string |  | The routes it may be used on. |
 | reentryAllowed | boolean |  | (default False) |
 | purchaseEligibility | object |  | 1.1.38, 1.1.121, 1.1.125, 1.1.126. (nullable) |
 | purchaseEligibility.minAgeYears | integer |  | (nullable) |
@@ -1885,7 +2112,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.performance` |
 | Writes | - |
-| Called by | BO-002, BO-015, BO-019, BO-063, GST-006, POS-004, WEB-006 |
+| Called by | BO-002, BO-015, BO-019, BO-063, GST-006, GST-041, POS-004, WEB-006, WEB-010 |
 
 **Parameters**
 
@@ -1906,6 +2133,8 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | status | enum (scheduled, onSale, soldOut, suspended, cancelled, completed) | yes |  |
 | admissionRulesId | string (uuid) |  | (nullable) |
 | seatMapId | string (uuid) |  | (nullable) |
+| language | string |  | The language the performance is given in, as a BCP 47 tag (en, ar, fr, de, zh, ru, ar-AE). (max length 35; pattern ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$; nullable) |
+| format | string |  | How it is presented, free text the venue chooses, e.g. (max length 40; nullable) |
 
 **Responses**
 
@@ -1913,6 +2142,52 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 |---|---|---|
 | 200 |  | Performance |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### listEvents
+
+**`GET /events`**: List events
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `catalogue.event` |
+| Writes | - |
+| Called by | BO-001, BO-015, BO-019, BO-063, BO-694, CMS-101 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of Event | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].code | string | yes |  |
+| items[].name | string | yes |  |
+| items[].venueId | string (uuid) | yes |  |
+| items[].scopePath | string | yes |  |
+| items[].parentEventId | string (uuid) |  | For grouped events. (nullable) |
+| items[].performanceCount | integer |  | How many performances the event has. (read-only) |
+| items[].isActive | boolean |  |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Events |
 
 ### listPerformances
 
@@ -1930,7 +2205,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.performance` |
 | Writes | - |
-| Called by | BO-001, BO-015, BO-019, BO-063, GST-003, GST-004, GST-005, GST-007, WEB-002, WEB-004 |
+| Called by | BO-001, BO-015, BO-019, BO-063, GST-003, GST-004, GST-005, GST-007, GST-049, WEB-002, WEB-004, WEB-006, WEB-007 |
 
 **Parameters**
 
@@ -1939,6 +2214,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | eventId | path | yes | string (uuid) |  |
 | from | query |  | string (date-time) | Only performances whose startsAt is at or after this instant. |
 | to | query |  | string (date-time) | Only performances whose startsAt is before this instant. |
+| language | query |  | string | Only performances given in this language, e.g. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -1956,6 +2232,8 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | items[].status | enum (scheduled, onSale, soldOut, suspended, cancelled, completed) | yes |  |
 | items[].admissionRulesId | string (uuid) |  | (nullable) |
 | items[].seatMapId | string (uuid) |  | (nullable) |
+| items[].language | string |  | The language the performance is given in, as a BCP 47 tag (en, ar, fr, de, zh, ru, ar-AE). (max length 35; pattern ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$; nullable) |
+| items[].format | string |  | How it is presented, free text the venue chooses, e.g. (max length 40; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -2049,6 +2327,8 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 | endsAt | string (date-time) |  |  |
 | status | enum (scheduled, onSale, suspended) |  |  |
 | admissionRulesId | string (uuid) |  |  |
+| language | string |  | As Performance.language (decided 29 September, rev 3 REV3-17). (max length 35; pattern ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$; nullable) |
+| format | string |  | As Performance.format (decided 29 September, rev 3 REV3-17). (max length 40; nullable) |
 
 **Response**: `Performance`
 
@@ -2063,6 +2343,8 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 | status | enum (scheduled, onSale, soldOut, suspended, cancelled, completed) | yes |  |
 | admissionRulesId | string (uuid) |  | (nullable) |
 | seatMapId | string (uuid) |  | (nullable) |
+| language | string |  | The language the performance is given in, as a BCP 47 tag (en, ar, fr, de, zh, ru, ar-AE). (max length 35; pattern ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$; nullable) |
+| format | string |  | How it is presented, free text the venue chooses, e.g. (max length 40; nullable) |
 
 **Responses**
 
@@ -2081,6 +2363,8 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 Short-lived and explicit, unlike a lease. Leases cover interchangeable units; a seat hold covers named seats and cannot be sub-allocated.
 The response carries `expiresAt` so the client can show a countdown. A selection that expires silently while a guest enters card details is the worst outcome in this flow.
 Where seating rules apply, holding a seat may implicitly buffer its neighbours — those appear in `bufferedSeatIds`.
+
+**Seats per guest booking is a venue setting** (decided 29 September, rev 3 REV3-7). On a guest channel (Guest Web, Guest App), the seats in this request plus the seats the same guest already holds on the same performance may not exceed `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50); above it the hold is refused with `422` `seat-limit-exceeded` and nothing is held. Staff and POS sales keep at most 10 seats per sale (audit R080 (c)), refused the same way.
 
 |  |  |
 |---|---|
@@ -2108,7 +2392,7 @@ Where seating rules apply, holding a seat may implicitly buffer its neighbours �
 |---|---|---|---|
 | id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
 | performanceId | string (uuid) | yes |  |
-| seatIds | array of string | yes | At most 10 seats per sale (decided 28 September, audit R080 (c)), as orders CreateOrderLine.seatIds and AddCartLineRequest.seatIds allow and POS-002 shows. (min items 1; max items 10) |
+| seatIds | array of string | yes | 50 is the ceiling of the venue setting, not the limit a caller gets. (min items 1; max items 50) |
 | ttlSeconds | integer |  | 8 minutes by default, extendable to 30 in all (decided 28 September, audit R169). (min 60; max 1800; default 480) |
 | subjectId | string (uuid) |  |  |
 
@@ -2137,6 +2421,7 @@ Where seating rules apply, holding a seat may implicitly buffer its neighbours �
 |---|---|---|
 | 201 |  | Held |
 | 409 |  | One or more seats are no longer available, or the selection breaks a seating rule. |
+| 422 |  | More seats than one booking may take: above VenueSettings.seating.maxSeatsPerGuestOrder on a guest channel (decided 29 September, rev 3 REV3-7), or above 10 per sale on a staff channel (audit R080 (c… |
 
 ### extendSeatHold
 
@@ -2245,6 +2530,8 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 
 Releases buffered neighbours alongside the held seats.
 
+**A guest may release their own hold** (decided 29 September, readiness close-out; the seat-map time bar on WEB-007 / GST-049 lets a guest give seats back before the hold runs out rather than leaving them locked until `expiresAt`). On a guest channel only a hold the same guest session or subject placed with `createSeatHold` can be released; any other hold answers `404`, as anything outside the caller's scope does, so hold ids cannot be probed. A hold already converted to an order, released or expired answers `409` `holdNotActive`. Staff at a till keep releasing any hold at their venue under `ORDER_CREATE`.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_CREATE` |
@@ -2253,9 +2540,10 @@ Releases buffered neighbours alongside the held seats.
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
+| Guest callable | True |
 | Reads | `seating.seat_hold` |
 | Writes | `seating.seat_hold` |
-| Called by | BO-998, BO-999, POS-004 |
+| Called by | BO-998, BO-999, GST-049, POS-004, WEB-007 |
 | State model | Seat hold ([states/seat-hold.yaml](../../../states/seat-hold.yaml)): moves `held` -> `released`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `held` -> `available` |
 
 **Parameters**
@@ -2271,6 +2559,7 @@ Releases buffered neighbours alongside the held seats.
 |---|---|---|
 | 204 |  | Released |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The hold is no longer active (holdNotActive) - converted to an order, already released or expired. |
 
 
 ## Group: lease
@@ -2651,7 +2940,7 @@ Currency must match the region's currency and scale. A price in a currency the r
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.price_list` |
 | Writes | `cache:idempotency`, `cache:resolution`, `catalogue.price_list` |
-| Called by | BO-009, BO-601, PTR-006 |
+| Called by | BO-009, BO-291, BO-601, PTR-006 |
 
 **Parameters**
 
@@ -2778,7 +3067,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | party[].ageBand | enum (infant, child, junior, adult, senior) |  | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | party[].ageYears | integer |  | (nullable) |
 | party[].heightBandIndex | integer |  | Which band of the rule's heightBandsCm, counting from 0. (nullable) |
-| party[].confidentSwimmer | boolean |  | (nullable) |
+| party[].confidentSwimmer | boolean |  | Superseded by the consent record for the product's swim consent question (decided 29 September, rev 3 REV3-26); see ProductEligibilityRule.swimAbility. (nullable) |
 | party[].guardianSigned | boolean |  | (default False) |
 
 **Response**: `EligibilityCheckResult`
@@ -2806,12 +3095,12 @@ Checks a party's declared ages and heights against every product in the booking 
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `catalogue.product` non-empty |
+| Part of slice | setup, makes `catalogue.product`, `catalogue.product_media` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.product` |
-| Writes | `cache:idempotency`, `catalogue.product` |
+| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.product_media` |
+| Writes | `cache:idempotency`, `catalogue.product`, `catalogue.product_media` |
 | Called by | ADM-119, BO-007, BO-012, BO-014, PTR-006 |
 | State model | Product ([states/product.yaml](../../../states/product.yaml)): created as `draft` |
 
@@ -2826,6 +3115,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | code | string | yes | Unique per tenant (decided 28 September, audit R108). (max length 64; pattern ^[A-Za-z0-9_-]+$) |
+| familyKey | string |  | The product family across the tenant's venues (decided 29 September, rev 3 REV3-18); see Product.familyKey. (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -2833,6 +3123,20 @@ Checks a party's declared ages and heights against every product in the booking 
 | channels | array of Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) |  |  |
 | entitlementTemplateId | string (uuid) |  |  |
 | dataMaskValues | object |  |  |
+| guestListing | GuestListing: enum (bookable, infoOnly, hidden) |  | How a product appears to a guest (decided 29 September, rev 3 REV3-14). (default bookable) |
+| notBookableLabel | object |  | (nullable) |
+| displayTags | array of ProductDisplayTag |  | (max items 6) |
+| displayTags[].kind | enum (clock, height, free, calendar, id) | yes | clock a duration, height a height rule, free something included free, calendar a validity, id a document the guest must bring. |
+| displayTags[].label | object | yes | What the guest reads, e.g. |
+| displayTags[].derived | boolean |  | True on a tag the server derived on read because the venue set none. (default False; read-only) |
+| media | array of ProductMedia |  | (max items 20) |
+| media[].assetId | string (uuid) | yes | A MediaAsset of assets.yaml, in status ready. |
+| media[].kind | enum (image, video) | yes |  |
+| media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
+| media[].displayOrder | integer |  | (default 100) |
+| media[].altText | object |  | (nullable) |
+| consentQuestionIds | array of string (uuid) |  | (max items 10) |
+| requiresTimeWindow | boolean |  |  |
 
 **Response**: `Product`
 
@@ -2840,6 +3144,7 @@ Checks a party's declared ages and heights against every product in the booking 
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | code | string | yes | (max length 64) |
+| familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -2862,6 +3167,20 @@ Checks a party's declared ages and heights against every product in the booking 
 | entitlementTemplateId | string (uuid) |  | What the buyer receives. (nullable) |
 | blockedOffline | boolean |  | True for seated and retail. |
 | dataMaskValues | object |  | Custom fields. |
+| guestListing | GuestListing: enum (bookable, infoOnly, hidden) |  | How a product appears to a guest (decided 29 September, rev 3 REV3-14). (default bookable) |
+| notBookableLabel | object |  | The label a guest reads on an infoOnly product, e.g. (nullable) |
+| displayTags | array of ProductDisplayTag |  | Short facts a guest reads on the ticket card and under *Read more*: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). (max items 6) |
+| displayTags[].kind | enum (clock, height, free, calendar, id) | yes | clock a duration, height a height rule, free something included free, calendar a validity, id a document the guest must bring. |
+| displayTags[].label | object | yes | What the guest reads, e.g. |
+| displayTags[].derived | boolean |  | True on a tag the server derived on read because the venue set none. (default False; read-only) |
+| media | array of ProductMedia |  | The product's own photos and video (decided 29 September, 23SEP-4). (max items 20) |
+| media[].assetId | string (uuid) | yes | A MediaAsset of assets.yaml, in status ready. |
+| media[].kind | enum (image, video) | yes |  |
+| media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
+| media[].displayOrder | integer |  | (default 100) |
+| media[].altText | object |  | (nullable) |
+| consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
+| requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
 
 **Responses**
 
@@ -2871,6 +3190,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 422 |  | A media asset that is not ready or whose kind does not match, a consentQuestionIds entry that names no active consent question of the tenant, or requiresTimeWindow on a product whose variants carry n… |
 
 ### getGroupPackageDefinition
 
@@ -2933,7 +3253,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Offline note | 24 August: servable from a local cache. |
-| Reads | `catalogue.product` |
+| Reads | `catalogue.product`, `catalogue.product_media` |
 | Writes | - |
 | Called by | BO-007, BO-008, BO-012, BO-014, EMP-034, GST-004, GST-006, POS-002, POS-003, PTR-006, WEB-004, WEB-022 |
 
@@ -2949,6 +3269,7 @@ Checks a party's declared ages and heights against every product in the booking 
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | code | string | yes | (max length 64) |
+| familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -2971,6 +3292,20 @@ Checks a party's declared ages and heights against every product in the booking 
 | entitlementTemplateId | string (uuid) |  | What the buyer receives. (nullable) |
 | blockedOffline | boolean |  | True for seated and retail. |
 | dataMaskValues | object |  | Custom fields. |
+| guestListing | GuestListing: enum (bookable, infoOnly, hidden) |  | How a product appears to a guest (decided 29 September, rev 3 REV3-14). (default bookable) |
+| notBookableLabel | object |  | The label a guest reads on an infoOnly product, e.g. (nullable) |
+| displayTags | array of ProductDisplayTag |  | Short facts a guest reads on the ticket card and under *Read more*: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). (max items 6) |
+| displayTags[].kind | enum (clock, height, free, calendar, id) | yes | clock a duration, height a height rule, free something included free, calendar a validity, id a document the guest must bring. |
+| displayTags[].label | object | yes | What the guest reads, e.g. |
+| displayTags[].derived | boolean |  | True on a tag the server derived on read because the venue set none. (default False; read-only) |
+| media | array of ProductMedia |  | The product's own photos and video (decided 29 September, 23SEP-4). (max items 20) |
+| media[].assetId | string (uuid) | yes | A MediaAsset of assets.yaml, in status ready. |
+| media[].kind | enum (image, video) | yes |  |
+| media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
+| media[].displayOrder | integer |  | (default 100) |
+| media[].altText | object |  | (nullable) |
+| consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
+| requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
 
 **Responses**
 
@@ -3020,7 +3355,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | guardianSignatureAgeFrom | integer |  | (nullable) |
 | guardianSignatureAgeTo | integer |  | Ages needing a guardian's signature, e.g. (nullable) |
 | waiverRequired | boolean |  | (default False) |
-| swimAbility | enum (notRequired, confident) |  | (default notRequired) |
+| swimAbility | enum (notRequired, confident) |  | Superseded for the guest's answer (decided 29 September, rev 3 REV3-26): the swim question is a consent, not a data field. (default notRequired) |
 | refundableIfIneligibleAtGate | boolean |  | (default False) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
@@ -3130,7 +3465,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.variant` |
 | Writes | - |
-| Called by | BO-007, BO-008, BO-012, BO-014, EMP-034, GST-041, KSK-004, POS-002, POS-003, PTR-006, WEB-005 |
+| Called by | BO-007, BO-008, BO-012, BO-014, EMP-034, GST-008, GST-041, GST-075, KSK-004, POS-002, POS-003, PTR-006, WEB-005, WEB-048 |
 
 **Parameters**
 
@@ -3153,6 +3488,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | items[].barcode | string |  | Taken from their variant tables, 20 September. (max length 64; nullable) |
 | items[].isDefault | boolean |  | Taken from their variant tables. (default False) |
 | items[].isActive | boolean | yes | False when retired. |
+| items[].description | object |  | Who this ticket type is for and what it includes, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). (nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -3167,6 +3503,8 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 **`GET /products`**: List products
 
 For guest, partner and back-office callers. **A point-of-sale terminal does not call this on the server** — on a till it is answered from the local catalogue bundle (`getLatestBundle`, ADR-0013), which is what `x-ticvai-offline-capable` means here. A till screen that lists this operation is reading the bundle.
+**What a guest caller gets** (decided 29 September, rev 3 REV3-14). Products with `guestListing: bookable` that are on sale at the caller's channel, plus products with `guestListing: infoOnly` whose lifecycle is live, whether or not they are on sale, each carrying its `guestListing` and `notBookableLabel` so the screen shows the label and opens details instead of adding to the basket. `hidden` products are never returned to a guest, and `infoOnly` ones are left out when the venue's `BookingFlowConfig.showInfoOnly` is off. Staff and partner callers see every product, whatever its `guestListing`.
+**Category and tag filters** (decided 29 September, rev 3 REV3-16 and REV3-19). `categoryId` narrows to one category of the `listProductCategories` tree, so a guest can go from a category tile to that category's tickets; `segmentTag` narrows by tag, e.g. a surf level.
 
 |  |  |
 |---|---|
@@ -3178,9 +3516,9 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Offline note | 24 August: servable from a local cache. |
-| Reads | `catalogue.product` |
+| Reads | `catalogue.product`, `catalogue.product_media` |
 | Writes | - |
-| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-125, EMP-034, GST-002, GST-003, GST-005, GST-015, GST-021, GST-038, GST-044, GST-050, GST-058, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-022, WEB-035 |
+| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-125, CMS-101, EMP-034, GST-002, GST-003, GST-005, GST-007, GST-008, GST-015, GST-021, GST-038, GST-044, GST-050, GST-058, GST-075, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-005, WEB-022, WEB-035, WEB-048 |
 
 **Parameters**
 
@@ -3189,6 +3527,8 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | venueId | query |  | string (uuid) |  |
 | kind | query |  | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) |  |
 | isSellable | query |  | boolean |  |
+| categoryId | query |  | string (uuid) | Only products filed under this category (Product.categoryId) or any category below it in the tree, so a tile for *Guided tours* also lists what sits under its subcategories. |
+| segmentTag | query |  | string | Only products carrying this tag in segmentTags, or a tag below it (level matches level/beginner; level/beginner matches only itself). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -3199,6 +3539,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | items | array of Product | yes |  |
 | items[].id | string (uuid) | yes |  |
 | items[].code | string | yes | (max length 64) |
+| items[].familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | items[].name | string | yes | (max length 200) |
 | items[].description | string |  |  |
 | items[].kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -3221,6 +3562,20 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | items[].entitlementTemplateId | string (uuid) |  | What the buyer receives. (nullable) |
 | items[].blockedOffline | boolean |  | True for seated and retail. |
 | items[].dataMaskValues | object |  | Custom fields. |
+| items[].guestListing | GuestListing: enum (bookable, infoOnly, hidden) |  | How a product appears to a guest (decided 29 September, rev 3 REV3-14). (default bookable) |
+| items[].notBookableLabel | object |  | The label a guest reads on an infoOnly product, e.g. (nullable) |
+| items[].displayTags | array of ProductDisplayTag |  | Short facts a guest reads on the ticket card and under *Read more*: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). (max items 6) |
+| items[].displayTags[].kind | enum (clock, height, free, calendar, id) | yes | clock a duration, height a height rule, free something included free, calendar a validity, id a document the guest must bring. |
+| items[].displayTags[].label | object | yes | What the guest reads, e.g. |
+| items[].displayTags[].derived | boolean |  | True on a tag the server derived on read because the venue set none. (default False; read-only) |
+| items[].media | array of ProductMedia |  | The product's own photos and video (decided 29 September, 23SEP-4). (max items 20) |
+| items[].media[].assetId | string (uuid) | yes | A MediaAsset of assets.yaml, in status ready. |
+| items[].media[].kind | enum (image, video) | yes |  |
+| items[].media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
+| items[].media[].displayOrder | integer |  | (default 100) |
+| items[].media[].altText | object |  | (nullable) |
+| items[].consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
+| items[].requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -3229,6 +3584,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Products |
+| 400 |  | A categoryId that names no category of the venue. |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 
 ### resolveProductByCode
@@ -3269,6 +3625,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | barcode | string |  | Taken from their variant tables, 20 September. (max length 64; nullable) |
 | isDefault | boolean |  | Taken from their variant tables. (default False) |
 | isActive | boolean | yes | False when retired. |
+| description | object |  | Who this ticket type is for and what it includes, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). (nullable) |
 
 **Responses**
 
@@ -3431,7 +3788,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | guardianSignatureAgeFrom | integer |  | (nullable) |
 | guardianSignatureAgeTo | integer |  | Ages needing a guardian's signature, e.g. (nullable) |
 | waiverRequired | boolean |  | (default False) |
-| swimAbility | enum (notRequired, confident) |  | (default notRequired) |
+| swimAbility | enum (notRequired, confident) |  | Superseded for the guest's answer (decided 29 September, rev 3 REV3-26): the swim question is a consent, not a data field. (default notRequired) |
 | refundableIfIneligibleAtGate | boolean |  | (default False) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
@@ -3450,7 +3807,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | guardianSignatureAgeFrom | integer |  | (nullable) |
 | guardianSignatureAgeTo | integer |  | Ages needing a guardian's signature, e.g. (nullable) |
 | waiverRequired | boolean |  | (default False) |
-| swimAbility | enum (notRequired, confident) |  | (default notRequired) |
+| swimAbility | enum (notRequired, confident) |  | Superseded for the guest's answer (decided 29 September, rev 3 REV3-26): the swim question is a consent, not a data field. (default notRequired) |
 | refundableIfIneligibleAtGate | boolean |  | (default False) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
@@ -3480,7 +3837,7 @@ Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.product` |
+| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.product_media` |
 | Writes | `cache:idempotency`, `catalogue.product`, `platform.outbox` |
 | Called by | BO-007, BO-012, BO-014, EMP-034, PTR-006 |
 | State model | Product ([states/product.yaml](../../../states/product.yaml)): moves `draft` -> `inReview`, `inReview` -> `approved`, `inReview` -> `draft`, `approved` -> `live`, `live` -> `withdrawn`, `withdrawn` -> `live`, `draft` -> `archived` |
@@ -3506,6 +3863,7 @@ Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | code | string | yes | (max length 64) |
+| familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -3528,6 +3886,20 @@ Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
 | entitlementTemplateId | string (uuid) |  | What the buyer receives. (nullable) |
 | blockedOffline | boolean |  | True for seated and retail. |
 | dataMaskValues | object |  | Custom fields. |
+| guestListing | GuestListing: enum (bookable, infoOnly, hidden) |  | How a product appears to a guest (decided 29 September, rev 3 REV3-14). (default bookable) |
+| notBookableLabel | object |  | The label a guest reads on an infoOnly product, e.g. (nullable) |
+| displayTags | array of ProductDisplayTag |  | Short facts a guest reads on the ticket card and under *Read more*: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). (max items 6) |
+| displayTags[].kind | enum (clock, height, free, calendar, id) | yes | clock a duration, height a height rule, free something included free, calendar a validity, id a document the guest must bring. |
+| displayTags[].label | object | yes | What the guest reads, e.g. |
+| displayTags[].derived | boolean |  | True on a tag the server derived on read because the venue set none. (default False; read-only) |
+| media | array of ProductMedia |  | The product's own photos and video (decided 29 September, 23SEP-4). (max items 20) |
+| media[].assetId | string (uuid) | yes | A MediaAsset of assets.yaml, in status ready. |
+| media[].kind | enum (image, video) | yes |  |
+| media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
+| media[].displayOrder | integer |  | (default 100) |
+| media[].altText | object |  | (nullable) |
+| consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
+| requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
 
 **Responses**
 
@@ -3545,12 +3917,12 @@ Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `catalogue.product` non-empty |
+| Part of slice | setup, makes `catalogue.product`, `catalogue.product_media` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.product` |
-| Writes | `cache:idempotency`, `catalogue.product` |
+| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.product_media` |
+| Writes | `cache:idempotency`, `catalogue.product`, `catalogue.product_media` |
 | Called by | BO-007, BO-008, BO-012, BO-014, PTR-006 |
 
 **Parameters**
@@ -3564,10 +3936,25 @@ Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| familyKey | string |  | The product family across the tenant's venues (decided 29 September, rev 3 REV3-18); see Product.familyKey. (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string |  | (max length 200) |
 | description | string |  |  |
 | channels | array of Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) |  |  |
 | dataMaskValues | object |  |  |
+| guestListing | GuestListing: enum (bookable, infoOnly, hidden) |  | How a product appears to a guest (decided 29 September, rev 3 REV3-14). (default bookable) |
+| notBookableLabel | object |  | (nullable) |
+| displayTags | array of ProductDisplayTag |  | (max items 6) |
+| displayTags[].kind | enum (clock, height, free, calendar, id) | yes | clock a duration, height a height rule, free something included free, calendar a validity, id a document the guest must bring. |
+| displayTags[].label | object | yes | What the guest reads, e.g. |
+| displayTags[].derived | boolean |  | True on a tag the server derived on read because the venue set none. (default False; read-only) |
+| media | array of ProductMedia |  | (max items 20) |
+| media[].assetId | string (uuid) | yes | A MediaAsset of assets.yaml, in status ready. |
+| media[].kind | enum (image, video) | yes |  |
+| media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
+| media[].displayOrder | integer |  | (default 100) |
+| media[].altText | object |  | (nullable) |
+| consentQuestionIds | array of string (uuid) |  | (max items 10) |
+| requiresTimeWindow | boolean |  |  |
 
 **Response**: `Product`
 
@@ -3575,6 +3962,7 @@ Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | code | string | yes | (max length 64) |
+| familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -3597,14 +3985,31 @@ Withdrawal stops new sales and leaves existing entitlements intact. Archiving is
 | entitlementTemplateId | string (uuid) |  | What the buyer receives. (nullable) |
 | blockedOffline | boolean |  | True for seated and retail. |
 | dataMaskValues | object |  | Custom fields. |
+| guestListing | GuestListing: enum (bookable, infoOnly, hidden) |  | How a product appears to a guest (decided 29 September, rev 3 REV3-14). (default bookable) |
+| notBookableLabel | object |  | The label a guest reads on an infoOnly product, e.g. (nullable) |
+| displayTags | array of ProductDisplayTag |  | Short facts a guest reads on the ticket card and under *Read more*: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). (max items 6) |
+| displayTags[].kind | enum (clock, height, free, calendar, id) | yes | clock a duration, height a height rule, free something included free, calendar a validity, id a document the guest must bring. |
+| displayTags[].label | object | yes | What the guest reads, e.g. |
+| displayTags[].derived | boolean |  | True on a tag the server derived on read because the venue set none. (default False; read-only) |
+| media | array of ProductMedia |  | The product's own photos and video (decided 29 September, 23SEP-4). (max items 20) |
+| media[].assetId | string (uuid) | yes | A MediaAsset of assets.yaml, in status ready. |
+| media[].kind | enum (image, video) | yes |  |
+| media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
+| media[].displayOrder | integer |  | (default 100) |
+| media[].altText | object |  | (nullable) |
+| consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
+| requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated. |
+| 400 |  | media with no isPrimary item or more than one, or one asset twice. |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 422 |  | A media asset that is not ready or whose kind does not match, a consentQuestionIds entry that names no active consent question of the tenant, or requiresTimeWindow on a product whose variants carry n… |
 
 
 ## Group: promotion
@@ -4241,7 +4646,7 @@ BL-114. **Split by a stable hash of the subject, not at random per request** —
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_variant` |
 | Writes | `cache:idempotency`, `promotions.promotion`, `promotions.promotion_variant` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-010 |
 
 **Parameters**
 
@@ -4367,7 +4772,7 @@ Rules apply across every channel by default — POS, kiosk, web, app, call centr
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `promotions.upsell_rule` |
 | Writes | `cache:idempotency`, `promotions.upsell_rule` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-119 |
 
 **Parameters**
 
@@ -4432,7 +4837,7 @@ Upsell rules are owned at region and read at venue (decided 28 September, audit 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `promotions.upsell_rule` |
 | Writes | `cache:idempotency`, `promotions.upsell_rule` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-119 |
 
 **Parameters**
 
@@ -4563,6 +4968,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | blackout_dates | text[] | no | Calendar exceptions on the entitlement. |
 | fast_track_tier | text | no | 19.2.20, BL-015. |
 | entries_allowed | integer | no | Null means unlimited. |
+| transport_restriction | jsonb | no | The journey a transport pass is good for (decided 29 September, rev 3 REV3-21). |
 | is_reentry_allowed | boolean | no |  |
 | purchase_eligibility | jsonb | no | 1.1.38, 1.1.121, 1.1.125, 1.1.126. |
 | person_type | text | no | 2.11.7. |
@@ -4652,6 +5058,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | yes |  |
 | admission_rules_id | uuid | no |  |
 | seat_map_id | uuid | no |  |
+| language | text | no | The language the performance is given in, as a BCP 47 tag (en, ar, fr, de, zh, ru, ar-AE). |
+| format | text | no | How it is presented, free text the venue chooses, e.g. |
 
 ### `catalogue.price_list`
 
@@ -4672,6 +5080,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | code | text | yes |  |
+| family_key | text | no | The same product at another location (decided 29 September, rev 3 REV3-18). |
 | name | text | yes |  |
 | description | text | no |  |
 | kind | text | yes |  |
@@ -4694,6 +5103,26 @@ Every table this service owns that the slice reads or writes, with its columns a
 | entitlement_template_id | uuid | no | What the buyer receives. |
 | blocked_offline | boolean | no | True for seated and retail. |
 | data_mask_values | jsonb | no | Custom fields. |
+| guest_listing | text | no |  |
+| not_bookable_label | jsonb | no | The label a guest reads on an infoOnly product, e.g. |
+| consent_question_ids | text[] | no | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… |
+| requires_time_window | boolean | no | True for a space sold by the hour, e.g. |
+
+### `catalogue.product_category`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| name | text | yes |  |
+| code | text | no | Taken from their category tables, 20 September. |
+| name_localised | jsonb | no |  |
+| kind | text | yes |  |
+| parent_id | uuid | no | One tree, not four. |
+| scope_path | text | no | Set by the server from the venue the caller acts at; not sent. |
+| display_order | integer | no |  |
+| image_asset_id | uuid | no |  |
+| description | jsonb | no | The short line a guest reads under a category option, e.g. |
+| is_active | boolean | no | Deactivated rather than deleted. |
 
 ### `catalogue.product_eligibility_rule`
 
@@ -4710,9 +5139,20 @@ Every table this service owns that the slice reads or writes, with its columns a
 | guardian_signature_age_from | integer | no |  |
 | guardian_signature_age_to | integer | no | Ages needing a guardian's signature, e.g. |
 | is_waiver_required | boolean | no |  |
-| swim_ability | text | no |  |
+| swim_ability | text | no | Superseded for the guest's answer (decided 29 September, rev 3 REV3-26): the swim question is a consent, not a data field. |
 | refundable_if_ineligible_at_gate | boolean | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
+
+### `catalogue.product_media`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| asset_id | uuid | yes | A MediaAsset of assets.yaml, in status ready. |
+| kind | text | yes |  |
+| is_primary | boolean | yes | The item *Read more* opens on and a listing shows. |
+| display_order | integer | no |  |
+| alt_text | jsonb | no |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `catalogue.product_version`
 
@@ -4755,6 +5195,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | barcode | text | no | Taken from their variant tables, 20 September. |
 | is_default | boolean | no | Taken from their variant tables. |
 | is_active | boolean | yes | False when retired. |
+| description | jsonb | no | Who this ticket type is for and what it includes, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). |
 
 ### `catalogue.waitlist_entry`
 
@@ -4990,7 +5431,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-338 operations, added to this service in later releases without changing any of the above.
+342 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -4998,17 +5439,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 | block | `allocateBlockedSeats`, `createSeatBlock`, `listSeatBlocks`, `relinquishSeatBlock` |
 | bundle | `listBundles`, `reportBundleApplied` |
 | capacity | `getChannelAllocations`, `listChannelCapacities`, `relinquishChannelAllocation`, `setChannelAllocations` |
-| catalogue | `assessProductChange`, `createDonationCampaign`, `freezeEntitlement`, `getCatalogueImportJob`, `getDynamicPriceRule`, `getPlanBenefits`, `importProductCatalogue`, `listDonationCampaigns`, `listDynamicPriceRules`, `listMembershipBenefits`, `listMembershipProgrammes`, `listProductCategories`, `listProductVersions`, `listWaitlistEntries`, `offerWaitlistCapacity`, `reinstateEntitlement`, `setDynamicPriceRule`, `setMembershipBenefit`, `setMembershipProgramme`, `setPlanBenefits`, `setProductCategories`, `updateDonationCampaign` |
+| catalogue | `createDonationCampaign`, `freezeEntitlement`, `getCatalogueImportJob`, `getDynamicPriceRule`, `getPlanBenefits`, `importProductCatalogue`, `listDonationCampaigns`, `listDynamicPriceRules`, `listMembershipBenefits`, `listMembershipProgrammes`, `listProductVersions`, `listWaitlistEntries`, `offerWaitlistCapacity`, `reinstateEntitlement`, `setDynamicPriceRule`, `setMembershipBenefit`, `setMembershipProgramme`, `setPlanBenefits`, `updateDonationCampaign` |
 | category | `listSeatCategories`, `updateSeatCategory` |
 | coupon | `assignCoupon`, `getCouponCodeBatch`, `listCouponCampaigns`, `listCouponCodes`, `voidCouponCode` |
-| drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `createBulkProductCatalogue`, `createChannelProfile`, `createLiveDynamicPrice`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listSeasonalCalendarDay`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishChannelAvailability`, `publishChannelReadinessValidation`, `publishPricingEffectiveDate`, `setBookingVelocityTime`, `setBundleComponent`, `setBundleDefinition`, `setBuyGetBogo`, `setCampaignBudgetFinancial`, `setCatalogueReview`, `setChannelFeePayment`, `setChannelPricingCommercial`, `setCodeDistributionManager`, `setCouponPromoCode`, `setCrossCategoryPromotion`, `setDemandOccupancyAvailability`, `setDynamicPricingStrategy`, `setEligibilityRule`, `setFeeApplicabilityCharging`, `setFixedPriceOffer`, `setGiftFreeProduct`, `setGuestChoiceBuild`, `setLifecycleStatuWorkflow`, `setPriceHierarchyInheritance`, `setPriceListMaster`, `setPricing`, `setPricingChangeRequest`, `setPricingExperiment`, `setProductCatalogue`, `setProductContextOwnership`, `setProductServicePrice`, `setPromotionRule`, `setPromotionStackingRule`, `setRateStructure`, `setRuleTestRecommendation`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation` |
+| drafted | `approveCampaignWorkflow`, `approveDecision`, `approvePricingWorkflowAuthority`, `approveReviewDecision`, `approveWorkflow`, `createBulkProductCatalogue`, `createChannelProfile`, `createLiveDynamicPrice`, `decidePricingChangeRequest`, `decidePricingRecommendation`, `listAdvancedOffer`, `listAdvancedOfferGuardrail`, `listAudienceDiscoveryTargeting`, `listAudiencePreviewReach`, `listAutomationPolicyAutonomous`, `listBehavioralTransactionTargeting`, `listBestOfferCustomer`, `listBudgetConsumptionForecast`, `listBulkPricingUpdate`, `listBundleAvailabilityCapacity`, `listBundleAvailabilityChannel`, `listBundleAvailabilityForecast`, `listBundleBogoAdvanced`, `listBundleCombo`, `listBundlePricingCommercial`, `listBundleSellabilityDependency`, `listBundleValidityScheduling`, `listCalculationValidationReconciliation`, `listCampaignCalendarTimeline`, `listCampaignExperimentTest`, `listCampaignFinancialCommercial`, `listCampaignGovernanceBudget`, `listCampaignPromotionPerformance`, `listCapacityPoolReservation`, `listCartTransactionThreshold`, `listChangeImpactAnalysis`, `listChangePropagationDependency`, `listChannel`, `listChannel2`, `listChannelAllocationRebalancing`, `listChannelBasedPricing`, `listChannelConnectionIntegration`, `listChannelCustomerSegment`, `listChannelExceptionIncident`, `listChannelGovernanceSla`, `listChannelLogTransaction`, `listChannelPerformanceCommercial`, `listChannelSaleRule`, `listChannelSaleSchedule`, `listCheapestLowestValue`, `listCodeEligibilityRestriction`, `listCodeSecurityFraud`, `listCommercialPricing`, `listCommercialPricingStructure`, `listCompetitorPricingMarket`, `listComponentInventoryAvailability`, `listConflict`, `listConflictDetectionResolution`, `listContextLocationChannel`, `listCrmCustomerSegment`, `listCurrencyPrecisionRounding`, `listCustomerEligibilityRule`, `listCustomerMembershipSegment`, `listCustomerSegmentChannel`, `listCustomerSegmentProfile`, `listDemandBookingCurve`, `listDiscountCalculationApplication`, `listDiscountCapMaximum`, `listDiscountLimitGuardrail`, `listDiscountMarginProfitability`, `listDynamicBundle`, `listDynamicBundle2`, `listDynamicBundleRule`, `listDynamicComponentSubstitution`, `listDynamicPriceBand`, `listDynamicPricingAutomation`, `listDynamicPricingGuardrail`, `listDynamicPricingPerformance`, `listDynamicPricingStrategy`, `listEffectiveDateSeason`, `listExecutivePromotionReporting`, `listFeeSurcharge`, `listFeeWaiverTax`, `listGovernanceRiskLaunch`, `listGovernanceRiskMonitoring`, `listIncrementalityAttributionCannibalization`, `listInternalDemandBooking`, `listInventoryCapacityChannel`, `listLearningModelPerformance`, `listLocationVenueEvent`, `listMarketTourismHoliday`, `listMarketVenueCurrency`, `listMembershipLoyaltyGuest`, `listMembershipLoyaltyPricing`, `listMultiBuyQuantity`, `listNearbyEventExhibition`, `listNextBestAction`, `listOfferBasketTrace`, `listPackageBundleAdd`, `listPartnerExternalProduct`, `listPartnerPaymentEligibility`, `listPaymentMethodBank`, `listPercentageFixedDiscount`, `listPriceCalculationSequence`, `listPriceCategoryRate`, `listPriceElasticityRevenue`, `listPriceListTemplate`, `listPricing`, `listPricingChangeImpact`, `listPricingCompliance`, `listPricingDistributionSynchronization`, `listPricingGovernance`, `listPricingRecommendationExplainability`, `listPricingRollbackEmergency`, `listPricingRule`, `listPricingRulePriority`, `listPricingVersionBaseline`, `listProductDuplicationTemplate`, `listProductGovernance`, `listProductImportExport`, `listProductLifecycle`, `listProductPriceAvailability`, `listProductRetirementSuspension`, `listProductTrailChange`, `listPromotionActivityVersion`, `listPromotionAlertException`, `listPromotionCampaign`, `listPromotionChannel`, `listPromotionDecisionTrace`, `listPromotionExclusionCompatibility`, `listPromotionHealthPerformance`, `listPromotionLifecycleStatus`, `listPromotionPerformance`, `listPromotionPriorityHierarchy`, `listQuantityGroupVolume`, `listRealTimeAvailability`, `listRealTimeChannel`, `listRecommendationReviewDecision`, `listRedemption`, `listRedemptionCodeLookup`, `listRedemptionConversionFunnel`, `listRedemptionDiscountExposure`, `listResidencyNationalityMarket`, `listRevenue`, `listRevenueAllocationCost`, `listRevenueDemandImpact`, `listRewardSelectionSubstitution`, `listRollbackRecovery`, `listRulePriorityConflict`, `listSaleChannel`, `listScenarioModelingWhat`, `listScheduledLifecycleActions`, `listSeasonalCalendarDay`, `listSignalDataQuality`, `listSpecialPriceGuest`, `listStackingConflict`, `listTargetingConflictFrequency`, `listTargetingEligibility`, `listTaxFeeCalculation`, `listThresholdActionAutomatic`, `listTimeBasedSeasonal`, `listTimeslotPerformanceTime`, `listUniqueCodeGeneration`, `listUpsellCrossSell`, `listUsageCapacityFrequency`, `listValidityDateTime`, `listVolumeBulkTier`, `listWeatherDemandImpact`, `publishActivationScheduler`, `publishChannelAvailability`, `publishChannelReadinessValidation`, `publishPricingEffectiveDate`, `setBookingVelocityTime`, `setBundleComponent`, `setBundleDefinition`, `setBuyGetBogo`, `setCampaignBudgetFinancial`, `setCatalogueReview`, `setChannelFeePayment`, `setChannelPricingCommercial`, `setCodeDistributionManager`, `setCouponPromoCode`, `setCrossCategoryPromotion`, `setDemandOccupancyAvailability`, `setDynamicPricingStrategy`, `setEligibilityRule`, `setFeeApplicabilityCharging`, `setFixedPriceOffer`, `setGiftFreeProduct`, `setGuestChoiceBuild`, `setLifecycleStatuWorkflow`, `setPriceHierarchyInheritance`, `setPriceListMaster`, `setPricing`, `setPricingChangeRequest`, `setPricingExperiment`, `setProductCatalogue`, `setProductContextOwnership`, `setProductServicePrice`, `setPromotionRule`, `setPromotionStackingRule`, `setRateStructure`, `setRulePriorityConflict`, `setRuleTestRecommendation`, `setTaxProfileJurisdiction`, `setTaxRuleTreatment`, `simulateBundlePreviewRecommendation`, `simulatePriceBreakdownCalculation`, `submitPricingChangeRequest`, `testPricingRule` |
 | entitlement | `listEntitlementTemplates`, `suspendEntitlement` |
-| event | `cancelPerformance`, `createPerformances`, `getEvent`, `listEvents` |
-| events | `assignPerformanceMedia`, `cloneEvent`, `getEventResourcePlan`, `listEventTypes`, `listPerformanceTemplates`, `listSpaces`, `rescheduleEvent`, `setEventCapacityProfile`, `setEventLifecycleState`, `setEventRegistration`, `setEventResourcePlan`, `setEventSchedule`, `setEventType`, `setPerformanceTemplate`, `setPrepaidMinutePackage`, `setSpace` |
+| event | `cancelPerformance`, `createPerformances`, `getEvent` |
+| events | `assignPerformanceMedia`, `cloneEvent`, `estimateEventResourceCost`, `getEventResourcePlan`, `listEventTypes`, `listPerformanceTemplates`, `listSpaces`, `rescheduleEvent`, `setEventCapacityProfile`, `setEventLifecycleState`, `setEventRegistration`, `setEventResourcePlan`, `setEventSchedule`, `setEventType`, `setPerformanceTemplate`, `setPrepaidMinutePackage`, `setSpace` |
 | import | `commitImportJob`, `getImportJob`, `importSeatGeometry`, `importSeatManifest` |
 | lease | `forceReleaseInventoryHold` |
 | pricing | `getPriceList`, `listPriceLists`, `listPrices` |
-| product | `setProductAttributes` |
+| product | `setProductAttributes`, `updateProductVariant` |
 | promotion | `endPromotion`, `pausePromotion`, `unschedulePromotion` |
 | promotions | `getRecommendations`, `simulatePromotion`, `voidVoucher` |
 | recommendations | `concludeRecommendationExperiment`, `createRecommendationExperiment`, `createRecommendationStrategy`, `explainRecommendation`, `getProductAffinity`, `getRecommendationPerformance`, `listProductRelationships`, `listRecommendationExperiments`, `listRecommendationStrategies`, `recordRecommendationOutcome`, `setProductRelationships`, `setRecommendationSuppression`, `simulateRecommendationStrategy`, `updateRecommendationStrategy` |

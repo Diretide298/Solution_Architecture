@@ -117,6 +117,7 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
+        - "P08 BO-221 Fast Pass & Attraction Access Journey"
         - "P12 SUP-020 Queue Configuration & Management"
       x-ticvai-audience: [staff, guest]
       x-ticvai-audience-note: >
@@ -235,6 +236,7 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
+        - "P08 BO-221 Fast Pass & Attraction Access Journey"
       x-ticvai-audience: [staff]
       summary: Amend queue configuration
       tags: [queue]
@@ -263,6 +265,13 @@ paths:
                 returnWindowMinutes: { type: integer, minimum: 1 }
                 heightRequirementCm: { type: integer, nullable: true }
                 fastPassAllocationPercent: { type: number, minimum: 0, maximum: 100 }
+                fastPass:
+                  allOf:
+                    - $ref: '#/components/schemas/QueueFastPass'
+                  nullable: true
+                  description: >
+                    The lane's Fast Pass block (decided 29 September, VM close-out). Replaces the whole
+                    block; null removes it.
       responses:
         '200':
           headers:
@@ -1256,6 +1265,48 @@ components:
           default: 0
           description: Share of each cycle reserved for Fast Pass holders.
         zone: { type: string, nullable: true }
+        fastPass:
+          allOf:
+            - $ref: '#/components/schemas/QueueFastPass'
+          nullable: true
+          description: >
+            The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that
+            takes no Fast Pass.
+
+    QueueFastPass:
+      x-ticvai-persistence: "queue.queue"
+      type: object
+      description: >
+        **Which Fast Pass entitlements this lane accepts, and how** (decided 29 September, VM
+        close-out; pack 'Access Control Module' p.109, BO-221 Fast Pass & Attraction Access Journey).
+        Fast Pass stays an entitlement owned by Product & Entitlement; this block is the lane's
+        side of it: which products it honours, the return window, a per-guest daily cap and the
+        access points that redeem it. Stored on the queue row. Only meaningful where `kind` is
+        `fastPass` or `fastPassAllocationPercent` is above 0.
+      required: [entitlementProductIds]
+      properties:
+        entitlementProductIds:
+          type: array
+          minItems: 1
+          description: Catalogue products whose entitlement admits to this lane.
+          items: { type: string, format: uuid }
+        returnWindowMinutes:
+          type: integer
+          minimum: 1
+          maximum: 240
+          default: 60
+          description: >
+            How long after the booked return time a Fast Pass holder may still enter. Proposed,
+            our build plan.
+        maxPerGuestPerDay:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Fast Pass redemptions one guest may make on this lane per day; null is no cap.
+        allowedAccessPointIds:
+          type: array
+          description: Access points that redeem Fast Pass for this lane; empty is the queue's own.
+          items: { type: string, format: uuid }
 
     Queue:
       # `operatingWindows` is an array of objects, so its rows are a child table rather than a

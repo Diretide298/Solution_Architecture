@@ -1,0 +1,53 @@
+# Hardware deployment — state model
+# Contract: access.HardwareDeploymentView.status
+# Checked by tools/check-states.py.
+
+entity: HardwareDeployment
+contract: access
+enum: HardwareDeploymentView.status
+enumKind: inline
+enumSchema: HardwareDeploymentView
+enumProperty: status
+owner: access
+description: One rollout of one gate configuration version to one target set (decided 29 September,
+  VM close-out; pack Access Control Module p.82, BO-203). Same vocabulary as `tenancy.ProfileDeployment`,
+  so a partial failure is visible and retried or rolled back. **Deploying the same version again is a
+  new deployment**, which is why `publishHardwareDeployment` is a POST.
+initial:
+- queued
+terminal:
+- completed
+- rolledBack
+transitions:
+- from: queued
+  to: inProgress
+  operation: publishHardwareDeployment
+  trigger: start
+  guard: The scheduled time came (now when none was given) and the compatibility test, if asked for, ran
+- from: inProgress
+  to: completed
+  trigger: complete
+  guard: Every targeted device that passed the compatibility test acknowledged the version
+- from: inProgress
+  to: partiallyFailed
+  trigger: partialFail
+  guard: At least one device did not take it; `failedDeviceIds` names them
+- from: partiallyFailed
+  to: inProgress
+  trigger: retry
+  guard: Retried against the failed devices only
+- from: partiallyFailed
+  to: rolledBack
+  trigger: rollback
+  guard: Given up on; the devices that took it go back to the previous version
+- from: inProgress
+  to: rolledBack
+  trigger: rollback
+  guard: Aborted
+- from: queued
+  to: rolledBack
+  trigger: rollback
+  guard: Cancelled before it started
+openQuestions: null
+notes: '**`completed` is terminal here, unlike `ProfileDeployment`.** Undoing a completed deployment is
+  a new deployment of the previous version, so the history shows both.'

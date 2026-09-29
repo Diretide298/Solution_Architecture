@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy` |
-| Operations in the slice | 23 of 166 |
+| Operations in the slice | 25 of 168 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -30,24 +30,26 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | BO-087 |
-| matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices` | setup | 1 | ADM-330, ADM-331, ADM-332, ADM-333, ADM-334, ADM-335 … |
+| delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | ADM-243, BO-087, BO-385 |
+| devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, POS-016 |
+| matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices` | setup | 1 | ADM-242, ADM-243, ADM-330, ADM-331, ADM-332, ADM-333 … |
 | region | [`updateRegionSettings`](#updateregionsettings) | PUT | `/regions/{regionId}/settings` | setup | 1 | ADM-425, BO-1065 |
-| request | [`createApprovalRequest`](#createapprovalrequest) | POST | `/approval-requests` | core | 1 | ADM-567, BO-1010, BO-1031, BO-1080, BO-1181, BO-718 … |
-| request | [`decideApprovalRequest`](#decideapprovalrequest) | POST | `/approval-requests/{requestId}/decide` | core | 1 | ACC-007, ADM-145, BO-084, BO-085, BO-133, BO-367 … |
+| request | [`createApprovalRequest`](#createapprovalrequest) | POST | `/approval-requests` | core | 1 | ADM-567, BO-1010, BO-1031, BO-1080, BO-1181, BO-243 … |
+| request | [`decideApprovalRequest`](#decideapprovalrequest) | POST | `/approval-requests/{requestId}/decide` | core | 1 | ACC-007, ADM-145, ADM-249, BO-084, BO-085, BO-133 … |
 | request | [`evaluateApprovalRequirement`](#evaluateapprovalrequirement) | POST | `/approval-requests/evaluate` | core | 1 | ADM-337, BO-085, BO-368, POS-002, POS-004 |
 | rota | [`createRotaAssignment`](#createrotaassignment) | POST | `/rota-assignments` | core | 1 | BO-055, BO-712, BO-884, BO-917, POS-009, POS-018 |
 | rota | [`listRotaAssignments`](#listrotaassignments) | GET | `/rota-assignments` | core | 1 | BO-055, BO-882, BO-883, EMP-021, EMP-022, EMP-023 … |
-| scope | [`createOrgUnit`](#createorgunit) | POST | `/org-units` | setup | 1 | ADM-006, ADM-420, BO-064 |
-| scope | [`updateOrgUnit`](#updateorgunit) | PATCH | `/org-units/{orgUnitId}` | setup | 1 | BO-064 |
-| tenancy | [`getVenueSettings`](#getvenuesettings) | GET | `/venues/{venueId}/settings` | core | 1 | BO-063, BO-100, BO-101, BO-102, BO-103, BO-104 … |
+| scope | [`createOrgUnit`](#createorgunit) | POST | `/org-units` | setup | 1 | ADM-006, ADM-420, BO-064, BO-145 |
+| scope | [`listOrgUnits`](#listorgunits) | GET | `/org-units` | core | 2 | ADM-006, BO-064, BO-145, CMS-016 |
+| scope | [`updateOrgUnit`](#updateorgunit) | PATCH | `/org-units/{orgUnitId}` | setup | 1 | BO-064, BO-145 |
+| tenancy | [`getVenueSettings`](#getvenuesettings) | GET | `/venues/{venueId}/settings` | core | 1 | BO-063, BO-065, BO-100, BO-101, BO-102, BO-103 … |
 | tenancy | [`getWorkstationHealth`](#getworkstationhealth) | GET | `/workstations/{workstationId}/health` | core | 1 | BO-036, BO-1069, BO-125, BO-128, BO-129, POS-001 … |
 | tenancy | [`setVenueSettings`](#setvenuesettings) | PUT | `/venues/{venueId}/settings` | core | 1 | BO-065, BO-1063, BO-116, BO-136, BO-143, BO-600 … |
 | workstation | [`configureWorkstation`](#configureworkstation) | PUT | `/workstations/{workstationId}` | core | 1 | BO-036, BO-129, BO-602, POS-016 |
 | workstation | [`createOutlet`](#createoutlet) | POST | `/outlets` | setup | 1 | BO-044 |
 | workstation | [`createSaleBoard`](#createsaleboard) | POST | `/sale-boards` | setup | 1 | BO-124 |
 | workstation | [`listDevices`](#listdevices) | GET | `/devices` | core | 1 | ADM-580, ANL-003, BO-036, BO-124, EMP-043, POS-016 … |
-| workstation | [`listOutlets`](#listoutlets) | GET | `/outlets` | core | 1 | BO-044, BO-727, BO-728, BO-732, POS-011, POS-024 |
+| workstation | [`listOutlets`](#listoutlets) | GET | `/outlets` | core | 1 | BO-044, BO-134, BO-727, BO-728, BO-732, POS-011 … |
 | workstation | [`listSaleBoards`](#listsaleboards) | GET | `/sale-boards` | core | 1 | BO-115, BO-116, BO-117, BO-118, BO-122, BO-123 … |
 | workstation | [`listWorkstations`](#listworkstations) | GET | `/workstations` | core | 2 | BO-036, BO-037, BO-116, BO-126, BO-128, BO-129 … |
 | workstation | [`recordDeviceHeartbeat`](#recorddeviceheartbeat) | POST | `/devices/{deviceId}/heartbeat` | core | 1 | BO-036, BO-124, BO-125, POS-016 |
@@ -75,7 +77,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | Conflict policy | serverWins |
 | Reads | `approvals.delegation`, `cache:idempotency`, `identity.delegated_access`, `identity.principal` |
 | Writes | `approvals.delegation`, `cache:idempotency` |
-| Called by | BO-087 |
+| Called by | ADM-243, BO-087, BO-385 |
 
 **Parameters**
 
@@ -128,6 +130,75 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | 403 |  | The delegation would hand over authority that is not there. |
 
 
+## Group: devices
+
+### setDeviceAssignment
+
+**`PUT /devices/{deviceId}/assignment`**: Who owns it, who holds it, and where it is
+
+16.2.9, 16.2.10 and 16.2.11. **Ownership, custody and location are three facts and the package carried none of them.** A device bound to a workstation has a venue, which answers none of the three: the venue owns it, a named supervisor is carrying it, and it is currently at the north gate.
+**Custody is what makes a loss investigable.** A scanner that disappears is a scanner somebody last had, and a model that only knows its workstation cannot say who.
+
+**PUT semantics** (pull audit R103). The target is the device in the path, which has one assignment. The first call creates it and later calls replace it whole, answered `200` either way; an omitted field is cleared to null. `deviceId` comes from the path, and `lastSeenLocation` (reported by the heartbeat), `assignedAt` and `scopePath` are server-owned; all four are `readOnly` and ignored on input.
+
+|  |  |
+|---|---|
+| Permission | `DEVICE_MANAGE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Reads | `tenancy.device_assignment` |
+| Writes | `tenancy.device_assignment` |
+| Called by | ADM-582, POS-016 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| deviceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `DeviceAssignment`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| deviceId | string (uuid) |  | From the path of setDeviceAssignment. (read-only) |
+| ownerOrgUnitId | string (uuid) |  | Who the device belongs to — the cost centre that replaces it when it breaks. (nullable) |
+| custodianPrincipalId | string (uuid) |  | Who is holding it right now. (nullable) |
+| assignedWorkstationId | string (uuid) |  | (nullable) |
+| locationScopePath | string |  | (nullable) |
+| lastSeenLocation | string |  | Reported by the heartbeat; distinct from where it is supposed to be. (read-only; nullable) |
+| assetTag | string |  | (nullable) |
+| acquiredAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
+| warrantyExpiresAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
+| assignedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | (read-only) |
+
+**Response**: `DeviceAssignment`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| deviceId | string (uuid) |  | From the path of setDeviceAssignment. (read-only) |
+| ownerOrgUnitId | string (uuid) |  | Who the device belongs to — the cost centre that replaces it when it breaks. (nullable) |
+| custodianPrincipalId | string (uuid) |  | Who is holding it right now. (nullable) |
+| assignedWorkstationId | string (uuid) |  | (nullable) |
+| locationScopePath | string |  | (nullable) |
+| lastSeenLocation | string |  | Reported by the heartbeat; distinct from where it is supposed to be. (read-only; nullable) |
+| assetTag | string |  | (nullable) |
+| acquiredAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
+| warrantyExpiresAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
+| assignedAt | string (date-time) |  | (read-only) |
+| scopePath | string |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Assigned |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+
 ## Group: matrix
 
 What requires approval, and who grants it
@@ -156,7 +227,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | Conflict policy | serverWins |
 | Reads | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
 | Writes | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
-| Called by | ADM-330, ADM-331, ADM-332, ADM-333, ADM-334, ADM-335, BO-086, BO-639 |
+| Called by | ADM-242, ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334, ADM-335, BO-086, BO-1120, BO-1149, BO-639, BO-863 |
 
 **Parameters**
 
@@ -341,7 +412,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | Conflict policy | serverWins |
 | Reads | `approvals.decision`, `approvals.delegation`, `approvals.matrix`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
 | Writes | `approvals.request`, `cache:idempotency` |
-| Called by | ADM-567, BO-1010, BO-1031, BO-1080, BO-1181, BO-718, BO-771, BO-922, POS-002, POS-020 |
+| Called by | ADM-567, BO-1010, BO-1031, BO-1080, BO-1181, BO-243, BO-301, BO-718, BO-771, BO-922, POS-002, POS-020 |
 | State model | Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): created as `draft` or `pending` |
 
 **Parameters**
@@ -379,7 +450,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | outOfOfficeDelegateId | string (uuid) |  | (nullable) |
 | allowEmailApproval | boolean |  | Approving from an email link with no second factor is the weakest path in the system, so it is off by default and available only below a configured value. (default False) |
 | reopenedFrom | string (uuid) |  | Reopening a decided approval creates a new one that points back. (nullable) |
-| status | ApprovalStatus: enum (draft, pending, escalated, approved, rejected, withdrawn, expired, cancelled) | yes |  |
+| status | ApprovalStatus: enum (draft, pending, escalated, returned, informationRequested, approved, rejected, withdrawn, …) | yes |  |
 | subjectContract | string |  |  |
 | subjectType | string |  |  |
 | subjectId | string |  |  |
@@ -435,11 +506,12 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 
 ### decideApprovalRequest
 
-**`POST /approval-requests/{requestId}/decide`**: Approve or reject
+**`POST /approval-requests/{requestId}/decide`**: Approve, reject, return or ask for information
 
 **Records an authorisation. Does not perform the action.** The requesting contract executes afterwards under the approver's permission.
 Refused where the approver is the requester (11.1.24), where they do not hold the permission the rule demands, or where the rule requires MFA and the step-up token is absent (11.1.60).
 A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.20) and usually should — six months later the comment is the only record of why the exception was allowed.
+**Return and request information (decided 29 September, readiness close-out; MoM 10 Aug §5.5: Approve, Reject, Return, Request More Information).** `return` sends the request back to the requester to amend (`returned`); `requestInformation` asks the requester a question and pauses the SLA clock (`informationRequested`). Neither is a rejection and neither counts against the requester in the rejection rate. Both need a comment saying what is wanted. The requester answers with `submitApprovalRequest` on the same request, and routing resumes at the level that sent it back.
 
 |  |  |
 |---|---|
@@ -451,8 +523,8 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | Conflict policy | serverWins |
 | Reads | `approvals.decision`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
 | Writes | `approvals.decision`, `approvals.request`, `cache:idempotency`, `platform.outbox` |
-| Called by | ACC-007, ADM-145, BO-084, BO-085, BO-133, BO-367, BO-377, BO-378, BO-940, POS-020 |
-| State model | Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): moves `escalated` -> `pending`, `pending` -> `approved`, `escalated` -> `approved`, `pending` -> `rejected`, `escalated` -> `rejected`<br/>Partner agreement ([states/partner-agreement.yaml](../../../states/partner-agreement.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `terminated`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `pendingApproval` -> `pendingGateway`, `pendingApproval` -> `declined`<br/>Shift swap ([states/shift-swap.yaml](../../../states/shift-swap.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `rejected` |
+| Called by | ACC-007, ADM-145, ADM-249, BO-084, BO-085, BO-133, BO-243, BO-367, BO-377, BO-378, BO-940, POS-020 |
+| State model | Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): moves `escalated` -> `pending`, `pending` -> `approved`, `escalated` -> `approved`, `pending` -> `rejected`, `escalated` -> `rejected`, `pending` -> `returned`, `escalated` -> `returned`, `pending` -> `informationRequested`, `escalated` -> `informationRequested`<br/>Partner agreement ([states/partner-agreement.yaml](../../../states/partner-agreement.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `terminated`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `pendingApproval` -> `pendingGateway`, `pendingApproval` -> `declined`<br/>Shift swap ([states/shift-swap.yaml](../../../states/shift-swap.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `rejected` |
 
 **Parameters**
 
@@ -465,7 +537,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| decision | enum (approve, reject) | yes |  |
+| decision | enum (approve, reject, return, requestInformation) | yes |  |
 | comment | string |  | (max length 1000) |
 | reason | string |  | Required on rejection. (max length 500) |
 | stepUpToken | string |  | Where the rule demands MFA (11.1.60). |
@@ -481,7 +553,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | outOfOfficeDelegateId | string (uuid) |  | (nullable) |
 | allowEmailApproval | boolean |  | Approving from an email link with no second factor is the weakest path in the system, so it is off by default and available only below a configured value. (default False) |
 | reopenedFrom | string (uuid) |  | Reopening a decided approval creates a new one that points back. (nullable) |
-| status | ApprovalStatus: enum (draft, pending, escalated, approved, rejected, withdrawn, expired, cancelled) | yes |  |
+| status | ApprovalStatus: enum (draft, pending, escalated, returned, informationRequested, approved, rejected, withdrawn, …) | yes |  |
 | subjectContract | string |  |  |
 | subjectType | string |  |  |
 | subjectId | string |  |  |
@@ -788,7 +860,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.scope` |
 | Writes | `cache:idempotency`, `cache:resolution`, `platform.scope` |
-| Called by | ADM-006, ADM-420, BO-064 |
+| Called by | ADM-006, ADM-420, BO-064, BO-145 |
 
 **Parameters**
 
@@ -827,6 +899,57 @@ Where the position needs a till, the assignment names the workstation their shif
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 | Conflict | Idempotency conflict or optimistic concurrency failure. |
 
+### listOrgUnits
+
+**`GET /org-units`**: List scope nodes visible to the session
+
+|  |  |
+|---|---|
+| Permission | `SCOPE_VIEW` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `cache:resolution`, `platform.scope` |
+| Writes | `cache:resolution` |
+| Called by | ADM-006, BO-064, BO-145, CMS-016 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| under | query |  | string | Return descendants of this path only. |
+| level | query |  | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet) |  |
+| includeInactive | query |  | boolean |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of OrgUnit | yes |  |
+| items[].id | string (uuid) | yes |  |
+| items[].level | ScopeLevel: enum (tenant, brand, region, venue, department, subDepartment, workstation, outlet) | yes | Seven organisational levels, confirmed binding (ADR-0011), plus outlet. |
+| items[].parentId | string (uuid) |  | (nullable) |
+| items[].path | string | yes | Materialised ltree path, e.g. (pattern ^[a-z0-9_]+(\.[a-z0-9_]+)*$) |
+| items[].code | string | yes | (max length 64) |
+| items[].name | string | yes | (max length 200) |
+| items[].isActive | boolean | yes | False causes every permission query at or beneath this node to resolve to DENY. |
+| items[].childCount | integer |  | (min 0) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Nodes at or beneath the session's granted scopes |
+| 401 | Unauthorized | Missing, expired or superseded session |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
 ### updateOrgUnit
 
 **`PATCH /org-units/{orgUnitId}`**: Rename or deactivate a scope node
@@ -843,7 +966,7 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.scope` |
 | Writes | `cache:idempotency`, `cache:resolution`, `platform.scope` |
-| Called by | BO-064 |
+| Called by | BO-064, BO-145 |
 
 **Parameters**
 
@@ -903,7 +1026,7 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 | Read routing | replica |
 | Reads | `cache:resolution`, `platform.venue_settings` |
 | Writes | - |
-| Called by | BO-063, BO-100, BO-101, BO-102, BO-103, BO-104, BO-105, BO-106, BO-1063, BO-107, BO-108, BO-136, BO-142, BO-143, POS-019 |
+| Called by | BO-063, BO-065, BO-100, BO-101, BO-102, BO-103, BO-104, BO-105, BO-106, BO-1063, BO-107, BO-108, BO-136, BO-142, BO-143, POS-019 |
 
 **Parameters**
 
@@ -978,6 +1101,7 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 | seating | object |  | (nullable) |
 | seating.seatHoldExtensionSeconds | integer |  | What one extendSeatHold adds. (min 60; max 1800; default 300; nullable) |
 | seating.seatHoldMaxExtensions | integer |  | How many times a seat hold may be extended. (min 0; max 5; default 2; nullable) |
+| seating.maxSeatsPerGuestOrder | integer |  | Seats one guest may take in one booking on a guest channel (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. (min 1; max 50; default 10; nullable) |
 | promotions | object |  | (nullable) |
 | promotions.maxDiscountPercent | number |  | The largest discount one promotion may give (createPromotion refuses above it). (min 0; max 100; default 30; nullable) |
 | promotions.nearZeroLinePrice | object |  | Net line price below which a stacked combination is flagged near-zero in analysePromotionConflicts (audit R096 (5)); a warning, not a refusal. (nullable) |
@@ -1000,6 +1124,9 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 | marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
 | identity | object |  | (nullable) |
 | identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
+| identity.guestTwoStep | object |  | Guest two-step verification: a venue option, off unless the venue enables it in Venue Management (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest M… (nullable) |
+| identity.guestTwoStep.enabled | boolean |  | Off unless the venue enables it. (default False) |
+| identity.guestTwoStep.stepUpActions | array of enum (changeContactDetails, changePassword, managePaymentMethods, transferTickets, deleteAccount) |  | The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. (default ['changeContactDetails', 'changePassword', 'managePaymentMethods', 'deleteAccount']) |
 
 **Responses**
 
@@ -1151,6 +1278,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | seating | object |  | (nullable) |
 | seating.seatHoldExtensionSeconds | integer |  | What one extendSeatHold adds. (min 60; max 1800; default 300; nullable) |
 | seating.seatHoldMaxExtensions | integer |  | How many times a seat hold may be extended. (min 0; max 5; default 2; nullable) |
+| seating.maxSeatsPerGuestOrder | integer |  | Seats one guest may take in one booking on a guest channel (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. (min 1; max 50; default 10; nullable) |
 | promotions | object |  | (nullable) |
 | promotions.maxDiscountPercent | number |  | The largest discount one promotion may give (createPromotion refuses above it). (min 0; max 100; default 30; nullable) |
 | promotions.nearZeroLinePrice | object |  | Net line price below which a stacked combination is flagged near-zero in analysePromotionConflicts (audit R096 (5)); a warning, not a refusal. (nullable) |
@@ -1173,6 +1301,9 @@ Support hours were an open conflict for eleven days and were never a design ques
 | marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
 | identity | object |  | (nullable) |
 | identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
+| identity.guestTwoStep | object |  | Guest two-step verification: a venue option, off unless the venue enables it in Venue Management (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest M… (nullable) |
+| identity.guestTwoStep.enabled | boolean |  | Off unless the venue enables it. (default False) |
+| identity.guestTwoStep.stepUpActions | array of enum (changeContactDetails, changePassword, managePaymentMethods, transferTickets, deleteAccount) |  | The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. (default ['changeContactDetails', 'changePassword', 'managePaymentMethods', 'deleteAccount']) |
 
 **Response**: `VenueSettings`
 
@@ -1241,6 +1372,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | seating | object |  | (nullable) |
 | seating.seatHoldExtensionSeconds | integer |  | What one extendSeatHold adds. (min 60; max 1800; default 300; nullable) |
 | seating.seatHoldMaxExtensions | integer |  | How many times a seat hold may be extended. (min 0; max 5; default 2; nullable) |
+| seating.maxSeatsPerGuestOrder | integer |  | Seats one guest may take in one booking on a guest channel (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. (min 1; max 50; default 10; nullable) |
 | promotions | object |  | (nullable) |
 | promotions.maxDiscountPercent | number |  | The largest discount one promotion may give (createPromotion refuses above it). (min 0; max 100; default 30; nullable) |
 | promotions.nearZeroLinePrice | object |  | Net line price below which a stacked combination is flagged near-zero in analysePromotionConflicts (audit R096 (5)); a warning, not a refusal. (nullable) |
@@ -1263,6 +1395,9 @@ Support hours were an open conflict for eleven days and were never a design ques
 | marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
 | identity | object |  | (nullable) |
 | identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
+| identity.guestTwoStep | object |  | Guest two-step verification: a venue option, off unless the venue enables it in Venue Management (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest M… (nullable) |
+| identity.guestTwoStep.enabled | boolean |  | Off unless the venue enables it. (default False) |
+| identity.guestTwoStep.stepUpActions | array of enum (changeContactDetails, changePassword, managePaymentMethods, transferTickets, deleteAccount) |  | The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. (default ['changeContactDetails', 'changePassword', 'managePaymentMethods', 'deleteAccount']) |
 
 **Responses**
 
@@ -1596,7 +1731,7 @@ An outlet is not a workstation. Several workstations sit in one outlet, and the 
 | Read routing | replica |
 | Reads | `platform.outlet` |
 | Writes | - |
-| Called by | BO-044, BO-727, BO-728, BO-732, POS-011, POS-024 |
+| Called by | BO-044, BO-134, BO-727, BO-728, BO-732, POS-011, POS-024 |
 
 **Parameters**
 
@@ -2162,6 +2297,23 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_active | boolean | no |  |
 | org_unit_id | uuid | yes | Renamed from scope_node_id on 31 August. |
 
+### `tenancy.device_assignment`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| device_id | uuid | no | From the path of setDeviceAssignment. |
+| owner_org_unit_id | uuid | no | Who the device belongs to — the cost centre that replaces it when it breaks. |
+| custodian_principal_id | uuid | no | Who is holding it right now. |
+| assigned_workstation_id | uuid | no |  |
+| location_scope_path | text | no |  |
+| last_seen_location | text | no | Reported by the heartbeat; distinct from where it is supposed to be. |
+| asset_tag | text | no |  |
+| acquired_at | date | no | A calendar date in the region's time zone. |
+| warranty_expires_at | date | no | A calendar date in the region's time zone. |
+| assigned_at | timestamptz | no |  |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `workforce.rota_assignment`
 
 | Column | Type | Required | Notes |
@@ -2193,17 +2345,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | accreditation | `createAccreditationApplication`, `createAccreditationProgramme`, `createBadgePrintJob`, `decideAccreditationApplication`, `getAccreditationHolder`, `importAccreditationHolders`, `issueAccreditationCredential`, `listAccessProfiles`, `listAccreditationAccessActivity`, `listAccreditationApplications`, `listAccreditationAudit`, `listAccreditationCredentials`, `listAccreditationHolders`, `listAccreditationIdentityConflicts`, `listAccreditationProgrammes`, `listBadgePrintJobs`, `listBadgeTemplates`, `previewAccessImpact`, `replaceAccreditationCredential`, `setAccessProfile`, `setAccreditationNotificationRules`, `setAccreditationRequirements`, `setAccreditationStatus`, `setAccreditationValidity`, `setBadgeTemplate`, `setHolderAccess`, `submitAccreditationDocument`, `updateAccreditationHolder`, `verifyAccreditationDocument` |
 | analytics | `getApprovalAnalytics` |
 | announcements | `acknowledgeAnnouncement`, `getAnnouncementReach`, `listAnnouncements`, `publishAnnouncement` |
-| approvals | `createApprovalEvidencePackage`, `getApprovalRecord`, `issueAccreditationBadge`, `listAccreditationBadges`, `listApprovalControlPolicies`, `setApprovalControlPolicy`, `setApprovalRetentionPolicy`, `setApprovalSlaPolicy`, `setApproverAvailability`, `signApprovalDecision` |
+| approvals | `approveMatrixMultiLevel`, `approveRoleAuthorityDelegation`, `approveUnifiedDecision`, `approveVersioningGovernance`, `createApprovalEvidencePackage`, `createAutomationAutonomouAction`, `getApprovalRecord`, `issueAccreditationBadge`, `listAccreditationBadges`, `listApprovalControlPolicies`, `listConditionDecisionLogic`, `listCrossModuleOrchestration`, `listProcessAutomationOpportunity`, `listRuleWorkflow`, `listSlaEscalationBottleneck`, `listSlaEscalationReminder`, `listWorkflow`, `listWorkflowAutonomouGovernance`, `listWorkflowExceptionFailure`, `listWorkflowInstanceProcess`, `listWorkflowProcessPerformance`, `setApprovalControlPolicy`, `setApprovalRetentionPolicy`, `setApprovalSlaPolicy`, `setApproverAvailability`, `setTriggerActionCross`, `setVisualBusinessRule`, `setVisualWorkflow`, `signApprovalDecision`, `simulateWorkflowTestingImpact` |
 | attendance | `amendAttendance`, `listAttendance`, `recordAttendance` |
 | delegation | `listApprovalDelegations`, `revokeApprovalDelegation` |
-| devices | `enrolDevice`, `getDeviceTelemetry`, `issueDeviceCredential`, `listDeviceAuditRecords`, `listDeviceFirmware`, `listDeviceTamperEvents`, `recordDeviceTamperEvent`, `revokeDeviceCredential`, `rollbackDeviceFirmware`, `setDeviceAssignment`, `startDeviceFirmwareRollout` |
-| drafted | `approveMatrixMultiLevel`, `approveRoleAuthorityDelegation`, `approveUnifiedDecision`, `approveVersioningGovernance`, `createAutomationAutonomouAction`, `listConditionDecisionLogic`, `listCrossModuleOrchestration`, `listProcessAutomationOpportunity`, `listRuleWorkflow`, `listSlaEscalationBottleneck`, `listSlaEscalationReminder`, `listWorkflow`, `listWorkflowAutonomouGovernance`, `listWorkflowExceptionFailure`, `listWorkflowInstanceProcess`, `listWorkflowProcessPerformance`, `setTriggerActionCross`, `setVisualBusinessRule`, `setVisualWorkflow`, `simulateWorkflowTestingImpact` |
+| devices | `enrolDevice`, `getDeviceTelemetry`, `issueDeviceCredential`, `listDeviceAuditRecords`, `listDeviceFirmware`, `listDeviceTamperEvents`, `recordDeviceTamperEvent`, `revokeDeviceCredential`, `rollbackDeviceFirmware`, `startDeviceFirmwareRollout` |
 | identity | `setRolePermissions` |
 | matrix | `listApprovalMatrices`, `listStepUpPolicies`, `setStepUpPolicy` |
 | region | `getRegionSettings` |
-| request | `escalateApprovalRequest`, `listApprovalRequests`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
+| request | `escalateApprovalRequest`, `listApprovalRequests`, `listApprovedActionExecutions`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
 | rota | `requestShiftSwap`, `updateRotaAssignment` |
-| scope | `getOrgUnit`, `listOrgUnits` |
+| scope | `getOrgUnit` |
 | tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettingsDefaults`, `listAuditRecords`, `listCellEndpoints`, `listConfigurationProfiles`, `listProfileDeployments`, `setConfigurationProfile`, `setConnectivityThresholds`, `setOfflinePolicy`, `setVenueSettingsDefaults` |
 | workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
 | workstation | `getDevice`, `getOutlet`, `getWorkstation`, `registerDevice` |

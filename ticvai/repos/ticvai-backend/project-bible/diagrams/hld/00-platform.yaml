@@ -9,9 +9,9 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 2147
-  contracts: 32
-  tables: 687
+  operations: 2298
+  contracts: 33
+  tables: 775
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
     stores. **They own no service and should not**: a cache entry is derived from something already
     read, invalidated by an event already consumed, and losable without consequence. **Both numbers
@@ -23,13 +23,13 @@ scale:
   - cache:idempotency
   - cache:resolution
   - qdrant:knowledge
-  schemas: 33
+  schemas: 36
   services: 17
   platforms: 16
   apps: 13
-  screens: 2422
+  screens: 2440
   flows: 288
-  stateModels: 125
+  stateModels: 134
   events: 29
   decisions: 49
   requirements: 3184
@@ -40,7 +40,7 @@ actors:
   - P01
   - P02
   - P05
-  operations: 190
+  operations: 214
   note: Buys, arrives, is admitted, spends. **Never sees a staff surface** — `check-screens` refuses
     a guest screen declaring a staff permission.
 - actor: venue staff
@@ -51,13 +51,13 @@ actors:
   - P08
   - P15
   - P16
-  operations: 2010
+  operations: 2149
   note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
     (ADR-0002) — which is what makes a shared handheld safe.
 - actor: partner
   reaches:
   - P10
-  operations: 164
+  operations: 166
   note: Resellers and agents, with their own credit and settlement.
 - actor: platform operator
   reaches:
@@ -68,7 +68,7 @@ actors:
 - actor: developer
   reaches:
   - P14
-  operations: 2
+  operations: 11
   note: Third parties against the public API, rate-limited and quota'd.
 - actor: prospect
   reaches:
@@ -90,7 +90,7 @@ surfaces:
   app: guest-web
   formFactor: web
   offlineCapable: false
-  screens: 46
+  screens: 49
   modules:
   - access
   - ai
@@ -98,9 +98,11 @@ surfaces:
   - fnb
   - marketing
   - queue
+  - resources
   - retail
   - seating
   - ticketing
+  - transport
   callsServices:
   - AccessService
   - AiService
@@ -122,7 +124,7 @@ surfaces:
   app: guest-app
   formFactor: mobileApp
   offlineCapable: true
-  screens: 71
+  screens: 77
   modules:
   - access
   - ai
@@ -131,9 +133,11 @@ surfaces:
   - games
   - marketing
   - queue
+  - resources
   - retail
   - seating
   - ticketing
+  - transport
   callsServices:
   - AccessService
   - AiService
@@ -259,7 +263,7 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 1178
+  screens: 1186
   modules:
   - access
   - accreditation
@@ -277,6 +281,7 @@ surfaces:
   - retail
   - seating
   - ticketing
+  - transport
   callsServices:
   - AccessService
   - AiService
@@ -386,16 +391,18 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 99
+  screens: 100
   modules:
   - core
   - fnb
   - ticketing
   callsServices:
+  - CatalogueService
   - FnbService
   - IdentityService
   - MarketingService
   - OrderService
+  - TenancyService
   - VenueOpsService
   - WhiteLabelService
   ref: diagrams/lld/platforms/P13.yaml
@@ -495,34 +502,34 @@ services:
     - WhiteLabelService
 stores:
 - store: postgres
-  operations: 2133
+  operations: 2284
   usedBy:
   - service: CatalogueService
-    operations: 407
-  - service: OrderService
-    operations: 254
+    operations: 415
   - service: VenueOpsService
-    operations: 224
+    operations: 270
+  - service: OrderService
+    operations: 268
   - service: MarketingService
-    operations: 213
-  - service: PlatformService
-    operations: 184
+    operations: 248
   - service: AccessService
-    operations: 182
+    operations: 206
+  - service: PlatformService
+    operations: 186
   - service: TenancyService
-    operations: 166
+    operations: 168
   - service: FnbService
-    operations: 112
+    operations: 114
   - service: IdentityService
     operations: 70
-  - service: LedgerService
-    operations: 56
   - service: WhiteLabelService
-    operations: 52
+    operations: 60
+  - service: WalletService
+    operations: 59
+  - service: LedgerService
+    operations: 57
   - service: InventoryService
     operations: 51
-  - service: WalletService
-    operations: 50
   - service: ReportingService
     operations: 43
   - service: AiService
@@ -534,52 +541,52 @@ stores:
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 1643
+  operations: 1794
   usedBy:
   - service: CatalogueService
-    operations: 352
-  - service: OrderService
-    operations: 186
+    operations: 360
   - service: MarketingService
-    operations: 181
+    operations: 216
+  - service: OrderService
+    operations: 200
   - service: AccessService
-    operations: 168
+    operations: 192
   - service: VenueOpsService
-    operations: 145
+    operations: 191
   - service: PlatformService
-    operations: 137
+    operations: 139
   - service: TenancyService
-    operations: 122
+    operations: 124
   - service: FnbService
-    operations: 91
+    operations: 93
   - service: IdentityService
     operations: 66
   - service: WhiteLabelService
-    operations: 39
+    operations: 47
+  - service: LedgerService
+    operations: 31
   - service: InventoryService
     operations: 31
-  - service: LedgerService
-    operations: 30
   - service: ReportingService
     operations: 30
+  - service: WalletService
+    operations: 23
   - service: AiService
     operations: 21
   - service: RetailService
     operations: 17
-  - service: WalletService
-    operations: 14
   - service: CrossRegionService
     operations: 13
   note: Sessions, resolution caches, idempotency. **Losable without consequence** — nothing treats a
     cache entry as a source of truth.
 - store: postgres-analytical
-  operations: 120
+  operations: 122
   usedBy:
   - service: PlatformService
     operations: 71
-  - service: ReportingService
-    operations: 17
   - service: FnbService
+    operations: 19
+  - service: ReportingService
     operations: 17
   - service: AiService
     operations: 15
@@ -591,10 +598,10 @@ stores:
     operations: 9
   note: Vector search for the concierge and semantic lookup.
 - store: derived
-  operations: 37
+  operations: 39
   usedBy:
   - service: FnbService
-    operations: 18
+    operations: 20
   - service: ReportingService
     operations: 16
   - service: InventoryService
@@ -661,9 +668,9 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 2147 operations across 28 contracts — the join
+  holds: 2298 operations across 28 contracts — the join
 - layer: backend
-  holds: 687 tables in 26 schemas, 910 relationships
+  holds: 775 tables in 26 schemas, 910 relationships
 - layer: domain
   holds: 113 state models, 29 events
 - layer: decisions

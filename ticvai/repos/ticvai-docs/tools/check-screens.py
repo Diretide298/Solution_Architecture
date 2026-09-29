@@ -142,13 +142,17 @@ def load_template_enum() -> set:
 
 OP_PATHS: dict = {}
 OP_CONTRACT: dict = {}
+# **An operation can belong to a different licence than its contract** (29 September): booking
+# consent questions live in marketing-crm, but a venue without the marketing licence must still ask
+# a guest "can you swim?". `x-ticvai-requires-module` on the operation overrides CONTRACT_MODULE.
+OP_MODULE: dict = {}
 CONTRACT_MODULE = {
     "orders": "ticketing", "catalogue": "ticketing", "promotions": "ticketing",
     "access": "access", "fnb": "fnb", "retail": "retail", "inventory": "inventory",
     "seating": "seating", "venue-map": "seating", "subscription": "membership",
     "marketing-crm": "marketing", "resources": "resources", "queue": "queue",
     "games": "games", "maintenance": "maintenance", "reporting": "analytics",
-    "ai": "ai", "public-api": "developerApi",
+    "ai": "ai", "public-api": "developerApi", "transport": "transport",
 }
 
 
@@ -909,7 +913,8 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
                           "which module it belongs to cannot be hidden from a tenant who did not "
                           "buy it")
         elif req_mod != "core":
-            reached = {CONTRACT_MODULE.get(OP_CONTRACT.get(a.get("operationId")), "core")
+            reached = {OP_MODULE.get(a.get("operationId"))
+                       or CONTRACT_MODULE.get(OP_CONTRACT.get(a.get("operationId")), "core")
                        for a in (s.get("apis") or [])}
             foreign = sorted(m for m in reached if m not in ("core", req_mod))
             if foreign:
@@ -1063,6 +1068,11 @@ def main() -> int:
         for oid, v in json.loads(lin_path.read_text(encoding="utf-8")).items():
             OP_PATHS[oid] = v.get("path", "")
             OP_CONTRACT[oid] = v.get("contract", "")
+    for cf in sorted((ROOT / "contracts").glob("*/*.yaml")):
+        for item in ((yaml.safe_load(cf.read_text(encoding="utf-8")) or {}).get("paths") or {}).values():
+            for op in (item or {}).values():
+                if isinstance(op, dict) and op.get("x-ticvai-requires-module"):
+                    OP_MODULE[op.get("operationId")] = op["x-ticvai-requires-module"]
     all_ids = {s["id"] for f in files for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]}
     # Anchors a `to` may point into: the rendering states a screen declares, and its overlays.
     for f in files:

@@ -1,5 +1,5 @@
 id: LLD-wallet
-title: wallet — 50 operations
+title: wallet — 59 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -130,6 +130,16 @@ operations:
   - wallet.wallet_type
   writes:
   - wallet.wallet_type
+- operation: diffWalletConfigurationVersion
+  verb: GET
+  path: /wallet-configuration/versions/{version}/diff
+  scope: tenant
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: expireCreditLots
   verb: POST
   path: /credit-lots/expire
@@ -289,6 +299,17 @@ operations:
   reads:
   - wallet.voucher_type
   writes: []
+- operation: listWalletConfigurationVersions
+  verb: GET
+  path: /wallet-configuration/versions
+  scope: tenant
+  permission: WALLET_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.configuration_version
+  writes: []
 - operation: listWalletDisputes
   verb: GET
   path: /wallet-disputes
@@ -403,6 +424,28 @@ operations:
   writes:
   - cache:idempotency
   - wallet.wallet
+- operation: resolveWalletDispute
+  verb: POST
+  path: /wallet-disputes/{disputeId}/resolve
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.dispute
+  writes: []
+- operation: restoreWalletConfigurationVersion
+  verb: POST
+  path: /wallet-configuration/versions/{version}/restore
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.configuration_version
+  writes: []
 - operation: reverseWalletFunding
   verb: POST
   path: /wallet-funding/reversals
@@ -475,6 +518,18 @@ operations:
   - wallet.accounting_mapping
   writes:
   - wallet.accounting_mapping
+- operation: setWalletAuthenticationPolicy
+  verb: PUT
+  path: /wallet-authentication-policy
+  scope: venue
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.authentication_policy
+  writes:
+  - wallet.authentication_policy
 - operation: setWalletChannelRules
   verb: PUT
   path: /wallet-channel-rules
@@ -499,6 +554,30 @@ operations:
   - wallet.funding_rules
   writes:
   - wallet.funding_rules
+- operation: setWalletIntegrationMapping
+  verb: PUT
+  path: /wallet-integration-mappings
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.integration_mapping
+  writes:
+  - wallet.integration_mapping
+- operation: setWalletReconciliationSources
+  verb: PUT
+  path: /wallet-reconciliation-sources
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.reconciliation_source
+  writes:
+  - wallet.reconciliation_source
 - operation: setWalletRefundPolicy
   verb: PUT
   path: /wallet-refund-policy
@@ -523,6 +602,17 @@ operations:
   - wallet.restriction
   writes:
   - wallet.restriction
+- operation: setWalletRiskRuleStatus
+  verb: POST
+  path: /wallet-risk-rules/{ruleCode}/status
+  scope: tenant
+  permission: WALLET_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - wallet.risk_rules
+  writes: []
 - operation: setWalletRiskRules
   verb: PUT
   path: /wallet-risk-rules
@@ -629,3 +719,15 @@ operations:
   - wallet.wallet_type
   writes:
   - wallet.wallet_type
+- operation: withdrawWalletDispute
+  verb: POST
+  path: /wallet-disputes/{disputeId}/withdraw
+  scope: venue
+  permission: WALLET_OPERATE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - wallet.dispute
+  writes: []

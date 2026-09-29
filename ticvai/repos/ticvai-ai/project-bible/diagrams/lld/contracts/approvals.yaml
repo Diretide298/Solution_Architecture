@@ -1,5 +1,5 @@
 id: LLD-approvals
-title: approvals — 46 operations
+title: approvals — 48 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -249,6 +249,17 @@ operations:
   - approvals.decision
   - approvals.request
   writes: []
+- operation: listApprovedActionExecutions
+  verb: GET
+  path: /approved-action-executions
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.approved_action_execution
+  writes: []
 - operation: listConditionDecisionLogic
   verb: GET
   path: /condition-decision-logic
@@ -369,6 +380,17 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: resolveApprovedActionExecution
+  verb: POST
+  path: /approved-action-executions/{executionId}/resolve
+  scope: venue
+  permission: APPROVAL_ACT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.approved_action_execution
   writes: []
 - operation: resubmitApprovalRequest
   verb: POST

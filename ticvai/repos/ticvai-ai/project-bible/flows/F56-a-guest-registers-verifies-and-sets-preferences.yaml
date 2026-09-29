@@ -35,9 +35,13 @@ steps:
   - requestGuestOtp
   - verifyGuestOtp
   - guestPasswordLogin
-  outcome: '**No enterprise SSO and no second factor for guests** (decided 28 September, audit R167):
-    a guest signs in with a one-time code, a password (audit R073 (a)), a social provider or UAE Pass.
-    A guest asked for a second factor halfway through a purchase abandons the purchase.'
+  outcome: '**No enterprise SSO for guests** (decided 28 September, audit R167 part 1): a guest signs in
+    with a one-time code, a password (audit R073 (a)), a social provider or UAE Pass. **A second factor
+    applies only where the venue enabled guest two-step verification** (`VenueSettings.identity.guestTwoStep`,
+    per venue, off by default; decided 29 September, rev 3 GAP-B1, superseding R167 part 2): the sign-in
+    sends the venue in context, and a guest who enrolled a method on their account is asked for the code
+    only at a venue that has it on. A guest asked for a second factor halfway through a purchase abandons the
+    purchase, which is why it is off unless the venue turns it on.'
 - step: 3
   screen: WEB-016
   action: A guest who checked out anonymously links their order.

@@ -5,9 +5,9 @@
 |  |  |
 |---|---|
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
-| Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental` |
-| Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental` |
-| Operations in the slice | 33 of 224 |
+| Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
+| Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
+| Operations in the slice | 56 of 270 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -30,34 +30,57 @@
 | asset | [`deleteMediaAsset`](#deletemediaasset) | DELETE | `/media/{mediaId}` | core | 2 | CMS-010, CMS-075 |
 | asset | [`getMediaAsset`](#getmediaasset) | GET | `/media/{mediaId}` | core | 1 | BO-027, CMS-010, CMS-068, CMS-082, EMP-036, POS-010 |
 | asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 2 | BO-027, CMS-010, CMS-076, CMS-095 |
-| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 2 | BO-838, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
+| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 2 | BO-008, BO-838, CMS-010, CMS-061, CMS-062, CMS-067 … |
 | asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 2 | CMS-010, CMS-075, CMS-082 |
 | card | [`getGameCard`](#getgamecard) | GET | `/game-cards/{cardCode}` | core | 2 | BO-396, BO-454, BO-455, BO-457, BO-462, BO-486 … |
 | card | [`issueGameCard`](#issuegamecard) | POST | `/game-cards` | core | 1 | POS-002 |
 | card | [`transferGameCard`](#transfergamecard) | POST | `/game-cards/{cardCode}/transfer` | core | 1 | POS-002 |
 | collection | [`createCollection`](#createcollection) | POST | `/media/collections` | core | 2 | CMS-010, CMS-064 |
 | collection | [`listCollections`](#listcollections) | GET | `/media/collections` | core | 2 | CMS-010, CMS-062, CMS-064 |
+| departure | [`getNextTransportDeparture`](#getnexttransportdeparture) | GET | `/transport/departures/next` | core | 3 | GST-076, WEB-049 |
+| departure | [`searchTransportDepartures`](#searchtransportdepartures) | GET | `/transport/departures` | core | 3 | GST-076, WEB-049 |
 | entry | [`getWaitingGuest`](#getwaitingguest) | GET | `/waiting-guests/{entryId}` | core | 1 | GST-023, GST-046, WEB-015, WEB-040 |
 | entry | [`joinQueue`](#joinqueue) | POST | `/waiting-guests` | core | 1 | GST-023, GST-046, WEB-015, WEB-040 |
 | entry | [`leaveQueue`](#leavequeue) | DELETE | `/waiting-guests/{entryId}` | core | 2 | GST-023, WEB-040 |
 | entry | [`listQueueEntries`](#listqueueentries) | GET | `/queues/{queueId}/entries` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
+| fare | [`getTransportFareTable`](#gettransportfaretable) | GET | `/transport/routes/{routeId}/fare-table` | core | 3 | BO-1185, GST-077, WEB-049 |
+| fare | [`quoteTransportFare`](#quotetransportfare) | POST | `/transport/fare-quotes` | core | 3 | BO-1185, GST-077, WEB-049 |
+| fare | [`setTransportFareTable`](#settransportfaretable) | PUT | `/transport/routes/{routeId}/fare-table` | setup | 3 | BO-1185 |
+| favourite | [`deleteFavouriteRoute`](#deletefavouriteroute) | DELETE | `/transport/favourite-routes/{favouriteId}` | core | 3 | GST-079, WEB-049 |
+| favourite | [`listMyFavouriteRoutes`](#listmyfavouriteroutes) | GET | `/transport/favourite-routes` | core | 3 | GST-079, WEB-049 |
+| favourite | [`saveFavouriteRoute`](#savefavouriteroute) | POST | `/transport/favourite-routes` | core | 3 | GST-077, WEB-049 |
 | feed | [`configureQueueFeed`](#configurequeuefeed) | PUT | `/queue-feeds` | setup | 1 | BO-001, BO-003 |
 | feed | [`getQueueFeedHealth`](#getqueuefeedhealth) | GET | `/queue-feeds/{feedId}/health` | core | 1 | BO-001, BO-003, POS-029 |
+| pass | [`listTransportPassOffers`](#listtransportpassoffers) | GET | `/transport/pass-offers` | core | 3 | GST-078, WEB-049 |
 | queue | [`createQueue`](#createqueue) | POST | `/queues` | setup | 1 | BO-001, BO-002, BO-004, BO-005, BO-038 |
 | queue | [`getQueue`](#getqueue) | GET | `/queues/{queueId}` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
-| queue | [`listQueues`](#listqueues) | GET | `/queues` | core | 2 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
-| queue | [`updateQueue`](#updatequeue) | PATCH | `/queues/{queueId}` | setup | 1 | BO-001, BO-002, BO-004, BO-005, BO-038 |
-| resources | [`createResource`](#createresource) | POST | `/resources` | setup | 2 | BO-095, BO-857 |
+| queue | [`listQueues`](#listqueues) | GET | `/queues` | core | 2 | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221 … |
+| queue | [`updateQueue`](#updatequeue) | PATCH | `/queues/{queueId}` | setup | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221 |
+| resources | [`createResource`](#createresource) | POST | `/resources` | setup | 2 | BO-095, BO-857, BO-863 |
+| resources | [`createResourceHold`](#createresourcehold) | POST | `/resource-holds` | core | 3 | GST-074, WEB-047 |
+| resources | [`extendResourceHold`](#extendresourcehold) | POST | `/resource-holds/{holdId}/extend` | core | 3 | GST-074, WEB-047 |
+| resources | [`getMapResourceAvailability`](#getmapresourceavailability) | GET | `/resource-availability` | core | 3 | GST-074, WEB-047 |
 | resources | [`getResourceAvailability`](#getresourceavailability) | GET | `/resources/{resourceId}/availability` | core | 2 | BO-096, WEB-031 |
-| resources | [`updateResource`](#updateresource) | PUT | `/resources/{resourceId}` | setup | 2 | BO-857 |
+| resources | [`getResourceHold`](#getresourcehold) | GET | `/resource-holds/{holdId}` | core | 1 | GST-041, GST-074, WEB-010, WEB-047 |
+| resources | [`listProductStartTimes`](#listproductstarttimes) | GET | `/resource-start-times` | core | 3 | GST-075, WEB-048 |
+| resources | [`relinquishResourceHold`](#relinquishresourcehold) | DELETE | `/resource-holds/{holdId}` | core | 3 | GST-074, WEB-047 |
+| resources | [`updateResource`](#updateresource) | PUT | `/resources/{resourceId}` | setup | 2 | BO-857, BO-863 |
 | rights | [`getExpiringRights`](#getexpiringrights) | GET | `/media/rights-expiring` | core | 2 | CMS-010, CMS-081, CMS-088, CMS-090 |
-| upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 2 | CMS-002, CMS-010, CMS-063 |
-| upload | [`createUpload`](#createupload) | POST | `/media/uploads` | core | 2 | CMS-002, CMS-010, CMS-063 |
+| route | [`createTransportRoute`](#createtransportroute) | POST | `/transport/routes` | setup | 3 | BO-1184 |
+| route | [`getTransportRoute`](#gettransportroute) | GET | `/transport/routes/{routeId}` | core | 3 | BO-1184, GST-077, WEB-049 |
+| route | [`getTransportRouteMap`](#gettransportroutemap) | GET | `/transport/routes/{routeId}/map` | core | 3 | GST-077, WEB-049 |
+| route | [`listTransportRoutes`](#listtransportroutes) | GET | `/transport/routes` | core | 3 | BO-1184, BO-1185, BO-1186, BO-1187, BO-1188, GST-076 … |
+| route | [`updateTransportRoute`](#updatetransportroute) | PATCH | `/transport/routes/{routeId}` | setup | 3 | BO-1184 |
+| station | [`listTransportStations`](#listtransportstations) | GET | `/transport/stations` | core | 3 | BO-1183, BO-1184, GST-076, GST-078, WEB-049 |
+| upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 2 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063 |
+| upload | [`createUpload`](#createupload) | POST | `/media/uploads` | core | 2 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063 |
 | venueMap | [`createVenueMap`](#createvenuemap) | POST | `/venue-maps` | setup | 1 | BO-092 |
-| venueMap | [`getVenueMap`](#getvenuemap) | GET | `/venue-maps/{mapId}` | core | 2 | BO-094, EMP-030, GST-021, WEB-039 |
+| venueMap | [`getVenueMap`](#getvenuemap) | GET | `/venue-maps/{mapId}` | core | 2 | BO-094, EMP-030, GST-021, GST-074, WEB-039, WEB-047 |
 | venueMap | [`getVenueMapGraph`](#getvenuemapgraph) | GET | `/venue-maps/{mapId}/graph` | core | 2 | BO-094, GST-021, WEB-039 |
 | venueMap | [`importVenueGeometry`](#importvenuegeometry) | POST | `/venue-maps/{mapId}/import` | setup | 1 | BO-093 |
+| venueMap | [`listBookableVenueMaps`](#listbookablevenuemaps) | GET | `/bookable-venue-maps` | core | 3 | GST-074, WEB-047 |
 | venueMap | [`publishVenueMap`](#publishvenuemap) | POST | `/venue-maps/{mapId}/publish` | setup | 1 | BO-094 |
+| venueMap | [`setPlacedResource`](#setplacedresource) | POST | `/venue-maps/{mapId}/resources` | setup | 2 | BO-094 |
 | venueMap | [`setVenuePoint`](#setvenuepoint) | POST | `/venue-maps/{mapId}/points` | setup | 1 | BO-094 |
 | waitTime | [`getWaitTimes`](#getwaittimes) | GET | `/queues/wait-times` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031 … |
 
@@ -292,7 +315,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 | Read routing | replica |
 | Reads | `assets.media_asset` |
 | Writes | - |
-| Called by | BO-838, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
+| Called by | BO-008, BO-838, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
 
 **Parameters**
 
@@ -712,6 +735,143 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 | 200 |  | Collections |
 
 
+## Group: departure
+
+### getNextTransportDeparture
+
+**`GET /transport/departures/next`**: Next Available Trip
+
+**The first departure on sale after `after`** (default now) between the two stations with seats for the party, across dates up to the release horizon (decided 29 September, rev 3 REV3-21). The prototype selects it straight away; the client then shows its card and period. 404 when none is on sale within the horizon.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | - |
+| Writes | - |
+| Called by | GST-076, WEB-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| fromStationId | query | yes | string |  |
+| toStationId | query | yes | string |  |
+| after | query |  | string (date-time) |  |
+| passengers | query |  | array of string | As on searchTransportDepartures. |
+
+**Response**: `DepartureOffer`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| departureId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| performanceId | string (uuid) | yes |  |
+| routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeCode | string |  | The price card's label, e.g. |
+| departsAt | string (date-time) | yes | At the boarding stop. |
+| arrivesAt | string (date-time) | yes | At the alighting stop. |
+| durationMinutes | integer | yes | (min 0) |
+| period | TimePeriod: enum (morning, afternoon, evening, night) | yes | Proposed, client to correct (rev 3 REV3-21): morning 05:00–11:59, afternoon 12:00–16:59, evening 17:00–20:59, night 21:00–04:59. |
+| seatsLeft | integer | yes | Catalogue availability for the performance. (min 0) |
+| fitsParty | boolean |  |  |
+| fare | Money | yes | On the wire this is three fields; in the database it is one column. |
+| fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| fare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| partyTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| partyTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| partyTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| partyTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The next departure |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | The stations are the same, or no active route serves them in this order. |
+
+### searchTransportDepartures
+
+**`GET /transport/departures`**: Search Trips — departures between two stations on a date
+
+The departure cards (decided 29 September, rev 3 REV3-21): departure and arrival time at the chosen stops, duration, seats left and fare. **`periodCounts` carries the number of departures in each time period** for the period buttons, whatever `period` filters the items to.
+**Time periods, proposed, client to correct (rev 3 REV3-21):** `morning` 05:00–11:59, `afternoon` 12:00–16:59, `evening` 17:00–20:59, `night` 21:00–04:59, by departure time at the boarding stop, venue local time.
+Only departures `onSale` and before the route's booking cut-off are returned; a `soldOut` departure is returned with `seatsLeft` 0 so the card can say so. With `passengers`, a departure with fewer seats left than the party is marked `fitsParty: false` and the fares are totalled for the party.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | - |
+| Writes | - |
+| Called by | GST-076, WEB-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| fromStationId | query | yes | string |  |
+| toStationId | query | yes | string |  |
+| date | query | yes | string (date) | Travel date, venue local. |
+| period | query |  | TimePeriod: enum (morning, afternoon, evening, night) |  |
+| passengers | query |  | array of string | The party as code:count pairs, one per passenger type (adult:2, child:1). |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of DepartureOffer | yes |  |
+| items[].departureId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].performanceId | string (uuid) | yes |  |
+| items[].routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].routeCode | string |  | The price card's label, e.g. |
+| items[].departsAt | string (date-time) | yes | At the boarding stop. |
+| items[].arrivesAt | string (date-time) | yes | At the alighting stop. |
+| items[].durationMinutes | integer | yes | (min 0) |
+| items[].period | TimePeriod: enum (morning, afternoon, evening, night) | yes | Proposed, client to correct (rev 3 REV3-21): morning 05:00–11:59, afternoon 12:00–16:59, evening 17:00–20:59, night 21:00–04:59. |
+| items[].seatsLeft | integer | yes | Catalogue availability for the performance. (min 0) |
+| items[].fitsParty | boolean |  |  |
+| items[].fare | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].fare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].partyTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].partyTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].partyTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].partyTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+| adultFare | Money |  | On the wire this is three fields; in the database it is one column. |
+| adultFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| adultFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| adultFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| periodCounts | object | yes | Departures on sale in each period on this date. |
+| periodCounts.morning | integer |  | (min 0) |
+| periodCounts.afternoon | integer |  | (min 0) |
+| periodCounts.evening | integer |  | (min 0) |
+| periodCounts.night | integer |  | (min 0) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Departures by departure time at the boarding stop |
+| 422 |  | The stations are the same, or no active route serves them in this order. |
+
+
 ## Group: entry
 
 ### getWaitingGuest
@@ -931,6 +1091,394 @@ Operator view. Position order, with no-shows and expiries visible.
 | 200 |  | Entries |
 
 
+## Group: fare
+
+### getTransportFareTable
+
+**`GET /transport/routes/{routeId}/fare-table`**: A route's fares and passenger types
+
+The passenger picker reads its types from here (adult, child, student, person of determination), with the proof each asks for. 404 when the route has none yet.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table` |
+| Writes | - |
+| Called by | BO-1185, GST-077, WEB-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| routeId | path | yes | string |  |
+
+**Response**: `FareTable`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| model | FareModel: enum (stopCount, matrix) | yes | stopCount: base plus an amount per stop travelled — the prototype's rule. |
+| baseFare | Money |  | On the wire this is three fields; in the database it is one column. |
+| baseFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| baseFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| baseFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| perStopFare | Money |  | On the wire this is three fields; in the database it is one column. |
+| perStopFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| perStopFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| perStopFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| matrix | array of object |  | matrix only. |
+| matrix[].fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].fare | Money | yes | On the wire this is three fields; in the database it is one column. |
+| matrix[].fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| matrix[].fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| matrix[].fare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| passengerTypes | array of PassengerType | yes | (min items 1; max items 10) |
+| passengerTypes[].code | string | yes | adult, child, student, determination. (pattern ^[a-z][a-zA-Z0-9]{0,31}$) |
+| passengerTypes[].name | LocalisedText | yes |  |
+| passengerTypes[].description | LocalisedText |  | What the picker shows under the name ("Age 5–11 · half fare"). |
+| passengerTypes[].fareMultiplier | number | yes | Share of the adult fare, set by the venue. (min 0; max 1) |
+| passengerTypes[].minAge | integer |  | (min 0; nullable) |
+| passengerTypes[].maxAge | integer |  | (min 0; nullable) |
+| passengerTypes[].proofRequired | LocalisedText |  | Checked by the driver at boarding ("Valid student card", "Sanad card"). |
+| passengerTypes[].isDefault | boolean |  | The type a new search starts with, one of it. (default False) |
+| passengerTypes[].catalogueVariantId | string (uuid) |  | The variant of the route's trip product this type is sold as. (read-only) |
+| effectiveFrom | string (date-time) | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Fare table |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### quoteTransportFare
+
+**`POST /transport/fare-quotes`**: Price a one-way trip or a pass for a party
+
+**Creates nothing; POST because the party is a body.** Returns the adult fare between the two stations, the price per passenger type and the total — or, with `passTypeId`, the pass price and its saving against single trips.
+**The order service calls this when a transport line is added to a cart** (a line whose `attributes.transport` names the route and stations), so the price a guest saw on the departure card and the price on the cart line come from one rule.
+Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads the pair. Per passenger, fare × multiplier, rounded to the currency's minor unit. A pass is `round(fare × pass.fareMultiplier)`; its saving is `fare × referenceTrips − price`.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | - |
+| Writes | - |
+| Called by | BO-1185, GST-077, WEB-049 |
+
+**Request body**: `FareQuoteRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| routeId | string |  | Omitted, the active route serving the two stations in this order. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| passengers | array of object |  | Omitted, one of the default type. (max items 10) |
+| passengers[].code | string | yes |  |
+| passengers[].count | integer | yes | (min 0; max 99) |
+| passTypeId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| at | string (date-time) |  | The sale instant the fare table is read at. |
+
+**Response**: `FareQuote`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stopsTravelled | integer | yes | (min 1) |
+| adultFare | Money | yes | On the wire this is three fields; in the database it is one column. |
+| adultFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| adultFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| adultFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines | array of object |  |  |
+| lines[].code | string | yes |  |
+| lines[].catalogueVariantId | string (uuid) |  |  |
+| lines[].count | integer | yes |  |
+| lines[].unitPrice | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].unitPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].unitPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].unitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].lineTotal | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| passTypeId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| saving | Money |  | On the wire this is three fields; in the database it is one column. |
+| saving.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| saving.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| saving.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| total | Money | yes | On the wire this is three fields; in the database it is one column. |
+| total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Quote |
+| 422 |  | Stations not on the route or in the wrong order, an unknown passenger type, no passengers, or a pass type not offered on this route. |
+
+### setTransportFareTable
+
+**`PUT /transport/routes/{routeId}/fare-table`**: Set a route's fares and passenger types
+
+Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21). **A change applies to sales from `effectiveFrom`; a ticket already sold keeps its price.** Adding or removing a passenger type adds or retires the matching variant on the route's catalogue product.
+**The fares are the venue's own configuration**, set here by a holder of `TRANSPORT_PRICE` (decided 29 September, rev 3 REV3-21: the network is operator configuration); a route has no fare table until one is set. The prototype's values are seed data for the demo tenant, not a default: `stopCount` model, base AED 5, AED 2.50 per stop travelled; adult ×1 (age 12+), child ×0.5 (age 5–11), student ×0.5 (valid student card), person of determination ×0 (Sanad card).
+**PUT semantics.** Creates the table if the route has none; otherwise replaces it.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_PRICE` |
+| Scope level | venue |
+| Part of slice | setup, makes `transport.fare_passenger_type` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table` |
+| Writes | `transport.fare_passenger_type` |
+| Called by | BO-1185 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| routeId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `SetFareTableRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| model | FareModel: enum (stopCount, matrix) | yes | stopCount: base plus an amount per stop travelled — the prototype's rule. |
+| baseFare | Money |  | On the wire this is three fields; in the database it is one column. |
+| baseFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| baseFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| baseFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| perStopFare | Money |  | On the wire this is three fields; in the database it is one column. |
+| perStopFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| perStopFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| perStopFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| matrix | array of object |  | matrix only. |
+| matrix[].fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].fare | Money | yes | On the wire this is three fields; in the database it is one column. |
+| matrix[].fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| matrix[].fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| matrix[].fare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| passengerTypes | array of PassengerType | yes | (min items 1; max items 10) |
+| passengerTypes[].code | string | yes | adult, child, student, determination. (pattern ^[a-z][a-zA-Z0-9]{0,31}$) |
+| passengerTypes[].name | LocalisedText | yes |  |
+| passengerTypes[].description | LocalisedText |  | What the picker shows under the name ("Age 5–11 · half fare"). |
+| passengerTypes[].fareMultiplier | number | yes | Share of the adult fare, set by the venue. (min 0; max 1) |
+| passengerTypes[].minAge | integer |  | (min 0; nullable) |
+| passengerTypes[].maxAge | integer |  | (min 0; nullable) |
+| passengerTypes[].proofRequired | LocalisedText |  | Checked by the driver at boarding ("Valid student card", "Sanad card"). |
+| passengerTypes[].isDefault | boolean |  | The type a new search starts with, one of it. (default False) |
+| passengerTypes[].catalogueVariantId | string (uuid) |  | The variant of the route's trip product this type is sold as. (read-only) |
+| effectiveFrom | string (date-time) | yes |  |
+
+**Response**: `FareTable`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| model | FareModel: enum (stopCount, matrix) | yes | stopCount: base plus an amount per stop travelled — the prototype's rule. |
+| baseFare | Money |  | On the wire this is three fields; in the database it is one column. |
+| baseFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| baseFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| baseFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| perStopFare | Money |  | On the wire this is three fields; in the database it is one column. |
+| perStopFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| perStopFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| perStopFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| matrix | array of object |  | matrix only. |
+| matrix[].fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].fare | Money | yes | On the wire this is three fields; in the database it is one column. |
+| matrix[].fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| matrix[].fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| matrix[].fare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| passengerTypes | array of PassengerType | yes | (min items 1; max items 10) |
+| passengerTypes[].code | string | yes | adult, child, student, determination. (pattern ^[a-z][a-zA-Z0-9]{0,31}$) |
+| passengerTypes[].name | LocalisedText | yes |  |
+| passengerTypes[].description | LocalisedText |  | What the picker shows under the name ("Age 5–11 · half fare"). |
+| passengerTypes[].fareMultiplier | number | yes | Share of the adult fare, set by the venue. (min 0; max 1) |
+| passengerTypes[].minAge | integer |  | (min 0; nullable) |
+| passengerTypes[].maxAge | integer |  | (min 0; nullable) |
+| passengerTypes[].proofRequired | LocalisedText |  | Checked by the driver at boarding ("Valid student card", "Sanad card"). |
+| passengerTypes[].isDefault | boolean |  | The type a new search starts with, one of it. (default False) |
+| passengerTypes[].catalogueVariantId | string (uuid) |  | The variant of the route's trip product this type is sold as. (read-only) |
+| effectiveFrom | string (date-time) | yes |  |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | A matrix model missing a station pair the route serves, a passenger type code repeated, no passenger type with isDefault, or a multiplier outside 0 to 1. |
+
+
+## Group: favourite
+
+### deleteFavouriteRoute
+
+**`DELETE /transport/favourite-routes/{favouriteId}`**: Remove a saved route
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | - |
+| Writes | - |
+| Called by | GST-079, WEB-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| favouriteId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Removed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### listMyFavouriteRoutes
+
+**`GET /transport/favourite-routes`**: The caller's saved routes
+
+The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of stations with its current adult fare and **Book this route**, which fills the one-way search. Scoped to the caller; newest first.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `transport.favourite_route` |
+| Writes | - |
+| Called by | GST-079, WEB-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | query | yes | string (uuid) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of FavouriteRoute | yes |  |
+| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].venueId | string (uuid) | yes |  |
+| items[].fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].fromStationName | string |  | (read-only) |
+| items[].toStationName | string |  | (read-only) |
+| items[].label | string |  | (nullable) |
+| items[].adultFare | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].adultFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].adultFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].adultFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].createdAt | string (date-time) | yes |  |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved routes |
+| 401 | Unauthorized | Missing, expired or superseded session |
+
+### saveFavouriteRoute
+
+**`POST /transport/favourite-routes`**: Save route
+
+**Save route** on the one-way tab. One favourite per guest per pair of stations in this direction: saving it again returns the existing one with 200. **At most 20 per guest per venue, proposed, client to correct (rev 3 REV3-21)**; the 21st is a 409.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.favourite_route` |
+| Writes | - |
+| Called by | GST-077, WEB-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| label | string |  | (max length 60; nullable) |
+
+**Response**: `FavouriteRoute`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| venueId | string (uuid) | yes |  |
+| fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| fromStationName | string |  | (read-only) |
+| toStationName | string |  | (read-only) |
+| label | string |  | (nullable) |
+| adultFare | Money |  | On the wire this is three fields; in the database it is one column. |
+| adultFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| adultFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| adultFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| createdAt | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Already saved; the existing favourite |
+| 201 |  | Saved |
+| 409 |  | The guest already has the maximum number of saved routes. |
+| 422 |  | The stations are the same, or no active route serves them in this order. |
+
+
 ## Group: feed
 
 ### configureQueueFeed
@@ -1057,6 +1605,68 @@ Last reading, expected interval, and whether the feed has gone quiet. A silent f
 | 200 |  | Health |
 
 
+## Group: pass
+
+### listTransportPassOffers
+
+**`GET /transport/pass-offers`**: Multi-trip passes for a pair of stations, priced, with the saving
+
+The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip cards and weekly and monthly unlimited, for the chosen route, each with its price and what it saves against single adult trips. A pass bought here is a catalogue `openDated` product (`catalogueProductId`) added to the cart with `attributes.transport` naming the stations.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | - |
+| Writes | - |
+| Called by | GST-078, WEB-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| fromStationId | query | yes | string |  |
+| toStationId | query | yes | string |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of PassOffer | yes |  |
+| items[].passTypeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].catalogueProductId | string (uuid) | yes |  |
+| items[].routeId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].name | string | yes |  |
+| items[].description | string |  |  |
+| items[].kind | enum (multiTrip, unlimited) |  |  |
+| items[].trips | integer |  | (nullable) |
+| items[].validityDays | integer | yes |  |
+| items[].price | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| items[].saving | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].saving.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| items[].saving.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| items[].saving.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Pass offers, by sortOrder |
+| 422 |  | The stations are the same, or no active route serves them in this order. |
+
+
 ## Group: queue
 
 ### createQueue
@@ -1111,6 +1721,11 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 | heightRequirementCm | integer |  | (nullable) |
 | fastPassAllocationPercent | number |  | Share of each cycle reserved for Fast Pass holders. (min 0; max 100; default 0) |
 | zone | string |  | (nullable) |
+| fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
+| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
+| fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
+| fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
 
 **Response**: `Queue`
 
@@ -1139,6 +1754,11 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 | heightRequirementCm | integer |  | (nullable) |
 | fastPassAllocationPercent | number |  | Share of each cycle reserved for Fast Pass holders. (min 0; max 100; default 0) |
 | zone | string |  | (nullable) |
+| fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
+| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
+| fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
+| fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
 | id | string (uuid) | yes |  |
 | status | QueueStatus: enum (open, paused, closed, atCapacity) | yes |  |
 | statusReason | string |  | (nullable) |
@@ -1208,6 +1828,11 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 | heightRequirementCm | integer |  | (nullable) |
 | fastPassAllocationPercent | number |  | Share of each cycle reserved for Fast Pass holders. (min 0; max 100; default 0) |
 | zone | string |  | (nullable) |
+| fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
+| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
+| fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
+| fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
 | id | string (uuid) | yes |  |
 | status | QueueStatus: enum (open, paused, closed, atCapacity) | yes |  |
 | statusReason | string |  | (nullable) |
@@ -1257,7 +1882,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Read routing | replica |
 | Reads | `queue.queue`, `queue.queue_operating_window` |
 | Writes | - |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, EMP-031, EMP-032, GST-023, SUP-020, WEB-039 |
+| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221, EMP-031, EMP-032, GST-023, SUP-020, WEB-039 |
 
 **Parameters**
 
@@ -1296,6 +1921,11 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | items[].heightRequirementCm | integer |  | (nullable) |
 | items[].fastPassAllocationPercent | number |  | Share of each cycle reserved for Fast Pass holders. (min 0; max 100; default 0) |
 | items[].zone | string |  | (nullable) |
+| items[].fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
+| items[].fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| items[].fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
+| items[].fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
+| items[].fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
 | items[].id | string (uuid) | yes |  |
 | items[].status | QueueStatus: enum (open, paused, closed, atCapacity) | yes |  |
 | items[].statusReason | string |  | (nullable) |
@@ -1331,7 +1961,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `queue.queue`, `queue.queue_operating_window` |
 | Writes | `cache:idempotency`, `queue.queue` |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-038 |
+| Called by | BO-001, BO-002, BO-004, BO-005, BO-038, BO-221 |
 
 **Parameters**
 
@@ -1351,6 +1981,11 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | returnWindowMinutes | integer |  | (min 1) |
 | heightRequirementCm | integer |  | (nullable) |
 | fastPassAllocationPercent | number |  | (min 0; max 100) |
+| fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
+| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
+| fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
+| fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
 
 **Response**: `Queue`
 
@@ -1379,6 +2014,11 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | heightRequirementCm | integer |  | (nullable) |
 | fastPassAllocationPercent | number |  | Share of each cycle reserved for Fast Pass holders. (min 0; max 100; default 0) |
 | zone | string |  | (nullable) |
+| fastPass | object |  | The lane's Fast Pass block (decided 29 September, VM close-out). (nullable) |
+| fastPass.entitlementProductIds | array of string (uuid) | yes | Catalogue products whose entitlement admits to this lane. (min items 1) |
+| fastPass.returnWindowMinutes | integer |  | How long after the booked return time a Fast Pass holder may still enter. (min 1; max 240; default 60) |
+| fastPass.maxPerGuestPerDay | integer |  | Fast Pass redemptions one guest may make on this lane per day; null is no cap. (min 1; nullable) |
+| fastPass.allowedAccessPointIds | array of string (uuid) |  | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
 | id | string (uuid) | yes |  |
 | status | QueueStatus: enum (open, paused, closed, atCapacity) | yes |  |
 | statusReason | string |  | (nullable) |
@@ -1415,7 +2055,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.scope`, `resources.resource` |
 | Writes | `cache:idempotency`, `resources.resource` |
-| Called by | BO-095, BO-857 |
+| Called by | BO-095, BO-857, BO-863 |
 | State model | Resource ([states/resource.yaml](../../../states/resource.yaml)): created as `available`; moves `available` -> `maintenance`, `maintenance` -> `retired`, `available` -> `retired` **(not settled: see the Gaps sheet)** |
 
 **Parameters**
@@ -1431,7 +2071,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | id | string (uuid) | yes |  |
 | code | string | yes |  |
 | name | string | yes |  |
-| kind | ResourceKind: enum (cabana, locker, wheelchair, stroller, equipment, room, auditorium, vehicle, …) | yes | BL-135. |
+| kind | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | yes | BL-135. |
 | venueId | string (uuid) | yes |  |
 | scopePath | string |  |  |
 | parentResourceId | string (uuid) |  | A pool cabana belongs to the pool area; a seat belongs to an auditorium. (nullable) |
@@ -1454,7 +2094,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | id | string (uuid) | yes |  |
 | code | string | yes |  |
 | name | string | yes |  |
-| kind | ResourceKind: enum (cabana, locker, wheelchair, stroller, equipment, room, auditorium, vehicle, …) | yes | BL-135. |
+| kind | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | yes | BL-135. |
 | venueId | string (uuid) | yes |  |
 | scopePath | string |  |  |
 | parentResourceId | string (uuid) |  | A pool cabana belongs to the pool area; a seat belongs to an auditorium. (nullable) |
@@ -1476,12 +2116,214 @@ Guest-facing when called with a guest token — returns only queues that are ope
 |---|---|---|
 | 201 |  | Created |
 
+### createResourceHold
+
+**`POST /resource-holds`**: Hold a specific resource picked on the map
+
+**A seat hold for a cabana** (decided 29 September, rev 3 REV3-15 and GAP-C2). The guest taps B09 on the map; this holds it for the window and returns `expiresAt`, so the client shows the same remaining-time counter the seat map shows. Short-lived and explicit, like `seating.createSeatHold`, and for the same reason: a cabana that expires silently while the guest enters card details is the worst outcome in the flow.
+
+**Only a resource placed on the published map may be held**, and only while it is free for the whole window, setup and teardown included; otherwise `409` names it. A party larger than the resource's `capacity` is refused `422`.
+
+**The order converts it.** The cart line carries `holdId`; `orders.createOrder` turns the hold into a `ResourceBooking` (status `reserved`) without releasing it first, so nobody takes the cabana between the two calls. **8 minutes by default, extendable to 30 in all** (audit R169), as a seat hold.
+
+|  |  |
+|---|---|
+| Permission | `ORDER_CREATE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Lock | rowExclusive |
+| Guest callable | True |
+| Reads | `resources.resource_hold` |
+| Writes | - |
+| Called by | GST-074, WEB-047 |
+| State model | Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): created as `held` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreateResourceHoldRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | Client-generated ULID, as a seat hold's. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| mapId | string (uuid) | yes | The published venue map the guest picked from. |
+| resourceIds | array of string (uuid) | yes | Placed resources on that map, e.g. (min items 1; max items 10) |
+| from | string (date-time) | yes |  |
+| to | string (date-time) | yes |  |
+| partySize | integer |  | Checked against each resource's capacity; above it the hold is refused 422. (min 1; nullable) |
+| ttlSeconds | integer |  | 8 minutes by default, 30 in all with extensions (audit R169), as a seat hold. (min 60; max 1800; default 480) |
+| subjectId | string (uuid) |  | (nullable) |
+
+**Response**: `ResourceHold`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| mapId | string (uuid) | yes |  |
+| resourceIds | array of string (uuid) | yes |  |
+| from | string (date-time) | yes |  |
+| to | string (date-time) | yes |  |
+| partySize | integer |  | (nullable) |
+| status | enum (held, converted, released, expired) | yes |  |
+| totalPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| totalPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| totalPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| totalPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| heldByPrincipalId | string (uuid) |  | (nullable) |
+| subjectId | string (uuid) |  | (nullable) |
+| orderId | string (uuid) |  | Set when the order converts it. (nullable) |
+| extensionCount | integer |  | (default 0) |
+| createdAt | string (date-time) | yes |  |
+| expiresAt | string (date-time) | yes |  |
+| scopePath | string |  | The partition key (ADR-0005), written at venue scope. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Held |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Taken for some of the window, held by someone else, not placed on the published map, or marked not bookable. |
+| 422 |  | The party is larger than the resource's capacity (party-exceeds-capacity). |
+
+### extendResourceHold
+
+**`POST /resource-holds/{holdId}/extend`**: Extend a resource hold
+
+For a guest still completing payment. **The same bounds as a seat hold**: `VenueSettings.seating.seatHoldExtensionSeconds` per extension and at most `VenueSettings.seating.seatHoldMaxExtensions` extensions (audit R094), and no hold outlives 30 minutes from creation (audit R169).
+
+|  |  |
+|---|---|
+| Permission | `ORDER_CREATE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Guest callable | True |
+| Reads | `resources.resource_hold` |
+| Writes | - |
+| Called by | GST-074, WEB-047 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| holdId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Response**: `ResourceHold`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| mapId | string (uuid) | yes |  |
+| resourceIds | array of string (uuid) | yes |  |
+| from | string (date-time) | yes |  |
+| to | string (date-time) | yes |  |
+| partySize | integer |  | (nullable) |
+| status | enum (held, converted, released, expired) | yes |  |
+| totalPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| totalPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| totalPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| totalPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| heldByPrincipalId | string (uuid) |  | (nullable) |
+| subjectId | string (uuid) |  | (nullable) |
+| orderId | string (uuid) |  | Set when the order converts it. (nullable) |
+| extensionCount | integer |  | (default 0) |
+| createdAt | string (date-time) | yes |  |
+| expiresAt | string (date-time) | yes |  |
+| scopePath | string |  | The partition key (ADR-0005), written at venue scope. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Extended |
+| 409 |  | Already expired or converted, or the extension limit is reached. |
+
+### getMapResourceAvailability
+
+**`GET /resource-availability`**: Every bookable resource on a venue map, free or taken, in one call
+
+**The whole map in one call** (decided 29 September, rev 3 REV3-15 and GAP-C2). A guest opening the Coastal Aqua map sees 34 cabanas at once, sold ones greyed, and one request per cabana is 34 round trips before the map can be drawn. So this returns every placed resource on the map's published version with its status for the window, its capacity and price band, and the band's price; the client joins it to `venue-map.getVenueMap` `resources` by `resourceId`.
+
+**Status is computed the way `getResourceAvailability` computes it**, with setup and teardown subtracted, and a live `ResourceHold` shows as `held`. A resource the map marks `isBookable` false comes back `unavailable`.
+
+**Not paged, deliberately.** A map carries tens of resources, not thousands, and a paged answer would make the client stitch pages before it could grey a single cabana.
+
+|  |  |
+|---|---|
+| Permission | `RESOURCE_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Guest callable | True |
+| Reads | - |
+| Writes | - |
+| Called by | GST-074, WEB-047 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| mapId | query | yes | string (uuid) | The venue-map.VenueMap whose placed resources to report. |
+| from | query | yes | string (date-time) | Start of the window. |
+| to | query | yes | string (date-time) |  |
+| kind | query |  | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | Only resources of this kind, e.g. |
+
+**Response**: `MapResourceAvailability`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| mapId | string (uuid) | yes |  |
+| mapVersion | integer | yes | The published venue-map version the placements were read from; the client checks it against the map it cached. |
+| from | string (date-time) | yes |  |
+| to | string (date-time) | yes |  |
+| totals | object |  |  |
+| totals.total | integer |  |  |
+| totals.available | integer |  |  |
+| totals.held | integer |  |  |
+| totals.booked | integer |  |  |
+| totals.unavailable | integer |  |  |
+| resources | array of object | yes |  |
+| resources[].resourceId | string (uuid) | yes |  |
+| resources[].placedResourceId | string (uuid) |  | The venue-map.PlacedResource it was read from. |
+| resources[].label | string | yes | As on the map, e.g. |
+| resources[].kind | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) |  | BL-135. |
+| resources[].zone | string |  |  |
+| resources[].capacity | integer |  |  |
+| resources[].priceBandCode | string |  |  |
+| resources[].variantId | string (uuid) |  | What the cart line names to buy it. |
+| resources[].price | Money |  | On the wire this is three fields; in the database it is one column. |
+| resources[].price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| resources[].price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| resources[].price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| resources[].status | enum (available, held, booked, unavailable) | yes | unavailable covers maintenance, a blackout, a block and a placement marked not bookable; the map greys all of them the same way. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Every placed resource with its status for the window |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
 ### getResourceAvailability
 
 **`GET /resources/{resourceId}/availability`**: When it is free, with conflicts already resolved
 
 **Returns free windows, not a list of bookings for the caller to subtract.** A client computing availability from bookings will forget setup time, and a cabana booked 14:00–16:00 with a 30-minute turnaround is not free at 16:00.
 Includes maintenance windows and blackouts. **A resource under repair is unavailable for a different reason from one that is booked**, and the response says which — an operator looking for something free needs to know whether to wait or to look elsewhere.
+**Per resource.** A guest booking a meeting room never names one, so the start times they choose from come from `listProductStartTimes` (product, length variant, date), not from here (decided 29 September, rev 3 REV3-13).
 
 |  |  |
 |---|---|
@@ -1516,13 +2358,154 @@ Includes maintenance windows and blackouts. **A resource under repair is unavail
 | blockedWindows | array of object |  | With a reason, because they are not the same. |
 | blockedWindows[].from | string (date-time) |  |  |
 | blockedWindows[].to | string (date-time) |  |  |
-| blockedWindows[].reason | enum (booked, setup, teardown, maintenance, blackout, closed) |  |  |
+| blockedWindows[].reason | enum (booked, held, setup, teardown, maintenance, blackout, closed) |  | held is a live ResourceHold (rev 3 REV3-15): taken now, free again if it expires. |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Free windows |
+
+### getResourceHold
+
+**`GET /resource-holds/{holdId}`**: Read a resource hold
+
+The countdown's source of truth, as `seating.getSeatHold`.
+
+|  |  |
+|---|---|
+| Permission | `ORDER_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Guest callable | True |
+| Reads | `resources.resource_hold` |
+| Writes | - |
+| Called by | GST-041, GST-074, WEB-010, WEB-047 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| holdId | path | yes | string |  |
+
+**Response**: `ResourceHold`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| mapId | string (uuid) | yes |  |
+| resourceIds | array of string (uuid) | yes |  |
+| from | string (date-time) | yes |  |
+| to | string (date-time) | yes |  |
+| partySize | integer |  | (nullable) |
+| status | enum (held, converted, released, expired) | yes |  |
+| totalPrice | Money |  | On the wire this is three fields; in the database it is one column. |
+| totalPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| totalPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| totalPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| heldByPrincipalId | string (uuid) |  | (nullable) |
+| subjectId | string (uuid) |  | (nullable) |
+| orderId | string (uuid) |  | Set when the order converts it. (nullable) |
+| extensionCount | integer |  | (default 0) |
+| createdAt | string (date-time) | yes |  |
+| expiresAt | string (date-time) | yes |  |
+| scopePath | string |  | The partition key (ADR-0005), written at venue scope. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Hold |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### listProductStartTimes
+
+**`GET /resource-start-times`**: Start times a space sold by the hour can be booked at, for one length on one day
+
+**The guest's start-time step for a meeting room** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). A guest never names a room, so `getResourceAvailability`, which is per resource, cannot answer them. Given the product (a room type such as *boardroom*, `catalogue.Product.requiresTimeWindow` true), the chosen length variant and a date, this returns every start time at which **at least one resource satisfying the product's resource requirements** (`setExperienceResourceRequirements`, the experience being the product) is free for the variant's `durationMinutes`, setup and teardown included, with live bookings, resource holds and cart windows already counted as taken. `freeCount` says how many.
+Start times fall on `stepMinutes` from the venue's opening on that date, and a window must end by its close. The chosen start becomes the cart line's `bookedWindow`; `allocateResources` picks the room at checkout. **Display only**, like any availability read: the cart line is what holds.
+
+|  |  |
+|---|---|
+| Permission | `RESOURCE_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Guest callable | True |
+| Reads | - |
+| Writes | - |
+| Called by | GST-075, WEB-048 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| productId | query | yes | string (uuid) | A catalogue.Product with requiresTimeWindow true, else 422. |
+| variantId | query | yes | string (uuid) | The length variant; its length value's durationMinutes is the window. |
+| date | query | yes | string (date) | The venue-local date. |
+| stepMinutes | query |  | enum (15, 30, 60) | Spacing of the offered start times. |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of ProductStartTime | yes |  |
+| items[].startsAt | string (date-time) | yes |  |
+| items[].endsAt | string (date-time) | yes | startsAt plus the variant's durationMinutes; the cart line's bookedWindow.endsAt. |
+| items[].freeCount | integer | yes | Resources of the room type free for the whole window. (min 1) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Free start times, earliest first |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | The product is not sold by time window, the variant is not one of its lengths, or it has no resource requirements (product-not-time-windowed, variant-has-no-duration, no-resource-requirements). |
+
+### relinquishResourceHold
+
+**`DELETE /resource-holds/{holdId}`**: Give up a resource hold
+
+The guest picked another cabana or left the map. The resource is free at once.
+
+|  |  |
+|---|---|
+| Permission | `ORDER_CREATE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Guest callable | True |
+| Reads | - |
+| Writes | - |
+| Called by | GST-074, WEB-047 |
+| State model | Resource hold ([states/resource-hold.yaml](../../../states/resource-hold.yaml)): moves `held` -> `released` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| holdId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Released |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### updateResource
 
@@ -1538,7 +2521,7 @@ Includes maintenance windows and blackouts. **A resource under repair is unavail
 | Conflict policy | serverWins |
 | Reads | `resources.resource` |
 | Writes | `resources.resource` |
-| Called by | BO-857 |
+| Called by | BO-857, BO-863 |
 
 **Parameters**
 
@@ -1554,7 +2537,7 @@ Includes maintenance windows and blackouts. **A resource under repair is unavail
 | id | string (uuid) | yes |  |
 | code | string | yes |  |
 | name | string | yes |  |
-| kind | ResourceKind: enum (cabana, locker, wheelchair, stroller, equipment, room, auditorium, vehicle, …) | yes | BL-135. |
+| kind | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | yes | BL-135. |
 | venueId | string (uuid) | yes |  |
 | scopePath | string |  |  |
 | parentResourceId | string (uuid) |  | A pool cabana belongs to the pool area; a seat belongs to an auditorium. (nullable) |
@@ -1577,7 +2560,7 @@ Includes maintenance windows and blackouts. **A resource under repair is unavail
 | id | string (uuid) | yes |  |
 | code | string | yes |  |
 | name | string | yes |  |
-| kind | ResourceKind: enum (cabana, locker, wheelchair, stroller, equipment, room, auditorium, vehicle, …) | yes | BL-135. |
+| kind | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | yes | BL-135. |
 | venueId | string (uuid) | yes |  |
 | scopePath | string |  |  |
 | parentResourceId | string (uuid) |  | A pool cabana belongs to the pool area; a seat belongs to an auditorium. (nullable) |
@@ -1635,6 +2618,420 @@ A stock photograph licensed for one season and still on a website two years late
 | 200 |  | Expiring assets |
 
 
+## Group: route
+
+### createTransportRoute
+
+**`POST /transport/routes`**: Define a route with its ordered stops
+
+Created as `draft`. **Creating a route creates its catalogue side** — a catalogue `Event` its departures become performances of, and one product of kind `timedAdmission` whose variants are the fare table's passenger types — so a one-way ticket is sold through the ordinary cart (decided 29 September, rev 3 REV3-21). The catalogue ids come back on the route and are not written by the caller.
+**Stops are ordered and carry an offset** in minutes from the first stop; the first stop's offset is 0 and offsets strictly increase. Arrival time and duration on a departure card are the difference of two offsets.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `transport.route_stop` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.route`, `transport.route_stop`, `transport.station` |
+| Writes | `transport.route_stop` |
+| Called by | BO-1184 |
+| State model | Transport route ([states/transport-route.yaml](../../../states/transport-route.yaml)): created as `draft` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `CreateTransportRouteRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string | yes | The line and direction, e.g. (max length 32) |
+| lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
+| name | LocalisedText | yes |  |
+| colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
+| pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
+| stops | array of RouteStopInput | yes | (min items 2; max items 100) |
+| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
+| stops[].boardingAllowed | boolean |  | (default True) |
+| stops[].alightingAllowed | boolean |  | (default True) |
+
+**Response**: `TransportRoute`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string | yes | The line and direction, e.g. (max length 32) |
+| lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
+| name | LocalisedText | yes |  |
+| colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
+| pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
+| stops | array of RouteStop | yes |  |
+| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
+| stops[].boardingAllowed | boolean |  | (default True) |
+| stops[].alightingAllowed | boolean |  | (default True) |
+| stops[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].sequence | integer | yes | 1 for the origin. (min 1) |
+| stops[].station | Station |  |  |
+| stops[].station.venueId | string (uuid) | yes |  |
+| stops[].station.code | string | yes | Short operator code, e.g. (max length 32) |
+| stops[].station.name | LocalisedText | yes |  |
+| stops[].station.shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
+| stops[].station.latitude | number |  | (min -90; max 90; nullable) |
+| stops[].station.longitude | number |  | (min -180; max 180; nullable) |
+| stops[].station.id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].station.active | boolean | yes | (default True) |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
+| totalMinutes | integer |  | The last stop's offset. (read-only) |
+| catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
+| catalogueProductId | string (uuid) |  | The one-way trip product (kind timedAdmission); one variant per passenger type. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created as draft |
+| 400 | BadRequest | Validation failed |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 422 |  | Fewer than two stops, a station repeated, a station that is inactive or not in this venue, or offsets that do not start at 0 and strictly increase. |
+
+### getTransportRoute
+
+**`GET /transport/routes/{routeId}`**: A route with its stops
+
+The stop list from origin to end. A guest or public caller gets 404 for a route that is not `active`.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `transport.route`, `transport.route_stop`, `transport.station` |
+| Writes | - |
+| Called by | BO-1184, GST-077, WEB-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| routeId | path | yes | string |  |
+
+**Response**: `TransportRoute`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string | yes | The line and direction, e.g. (max length 32) |
+| lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
+| name | LocalisedText | yes |  |
+| colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
+| pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
+| stops | array of RouteStop | yes |  |
+| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
+| stops[].boardingAllowed | boolean |  | (default True) |
+| stops[].alightingAllowed | boolean |  | (default True) |
+| stops[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].sequence | integer | yes | 1 for the origin. (min 1) |
+| stops[].station | Station |  |  |
+| stops[].station.venueId | string (uuid) | yes |  |
+| stops[].station.code | string | yes | Short operator code, e.g. (max length 32) |
+| stops[].station.name | LocalisedText | yes |  |
+| stops[].station.shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
+| stops[].station.latitude | number |  | (min -90; max 90; nullable) |
+| stops[].station.longitude | number |  | (min -180; max 180; nullable) |
+| stops[].station.id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].station.active | boolean | yes | (default True) |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
+| totalMinutes | integer |  | The last stop's offset. (read-only) |
+| catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
+| catalogueProductId | string (uuid) |  | The one-way trip product (kind timedAdmission); one variant per passenger type. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Route |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### getTransportRouteMap
+
+**`GET /transport/routes/{routeId}/map`**: The route drawn for a map, with the journey highlighted
+
+The stop list from departure to arrival and the street map beside it (decided 29 September, rev 3 REV3-21). Every stop comes back with its coordinates, its order and whether it lies on the journey; the boarding and alighting stops are flagged, so the client draws the departure pin, the arrival pin and the highlighted segment. With no `fromStationId`/`toStationId`, nothing is highlighted.
+**The map tiles are the client's, not this operation's.** The street map needs an internet connection and a third-party tile provider, which is an external dependency needing approval under audit R038; the stop list and the schematic line need neither and are what an offline device shows.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | - |
+| Writes | - |
+| Called by | GST-077, WEB-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| routeId | path | yes | string |  |
+| fromStationId | query |  | string |  |
+| toStationId | query |  | string |  |
+
+**Response**: `RouteMap`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| routeId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lineCode | string |  |  |
+| colour | string |  |  |
+| stops | array of object | yes | Every stop in route order. |
+| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].sequence | integer | yes |  |
+| stops[].name | string | yes | Localised to the caller. |
+| stops[].shortName | string |  |  |
+| stops[].latitude | number |  | (nullable) |
+| stops[].longitude | number |  | (nullable) |
+| stops[].offsetMinutes | integer |  |  |
+| stops[].onJourney | boolean | yes | Between the boarding and alighting stops |
+| stops[].isBoarding | boolean |  |  |
+| stops[].isAlighting | boolean |  |  |
+| intermediateStopCount | integer |  | Stops between boarding and alighting — the number behind "Show full route (n stops)". |
+| bounds | object |  | The box around the stops with coordinates, for the map's initial view. (nullable) |
+| bounds.south | number |  |  |
+| bounds.west | number |  |  |
+| bounds.north | number |  |  |
+| bounds.east | number |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Route map |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | A station is not on this route, or the alighting stop comes before the boarding stop. |
+
+### listTransportRoutes
+
+**`GET /transport/routes`**: Routes, optionally those serving a pair of stations
+
+With `fromStationId` and `toStationId`, returns the active routes on which the first station comes **before** the second — the direction of travel. A line run both ways is two routes (`E101` outbound and inbound) paired by `pairedRouteId`, so the swap button on the search row lands on the paired route (decided 29 September, rev 3 REV3-21).
+A guest or public caller sees `active` routes only; `status` is honoured only for a caller holding `TRANSPORT_VIEW`.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `transport.route`, `transport.route_stop`, `transport.station` |
+| Writes | - |
+| Called by | BO-1184, BO-1185, BO-1186, BO-1187, BO-1188, GST-076, WEB-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | query | yes | string (uuid) |  |
+| fromStationId | query |  | string |  |
+| toStationId | query |  | string |  |
+| status | query |  | TransportRouteStatus: enum (draft, active, suspended, retired) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of TransportRoute | yes |  |
+| items[].venueId | string (uuid) | yes |  |
+| items[].code | string | yes | The line and direction, e.g. (max length 32) |
+| items[].lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
+| items[].name | LocalisedText | yes |  |
+| items[].colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
+| items[].pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
+| items[].stops | array of RouteStop | yes |  |
+| items[].stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
+| items[].stops[].boardingAllowed | boolean |  | (default True) |
+| items[].stops[].alightingAllowed | boolean |  | (default True) |
+| items[].stops[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].stops[].sequence | integer | yes | 1 for the origin. (min 1) |
+| items[].stops[].station | Station |  |  |
+| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
+| items[].totalMinutes | integer |  | The last stop's offset. (read-only) |
+| items[].catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
+| items[].catalogueProductId | string (uuid) |  | The one-way trip product (kind timedAdmission); one variant per passenger type. (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Routes |
+
+### updateTransportRoute
+
+**`PATCH /transport/routes/{routeId}`**: Amend a route
+
+**Stops can change only while no published timetable covers a future date.** Every departure already on sale was generated from the old stop offsets, and a ticket sold to a stop that no longer exists is a refund. Withdraw the timetable first; the refusal is a 409. Name, colour and booking cut-off change at any time.
+
+|  |  |
+|---|---|
+| Permission | `TRANSPORT_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `transport.route_stop` non-empty |
+| Wave | 3 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `transport.route`, `transport.route_stop`, `transport.station` |
+| Writes | `transport.route_stop` |
+| Called by | BO-1184 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| routeId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | LocalisedText |  |  |
+| colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
+| pairedRouteId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| bookingCutoffMinutes | integer |  | (min 0; max 1440) |
+| stops | array of RouteStopInput |  | (min items 2) |
+| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
+| stops[].boardingAllowed | boolean |  | (default True) |
+| stops[].alightingAllowed | boolean |  | (default True) |
+
+**Response**: `TransportRoute`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| code | string | yes | The line and direction, e.g. (max length 32) |
+| lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
+| name | LocalisedText | yes |  |
+| colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
+| pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
+| stops | array of RouteStop | yes |  |
+| stops[].stationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
+| stops[].boardingAllowed | boolean |  | (default True) |
+| stops[].alightingAllowed | boolean |  | (default True) |
+| stops[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].sequence | integer | yes | 1 for the origin. (min 1) |
+| stops[].station | Station |  |  |
+| stops[].station.venueId | string (uuid) | yes |  |
+| stops[].station.code | string | yes | Short operator code, e.g. (max length 32) |
+| stops[].station.name | LocalisedText | yes |  |
+| stops[].station.shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
+| stops[].station.latitude | number |  | (min -90; max 90; nullable) |
+| stops[].station.longitude | number |  | (min -180; max 180; nullable) |
+| stops[].station.id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].station.active | boolean | yes | (default True) |
+| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
+| totalMinutes | integer |  | The last stop's offset. (read-only) |
+| catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
+| catalogueProductId | string (uuid) |  | The one-way trip product (kind timedAdmission); one variant per passenger type. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Stops changed while a published timetable covers a future date. |
+| 422 |  | Invalid stops, as on createTransportRoute. |
+
+
+## Group: station
+
+### listTransportStations
+
+**`GET /transport/stations`**: Stations of a venue's transport network
+
+The From and To station menus (decided 29 September, rev 3 REV3-21). A guest or public caller sees active stations only, ordered by `name`. **`includeInactive` is honoured only for a caller holding `TRANSPORT_VIEW`** — the setup list in Venue Management — and is ignored for anyone else.
+**The station list is the venue's own configuration**, entered here or with `importTransportNetwork` (decided 29 September, rev 3 REV3-21: the network is operator configuration). The nine E101 stations of the prototype (Sharjah Al Jubail to Abu Dhabi Central) are seed data for the demo tenant, not a default.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `transport.station` |
+| Writes | - |
+| Called by | BO-1183, BO-1184, GST-076, GST-078, WEB-049 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | query | yes | string (uuid) |  |
+| includeInactive | query |  | boolean |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of Station | yes |  |
+| items[].venueId | string (uuid) | yes |  |
+| items[].code | string | yes | Short operator code, e.g. (max length 32) |
+| items[].name | LocalisedText | yes |  |
+| items[].shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
+| items[].latitude | number |  | (min -90; max 90; nullable) |
+| items[].longitude | number |  | (min -180; max 180; nullable) |
+| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].active | boolean | yes | (default True) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Stations |
+
+
 ## Group: upload
 
 ### completeUpload
@@ -1655,7 +3052,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `cache:idempotency` |
 | Writes | `assets.media_asset`, `cache:idempotency` |
-| Called by | CMS-002, CMS-010, CMS-063 |
+| Called by | BO-1189, BO-955, CMS-002, CMS-010, CMS-063 |
 | State model | Media asset ([states/media.yaml](../../../states/media.yaml)): created as `processing` |
 
 **Parameters**
@@ -1752,7 +3149,7 @@ Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes. The
 | Conflict policy | serverWins |
 | Reads | `assets.media_upload`, `cache:idempotency` |
 | Writes | `assets.media_upload`, `cache:idempotency` |
-| Called by | CMS-002, CMS-010, CMS-063 |
+| Called by | BO-1189, BO-955, CMS-002, CMS-010, CMS-063 |
 
 **Parameters**
 
@@ -1889,6 +3286,7 @@ A venue may have several — **a park map and a floor plan per building are diff
 
 19.2.55. **The whole map in one call.** A guest app opening the map should not make one request per category — it caches the map and filters locally, which is also what makes it work with no signal in the middle of a park.
 **Three things it can return, and the caller says which.** With no parameters, the published version guests see. With `version`, that published version, read from its `VenueMapVersion` snapshot. With `draft=true`, the working draft the editor changes, which is what BO-094 loads. `VenueMapDetail.version` says which published version came back, and is null for the draft.
+**Placed resources come back with the map** (decided 29 September, rev 3 REV3-15): each cabana, lounger or table with its label, zone, capacity, price band and shape. What is free on a date is not here, because it changes by the minute and the map by the month; that is `resources.getMapResourceAvailability`, one call for the whole map, keyed by `resourceId`.
 
 |  |  |
 |---|---|
@@ -1900,9 +3298,9 @@ A venue may have several — **a park map and a floor plan per building are diff
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `assets.media_asset`, `venuemap.map`, `venuemap.path`, `venuemap.point` |
+| Reads | `assets.media_asset`, `venuemap.map`, `venuemap.path`, `venuemap.placed_resource`, `venuemap.point` |
 | Writes | - |
-| Called by | BO-094, EMP-030, GST-021, WEB-039 |
+| Called by | BO-094, EMP-030, GST-021, GST-074, WEB-039, WEB-047 |
 
 **Parameters**
 
@@ -1965,6 +3363,23 @@ A venue may have several — **a park map and a floor plan per building are diff
 | paths[].isIndoor | boolean |  | (default False) |
 | paths[].restrictedByPointId | string (uuid) |  | Where a path is one-way, it is because of a thing on it — not because of the path. (nullable) |
 | paths[].closedReason | string |  | Set by setPathClosure during works or an incident, never by sending it here. (read-only; nullable) |
+| resources | array of PlacedResource |  | The bookable resources placed on this version of the map (rev 3 REV3-15). |
+| resources[].id | string (uuid) | yes | (read-only) |
+| resources[].mapId | string (uuid) | yes | From the path of the operation that writes it. (read-only) |
+| resources[].resourceId | string (uuid) | yes | The resources.Resource this is. |
+| resources[].label | string | yes | What the guest sees and taps, e.g. (max length 40) |
+| resources[].kind | enum (cabana, lounger, table, pitch, other) | yes | A subset of resources.ResourceKind, the kinds a guest books from a map. |
+| resources[].zone | string | yes | The area the guest reads it by, e.g. (max length 80) |
+| resources[].capacity | integer | yes | Guests it takes, e.g. (min 1; max 500) |
+| resources[].priceBandCode | string | yes | The band it sells in, e.g. (max length 40) |
+| resources[].variantId | string (uuid) |  | Resolved from the price band. (read-only; nullable) |
+| resources[].position | object | yes | Drawing coordinates of its label anchor, as on VenuePoint. |
+| resources[].position.x | number | yes |  |
+| resources[].position.y | number | yes |  |
+| resources[].boundary | array of object |  | The shape drawn, as a polygon in drawing coordinates. (nullable) |
+| resources[].boundary[].x | number |  |  |
+| resources[].boundary[].y | number |  |  |
+| resources[].isBookable | boolean |  | False keeps it on the map and off sale, e.g. (default True) |
 
 **Responses**
 
@@ -2077,6 +3492,7 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 | layerMapping.exitLayer | array of string |  |  |
 | layerMapping.emergencyExitLayer | array of string |  | Separate from exitLayer, and drawings usually blur them. |
 | layerMapping.poiLayers | object |  | Where a drawing already marks toilets, first aid and the rest. |
+| layerMapping.resourceLayer | array of string |  | The bookable resources drawn on the plan — cabanas, loungers, tables (decided 29 September, rev 3 REV3-15). |
 | layerMapping.keepOutLayer | array of string |  | Water, planting, back-of-house, plant rooms. |
 | digitNormalisation | boolean |  | A١ and A1 are one section to a person and two to a computer, and the failure is silent — the seats simply do not join, and you get geometry with no seats or seats with no geometry. (default True) |
 | georeference | object |  | 19.2.56. (nullable) |
@@ -2091,6 +3507,12 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 | georeference.anchors[].lat | number |  |  |
 | georeference.anchors[].lng | number |  |  |
 | manifestRef | string (uuid) |  | The seating manifest, where this map has seats, as the MediaAsset.id from assets.completeUpload, uploaded the same way as sourceRef. (nullable) |
+| resourceManifestRef | string (uuid) |  | The resource manifest, where this map carries bookable resources (decided 29 September, rev 3 REV3-15), uploaded like manifestRef. (nullable) |
+| priceBands | array of object |  | What each price band sells as, so a placed resource can be bought: the band code the manifest uses and the catalogue.ProductVariant that prices it (Family 6, Medium 10, Large 15, XL 20 on the Coastal… (nullable) |
+| priceBands[].code | string | yes | (max length 40) |
+| priceBands[].name | string |  | (nullable) |
+| priceBands[].variantId | string (uuid) | yes |  |
+| createMissingResources | boolean |  | Where a manifest label has no resources.Resource with that code at this venue, create one through resources.createResource (kind, capacity and zone as attributes) instead of reporting resourceCodeUnm… (default False) |
 
 **Response**: `VenueMapImportJob`
 
@@ -2104,6 +3526,8 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 | layersFound | array of string |  | Every layer name in the source, decoded. |
 | unmappedLayers | array of string |  |  |
 | manifestRowsRead | integer |  | (nullable) |
+| resourcesFound | integer |  | Bookable resource shapes found on the resource layer (rev 3 REV3-15). (nullable) |
+| resourceRowsJoined | integer |  | Resource manifest rows that joined a shape and a resources.Resource. (nullable) |
 | manifestRowsJoined | integer |  | The number to check against your own count. (nullable) |
 | findings | array of object |  | Named against the spec, so a finding maps to a section of handoff/venue-map-input-spec.md rather than to a stack trace. |
 | findings[].code | enum (duplicateLayerName, geometryOnLayerZero, unmappedLayer, mixedLayerContent, sectionCodeMismatch, digitScriptMismatch, mergedCells, totalRowDetected, …) | yes | A closed set, and each one names a rule in the spec. |
@@ -2118,6 +3542,57 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 |---|---|---|
 | 202 |  | Accepted and parsing. |
 
+### listBookableVenueMaps
+
+**`GET /bookable-venue-maps`**: The published maps of a venue that carry bookable spots
+
+**How a guest finds the map to pick a cabana on** (decided 29 September, readiness close-out, S1 guest screens). `getVenueMap` needs a `mapId` and `listVenueMaps` is staff only, so WEB-047 / GST-074 had nothing to start from unless the screen that opened them handed a map over. This answers it for any venue: the **published** maps of `venueId` whose published version carries at least one placed resource, with how many of each kind.
+**Published only, always.** A draft or archived map never appears here, whoever calls, so unfinished work cannot reach a guest; staff read drafts through `listVenueMaps`.
+**No date filter, by design.** A map changes when it is republished, not by day; what is free on a date is `resources.getMapResourceAvailability` for the chosen `mapId`. With `productId`, only maps carrying a spot sold by one of that product's price-band variants are returned, which is how the product page (WEB-004) opens straight onto the right map. A venue with one bookable map returns one entry and the screen skips the choice.
+A venue with no published bookable map is an empty `maps` list, not a 404.
+
+|  |  |
+|---|---|
+| Permission | `VENUE_MAP_VIEW` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 3 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Guest callable | True |
+| Reads | - |
+| Writes | - |
+| Called by | GST-074, WEB-047 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | query | yes | string (uuid) | The venue whose bookable maps are wanted. |
+| productId | query |  | string (uuid) | Only maps with a placed resource sold by this product's price-band variants. |
+| kind | query |  | enum (cabana, lounger, table, pitch, other) | Only maps carrying at least one placed resource of this kind (PlacedResource.kind). |
+
+**Response**: `BookableVenueMaps`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| venueId | string (uuid) | yes |  |
+| maps | array of BookableVenueMapRef | yes | (max items 50) |
+| maps[].mapId | string (uuid) | yes |  |
+| maps[].name | string | yes |  |
+| maps[].kind | enum (park, floor, zone, parking) | yes |  |
+| maps[].floorLevel | integer |  | (nullable) |
+| maps[].publishedVersion | integer | yes | The VenueMap.publishedVersion a guest is served; send it to getVenueMap as version. |
+| maps[].placedResourceCount | integer | yes | Placed resources on the published version. (min 1) |
+| maps[].kinds | array of enum (cabana, lounger, table, pitch, other) |  | The kinds of spot on this map, e.g. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The venue's published bookable maps, park maps first, then by name. |
+
 ### publishVenueMap
 
 **`POST /venue-maps/{mapId}/publish`**: Make the draft the one guests see
@@ -2127,6 +3602,7 @@ Publishing creates a version. **The previous version stays readable** so a guest
 **What publishing stores.** The working draft's points and paths are copied into a new `VenueMapVersion` snapshot, `publishedVersion` moves to it and `graphVersion` is bumped. The draft stays as the working copy for the next round of edits. Earlier snapshots are kept, which is what `getVenueMap?version=` reads.
 Refuses a draft with unresolved proposals or a point linked to something that no longer exists — **a restaurant point pointing at a closed outlet is worse than no point**, because a guest walks there.
 **Refuses a draft whose graph is disconnected** (decided 28 September, audit R106 (8)). Where `validateVenueMapGraph` finds more than one component, or a public point with no path to it, the publish is refused with a `disconnectedArea` blocker per unreachable point. A venue made of two sites is two maps.
+**Refuses a draft with a placed resource a guest could not buy** (decided 29 September, rev 3 REV3-15): no linked resource (`resourceUnlinked`), no price band or a band with no variant (`resourcePriceBandMissing`), or a label used twice (`duplicateResourceLabel`). Publishing copies placed resources into the snapshot with the points and paths; from then on a guest can pick them. Holds and bookings on a resource survive a republish because they are keyed by `resourceId`, not by the placement.
 
 |  |  |
 |---|---|
@@ -2187,6 +3663,84 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 |---|---|---|
 | 200 |  | Published |
 | 409 |  | Unresolved proposals, a broken link, or a disconnected area (audit R106 (8)). |
+
+### setPlacedResource
+
+**`POST /venue-maps/{mapId}/resources`**: Place or amend a bookable resource on the map
+
+**The hand correction after an import** (decided 29 September, rev 3 REV3-15 and GAP-C2): place a cabana, lounger or table the drawing missed, move one, or change its label, zone, capacity or price band. Mirrors `setVenuePoint`: writes the working draft only, reaches guests at the next `publishVenueMap`, and `placedResourceId` decides place or amend.
+**The resource must exist in `resources`** at this venue; a `resourceId` that does not returns 404. A label already used on this map returns `409` `duplicate-code`. A price band the map does not know returns 400.
+
+|  |  |
+|---|---|
+| Permission | `VENUE_MAP_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `venuemap.placed_resource` non-empty |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `venuemap.placed_resource` |
+| Writes | `venuemap.placed_resource` |
+| Called by | BO-094 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| mapId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `SetPlacedResourceRequest`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| mapId | string (uuid) | yes | From the path of the operation that writes it. (read-only) |
+| resourceId | string (uuid) | yes | The resources.Resource this is. |
+| label | string | yes | What the guest sees and taps, e.g. (max length 40) |
+| kind | enum (cabana, lounger, table, pitch, other) | yes | A subset of resources.ResourceKind, the kinds a guest books from a map. |
+| zone | string | yes | The area the guest reads it by, e.g. (max length 80) |
+| capacity | integer | yes | Guests it takes, e.g. (min 1; max 500) |
+| priceBandCode | string | yes | The band it sells in, e.g. (max length 40) |
+| variantId | string (uuid) |  | Resolved from the price band. (read-only; nullable) |
+| position | object | yes | Drawing coordinates of its label anchor, as on VenuePoint. |
+| position.x | number | yes |  |
+| position.y | number | yes |  |
+| boundary | array of object |  | The shape drawn, as a polygon in drawing coordinates. (nullable) |
+| boundary[].x | number |  |  |
+| boundary[].y | number |  |  |
+| isBookable | boolean |  | False keeps it on the map and off sale, e.g. (default True) |
+| placedResourceId | string (uuid) |  | The placed resource to amend. (nullable) |
+
+**Response**: `PlacedResource`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| mapId | string (uuid) | yes | From the path of the operation that writes it. (read-only) |
+| resourceId | string (uuid) | yes | The resources.Resource this is. |
+| label | string | yes | What the guest sees and taps, e.g. (max length 40) |
+| kind | enum (cabana, lounger, table, pitch, other) | yes | A subset of resources.ResourceKind, the kinds a guest books from a map. |
+| zone | string | yes | The area the guest reads it by, e.g. (max length 80) |
+| capacity | integer | yes | Guests it takes, e.g. (min 1; max 500) |
+| priceBandCode | string | yes | The band it sells in, e.g. (max length 40) |
+| variantId | string (uuid) |  | Resolved from the price band. (read-only; nullable) |
+| position | object | yes | Drawing coordinates of its label anchor, as on VenuePoint. |
+| position.x | number | yes |  |
+| position.y | number | yes |  |
+| boundary | array of object |  | The shape drawn, as a polygon in drawing coordinates. (nullable) |
+| boundary[].x | number |  |  |
+| boundary[].y | number |  |  |
+| isBookable | boolean |  | False keeps it on the map and off sale, e.g. (default True) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Placed |
+| 400 | BadRequest | Validation failed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 
 ### setVenuePoint
 
@@ -2514,10 +4068,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | capacity_per_cycle | integer | yes |  |
 | cycle_minutes | numeric | yes |  |
 | max_party_size | integer | no |  |
-| return_window_minutes | integer | no | How long a called party has to arrive before the entry expires. |
 | height_requirement_cm | integer | no |  |
 | fast_pass_allocation_percent | numeric | no | Share of each cycle reserved for Fast Pass holders. |
 | zone | text | no |  |
+| fast_pass_id | uuid | no | The lane's Fast Pass block (decided 29 September, VM close-out). |
 | id | uuid | yes |  |
 | status | text | yes |  |
 | status_reason | text | no |  |
@@ -2533,6 +4087,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | last_called_at | timestamptz | no |  |
 | throughput_last_hour | integer | no |  |
 | no_show_rate_percent | numeric | no |  |
+| entitlement_product_ids | text[] | yes | Catalogue products whose entitlement admits to this lane. |
+| return_window_minutes | integer | no | How long after the booked return time a Fast Pass holder may still enter. |
+| max_per_guest_per_day | integer | no | Fast Pass redemptions one guest may make on this lane per day; null is no cap. |
+| allowed_access_point_ids | text[] | no | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
 
 ### `queue.queue_operating_window`
 
@@ -2569,6 +4127,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | valid_from | timestamptz | yes |  |
 | valid_to | timestamptz | yes |  |
 | status | text | yes |  |
+| hold_id | text | no | The ResourceHold this booking was converted from, where a guest picked the resource on a venue map (rev 3 REV3-15). |
 | recurrence_group_id | uuid | no | Ties the occurrences of a recurring booking. |
 | deposit_authorisation_id | uuid | no | The hold, through orders.authoriseStoredValue (CF-126). |
 | checked_out_at | timestamptz | no |  |
@@ -2598,6 +4157,118 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | no |  |
 | is_active | boolean | no |  |
 
+### `resources.resource_hold`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | text | yes |  |
+| map_id | uuid | yes |  |
+| resource_ids | text[] | yes |  |
+| valid_from | timestamptz | yes |  |
+| valid_to | timestamptz | yes |  |
+| party_size | integer | no |  |
+| status | text | yes |  |
+| gross_amount | numeric(18,4) | no |  |
+| held_by_principal_id | uuid | no |  |
+| subject_id | uuid | no |  |
+| order_id | uuid | no | Set when the order converts it. |
+| extension_count | integer | no |  |
+| created_at | timestamptz | yes |  |
+| expires_at | timestamptz | yes |  |
+| scope_path | text | no | The partition key (ADR-0005), written at venue scope. |
+
+### `transport.fare_matrix_cell`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| fare_table_id | jsonb | yes | The parent row. |
+| from_station_id | jsonb | yes |  |
+| to_station_id | jsonb | yes |  |
+| fare | numeric(18,4) | yes |  |
+| id | uuid | yes | Synthesised key. |
+
+### `transport.fare_passenger_type`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| fare_table_id | jsonb | yes | The parent row. |
+| code | text | yes | adult, child, student, determination. |
+| name | jsonb | yes |  |
+| description | jsonb | no | What the picker shows under the name ("Age 5–11 · half fare"). |
+| fare_multiplier | numeric | yes | Share of the adult fare, set by the venue. |
+| min_age | integer | no |  |
+| max_age | integer | no |  |
+| proof_required | jsonb | no | Checked by the driver at boarding ("Valid student card", "Sanad card"). |
+| is_default | boolean | no | The type a new search starts with, one of it. |
+| catalogue_variant_id | uuid | no | The variant of the route's trip product this type is sold as. |
+| id | uuid | yes | Synthesised key. |
+
+### `transport.fare_table`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| model | text | yes |  |
+| base_fare | numeric(18,4) | no | stopCount only. |
+| per_stop_fare | numeric(18,4) | no | stopCount only. |
+| effective_from | timestamptz | yes |  |
+| id | jsonb | yes |  |
+| route_id | jsonb | yes |  |
+
+### `transport.favourite_route`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | jsonb | yes |  |
+| venue_id | uuid | yes |  |
+| from_station_id | jsonb | yes |  |
+| to_station_id | jsonb | yes |  |
+| from_station_name | text | no |  |
+| to_station_name | text | no |  |
+| label | text | no |  |
+| created_at | timestamptz | yes |  |
+
+### `transport.route`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| venue_id | uuid | yes |  |
+| code | text | yes | The line and direction, e.g. |
+| line_code | text | no | The public line number shared by both directions, e.g. |
+| name | jsonb | yes |  |
+| colour | text | no |  |
+| paired_route_id | text | no | The same line run the other way. |
+| booking_cutoff_minutes | integer | no | How long before a departure leaves the boarding stop that online sale stops. |
+| id | jsonb | yes |  |
+| status | text | yes |  |
+| total_minutes | integer | no | The last stop's offset. |
+| catalogue_event_id | uuid | no | The catalogue event its departures are performances of. |
+| catalogue_product_id | uuid | no | The one-way trip product (kind timedAdmission); one variant per passenger type. |
+
+### `transport.route_stop`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| route_id | jsonb | yes | The parent row. |
+| station_id | jsonb | yes |  |
+| offset_minutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. |
+| is_boarding_allowed | boolean | no |  |
+| is_alighting_allowed | boolean | no |  |
+| id | jsonb | yes |  |
+| sequence | integer | yes | 1 for the origin. |
+
+### `transport.station`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| venue_id | uuid | yes |  |
+| code | text | yes | Short operator code, e.g. |
+| name | jsonb | yes |  |
+| short_name | jsonb | no | The label on the route diagram and the map pin (Union Sq, MoE). |
+| latitude | numeric | no |  |
+| longitude | numeric | no |  |
+| id | jsonb | yes |  |
+| is_active | boolean | yes |  |
+
 ### `venuemap.import_job`
 
 | Column | Type | Required | Notes |
@@ -2610,6 +4281,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | layers_found | text[] | no | Every layer name in the source, decoded. |
 | unmapped_layers | text[] | no |  |
 | manifest_rows_read | integer | no |  |
+| resources_found | integer | no | Bookable resource shapes found on the resource layer (rev 3 REV3-15). |
+| resource_rows_joined | integer | no | Resource manifest rows that joined a shape and a resources.Resource. |
 | manifest_rows_joined | integer | no | The number to check against your own count. |
 
 ### `venuemap.map`
@@ -2647,6 +4320,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | restricted_by_point_id | uuid | no | Where a path is one-way, it is because of a thing on it — not because of the path. |
 | closed_reason | text | no | Set by setPathClosure during works or an incident, never by sending it here. |
 
+### `venuemap.placed_resource`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| map_id | uuid | yes | From the path of the operation that writes it. |
+| resource_id | uuid | yes | The resources.Resource this is. |
+| label | text | yes | What the guest sees and taps, e.g. |
+| kind | text | yes | A subset of resources.ResourceKind, the kinds a guest books from a map. |
+| zone | text | yes | The area the guest reads it by, e.g. |
+| capacity | integer | yes | Guests it takes, e.g. |
+| price_band_code | text | yes | The band it sells in, e.g. |
+| variant_id | uuid | no | Resolved from the price band. |
+| position | jsonb | yes | Drawing coordinates of its label anchor, as on VenuePoint. |
+| is_bookable | boolean | no | False keeps it on the map and off sale, e.g. |
+
 ### `venuemap.point`
 
 | Column | Type | Required | Notes |
@@ -2669,26 +4358,32 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-191 operations, added to this service in later releases without changing any of the above.
+214 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | asset | `createAsset`, `getAsset`, `getAssetHistory`, `listAssets`, `lookupAsset`, `setAssetStatus`, `updateAsset` |
 | assets | `analyseMediaAsset`, `bulkUpdateMediaAssets`, `createMediaShare`, `findSimilarMediaAssets`, `getMediaDistribution`, `getMediaTaxonomy`, `getMediaUsageAnalytics`, `listMediaAssetAudit`, `listMediaAssetVersions`, `listMediaRenditions`, `requestMediaRendition`, `setMediaAssetApproval`, `setMediaAssetRights`, `setMediaAssetTags`, `setMediaDistributionChannels`, `setMediaTaxonomy` |
+| departure | `listTransportRouteDepartures`, `updateTransportDeparture` |
 | entry | `callNextParties`, `listMyWaitingGuests`, `overrideWaitingGuest`, `redeemWaitingGuest` |
 | feed | `listQueueFeeds`, `submitQueueReading`, `testQueueFeed` |
-| game | `createGame`, `listGames`, `updateGame` |
-| games | `authoriseGameplay`, `createGameEntitlement`, `deployReaderConfiguration`, `getGameEligibility`, `getGamePricing`, `getGameplaySyncStatus`, `getGameplayValidationRules`, `listAttractionTypes`, `listGameEntitlements`, `listGameplayTransactions`, `listReaders`, `setAttractionType`, `setGameCardExpiryRules`, `setGameCardLifecycle`, `setGameKioskConfiguration`, `setGameOperationalConfiguration`, `setGamePricing`, `setGameplayValidationRules`, `setPrizeCost`, `setReaderConfiguration`, `setReaderProfile`, `setRedemptionRules`, `simulateGameplayAuthorisation`, `testReader` |
+| game | `cloneGame`, `createGame`, `listGames`, `updateGame` |
+| games | `authoriseGameplay`, `cloneReaderConfiguration`, `createGameEntitlement`, `deployReaderConfiguration`, `getGameEligibility`, `getGamePricing`, `getGameplaySyncStatus`, `getGameplayValidationRules`, `listAttractionTypes`, `listGameEntitlements`, `listGameplayTransactions`, `listReaders`, `setAttractionType`, `setGameCardExpiryRules`, `setGameCardLifecycle`, `setGameKioskConfiguration`, `setGameOperationalConfiguration`, `setGamePricing`, `setGameplayValidationRules`, `setPrizeCost`, `setReaderConfiguration`, `setReaderProfile`, `setRedemptionRules`, `simulateGameplayAuthorisation`, `testReader`, `validateGameConfiguration` |
 | incident | `getIncident`, `listIncidents`, `recordAuthorityNotification`, `reportIncident`, `updateIncident` |
 | inspection | `createInspectionTemplate`, `listInspectionTemplates`, `listInspections`, `submitInspection` |
 | maintenance | `acceptWorkOrder`, `attachWorkOrderEvidence`, `closeWorkOrder`, `pauseWorkOrder`, `rejectWorkOrder`, `resumeWorkOrder`, `startWorkOrder` |
+| networkImport | `applyTransportNetworkImport`, `getTransportNetworkImport`, `importTransportNetwork` |
+| pass | `createTransportPassType`, `listTransportPassTypes`, `updateTransportPassType` |
 | planned | `createMaintenancePlan`, `getDueMaintenance`, `listMaintenancePlans`, `updateMaintenancePlan` |
 | play | `recordGamePlay`, `syncGamePlays` |
-| prize | `createPrize`, `listPrizes`, `redeemPrize` |
+| prize | `createPrize`, `listPrizes`, `lookupPrize`, `redeemPrize` |
 | queue | `setQueueStatus` |
 | rental | `assessRentalDamage`, `assignRentalEquipment`, `checkOutRental`, `createRentalAgreement`, `createRentalBlackout`, `createRentalBooking`, `createRentalCategory`, `createRentalPricingProfile`, `createRentalProduct`, `explainRentalPrice`, `extendRental`, `getRentalAgreement`, `getRentalAvailability`, `getRentalBooking`, `getRentalProduct`, `importRentalCatalogue`, `listOverdueRentals`, `listRentalAgreements`, `listRentalBookings`, `listRentalCategories`, `listRentalPricingProfiles`, `listRentalProducts`, `publishRentalProduct`, `quoteRentalPrice`, `recordRentalInspection`, `reportRentalIncident`, `requestRentalCommercialOverride`, `returnRental`, `setRentalAgreementRequirements`, `setRentalAvailabilityRules`, `setRentalDepositPolicy`, `setRentalDurationRules`, `setRentalFeePolicy`, `setRentalInventoryModel`, `setRentalOperationalRules`, `setRentalProductLocations`, `signRentalAgreement`, `simulateRentalPricing`, `swapRentalEquipment`, `updateRentalBooking`, `updateRentalPricingProfile`, `updateRentalProduct`, `validateRentalProduct` |
-| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `cloneResource`, `createResourceAttribute`, `createResourceBlock`, `createResourceCategory`, `createResourcePackage`, `createResourceType`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceCalendar`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourcePackages`, `listResourceTypes`, `listResources`, `releaseResourceBlock`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setExperienceResourceRequirements`, `setResourceAllocationPolicy`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceLifecycleState`, `setResourceQualifications`, `setResourceSchedule`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourcePackage`, `updateResourceType` |
+| resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `cloneResource`, `createResourceAttribute`, `createResourceBlock`, `createResourceCategory`, `createResourcePackage`, `createResourceType`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `releaseResourceBlock`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setExperienceResourceRequirements`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceLifecycleState`, `setResourceQualifications`, `setResourceSchedule`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourcePackage`, `updateResourceType` |
+| route | `setTransportRouteStatus` |
 | signage | `getSignageQueueBoard`, `getSignageQueueCalls` |
+| station | `createTransportStation`, `updateTransportStation` |
+| timetable | `createTransportTimetable`, `listTransportTimetables`, `publishTransportTimetable`, `updateTransportTimetable`, `withdrawTransportTimetable` |
 | venueMap | `acceptVenueLabelProposals`, `acceptWalkwayProposals`, `getVenueMapImportJob`, `getVenueMapLive`, `listVenueMaps`, `setPathClosure`, `validateVenueMapGraph` |
 | waitTime | `setWaitTime` |
 | work | `cancelWorkOrder` |

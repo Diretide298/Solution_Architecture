@@ -15,7 +15,7 @@
   "contracts": 5,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 56
+  "operationsWithNoScreen": 45
  },
  "waves": {
   "wave1": 11
@@ -155,10 +155,10 @@
  "gaps": {
   "operationsWithNoScreen": [
    {
-    "operation": "enrolFaceTag",
+    "operation": "approveManualOverrideSupervisor",
     "contract": "access",
-    "verb": "POST",
-    "summary": "Capture a same-visit facial model that dies at close of day"
+    "verb": "PUT",
+    "summary": "Manual Override & Supervisor Approval"
    },
    {
     "operation": "listAccessChanges",
@@ -171,12 +171,6 @@
     "contract": "access",
     "verb": "GET",
     "summary": "Which access points an admission rule covers"
-   },
-   {
-    "operation": "setEntryRulePoints",
-    "contract": "access",
-    "verb": "PUT",
-    "summary": "Set the access points an admission rule covers"
    },
    {
     "operation": "verifyIdentity",
@@ -197,12 +191,6 @@
     "summary": "Capture a held amount"
    },
    {
-    "operation": "getWalletAllocation",
-    "contract": "cross-region",
-    "verb": "GET",
-    "summary": "The consuming cell's bounded offline allocation"
-   },
-   {
     "operation": "listCellConnections",
     "contract": "cross-region",
     "verb": "GET",
@@ -219,18 +207,6 @@
     "contract": "cross-region",
     "verb": "POST",
     "summary": "Release a hold without capturing"
-   },
-   {
-    "operation": "setWalletAllocationPolicy",
-    "contract": "cross-region",
-    "verb": "PUT",
-    "summary": "Set the allocation cap policy"
-   },
-   {
-    "operation": "createEmergencyAccessOverride",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Bypass the policy, loudly"
    },
    {
     "operation": "evaluateAccess",
@@ -329,34 +305,10 @@
     "summary": "Who already holds a conflicting pair"
    },
    {
-    "operation": "recordBenefitUsage",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Consume a benefit"
-   },
-   {
-    "operation": "setAccessPolicyState",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Submit, approve, activate or retire a policy"
-   },
-   {
-    "operation": "setCapabilityTemplate",
-    "contract": "identity",
-    "verb": "PUT",
-    "summary": "Save a tick-set under a name"
-   },
-   {
     "operation": "setPrincipalModuleAccess",
     "contract": "identity",
     "verb": "PUT",
     "summary": "Tick what they may do"
-   },
-   {
-    "operation": "updateAccessPolicy",
-    "contract": "identity",
-    "verb": "PUT",
-    "summary": "Change a policy, as a new version"
    },
    {
     "operation": "convertReservation",
@@ -381,12 +333,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Extend a reservation"
-   },
-   {
-    "operation": "getResaleFeePolicy",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "The commission and price cap a resale listing is created under"
    },
    {
     "operation": "issueInvitation",
@@ -455,12 +401,6 @@
     "summary": "Push a change to every device holding it"
    },
    {
-    "operation": "renewMembership",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Renew a membership"
-   },
-   {
     "operation": "resolveSyncRejection",
     "contract": "orders",
     "verb": "POST",
@@ -477,12 +417,6 @@
     "contract": "orders",
     "verb": "PUT",
     "summary": ""
-   },
-   {
-    "operation": "setResaleFeePolicy",
-    "contract": "orders",
-    "verb": "PUT",
-    "summary": "Set resale commission and the price ceiling"
    },
    {
     "operation": "approveShiftClose",

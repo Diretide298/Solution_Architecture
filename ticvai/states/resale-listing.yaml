@@ -24,8 +24,9 @@ transitions:
   to: sold
   operation: createResaleListing
   trigger: operation
-  guard: '**The seller entitlement is voided and a new one issued to the buyer** — the ticket that admits
-    is always one the venue issued'
+  guard: '**The buyer becomes the owner of the same entitlement; its media is re-issued and the transfer
+    is logged** (MoM 1 Sep 4.14: the virtual ticket ID is preserved) — the media that admits is always
+    one the venue issued'
 - from: reserved
   to: listed
   operation: createResaleListing
@@ -42,7 +43,7 @@ transitions:
   trigger: timer
   guard: The performance started. **A listing outliving its event is a listing that sells nothing**
 notes: '**The seller is paid after the buyer is admitted, not after they pay** — a resale refunded at
-  the gate for a void ticket cannot be clawed back from a seller who already has the money.
+  the gate for superseded media cannot be clawed back from a seller who already has the money.
 
 
   **`reserved` is what stops two buyers on one seat**, and it is the only reason this is a state machine

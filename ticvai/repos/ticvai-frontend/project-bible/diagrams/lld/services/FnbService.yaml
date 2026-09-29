@@ -1,28 +1,28 @@
 id: LLD-FnbService
-title: FnbService — 115 operations, 48 tables
+title: FnbService — 117 operations, 50 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
-why: '**115 operations and 48 tables — the largest single domain after marketing.** Its own service
+why: '**117 operations and 50 tables — the largest single domain after marketing.** Its own service
   because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second
   on a display that may be offline.'
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
-  operations: 115
+  operations: 117
   inAFlow: 70
-  percent: 61%
+  percent: 60%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: fnb
-  tables: 48
+  tables: 50
   stores:
   - postgres
-  largestTable: fnb.product_recommendation
+  largestTable: fnb.table_reservation
 operationsByContract:
 - contract: fnb
-  count: 115
+  count: 117
   operations:
   - operation: acceptFnbOrder
     verb: POST
@@ -190,8 +190,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 4
-    writes: 3
+    reads: 5
+    writes: 4
   - operation: enterCountLine
     verb: POST
     path: /stock-counts/{countId}/lines
@@ -456,6 +456,14 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 0
+  - operation: listOutletTemplates
+    verb: GET
+    path: /outlet-templates
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listProductionRuns
     verb: GET
     path: /production-runs
@@ -478,7 +486,7 @@ operationsByContract:
     scope: venue
     permission: FNB_OPERATE
     offline: true
-    reads: 3
+    reads: 4
     writes: 0
   - operation: listTemperatureCheckpoints
     verb: GET
@@ -710,7 +718,7 @@ operationsByContract:
     scope: venue
     permission: FNB_OPERATE
     offline: true
-    reads: 4
+    reads: 5
     writes: 4
   - operation: sendBookingConfirmation
     verb: POST
@@ -816,6 +824,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 4
+  - operation: setOutletTemplate
+    verb: PUT
+    path: /outlet-templates
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: setRecipe
     verb: PUT
     path: /recipes
@@ -926,8 +942,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 3
-    writes: 3
+    reads: 4
+    writes: 4
   - operation: updateTableVisit
     verb: PATCH
     path: /table-visits/{visitId}
@@ -1319,6 +1335,12 @@ tables:
   writtenBy:
   - fnb
   foreignWriters: null
+- table: fnb.outlet_template
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: fnb.product_recommendation
   columns: 17
   store: postgres
@@ -1422,7 +1444,14 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.table_reservation
-  columns: 14
+  columns: 21
+  store: postgres
+  parent: null
+  writtenBy:
+  - fnb
+  foreignWriters: null
+- table: fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -1590,6 +1619,7 @@ screens:
 - P06:EMP-066 Stock Count & Cycle Count Management
 - P06:EMP-067 Damage, Loss, Shrinkage & Stock Adjustment
 - P08:BO-007 Product Directory
+- P08:BO-011 Packages & Bundles
 - P08:BO-014 Catalogue Publishing
 - P08:BO-020 F&B Order Management
 - P08:BO-021 Order Search
@@ -1616,6 +1646,7 @@ screens:
 - P08:BO-729 Create / Edit Outlet
 - P08:BO-730 Outlet Types & Templates
 - P08:BO-731 Operating Hours & Service Periods
+- P08:BO-733 Service Channel Configuration
 - P13:CMS-009 Navigation & Menus
 - P15:KIT-001 Kitchen Operations Command Center
 - P15:KIT-002 Kitchen Display System (KDS)

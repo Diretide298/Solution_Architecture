@@ -1,4 +1,4 @@
--- access — 9 tables
+-- access — 11 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -49,6 +49,14 @@ CREATE TABLE IF NOT EXISTS access.admission_rules (
     max_duration_minutes              integer,
     requires_exit_before_reentry      boolean DEFAULT false,
     max_reentries                     integer,
+    entry_limit                       jsonb,
+    exit_scan                         text DEFAULT 'optional' CONSTRAINT admission_rules_exit_scan_chk CHECK (exit_scan IN ('required', 'optional', 'none')),
+    max_exits                         integer,
+    re_entry_window_minutes           integer,
+    same_day_only                     boolean DEFAULT true,
+    designated_access_point_ids       text[],
+    validity                          jsonb,
+    crossover                         jsonb,
     allowed_access_point_ids          text[],
     scope_path                        ltree NOT NULL
 );
@@ -60,6 +68,19 @@ CREATE TABLE IF NOT EXISTS access.blacklist (
     added_at                          timestamptz NOT NULL,
     added_by_principal_id             uuid NOT NULL,
     expires_at                        timestamptz,
+    scope_path                        ltree NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS access.credential_issuance_retry_policy (
+    venue_id                          text NOT NULL,
+    automatic_retry                   boolean NOT NULL DEFAULT true,
+    max_attempts                      integer NOT NULL DEFAULT 3,
+    backoff_minutes                   integer NOT NULL DEFAULT 5,
+    escalate_after_attempts           integer NOT NULL DEFAULT 3,
+    updated_at                        timestamptz,
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
@@ -106,6 +127,25 @@ CREATE TABLE IF NOT EXISTS access.entry_rule_point (
     is_active                         boolean NOT NULL,
     created_at                        timestamptz NOT NULL,
     id                                uuid PRIMARY KEY
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS access.hardware_deployment (
+    id                                text PRIMARY KEY NOT NULL,
+    configuration_version             text NOT NULL,
+    target_scope                      text NOT NULL CONSTRAINT hardware_deployment_target_scope_chk CHECK (target_scope IN ('pilot', 'selectedGates', 'deviceGroup', 'venue')),
+    venue_id                          text,
+    gate_ids                          text[],
+    device_group_id                   text,
+    status                            text NOT NULL CONSTRAINT hardware_deployment_status_chk CHECK (status IN ('queued', 'inProgress', 'completed', 'partiallyFailed', 'rolledBack')),
+    devices_targeted                  integer,
+    devices_acknowledged              integer,
+    failed_device_ids                 text[],
+    requested_by_principal_id         text,
+    requested_at                      timestamptz,
+    scheduled_at                      timestamptz,
+    scope_path                        ltree NOT NULL
 );
 
 -- A guest bought parking. Carries the plate where the mode is plateWhitelist — personal data,
@@ -155,7 +195,7 @@ CREATE TABLE IF NOT EXISTS access.scan_event (
     ticket_id                         text,
     media_code                        text,
     outcome                           text NOT NULL CONSTRAINT scan_event_outcome_chk CHECK (outcome IN ('admitted', 'denied', 'overridden')),
-    deny_reason                       text CONSTRAINT scan_event_deny_reason_chk CHECK (deny_reason IN ('notFound', 'notYetValid', 'expired', 'alreadyUsed', 'reentryLimitReached', 'exitRequiredBeforeReentry', 'wrongAccessPoint', 'wrongPerformance', 'outsideAdmissionWindow', 'entitlementSuspended', 'blacklisted', 'capacityReached', 'waiverRequired', 'accompanimentRequired', 'mediaDeactivated', 'unpaid', 'delegatedRightExhausted', 'delegatedRightRevoked')),
+    deny_reason                       text CONSTRAINT scan_event_deny_reason_chk CHECK (deny_reason IN ('notFound', 'notYetValid', 'expired', 'alreadyUsed', 'reentryLimitReached', 'exitRequiredBeforeReentry', 'wrongAccessPoint', 'wrongPerformance', 'outsideAdmissionWindow', 'entitlementSuspended', 'blacklisted', 'capacityReached', 'waiverRequired', 'accompanimentRequired', 'mediaDeactivated', 'unpaid', 'delegatedRightExhausted', 'delegatedRightRevoked', 'journeyNotCovered')),
     direction                         text NOT NULL CONSTRAINT scan_event_direction_chk CHECK (direction IN ('entry', 'exit', 'reentry', 'crossover')),
     operator_principal_id             uuid,
     device_id                         uuid,

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Seating & Venue Mapping
   version: 0.1.0
-  x-ticvai-screen-count: 54
+  x-ticvai-screen-count: 55
   x-ticvai-tier: satellite
   x-ticvai-module: 21 — Seat Management & Venue Mapping
   x-ticvai-requirements: 112
@@ -364,6 +364,7 @@ paths:
       operationId: updateSeatMap
       x-ticvai-consumed-by:
         - "P08 BO-954 Venue Canvas"
+        - "P08 BO-955 Sections & Zones"
       x-ticvai-audience:
       - staff
       summary: Rename or amend a seat map
@@ -395,6 +396,27 @@ paths:
                   maxLength: 1000
                 isActive:
                   type: boolean
+                sectionViews:
+                  type: array
+                  description: 'Set or clear the view photo of one or more sections (`Section.viewAssetId`,
+                    decided 29 September, rev 3 23SEP-14). **Not a structural change**, so it is accepted
+                    on a published map. A null `viewAssetId` clears the photo and the client falls back to
+                    rendering the view from geometry. A `sectionCode` not on this map returns 404.
+
+                    '
+                  items:
+                    type: object
+                    required:
+                    - sectionCode
+                    - viewAssetId
+                    properties:
+                      sectionCode:
+                        type: string
+                      viewAssetId:
+                        type: string
+                        format: uuid
+                        nullable: true
+                        x-ticvai-references: assets.MediaAsset
       responses:
         '200':
           headers:
@@ -1023,6 +1045,8 @@ paths:
         format: uuid
     patch:
       operationId: updateSeatCategory
+      x-ticvai-consumed-by:
+        - "P08 BO-1045 Price Bands & Categories"
       x-ticvai-audience:
       - staff
       summary: Rename, re-rank or re-price a seat category
@@ -1177,6 +1201,14 @@ paths:
         Where seating rules apply, holding a seat may implicitly buffer its neighbours — those appear
         in `bufferedSeatIds`.
 
+
+        **Seats per guest booking is a venue setting** (decided 29 September, rev 3 REV3-7). On a guest
+        channel (Guest Web, Guest App), the seats in this request plus the seats the same guest already
+        holds on the same performance may not exceed `VenueSettings.seating.maxSeatsPerGuestOrder`
+        (default 10, bounds 1 to 50); above it the hold is refused with `422` `seat-limit-exceeded`
+        and nothing is held. Staff and POS sales keep at most 10 seats per sale (audit R080 (c)),
+        refused the same way.
+
         '
       tags:
       - hold
@@ -1223,6 +1255,18 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/SeatConflictProblem'
+        '422':
+          description: 'More seats than one booking may take: above `VenueSettings.seating.maxSeatsPerGuestOrder`
+            on a guest channel (decided 29 September, rev 3 REV3-7), or above 10 per sale on a staff
+            channel (audit R080 (c)). The response names the limit and how many were asked for.
+
+            '
+          x-ticvai-problem-types:
+          - seat-limit-exceeded
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/SeatLimitProblem'
   /seat-holds/{holdId}:
     parameters:
     - name: holdId
@@ -1259,16 +1303,32 @@ paths:
     delete:
       operationId: relinquishSeatHold
       x-ticvai-consumed-by:
+        - "P01 WEB-007 Interactive Seat Selection"
+        - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-998 Lock Timeout & Concurrency"
         - "P08 BO-999 Cart & Multi-Seat Management"
       x-ticvai-audience:
       - staff
+      - guest
       summary: Release a hold
-      description: Releases buffered neighbours alongside the held seats.
+      description: 'Releases buffered neighbours alongside the held seats.
+
+
+        **A guest may release their own hold** (decided 29 September, readiness close-out; the seat-map
+        time bar on WEB-007 / GST-049 lets a guest give seats back before the hold runs out rather than
+        leaving them locked until `expiresAt`). On a guest channel only a hold the same guest session or
+        subject placed with `createSeatHold` can be released; any other hold answers `404`, as anything
+        outside the caller''s scope does, so hold ids cannot be probed. A hold already converted to an
+        order, released or expired answers `409` `holdNotActive`. Staff at a till keep releasing any
+        hold at their venue under `ORDER_CREATE`.
+
+        '
       tags:
       - hold
       x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
+      x-ticvai-agreed: '29 September: readiness close-out, S1 guest screens (WEB-007 / GST-049 seat-map time bar); shape unchanged, guest audience added with an own-hold rule'
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1282,6 +1342,13 @@ paths:
           description: Released
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The hold is no longer active (`holdNotActive`) - converted to an order, already
+            released or expired. Nothing changes.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /seat-holds/{holdId}/extend:
     parameters:
     - name: holdId
@@ -3452,6 +3519,19 @@ components:
           items:
             $ref: '#/components/schemas/Point'
           description: Polygon for rendering. Absent without geometry.
+        viewAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: assets.MediaAsset
+          description: '**The view of the stage from this section, as a photo**, uploaded through `assets`
+            like any other media (decided 29 September, rev 3 23SEP-14). Optional: where it is null the
+            client renders the view from the imported geometry (the section `boundary`, the map''s
+            `stagePosition` and the seat positions), so a closer section shows a larger stage and fewer
+            rows ahead. Set with `updateSeatMap` `sectionViews`, which is allowed on a published map
+            because a photo does not change the map''s shape.
+
+            '
         rows:
           type: array
           items:
@@ -4037,6 +4117,34 @@ components:
             type: string
             format: date-time
             description: When the hold expired or will expire.
+    SeatLimitProblem:
+      x-ticvai-persistence: none — error shape
+      description: The `422` from `createSeatHold` when a booking asks for more seats than it may take
+        (decided 29 September, rev 3 REV3-7).
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        - maxSeats
+        - requestedSeats
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - seatLimitExceeded
+          maxSeats:
+            type: integer
+            description: The limit that applied, `VenueSettings.seating.maxSeatsPerGuestOrder` on a guest
+              channel and 10 on a staff channel.
+          requestedSeats:
+            type: integer
+            description: Seats in this request plus seats the same guest already holds on the performance.
+          channel:
+            type: string
+            enum:
+            - guest
+            - staff
     GroupSeatingProblem:
       x-ticvai-persistence: none — error shape
       allOf:
@@ -4106,6 +4214,35 @@ components:
                 type: integer
               price:
                 $ref: ../shared/common.yaml#/components/schemas/Money
+        sections:
+          type: array
+          description: 'The map''s sections with what a guest screen needs to show the view from each
+            (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise
+            null and the client renders the view from `boundary` and the seat positions. In this
+            response so WEB-007 and GST-049 need no second call.
+
+            '
+          items:
+            type: object
+            required:
+            - code
+            - name
+            properties:
+              code:
+                type: string
+              name:
+                type: string
+              viewAssetId:
+                type: string
+                format: uuid
+                nullable: true
+                description: As `Section.viewAssetId`. Null means render the view from geometry.
+              boundary:
+                type: array
+                nullable: true
+                items:
+                  $ref: '#/components/schemas/Point'
+                description: As `Section.boundary`. Null when `renderMode` is `list`.
         seats:
           type: array
           items:
@@ -4148,9 +4285,13 @@ components:
         seatIds:
           type: array
           minItems: 1
-          maxItems: 10
-          description: At most 10 seats per sale (decided 28 September, audit R080 (c)), as orders
-            `CreateOrderLine.seatIds` and `AddCartLineRequest.seatIds` allow and POS-002 shows.
+          maxItems: 50
+          description: '50 is the ceiling of the venue setting, not the limit a caller gets. On a guest
+            channel the limit is `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to
+            50, decided 29 September, rev 3 REV3-7); on a staff channel it stays 10 per sale (audit R080
+            (c)), as POS-002 shows. Either is refused with `422` `seat-limit-exceeded`.
+
+            '
           items:
             type: string
         ttlSeconds:

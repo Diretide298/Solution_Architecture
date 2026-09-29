@@ -1,5 +1,5 @@
 id: LLD-P01
-title: P01 Guest Web — Storefront — 46 screens
+title: P01 Guest Web — Storefront — 49 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: guest
@@ -33,27 +33,31 @@ modulesUsed:
   screens: 3
 - module: access
   screens: 2
+- module: resources
+  screens: 2
 - module: seating
   screens: 1
 - module: ai
   screens: 1
+- module: transport
+  screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 58
+  operationCalls: 62
 - service: OrderService
-  operationCalls: 55
+  operationCalls: 61
 - service: CatalogueService
-  operationCalls: 37
+  operationCalls: 46
+- service: VenueOpsService
+  operationCalls: 36
+- service: IdentityService
+  operationCalls: 21
 - service: FnbService
   operationCalls: 21
-- service: VenueOpsService
-  operationCalls: 15
-- service: IdentityService
-  operationCalls: 15
 - service: AccessService
   operationCalls: 10
 - service: WhiteLabelService
-  operationCalls: 7
+  operationCalls: 9
 - service: RetailService
   operationCalls: 5
 - service: WalletService
@@ -63,9 +67,9 @@ servicesCalled:
 - service: LedgerService
   operationCalls: 1
 coverage:
-  screens: 46
+  screens: 49
   inAFlow: 14
-  drawn: 46
+  drawn: 49
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -124,6 +128,7 @@ screens:
   - WEB-044
   - WEB-045
   - WEB-046
+  - WEB-049
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-001
   inFlows:
@@ -137,6 +142,7 @@ screens:
   operations:
   - getWaitTimes
   - listPerformances
+  - listProductCategories
   - listProducts
   - searchCatalogue
   states:
@@ -153,6 +159,7 @@ screens:
   - WEB-001
   - WEB-003
   - WEB-004
+  - WEB-005
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-002
   inFlows: null
@@ -209,6 +216,10 @@ screens:
   - WEB-002
   - WEB-003
   - WEB-005
+  - WEB-006
+  - WEB-007
+  - WEB-047
+  - WEB-048
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-004
   inFlows:
@@ -221,7 +232,10 @@ screens:
   density: compact
   operations:
   - evaluatePromotions
+  - getPublishedGuidedChoice
+  - listProductCategories
   - listProductVariants
+  - listProducts
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -232,12 +246,14 @@ screens:
   offlineState: true
   entryParams:
   - productId<-WEB-004
+  - venueId<-session
   goesTo:
   - WEB-001
   - WEB-006
   - WEB-007
   - WEB-008
   - WEB-010
+  - WEB-016
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-005
   inFlows:
@@ -252,10 +268,14 @@ screens:
   - addCartLine
   - checkBookingEligibility
   - getAvailability
+  - getCart
   - getPerformance
+  - listPerformances
+  - recordConsentAnswers
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -263,6 +283,7 @@ screens:
   entryParams:
   - performanceId<-navigation
   - cartId<-navigation
+  - eventId<-WEB-004
   goesTo:
   - WEB-001
   - WEB-005
@@ -283,16 +304,21 @@ screens:
   operations:
   - createSeatHold
   - getSeatAvailability
+  - listPerformances
   - recommendSeats
+  - relinquishSeatHold
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
   offlineState: true
   entryParams:
   - performanceId<-deepLink
+  - eventId<-WEB-006
+  - holdId<-navigation
   goesTo:
   - WEB-001
   - WEB-005
@@ -332,6 +358,7 @@ screens:
   - WEB-006
   - WEB-007
   - WEB-010
+  - WEB-016
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-008
   inFlows: null
@@ -379,6 +406,8 @@ screens:
   - extendCart
   - getCart
   - getCouponCode
+  - getPerformance
+  - getResourceHold
   - removeCartLine
   - updateCartLine
   states:
@@ -392,6 +421,8 @@ screens:
   - cartId<-WEB-008
   - code<-deepLink
   - lineId<-deepLink
+  - performanceId<-navigation
+  - holdId<-navigation
   goesTo:
   - WEB-001
   - WEB-011
@@ -413,11 +444,13 @@ screens:
   density: compact
   operations:
   - addToWishlist
+  - getCart
   - getGuestProfile
   - getWishlist
   - listConsentPurposes
   - listGuestDevices
   - recordConsent
+  - recordConsentAnswers
   - registerGuestDevice
   - removeFromWishlist
   - revokeGuestDevice
@@ -435,6 +468,7 @@ screens:
   - deviceId<-deepLink
   - itemId<-deepLink
   - subjectId<-session
+  - cartId<-session
   goesTo:
   - WEB-001
   - WEB-010
@@ -474,6 +508,7 @@ screens:
   - WEB-010
   - WEB-011
   - WEB-013
+  - WEB-016
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-012
   inFlows:
@@ -564,6 +599,7 @@ screens:
   density: compact
   operations:
   - claimCart
+  - createMfaChallenge
   - getGuestSession
   - guestLogout
   - guestPasswordLogin
@@ -574,6 +610,7 @@ screens:
   - registerGuest
   - requestGuestOtp
   - verifyGuestOtp
+  - verifyMfaChallenge
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -584,10 +621,12 @@ screens:
   offlineState: true
   entryParams:
   - cartId<-session
+  - challengeId<-navigation
   goesTo:
   - WEB-001
   - WEB-010
   - WEB-011
+  - WEB-012
   - WEB-017
   - WEB-018
   - WEB-019
@@ -834,6 +873,7 @@ screens:
   operations:
   - addToWishlist
   - deleteGuestAccount
+  - enrolMfaMethod
   - exportSubjectData
   - getFacePassEnrolment
   - getGuestConsents
@@ -842,11 +882,14 @@ screens:
   - grantDelegation
   - listDelegations
   - listGuestDevices
+  - listMfaMethods
   - recordConsent
   - registerGuestDevice
   - removeFromWishlist
+  - removeMfaMethod
   - revokeFacePass
   - revokeGuestDevice
+  - verifyMfaEnrolment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -860,6 +903,7 @@ screens:
   - itemId<-deepLink
   - subjectId<-session
   - enrolmentId<-navigation
+  - methodId<-navigation
   goesTo:
   - WEB-001
   - WEB-021
@@ -1179,6 +1223,7 @@ screens:
   wave: 2
   density: compact
   operations:
+  - addCartLine
   - claimLocationSession
   - claimTableSession
   - createGuestFnbOrder
@@ -1205,6 +1250,7 @@ screens:
   - venueId<-session
   - orderId<-deepLink
   - entryId<-deepLink
+  - cartId<-session
   goesTo:
   - WEB-001
   boardFrames: null
@@ -1439,6 +1485,7 @@ screens:
   wave: 2
   density: compact
   operations:
+  - getTenantAppStatus
   - listContentPages
   - listFaqs
   states:
@@ -1459,13 +1506,16 @@ screens:
   name: In-Venue Notifications
   module: Engagement & Support
   requiresModule: marketing
-  wave: 4
+  wave: 2
   density: compact
   operations:
   - claimLocationSession
+  - listMyNotifications
+  - markMyNotificationsRead
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1475,4 +1525,108 @@ screens:
   - WEB-001
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-046
+  inFlows: null
+- screen: WEB-047
+  name: Map Booking — Cabanas & Spots
+  module: Booking & Selection
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations:
+  - addCartLine
+  - createResourceHold
+  - extendResourceHold
+  - getMapResourceAvailability
+  - getResourceHold
+  - getVenueMap
+  - listBookableVenueMaps
+  - relinquishResourceHold
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - mapId<-WEB-004
+  - productId<-WEB-004
+  - cartId<-session
+  - venueId<-session
+  - holdId<-navigation
+  goesTo:
+  - WEB-004
+  - WEB-008
+  - WEB-010
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-047
+  inFlows: null
+- screen: WEB-048
+  name: Book a Space by the Hour
+  module: Booking & Selection
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations:
+  - addCartLine
+  - listProductStartTimes
+  - listProductVariants
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - productId<-WEB-004
+  - cartId<-session
+  goesTo:
+  - WEB-004
+  - WEB-010
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-048
+  inFlows: null
+- screen: WEB-049
+  name: Transport — Route & Schedule
+  module: Transport
+  requiresModule: transport
+  wave: 3
+  density: compact
+  operations:
+  - addCartLine
+  - deleteFavouriteRoute
+  - getNextTransportDeparture
+  - getTransportFareTable
+  - getTransportRoute
+  - getTransportRouteMap
+  - listMyFavouriteRoutes
+  - listTransportPassOffers
+  - listTransportRoutes
+  - listTransportStations
+  - quoteTransportFare
+  - saveFavouriteRoute
+  - searchTransportDepartures
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - cartId<-session
+  - favouriteId<-navigation
+  - routeId<-navigation
+  goesTo:
+  - WEB-001
+  - WEB-007
+  - WEB-010
+  - WEB-016
+  boardFrames: null
+  wireframe: wireframes/P01 Guest Web.dc.html#web-049
   inFlows: null

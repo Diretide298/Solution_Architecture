@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 182 operations
+title: access — 206 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -84,6 +84,16 @@ operations:
   writes:
   - access.parking_entitlement
   - cache:idempotency
+- operation: deliverCredential
+  verb: POST
+  path: /credentials/{credentialId}/deliveries
+  scope: venue
+  permission: ORDER_REPRINT
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: enrolFacePass
   verb: POST
   path: /face-pass/enrolments
@@ -123,6 +133,17 @@ operations:
   offline: true
   reads:
   - access.access_point
+  writes: []
+- operation: getCredentialIssuanceRetryPolicy
+  verb: GET
+  path: /credential-issuance-retry-policy
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.credential_issuance_retry_policy
   writes: []
 - operation: getEntitlement
   verb: GET
@@ -1392,6 +1413,17 @@ operations:
   writes:
   - access.scan_event
   - cache:idempotency
+- operation: publishHardwareDeployment
+  verb: POST
+  path: /hardware-deployments
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.hardware_deployment
+  writes: []
 - operation: publishMediaCompatibilityTesting
   verb: PUT
   path: /media-compatibility-testing
@@ -1436,6 +1468,36 @@ operations:
   writes:
   - access.blacklist
   - cache:idempotency
+- operation: replaceCredential
+  verb: POST
+  path: /credentials/{credentialId}/replace
+  scope: venue
+  permission: ORDER_EXCHANGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: resolveCredentialException
+  verb: POST
+  path: /credential-exceptions/{exceptionId}/resolve
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: retryCredentialGeneration
+  verb: POST
+  path: /credential-generation-issuance/retry
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: revokeFacePass
   verb: DELETE
   path: /face-pass/enrolments/{enrolmentId}
@@ -1451,9 +1513,29 @@ operations:
   writes:
   - cache:idempotency
   - pii.subject_biometric
+- operation: rollbackAccessPolicy
+  verb: POST
+  path: /dynamic-access-policy/{policyId}/rollback
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setAccessAreaZone
   verb: PUT
   path: /access-area-zone
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setAccessAttributeCatalog
+  verb: PUT
+  path: /access-attribute-catalog
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -1505,6 +1587,16 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setBiometricLifecycleRetention
+  verb: PUT
+  path: /biometric-lifecycle-retention
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setBiometricVerificationProfile
   verb: PUT
   path: /biometric-verification-profile
@@ -1525,6 +1617,16 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setBrandingLocalizationTemplate
+  verb: PUT
+  path: /branding-localization-template
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setContextTimeEvent
   verb: PUT
   path: /context-time-event
@@ -1534,6 +1636,27 @@ operations:
   - staff
   offline: false
   reads: []
+  writes: []
+- operation: setCredentialActivationDisplay
+  verb: PUT
+  path: /credential-activation-display
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setCredentialIssuanceRetryPolicy
+  verb: PUT
+  path: /credential-issuance-retry-policy
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - access.credential_issuance_retry_policy
   writes: []
 - operation: setDeviceSoftwareContent
   verb: PUT
@@ -1605,6 +1728,16 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setEntitlementConsumption
+  verb: PUT
+  path: /entitlement-consumption
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setEntryRulePoints
   verb: PUT
   path: /admission-rules/{ruleId}/points
@@ -1617,9 +1750,39 @@ operations:
   - access.entry_rule_point
   writes:
   - access.entry_rule_point
+- operation: setFaceMatchingVerification
+  verb: PUT
+  path: /face-matching-verification
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setFacePassEnrollment
   verb: PUT
   path: /face-pass-enrollment
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setFaceTagTemporaryEnrollment
+  verb: PUT
+  path: /face-tag-temporary
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setFraudDetectionRule
+  verb: PUT
+  path: /fraud-detection-rule
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -1657,6 +1820,16 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setGuestCompanionEligibility
+  verb: PUT
+  path: /guest-companion-eligibility
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setHandheldMobileAccess
   verb: PUT
   path: /handheld-mobile-access
@@ -1667,9 +1840,49 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: setHotelWalletExternal
+  verb: PUT
+  path: /hotel-wallet-external
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setMediaBindingActivation
   verb: PUT
   path: /media-binding-activation
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setMediaIssuanceEncoding
+  verb: PUT
+  path: /media-issuance-encoding
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setMediaReplacementRevocation
+  verb: PUT
+  path: /media-replacement-revocation
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setMediaTypeTechnology
+  verb: PUT
+  path: /media-type-technology
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -1704,6 +1917,16 @@ operations:
 - operation: setPdfPrintablePos
   verb: PUT
   path: /pdf-printable-pos
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setPolicyScopeHierarchy
+  verb: PUT
+  path: /policy-scope-hierarchy
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -1828,6 +2051,26 @@ operations:
 - operation: setVisualDynamicPolicy
   verb: PUT
   path: /visual-dynamic-policy
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: simulateBiometricConfiguration
+  verb: POST
+  path: /biometric/simulate
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: simulateGuestJourney
+  verb: POST
+  path: /guest-journey/simulate
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:

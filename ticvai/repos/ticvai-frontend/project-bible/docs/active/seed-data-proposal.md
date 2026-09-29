@@ -109,6 +109,21 @@ Everything the Supervisor holds, plus:
 
 ---
 
+## 2a. Demo tenant: the Emirates Link transport network
+
+**This goes to the demo tenant only** (decided 29 September, rev 3 REV3-21). A real venue starts with an empty network and enters its own in Venue Management, one item at a time or in bulk with `importTransportNetwork`. The values come from the client's rev 3 prototype (`sources/designs/guest-rev3-28-september/`), so the demo shows the same flow the client approved.
+
+| What | Demo value |
+|---|---|
+| Line | E101, Sharjah – Dubai – Abu Dhabi, as two routes (outbound and inbound) paired for the swap button |
+| Stations | The nine E101 stations of the prototype, from Sharjah Al Jubail to Abu Dhabi Central, with their coordinates for the route map |
+| Fare | AED 5 plus AED 2.50 per stop |
+| Passenger types | Adult (full fare), child (half), student (half), person of determination (free) |
+| Pass types | 5-trip, 10-trip, weekly unlimited, monthly unlimited |
+| Timetable | 23 departures a day |
+
+The exact station list and times are read from the prototype when SETUP-SEED builds the demo tenant. `contracts/satellite/transport.yaml` describes the network model.
+
 ## 3. What happens next
 
 1. The client corrects this page (denominations, tray order, the five roles and their permissions).

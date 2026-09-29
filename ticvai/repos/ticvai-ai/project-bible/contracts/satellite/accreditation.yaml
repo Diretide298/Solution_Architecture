@@ -799,6 +799,7 @@ paths:
     put:
       operationId: setAccessProfile
       x-ticvai-consumed-by:
+        - "P08 BO-238 Identity, Membership & Accreditation Policies"
         - "P08 BO-655 Access Profile Management"
         - "P08 BO-656 Venue & Zone Access Matrix"
         - "P08 BO-657 Operational Area Permission Management"

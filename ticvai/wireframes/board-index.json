@@ -3,18 +3,18 @@
  "generated": "2026-09-29",
  "note": "One record per board file under `wireframes/`, keyed by content hash so an unchanged board is never re-read. **A frame in a `generated` board is the screen's own YAML rendered as boxes, not a drawing** \u2014 only `clientPack` and `claudeDesign` frames are evidence that somebody designed something.",
  "counts": {
-  "boards": 285,
+  "boards": 286,
   "boardsByProvenance": {
    "generated": 17,
    "workshop": 195,
    "clientPack": 71,
    "claudeDesign": 0,
-   "unrecognised": 2
+   "unrecognised": 3
   },
-  "packageScreens": 2422,
+  "packageScreens": 2440,
   "screensDrawnByClaudeDesign": 0,
-  "screensOnClientPacks": 2422,
-  "screensDrawnByEither": 2422,
+  "screensOnClientPacks": 2440,
+  "screensDrawnByEither": 2440,
   "screensWithNoDrawnFrame": 0
  },
  "screensDrawn": [
@@ -1072,7 +1072,15 @@
   "BO-1180",
   "BO-1181",
   "BO-1182",
+  "BO-1183",
+  "BO-1184",
+  "BO-1185",
+  "BO-1186",
+  "BO-1187",
+  "BO-1188",
+  "BO-1189",
   "BO-119",
+  "BO-1190",
   "BO-120",
   "BO-121",
   "BO-122",
@@ -2048,6 +2056,7 @@
   "CMS-098",
   "CMS-099",
   "CMS-100",
+  "CMS-101",
   "DEV-001",
   "DEV-002",
   "DEV-003",
@@ -2223,6 +2232,12 @@
   "GST-071",
   "GST-072",
   "GST-073",
+  "GST-074",
+  "GST-075",
+  "GST-076",
+  "GST-077",
+  "GST-078",
+  "GST-079",
   "KIT-001",
   "KIT-002",
   "KIT-003",
@@ -2439,7 +2454,10 @@
   "WEB-043",
   "WEB-044",
   "WEB-045",
-  "WEB-046"
+  "WEB-046",
+  "WEB-047",
+  "WEB-048",
+  "WEB-049"
  ],
  "screensDrawnByClaudeDesign": [],
  "unverifiedClaims": [],
@@ -2448,10 +2466,10 @@
   {
    "file": "APP guest.dc.html",
    "provenance": "clientPack",
-   "bytes": 1300844,
-   "sha256": "a23376ea6af7acfd",
-   "frames": 134,
-   "screensFramed": 134,
+   "bytes": 327780,
+   "sha256": "04e126ad040cefa9",
+   "frames": 143,
+   "screensFramed": 143,
    "screens": [
     "GST-001",
     "GST-002",
@@ -2524,6 +2542,12 @@
     "GST-071",
     "GST-072",
     "GST-073",
+    "GST-074",
+    "GST-075",
+    "GST-076",
+    "GST-077",
+    "GST-078",
+    "GST-079",
     "KSK-001",
     "KSK-002",
     "KSK-003",
@@ -2586,7 +2610,10 @@
     "WEB-043",
     "WEB-044",
     "WEB-045",
-    "WEB-046"
+    "WEB-046",
+    "WEB-047",
+    "WEB-048",
+    "WEB-049"
    ],
    "orphanFrames": [],
    "anchors": [
@@ -2661,6 +2688,12 @@
     "gst-071",
     "gst-072",
     "gst-073",
+    "gst-074",
+    "gst-075",
+    "gst-076",
+    "gst-077",
+    "gst-078",
+    "gst-079",
     "ksk-001",
     "ksk-002",
     "ksk-003",
@@ -2723,7 +2756,10 @@
     "web-043",
     "web-044",
     "web-045",
-    "web-046"
+    "web-046",
+    "web-047",
+    "web-048",
+    "web-049"
    ],
    "platforms": [
     "P01",
@@ -2736,8 +2772,8 @@
   {
    "file": "APP ticvai-control.dc.html",
    "provenance": "clientPack",
-   "bytes": 2212447,
-   "sha256": "0768d5aa41c1a2f6",
+   "bytes": 2214441,
+   "sha256": "8e204c32d3bf3be0",
    "frames": 767,
    "screensFramed": 767,
    "screens": [
@@ -4292,10 +4328,10 @@
   {
    "file": "APP venue-management.dc.html",
    "provenance": "clientPack",
-   "bytes": 4039552,
-   "sha256": "8066763182665753",
-   "frames": 1374,
-   "screensFramed": 1374,
+   "bytes": 4098282,
+   "sha256": "2046471a09a99c40",
+   "frames": 1383,
+   "screensFramed": 1383,
    "screens": [
     "ANL-001",
     "ANL-002",
@@ -4667,7 +4703,15 @@
     "BO-1180",
     "BO-1181",
     "BO-1182",
+    "BO-1183",
+    "BO-1184",
+    "BO-1185",
+    "BO-1186",
+    "BO-1187",
+    "BO-1188",
+    "BO-1189",
     "BO-119",
+    "BO-1190",
     "BO-120",
     "BO-121",
     "BO-122",
@@ -5643,6 +5687,7 @@
     "CMS-098",
     "CMS-099",
     "CMS-100",
+    "CMS-101",
     "SUP-001",
     "SUP-002",
     "SUP-003",
@@ -6044,7 +6089,15 @@
     "bo-1180",
     "bo-1181",
     "bo-1182",
+    "bo-1183",
+    "bo-1184",
+    "bo-1185",
+    "bo-1186",
+    "bo-1187",
+    "bo-1188",
+    "bo-1189",
     "bo-119",
+    "bo-1190",
     "bo-120",
     "bo-121",
     "bo-122",
@@ -7020,6 +7073,7 @@
     "cms-098",
     "cms-099",
     "cms-100",
+    "cms-101",
     "sup-001",
     "sup-002",
     "sup-003",
@@ -7061,8 +7115,8 @@
   {
    "file": "APP venue-pos.dc.html",
    "provenance": "clientPack",
-   "bytes": 202905,
-   "sha256": "6acbbec74dda00e9",
+   "bytes": 386810,
+   "sha256": "3784402e76242805",
    "frames": 40,
    "screensFramed": 40,
    "screens": [
@@ -7160,8 +7214,8 @@
   {
    "file": "APP venue-staff-mobile.dc.html",
    "provenance": "clientPack",
-   "bytes": 390422,
-   "sha256": "f058782aad5f572a",
+   "bytes": 390585,
+   "sha256": "d99aa2a31958a537",
    "frames": 107,
    "screensFramed": 107,
    "screens": [
@@ -7391,12 +7445,28 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "file": "design-requests/missing-views-29-september/reference/web/TICVAI Guest Booking v2.dc.html",
+   "provenance": "unrecognised",
+   "bytes": 1061859,
+   "sha256": "3024917d427ec792",
+   "frames": 0,
+   "screensFramed": 0,
+   "screens": [],
+   "orphanFrames": [],
+   "anchors": [
+    "tvroutemap"
+   ],
+   "platforms": [],
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "file": "P01 Guest Web.dc.html",
    "provenance": "generated",
-   "bytes": 1027241,
-   "sha256": "364e6c58b85898ea",
-   "frames": 46,
-   "screensFramed": 46,
+   "bytes": 136145,
+   "sha256": "dd231f91d3f864ca",
+   "frames": 49,
+   "screensFramed": 49,
    "screens": [
     "WEB-001",
     "WEB-002",
@@ -7443,7 +7513,10 @@
     "WEB-043",
     "WEB-044",
     "WEB-045",
-    "WEB-046"
+    "WEB-046",
+    "WEB-047",
+    "WEB-048",
+    "WEB-049"
    ],
    "orphanFrames": [],
    "anchors": [
@@ -7492,7 +7565,10 @@
     "web-043",
     "web-044",
     "web-045",
-    "web-046"
+    "web-046",
+    "web-047",
+    "web-048",
+    "web-049"
    ],
    "platforms": [
     "P01"
@@ -7503,10 +7579,10 @@
   {
    "file": "P02 Guest App.dc.html",
    "provenance": "generated",
-   "bytes": 234683,
-   "sha256": "c7bd8c257e2e742c",
-   "frames": 71,
-   "screensFramed": 71,
+   "bytes": 152687,
+   "sha256": "6f252266e33ebc65",
+   "frames": 77,
+   "screensFramed": 77,
    "screens": [
     "GST-001",
     "GST-002",
@@ -7578,7 +7654,13 @@
     "GST-070",
     "GST-071",
     "GST-072",
-    "GST-073"
+    "GST-073",
+    "GST-074",
+    "GST-075",
+    "GST-076",
+    "GST-077",
+    "GST-078",
+    "GST-079"
    ],
    "orphanFrames": [],
    "anchors": [
@@ -7652,7 +7734,13 @@
     "gst-070",
     "gst-071",
     "gst-072",
-    "gst-073"
+    "gst-073",
+    "gst-074",
+    "gst-075",
+    "gst-076",
+    "gst-077",
+    "gst-078",
+    "gst-079"
    ],
    "platforms": [
     "P02"
@@ -7663,8 +7751,8 @@
   {
    "file": "P04 Venue POS.dc.html",
    "provenance": "generated",
-   "bytes": 153449,
-   "sha256": "b8b1dc62fb2630ef",
+   "bytes": 337313,
+   "sha256": "4b07375ea6c61f7a",
    "frames": 30,
    "screensFramed": 30,
    "screens": [
@@ -7793,8 +7881,8 @@
   {
    "file": "P06 Venue Staff App.dc.html",
    "provenance": "generated",
-   "bytes": 348241,
-   "sha256": "4014dc00f7363903",
+   "bytes": 348404,
+   "sha256": "eccbd6f5d8a5768c",
    "frames": 96,
    "screensFramed": 96,
    "screens": [
@@ -8043,10 +8131,10 @@
   {
    "file": "P08 Venue Management.dc.html",
    "provenance": "generated",
-   "bytes": 3465340,
-   "sha256": "c85ac9211119aeb5",
-   "frames": 1178,
-   "screensFramed": 1178,
+   "bytes": 3516232,
+   "sha256": "1a6ffe593f783d74",
+   "frames": 1186,
+   "screensFramed": 1186,
    "screens": [
     "BO-001",
     "BO-002",
@@ -8349,7 +8437,15 @@
     "BO-1180",
     "BO-1181",
     "BO-1182",
+    "BO-1183",
+    "BO-1184",
+    "BO-1185",
+    "BO-1186",
+    "BO-1187",
+    "BO-1188",
+    "BO-1189",
     "BO-119",
+    "BO-1190",
     "BO-120",
     "BO-121",
     "BO-122",
@@ -9530,7 +9626,15 @@
     "bo-1180",
     "bo-1181",
     "bo-1182",
+    "bo-1183",
+    "bo-1184",
+    "bo-1185",
+    "bo-1186",
+    "bo-1187",
+    "bo-1188",
+    "bo-1189",
     "bo-119",
+    "bo-1190",
     "bo-120",
     "bo-121",
     "bo-122",
@@ -10418,8 +10522,8 @@
   {
    "file": "P09 TICVAI Web.dc.html",
    "provenance": "generated",
-   "bytes": 1938183,
-   "sha256": "d895d5ff43e6597a",
+   "bytes": 1940177,
+   "sha256": "40fbf35016cfc7f7",
    "frames": 676,
    "screensFramed": 676,
    "screens": [
@@ -12019,10 +12123,10 @@
   {
    "file": "P13 Venue CMS.dc.html",
    "provenance": "generated",
-   "bytes": 295606,
-   "sha256": "4a799e71fd9b385f",
-   "frames": 99,
-   "screensFramed": 99,
+   "bytes": 303414,
+   "sha256": "20e0b2d27fbf365f",
+   "frames": 100,
+   "screensFramed": 100,
    "screens": [
     "CMS-001",
     "CMS-002",
@@ -12122,7 +12226,8 @@
     "CMS-097",
     "CMS-098",
     "CMS-099",
-    "CMS-100"
+    "CMS-100",
+    "CMS-101"
    ],
    "orphanFrames": [],
    "anchors": [
@@ -12225,6 +12330,7 @@
     "cms-098",
     "cms-099",
     "cms-100",
+    "cms-101",
     "wsf"
    ],
    "platforms": [
@@ -12270,8 +12376,8 @@
   {
    "file": "P15 Kitchen Display.dc.html",
    "provenance": "generated",
-   "bytes": 58631,
-   "sha256": "44a50986908771fe",
+   "bytes": 58672,
+   "sha256": "d9cfbe1362833e66",
    "frames": 10,
    "screensFramed": 10,
    "screens": [
@@ -12308,8 +12414,8 @@
   {
    "file": "P16 Venue Analytics.dc.html",
    "provenance": "generated",
-   "bytes": 220874,
-   "sha256": "2fa340114c76a4a0",
+   "bytes": 220893,
+   "sha256": "bcb66dba86b9f60e",
    "frames": 69,
    "screensFramed": 69,
    "screens": [
@@ -14387,8 +14493,8 @@
   {
    "file": "TICVAI Wireframe Boards.dc.html",
    "provenance": "generated",
-   "bytes": 15545,
-   "sha256": "edccf8acf1b9aeab",
+   "bytes": 15546,
+   "sha256": "06a4904dfbb89bab",
    "frames": 0,
    "screensFramed": 0,
    "screens": [],

@@ -4,31 +4,32 @@
  "modules": {
   "access": {
    "title": "3 — Admission and Access",
-   "capabilityCount": 11,
+   "capabilityCount": 17,
    "unguardedOperations": 3,
    "capabilities": [
     {
      "key": "ACCESS_OVERRIDE",
      "label": "admit against a failed validation, logged",
      "group": "Access control",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
+      "approveManualOverrideSupervisor",
       "overrideAccess"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
      "key": "ACCESS_POINT_CONFIGURE",
      "label": null,
      "group": "Access control",
-     "operationCount": 48,
+     "operationCount": 64,
      "operations": [
       "addBlacklistEntry",
-      "approveManualOverrideSupervisor",
       "approveMultiMediaPreview",
       "createAccessPoint",
       "createAdmissionRules",
+      "publishHardwareDeployment",
       "publishMediaCompatibilityTesting"
      ],
      "elevated": true,
@@ -45,6 +46,48 @@
       "validateAccess",
       "validateGroupAccess",
       "verifyIdentity"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "AUDIT_VIEW",
+     "label": "the platform audit log: who did what, where and when",
+     "group": "Operations",
+     "operationCount": 5,
+     "operations": [
+      "listBiometric",
+      "listCredentialSecurity",
+      "listCredentialSecurityOperational",
+      "listShiftHandoverSummary",
+      "listVirtualTicketArchitecture"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "DEVICE_CONFIGURE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 3,
+     "operations": [
+      "setDeviceSoftwareContent",
+      "setHandheldMobileAccess",
+      "setReaderScannerPeripheral"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "DEVICE_VIEW",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 4,
+     "operations": [
+      "listDeviceGate",
+      "listDeviceTypeHardware",
+      "listHardwareCompatibilityHealth",
+      "listPhysicalDeviceRegistration"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -70,6 +113,39 @@
      "operations": [
       "getFacePassEnrolment",
       "listAccessChanges"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "INCIDENT_MANAGE",
+     "label": "investigate, close, notify an authority",
+     "group": "Maintenance & safety",
+     "operationCount": 1,
+     "operations": [
+      "setOperationalIncidentException"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_EXCHANGE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "replaceCredential"
+     ],
+     "elevated": true,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_REPRINT",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "deliverCredential"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -104,9 +180,14 @@
      "key": "REPORT_VIEW_VENUE",
      "label": null,
      "group": "Reporting",
-     "operationCount": 1,
+     "operationCount": 11,
      "operations": [
-      "listScans"
+      "listAccessExecutiveInsight",
+      "listAccessMonitoring",
+      "listAccessReportScheduled",
+      "listAttendanceAdmission",
+      "listEntryExitCrossover",
+      "listGuestDwellTime"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -115,14 +196,14 @@
      "key": "SCOPE_VIEW",
      "label": "read the hierarchy",
      "group": "Organisation",
-     "operationCount": 111,
+     "operationCount": 91,
      "operations": [
       "getAccessPoint",
+      "getCredentialIssuanceRetryPolicy",
       "listAccess",
       "listAccessAttributeCatalog",
-      "listAccessExecutiveInsight",
       "listAccessLocationGrouping",
-      "listAccessMonitoring"
+      "listAccessPoints"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -131,8 +212,10 @@
      "key": "TICKET_LOOKUP",
      "label": "read-only validity check, no admission",
      "group": "Access control",
-     "operationCount": 1,
+     "operationCount": 3,
      "operations": [
+      "listCredentialUsageCross",
+      "listTicketCredentialInvestigation",
       "lookupTicket"
      ],
      "elevated": false,
@@ -341,16 +424,17 @@
   },
   "approvals": {
    "title": "11 — Approval Workflows and Governance",
-   "capabilityCount": 5,
+   "capabilityCount": 6,
    "unguardedOperations": 0,
    "capabilities": [
     {
      "key": "APPROVAL_ACT",
      "label": "approve, reject, return, request info",
      "group": "Operations",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
-      "issueAccreditationBadge"
+      "issueAccreditationBadge",
+      "resolveApprovedActionExecution"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -359,54 +443,54 @@
      "key": "APPROVAL_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 7,
+     "operationCount": 15,
      "operations": [
+      "approveMatrixMultiLevel",
+      "approveRoleAuthorityDelegation",
+      "approveVersioningGovernance",
+      "createAutomationAutonomouAction",
       "listApprovalMatrices",
-      "listStepUpPolicies",
-      "setApprovalControlPolicy",
-      "setApprovalMatrix",
-      "setApprovalRetentionPolicy",
-      "setApprovalSlaPolicy"
+      "listStepUpPolicies"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
      "key": "APPROVAL_DECIDE",
      "label": null,
      "group": "Operations",
-     "operationCount": 5,
+     "operationCount": 6,
      "operations": [
+      "approveUnifiedDecision",
       "createApprovalDelegation",
       "decideApprovalRequest",
       "revokeApprovalDelegation",
       "setApproverAvailability",
       "signApprovalDecision"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
      "key": "APPROVAL_REQUEST",
      "label": null,
      "group": "Operations",
-     "operationCount": 14,
+     "operationCount": 5,
      "operations": [
-      "approveMatrixMultiLevel",
-      "approveRoleAuthorityDelegation",
-      "approveUnifiedDecision",
-      "approveVersioningGovernance",
       "createApprovalRequest",
-      "createAutomationAutonomouAction"
+      "escalateApprovalRequest",
+      "resubmitApprovalRequest",
+      "submitApprovalRequest",
+      "withdrawApprovalRequest"
      ],
-     "elevated": true,
+     "elevated": false,
      "segregationConstrained": false
     },
     {
      "key": "APPROVAL_VIEW",
      "label": null,
      "group": "Operations",
-     "operationCount": 19,
+     "operationCount": 18,
      "operations": [
       "createApprovalEvidencePackage",
       "evaluateApprovalRequirement",
@@ -414,6 +498,18 @@
       "getApprovalRecord",
       "listAccreditationBadges",
       "listApprovalControlPolicies"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "REPORT_VIEW_VENUE",
+     "label": null,
+     "group": "Reporting",
+     "operationCount": 2,
+     "operations": [
+      "listProcessAutomationOpportunity",
+      "listWorkflowProcessPerformance"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -483,9 +579,20 @@
   },
   "catalogue": {
    "title": "1 — Ticketing Catalogue",
-   "capabilityCount": 9,
+   "capabilityCount": 11,
    "unguardedOperations": 3,
    "capabilities": [
+    {
+     "key": "AI_APPROVE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "decidePricingRecommendation"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
     {
      "key": "CAPACITY_CONFIGURE",
      "label": "envelopes and allocation",
@@ -506,14 +613,14 @@
      "key": "EVENT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 12,
+     "operationCount": 13,
      "operations": [
       "assignPerformanceMedia",
       "cloneEvent",
       "createEvent",
+      "estimateEventResourceCost",
       "getEventResourcePlan",
-      "listEventTypes",
-      "listSpaces"
+      "listEventTypes"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -590,10 +697,21 @@
      "segregationConstrained": false
     },
     {
+     "key": "PRODUCT_APPROVE",
+     "label": "move a product from review to approved",
+     "group": "Catalogue",
+     "operationCount": 1,
+     "operations": [
+      "decidePricingChangeRequest"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 54,
+     "operationCount": 57,
      "operations": [
       "approvePricingWorkflowAuthority",
       "approveReviewDecision",
@@ -609,7 +727,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 109,
+     "operationCount": 111,
      "operations": [
       "checkBookingEligibility",
       "getAvailability",
@@ -798,11 +916,12 @@
      "key": "TAX_CONFIGURE",
      "label": null,
      "group": "Finance",
-     "operationCount": 3,
+     "operationCount": 4,
      "operations": [
       "createTaxCode",
       "createTaxExemption",
-      "updateTaxCode"
+      "updateTaxCode",
+      "verifyTaxExemption"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -901,7 +1020,7 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 34,
+     "operationCount": 35,
      "operations": [
       "applyMenuActions",
       "attachModifierGroup",
@@ -917,7 +1036,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 18,
+     "operationCount": 19,
      "operations": [
       "getAllergenVerification",
       "getFnbDeliveryPolicy",
@@ -951,8 +1070,9 @@
      "key": "DEVICE_CONFIGURE",
      "label": null,
      "group": "Operations",
-     "operationCount": 3,
+     "operationCount": 4,
      "operations": [
+      "cloneReaderConfiguration",
       "deployReaderConfiguration",
       "setReaderConfiguration",
       "testReader"
@@ -1020,14 +1140,14 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 13,
+     "operationCount": 15,
      "operations": [
+      "cloneGame",
       "createGame",
       "createGameEntitlement",
       "createPrize",
       "setAttractionType",
-      "setGameCardExpiryRules",
-      "setGameCardLifecycle"
+      "setGameCardExpiryRules"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1036,7 +1156,7 @@
      "key": "PRODUCT_VIEW",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 8,
+     "operationCount": 9,
      "operations": [
       "getGameEligibility",
       "getGameplaySyncStatus",
@@ -1544,21 +1664,44 @@
   },
   "marketing-crm": {
    "title": "22 — Marketing & CRM",
-   "capabilityCount": 11,
-   "unguardedOperations": 19,
+   "capabilityCount": 15,
+   "unguardedOperations": 21,
    "capabilities": [
+    {
+     "key": "AI_CONFIGURE",
+     "label": null,
+     "group": "Operations",
+     "operationCount": 2,
+     "operations": [
+      "setContactAutomation",
+      "setCustomerServiceCopilot"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "AUDIT_VIEW",
+     "label": "the platform audit log: who did what, where and when",
+     "group": "Operations",
+     "operationCount": 1,
+     "operations": [
+      "listPrivacyEvidenceCompliance"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
     {
      "key": "CASE_MANAGE",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 15,
+     "operationCount": 23,
      "operations": [
       "addCaseMessage",
       "claimConversation",
       "closeConversation",
       "createCase",
-      "escalateCase",
-      "matchLostItem"
+      "createCaseClassificationIntelligent",
+      "escalateCase"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1567,14 +1710,14 @@
      "key": "CASE_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 7,
+     "operationCount": 22,
      "operations": [
       "getCase",
+      "getCaseInvestigationResolution",
       "getConversation",
       "getLostItemMatches",
-      "listCases",
-      "listConversations",
-      "listLostItems"
+      "listAgentWorkloadAvailability",
+      "listCaseResolutionClosure"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1583,14 +1726,14 @@
      "key": "GUEST_MANAGE",
      "label": "amend, merge, configure consent purposes",
      "group": "Guest engagement",
-     "operationCount": 15,
+     "operationCount": 40,
      "operations": [
+      "actOnWaiverRequirements",
       "addGuestNote",
       "addSuppression",
-      "decideDuplicateCandidate",
-      "listDuplicateCandidates",
-      "mergeGuestProfiles",
-      "mergeGuests"
+      "approvePrivacyTesting",
+      "approveWaiverTesting",
+      "createConsentQuestion"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1599,14 +1742,14 @@
      "key": "GUEST_VIEW",
      "label": "profiles, behavioural attributes, consent state",
      "group": "Guest engagement",
-     "operationCount": 23,
+     "operationCount": 52,
      "operations": [
       "getConsentHistory",
+      "getDigitalWaiverForm",
       "getForm",
       "getGuestAttributeModel",
       "getGuestConsents",
-      "getGuestExtraValues",
-      "getGuestIntelligence"
+      "getGuestExtraValues"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1615,11 +1758,14 @@
      "key": "GUEST_VIEW_PII",
      "label": "personal fields. Distinct from GUEST_VIEW by design",
      "group": "Guest engagement",
-     "operationCount": 3,
+     "operationCount": 11,
      "operations": [
-      "listWaiverSignatures",
-      "setGuestExtraValues",
-      "uploadGuestDocument"
+      "listComplianceEvidenceWaiver",
+      "listCustomerPrivacyConsent",
+      "listMinorGuardianGroup",
+      "listMissingExpiredInvalid",
+      "listParticipantWaiverStatus",
+      "listSiteWaiverException"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1663,14 +1809,14 @@
      "key": "MARKETING_MANAGE",
      "label": "create and amend",
      "group": "Guest engagement",
-     "operationCount": 46,
+     "operationCount": 31,
      "operations": [
       "activateAudience",
-      "approvePrivacyTesting",
-      "approveWaiverTesting",
       "awardBadge",
       "createCampaign",
-      "createCaseClassificationIntelligent"
+      "createChallenge",
+      "createForm",
+      "createInvitationCampaign"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1693,7 +1839,7 @@
      "key": "MARKETING_VIEW",
      "label": "segments, campaigns, loyalty, reviews",
      "group": "Guest engagement",
-     "operationCount": 76,
+     "operationCount": 34,
      "operations": [
       "getAudienceOverlap",
       "getCampaign",
@@ -1701,6 +1847,28 @@
       "getGuestMatchPolicy",
       "getJourneyPerformance",
       "getLoyaltyRules"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "recordConsentAnswers"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_REFUND",
+     "label": "initiate, subject to threshold",
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "setRefundCompensationService"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1760,7 +1928,7 @@
      "key": "ORDER_CREATE",
      "label": null,
      "group": "Selling",
-     "operationCount": 42,
+     "operationCount": 43,
      "operations": [
       "appendEntitlementToMedia",
       "approveExceptionServiceRecovery",
@@ -1792,21 +1960,21 @@
       "exchangeOrderLines",
       "reissueEntitlement"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
      "key": "ORDER_MODIFY",
      "label": null,
      "group": "Selling",
-     "operationCount": 15,
+     "operationCount": 22,
      "operations": [
       "addTip",
       "convertToTermProduct",
+      "createMemberException",
       "holdOrder",
-      "modifyOrder",
-      "pushWalletPassUpdate",
-      "quoteUpgrade"
+      "migrateMembership",
+      "modifyOrder"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1889,8 +2057,10 @@
      "key": "ORDER_VOID",
      "label": null,
      "group": "Selling",
-     "operationCount": 1,
+     "operationCount": 3,
      "operations": [
+      "cleanupFailedPayment",
+      "voidEntitlement",
       "voidOrder"
      ],
      "elevated": false,
@@ -1911,12 +2081,14 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 4,
+     "operationCount": 8,
      "operations": [
+      "cloneTicketTemplate",
       "createTicketTemplate",
+      "importTicketTemplate",
       "setDepositPolicy",
-      "setResaleFeePolicy",
-      "updateTicketTemplate"
+      "setGroupCustomerOrganization",
+      "setRefundCalculationPolicy"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2256,7 +2428,7 @@
      "key": "DEVELOPER_MANAGE",
      "label": "own clients, credentials, sandboxes, subscriptions",
      "group": "Guest engagement",
-     "operationCount": 9,
+     "operationCount": 11,
      "operations": [
       "createApiClient",
       "createSandbox",
@@ -2544,14 +2716,38 @@
   },
   "resources": {
    "title": "1 — Ticketing Catalogue",
-   "capabilityCount": 4,
+   "capabilityCount": 6,
    "unguardedOperations": 0,
    "capabilities": [
+    {
+     "key": "ORDER_CREATE",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 3,
+     "operations": [
+      "createResourceHold",
+      "extendResourceHold",
+      "relinquishResourceHold"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "ORDER_VIEW",
+     "label": null,
+     "group": "Selling",
+     "operationCount": 1,
+     "operations": [
+      "getResourceHold"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
     {
      "key": "RESOURCE_BOOK",
      "label": "reserve, check out, check in",
      "group": "Guest engagement",
-     "operationCount": 8,
+     "operationCount": 9,
      "operations": [
       "allocateResources",
       "bookResource",
@@ -2599,14 +2795,14 @@
      "key": "RESOURCE_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 20,
+     "operationCount": 24,
      "operations": [
       "getExperienceResourceRequirements",
+      "getMapResourceAvailability",
       "getPerformanceManifest",
       "getResource",
       "getResourceAllocationPolicy",
-      "getResourceAuditTrail",
-      "getResourceAvailability"
+      "getResourceAuditTrail"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -2641,7 +2837,7 @@
      "operations": [
       "createRetailExchange"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -3298,6 +3494,56 @@
     }
    ]
   },
+  "transport": {
+   "title": "1 — Ticketing Catalogue (Transport)",
+   "capabilityCount": 3,
+   "unguardedOperations": 12,
+   "capabilities": [
+    {
+     "key": "TRANSPORT_MANAGE",
+     "label": "stations, routes and stops, network import, timetables publish/withdraw, departure coach and capacity",
+     "group": "Transport --- (decided 29 September, rev 3 REV3-21)",
+     "operationCount": 12,
+     "operations": [
+      "applyTransportNetworkImport",
+      "createTransportRoute",
+      "createTransportStation",
+      "createTransportTimetable",
+      "importTransportNetwork",
+      "publishTransportTimetable"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TRANSPORT_PRICE",
+     "label": "fare tables, passenger types, pass types and their prices",
+     "group": "Transport --- (decided 29 September, rev 3 REV3-21)",
+     "operationCount": 3,
+     "operations": [
+      "createTransportPassType",
+      "setTransportFareTable",
+      "updateTransportPassType"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    },
+    {
+     "key": "TRANSPORT_VIEW",
+     "label": "stations, routes, timetables, departure board, pass types, network imports: read",
+     "group": "Transport --- (decided 29 September, rev 3 REV3-21)",
+     "operationCount": 4,
+     "operations": [
+      "getTransportNetworkImport",
+      "listTransportPassTypes",
+      "listTransportRouteDepartures",
+      "listTransportTimetables"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
+    }
+   ]
+  },
   "venue-map": {
    "title": "21 — Seat Management & Venue Mapping",
    "capabilityCount": 3,
@@ -3307,14 +3553,14 @@
      "key": "VENUE_MAP_MANAGE",
      "label": "place points, import geometry, accept proposals",
      "group": "Guest engagement",
-     "operationCount": 7,
+     "operationCount": 8,
      "operations": [
       "acceptVenueLabelProposals",
       "acceptWalkwayProposals",
       "createVenueMap",
       "importVenueGeometry",
       "setPathClosure",
-      "setVenuePoint"
+      "setPlacedResource"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3334,12 +3580,13 @@
      "key": "VENUE_MAP_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 5,
+     "operationCount": 6,
      "operations": [
       "getVenueMap",
       "getVenueMapGraph",
       "getVenueMapImportJob",
       "getVenueMapLive",
+      "listBookableVenueMaps",
       "listVenueMaps"
      ],
      "elevated": false,
@@ -3356,14 +3603,14 @@
      "key": "WALLET_CONFIGURE",
      "label": "wallet types, credit types, funding and risk rules",
      "group": "Wallet and stored value",
-     "operationCount": 15,
+     "operationCount": 20,
      "operations": [
       "createCreditType",
       "createVoucherType",
       "createWalletType",
       "publishWalletConfiguration",
-      "setCreditConsumptionPolicy",
-      "setCreditEligibilityRules"
+      "restoreWalletConfigurationVersion",
+      "setCreditConsumptionPolicy"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3372,7 +3619,7 @@
      "key": "WALLET_OPERATE",
      "label": "adjust, reverse, freeze, relink a credential",
      "group": "Wallet and stored value",
-     "operationCount": 19,
+     "operationCount": 21,
      "operations": [
       "activateGiftCard",
       "adjustGameCard",
@@ -3388,14 +3635,14 @@
      "key": "WALLET_VIEW",
      "label": "balances, lots, liability, disputes",
      "group": "Wallet and stored value",
-     "operationCount": 16,
+     "operationCount": 18,
      "operations": [
+      "diffWalletConfigurationVersion",
       "getCreditConsumptionPolicy",
       "getGiftCard",
       "getWallet",
       "getWalletBalance",
-      "getWalletFundingRules",
-      "getWalletLiability"
+      "getWalletFundingRules"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3405,20 +3652,20 @@
   "white-label": {
    "title": "19 — Guest Mobile App & Branding (builder)",
    "capabilityCount": 2,
-   "unguardedOperations": 1,
+   "unguardedOperations": 3,
    "capabilities": [
     {
      "key": "TENANT_CONFIGURE",
      "label": "edit branding, content, navigation, modules",
      "group": "Tenant experience",
-     "operationCount": 48,
+     "operationCount": 52,
      "operations": [
       "claimCustomDomain",
       "createBanner",
       "createContentBlock",
       "createContentPage",
-      "createPreview",
-      "createPromoBlock"
+      "createGuidedChoice",
+      "createPreview"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3427,11 +3674,13 @@
      "key": "TENANT_PUBLISH",
      "label": "publish a configuration version, restore a prior one",
      "group": "Tenant experience",
-     "operationCount": 3,
+     "operationCount": 5,
      "operations": [
       "publishContentBlock",
+      "publishGuidedChoice",
       "publishTenantConfig",
-      "restoreConfigVersion"
+      "restoreConfigVersion",
+      "unpublishGuidedChoice"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3503,19 +3752,22 @@
  },
  "unlabelled": {
   "note": "Permission keys used by a contract with no description in contracts/shared/permissions.yaml. **A checklist item nobody can read gets ticked anyway**, so these are the blocker for shipping the grant screen -- not the contract, which is done. One line each, written next to the key in permissions.yaml.",
-  "count": 69,
+  "count": 70,
   "keys": {
    "ACCESS_POINT_CONFIGURE": [
     "addBlacklistEntry",
-    "approveManualOverrideSupervisor",
     "approveMultiMediaPreview",
-    "createAccessPoint"
+    "createAccessPoint",
+    "createAdmissionRules"
    ],
    "ACCREDITATION_VIEW": [
     "getAccreditationHolder",
     "listAccessProfiles",
     "listAccreditationAccessActivity",
     "listAccreditationApplications"
+   ],
+   "AI_APPROVE": [
+    "decidePricingRecommendation"
    ],
    "AI_CONFIGURE": [
     "createKnowledgeCollection",
@@ -3534,22 +3786,22 @@
     "publishAnnouncement"
    ],
    "APPROVAL_CONFIGURE": [
-    "listApprovalMatrices",
-    "listStepUpPolicies",
-    "setApprovalControlPolicy",
-    "setApprovalMatrix"
-   ],
-   "APPROVAL_DECIDE": [
-    "createApprovalDelegation",
-    "decideApprovalRequest",
-    "revokeApprovalDelegation",
-    "setApproverAvailability"
-   ],
-   "APPROVAL_REQUEST": [
     "approveMatrixMultiLevel",
     "approveRoleAuthorityDelegation",
+    "approveVersioningGovernance",
+    "createAutomationAutonomouAction"
+   ],
+   "APPROVAL_DECIDE": [
     "approveUnifiedDecision",
-    "approveVersioningGovernance"
+    "createApprovalDelegation",
+    "decideApprovalRequest",
+    "revokeApprovalDelegation"
+   ],
+   "APPROVAL_REQUEST": [
+    "createApprovalRequest",
+    "escalateApprovalRequest",
+    "resubmitApprovalRequest",
+    "submitApprovalRequest"
    ],
    "APPROVAL_VIEW": [
     "createApprovalEvidencePackage",
@@ -3580,9 +3832,9 @@
    ],
    "CASE_VIEW": [
     "getCase",
+    "getCaseInvestigationResolution",
     "getConversation",
-    "getLostItemMatches",
-    "listCases"
+    "getLostItemMatches"
    ],
    "CASH_ADD": [
     "adjustDepositBoxFloat"
@@ -3594,10 +3846,10 @@
     "listApiVersions"
    ],
    "DEVICE_CONFIGURE": [
+    "cloneReaderConfiguration",
     "deployReaderConfiguration",
     "registerDevice",
-    "setReaderConfiguration",
-    "testReader"
+    "setDeviceSoftwareContent"
    ],
    "DEVICE_VIEW": [
     "getDevice",
@@ -3609,7 +3861,7 @@
     "assignPerformanceMedia",
     "cloneEvent",
     "createEvent",
-    "getEventResourcePlan"
+    "estimateEventResourceCost"
    ],
    "INCIDENT_VIEW": [
     "getHaccpStatus",
@@ -3656,7 +3908,8 @@
    "ORDER_EXCHANGE": [
     "createRetailExchange",
     "exchangeOrderLines",
-    "reissueEntitlement"
+    "reissueEntitlement",
+    "replaceCredential"
    ],
    "ORDER_MODIFY": [
     "acceptFnbOrder",
@@ -3665,6 +3918,7 @@
     "cancelFnbOrder"
    ],
    "ORDER_REPRINT": [
+    "deliverCredential",
     "printTicketProof",
     "reprintOrder",
     "reprintReceipt"
@@ -3679,6 +3933,8 @@
     "getEntitlementCredential"
    ],
    "ORDER_VOID": [
+    "cleanupFailedPayment",
+    "voidEntitlement",
     "voidOrder"
    ],
    "PARKING_CONFIGURE": [
@@ -3817,9 +4073,9 @@
    ],
    "RESOURCE_VIEW": [
     "getExperienceResourceRequirements",
+    "getMapResourceAvailability",
     "getPerformanceManifest",
-    "getResource",
-    "getResourceAllocationPolicy"
+    "getResource"
    ],
    "SETTLEMENT_RECONCILE": [
     "ingestSettlementFile",
@@ -3843,7 +4099,8 @@
    "TAX_CONFIGURE": [
     "createTaxCode",
     "createTaxExemption",
-    "updateTaxCode"
+    "updateTaxCode",
+    "verifyTaxExemption"
    ],
    "VENUE_MAP_VIEW": [
     "getVenueMap",

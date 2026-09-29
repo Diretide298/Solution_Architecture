@@ -1,7 +1,7 @@
 id: HLD
 title: TICVAI — seventeen services in five tiers
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,147 operations and 687 tables resolve into seventeen deployable services,
+about: '**What ships together.** 2,298 operations and 775 tables resolve into seventeen deployable services,
   and **the data boundary decides where they split** — no service spans a schema it does not own, and
   no schema is written by two services.
 
@@ -16,8 +16,8 @@ tiers:
     Identity and 289 tables anchor on `platform.scope`.
   services:
   - service: TenancyService
-    operations: 166
-    tables: 83
+    operations: 168
+    tables: 84
     schemas:
     - platform
     - workforce
@@ -29,7 +29,7 @@ tiers:
     - workforce
     - approvals
     - accreditation
-    flowCoverage: 31%
+    flowCoverage: 32%
     scale: Read-heavy and highly cacheable. Config changes are rare.
     ifDown: Same as identity — nothing runs without a scope.
     ref: diagrams/lld/services/TenancyService.yaml
@@ -49,8 +49,8 @@ tiers:
   meaning: The sale path. Highest availability and the highest write rate in the platform.
   services:
   - service: CatalogueService
-    operations: 407
-    tables: 75
+    operations: 415
+    tables: 77
     schemas:
     - catalogue
     - pricing
@@ -60,14 +60,14 @@ tiers:
     - catalogue
     - promotions
     - seating
-    flowCoverage: 63%
+    flowCoverage: 62%
     scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output**
       (ADR-0013).
     ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
     ref: diagrams/lld/services/CatalogueService.yaml
   - service: OrderService
-    operations: 254
-    tables: 70
+    operations: 268
+    tables: 85
     schemas:
     - orders
     - payments
@@ -75,42 +75,30 @@ tiers:
     - orders
     - shift
     - payments
-    flowCoverage: 56%
+    flowCoverage: 53%
     scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
     ifDown: '**Down means no sales.** Highest availability target in the platform.'
     ref: diagrams/lld/services/OrderService.yaml
   - service: AccessService
-    operations: 182
-    tables: 10
+    operations: 206
+    tables: 12
     schemas:
     - access
     contracts:
     - access
-    flowCoverage: 88%
+    flowCoverage: 78%
     scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is held rather than
       replayed** precisely because the gate cannot afford the arithmetic.
     ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
     ref: diagrams/lld/services/AccessService.yaml
-  - service: LedgerService
-    operations: 56
-    tables: 20
-    schemas:
-    - ledger
-    contracts:
-    - finance
-    flowCoverage: 59%
-    scale: Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs.
-    ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable;
-      one that is briefly wrong is not.'
-    ref: diagrams/lld/services/LedgerService.yaml
   - service: WalletService
-    operations: 50
-    tables: 25
+    operations: 59
+    tables: 28
     schemas:
     - wallet
     contracts:
     - wallet
-    flowCoverage: 6%
+    flowCoverage: 5%
     scale: 'Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy
       on top-up. **Latency-critical in a way LedgerService is not**, which is why the two are separate:
       the ledger is append-only and batch-tolerant, a balance check is neither.'
@@ -118,13 +106,25 @@ tiers:
       loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once,
       rather than per caller.'
     ref: diagrams/lld/services/WalletService.yaml
+  - service: LedgerService
+    operations: 57
+    tables: 20
+    schemas:
+    - ledger
+    contracts:
+    - finance
+    flowCoverage: 58%
+    scale: Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs.
+    ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable;
+      one that is briefly wrong is not.'
+    ref: diagrams/lld/services/LedgerService.yaml
 - tier: operations
   meaning: What a venue does with what it sold. **Licensed per module** — a venue that bought none of
     these runs none of them.
   services:
   - service: VenueOpsService
-    operations: 224
-    tables: 98
+    operations: 270
+    tables: 113
     schemas:
     - queue
     - maintenance
@@ -133,6 +133,7 @@ tiers:
     - assets
     - games
     - rental
+    - transport
     contracts:
     - queue
     - maintenance
@@ -141,18 +142,19 @@ tiers:
     - assets
     - games
     - rental
-    flowCoverage: 21%
+    - transport
+    flowCoverage: 19%
     scale: Low and steady. Queue readings are the only frequent write.
     ifDown: Down degrades venue operations. Selling and admitting continue.
     ref: diagrams/lld/services/VenueOpsService.yaml
   - service: FnbService
-    operations: 115
-    tables: 48
+    operations: 117
+    tables: 50
     schemas:
     - fnb
     contracts:
     - fnb
-    flowCoverage: 61%
+    flowCoverage: 60%
     scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
     ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
     ref: diagrams/lld/services/FnbService.yaml
@@ -183,13 +185,13 @@ tiers:
     property and one that should be tested rather than assumed.
   services:
   - service: MarketingService
-    operations: 213
-    tables: 70
+    operations: 248
+    tables: 113
     schemas:
     - marketing
     contracts:
     - marketing-crm
-    flowCoverage: 48%
+    flowCoverage: 41%
     scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
     ifDown: Down stops campaigns and guest lookup. Neither stops trading.
     ref: diagrams/lld/services/MarketingService.yaml
@@ -209,7 +211,7 @@ tiers:
   meaning: Provisioning, publishing, reporting, and the one path that crosses a region.
   services:
   - service: PlatformService
-    operations: 184
+    operations: 186
     tables: 64
     schemas:
     - control
@@ -223,13 +225,13 @@ tiers:
     ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
     ref: diagrams/lld/services/PlatformService.yaml
   - service: WhiteLabelService
-    operations: 52
-    tables: 16
+    operations: 60
+    tables: 19
     schemas:
     - whitelabel
     contracts:
     - white-label
-    flowCoverage: 46%
+    flowCoverage: 40%
     scale: Read-heavy and heavily cached. Published, not queried.
     ifDown: Down freezes the current published config. Guests see the last good version.
     ref: diagrams/lld/services/WhiteLabelService.yaml
@@ -269,7 +271,7 @@ crossServiceWrites:
 - from: OrderService
   to: AccessService
   writes: 7
-  reads: 12
+  reads: 13
   kind: strong
 - from: PlatformService
   to: TenancyService
@@ -314,7 +316,7 @@ crossServiceWrites:
 - from: OrderService
   to: MarketingService
   writes: 3
-  reads: 1
+  reads: 17
   kind: ordinary
 - from: PlatformService
   to: OrderService

@@ -8,103 +8,24 @@
   "P04": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
  },
  "counts": {
-  "batches": 298,
-  "screens": 2422,
-  "framesOnDisk": 46,
+  "batches": 301,
+  "screens": 2440,
+  "framesOnDisk": 156,
   "byStatus": {
-   "pending": 279,
+   "pending": 262,
    "partial": 0,
-   "drawn": 13,
+   "drawn": 33,
    "locked": 6
   },
   "screensByStatus": {
-   "pending": 2346,
+   "pending": 2284,
    "partial": 0,
-   "drawn": 46,
+   "drawn": 126,
    "locked": 30
   },
-  "fullyDrawableBatches": 56
+  "fullyDrawableBatches": 59
  },
  "batches": [
-  {
-   "id": "P02-discovery-01",
-   "kind": "module",
-   "label": "P02 · Discovery",
-   "platform": "P02",
-   "screens": [
-    "GST-063"
-   ],
-   "drawable": 1,
-   "thin": 0,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-engagement-support-02",
-   "kind": "module",
-   "label": "P02 · Engagement & Support (2 of 2)",
-   "platform": "P02",
-   "screens": [
-    "GST-059",
-    "GST-068"
-   ],
-   "drawable": 2,
-   "thin": 0,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-marketing-01",
-   "kind": "module",
-   "label": "P02 · Marketing",
-   "platform": "P02",
-   "screens": [
-    "GST-065"
-   ],
-   "drawable": 1,
-   "thin": 0,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-promotions-01",
-   "kind": "module",
-   "label": "P02 · Promotions",
-   "platform": "P02",
-   "screens": [
-    "GST-037"
-   ],
-   "drawable": 1,
-   "thin": 0,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-retail-01",
-   "kind": "module",
-   "label": "P02 · Retail",
-   "platform": "P02",
-   "screens": [
-    "GST-026"
-   ],
-   "drawable": 1,
-   "thin": 0,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-support-01",
-   "kind": "module",
-   "label": "P02 · Support",
-   "platform": "P02",
-   "screens": [
-    "GST-034"
-   ],
-   "drawable": 1,
-   "thin": 0,
-   "frames": 0,
-   "status": "pending"
-  },
   {
    "id": "P05-ai-01",
    "kind": "module",
@@ -314,10 +235,10 @@
     "BO-043",
     "BO-047",
     "BO-048",
-    "BO-051",
     "BO-059",
     "BO-061",
-    "BO-062"
+    "BO-062",
+    "BO-065"
    ],
    "drawable": 10,
    "thin": 0,
@@ -330,7 +251,6 @@
    "label": "P08 · Orders & Money (3 of 3)",
    "platform": "P08",
    "screens": [
-    "BO-065",
     "BO-074",
     "BO-075",
     "BO-076",
@@ -339,7 +259,7 @@
     "BO-090",
     "BO-101"
    ],
-   "drawable": 8,
+   "drawable": 7,
    "thin": 0,
    "frames": 0,
    "status": "pending"
@@ -378,10 +298,10 @@
     "BO-117",
     "BO-118",
     "BO-119",
+    "BO-1190",
     "BO-120",
     "BO-121",
-    "BO-122",
-    "BO-123"
+    "BO-122"
    ],
    "drawable": 10,
    "thin": 0,
@@ -407,13 +327,33 @@
    "label": "P08 · Stock & Supply (2 of 2)",
    "platform": "P08",
    "screens": [
+    "BO-105",
     "BO-137",
     "BO-138",
     "BO-139",
     "BO-140",
     "BO-141"
    ],
-   "drawable": 5,
+   "drawable": 6,
+   "thin": 0,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "P08-transport-01",
+   "kind": "module",
+   "label": "P08 · Transport",
+   "platform": "P08",
+   "screens": [
+    "BO-1183",
+    "BO-1184",
+    "BO-1185",
+    "BO-1186",
+    "BO-1187",
+    "BO-1188",
+    "BO-1189"
+   ],
+   "drawable": 7,
    "thin": 0,
    "frames": 0,
    "status": "pending"
@@ -791,6 +731,28 @@
    "status": "pending"
   },
   {
+   "id": "WS60",
+   "kind": "workshop",
+   "label": "Ticket Media   Credential Management board 2",
+   "platform": "P08",
+   "screens": [
+    "BO-344",
+    "BO-345",
+    "BO-346",
+    "BO-347",
+    "BO-348",
+    "BO-349",
+    "BO-350",
+    "BO-351",
+    "BO-352",
+    "BO-353"
+   ],
+   "drawable": 10,
+   "thin": 0,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS187",
    "kind": "workshop",
    "label": "Wallet Configuration Backend Structure v1.0 board 2",
@@ -809,163 +771,6 @@
    ],
    "drawable": 10,
    "thin": 0,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-account-self-service-01",
-   "kind": "module",
-   "label": "P02 · Account & Self-Service (1 of 2)",
-   "platform": "P02",
-   "screens": [
-    "GST-012",
-    "GST-013",
-    "GST-018",
-    "GST-019",
-    "GST-020",
-    "GST-039",
-    "GST-042",
-    "GST-045",
-    "GST-055",
-    "GST-066"
-   ],
-   "drawable": 9,
-   "thin": 1,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-account-self-service-02",
-   "kind": "module",
-   "label": "P02 · Account & Self-Service (2 of 2)",
-   "platform": "P02",
-   "screens": [
-    "GST-067",
-    "GST-069",
-    "GST-071",
-    "GST-073"
-   ],
-   "drawable": 3,
-   "thin": 1,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-booking-selection-01",
-   "kind": "module",
-   "label": "P02 · Booking & Selection",
-   "platform": "P02",
-   "screens": [
-    "GST-007",
-    "GST-008",
-    "GST-048",
-    "GST-049",
-    "GST-050",
-    "GST-056",
-    "GST-058",
-    "GST-072"
-   ],
-   "drawable": 7,
-   "thin": 1,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-cart-checkout-01",
-   "kind": "module",
-   "label": "P02 · Cart & Checkout",
-   "platform": "P02",
-   "screens": [
-    "GST-009",
-    "GST-010",
-    "GST-041"
-   ],
-   "drawable": 2,
-   "thin": 1,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-discovery-browse-01",
-   "kind": "module",
-   "label": "P02 · Discovery & Browse",
-   "platform": "P02",
-   "screens": [
-    "GST-001",
-    "GST-002",
-    "GST-003",
-    "GST-004",
-    "GST-005",
-    "GST-006",
-    "GST-057"
-   ],
-   "drawable": 6,
-   "thin": 1,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-engagement-support-01",
-   "kind": "module",
-   "label": "P02 · Engagement & Support (1 of 2)",
-   "platform": "P02",
-   "screens": [
-    "GST-030",
-    "GST-031",
-    "GST-032",
-    "GST-033",
-    "GST-035",
-    "GST-040",
-    "GST-051",
-    "GST-052",
-    "GST-053",
-    "GST-054"
-   ],
-   "drawable": 9,
-   "thin": 1,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-high-demand-access-01",
-   "kind": "module",
-   "label": "P02 · High-Demand Access",
-   "platform": "P02",
-   "screens": [
-    "GST-046"
-   ],
-   "drawable": 0,
-   "thin": 1,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-in-venue-experience-01",
-   "kind": "module",
-   "label": "P02 · In-Venue Experience",
-   "platform": "P02",
-   "screens": [
-    "GST-061",
-    "GST-062"
-   ],
-   "drawable": 1,
-   "thin": 1,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-ticketing-01",
-   "kind": "module",
-   "label": "P02 · Ticketing",
-   "platform": "P02",
-   "screens": [
-    "GST-014",
-    "GST-016",
-    "GST-017",
-    "GST-044"
-   ],
-   "drawable": 3,
-   "thin": 1,
    "frames": 0,
    "status": "pending"
   },
@@ -1113,13 +918,14 @@
    "label": "P08 · Sell (4 of 4)",
    "platform": "P08",
    "screens": [
+    "BO-123",
     "BO-124",
     "BO-125",
     "BO-126",
     "BO-142",
     "BO-143"
    ],
-   "drawable": 4,
+   "drawable": 5,
    "thin": 1,
    "frames": 0,
    "status": "pending"
@@ -1132,14 +938,14 @@
    "screens": [
     "BO-049",
     "BO-050",
+    "BO-051",
     "BO-052",
     "BO-078",
     "BO-079",
     "BO-080",
     "BO-081",
     "BO-082",
-    "BO-083",
-    "BO-105"
+    "BO-083"
    ],
    "drawable": 9,
    "thin": 1,
@@ -1260,28 +1066,6 @@
     "BO-323"
    ],
    "drawable": 8,
-   "thin": 1,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS60",
-   "kind": "workshop",
-   "label": "Ticket Media   Credential Management board 2",
-   "platform": "P08",
-   "screens": [
-    "BO-344",
-    "BO-345",
-    "BO-346",
-    "BO-347",
-    "BO-348",
-    "BO-349",
-    "BO-350",
-    "BO-351",
-    "BO-352",
-    "BO-353"
-   ],
-   "drawable": 9,
    "thin": 1,
    "frames": 0,
    "status": "pending"
@@ -1467,57 +1251,6 @@
    "status": "pending"
   },
   {
-   "id": "P02-in-venue-services-01",
-   "kind": "module",
-   "label": "P02 · In-venue Services",
-   "platform": "P02",
-   "screens": [
-    "GST-021",
-    "GST-022",
-    "GST-023",
-    "GST-024",
-    "GST-025",
-    "GST-027",
-    "GST-028",
-    "GST-029",
-    "GST-038",
-    "GST-070"
-   ],
-   "drawable": 8,
-   "thin": 2,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-membership-loyalty-value-01",
-   "kind": "module",
-   "label": "P02 · Membership, Loyalty & Value",
-   "platform": "P02",
-   "screens": [
-    "GST-011",
-    "GST-015",
-    "GST-036"
-   ],
-   "drawable": 1,
-   "thin": 2,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P02-system-states-01",
-   "kind": "module",
-   "label": "P02 · System States",
-   "platform": "P02",
-   "screens": [
-    "GST-043",
-    "GST-047"
-   ],
-   "drawable": 0,
-   "thin": 2,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "P06-operations-05",
    "kind": "module",
    "label": "P06 · Operations (5 of 5)",
@@ -1550,6 +1283,50 @@
     "ADM-028"
    ],
    "drawable": 5,
+   "thin": 2,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "P13-white-label-02",
+   "kind": "module",
+   "label": "P13 · White Label (2 of 2)",
+   "platform": "P13",
+   "screens": [
+    "CMS-011",
+    "CMS-012",
+    "CMS-013",
+    "CMS-014",
+    "CMS-015",
+    "CMS-016",
+    "CMS-017",
+    "CMS-018",
+    "CMS-019",
+    "CMS-101"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS06",
+   "kind": "workshop",
+   "label": "Access Control board 6",
+   "platform": "P08",
+   "screens": [
+    "BO-194",
+    "BO-195",
+    "BO-196",
+    "BO-197",
+    "BO-198",
+    "BO-199",
+    "BO-200",
+    "BO-201",
+    "BO-202",
+    "BO-203"
+   ],
+   "drawable": 8,
    "thin": 2,
    "frames": 0,
    "status": "pending"
@@ -1614,6 +1391,28 @@
     "BO-291",
     "BO-292",
     "BO-293"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS30",
+   "kind": "workshop",
+   "label": "Membership   Annual Pass Management board 2",
+   "platform": "P08",
+   "screens": [
+    "BO-294",
+    "BO-295",
+    "BO-296",
+    "BO-297",
+    "BO-298",
+    "BO-299",
+    "BO-300",
+    "BO-301",
+    "BO-302",
+    "BO-303"
    ],
    "drawable": 8,
    "thin": 2,
@@ -1687,6 +1486,28 @@
    "status": "pending"
   },
   {
+   "id": "WS40",
+   "kind": "workshop",
+   "label": "Pricing   Revenue Management board 7",
+   "platform": "P09",
+   "screens": [
+    "ADM-108",
+    "ADM-109",
+    "ADM-110",
+    "ADM-111",
+    "ADM-112",
+    "ADM-113",
+    "ADM-114",
+    "ADM-115",
+    "ADM-116",
+    "ADM-117"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS55",
    "kind": "workshop",
    "label": "Rules  Workflow  Approval   Automation Engine board 1",
@@ -1702,6 +1523,28 @@
     "ADM-245",
     "ADM-246",
     "ADM-247"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS57",
+   "kind": "workshop",
+   "label": "Sales Channel Management board 1",
+   "platform": "P09",
+   "screens": [
+    "ADM-258",
+    "ADM-259",
+    "ADM-260",
+    "ADM-261",
+    "ADM-262",
+    "ADM-263",
+    "ADM-264",
+    "ADM-265",
+    "ADM-266",
+    "ADM-267"
    ],
    "drawable": 8,
    "thin": 2,
@@ -1916,22 +1759,45 @@
    "status": "pending"
   },
   {
-   "id": "P13-white-label-02",
-   "kind": "module",
-   "label": "P13 · White Label (2 of 2)",
-   "platform": "P13",
+   "id": "WS05",
+   "kind": "workshop",
+   "label": "Access Control board 5",
+   "platform": "P08",
    "screens": [
-    "CMS-011",
-    "CMS-012",
-    "CMS-013",
-    "CMS-014",
-    "CMS-015",
-    "CMS-016",
-    "CMS-017",
-    "CMS-018",
-    "CMS-019"
+    "BO-184",
+    "BO-185",
+    "BO-186",
+    "BO-187",
+    "BO-188",
+    "BO-189",
+    "BO-190",
+    "BO-191",
+    "BO-192",
+    "BO-193"
    ],
-   "drawable": 6,
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS23",
+   "kind": "workshop",
+   "label": "B2B, Reseller & OTA Partner Management board 3",
+   "platform": "P10",
+   "screens": [
+    "PTR-042",
+    "PTR-043",
+    "PTR-044",
+    "PTR-045",
+    "PTR-046",
+    "PTR-047",
+    "PTR-048",
+    "PTR-049",
+    "PTR-050",
+    "PTR-051"
+   ],
+   "drawable": 7,
    "thin": 3,
    "frames": 0,
    "status": "pending"
@@ -2040,28 +1906,6 @@
     "ADM-095",
     "ADM-096",
     "ADM-097"
-   ],
-   "drawable": 7,
-   "thin": 3,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS40",
-   "kind": "workshop",
-   "label": "Pricing   Revenue Management board 7",
-   "platform": "P09",
-   "screens": [
-    "ADM-108",
-    "ADM-109",
-    "ADM-110",
-    "ADM-111",
-    "ADM-112",
-    "ADM-113",
-    "ADM-114",
-    "ADM-115",
-    "ADM-116",
-    "ADM-117"
    ],
    "drawable": 7,
    "thin": 3,
@@ -2179,28 +2023,6 @@
    "status": "pending"
   },
   {
-   "id": "WS57",
-   "kind": "workshop",
-   "label": "Sales Channel Management board 1",
-   "platform": "P09",
-   "screens": [
-    "ADM-258",
-    "ADM-259",
-    "ADM-260",
-    "ADM-261",
-    "ADM-262",
-    "ADM-263",
-    "ADM-264",
-    "ADM-265",
-    "ADM-266",
-    "ADM-267"
-   ],
-   "drawable": 7,
-   "thin": 3,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS59",
    "kind": "workshop",
    "label": "Ticket Media   Credential Management board 1",
@@ -2267,6 +2089,28 @@
    "status": "pending"
   },
   {
+   "id": "WS75",
+   "kind": "workshop",
+   "label": "Digital Asset Management DAM board 2",
+   "platform": "P13",
+   "screens": [
+    "CMS-071",
+    "CMS-072",
+    "CMS-073",
+    "CMS-074",
+    "CMS-075",
+    "CMS-076",
+    "CMS-077",
+    "CMS-078",
+    "CMS-079",
+    "CMS-080"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS77",
    "kind": "workshop",
    "label": "Digital Asset Management DAM board 4",
@@ -2304,6 +2148,50 @@
     "BO-401",
     "BO-402",
     "BO-403"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS82",
+   "kind": "workshop",
+   "label": "Game and Ride board 5",
+   "platform": "P08",
+   "screens": [
+    "BO-434",
+    "BO-435",
+    "BO-436",
+    "BO-437",
+    "BO-438",
+    "BO-439",
+    "BO-440",
+    "BO-441",
+    "BO-442",
+    "BO-443"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS97",
+   "kind": "workshop",
+   "label": "Rental Management board 10",
+   "platform": "P08",
+   "screens": [
+    "BO-584",
+    "BO-585",
+    "BO-586",
+    "BO-587",
+    "BO-588",
+    "BO-589",
+    "BO-590",
+    "BO-591",
+    "BO-592",
+    "BO-593"
    ],
    "drawable": 7,
    "thin": 3,
@@ -2459,6 +2347,28 @@
    "status": "pending"
   },
   {
+   "id": "WS159",
+   "kind": "workshop",
+   "label": "Resource Management Configuration board 5",
+   "platform": "P08",
+   "screens": [
+    "BO-893",
+    "BO-894",
+    "BO-895",
+    "BO-896",
+    "BO-897",
+    "BO-898",
+    "BO-899",
+    "BO-900",
+    "BO-901",
+    "BO-902"
+   ],
+   "drawable": 7,
+   "thin": 3,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS183",
    "kind": "workshop",
    "label": "Upsell,CrossSellEngine board 4",
@@ -2547,43 +2457,21 @@
    "status": "pending"
   },
   {
-   "id": "WS05",
+   "id": "WS08",
    "kind": "workshop",
-   "label": "Access Control board 5",
+   "label": "Access Control board 8",
    "platform": "P08",
    "screens": [
-    "BO-184",
-    "BO-185",
-    "BO-186",
-    "BO-187",
-    "BO-188",
-    "BO-189",
-    "BO-190",
-    "BO-191",
-    "BO-192",
-    "BO-193"
-   ],
-   "drawable": 6,
-   "thin": 4,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS06",
-   "kind": "workshop",
-   "label": "Access Control board 6",
-   "platform": "P08",
-   "screens": [
-    "BO-194",
-    "BO-195",
-    "BO-196",
-    "BO-197",
-    "BO-198",
-    "BO-199",
-    "BO-200",
-    "BO-201",
-    "BO-202",
-    "BO-203"
+    "BO-214",
+    "BO-215",
+    "BO-216",
+    "BO-217",
+    "BO-218",
+    "BO-219",
+    "BO-220",
+    "BO-221",
+    "BO-222",
+    "BO-223"
    ],
    "drawable": 6,
    "thin": 4,
@@ -2635,21 +2523,21 @@
    "status": "pending"
   },
   {
-   "id": "WS30",
+   "id": "WS27",
    "kind": "workshop",
-   "label": "Membership   Annual Pass Management board 2",
+   "label": "Group Sales   Corporate Booking Management board 1",
    "platform": "P08",
    "screens": [
-    "BO-294",
-    "BO-295",
-    "BO-296",
-    "BO-297",
-    "BO-298",
-    "BO-299",
-    "BO-300",
-    "BO-301",
-    "BO-302",
-    "BO-303"
+    "BO-264",
+    "BO-265",
+    "BO-266",
+    "BO-267",
+    "BO-268",
+    "BO-269",
+    "BO-270",
+    "BO-271",
+    "BO-272",
+    "BO-273"
    ],
    "drawable": 6,
    "thin": 4,
@@ -2767,28 +2655,6 @@
    "status": "pending"
   },
   {
-   "id": "WS75",
-   "kind": "workshop",
-   "label": "Digital Asset Management DAM board 2",
-   "platform": "P13",
-   "screens": [
-    "CMS-071",
-    "CMS-072",
-    "CMS-073",
-    "CMS-074",
-    "CMS-075",
-    "CMS-076",
-    "CMS-077",
-    "CMS-078",
-    "CMS-079",
-    "CMS-080"
-   ],
-   "drawable": 6,
-   "thin": 4,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS79",
    "kind": "workshop",
    "label": "Game and Ride board 2",
@@ -2804,28 +2670,6 @@
     "BO-411",
     "BO-412",
     "BO-413"
-   ],
-   "drawable": 6,
-   "thin": 4,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS97",
-   "kind": "workshop",
-   "label": "Rental Management board 10",
-   "platform": "P08",
-   "screens": [
-    "BO-584",
-    "BO-585",
-    "BO-586",
-    "BO-587",
-    "BO-588",
-    "BO-589",
-    "BO-590",
-    "BO-591",
-    "BO-592",
-    "BO-593"
    ],
    "drawable": 6,
    "thin": 4,
@@ -3062,28 +2906,6 @@
    "status": "pending"
   },
   {
-   "id": "WS27",
-   "kind": "workshop",
-   "label": "Group Sales   Corporate Booking Management board 1",
-   "platform": "P08",
-   "screens": [
-    "BO-264",
-    "BO-265",
-    "BO-266",
-    "BO-267",
-    "BO-268",
-    "BO-269",
-    "BO-270",
-    "BO-271",
-    "BO-272",
-    "BO-273"
-   ],
-   "drawable": 5,
-   "thin": 5,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS44",
    "kind": "workshop",
    "label": "Product Lifecycle   Catalogue Governance board 2",
@@ -3150,6 +2972,28 @@
    "status": "pending"
   },
   {
+   "id": "WS56",
+   "kind": "workshop",
+   "label": "Rules  Workflow  Approval   Automation Engine board 2",
+   "platform": "P09",
+   "screens": [
+    "ADM-248",
+    "ADM-249",
+    "ADM-250",
+    "ADM-251",
+    "ADM-252",
+    "ADM-253",
+    "ADM-254",
+    "ADM-255",
+    "ADM-256",
+    "ADM-257"
+   ],
+   "drawable": 5,
+   "thin": 5,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS67",
    "kind": "workshop",
    "label": "Unified BI Reporting and AI Analytics Platform board 2",
@@ -3172,23 +3016,22 @@
    "status": "pending"
   },
   {
-   "id": "WS82",
+   "id": "WS85",
    "kind": "workshop",
-   "label": "Game and Ride board 5",
+   "label": "Game and Ride board 8",
    "platform": "P08",
    "screens": [
-    "BO-434",
-    "BO-435",
-    "BO-436",
-    "BO-437",
-    "BO-438",
-    "BO-439",
-    "BO-440",
-    "BO-441",
-    "BO-442",
-    "BO-443"
+    "BO-464",
+    "BO-465",
+    "BO-466",
+    "BO-467",
+    "BO-468",
+    "BO-469",
+    "BO-470",
+    "BO-471",
+    "BO-473"
    ],
-   "drawable": 5,
+   "drawable": 4,
    "thin": 5,
    "frames": 0,
    "status": "pending"
@@ -3216,6 +3059,28 @@
    "status": "pending"
   },
   {
+   "id": "WS90",
+   "kind": "workshop",
+   "label": "Rental Management board 3",
+   "platform": "P08",
+   "screens": [
+    "BO-514",
+    "BO-515",
+    "BO-516",
+    "BO-517",
+    "BO-518",
+    "BO-519",
+    "BO-520",
+    "BO-521",
+    "BO-522",
+    "BO-523"
+   ],
+   "drawable": 5,
+   "thin": 5,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS91",
    "kind": "workshop",
    "label": "Rental Management board 4",
@@ -3231,6 +3096,28 @@
     "BO-531",
     "BO-532",
     "BO-533"
+   ],
+   "drawable": 5,
+   "thin": 5,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS92",
+   "kind": "workshop",
+   "label": "Rental Management board 5",
+   "platform": "P08",
+   "screens": [
+    "BO-534",
+    "BO-535",
+    "BO-536",
+    "BO-537",
+    "BO-538",
+    "BO-539",
+    "BO-540",
+    "BO-541",
+    "BO-542",
+    "BO-543"
    ],
    "drawable": 5,
    "thin": 5,
@@ -3277,21 +3164,43 @@
    "status": "pending"
   },
   {
-   "id": "WS159",
+   "id": "WS161",
    "kind": "workshop",
-   "label": "Resource Management Configuration board 5",
+   "label": "Resource Management Configuration board 7",
    "platform": "P08",
    "screens": [
-    "BO-893",
-    "BO-894",
-    "BO-895",
-    "BO-896",
-    "BO-897",
-    "BO-898",
-    "BO-899",
-    "BO-900",
-    "BO-901",
-    "BO-902"
+    "BO-913",
+    "BO-914",
+    "BO-915",
+    "BO-916",
+    "BO-917",
+    "BO-918",
+    "BO-919",
+    "BO-920",
+    "BO-921",
+    "BO-922"
+   ],
+   "drawable": 5,
+   "thin": 5,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS164",
+   "kind": "workshop",
+   "label": "Resource Management Configuration board 10",
+   "platform": "P08",
+   "screens": [
+    "BO-943",
+    "BO-944",
+    "BO-945",
+    "BO-946",
+    "BO-947",
+    "BO-948",
+    "BO-949",
+    "BO-950",
+    "BO-951",
+    "BO-952"
    ],
    "drawable": 5,
    "thin": 5,
@@ -3314,6 +3223,28 @@
     "ADM-656",
     "ADM-657",
     "ADM-658"
+   ],
+   "drawable": 5,
+   "thin": 5,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS194",
+   "kind": "workshop",
+   "label": "Wallet Configuration Backend Structure v1.0 board 9",
+   "platform": "P08",
+   "screens": [
+    "BO-1163",
+    "BO-1164",
+    "BO-1165",
+    "BO-1166",
+    "BO-1167",
+    "BO-1168",
+    "BO-1169",
+    "BO-1170",
+    "BO-1171",
+    "BO-1172"
    ],
    "drawable": 5,
    "thin": 5,
@@ -3387,6 +3318,94 @@
    "status": "pending"
   },
   {
+   "id": "WS07",
+   "kind": "workshop",
+   "label": "Access Control board 7",
+   "platform": "P08",
+   "screens": [
+    "BO-204",
+    "BO-205",
+    "BO-206",
+    "BO-207",
+    "BO-208",
+    "BO-209",
+    "BO-210",
+    "BO-211",
+    "BO-212",
+    "BO-213"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS11",
+   "kind": "workshop",
+   "label": "Access Control board 11",
+   "platform": "P08",
+   "screens": [
+    "BO-244",
+    "BO-245",
+    "BO-246",
+    "BO-247",
+    "BO-248",
+    "BO-249",
+    "BO-250",
+    "BO-251",
+    "BO-252",
+    "BO-253"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS12",
+   "kind": "workshop",
+   "label": "Access Control board 12",
+   "platform": "P08",
+   "screens": [
+    "BO-254",
+    "BO-255",
+    "BO-256",
+    "BO-257",
+    "BO-258",
+    "BO-259",
+    "BO-260",
+    "BO-261",
+    "BO-262",
+    "BO-263"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS17",
+   "kind": "workshop",
+   "label": "Approval Workflows and Governance board 5",
+   "platform": "P08",
+   "screens": [
+    "BO-384",
+    "BO-385",
+    "BO-386",
+    "BO-387",
+    "BO-388",
+    "BO-389",
+    "BO-390",
+    "BO-391",
+    "BO-392",
+    "BO-393"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS19",
    "kind": "workshop",
    "label": "Approval Workflows and Governance board 7",
@@ -3402,28 +3421,6 @@
     "ADM-356",
     "ADM-357",
     "ADM-358"
-   ],
-   "drawable": 4,
-   "thin": 6,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS23",
-   "kind": "workshop",
-   "label": "B2B, Reseller & OTA Partner Management board 3",
-   "platform": "P10",
-   "screens": [
-    "PTR-042",
-    "PTR-043",
-    "PTR-044",
-    "PTR-045",
-    "PTR-046",
-    "PTR-047",
-    "PTR-048",
-    "PTR-049",
-    "PTR-050",
-    "PTR-051"
    ],
    "drawable": 4,
    "thin": 6,
@@ -3607,6 +3604,28 @@
    "status": "pending"
   },
   {
+   "id": "WS83",
+   "kind": "workshop",
+   "label": "Game and Ride board 6",
+   "platform": "P08",
+   "screens": [
+    "BO-444",
+    "BO-445",
+    "BO-446",
+    "BO-447",
+    "BO-448",
+    "BO-449",
+    "BO-450",
+    "BO-451",
+    "BO-452",
+    "BO-453"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS89",
    "kind": "workshop",
    "label": "Rental Management board 2",
@@ -3622,28 +3641,6 @@
     "BO-511",
     "BO-512",
     "BO-513"
-   ],
-   "drawable": 4,
-   "thin": 6,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS92",
-   "kind": "workshop",
-   "label": "Rental Management board 5",
-   "platform": "P08",
-   "screens": [
-    "BO-534",
-    "BO-535",
-    "BO-536",
-    "BO-537",
-    "BO-538",
-    "BO-539",
-    "BO-540",
-    "BO-541",
-    "BO-542",
-    "BO-543"
    ],
    "drawable": 4,
    "thin": 6,
@@ -3797,21 +3794,21 @@
    "status": "pending"
   },
   {
-   "id": "WS161",
+   "id": "WS158",
    "kind": "workshop",
-   "label": "Resource Management Configuration board 7",
+   "label": "Resource Management Configuration board 4",
    "platform": "P08",
    "screens": [
-    "BO-913",
-    "BO-914",
-    "BO-915",
-    "BO-916",
-    "BO-917",
-    "BO-918",
-    "BO-919",
-    "BO-920",
-    "BO-921",
-    "BO-922"
+    "BO-883",
+    "BO-884",
+    "BO-885",
+    "BO-886",
+    "BO-887",
+    "BO-888",
+    "BO-889",
+    "BO-890",
+    "BO-891",
+    "BO-892"
    ],
    "drawable": 4,
    "thin": 6,
@@ -3841,21 +3838,65 @@
    "status": "pending"
   },
   {
-   "id": "WS164",
+   "id": "WS167",
    "kind": "workshop",
-   "label": "Resource Management Configuration board 10",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 3",
    "platform": "P08",
    "screens": [
-    "BO-943",
-    "BO-944",
-    "BO-945",
-    "BO-946",
-    "BO-947",
-    "BO-948",
-    "BO-949",
-    "BO-950",
-    "BO-951",
-    "BO-952"
+    "BO-973",
+    "BO-974",
+    "BO-975",
+    "BO-976",
+    "BO-977",
+    "BO-978",
+    "BO-979",
+    "BO-980",
+    "BO-981",
+    "BO-982"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS168",
+   "kind": "workshop",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 4",
+   "platform": "P08",
+   "screens": [
+    "BO-983",
+    "BO-984",
+    "BO-985",
+    "BO-986",
+    "BO-987",
+    "BO-988",
+    "BO-989",
+    "BO-990",
+    "BO-991",
+    "BO-992"
+   ],
+   "drawable": 4,
+   "thin": 6,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS175",
+   "kind": "workshop",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 11",
+   "platform": "P08",
+   "screens": [
+    "BO-1051",
+    "BO-1052",
+    "BO-1053",
+    "BO-1054",
+    "BO-1055",
+    "BO-1056",
+    "BO-1057",
+    "BO-1058",
+    "BO-1059",
+    "BO-1060"
    ],
    "drawable": 4,
    "thin": 6,
@@ -3878,28 +3919,6 @@
     "ADM-646",
     "ADM-647",
     "ADM-648"
-   ],
-   "drawable": 4,
-   "thin": 6,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS194",
-   "kind": "workshop",
-   "label": "Wallet Configuration Backend Structure v1.0 board 9",
-   "platform": "P08",
-   "screens": [
-    "BO-1163",
-    "BO-1164",
-    "BO-1165",
-    "BO-1166",
-    "BO-1167",
-    "BO-1168",
-    "BO-1169",
-    "BO-1170",
-    "BO-1171",
-    "BO-1172"
    ],
    "drawable": 4,
    "thin": 6,
@@ -3967,65 +3986,21 @@
    "status": "pending"
   },
   {
-   "id": "WS08",
+   "id": "WS10",
    "kind": "workshop",
-   "label": "Access Control board 8",
+   "label": "Access Control board 10",
    "platform": "P08",
    "screens": [
-    "BO-214",
-    "BO-215",
-    "BO-216",
-    "BO-217",
-    "BO-218",
-    "BO-219",
-    "BO-220",
-    "BO-221",
-    "BO-222",
-    "BO-223"
-   ],
-   "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS11",
-   "kind": "workshop",
-   "label": "Access Control board 11",
-   "platform": "P08",
-   "screens": [
-    "BO-244",
-    "BO-245",
-    "BO-246",
-    "BO-247",
-    "BO-248",
-    "BO-249",
-    "BO-250",
-    "BO-251",
-    "BO-252",
-    "BO-253"
-   ],
-   "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS12",
-   "kind": "workshop",
-   "label": "Access Control board 12",
-   "platform": "P08",
-   "screens": [
-    "BO-254",
-    "BO-255",
-    "BO-256",
-    "BO-257",
-    "BO-258",
-    "BO-259",
-    "BO-260",
-    "BO-261",
-    "BO-262",
-    "BO-263"
+    "BO-234",
+    "BO-235",
+    "BO-236",
+    "BO-237",
+    "BO-238",
+    "BO-239",
+    "BO-240",
+    "BO-241",
+    "BO-242",
+    "BO-243"
    ],
    "drawable": 3,
    "thin": 7,
@@ -4054,28 +4029,6 @@
    "status": "pending"
   },
   {
-   "id": "WS17",
-   "kind": "workshop",
-   "label": "Approval Workflows and Governance board 5",
-   "platform": "P08",
-   "screens": [
-    "BO-384",
-    "BO-385",
-    "BO-386",
-    "BO-387",
-    "BO-388",
-    "BO-389",
-    "BO-390",
-    "BO-391",
-    "BO-392",
-    "BO-393"
-   ],
-   "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS39",
    "kind": "workshop",
    "label": "Pricing   Revenue Management board 6",
@@ -4091,28 +4044,6 @@
     "ADM-105",
     "ADM-106",
     "ADM-107"
-   ],
-   "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS56",
-   "kind": "workshop",
-   "label": "Rules  Workflow  Approval   Automation Engine board 2",
-   "platform": "P09",
-   "screens": [
-    "ADM-248",
-    "ADM-249",
-    "ADM-250",
-    "ADM-251",
-    "ADM-252",
-    "ADM-253",
-    "ADM-254",
-    "ADM-255",
-    "ADM-256",
-    "ADM-257"
    ],
    "drawable": 3,
    "thin": 7,
@@ -4142,28 +4073,6 @@
    "status": "pending"
   },
   {
-   "id": "WS83",
-   "kind": "workshop",
-   "label": "Game and Ride board 6",
-   "platform": "P08",
-   "screens": [
-    "BO-444",
-    "BO-445",
-    "BO-446",
-    "BO-447",
-    "BO-448",
-    "BO-449",
-    "BO-450",
-    "BO-451",
-    "BO-452",
-    "BO-453"
-   ],
-   "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS84",
    "kind": "workshop",
    "label": "Game and Ride board 7",
@@ -4181,27 +4090,6 @@
     "BO-463"
    ],
    "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS85",
-   "kind": "workshop",
-   "label": "Game and Ride board 8",
-   "platform": "P08",
-   "screens": [
-    "BO-464",
-    "BO-465",
-    "BO-466",
-    "BO-467",
-    "BO-468",
-    "BO-469",
-    "BO-470",
-    "BO-471",
-    "BO-473"
-   ],
-   "drawable": 2,
    "thin": 7,
    "frames": 0,
    "status": "pending"
@@ -4229,21 +4117,21 @@
    "status": "pending"
   },
   {
-   "id": "WS90",
+   "id": "WS87",
    "kind": "workshop",
-   "label": "Rental Management board 3",
+   "label": "Game and Ride board 10",
    "platform": "P08",
    "screens": [
-    "BO-514",
-    "BO-515",
-    "BO-516",
-    "BO-517",
-    "BO-518",
-    "BO-519",
-    "BO-520",
-    "BO-521",
-    "BO-522",
-    "BO-523"
+    "BO-484",
+    "BO-485",
+    "BO-486",
+    "BO-487",
+    "BO-488",
+    "BO-489",
+    "BO-490",
+    "BO-491",
+    "BO-492",
+    "BO-493"
    ],
    "drawable": 3,
    "thin": 7,
@@ -4295,6 +4183,28 @@
    "status": "pending"
   },
   {
+   "id": "WS105",
+   "kind": "workshop",
+   "label": "Subscription Licensing AI Self Service board 8",
+   "platform": "P08",
+   "screens": [
+    "BO-605",
+    "BO-606",
+    "BO-607",
+    "BO-608",
+    "BO-609",
+    "BO-610",
+    "BO-611",
+    "BO-612",
+    "BO-613",
+    "BO-614"
+   ],
+   "drawable": 3,
+   "thin": 7,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS113",
    "kind": "workshop",
    "label": "ACCREDITATION board 6",
@@ -4310,6 +4220,28 @@
     "BO-671",
     "BO-672",
     "BO-673"
+   ],
+   "drawable": 3,
+   "thin": 7,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS115",
+   "kind": "workshop",
+   "label": "ACCREDITATION board 8",
+   "platform": "P08",
+   "screens": [
+    "BO-684",
+    "BO-685",
+    "BO-686",
+    "BO-687",
+    "BO-688",
+    "BO-689",
+    "BO-690",
+    "BO-691",
+    "BO-692",
+    "BO-693"
    ],
    "drawable": 3,
    "thin": 7,
@@ -4449,28 +4381,6 @@
    "status": "pending"
   },
   {
-   "id": "WS167",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 3",
-   "platform": "P08",
-   "screens": [
-    "BO-973",
-    "BO-974",
-    "BO-975",
-    "BO-976",
-    "BO-977",
-    "BO-978",
-    "BO-979",
-    "BO-980",
-    "BO-981",
-    "BO-982"
-   ],
-   "drawable": 3,
-   "thin": 7,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS182",
    "kind": "workshop",
    "label": "Upsell,CrossSellEngine board 3",
@@ -4515,6 +4425,28 @@
    "status": "pending"
   },
   {
+   "id": "P06-rentals-02",
+   "kind": "module",
+   "label": "P06 · Rentals (2 of 3)",
+   "platform": "P06",
+   "screens": [
+    "EMP-081",
+    "EMP-082",
+    "EMP-083",
+    "EMP-084",
+    "EMP-085",
+    "EMP-086",
+    "EMP-087",
+    "EMP-088",
+    "EMP-089",
+    "EMP-090"
+   ],
+   "drawable": 2,
+   "thin": 8,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS01",
    "kind": "workshop",
    "label": "Access Control board 1",
@@ -4537,43 +4469,21 @@
    "status": "pending"
   },
   {
-   "id": "WS07",
+   "id": "WS09",
    "kind": "workshop",
-   "label": "Access Control board 7",
+   "label": "Access Control board 9",
    "platform": "P08",
    "screens": [
-    "BO-204",
-    "BO-205",
-    "BO-206",
-    "BO-207",
-    "BO-208",
-    "BO-209",
-    "BO-210",
-    "BO-211",
-    "BO-212",
-    "BO-213"
-   ],
-   "drawable": 2,
-   "thin": 8,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS10",
-   "kind": "workshop",
-   "label": "Access Control board 10",
-   "platform": "P08",
-   "screens": [
-    "BO-234",
-    "BO-235",
-    "BO-236",
-    "BO-237",
-    "BO-238",
-    "BO-239",
-    "BO-240",
-    "BO-241",
-    "BO-242",
-    "BO-243"
+    "BO-224",
+    "BO-225",
+    "BO-226",
+    "BO-227",
+    "BO-228",
+    "BO-229",
+    "BO-230",
+    "BO-231",
+    "BO-232",
+    "BO-233"
    ],
    "drawable": 2,
    "thin": 8,
@@ -4625,21 +4535,21 @@
    "status": "pending"
   },
   {
-   "id": "WS87",
+   "id": "WS94",
    "kind": "workshop",
-   "label": "Game and Ride board 10",
+   "label": "Rental Management board 7",
    "platform": "P08",
    "screens": [
-    "BO-484",
-    "BO-485",
-    "BO-486",
-    "BO-487",
-    "BO-488",
-    "BO-489",
-    "BO-490",
-    "BO-491",
-    "BO-492",
-    "BO-493"
+    "BO-554",
+    "BO-555",
+    "BO-556",
+    "BO-557",
+    "BO-558",
+    "BO-559",
+    "BO-560",
+    "BO-561",
+    "BO-562",
+    "BO-563"
    ],
    "drawable": 2,
    "thin": 8,
@@ -4734,28 +4644,6 @@
    "status": "pending"
   },
   {
-   "id": "WS115",
-   "kind": "workshop",
-   "label": "ACCREDITATION board 8",
-   "platform": "P08",
-   "screens": [
-    "BO-684",
-    "BO-685",
-    "BO-686",
-    "BO-687",
-    "BO-688",
-    "BO-689",
-    "BO-690",
-    "BO-691",
-    "BO-692",
-    "BO-693"
-   ],
-   "drawable": 2,
-   "thin": 8,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS118",
    "kind": "workshop",
    "label": "AI Configuration Assistant board 3",
@@ -4800,21 +4688,87 @@
    "status": "pending"
   },
   {
-   "id": "WS158",
+   "id": "WS144",
    "kind": "workshop",
-   "label": "Resource Management Configuration board 4",
+   "label": "Marketing CRM Configuration Reference v1.0 board 10",
    "platform": "P08",
    "screens": [
-    "BO-883",
-    "BO-884",
-    "BO-885",
-    "BO-886",
-    "BO-887",
-    "BO-888",
-    "BO-889",
-    "BO-890",
-    "BO-891",
-    "BO-892"
+    "BO-824",
+    "BO-825",
+    "BO-826",
+    "BO-827",
+    "BO-828",
+    "BO-829",
+    "BO-830",
+    "BO-831",
+    "BO-832",
+    "BO-833"
+   ],
+   "drawable": 2,
+   "thin": 8,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS165",
+   "kind": "workshop",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 1",
+   "platform": "P08",
+   "screens": [
+    "BO-953",
+    "BO-954",
+    "BO-955",
+    "BO-956",
+    "BO-957",
+    "BO-958",
+    "BO-959",
+    "BO-960",
+    "BO-961",
+    "BO-962"
+   ],
+   "drawable": 2,
+   "thin": 8,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS171",
+   "kind": "workshop",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 7",
+   "platform": "P08",
+   "screens": [
+    "BO-1013",
+    "BO-1014",
+    "BO-1015",
+    "BO-1016",
+    "BO-1017",
+    "BO-1018",
+    "BO-1019",
+    "BO-1020",
+    "BO-1021",
+    "BO-1022"
+   ],
+   "drawable": 2,
+   "thin": 8,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS173",
+   "kind": "workshop",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 9",
+   "platform": "P08",
+   "screens": [
+    "BO-1033",
+    "BO-1034",
+    "BO-1035",
+    "BO-1036",
+    "BO-1037",
+    "BO-1038",
+    "BO-1039",
+    "BO-1040",
+    "BO-1041",
+    "BO-1042"
    ],
    "drawable": 2,
    "thin": 8,
@@ -4864,28 +4818,6 @@
    "status": "pending"
   },
   {
-   "id": "P06-rentals-02",
-   "kind": "module",
-   "label": "P06 · Rentals (2 of 3)",
-   "platform": "P06",
-   "screens": [
-    "EMP-081",
-    "EMP-082",
-    "EMP-083",
-    "EMP-084",
-    "EMP-085",
-    "EMP-086",
-    "EMP-087",
-    "EMP-088",
-    "EMP-089",
-    "EMP-090"
-   ],
-   "drawable": 1,
-   "thin": 9,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "P06-rentals-03",
    "kind": "module",
    "label": "P06 · Rentals (3 of 3)",
@@ -4908,28 +4840,6 @@
    "status": "pending"
   },
   {
-   "id": "WS09",
-   "kind": "workshop",
-   "label": "Access Control board 9",
-   "platform": "P08",
-   "screens": [
-    "BO-224",
-    "BO-225",
-    "BO-226",
-    "BO-227",
-    "BO-228",
-    "BO-229",
-    "BO-230",
-    "BO-231",
-    "BO-232",
-    "BO-233"
-   ],
-   "drawable": 1,
-   "thin": 9,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS13",
    "kind": "workshop",
    "label": "Approval Workflows and Governance board 1",
@@ -4945,6 +4855,28 @@
     "BO-371",
     "BO-372",
     "BO-373"
+   ],
+   "drawable": 1,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS16",
+   "kind": "workshop",
+   "label": "Approval Workflows and Governance board 4",
+   "platform": "P08",
+   "screens": [
+    "BO-374",
+    "BO-375",
+    "BO-376",
+    "BO-377",
+    "BO-378",
+    "BO-379",
+    "BO-380",
+    "BO-381",
+    "BO-382",
+    "BO-383"
    ],
    "drawable": 1,
    "thin": 9,
@@ -5018,28 +4950,6 @@
    "status": "pending"
   },
   {
-   "id": "WS94",
-   "kind": "workshop",
-   "label": "Rental Management board 7",
-   "platform": "P08",
-   "screens": [
-    "BO-554",
-    "BO-555",
-    "BO-556",
-    "BO-557",
-    "BO-558",
-    "BO-559",
-    "BO-560",
-    "BO-561",
-    "BO-562",
-    "BO-563"
-   ],
-   "drawable": 1,
-   "thin": 9,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS95",
    "kind": "workshop",
    "label": "Rental Management board 8",
@@ -5055,28 +4965,6 @@
     "BO-571",
     "BO-572",
     "BO-573"
-   ],
-   "drawable": 1,
-   "thin": 9,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS105",
-   "kind": "workshop",
-   "label": "Subscription Licensing AI Self Service board 8",
-   "platform": "P08",
-   "screens": [
-    "BO-605",
-    "BO-606",
-    "BO-607",
-    "BO-608",
-    "BO-609",
-    "BO-610",
-    "BO-611",
-    "BO-612",
-    "BO-613",
-    "BO-614"
    ],
    "drawable": 1,
    "thin": 9,
@@ -5171,6 +5059,28 @@
    "status": "pending"
   },
   {
+   "id": "WS145",
+   "kind": "workshop",
+   "label": "Marketing CRM Configuration Reference v1.0 board 11",
+   "platform": "P08",
+   "screens": [
+    "BO-834",
+    "BO-835",
+    "BO-836",
+    "BO-837",
+    "BO-838",
+    "BO-839",
+    "BO-840",
+    "BO-841",
+    "BO-842",
+    "BO-843"
+   ],
+   "drawable": 1,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS162",
    "kind": "workshop",
    "label": "Resource Management Configuration board 8",
@@ -5186,28 +5096,6 @@
     "BO-930",
     "BO-931",
     "BO-932"
-   ],
-   "drawable": 1,
-   "thin": 9,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS165",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 1",
-   "platform": "P08",
-   "screens": [
-    "BO-953",
-    "BO-954",
-    "BO-955",
-    "BO-956",
-    "BO-957",
-    "BO-958",
-    "BO-959",
-    "BO-960",
-    "BO-961",
-    "BO-962"
    ],
    "drawable": 1,
    "thin": 9,
@@ -5237,24 +5125,46 @@
    "status": "pending"
   },
   {
-   "id": "WS16",
+   "id": "WS176",
    "kind": "workshop",
-   "label": "Approval Workflows and Governance board 4",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 12",
    "platform": "P08",
    "screens": [
-    "BO-374",
-    "BO-375",
-    "BO-376",
-    "BO-377",
-    "BO-378",
-    "BO-379",
-    "BO-380",
-    "BO-381",
-    "BO-382",
-    "BO-383"
+    "BO-1061",
+    "BO-1062",
+    "BO-1063",
+    "BO-1064",
+    "BO-1065",
+    "BO-1066",
+    "BO-1067",
+    "BO-1068",
+    "BO-1069",
+    "BO-1070"
    ],
-   "drawable": 0,
-   "thin": 10,
+   "drawable": 1,
+   "thin": 9,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS177",
+   "kind": "workshop",
+   "label": "Seat Management Venue Mapping Reference v1.0 board 13",
+   "platform": "P08",
+   "screens": [
+    "BO-1071",
+    "BO-1072",
+    "BO-1073",
+    "BO-1074",
+    "BO-1075",
+    "BO-1076",
+    "BO-1077",
+    "BO-1078",
+    "BO-1079",
+    "BO-1080"
+   ],
+   "drawable": 1,
+   "thin": 9,
    "frames": 0,
    "status": "pending"
   },
@@ -5457,50 +5367,6 @@
    "status": "pending"
   },
   {
-   "id": "WS144",
-   "kind": "workshop",
-   "label": "Marketing CRM Configuration Reference v1.0 board 10",
-   "platform": "P08",
-   "screens": [
-    "BO-824",
-    "BO-825",
-    "BO-826",
-    "BO-827",
-    "BO-828",
-    "BO-829",
-    "BO-830",
-    "BO-831",
-    "BO-832",
-    "BO-833"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS145",
-   "kind": "workshop",
-   "label": "Marketing CRM Configuration Reference v1.0 board 11",
-   "platform": "P08",
-   "screens": [
-    "BO-834",
-    "BO-835",
-    "BO-836",
-    "BO-837",
-    "BO-838",
-    "BO-839",
-    "BO-840",
-    "BO-841",
-    "BO-842",
-    "BO-843"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS146",
    "kind": "workshop",
    "label": "Marketing CRM Configuration Reference v1.0 board 12",
@@ -5538,28 +5404,6 @@
     "BO-970",
     "BO-971",
     "BO-972"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS168",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 4",
-   "platform": "P08",
-   "screens": [
-    "BO-983",
-    "BO-984",
-    "BO-985",
-    "BO-986",
-    "BO-987",
-    "BO-988",
-    "BO-989",
-    "BO-990",
-    "BO-991",
-    "BO-992"
    ],
    "drawable": 0,
    "thin": 10,
@@ -5611,116 +5455,6 @@
    "status": "pending"
   },
   {
-   "id": "WS171",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 7",
-   "platform": "P08",
-   "screens": [
-    "BO-1013",
-    "BO-1014",
-    "BO-1015",
-    "BO-1016",
-    "BO-1017",
-    "BO-1018",
-    "BO-1019",
-    "BO-1020",
-    "BO-1021",
-    "BO-1022"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS173",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 9",
-   "platform": "P08",
-   "screens": [
-    "BO-1033",
-    "BO-1034",
-    "BO-1035",
-    "BO-1036",
-    "BO-1037",
-    "BO-1038",
-    "BO-1039",
-    "BO-1040",
-    "BO-1041",
-    "BO-1042"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS175",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 11",
-   "platform": "P08",
-   "screens": [
-    "BO-1051",
-    "BO-1052",
-    "BO-1053",
-    "BO-1054",
-    "BO-1055",
-    "BO-1056",
-    "BO-1057",
-    "BO-1058",
-    "BO-1059",
-    "BO-1060"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS176",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 12",
-   "platform": "P08",
-   "screens": [
-    "BO-1061",
-    "BO-1062",
-    "BO-1063",
-    "BO-1064",
-    "BO-1065",
-    "BO-1066",
-    "BO-1067",
-    "BO-1068",
-    "BO-1069",
-    "BO-1070"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS177",
-   "kind": "workshop",
-   "label": "Seat Management Venue Mapping Reference v1.0 board 13",
-   "platform": "P08",
-   "screens": [
-    "BO-1071",
-    "BO-1072",
-    "BO-1073",
-    "BO-1074",
-    "BO-1075",
-    "BO-1076",
-    "BO-1077",
-    "BO-1078",
-    "BO-1079",
-    "BO-1080"
-   ],
-   "drawable": 0,
-   "thin": 10,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "P01-account-self-service-01",
    "kind": "module",
    "label": "P01 · Account & Self-Service",
@@ -5747,11 +5481,13 @@
     "WEB-006",
     "WEB-007",
     "WEB-008",
-    "WEB-009"
+    "WEB-009",
+    "WEB-047",
+    "WEB-048"
    ],
-   "drawable": 5,
+   "drawable": 7,
    "thin": 0,
-   "frames": 5,
+   "frames": 7,
    "status": "drawn"
   },
   {
@@ -5879,6 +5615,116 @@
    "status": "drawn"
   },
   {
+   "id": "P01-transport-01",
+   "kind": "module",
+   "label": "P01 · Transport",
+   "platform": "P01",
+   "screens": [
+    "WEB-049"
+   ],
+   "drawable": 1,
+   "thin": 0,
+   "frames": 1,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-discovery-01",
+   "kind": "module",
+   "label": "P02 · Discovery",
+   "platform": "P02",
+   "screens": [
+    "GST-063"
+   ],
+   "drawable": 1,
+   "thin": 0,
+   "frames": 1,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-engagement-support-02",
+   "kind": "module",
+   "label": "P02 · Engagement & Support (2 of 2)",
+   "platform": "P02",
+   "screens": [
+    "GST-059",
+    "GST-068"
+   ],
+   "drawable": 2,
+   "thin": 0,
+   "frames": 2,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-marketing-01",
+   "kind": "module",
+   "label": "P02 · Marketing",
+   "platform": "P02",
+   "screens": [
+    "GST-065"
+   ],
+   "drawable": 1,
+   "thin": 0,
+   "frames": 1,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-promotions-01",
+   "kind": "module",
+   "label": "P02 · Promotions",
+   "platform": "P02",
+   "screens": [
+    "GST-037"
+   ],
+   "drawable": 1,
+   "thin": 0,
+   "frames": 1,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-retail-01",
+   "kind": "module",
+   "label": "P02 · Retail",
+   "platform": "P02",
+   "screens": [
+    "GST-026"
+   ],
+   "drawable": 1,
+   "thin": 0,
+   "frames": 1,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-support-01",
+   "kind": "module",
+   "label": "P02 · Support",
+   "platform": "P02",
+   "screens": [
+    "GST-034"
+   ],
+   "drawable": 1,
+   "thin": 0,
+   "frames": 1,
+   "status": "drawn"
+  },
+  {
+   "id": "P01-engagement-support-01",
+   "kind": "module",
+   "label": "P01 · Engagement & Support",
+   "platform": "P01",
+   "screens": [
+    "WEB-025",
+    "WEB-026",
+    "WEB-027",
+    "WEB-028",
+    "WEB-044",
+    "WEB-046"
+   ],
+   "drawable": 5,
+   "thin": 1,
+   "frames": 6,
+   "status": "drawn"
+  },
+  {
    "id": "P01-high-demand-access-01",
    "kind": "module",
    "label": "P01 · High-Demand Access",
@@ -5905,21 +5751,229 @@
    "status": "drawn"
   },
   {
-   "id": "P01-engagement-support-01",
+   "id": "P02-account-self-service-01",
    "kind": "module",
-   "label": "P01 · Engagement & Support",
-   "platform": "P01",
+   "label": "P02 · Account & Self-Service (1 of 2)",
+   "platform": "P02",
    "screens": [
-    "WEB-025",
-    "WEB-026",
-    "WEB-027",
-    "WEB-028",
-    "WEB-044",
-    "WEB-046"
+    "GST-012",
+    "GST-013",
+    "GST-018",
+    "GST-019",
+    "GST-020",
+    "GST-039",
+    "GST-042",
+    "GST-045",
+    "GST-055",
+    "GST-066"
    ],
-   "drawable": 4,
+   "drawable": 9,
+   "thin": 1,
+   "frames": 10,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-account-self-service-02",
+   "kind": "module",
+   "label": "P02 · Account & Self-Service (2 of 2)",
+   "platform": "P02",
+   "screens": [
+    "GST-067",
+    "GST-069",
+    "GST-071",
+    "GST-073"
+   ],
+   "drawable": 3,
+   "thin": 1,
+   "frames": 4,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-booking-selection-01",
+   "kind": "module",
+   "label": "P02 · Booking & Selection",
+   "platform": "P02",
+   "screens": [
+    "GST-007",
+    "GST-008",
+    "GST-048",
+    "GST-049",
+    "GST-050",
+    "GST-056",
+    "GST-058",
+    "GST-072",
+    "GST-074",
+    "GST-075"
+   ],
+   "drawable": 9,
+   "thin": 1,
+   "frames": 10,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-cart-checkout-01",
+   "kind": "module",
+   "label": "P02 · Cart & Checkout",
+   "platform": "P02",
+   "screens": [
+    "GST-009",
+    "GST-010",
+    "GST-041"
+   ],
+   "drawable": 2,
+   "thin": 1,
+   "frames": 3,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-discovery-browse-01",
+   "kind": "module",
+   "label": "P02 · Discovery & Browse",
+   "platform": "P02",
+   "screens": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-004",
+    "GST-005",
+    "GST-006",
+    "GST-057"
+   ],
+   "drawable": 6,
+   "thin": 1,
+   "frames": 7,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-engagement-support-01",
+   "kind": "module",
+   "label": "P02 · Engagement & Support (1 of 2)",
+   "platform": "P02",
+   "screens": [
+    "GST-030",
+    "GST-031",
+    "GST-032",
+    "GST-033",
+    "GST-035",
+    "GST-040",
+    "GST-051",
+    "GST-052",
+    "GST-053",
+    "GST-054"
+   ],
+   "drawable": 9,
+   "thin": 1,
+   "frames": 10,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-high-demand-access-01",
+   "kind": "module",
+   "label": "P02 · High-Demand Access",
+   "platform": "P02",
+   "screens": [
+    "GST-046"
+   ],
+   "drawable": 0,
+   "thin": 1,
+   "frames": 1,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-in-venue-experience-01",
+   "kind": "module",
+   "label": "P02 · In-Venue Experience",
+   "platform": "P02",
+   "screens": [
+    "GST-061",
+    "GST-062"
+   ],
+   "drawable": 1,
+   "thin": 1,
+   "frames": 2,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-ticketing-01",
+   "kind": "module",
+   "label": "P02 · Ticketing",
+   "platform": "P02",
+   "screens": [
+    "GST-014",
+    "GST-016",
+    "GST-017",
+    "GST-044"
+   ],
+   "drawable": 3,
+   "thin": 1,
+   "frames": 4,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-transport-01",
+   "kind": "module",
+   "label": "P02 · Transport",
+   "platform": "P02",
+   "screens": [
+    "GST-076",
+    "GST-077",
+    "GST-078",
+    "GST-079"
+   ],
+   "drawable": 3,
+   "thin": 1,
+   "frames": 4,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-in-venue-services-01",
+   "kind": "module",
+   "label": "P02 · In-venue Services",
+   "platform": "P02",
+   "screens": [
+    "GST-021",
+    "GST-022",
+    "GST-023",
+    "GST-024",
+    "GST-025",
+    "GST-027",
+    "GST-028",
+    "GST-029",
+    "GST-038",
+    "GST-070"
+   ],
+   "drawable": 8,
    "thin": 2,
-   "frames": 6,
+   "frames": 10,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-membership-loyalty-value-01",
+   "kind": "module",
+   "label": "P02 · Membership, Loyalty & Value",
+   "platform": "P02",
+   "screens": [
+    "GST-011",
+    "GST-015",
+    "GST-036"
+   ],
+   "drawable": 1,
+   "thin": 2,
+   "frames": 3,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-system-states-01",
+   "kind": "module",
+   "label": "P02 · System States",
+   "platform": "P02",
+   "screens": [
+    "GST-043",
+    "GST-047"
+   ],
+   "drawable": 0,
+   "thin": 2,
+   "frames": 2,
    "status": "drawn"
   },
   {
@@ -5932,7 +5986,7 @@
    ],
    "drawable": 1,
    "thin": 0,
-   "frames": 0,
+   "frames": 1,
    "status": "locked",
    "lockedReason": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
   },
@@ -5946,7 +6000,7 @@
    ],
    "drawable": 1,
    "thin": 0,
-   "frames": 0,
+   "frames": 1,
    "status": "locked",
    "lockedReason": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
   },
@@ -5969,7 +6023,7 @@
    ],
    "drawable": 10,
    "thin": 0,
-   "frames": 0,
+   "frames": 10,
    "status": "locked",
    "lockedReason": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
   },
@@ -5992,7 +6046,7 @@
    ],
    "drawable": 10,
    "thin": 0,
-   "frames": 0,
+   "frames": 10,
    "status": "locked",
    "lockedReason": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
   },
@@ -6009,7 +6063,7 @@
    ],
    "drawable": 4,
    "thin": 0,
-   "frames": 0,
+   "frames": 4,
    "status": "locked",
    "lockedReason": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
   },
@@ -6026,7 +6080,7 @@
    ],
    "drawable": 4,
    "thin": 0,
-   "frames": 0,
+   "frames": 4,
    "status": "locked",
    "lockedReason": "Already built, and better than a batch would build it. `sources/designs/TICVAI_POS_Terminal_client_approved.html` is a working Claude Design terminal for these 29 screens and is the fidelity reference every other batch is measured against. Cutting a batch for P04 would commission a second, worse version of an artefact the client has already responded to. Its screens were enriched from the prototype on 10 September rather than redesigned. **Brought inside the package on 10 September.** It had been sitting at the repository root as `TICVAI POS Terminal (1) 1.html`, where the root ignore rule (`/*`, with `!/*/` letting the folders back in) kept it out of git entirely -- so the one artefact all 169 batches are measured against existed on a single machine and in no clone."
   }

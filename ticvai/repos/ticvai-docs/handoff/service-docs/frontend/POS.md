@@ -28,7 +28,7 @@
 | [POS-001](#pos-001-begin-shift) | Begin Shift | Shift | 1 | 17 |
 | [POS-002](#pos-002-sell-ticket-catalogue) | Sell — Ticket Catalogue | Sell | 1 | 42 |
 | [POS-003](#pos-003-sell-timed-entry) | Sell — Timed Entry | Sell | 1 | 10 |
-| [POS-005](#pos-005-payment) | Payment | Payment | 1 | 11 |
+| [POS-005](#pos-005-payment) | Payment | Payment | 1 | 12 |
 | [POS-006](#pos-006-held-orders) | Held Orders | Sell | 1 | 14 |
 | [POS-007](#pos-007-close-shift) | Close Shift | Shift | 1 | 17 |
 | [POS-010](#pos-010-add-to-existing-ticket) | Add to Existing Ticket | Sell | 1 | 5 |
@@ -55,11 +55,11 @@
 | [KIT-002](#kit-002-kitchen-display-system-kds) | Kitchen Display System (KDS) | Kitchen | 2 | 7 |
 | [KIT-003](#kit-003-order-firing-course-management) | Order Firing & Course Management | Kitchen | 2 | 6 |
 | [KIT-004](#kit-004-active-order-management-fulfilment-journey) | Active Order Management & Fulfilment Journey | Kitchen | 2 | 2 |
-| [KIT-005](#kit-005-kitchen-station-workload-dynamic-routing) | Kitchen Station Workload & Dynamic Routing | Kitchen | 2 | 3 |
+| [KIT-005](#kit-005-kitchen-station-workload-dynamic-routing) | Kitchen Station Workload & Dynamic Routing | Kitchen | 2 | 4 |
 | [KIT-006](#kit-006-expeditor-order-assembly) | Expeditor & Order Assembly | Kitchen | 2 | 5 |
 | [KIT-007](#kit-007-guest-collection-buzzer-digital-notification) | Guest Collection, Buzzer & Digital Notification | Kitchen | 2 | 2 |
 | [KIT-008](#kit-008-exceptions-re-fire-unavailable-items) | Exceptions, Re-Fire & Unavailable Items | Kitchen | 2 | 6 |
-| [KIT-009](#kit-009-sla-priority-service-rules) | SLA, Priority & Service Rules | Kitchen | 2 | 2 |
+| [KIT-009](#kit-009-sla-priority-service-rules) | SLA, Priority & Service Rules | Kitchen | 2 | 3 |
 | [KIT-010](#kit-010-kitchen-performance-ai-operational-optimization) | Kitchen Performance, AI & Operational Optimization | Kitchen | 2 | 2 |
 | [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 2 | 11 |
 | [POS-008](#pos-008-reports) | Reports | Reports | 2 | 7 |
@@ -388,6 +388,7 @@
 | `lookupRetailSale` | [RetailService](../backend/RetailService.md#lookupretailsale) | onAction | Find a sale from a receipt; returns a list with matchedBy, a pick list when several match (audit R215) | `ORDER_VIEW` |
 | `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Create an order | `ORDER_CREATE` |
 | `redeemLoyaltyPoints` | [MarketingService](../backend/MarketingService.md#redeemloyaltypoints) | onAction | Spend points | `LOYALTY_REDEEM` |
+| `enrolFaceTag` | [AccessService](../backend/AccessService.md#enrolfacetag) | onAction | Capture a same-visit Face Tag for the tickets just sold | `GUEST_MANAGE` |
 
 **States**
 
@@ -865,7 +866,7 @@
 | `allocateDepositBox` | [OrderService](../backend/OrderService.md#allocatedepositbox) | onAction | Give a cashier a box and a float | `SHIFT_OPEN` |
 | `configureWorkstation` | [TenancyService](../backend/TenancyService.md#configureworkstation) | onAction | Configure a workstation | `WORKSTATION_CONFIGURE` |
 | `listDevices` | [TenancyService](../backend/TenancyService.md#listdevices) | onLoad | The peripherals bound to this workstation | `DEVICE_VIEW` |
-| `setReaderScannerPeripheral` | [AccessService](../backend/AccessService.md#setreaderscannerperipheral) | onAction | Bind or replace a reader or scanner | `ACCESS_POINT_CONFIGURE` |
+| `setDeviceAssignment` | [TenancyService](../backend/TenancyService.md#setdeviceassignment) | onAction | Assign a reader, scanner or printer to this till | `DEVICE_MANAGE` |
 | `recordDeviceHeartbeat` | [TenancyService](../backend/TenancyService.md#recorddeviceheartbeat) | background | Whether each peripheral is answering | `None` |
 
 **States**
@@ -1752,6 +1753,7 @@
 | `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue, filtered by course (audit R277) | `ORDER_VIEW` |
 | `listKitchenStations` | [FnbService](../backend/FnbService.md#listkitchenstations) | onLoad | List preparation stations and their routing | `PRODUCT_VIEW` |
 | `setKitchenStations` | [FnbService](../backend/FnbService.md#setkitchenstations) | onAction | Configure stations and item routing | `PRODUCT_CONFIGURE` |
+| `rebalanceStationLoad` | [FnbService](../backend/FnbService.md#rebalancestationload) | onAction | Move work between stations mid-service | `PRODUCT_CONFIGURE` |
 
 **States**
 
@@ -1935,6 +1937,7 @@
 |---|---|
 | venueId | session |
 | stationId | session |
+| outletId | session |
 | ticketId | KIT-002 |
 
 **Operations**
@@ -1943,6 +1946,7 @@
 |---|---|---|---|---|
 | `prioritiseKitchenTicket` | [FnbService](../backend/FnbService.md#prioritisekitchenticket) | onAction | Move a ticket up the queue | `ORDER_MODIFY` |
 | `setVenueSettings` | [TenancyService](../backend/TenancyService.md#setvenuesettings) | onAction | Set support hours, quiet hours, segregated access and alerti | `TENANT_CONFIGURE` |
+| `setKitchenSla` | [FnbService](../backend/FnbService.md#setkitchensla) | onAction | The outlet's kitchen service-time targets | `PRODUCT_CONFIGURE` |
 
 **States**
 

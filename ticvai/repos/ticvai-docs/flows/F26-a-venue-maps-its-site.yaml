@@ -21,6 +21,7 @@ contracts:
 - ai
 - assets
 - platform-ops
+- resources
 platforms:
 - P08
 - P02
@@ -52,6 +53,11 @@ steps:
     or not — and **a file that yields nothing says `nothingFound` rather than reporting success**, which
     is the defect CF-122 found in the seat importer.
 
+    **Where the map carries bookable places** (decided 29 September, rev 3 REV3-15 and GAP-C2), the resource
+    layer and the resource manifest (label, kind, zone, capacity, price band) are read too, each price band
+    joined to the catalogue variant that prices it, and `resourcesFound` and `resourceRowsJoined` report the
+    join. A table on a map is a non-dining spot sold like a cabana; restaurant tables stay F&B reservations.
+
     '
 - step: 3
   screen: BO-093
@@ -68,9 +74,12 @@ steps:
   action: The operator places what the drawing did not carry and links each point to what it is.
   operations:
   - setVenuePoint
+  - setPlacedResource
   outcome: 'A restaurant point carries its outlet id, a ride its product id, a gate its access point.
     **Tapping a restaurant on the map should open its menu, and that only works if the map knows which
-    outlet it is.**
+    outlet it is.** A cabana, lounger or table is placed with `setPlacedResource` and linked to its
+    `resources.Resource`, so a guest can pick that one on the map and buy it (rev 3 REV3-15, superseding
+    audit R073 (c) for resources on an ingested map).
 
     '
 - step: 5
@@ -152,6 +161,16 @@ branches:
     '
   severity: recoverable
   resolvedBy: publishVenueMap
+- at: 6
+  condition: A placed cabana has no linked resource or no price band, or two places share a label.
+  behaviour: 'Publish is refused with `resourceUnlinked`, `resourcePriceBandMissing` or `duplicateResourceLabel`,
+    naming the place (decided 29 September, rev 3 REV3-15). **A cabana a guest can tap and cannot buy
+    is worse than no cabana on the map.** `validateVenueMapGraph` reports the same before anyone presses
+    Publish.
+
+    '
+  severity: recoverable
+  resolvedBy: setPlacedResource
 - at: 7
   condition: A path closes after the guest cached the graph.
   behaviour: '`setPathClosure` bumps the graph version, and the client holding an older version knows

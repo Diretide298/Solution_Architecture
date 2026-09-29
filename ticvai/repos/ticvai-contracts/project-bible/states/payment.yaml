@@ -28,6 +28,18 @@ transitions:
   - order.paid
 - from: authorised
   to: voided
+  operation: cleanupFailedPayment
+  trigger: operation
+  guard: '`releaseHold`: an authorisation left behind by an order that never completed (decided 29
+    September, readiness close-out)'
+- from: pendingConfirmation
+  to: failed
+  operation: cleanupFailedPayment
+  trigger: operation
+  guard: '`cancelPending`: stuck in confirmation after `inquirePaymentStatus` found no result at the
+    provider (decided 29 September, readiness close-out)'
+- from: authorised
+  to: voided
   operation: voidPayment
   trigger: operation
   guard: Released before capture. **Cheaper and cleaner than a refund**, and the guest never sees a

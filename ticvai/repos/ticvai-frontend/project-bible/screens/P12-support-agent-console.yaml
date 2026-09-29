@@ -2360,25 +2360,20 @@ screens:
         - CustomerServiceCommandCenterView.awaitingInternalTeam
         - CustomerServiceCommandCenterView.escalatedCases
         - CustomerServiceCommandCenterView.resolvedToday
-        - CustomerServiceCommandCenterView.averageResolutionTime
-        - CustomerServiceCommandCenterView.caseId
-        - CustomerServiceCommandCenterView.customer
-        - CustomerServiceCommandCenterView.subject
-        - CustomerServiceCommandCenterView.category
-        - CustomerServiceCommandCenterView.channel
-        - CustomerServiceCommandCenterView.priority
-        - CustomerServiceCommandCenterView.status
-        - CustomerServiceCommandCenterView.assignedAgent
-        - CustomerServiceCommandCenterView.slaRemaining
-        - CustomerServiceCommandCenterView.lastInteraction
-        - CustomerServiceCommandCenterView.nextAction
-        - CustomerServiceCommandCenterView.callCustomer
-        - Review refund request
-        - CustomerServiceCommandCenterView.followUpFinance
-        - Reissue ticket
-        - CustomerServiceCommandCenterView.respondToComplaint
-        - CustomerServiceCommandCenterView.requestSupervisorApproval
-        bindsTo: CustomerServiceCommandCenterView
+        - CustomerServiceCommandCenterView.averageResolutionSeconds
+        - CustomerServiceCommandCenterView.workQueue[].caseId
+        - CustomerServiceCommandCenterView.workQueue[].customer
+        - CustomerServiceCommandCenterView.workQueue[].subject
+        - CustomerServiceCommandCenterView.workQueue[].category
+        - CustomerServiceCommandCenterView.workQueue[].channel
+        - CustomerServiceCommandCenterView.workQueue[].priority
+        - CustomerServiceCommandCenterView.workQueue[].status
+        - CustomerServiceCommandCenterView.workQueue[].assignedAgentPrincipalId
+        - CustomerServiceCommandCenterView.workQueue[].slaRemainingSeconds
+        - CustomerServiceCommandCenterView.workQueue[].lastInteractionAt
+        - CustomerServiceCommandCenterView.workQueue[].nextAction
+        - CustomerServiceCommandCenterView.todaysTasks[].kind
+        bindsTo: CustomerServiceCommandCenterView.workQueue[]
         operation: listCustomerService
         provenance: pack Customer Service_Reference.pdf, page 3 §Display
     - name: contextPanel
@@ -2397,24 +2392,19 @@ screens:
         - CustomerServiceCommandCenterView.awaitingInternalTeam
         - CustomerServiceCommandCenterView.escalatedCases
         - CustomerServiceCommandCenterView.resolvedToday
-        - CustomerServiceCommandCenterView.averageResolutionTime
-        - CustomerServiceCommandCenterView.caseId
-        - CustomerServiceCommandCenterView.customer
-        - CustomerServiceCommandCenterView.subject
-        - CustomerServiceCommandCenterView.category
-        - CustomerServiceCommandCenterView.channel
-        - CustomerServiceCommandCenterView.priority
-        - CustomerServiceCommandCenterView.status
-        - CustomerServiceCommandCenterView.assignedAgent
-        - CustomerServiceCommandCenterView.slaRemaining
-        - CustomerServiceCommandCenterView.lastInteraction
-        - CustomerServiceCommandCenterView.nextAction
-        - CustomerServiceCommandCenterView.callCustomer
-        - Review refund request
-        - CustomerServiceCommandCenterView.followUpFinance
-        - Reissue ticket
-        - CustomerServiceCommandCenterView.respondToComplaint
-        - CustomerServiceCommandCenterView.requestSupervisorApproval
+        - CustomerServiceCommandCenterView.averageResolutionSeconds
+        - CustomerServiceCommandCenterView.workQueue[].caseId
+        - CustomerServiceCommandCenterView.workQueue[].customer
+        - CustomerServiceCommandCenterView.workQueue[].subject
+        - CustomerServiceCommandCenterView.workQueue[].category
+        - CustomerServiceCommandCenterView.workQueue[].channel
+        - CustomerServiceCommandCenterView.workQueue[].priority
+        - CustomerServiceCommandCenterView.workQueue[].status
+        - CustomerServiceCommandCenterView.workQueue[].assignedAgentPrincipalId
+        - CustomerServiceCommandCenterView.workQueue[].slaRemainingSeconds
+        - CustomerServiceCommandCenterView.workQueue[].lastInteractionAt
+        - CustomerServiceCommandCenterView.workQueue[].nextAction
+        - CustomerServiceCommandCenterView.todaysTasks[].kind
         notes: 'The pack groups this record''s detail under its own headings: “Use”, “Customer Waiting”.'
         provenance: pack Customer Service_Reference.pdf, page 3 §Display
     - name: actionBar
@@ -2539,7 +2529,7 @@ screens:
         - Customer360ServiceProfileView.activeMembership
         - Customer360ServiceProfileView.walletBalance
         - Customer360ServiceProfileView.activeReservations
-        - Customer360ServiceProfileView.futureGroupBookingWhereApplicable
+        - Customer360ServiceProfileView.futureGroupBookings
         - Open Orders
         bindsTo: Customer360ServiceProfileView
         operation: listCustomerServiceProfile
@@ -2568,7 +2558,7 @@ screens:
         - Customer360ServiceProfileView.activeMembership
         - Customer360ServiceProfileView.walletBalance
         - Customer360ServiceProfileView.activeReservations
-        - Customer360ServiceProfileView.futureGroupBookingWhereApplicable
+        - Customer360ServiceProfileView.futureGroupBookings
         - Open Orders
         notes: 'The pack groups this record''s detail under its own headings: “Today”, “Yesterday”, “Last
           Month”, “Display permitted information such as”, “Sensitive information should be”, “Customer
@@ -3644,15 +3634,15 @@ screens:
       - kind: metricTile
         label: First Response Time
         provenance: pack Customer Service_Reference.pdf, page 24 §Display
-        bindsTo: ContactCenterOperationsCommandCenterView.firstResponseTime
+        bindsTo: ContactCenterOperationsCommandCenterView.averageFirstResponseSeconds
       - kind: metricTile
         label: Average Resolution Time
         provenance: pack Customer Service_Reference.pdf, page 24 §Display
-        bindsTo: ContactCenterOperationsCommandCenterView.averageResolutionTime
+        bindsTo: ContactCenterOperationsCommandCenterView.averageResolutionSeconds
       - kind: metricTile
         label: First Contact Resolution
         provenance: pack Customer Service_Reference.pdf, page 24 §Display
-        bindsTo: ContactCenterOperationsCommandCenterView.firstContactResolution
+        bindsTo: ContactCenterOperationsCommandCenterView.firstContactResolutionRate
       - kind: metricTile
         label: CSAT
         provenance: pack Customer Service_Reference.pdf, page 24 §Display
@@ -4014,9 +4004,6 @@ screens:
     - SlaPolicyServiceLevelManagementView.withinSla
     - SlaPolicyServiceLevelManagementView.atRisk
     - SlaPolicyServiceLevelManagementView.breached
-    - SlaPolicyServiceLevelManagementView.averageResponse
-    - SlaPolicyServiceLevelManagementView.averageResolution
-    - SlaPolicyServiceLevelManagementView.slaCompliance
   wireframe:
     status: notStarted
     provenance: generated
@@ -4068,7 +4055,7 @@ screens:
       - kind: dataTable
         label: Every agent workload availability
         columns:
-        - AgentWorkloadAvailabilityWorkforceControlView.agent
+        - AgentWorkloadAvailabilityWorkforceControlView.agentName
         - AgentWorkloadAvailabilityWorkforceControlView.team
         - AgentWorkloadAvailabilityWorkforceControlView.skills
         - AgentWorkloadAvailabilityWorkforceControlView.languages
@@ -4076,9 +4063,9 @@ screens:
         - AgentWorkloadAvailabilityWorkforceControlView.activeCases
         - AgentWorkloadAvailabilityWorkforceControlView.chats
         - AgentWorkloadAvailabilityWorkforceControlView.calls
-        - AgentWorkloadAvailabilityWorkforceControlView.queue
+        - AgentWorkloadAvailabilityWorkforceControlView.queues[].queueName
         - AgentWorkloadAvailabilityWorkforceControlView.slaRiskCases
-        - AgentWorkloadAvailabilityWorkforceControlView.averageHandleTime
+        - AgentWorkloadAvailabilityWorkforceControlView.averageHandleSeconds
         - AgentWorkloadAvailabilityWorkforceControlView.resolutionRate
         - AgentWorkloadAvailabilityWorkforceControlView.utilization
         bindsTo: AgentWorkloadAvailabilityWorkforceControlView
@@ -4091,7 +4078,7 @@ screens:
         label: The selected agent workload availability
         bindsTo: AgentWorkloadAvailabilityWorkforceControlView
         columns:
-        - AgentWorkloadAvailabilityWorkforceControlView.agent
+        - AgentWorkloadAvailabilityWorkforceControlView.agentName
         - AgentWorkloadAvailabilityWorkforceControlView.team
         - AgentWorkloadAvailabilityWorkforceControlView.skills
         - AgentWorkloadAvailabilityWorkforceControlView.languages
@@ -4099,9 +4086,9 @@ screens:
         - AgentWorkloadAvailabilityWorkforceControlView.activeCases
         - AgentWorkloadAvailabilityWorkforceControlView.chats
         - AgentWorkloadAvailabilityWorkforceControlView.calls
-        - AgentWorkloadAvailabilityWorkforceControlView.queue
+        - AgentWorkloadAvailabilityWorkforceControlView.queues[].queueName
         - AgentWorkloadAvailabilityWorkforceControlView.slaRiskCases
-        - AgentWorkloadAvailabilityWorkforceControlView.averageHandleTime
+        - AgentWorkloadAvailabilityWorkforceControlView.averageHandleSeconds
         - AgentWorkloadAvailabilityWorkforceControlView.resolutionRate
         - AgentWorkloadAvailabilityWorkforceControlView.utilization
         notes: 'The pack groups this record''s detail under its own headings: “Authorized supervisors
@@ -4123,7 +4110,7 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - AgentWorkloadAvailabilityWorkforceControlView.agent
+    - AgentWorkloadAvailabilityWorkforceControlView.agentName
     - AgentWorkloadAvailabilityWorkforceControlView.team
     - AgentWorkloadAvailabilityWorkforceControlView.skills
     - AgentWorkloadAvailabilityWorkforceControlView.languages
@@ -4181,25 +4168,18 @@ screens:
       - kind: dataTable
         label: Every escalation critical case
         columns:
-        - EscalationCriticalCaseMonitorView.escalatedCases
-        - EscalationCriticalCaseMonitorView.criticalCases
-        - EscalationCriticalCaseMonitorView.slaBreaches
-        - EscalationCriticalCaseMonitorView.vipEscalations
-        - EscalationCriticalCaseMonitorView.financialEscalations
-        - EscalationCriticalCaseMonitorView.eventDayEscalations
-        - EscalationCriticalCaseMonitorView.managementEscalations
-        - EscalationCriticalCaseMonitorView.technicalEscalations
-        - EscalationCriticalCaseMonitorView.case
-        - EscalationCriticalCaseMonitorView.customer
+        - EscalationCriticalCaseMonitorView.caseNumber
+        - EscalationCriticalCaseMonitorView.customerName
         - EscalationCriticalCaseMonitorView.reason
         - EscalationCriticalCaseMonitorView.priority
         - EscalationCriticalCaseMonitorView.transactionValue
-        - EscalationCriticalCaseMonitorView.event
-        - EscalationCriticalCaseMonitorView.assignedAgent
-        - EscalationCriticalCaseMonitorView.escalatedTo
-        - EscalationCriticalCaseMonitorView.escalationTime
-        - EscalationCriticalCaseMonitorView.sla
-        - EscalationCriticalCaseMonitorView.currentStatus
+        - EscalationCriticalCaseMonitorView.eventName
+        - EscalationCriticalCaseMonitorView.assignedToPrincipalId
+        - EscalationCriticalCaseMonitorView.escalatedToPrincipalId
+        - EscalationCriticalCaseMonitorView.escalatedAt
+        - EscalationCriticalCaseMonitorView.slaDueAt
+        - EscalationCriticalCaseMonitorView.isSlaBreached
+        - EscalationCriticalCaseMonitorView.status
         bindsTo: EscalationCriticalCaseMonitorView
         operation: listEscalationCriticalCase
         provenance: pack Customer Service_Reference.pdf, page 32 §Display
@@ -4210,25 +4190,18 @@ screens:
         label: The selected escalation critical case
         bindsTo: EscalationCriticalCaseMonitorView
         columns:
-        - EscalationCriticalCaseMonitorView.escalatedCases
-        - EscalationCriticalCaseMonitorView.criticalCases
-        - EscalationCriticalCaseMonitorView.slaBreaches
-        - EscalationCriticalCaseMonitorView.vipEscalations
-        - EscalationCriticalCaseMonitorView.financialEscalations
-        - EscalationCriticalCaseMonitorView.eventDayEscalations
-        - EscalationCriticalCaseMonitorView.managementEscalations
-        - EscalationCriticalCaseMonitorView.technicalEscalations
-        - EscalationCriticalCaseMonitorView.case
-        - EscalationCriticalCaseMonitorView.customer
+        - EscalationCriticalCaseMonitorView.caseNumber
+        - EscalationCriticalCaseMonitorView.customerName
         - EscalationCriticalCaseMonitorView.reason
         - EscalationCriticalCaseMonitorView.priority
         - EscalationCriticalCaseMonitorView.transactionValue
-        - EscalationCriticalCaseMonitorView.event
-        - EscalationCriticalCaseMonitorView.assignedAgent
-        - EscalationCriticalCaseMonitorView.escalatedTo
-        - EscalationCriticalCaseMonitorView.escalationTime
-        - EscalationCriticalCaseMonitorView.sla
-        - EscalationCriticalCaseMonitorView.currentStatus
+        - EscalationCriticalCaseMonitorView.eventName
+        - EscalationCriticalCaseMonitorView.assignedToPrincipalId
+        - EscalationCriticalCaseMonitorView.escalatedToPrincipalId
+        - EscalationCriticalCaseMonitorView.escalatedAt
+        - EscalationCriticalCaseMonitorView.slaDueAt
+        - EscalationCriticalCaseMonitorView.isSlaBreached
+        - EscalationCriticalCaseMonitorView.status
         notes: 'The pack groups this record''s detail under its own headings: “Major Issue Detection”,
           “Potential Major Incident”.'
         provenance: pack Customer Service_Reference.pdf, page 32 §Display
@@ -4247,13 +4220,7 @@ screens:
     purpose: Escalation & Critical Case Monitor
     trigger: onLoad
   entryState:
-    preloaded:
-    - EscalationCriticalCaseMonitorView.escalatedCases
-    - EscalationCriticalCaseMonitorView.criticalCases
-    - EscalationCriticalCaseMonitorView.slaBreaches
-    - EscalationCriticalCaseMonitorView.vipEscalations
-    - EscalationCriticalCaseMonitorView.financialEscalations
-    - EscalationCriticalCaseMonitorView.eventDayEscalations
+    preloaded: []
   wireframe:
     status: notStarted
     provenance: generated
@@ -4345,12 +4312,7 @@ screens:
     purpose: Quality Management & Agent Evaluation
     trigger: onLoad
   entryState:
-    preloaded:
-    - QualityManagementAgentEvaluationView.greeting
-    - QualityManagementAgentEvaluationView.customerVerification
-    - QualityManagementAgentEvaluationView.understanding
-    - QualityManagementAgentEvaluationView.accuracy
-    - QualityManagementAgentEvaluationView.policyCompliance
+    preloaded: []
   wireframe:
     status: notStarted
     provenance: generated
@@ -4418,15 +4380,15 @@ screens:
       - kind: metricTile
         label: Positive %
         provenance: pack Customer Service_Reference.pdf, page 35 §Display
-        bindsTo: CustomerSatisfactionFeedbackVoiceOfCustomerView.positive
+        bindsTo: CustomerSatisfactionFeedbackVoiceOfCustomerView.positiveRate
       - kind: metricTile
         label: Neutral %
         provenance: pack Customer Service_Reference.pdf, page 35 §Display
-        bindsTo: CustomerSatisfactionFeedbackVoiceOfCustomerView.neutral
+        bindsTo: CustomerSatisfactionFeedbackVoiceOfCustomerView.neutralRate
       - kind: metricTile
         label: Negative %
         provenance: pack Customer Service_Reference.pdf, page 35 §Display
-        bindsTo: CustomerSatisfactionFeedbackVoiceOfCustomerView.negative
+        bindsTo: CustomerSatisfactionFeedbackVoiceOfCustomerView.negativeRate
       - kind: metricTile
         label: Complaints
         provenance: pack Customer Service_Reference.pdf, page 35 §Display
@@ -4438,7 +4400,7 @@ screens:
       - kind: metricTile
         label: Customer Effort where measured
         provenance: pack Customer Service_Reference.pdf, page 35 §Display
-        bindsTo: CustomerSatisfactionFeedbackVoiceOfCustomerView.customerEffortWhereMeasured
+        bindsTo: CustomerSatisfactionFeedbackVoiceOfCustomerView.customerEffortScore
     - name: actionBar
       slot: rowActions
       components:
@@ -4469,9 +4431,9 @@ screens:
     preloaded:
     - CustomerSatisfactionFeedbackVoiceOfCustomerView.csat
     - CustomerSatisfactionFeedbackVoiceOfCustomerView.surveyResponseRate
-    - CustomerSatisfactionFeedbackVoiceOfCustomerView.positive
-    - CustomerSatisfactionFeedbackVoiceOfCustomerView.neutral
-    - CustomerSatisfactionFeedbackVoiceOfCustomerView.negative
+    - CustomerSatisfactionFeedbackVoiceOfCustomerView.positiveRate
+    - CustomerSatisfactionFeedbackVoiceOfCustomerView.neutralRate
+    - CustomerSatisfactionFeedbackVoiceOfCustomerView.negativeRate
     - CustomerSatisfactionFeedbackVoiceOfCustomerView.complaints
   wireframe:
     status: notStarted
@@ -4535,15 +4497,15 @@ screens:
       - kind: metricTile
         label: First Response Time
         provenance: pack Customer Service_Reference.pdf, page 37 §Analyze
-        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.firstResponseTime
+        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.averageFirstResponseSeconds
       - kind: metricTile
         label: Resolution Time
         provenance: pack Customer Service_Reference.pdf, page 37 §Analyze
-        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.resolutionTime
+        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.averageResolutionSeconds
       - kind: metricTile
         label: First Contact Resolution
         provenance: pack Customer Service_Reference.pdf, page 37 §Analyze
-        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.firstContactResolution
+        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.firstContactResolutionRate
       - kind: metricTile
         label: Reopen Rate
         provenance: pack Customer Service_Reference.pdf, page 37 §Analyze
@@ -4555,11 +4517,11 @@ screens:
       - kind: metricTile
         label: SLA Compliance
         provenance: pack Customer Service_Reference.pdf, page 37 §Analyze
-        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.slaCompliance
+        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.slaComplianceRate
       - kind: metricTile
         label: Cost per Case where available
         provenance: pack Customer Service_Reference.pdf, page 37 §Analyze
-        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.costPerCaseWhereAvailable
+        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.costPerCase
       - kind: metricTile
         label: CSAT
         provenance: pack Customer Service_Reference.pdf, page 37 §Analyze
@@ -4567,34 +4529,25 @@ screens:
       - kind: metricTile
         label: Refund Requests
         provenance: pack Customer Service_Reference.pdf, page 37 §Analyze
+        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.refundRequests
       - kind: metricTile
         label: Complaint Rate
         provenance: pack Customer Service_Reference.pdf, page 37 §Analyze
         bindsTo: ServiceAnalyticsRootCauseIntelligenceView.complaintRate
-      - kind: metricTile
-        label: Today vs Yesterday
+      - kind: dataTable
+        label: Comparison
+        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[]
+        columns:
+        - ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].kpi
+        - ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].current
+        - ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].previous
+        - ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].changeRate
+        operation: listServiceRootCause
+        notes: One comparison panel in place of the pack's six tiles (Today vs Yesterday, Week vs Week,
+          Month vs Month, Event vs Event, Venue vs Venue, Product vs Product). The compare selector sends
+          `?compare=` (previousDay, previousWeek, previousMonth, event, venue, product) and `?compareId=`
+          to `listServiceRootCause`; the basis shown is `comparison.basis`.
         provenance: pack Customer Service_Reference.pdf, page 37 §Compare
-        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.todayVsYesterday
-      - kind: metricTile
-        label: Week vs Week
-        provenance: pack Customer Service_Reference.pdf, page 37 §Compare
-        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.weekVsWeek
-      - kind: metricTile
-        label: Month vs Month
-        provenance: pack Customer Service_Reference.pdf, page 37 §Compare
-        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.monthVsMonth
-      - kind: metricTile
-        label: Event vs Event
-        provenance: pack Customer Service_Reference.pdf, page 37 §Compare
-        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.eventVsEvent
-      - kind: metricTile
-        label: Venue vs Venue
-        provenance: pack Customer Service_Reference.pdf, page 37 §Compare
-        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.venueVsVenue
-      - kind: metricTile
-        label: Product vs Product
-        provenance: pack Customer Service_Reference.pdf, page 37 §Compare
-        bindsTo: ServiceAnalyticsRootCauseIntelligenceView.productVsProduct
   states:
     loading: The service analytics root-cause list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the service analytics root-cause untouched.
@@ -4613,9 +4566,9 @@ screens:
     preloaded:
     - ServiceAnalyticsRootCauseIntelligenceView.contactVolume
     - ServiceAnalyticsRootCauseIntelligenceView.cases
-    - ServiceAnalyticsRootCauseIntelligenceView.firstResponseTime
-    - ServiceAnalyticsRootCauseIntelligenceView.resolutionTime
-    - ServiceAnalyticsRootCauseIntelligenceView.firstContactResolution
+    - ServiceAnalyticsRootCauseIntelligenceView.averageFirstResponseSeconds
+    - ServiceAnalyticsRootCauseIntelligenceView.averageResolutionSeconds
+    - ServiceAnalyticsRootCauseIntelligenceView.firstContactResolutionRate
   wireframe:
     status: notStarted
     provenance: generated
@@ -4672,12 +4625,12 @@ screens:
       - kind: dataTable
         label: Every contact intelligence automation
         columns:
-        - AiContactCenterIntelligenceAutomationStudioView.contactVolume
-        - AiContactCenterIntelligenceAutomationStudioView.queueDemand
-        - AiContactCenterIntelligenceAutomationStudioView.requiredAgents
-        - AiContactCenterIntelligenceAutomationStudioView.slaRisk
-        - AiContactCenterIntelligenceAutomationStudioView.expectedComplaints
-        - AiContactCenterIntelligenceAutomationStudioView.eventDaySupportDemand
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.contactVolume
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.queueDemand[]
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.requiredAgents
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.slaRiskCases
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.expectedComplaints
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.eventDaySupportDemand
         bindsTo: AiContactCenterIntelligenceAutomationStudioView
         operation: listContactAutomation
         provenance: pack Customer Service_Reference.pdf, page 39 §Forecast
@@ -4688,12 +4641,12 @@ screens:
         label: The selected contact intelligence automation
         bindsTo: AiContactCenterIntelligenceAutomationStudioView
         columns:
-        - AiContactCenterIntelligenceAutomationStudioView.contactVolume
-        - AiContactCenterIntelligenceAutomationStudioView.queueDemand
-        - AiContactCenterIntelligenceAutomationStudioView.requiredAgents
-        - AiContactCenterIntelligenceAutomationStudioView.slaRisk
-        - AiContactCenterIntelligenceAutomationStudioView.expectedComplaints
-        - AiContactCenterIntelligenceAutomationStudioView.eventDaySupportDemand
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.contactVolume
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.queueDemand[]
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.requiredAgents
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.slaRiskCases
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.expectedComplaints
+        - AiContactCenterIntelligenceAutomationStudioView.forecast.eventDaySupportDemand
         notes: 'The pack groups this record''s detail under its own headings: “Analyze governed information
           from”, “Workforce”, “Self-Service”, “Product Improvement”, “Operational Improvement”, “Incident
           Detection”.'
@@ -4714,12 +4667,12 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - AiContactCenterIntelligenceAutomationStudioView.contactVolume
-    - AiContactCenterIntelligenceAutomationStudioView.queueDemand
-    - AiContactCenterIntelligenceAutomationStudioView.requiredAgents
-    - AiContactCenterIntelligenceAutomationStudioView.slaRisk
-    - AiContactCenterIntelligenceAutomationStudioView.expectedComplaints
-    - AiContactCenterIntelligenceAutomationStudioView.eventDaySupportDemand
+    - AiContactCenterIntelligenceAutomationStudioView.forecast.contactVolume
+    - AiContactCenterIntelligenceAutomationStudioView.forecast.queueDemand[]
+    - AiContactCenterIntelligenceAutomationStudioView.forecast.requiredAgents
+    - AiContactCenterIntelligenceAutomationStudioView.forecast.slaRiskCases
+    - AiContactCenterIntelligenceAutomationStudioView.forecast.expectedComplaints
+    - AiContactCenterIntelligenceAutomationStudioView.forecast.eventDaySupportDemand
   wireframe:
     status: notStarted
     provenance: generated

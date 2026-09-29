@@ -33,13 +33,13 @@ modulesUsed:
   screens: 19
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 311
+  operationCalls: 320
 - service: PlatformService
   operationCalls: 296
 - service: OrderService
-  operationCalls: 145
+  operationCalls: 147
 - service: TenancyService
-  operationCalls: 88
+  operationCalls: 92
 - service: IdentityService
   operationCalls: 45
 - service: WhiteLabelService
@@ -48,12 +48,12 @@ servicesCalled:
   operationCalls: 12
 - service: LedgerService
   operationCalls: 9
+- service: CrossRegionService
+  operationCalls: 5
 - service: AiService
   operationCalls: 5
 - service: ReportingService
   operationCalls: 4
-- service: CrossRegionService
-  operationCalls: 3
 - service: WalletService
   operationCalls: 2
 - service: VenueOpsService
@@ -246,9 +246,11 @@ screens:
   - getCellCapacity
   - getCellHealth
   - getCrossRegionEntitlement
+  - getWalletAllocation
   - listCellJobs
   - propagateCrossRegionEntitlement
   - reconcileRedemptions
+  - setWalletAllocationPolicy
   - updateCellTier
   states:
   - emptyFirstRun
@@ -1802,6 +1804,7 @@ screens:
   operations:
   - listPricingRule
   - listPricingRulePriority
+  - testPricingRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1809,7 +1812,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - ruleId<-navigation
   goesTo:
   - ADM-002
   - ADM-059
@@ -2003,7 +2007,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listPricingRule
   - listPricingRulePriority
+  - testPricingRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2011,7 +2017,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - ruleId<-navigation
   goesTo:
   - ADM-058
   boardFrames: null
@@ -2248,6 +2255,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decidePricingChangeRequest
   - listPricingGovernance
   states:
   - emptyFirstRun
@@ -2256,7 +2264,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - changeId<-navigation
   goesTo:
   - ADM-002
   - ADM-079
@@ -2279,14 +2288,17 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decidePricingChangeRequest
   - setPricingChangeRequest
+  - submitPricingChangeRequest
   states:
   - emptyFirstRun
   - emptyNoAccess
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - changeId<-navigation
   goesTo:
   - ADM-078
   boardFrames: null
@@ -2679,6 +2691,7 @@ screens:
   density: compact
   operations:
   - listRulePriorityConflict
+  - setRulePriorityConflict
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3047,6 +3060,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - decidePricingRecommendation
   - listRecommendationReviewDecision
   states:
   - emptyFirstRun
@@ -3055,7 +3069,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - recommendationId<-navigation
   goesTo:
   - ADM-108
   boardFrames: null
@@ -3319,6 +3334,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listScheduledLifecycleActions
   - publishActivationScheduler
   states:
   - emptyFirstRun
@@ -5990,7 +6006,8 @@ screens:
   wave: 3
   density: compact
   operations:
-  - approveMatrixMultiLevel
+  - listApprovalMatrices
+  - setApprovalMatrix
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6011,7 +6028,9 @@ screens:
   wave: 3
   density: compact
   operations:
-  - approveRoleAuthorityDelegation
+  - createApprovalDelegation
+  - listApprovalDelegations
+  - setApprovalMatrix
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6149,7 +6168,8 @@ screens:
   wave: 3
   density: compact
   operations:
-  - approveUnifiedDecision
+  - decideApprovalRequest
+  - listApprovalRequests
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6157,7 +6177,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - requestId<-navigation
   goesTo:
   - ADM-248
   boardFrames: null
@@ -6921,8 +6942,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getResaleFeePolicy
   - listFeeSellerProceed
   - listResaleFeeCommission
+  - setResaleFeePolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7733,7 +7756,7 @@ screens:
   density: compact
   operations:
   - approveWorkflow
-  - listWorkflow
+  - listRuleWorkflow
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7895,7 +7918,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listWorkflow
+  - listRuleWorkflow
   - setVisualWorkflow
   states:
   - emptyFirstRun
@@ -7917,8 +7940,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listRuleWorkflow
   - listVersioningEffectiveDate
-  - listWorkflow
   states:
   - emptyFirstRun
   - emptyNoAccess

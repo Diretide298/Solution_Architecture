@@ -49,6 +49,7 @@ contracts:
 - shift
 - subscription
 - tenancy
+- transport
 - venue-map
 - wallet
 - white-label

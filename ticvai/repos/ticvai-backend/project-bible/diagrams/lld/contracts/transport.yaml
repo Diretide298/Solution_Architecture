@@ -1,0 +1,380 @@
+id: LLD-transport
+title: transport — 31 operations
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/03-contracts.yaml
+tier: satellite
+service: VenueOpsService
+operations:
+- operation: applyTransportNetworkImport
+  verb: POST
+  path: /transport/network-imports/{importId}/apply
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.network_import
+  writes: []
+- operation: createTransportPassType
+  verb: POST
+  path: /transport/pass-types
+  scope: venue
+  permission: TRANSPORT_PRICE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.pass_type
+  writes: []
+- operation: createTransportRoute
+  verb: POST
+  path: /transport/routes
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.route
+  - transport.route_stop
+  - transport.station
+  writes:
+  - transport.route_stop
+- operation: createTransportStation
+  verb: POST
+  path: /transport/stations
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.station
+  writes: []
+- operation: createTransportTimetable
+  verb: POST
+  path: /transport/routes/{routeId}/timetables
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.timetable
+  - transport.timetable_run
+  writes:
+  - transport.timetable_run
+- operation: deleteFavouriteRoute
+  verb: DELETE
+  path: /transport/favourite-routes/{favouriteId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads: []
+  writes: []
+- operation: getNextTransportDeparture
+  verb: GET
+  path: /transport/departures/next
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  - public
+  offline: false
+  reads: []
+  writes: []
+- operation: getTransportFareTable
+  verb: GET
+  path: /transport/routes/{routeId}/fare-table
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  - public
+  - staff
+  offline: true
+  reads:
+  - transport.fare_matrix_cell
+  - transport.fare_passenger_type
+  - transport.fare_table
+  writes: []
+- operation: getTransportNetworkImport
+  verb: GET
+  path: /transport/network-imports/{importId}
+  scope: venue
+  permission: TRANSPORT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.network_import
+  writes: []
+- operation: getTransportRoute
+  verb: GET
+  path: /transport/routes/{routeId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  - public
+  - staff
+  offline: true
+  reads:
+  - transport.route
+  - transport.route_stop
+  - transport.station
+  writes: []
+- operation: getTransportRouteMap
+  verb: GET
+  path: /transport/routes/{routeId}/map
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  - public
+  offline: true
+  reads: []
+  writes: []
+- operation: importTransportNetwork
+  verb: POST
+  path: /transport/network-imports
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.network_import
+  writes: []
+- operation: listMyFavouriteRoutes
+  verb: GET
+  path: /transport/favourite-routes
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - transport.favourite_route
+  writes: []
+- operation: listTransportPassOffers
+  verb: GET
+  path: /transport/pass-offers
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  - public
+  offline: false
+  reads: []
+  writes: []
+- operation: listTransportPassTypes
+  verb: GET
+  path: /transport/pass-types
+  scope: venue
+  permission: TRANSPORT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.pass_type
+  writes: []
+- operation: listTransportRouteDepartures
+  verb: GET
+  path: /transport/routes/{routeId}/departures
+  scope: venue
+  permission: TRANSPORT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.departure
+  writes: []
+- operation: listTransportRoutes
+  verb: GET
+  path: /transport/routes
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  - public
+  - staff
+  offline: true
+  reads:
+  - transport.route
+  - transport.route_stop
+  - transport.station
+  writes: []
+- operation: listTransportStations
+  verb: GET
+  path: /transport/stations
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  - public
+  - staff
+  offline: true
+  reads:
+  - transport.station
+  writes: []
+- operation: listTransportTimetables
+  verb: GET
+  path: /transport/routes/{routeId}/timetables
+  scope: venue
+  permission: TRANSPORT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.timetable
+  - transport.timetable_run
+  writes: []
+- operation: publishTransportTimetable
+  verb: POST
+  path: /transport/timetables/{timetableId}/publish
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.timetable
+  - transport.timetable_run
+  writes: []
+- operation: quoteTransportFare
+  verb: POST
+  path: /transport/fare-quotes
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  - public
+  - service
+  offline: false
+  reads: []
+  writes: []
+- operation: saveFavouriteRoute
+  verb: POST
+  path: /transport/favourite-routes
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - transport.favourite_route
+  writes: []
+- operation: searchTransportDepartures
+  verb: GET
+  path: /transport/departures
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  - public
+  offline: false
+  reads: []
+  writes: []
+- operation: setTransportFareTable
+  verb: PUT
+  path: /transport/routes/{routeId}/fare-table
+  scope: venue
+  permission: TRANSPORT_PRICE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.fare_matrix_cell
+  - transport.fare_passenger_type
+  - transport.fare_table
+  writes:
+  - transport.fare_passenger_type
+- operation: setTransportRouteStatus
+  verb: PUT
+  path: /transport/routes/{routeId}/status
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.route
+  - transport.route_stop
+  - transport.station
+  writes: []
+- operation: updateTransportDeparture
+  verb: PATCH
+  path: /transport/departures/{departureId}
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.departure
+  writes: []
+- operation: updateTransportPassType
+  verb: PATCH
+  path: /transport/pass-types/{passTypeId}
+  scope: venue
+  permission: TRANSPORT_PRICE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.pass_type
+  writes: []
+- operation: updateTransportRoute
+  verb: PATCH
+  path: /transport/routes/{routeId}
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.route
+  - transport.route_stop
+  - transport.station
+  writes:
+  - transport.route_stop
+- operation: updateTransportStation
+  verb: PATCH
+  path: /transport/stations/{stationId}
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.station
+  writes: []
+- operation: updateTransportTimetable
+  verb: PATCH
+  path: /transport/timetables/{timetableId}
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.timetable
+  - transport.timetable_run
+  writes:
+  - transport.timetable_run
+- operation: withdrawTransportTimetable
+  verb: POST
+  path: /transport/timetables/{timetableId}/withdraw
+  scope: venue
+  permission: TRANSPORT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - transport.timetable
+  - transport.timetable_run
+  writes: []

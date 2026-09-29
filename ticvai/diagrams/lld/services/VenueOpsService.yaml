@@ -1,18 +1,18 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 224 operations, 98 tables
+title: VenueOpsService — 270 operations, 113 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
-why: '**Six small domains, 224 operations, one team.** Queue, maintenance, bookable resources, venue
+why: '**Six small domains, 270 operations, one team.** Queue, maintenance, bookable resources, venue
   mapping, media assets and arcade. None is large enough to deploy alone, all are venue-scoped, none
   is on the critical sale path, and **all six are licensed as optional modules** — a venue that buys
   none of them should not be running six idle services.'
 scale: Low and steady. Queue readings are the only frequent write.
 ifDown: Down degrades venue operations. Selling and admitting continue.
 coverage:
-  operations: 224
-  inAFlow: 47
-  percent: 21%
+  operations: 270
+  inAFlow: 50
+  percent: 19%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -27,15 +27,15 @@ schemas:
   - postgres
   largestTable: maintenance.work_order
 - schema: resources
-  tables: 16
+  tables: 18
   stores:
   - postgres
   largestTable: resources.resource_type
 - schema: venuemap
-  tables: 5
+  tables: 6
   stores:
   - postgres
-  largestTable: venuemap.point
+  largestTable: venuemap.map
 - schema: assets
   tables: 13
   stores:
@@ -51,9 +51,14 @@ schemas:
   stores:
   - postgres
   largestTable: rental.pricing_profile
+- schema: transport
+  tables: 12
+  stores:
+  - postgres
+  largestTable: transport.pass_type
 operationsByContract:
 - contract: resources
-  count: 49
+  count: 58
   operations:
   - operation: allocateResources
     verb: POST
@@ -135,6 +140,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: createResourceHold
+    verb: POST
+    path: /resource-holds
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: createResourcePackage
     verb: POST
     path: /resource-packages
@@ -151,6 +164,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: extendResourceHold
+    verb: POST
+    path: /resource-holds/{holdId}/extend
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: getExperienceResourceRequirements
     verb: GET
     path: /experiences/{experienceId}/resource-requirements
@@ -158,6 +179,14 @@ operationsByContract:
     permission: RESOURCE_VIEW
     offline: false
     reads: 1
+    writes: 0
+  - operation: getMapResourceAvailability
+    verb: GET
+    path: /resource-availability
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: getPerformanceManifest
     verb: GET
@@ -207,6 +236,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: getResourceCostAnalytics
+    verb: GET
+    path: /resource-cost-analytics
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: getResourceDependencies
     verb: GET
     path: /resources/{resourceId}/dependencies
@@ -220,6 +257,14 @@ operationsByContract:
     path: /resources/{resourceId}/hierarchy
     scope: venue
     permission: RESOURCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getResourceHold
+    verb: GET
+    path: /resource-holds/{holdId}
+    scope: venue
+    permission: ORDER_VIEW
     offline: false
     reads: 1
     writes: 0
@@ -242,6 +287,14 @@ operationsByContract:
   - operation: getResourceUtilisation
     verb: GET
     path: /resource-utilisation
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listProductStartTimes
+    verb: GET
+    path: /resource-start-times
     scope: venue
     permission: RESOURCE_VIEW
     offline: false
@@ -303,11 +356,27 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: raiseResourceRequest
+    verb: POST
+    path: /resource-requests
+    scope: venue
+    permission: RESOURCE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
   - operation: releaseResourceBlock
     verb: DELETE
     path: /resource-blocks/{blockId}
     scope: venue
     permission: RESOURCE_MANAGE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: relinquishResourceHold
+    verb: DELETE
+    path: /resource-holds/{holdId}
+    scope: venue
+    permission: ORDER_CREATE
     offline: false
     reads: 0
     writes: 0
@@ -343,6 +412,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setResourceBookingProgress
+    verb: POST
+    path: /resource-bookings/{bookingId}/progress
+    scope: venue
+    permission: RESOURCE_BOOK
+    offline: true
+    reads: 1
+    writes: 0
   - operation: setResourceDependencies
     verb: PUT
     path: /resources/{resourceId}/dependencies
@@ -794,6 +871,321 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+- contract: games
+  count: 39
+  operations:
+  - operation: authoriseGameplay
+    verb: POST
+    path: /gameplay-authorisations
+    scope: venue
+    permission: ACCESS_VALIDATE
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: cloneGame
+    verb: POST
+    path: /games/{gameId}/clone
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: cloneReaderConfiguration
+    verb: POST
+    path: /readers/{readerId}/clone
+    scope: venue
+    permission: DEVICE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: createGame
+    verb: POST
+    path: /games
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createGameEntitlement
+    verb: POST
+    path: /game-entitlements
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: createPrize
+    verb: POST
+    path: /prizes
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deployReaderConfiguration
+    verb: POST
+    path: /readers/{readerId}/deploy
+    scope: venue
+    permission: DEVICE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getGameCard
+    verb: GET
+    path: /game-cards/{cardCode}
+    scope: venue
+    permission: null
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: getGameEligibility
+    verb: GET
+    path: /game-eligibility
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getGamePricing
+    verb: GET
+    path: /game-pricing
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getGameplaySyncStatus
+    verb: GET
+    path: /gameplay-sync-status
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: getGameplayValidationRules
+    verb: GET
+    path: /gameplay-validation-rules
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: issueGameCard
+    verb: POST
+    path: /game-cards
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: listAttractionTypes
+    verb: GET
+    path: /attraction-types
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listGameEntitlements
+    verb: GET
+    path: /game-entitlements
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listGameplayTransactions
+    verb: GET
+    path: /gameplay-transactions
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listGames
+    verb: GET
+    path: /games
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listPrizes
+    verb: GET
+    path: /prizes
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listReaders
+    verb: GET
+    path: /readers
+    scope: venue
+    permission: DEVICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: lookupPrize
+    verb: GET
+    path: /prizes/lookup
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: recordGamePlay
+    verb: POST
+    path: /game-plays
+    scope: venue
+    permission: null
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: redeemPrize
+    verb: POST
+    path: /prize-redemptions
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: setAttractionType
+    verb: PUT
+    path: /attraction-types
+    scope: tenant
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGameCardExpiryRules
+    verb: PUT
+    path: /game-card-expiry-rules
+    scope: tenant
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGameCardLifecycle
+    verb: POST
+    path: /game-cards/{cardId}/lifecycle
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: setGameKioskConfiguration
+    verb: PUT
+    path: /game-kiosk-config
+    scope: venue
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGameOperationalConfiguration
+    verb: PUT
+    path: /games/{gameId}/operations
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGamePricing
+    verb: PUT
+    path: /game-pricing
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setGameplayValidationRules
+    verb: PUT
+    path: /gameplay-validation-rules
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setPrizeCost
+    verb: PUT
+    path: /prizes/{prizeId}/cost
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setReaderConfiguration
+    verb: PUT
+    path: /readers/{readerId}
+    scope: venue
+    permission: DEVICE_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: setReaderProfile
+    verb: PUT
+    path: /reader-profiles
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: setRedemptionRules
+    verb: PUT
+    path: /redemption-rules
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: simulateGameplayAuthorisation
+    verb: POST
+    path: /gameplay-authorisations/simulate
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: syncGamePlays
+    verb: POST
+    path: /game-plays/sync
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: testReader
+    verb: POST
+    path: /readers/{readerId}/test
+    scope: venue
+    permission: DEVICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: transferGameCard
+    verb: POST
+    path: /game-cards/{cardCode}/transfer
+    scope: venue
+    permission: ORDER_MODIFY
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateGame
+    verb: PATCH
+    path: /games/{gameId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: validateGameConfiguration
+    verb: POST
+    path: /game-configuration-validations
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
 - contract: maintenance
   count: 36
   operations:
@@ -1085,289 +1477,257 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
-- contract: games
-  count: 35
+- contract: transport
+  count: 31
   operations:
-  - operation: authoriseGameplay
+  - operation: applyTransportNetworkImport
     verb: POST
-    path: /gameplay-authorisations
+    path: /transport/network-imports/{importId}/apply
     scope: venue
-    permission: ACCESS_VALIDATE
-    offline: true
+    permission: TRANSPORT_MANAGE
+    offline: false
     reads: 1
     writes: 0
-  - operation: createGame
+  - operation: createTransportPassType
     verb: POST
-    path: /games
+    path: /transport/pass-types
     scope: venue
-    permission: PRODUCT_CONFIGURE
+    permission: TRANSPORT_PRICE
     offline: false
-    reads: 2
-    writes: 2
-  - operation: createGameEntitlement
+    reads: 1
+    writes: 0
+  - operation: createTransportRoute
     verb: POST
-    path: /game-entitlements
+    path: /transport/routes
     scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: createPrize
-    verb: POST
-    path: /prizes
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: deployReaderConfiguration
-    verb: POST
-    path: /readers/{readerId}/deploy
-    scope: venue
-    permission: DEVICE_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: getGameCard
-    verb: GET
-    path: /game-cards/{cardCode}
-    scope: venue
-    permission: null
-    offline: true
-    reads: 2
-    writes: 0
-  - operation: getGameEligibility
-    verb: GET
-    path: /game-eligibility
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: false
-    reads: 0
-    writes: 0
-  - operation: getGamePricing
-    verb: GET
-    path: /game-pricing
-    scope: venue
-    permission: PRICE_VIEW
-    offline: false
-    reads: 0
-    writes: 0
-  - operation: getGameplaySyncStatus
-    verb: GET
-    path: /gameplay-sync-status
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: false
-    reads: 0
-    writes: 0
-  - operation: getGameplayValidationRules
-    verb: GET
-    path: /gameplay-validation-rules
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: issueGameCard
-    verb: POST
-    path: /game-cards
-    scope: workstation
-    permission: ORDER_CREATE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: listAttractionTypes
-    verb: GET
-    path: /attraction-types
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listGameEntitlements
-    verb: GET
-    path: /game-entitlements
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listGameplayTransactions
-    verb: GET
-    path: /gameplay-transactions
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listGames
-    verb: GET
-    path: /games
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: listPrizes
-    verb: GET
-    path: /prizes
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: listReaders
-    verb: GET
-    path: /readers
-    scope: venue
-    permission: DEVICE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: recordGamePlay
-    verb: POST
-    path: /game-plays
-    scope: venue
-    permission: null
-    offline: true
-    reads: 2
-    writes: 2
-  - operation: redeemPrize
-    verb: POST
-    path: /prize-redemptions
-    scope: workstation
-    permission: ORDER_CREATE
+    permission: TRANSPORT_MANAGE
     offline: false
     reads: 3
-    writes: 3
-  - operation: setAttractionType
-    verb: PUT
-    path: /attraction-types
-    scope: tenant
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 1
     writes: 1
-  - operation: setGameCardExpiryRules
-    verb: PUT
-    path: /game-card-expiry-rules
-    scope: tenant
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setGameCardLifecycle
+  - operation: createTransportStation
     verb: POST
-    path: /game-cards/{cardId}/lifecycle
+    path: /transport/stations
     scope: venue
-    permission: PRODUCT_CONFIGURE
+    permission: TRANSPORT_MANAGE
     offline: false
     reads: 1
     writes: 0
-  - operation: setGameKioskConfiguration
-    verb: PUT
-    path: /game-kiosk-config
-    scope: venue
-    permission: TENANT_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setGameOperationalConfiguration
-    verb: PUT
-    path: /games/{gameId}/operations
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setGamePricing
-    verb: PUT
-    path: /game-pricing
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setGameplayValidationRules
-    verb: PUT
-    path: /gameplay-validation-rules
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setPrizeCost
-    verb: PUT
-    path: /prizes/{prizeId}/cost
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setReaderConfiguration
-    verb: PUT
-    path: /readers/{readerId}
-    scope: venue
-    permission: DEVICE_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: setReaderProfile
-    verb: PUT
-    path: /reader-profiles
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 3
-    writes: 2
-  - operation: setRedemptionRules
-    verb: PUT
-    path: /redemption-rules
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 1
-    writes: 1
-  - operation: simulateGameplayAuthorisation
+  - operation: createTransportTimetable
     verb: POST
-    path: /gameplay-authorisations/simulate
+    path: /transport/routes/{routeId}/timetables
     scope: venue
-    permission: PRODUCT_CONFIGURE
+    permission: TRANSPORT_MANAGE
     offline: false
-    reads: 1
-    writes: 0
-  - operation: syncGamePlays
-    verb: POST
-    path: /game-plays/sync
+    reads: 2
+    writes: 1
+  - operation: deleteFavouriteRoute
+    verb: DELETE
+    path: /transport/favourite-routes/{favouriteId}
     scope: venue
     permission: null
     offline: false
-    reads: 2
-    writes: 3
-  - operation: testReader
-    verb: POST
-    path: /readers/{readerId}/test
+    reads: 0
+    writes: 0
+  - operation: getNextTransportDeparture
+    verb: GET
+    path: /transport/departures/next
     scope: venue
-    permission: DEVICE_CONFIGURE
+    permission: null
     offline: false
     reads: 0
     writes: 0
-  - operation: transferGameCard
-    verb: POST
-    path: /game-cards/{cardCode}/transfer
+  - operation: getTransportFareTable
+    verb: GET
+    path: /transport/routes/{routeId}/fare-table
     scope: venue
-    permission: ORDER_MODIFY
+    permission: null
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: getTransportNetworkImport
+    verb: GET
+    path: /transport/network-imports/{importId}
+    scope: venue
+    permission: TRANSPORT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getTransportRoute
+    verb: GET
+    path: /transport/routes/{routeId}
+    scope: venue
+    permission: null
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: getTransportRouteMap
+    verb: GET
+    path: /transport/routes/{routeId}/map
+    scope: venue
+    permission: null
+    offline: true
+    reads: 0
+    writes: 0
+  - operation: importTransportNetwork
+    verb: POST
+    path: /transport/network-imports
+    scope: venue
+    permission: TRANSPORT_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMyFavouriteRoutes
+    verb: GET
+    path: /transport/favourite-routes
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTransportPassOffers
+    verb: GET
+    path: /transport/pass-offers
+    scope: venue
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listTransportPassTypes
+    verb: GET
+    path: /transport/pass-types
+    scope: venue
+    permission: TRANSPORT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTransportRouteDepartures
+    verb: GET
+    path: /transport/routes/{routeId}/departures
+    scope: venue
+    permission: TRANSPORT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTransportRoutes
+    verb: GET
+    path: /transport/routes
+    scope: venue
+    permission: null
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: listTransportStations
+    verb: GET
+    path: /transport/stations
+    scope: venue
+    permission: null
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listTransportTimetables
+    verb: GET
+    path: /transport/routes/{routeId}/timetables
+    scope: venue
+    permission: TRANSPORT_VIEW
     offline: false
     reads: 2
-    writes: 2
-  - operation: updateGame
+    writes: 0
+  - operation: publishTransportTimetable
+    verb: POST
+    path: /transport/timetables/{timetableId}/publish
+    scope: venue
+    permission: TRANSPORT_MANAGE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: quoteTransportFare
+    verb: POST
+    path: /transport/fare-quotes
+    scope: venue
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: saveFavouriteRoute
+    verb: POST
+    path: /transport/favourite-routes
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: searchTransportDepartures
+    verb: GET
+    path: /transport/departures
+    scope: venue
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setTransportFareTable
+    verb: PUT
+    path: /transport/routes/{routeId}/fare-table
+    scope: venue
+    permission: TRANSPORT_PRICE
+    offline: false
+    reads: 3
+    writes: 1
+  - operation: setTransportRouteStatus
+    verb: PUT
+    path: /transport/routes/{routeId}/status
+    scope: venue
+    permission: TRANSPORT_MANAGE
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: updateTransportDeparture
     verb: PATCH
-    path: /games/{gameId}
+    path: /transport/departures/{departureId}
     scope: venue
-    permission: PRODUCT_CONFIGURE
+    permission: TRANSPORT_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: updateTransportPassType
+    verb: PATCH
+    path: /transport/pass-types/{passTypeId}
+    scope: venue
+    permission: TRANSPORT_PRICE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: updateTransportRoute
+    verb: PATCH
+    path: /transport/routes/{routeId}
+    scope: venue
+    permission: TRANSPORT_MANAGE
+    offline: false
+    reads: 3
+    writes: 1
+  - operation: updateTransportStation
+    verb: PATCH
+    path: /transport/stations/{stationId}
+    scope: venue
+    permission: TRANSPORT_MANAGE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: updateTransportTimetable
+    verb: PATCH
+    path: /transport/timetables/{timetableId}
+    scope: venue
+    permission: TRANSPORT_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 1
+  - operation: withdrawTransportTimetable
+    verb: POST
+    path: /transport/timetables/{timetableId}/withdraw
+    scope: venue
+    permission: TRANSPORT_MANAGE
+    offline: false
+    reads: 2
+    writes: 0
 - contract: assets
   count: 26
   operations:
@@ -1759,7 +2119,7 @@ operationsByContract:
     reads: 3
     writes: 2
 - contract: venue-map
-  count: 13
+  count: 15
   operations:
   - operation: acceptVenueLabelProposals
     verb: POST
@@ -1791,7 +2151,7 @@ operationsByContract:
     scope: venue
     permission: VENUE_MAP_VIEW
     offline: true
-    reads: 4
+    reads: 5
     writes: 0
   - operation: getVenueMapGraph
     verb: GET
@@ -1825,6 +2185,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 4
+  - operation: listBookableVenueMaps
+    verb: GET
+    path: /bookable-venue-maps
+    scope: venue
+    permission: VENUE_MAP_VIEW
+    offline: true
+    reads: 0
+    writes: 0
   - operation: listVenueMaps
     verb: GET
     path: /venue-maps
@@ -1849,6 +2217,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 4
+  - operation: setPlacedResource
+    verb: POST
+    path: /venue-maps/{mapId}/resources
+    scope: venue
+    permission: VENUE_MAP_MANAGE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setVenuePoint
     verb: POST
     path: /venue-maps/{mapId}/points
@@ -2197,7 +2573,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.prize
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -2374,7 +2750,7 @@ tables:
   - queue
   foreignWriters: null
 - table: queue.queue
-  columns: 33
+  columns: 37
   store: postgres
   parent: null
   writtenBy:
@@ -2567,7 +2943,7 @@ tables:
   - resources
   foreignWriters: null
 - table: resources.booking
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2621,6 +2997,12 @@ tables:
   writtenBy:
   - resources
   foreignWriters: null
+- table: resources.resource_hold
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: resources.resource_package
   columns: 13
   store: postgres
@@ -2634,6 +3016,12 @@ tables:
   parent: resources.resource
   writtenBy:
   - resources
+  foreignWriters: null
+- table: resources.resource_request
+  columns: 11
+  store: postgres
+  parent: resources.resource
+  writtenBy: []
   foreignWriters: null
 - table: resources.resource_requirement
   columns: 10
@@ -2663,8 +3051,83 @@ tables:
   writtenBy:
   - resources
   foreignWriters: null
+- table: transport.departure
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: transport.fare_matrix_cell
+  columns: 5
+  store: postgres
+  parent: transport.fare_table
+  writtenBy: []
+  foreignWriters: null
+- table: transport.fare_passenger_type
+  columns: 11
+  store: postgres
+  parent: transport.fare_table
+  writtenBy:
+  - transport
+  foreignWriters: null
+- table: transport.fare_table
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: transport.favourite_route
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: transport.network_import
+  columns: 10
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: transport.pass_type
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: transport.route
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: transport.route_stop
+  columns: 7
+  store: postgres
+  parent: transport.route
+  writtenBy:
+  - transport
+  foreignWriters: null
+- table: transport.station
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: transport.timetable
+  columns: 12
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: transport.timetable_run
+  columns: 4
+  store: postgres
+  parent: transport.timetable
+  writtenBy:
+  - transport
+  foreignWriters: null
 - table: venuemap.import_job
-  columns: 9
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -2685,6 +3148,13 @@ tables:
   foreignWriters: null
 - table: venuemap.path
   columns: 10
+  store: postgres
+  parent: null
+  writtenBy:
+  - venue-map
+  foreignWriters: null
+- table: venuemap.placed_resource
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -2764,11 +3234,15 @@ writesOutside:
 screens:
 - P01:WEB-002 Event & Attraction Listing
 - P01:WEB-004 Attraction Details
+- P01:WEB-010 Shopping Cart
 - P01:WEB-015 Branded Queue / Waiting Room
 - P01:WEB-021 Wallet & Gift Cards
 - P01:WEB-031 My Reservations
 - P01:WEB-039 Venue Map & Wait Times
 - P01:WEB-040 Virtual Queue
+- P01:WEB-047 Map Booking — Cabanas & Spots
+- P01:WEB-048 Book a Space by the Hour
+- P01:WEB-049 Transport — Route & Schedule
 - P02:GST-003 Event & Attraction Listing
 - P02:GST-004 Attraction Details
 - P02:GST-021 Interactive Map
@@ -2776,11 +3250,18 @@ screens:
 - P02:GST-023 Virtual Queue
 - P02:GST-026 Retail / Merchandise
 - P02:GST-038 Digital Companion Mode
+- P02:GST-041 Checkout Entry
 - P02:GST-046 Branded Queue / Waiting Room
 - P02:GST-051 Plan Your Adventure – Start
 - P02:GST-053 Build Your Own Itinerary
 - P02:GST-054 AI Optimized Itinerary
 - P02:GST-059 Plan My Day – In Progress
+- P02:GST-074 Map Booking — Cabanas & Spots
+- P02:GST-075 Book a Space by the Hour
+- P02:GST-076 Intercity Trip — Route & Schedule
+- P02:GST-077 Intercity Trip — Route & Passengers
+- P02:GST-078 Intercity Trip — Multi-trip Passes
+- P02:GST-079 Intercity Trip — Favourite Routes
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-010 Add to Existing Ticket
 - P04:POS-029 Order Queue
@@ -2832,6 +3313,7 @@ screens:
 - P08:BO-003 Queue Integration Setup
 - P08:BO-004 Manual Wait Time Entry
 - P08:BO-005 Queue Monitor
+- P08:BO-008 Product Detail & Variants
 - P08:BO-019 Closures & Blackouts
 - P08:BO-027 Reissue & Media Replacement
 - P08:BO-030 Work Order Verification
@@ -2851,7 +3333,15 @@ screens:
 - P08:BO-099 Performance Manifest
 - P08:BO-1061 Platform Command Center
 - P08:BO-108 Venue Operations
+- P08:BO-1183 Transport Stations
+- P08:BO-1184 Transport Routes & Stops
+- P08:BO-1185 Transport Fares & Passenger Types
+- P08:BO-1186 Transport Timetables
+- P08:BO-1187 Transport Departure Board
+- P08:BO-1188 Transport Pass Types
+- P08:BO-1189 Transport Network Import
 - P08:BO-125 Product & Category Button Configuration
+- P08:BO-221 Fast Pass & Attraction Access Journey
 - P08:BO-394 Game & Ride Operations Dashboard
 - P08:BO-395 Game & Ride Directory
 - P08:BO-396 Attraction Profile
@@ -3046,6 +3536,7 @@ screens:
 - P08:BO-876 Certification & Expiry Management
 - P08:BO-877 Qualification & Assignment Rule Engine
 - P08:BO-878 Staff Availability & Working Pattern
+- P08:BO-880 Break, Leave & Absence Configuration
 - P08:BO-893 Experience Resource Requirement Builder
 - P08:BO-894 Staff-to-Experience Qualification Mapping
 - P08:BO-895 Resource Combination Builder
@@ -3071,10 +3562,13 @@ screens:
 - P08:BO-918 Event Resource Template Library
 - P08:BO-921 Multi-Event Allocation & Conflict Optimizer
 - P08:BO-923 AI Resource Intelligence Command Center
+- P08:BO-924 Optimal Resource Recommendation Engine
+- P08:BO-930 Alternative & Replacement Resource
 - P08:BO-933 My Resource Operations Home
 - P08:BO-934 My Schedule & Assignment Calendar
 - P08:BO-935 Assignment Detail & Operational Brief
 - P08:BO-937 Resource Collection, Handover & Return
+- P08:BO-938 Employee Requests & Resource Support
 - P08:BO-942 Mobile Operations Control & Offline Sync
 - P08:BO-943 Resource Analytics Command Center
 - P08:BO-944 Resource Utilization & Capacity Analytics
@@ -3083,6 +3577,7 @@ screens:
 - P08:BO-948 Resource Governance & Policy Center
 - P08:BO-950 Audit Trail & Resource Decision History
 - P08:BO-952 Executive Resource Intelligence & AI Improvement Center
+- P08:BO-955 Sections & Zones
 - P08:BO-990 Maintenance & Out of Service
 - P09:ADM-587 Terminal Health, Maintenance & Incident Center\t57
 - P12:SUP-020 Queue Configuration & Management
@@ -3139,6 +3634,7 @@ flows:
 - F26 A venue maps its site
 - F48 A guest finds it, queues for it, and eats
 - F49 A guest plans a day and follows it
+- F52 A guest books a cabana and uses it
 - F64 A steward signs in and takes a venue and a role
 - F65 A task is raised, worked and handed over
 - F67 A queue is monitored and capacity is held

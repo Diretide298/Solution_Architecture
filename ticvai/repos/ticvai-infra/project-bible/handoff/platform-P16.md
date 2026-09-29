@@ -5,25 +5,24 @@
 | | |
 |---|---|
 | Screens | 69 |
-| Operations | 54 |
+| Operations | 55 |
 | Contracts | 11 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 148 |
+| Operations with no screen | 124 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 148 operations with no screen here
+### 124 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `enrolFaceTag` | access | POST | Capture a same-visit facial model that dies at close of day |
+| `approveManualOverrideSupervisor` | access | PUT | Manual Override & Supervisor Approval |
 | `listAccessChanges` | access | GET | Changes made to an entitlement's access |
 | `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
-| `setEntryRulePoints` | access | PUT | Set the access points an admission rule covers |
 | `verifyIdentity` | access | POST | Check the person presenting against the person entitled |
 | `createKnowledgeCollection` | ai | POST | Create a collection |
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
@@ -35,32 +34,33 @@
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
 | `setSuggestionProvider` | ai | PUT |  |
+| `approveMatrixMultiLevel` | approvals | PUT | Approval Matrix & Multi-Level Approval Configuration |
+| `approveRoleAuthorityDelegation` | approvals | PUT | Roles, Authority, Delegation & Approval Limits |
+| `approveUnifiedDecision` | approvals | PUT | Unified Approval Inbox & Decision Workspace |
 | `submitApprovalRequest` | approvals | POST | Send a saved draft for approval |
-| `assessProductChange` | catalogue | POST | What a change would touch, before making it |
-| `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
-| `cloneProduct` | catalogue | POST | Copy a product as a new draft |
-| `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
-| `createDonationCampaign` | catalogue | POST | Create a campaign |
-| `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
 | `getCatalogueImportJob` | catalogue | GET | Progress and findings of a catalogue import |
-| `getDynamicPriceRule` | catalogue | GET | One rule with its conditions and actions |
 | `getPlanBenefits` | catalogue | GET | Which benefits a plan grants, and how much of each |
-| `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
-| `listDynamicPriceRules` | catalogue | GET | Dynamic pricing rules |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
-| `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
-| `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
-| `reinstateEntitlement` | catalogue | POST | Lift a suspension |
-| `restoreProductVersion` | catalogue | POST | Put a previous version back |
-| `setDynamicPriceRule` | catalogue | PUT | Replace a rule, its conditions and its actions |
-| `setMembershipBenefit` | catalogue | PUT | Define a benefit |
-| `setMembershipProgramme` | catalogue | PUT | Define a membership programme |
-| `setPlanBenefits` | catalogue | PUT | Replace the benefits a plan grants |
-| `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
-| `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
-| `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
-| … | | | 108 more |
+| `evaluateAccess` | identity | POST | Decide, now, and say why |
+| `getAccessPolicy` | identity | GET | One policy, at a version |
+| `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
+| `getMembership` | identity | GET | A membership with its history, usage and renewals |
+| `getPasswordPolicy` | identity | GET | Read the password and MFA policy in force |
+| `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
+| `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
+| `listAccessPolicyHistory` | identity | GET | Every version, who changed it and why |
+| `listAccessPolicyTemplates` | identity | GET | Reusable policy shapes |
+| `listCapabilityTemplates` | identity | GET | Saved tick-sets |
+| `listCustomerMemberships` | identity | GET | Memberships a customer holds |
+| `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
+| `listModules` | identity | GET | The module tree permissions are grouped under |
+| `listPermissions` | identity | GET | Every permission key the contracts enforce |
+| `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
+| `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
+| `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
+| `listStockReservations` | inventory | GET | Soft holds on stock |
+| … | | | 84 more |
 
 ## Modules
 
@@ -93,7 +93,7 @@
 | `ANL-020` | Multi-Site & Performance Comparison | Analytics | 3 | 1 | yes |
 | `ANL-021` | Dashboard Library | Analytics | 3 | 3 | yes |
 | `ANL-022` | Dashboard Creation Wizard | Analytics | 3 | 1 | yes |
-| `ANL-023` | Drag-and-Drop Dashboard Canvas | Analytics | 3 | 2 | yes |
+| `ANL-023` | Drag-and-Drop Dashboard Canvas | Analytics | 3 | 3 | yes |
 | `ANL-024` | Widget & Visualization Library | Analytics | 3 | 1 | yes |
 | `ANL-025` | KPI Builder | Analytics | 3 | 2 | yes |
 | `ANL-026` | Targets, Thresholds & KPI Status Rules | Analytics | 3 | 2 | yes |

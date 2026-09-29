@@ -78,6 +78,12 @@ IS_CONFIG = re.compile(
     # and `identity.benefit_usage` is the record written against it, and only the first
     # is configuration.
     r"JobTitle|ShiftPattern|Tier|Badge|Reward|PlanBenefit|MembershipBenefit|Substitute|"
+    # **Widened 29 September** for Help me choose (rev 3 REV3-11): a venue's guided choice is the
+    # configuration a guest's questions resolve against, drafted and published like a template.
+    r"GuidedChoice|"
+    # and for the VM close-out (29 September): which systems a wallet reconciles against is set up
+    # once and read by every reconciliation run.
+    r"ReconciliationSource|"
     r"IntegrationSource|FieldOwnership|ExtraField|ExtraValue|LoyaltyCampaign|"
     # **Widened 22 September** for `setTemperatureCheckpoint`. A checkpoint is the same shape as
     # `JobTitle` and `ShiftPattern` above it: a thing defined once that other rows resolve
@@ -140,7 +146,12 @@ NOT_CONFIG = re.compile(
     # migration, not a setting. Returns a job to track."* Tagging a config scope onto
     # something its author explicitly called not-a-setting would be answering the checker
     # rather than the question.
-    r"BadgePrintJob|updateCellTier", re.I)
+    r"BadgePrintJob|updateCellTier|"
+    # **`recordConsentAnswers` reaches these rules because it contains `Consent`, and it is not a
+    # setting** (29 September, rev 3 REV3-26): it is a guest's answer to a booking's consent
+    # question, an append-only record against one booking. The question itself is configuration
+    # (`createConsentQuestion`, scoped); the answer is what happened.
+    r"recordConsentAnswers", re.I)
 WRITES = ("put", "post", "patch")
 
 
@@ -170,7 +181,7 @@ def main() -> int:
                     # The verb list came from a back office where every settings act begins with
                     # `set`; five guest-owned settings operations were unreachable by it and their
                     # scopes went unexamined.
-                    r"^(set|configure|update|publish|create|schedule|claim|record|add|remove|"
+                    r"^(set|configure|update|publish|unpublish|create|clone|restore|schedule|claim|record|add|remove|"
                     r"register|revoke)", oid)
                 if not reached:
                     if op.get("x-ticvai-config-scope"):

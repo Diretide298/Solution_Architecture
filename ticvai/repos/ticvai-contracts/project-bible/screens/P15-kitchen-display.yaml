@@ -1234,6 +1234,13 @@ screens:
     trigger: onAction
     invalidates:
     - listKitchenStations
+  - operationId: rebalanceStationLoad
+    contract: fnb
+    purpose: Move work between stations mid-service
+    trigger: onAction
+    provenance: decided 29 September, VM close-out (venue management and configuration)
+    invalidates:
+    - listKitchenTickets
   entryState:
     params:
     - name: venueId
@@ -2118,16 +2125,27 @@ screens:
     contract: tenancy
     purpose: Set support hours, quiet hours, segregated access and alerti
     trigger: onAction
+  - operationId: setKitchenSla
+    contract: fnb
+    purpose: The outlet's kitchen service-time targets
+    trigger: onAction
+    provenance: decided 29 September, VM close-out (venue management and configuration)
   entryState:
     params:
     - name: venueId
       from: session
     - name: stationId
       from: session
+    - name: outletId
+      from: session
     - name: ticketId
       from: KIT-002
     coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
-      is open, and it resolves its station from the device assignment rather than from a person.'
+      is open, and it resolves its station from the device assignment rather than from a person. **`outletId`
+      comes from that assignment too** (confirmed 29 September, readiness close-out): the display is a
+      tenancy `Workstation` listed in its station''s `KitchenStation.displayWorkstationIds`, and the station
+      carries `outletId`, so `setKitchenSla` (per outlet) needs nothing the session does not already hold,
+      as KIT-003 and KIT-008 already take it.'
   wireframe:
     status: notStarted
     provenance: generated

@@ -4,7 +4,8 @@
   "verb": "GET",
   "path": "/products",
   "reads": [
-   "catalogue.product"
+   "catalogue.product",
+   "catalogue.product_media"
   ],
   "writes": [],
   "routing": "replica",
@@ -29,11 +30,13 @@
   "path": "/products",
   "reads": [
    "cache:idempotency",
-   "catalogue.product"
+   "catalogue.product",
+   "catalogue.product_media"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.product"
+   "catalogue.product",
+   "catalogue.product_media"
   ],
   "routing": "",
   "scope": "venue",
@@ -56,7 +59,8 @@
   "verb": "GET",
   "path": "/products/{productId}",
   "reads": [
-   "catalogue.product"
+   "catalogue.product",
+   "catalogue.product_media"
   ],
   "writes": [],
   "routing": "replica",
@@ -81,11 +85,13 @@
   "path": "/products/{productId}",
   "reads": [
    "cache:idempotency",
-   "catalogue.product"
+   "catalogue.product",
+   "catalogue.product_media"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.product"
+   "catalogue.product",
+   "catalogue.product_media"
   ],
   "routing": "",
   "scope": "venue",
@@ -702,7 +708,8 @@
   "path": "/products/{productId}/lifecycle",
   "reads": [
    "cache:idempotency",
-   "catalogue.product"
+   "catalogue.product",
+   "catalogue.product_media"
   ],
   "writes": [
    "cache:idempotency",
@@ -1603,6 +1610,8 @@
   "path": "/orders",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -1610,6 +1619,8 @@
   ],
   "writes": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.payment",
    "orders.sales_order"
@@ -1636,6 +1647,8 @@
   "verb": "GET",
   "path": "/orders/{orderId}",
   "reads": [
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -1664,6 +1677,8 @@
   "path": "/orders/{orderId}/hold",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -1697,6 +1712,8 @@
   "path": "/orders/{orderId}/resume",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -1730,6 +1747,8 @@
   "path": "/orders/{orderId}/discounts",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -1763,6 +1782,8 @@
   "path": "/orders/{orderId}/voids",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -2116,6 +2137,8 @@
   "path": "/reservations/{reservationId}/convert",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -2150,6 +2173,8 @@
    "orders.sales_order"
   ],
   "writes": [
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.sales_order"
   ],
   "routing": "",
@@ -2194,6 +2219,8 @@
   "path": "/orders/{orderId}/modify",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -2201,6 +2228,8 @@
   ],
   "writes": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.payment",
    "orders.sales_order"
@@ -2254,6 +2283,8 @@
   "reads": [
    "access.entitlement",
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -2291,6 +2322,8 @@
   ],
   "writes": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.sales_order"
   ],
   "routing": "",
@@ -2455,6 +2488,8 @@
   "verb": "GET",
   "path": "/reservations",
   "reads": [
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
   ],
@@ -2480,11 +2515,15 @@
   "path": "/reservations",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
   ],
   "writes": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
   ],
@@ -2508,6 +2547,8 @@
   "verb": "GET",
   "path": "/reservations/{reservationId}",
   "reads": [
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
   ],
@@ -2561,6 +2602,8 @@
   "path": "/reservations/{reservationId}/extend",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.reservation",
    "orders.reservation_line"
   ],
@@ -4361,6 +4404,7 @@
   "path": "/auth/guest/register",
   "reads": [
    "cache:idempotency",
+   "identity.mfa_method",
    "pii.subject"
   ],
   "writes": [
@@ -4417,6 +4461,7 @@
   "path": "/auth/guest/otp/verify",
   "reads": [
    "cache:idempotency",
+   "identity.mfa_method",
    "identity.otp_challenge",
    "pii.subject_contact"
   ],
@@ -4446,6 +4491,7 @@
   "path": "/auth/guest/social",
   "reads": [
    "cache:idempotency",
+   "identity.mfa_method",
    "pii.subject_contact"
   ],
   "writes": [
@@ -4474,6 +4520,7 @@
   "path": "/auth/guest/uae-pass",
   "reads": [
    "cache:idempotency",
+   "identity.mfa_method",
    "pii.subject_contact"
   ],
   "writes": [
@@ -4503,6 +4550,7 @@
   "path": "/auth/guest/session",
   "reads": [
    "identity.guest_session",
+   "identity.mfa_method",
    "pii.subject"
   ],
   "writes": [],
@@ -18607,6 +18655,10 @@
   "path": "/carts",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+   "marketing.consent_question",
+   "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line",
    "pii.subject",
@@ -18639,6 +18691,10 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.inventory_hold",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+   "marketing.consent_question",
+   "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line",
    "promotions.promotion"
@@ -18696,12 +18752,18 @@
    "catalogue.channel_capacity",
    "catalogue.performance",
    "catalogue.variant",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+   "marketing.consent_question",
+   "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.inventory_hold",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -18728,6 +18790,10 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+   "marketing.consent_question",
+   "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -18758,6 +18824,10 @@
   "path": "/carts/{cartId}/lines/{lineId}",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+   "marketing.consent_question",
+   "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -18789,6 +18859,10 @@
   "reads": [
    "cache:idempotency",
    "catalogue.inventory_hold",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+   "marketing.consent_question",
+   "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -18818,6 +18892,10 @@
   "path": "/carts/{cartId}/claim",
   "reads": [
    "cache:idempotency",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+   "marketing.consent_question",
+   "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line",
    "pii.subject"
@@ -18849,6 +18927,8 @@
   "reads": [
    "cache:idempotency",
    "catalogue.inventory_hold",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.cart",
    "orders.cart_line",
    "orders.order_line",
@@ -19094,7 +19174,8 @@
   "reads": [
    "fnb.dining_table",
    "fnb.reservation_table",
-   "fnb.table_reservation"
+   "fnb.table_reservation",
+   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
   ],
   "writes": [],
   "routing": "primary",
@@ -19119,12 +19200,14 @@
    "cache:idempotency",
    "fnb.dining_table",
    "fnb.reservation_table",
-   "fnb.table_reservation"
+   "fnb.table_reservation",
+   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
   ],
   "writes": [
    "cache:idempotency",
    "fnb.reservation_table",
-   "fnb.table_reservation"
+   "fnb.table_reservation",
+   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
   ],
   "routing": "",
   "scope": "venue",
@@ -19148,12 +19231,14 @@
   "reads": [
    "cache:idempotency",
    "fnb.reservation_table",
-   "fnb.table_reservation"
+   "fnb.table_reservation",
+   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
   ],
   "writes": [
    "cache:idempotency",
    "fnb.reservation_table",
-   "fnb.table_reservation"
+   "fnb.table_reservation",
+   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
   ],
   "routing": "",
   "scope": "venue",
@@ -19178,7 +19263,8 @@
    "cache:idempotency",
    "fnb.dining_table",
    "fnb.reservation_table",
-   "fnb.table_reservation"
+   "fnb.table_reservation",
+   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)"
   ],
   "writes": [
    "cache:idempotency",
@@ -19453,6 +19539,7 @@
   "reads": [
    "catalogue.event",
    "catalogue.product",
+   "catalogue.product_media",
    "catalogue.variant"
   ],
   "writes": [],
@@ -20602,6 +20689,7 @@
   "path": "/products/{productId}/clone",
   "reads": [
    "catalogue.product",
+   "catalogue.product_media",
    "catalogue.variant"
   ],
   "writes": [
@@ -20713,6 +20801,7 @@
   "reads": [
    "cache:idempotency",
    "catalogue.product",
+   "catalogue.product_media",
    "catalogue.product_version"
   ],
   "writes": [
@@ -20745,7 +20834,9 @@
    "orders.cart",
    "orders.sales_order"
   ],
-  "writes": [],
+  "writes": [
+   "catalogue.product_media"
+  ],
   "routing": "",
   "scope": "venue",
   "perm": "PRODUCT_CONFIGURE",
@@ -21314,6 +21405,7 @@
    "assets.media_asset",
    "venuemap.map",
    "venuemap.path",
+   "venuemap.placed_resource",
    "venuemap.point"
   ],
   "writes": [],
@@ -24420,6 +24512,8 @@
   "reads": [
    "cache:idempotency",
    "catalogue.product",
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -24810,6 +24904,8 @@
   "verb": "GET",
   "path": "/payment-links/{token}",
   "reads": [
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment_link",
@@ -27072,6 +27168,8 @@
   "verb": "GET",
   "path": "/my/orders",
   "reads": [
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
    "orders.order_line",
    "orders.order_line_eligibility",
    "orders.payment",
@@ -28404,7 +28502,9 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/privacy-testing",
-  "reads": [],
+  "reads": [
+   "marketing.privacy_change_set"
+  ],
   "writes": [],
   "routing": "primary",
   "scope": "venue",
@@ -28509,7 +28609,10 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/waiver-testing",
-  "reads": [],
+  "reads": [
+   "marketing.waiver_version_control",
+   "marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)"
+  ],
   "writes": [],
   "routing": "primary",
   "scope": "venue",
@@ -29790,7 +29893,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/case-resolution-closure",
-  "reads": [],
+  "reads": [
+   "marketing.case_resolution"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -30530,7 +30635,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/contact-automation",
-  "reads": [],
+  "reads": [
+   "marketing.contact_automation"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -30572,7 +30679,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/cookie-banner-preference",
-  "reads": [],
+  "reads": [
+   "marketing.cookie_banner_design"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -30593,7 +30702,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/cookie-tracking-digital",
-  "reads": [],
+  "reads": [
+   "marketing.tracking_technology"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -31182,7 +31293,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/data-processing-purpose",
-  "reads": [],
+  "reads": [
+   "marketing.processing_purpose"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -31203,7 +31316,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/data-retention-expiry",
-  "reads": [],
+  "reads": [
+   "marketing.legal_hold"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -31224,7 +31339,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/data-subject-customer",
-  "reads": [],
+  "reads": [
+   "marketing.privacy_request"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -31245,7 +31362,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/deletion-anonymization-restriction",
-  "reads": [],
+  "reads": [
+   "marketing.privacy_action"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -31645,7 +31764,10 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/dynamic-field-question",
-  "reads": [],
+  "reads": [
+   "marketing.form_definition_field",
+   "marketing.waiver_field_rule"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -31918,7 +32040,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/escalation-collaboration-internal",
-  "reads": [],
+  "reads": [
+   "marketing.case_internal_request"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -34734,7 +34858,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/privacy-evidence-compliance",
-  "reads": [],
+  "reads": [
+   "marketing.privacy_audit_event"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -34818,7 +34944,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/product-event-experience",
-  "reads": [],
+  "reads": [
+   "marketing.waiver_association"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -35196,7 +35324,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/quality-agent-evaluation",
-  "reads": [],
+  "reads": [
+   "marketing.quality_evaluation"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -35975,7 +36105,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/routing-priority-throttling",
-  "reads": [],
+  "reads": [
+   "marketing.communication_routing_rule"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -36206,7 +36338,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/site-waiver-exception",
-  "reads": [],
+  "reads": [
+   "marketing.waiver_exception"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -37111,7 +37245,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/waiver-template-master",
-  "reads": [],
+  "reads": [
+   "marketing.waiver_master"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -37132,7 +37268,9 @@
   "contract": "marketing-crm",
   "verb": "GET",
   "path": "/waiver-trigger-eligibility",
-  "reads": [],
+  "reads": [
+   "marketing.waiver_trigger_rule"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "venue",
@@ -37763,8 +37901,12 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/case-investigation-resolution",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.case_linked_record"
+  ],
+  "writes": [
+   "marketing.case_linked_record"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -37847,8 +37989,12 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/channel-provider",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.communication_provider"
+  ],
+  "writes": [
+   "marketing.communication_provider"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -37889,7 +38035,9 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/communication-preference-marketing",
-  "reads": [],
+  "reads": [
+   "marketing.communication_preference_type"
+  ],
   "writes": [],
   "routing": "primary",
   "scope": "venue",
@@ -37910,7 +38058,9 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/consent-capture-point",
-  "reads": [],
+  "reads": [
+   "marketing.consent_capture_point"
+  ],
   "writes": [],
   "routing": "primary",
   "scope": "venue",
@@ -38015,8 +38165,12 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/customer-service-copilot",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.service_copilot_config"
+  ],
+  "writes": [
+   "marketing.service_copilot_config"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -38036,8 +38190,12 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/data-discovery-access",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.privacy_export_package"
+  ],
+  "writes": [
+   "marketing.privacy_export_package"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -38141,8 +38299,12 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/digital-waiver-form",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.waiver_form_layout"
+  ],
+  "writes": [
+   "marketing.waiver_form_layout"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -38583,8 +38745,12 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/intelligent-routing-skill",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.case_routing_rule"
+  ],
+  "writes": [
+   "marketing.case_routing_rule"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -38625,8 +38791,12 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/localization-branding-customer",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.waiver_localisation"
+  ],
+  "writes": [
+   "marketing.waiver_localisation"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -38755,7 +38925,9 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/minor-guardian-age",
-  "reads": [],
+  "reads": [
+   "marketing.minor_privacy_rule"
+  ],
   "writes": [],
   "routing": "primary",
   "scope": "venue",
@@ -38839,8 +39011,12 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/order-booking-ticket",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.case_service_action"
+  ],
+  "writes": [
+   "marketing.case_service_action"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -39116,8 +39292,12 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/privacy-compliance-exception",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.privacy_exception"
+  ],
+  "writes": [
+   "marketing.privacy_exception"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -39305,8 +39485,12 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/refund-compensation-service",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.case_compensation_request"
+  ],
+  "writes": [
+   "marketing.case_compensation_request"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -39495,8 +39679,12 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/sender-identity-domain",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.sender_identity"
+  ],
+  "writes": [
+   "marketing.sender_identity"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -39516,8 +39704,14 @@
   "contract": "marketing-crm",
   "verb": "PUT",
   "path": "/signatory-signature-guardian",
-  "reads": [],
-  "writes": [],
+  "reads": [
+   "marketing.waiver_signatory_rule",
+   "marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)"
+  ],
+  "writes": [
+   "marketing.waiver_signatory_rule",
+   "marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -39791,7 +39985,9 @@
   "verb": "PUT",
   "path": "/waiver-verification-validation",
   "reads": [],
-  "writes": [],
+  "writes": [
+   "marketing.waiver_verification"
+  ],
   "routing": "primary",
   "scope": "venue",
   "perm": "MARKETING_MANAGE",
@@ -51347,7 +51543,8 @@
   "verb": "GET",
   "path": "/deposit-policy",
   "reads": [
-   "orders.deposit_policy"
+   "orders.deposit_policy",
+   "orders.deposit_policy (dining_* columns)"
   ],
   "writes": [],
   "routing": "replica",
@@ -51623,10 +51820,12 @@
   "verb": "PUT",
   "path": "/deposit-policy",
   "reads": [
-   "orders.deposit_policy"
+   "orders.deposit_policy",
+   "orders.deposit_policy (dining_* columns)"
   ],
   "writes": [
-   "orders.deposit_policy"
+   "orders.deposit_policy",
+   "orders.deposit_policy (dining_* columns)"
   ],
   "routing": null,
   "scope": "venue",
@@ -52267,6 +52466,10 @@
   "verb": "POST",
   "path": "/carts/{cartId}/promo-codes",
   "reads": [
+   "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+   "marketing.consent_question",
+   "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line"
   ],
@@ -52383,7 +52586,9 @@
   "contract": "identity",
   "verb": "POST",
   "path": "/auth/guest/password",
-  "reads": [],
+  "reads": [
+   "identity.mfa_method"
+  ],
   "writes": [],
   "routing": null,
   "scope": "tenant",
@@ -52613,6 +52818,3542 @@
    "staff"
   ],
   "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "actOnWaiverRequirements": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/participant-waiver-statu",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Send, resend or correct participant waiver requirements, one or in bulk",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "applyTransportNetworkImport": {
+  "contract": "transport",
+  "verb": "POST",
+  "path": "/transport/network-imports/{importId}/apply",
+  "reads": [
+   "transport.network_import"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Apply a previewed import to the network",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "cleanupFailedPayment": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/payments/{paymentId}/cleanup",
+  "reads": [
+   "orders.payment"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_VOID",
+  "offline": false,
+  "summary": "Clear a failed or orphaned payment",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "cloneGame": {
+  "contract": "games",
+  "verb": "POST",
+  "path": "/games/{gameId}/clone",
+  "reads": [
+   "games.game"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Copy a game or ride as a new one",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "cloneReaderConfiguration": {
+  "contract": "games",
+  "verb": "POST",
+  "path": "/readers/{readerId}/clone",
+  "reads": [
+   "games.reader"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "DEVICE_CONFIGURE",
+  "offline": false,
+  "summary": "Copy one reader's configuration onto other readers",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "cloneTicketTemplate": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/ticket-templates/{templateId}/clone",
+  "reads": [
+   "orders.ticket_template",
+   "orders.ticket_template_channel"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Create a ticket template from an existing one",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createConsentQuestion": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/consent-questions",
+  "reads": [
+   "marketing.consent_question",
+   "marketing.consent_question_version"
+  ],
+  "writes": [
+   "marketing.consent_question",
+   "marketing.consent_question_version"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Define a consent question",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createGroupEnquiry": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/group-enquiry-opportunity",
+  "reads": [
+   "orders.group_enquiry"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Capture a group enquiry",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createGuidedChoice": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/venues/{venueId}/guided-choices",
+  "reads": [
+   "whitelabel.guided_choice",
+   "whitelabel.guided_choice_answer",
+   "whitelabel.guided_choice_question"
+  ],
+  "writes": [
+   "whitelabel.guided_choice",
+   "whitelabel.guided_choice_answer",
+   "whitelabel.guided_choice_question"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Set up Help me choose for a venue",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createMemberException": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/memberships/{membershipId}/exceptions",
+  "reads": [
+   "orders.member_exception"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Record a member exception, override or service-recovery act",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createResourceHold": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resource-holds",
+  "reads": [
+   "resources.resource_hold"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Hold a specific resource picked on the map",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createTransportPassType": {
+  "contract": "transport",
+  "verb": "POST",
+  "path": "/transport/pass-types",
+  "reads": [
+   "transport.pass_type"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_PRICE",
+  "offline": false,
+  "summary": "Define a multi-trip or unlimited pass",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createTransportRoute": {
+  "contract": "transport",
+  "verb": "POST",
+  "path": "/transport/routes",
+  "reads": [
+   "transport.route",
+   "transport.route_stop",
+   "transport.station"
+  ],
+  "writes": [
+   "transport.route_stop"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Define a route with its ordered stops",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createTransportStation": {
+  "contract": "transport",
+  "verb": "POST",
+  "path": "/transport/stations",
+  "reads": [
+   "transport.station"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Add a station",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "createTransportTimetable": {
+  "contract": "transport",
+  "verb": "POST",
+  "path": "/transport/routes/{routeId}/timetables",
+  "reads": [
+   "transport.timetable",
+   "transport.timetable_run"
+  ],
+  "writes": [
+   "transport.timetable_run"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Draft a timetable for a route",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "decidePricingChangeRequest": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/pricing-change-request/{changeId}/decision",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PRODUCT_APPROVE",
+  "offline": false,
+  "summary": "Approve, reject or return a pricing change request",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "decidePricingRecommendation": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/recommendation-review-decision/{recommendationId}/decision",
+  "reads": [
+   "catalogue.pricing_recommendation_decision"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "AI_APPROVE",
+  "offline": false,
+  "summary": "Record a human decision on an AI pricing recommendation",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "deleteFavouriteRoute": {
+  "contract": "transport",
+  "verb": "DELETE",
+  "path": "/transport/favourite-routes/{favouriteId}",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Remove a saved route",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "deleteGuidedChoice": {
+  "contract": "white-label",
+  "verb": "DELETE",
+  "path": "/guided-choices/{guidedChoiceId}",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Delete a Help me choose set-up, or dismiss a suggestion",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "deliverCredential": {
+  "contract": "access",
+  "verb": "POST",
+  "path": "/credentials/{credentialId}/deliveries",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ORDER_REPRINT",
+  "offline": false,
+  "summary": "Send a credential over a channel",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "diffWalletConfigurationVersion": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-configuration/versions/{version}/diff",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "Compare a wallet configuration version against another or the working draft",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "estimateEventResourceCost": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/events/{eventId}/resource-cost",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "EVENT_CONFIGURE",
+  "offline": false,
+  "summary": "What an event's resource plan costs, by kind",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "extendResourceHold": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resource-holds/{holdId}/extend",
+  "reads": [
+   "resources.resource_hold"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Extend a resource hold",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getCaseInvestigationResolution": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/case-investigation-resolution",
+  "reads": [
+   "marketing.case_linked_record"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CASE_VIEW",
+  "offline": false,
+  "summary": "Read the case workspace",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getCredentialIssuanceRetryPolicy": {
+  "contract": "access",
+  "verb": "GET",
+  "path": "/credential-issuance-retry-policy",
+  "reads": [
+   "access.credential_issuance_retry_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "SCOPE_VIEW",
+  "offline": false,
+  "summary": "Read the credential issuance retry policy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getDigitalWaiverForm": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/digital-waiver-form",
+  "reads": [
+   "marketing.waiver_form_layout"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Load the layout of a waiver version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getLocalizationBrandingCustomer": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/localization-branding-customer",
+  "reads": [
+   "marketing.waiver_localisation"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Load a waiver version's languages, branding and channels",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getMapResourceAvailability": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-availability",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "Every bookable resource on a venue map, free or taken, in one call",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getNextTransportDeparture": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/departures/next",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Next Available Trip",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "public"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getPublishedGuidedChoice": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/venues/{venueId}/guided-choice",
+  "reads": [
+   "whitelabel.guided_choice",
+   "whitelabel.guided_choice_answer",
+   "whitelabel.guided_choice_question"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": true,
+  "summary": "The venue's published Help me choose",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceCostAnalytics": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-cost-analytics",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "What resources cost and earn, grouped",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceHold": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-holds/{holdId}",
+  "reads": [
+   "resources.resource_hold"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ORDER_VIEW",
+  "offline": false,
+  "summary": "Read a resource hold",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getSignatorySignatureGuardian": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/signatory-signature-guardian",
+  "reads": [
+   "marketing.waiver_signatory_rule",
+   "marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Load the signatory rules of a waiver version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getTransportFareTable": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/routes/{routeId}/fare-table",
+  "reads": [
+   "transport.fare_matrix_cell",
+   "transport.fare_passenger_type",
+   "transport.fare_table"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": true,
+  "summary": "A route's fares and passenger types",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "public",
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getTransportNetworkImport": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/network-imports/{importId}",
+  "reads": [
+   "transport.network_import"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "TRANSPORT_VIEW",
+  "offline": false,
+  "summary": "An import's status, preview counts and findings",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getTransportRoute": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/routes/{routeId}",
+  "reads": [
+   "transport.route",
+   "transport.route_stop",
+   "transport.station"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": true,
+  "summary": "A route with its stops",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "public",
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getTransportRouteMap": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/routes/{routeId}/map",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": true,
+  "summary": "The route drawn for a map, with the journey highlighted",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "public"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getWaiverTesting": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/waiver-testing",
+  "reads": [
+   "marketing.waiver_version_control",
+   "marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Checklist, rule simulation and approval record of a waiver version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "importTicketTemplate": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/ticket-templates/imports",
+  "reads": [
+   "orders.ticket_template",
+   "orders.ticket_template_channel"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Import a ticket template definition",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "importTransportNetwork": {
+  "contract": "transport",
+  "verb": "POST",
+  "path": "/transport/network-imports",
+  "reads": [
+   "transport.network_import"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Read a network file into a preview",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listApprovedActionExecutions": {
+  "contract": "approvals",
+  "verb": "GET",
+  "path": "/approved-action-executions",
+  "reads": [
+   "approvals.approved_action_execution"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "APPROVAL_VIEW",
+  "offline": false,
+  "summary": "Approved actions and whether they ran",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listBookableVenueMaps": {
+  "contract": "venue-map",
+  "verb": "GET",
+  "path": "/bookable-venue-maps",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "VENUE_MAP_VIEW",
+  "offline": true,
+  "summary": "The published maps of a venue that carry bookable spots",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listConsentAnswers": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/consent-answers",
+  "reads": [
+   "marketing.booking_consent_record"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "The consent records given at booking",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listConsentQuestions": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/consent-questions",
+  "reads": [
+   "marketing.consent_question",
+   "marketing.consent_question_version"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "The consent questions a venue asks at booking",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listGuidedChoices": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/venues/{venueId}/guided-choices",
+  "reads": [
+   "whitelabel.guided_choice",
+   "whitelabel.guided_choice_answer",
+   "whitelabel.guided_choice_question"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "List a venue's Help me choose set-ups",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listIntelligentRoutingSkills": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/intelligent-routing-skill",
+  "reads": [
+   "marketing.case_routing_rule"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "CASE_VIEW",
+  "offline": false,
+  "summary": "List case routing rules",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listMyFavouriteRoutes": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/favourite-routes",
+  "reads": [
+   "transport.favourite_route"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "The caller's saved routes",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listMyNotifications": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/me/notifications",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": null,
+  "offline": true,
+  "summary": "The signed-in guest's notification feed",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listOutletTemplates": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/outlet-templates",
+  "reads": [
+   "fnb.outlet_template"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "List outlet templates",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listPrivacyComplianceExceptions": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/privacy-compliance-exception",
+  "reads": [
+   "marketing.privacy_exception"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "The privacy exception queue",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listProductStartTimes": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-start-times",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "Start times a space sold by the hour can be booked at, for one length on one day",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listScheduledLifecycleActions": {
+  "contract": "catalogue",
+  "verb": "GET",
+  "path": "/activation-scheduler",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Scheduled lifecycle actions, for the scheduler calendar",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTransportPassOffers": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/pass-offers",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Multi-trip passes for a pair of stations, priced, with the saving",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "public"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTransportPassTypes": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/pass-types",
+  "reads": [
+   "transport.pass_type"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TRANSPORT_VIEW",
+  "offline": false,
+  "summary": "The venue's multi-trip pass types",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTransportRouteDepartures": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/routes/{routeId}/departures",
+  "reads": [
+   "transport.departure"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TRANSPORT_VIEW",
+  "offline": false,
+  "summary": "A route's departures, for operations",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTransportRoutes": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/routes",
+  "reads": [
+   "transport.route",
+   "transport.route_stop",
+   "transport.station"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": true,
+  "summary": "Routes, optionally those serving a pair of stations",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "public",
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTransportStations": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/stations",
+  "reads": [
+   "transport.station"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": true,
+  "summary": "Stations of a venue's transport network",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "public",
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listTransportTimetables": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/routes/{routeId}/timetables",
+  "reads": [
+   "transport.timetable",
+   "transport.timetable_run"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "TRANSPORT_VIEW",
+  "offline": false,
+  "summary": "A route's timetables",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listWaiverVerificationQueue": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/waiver-verification-validation",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "GUEST_VIEW_PII",
+  "offline": false,
+  "summary": "The waiver submissions awaiting or given verification",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listWalletConfigurationVersions": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-configuration/versions",
+  "reads": [
+   "wallet.configuration_version"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "Wallet configuration versions, newest first",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "lookupPrize": {
+  "contract": "games",
+  "verb": "GET",
+  "path": "/prizes/lookup",
+  "reads": [
+   "games.prize"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": true,
+  "summary": "Look up a prize by barcode or SKU",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "markMyNotificationsRead": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/me/notifications/read",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": true,
+  "summary": "Mark the signed-in guest's notifications read",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "migrateMembership": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/memberships/{membershipId}/migrations",
+  "reads": [
+   "orders.membership_migration"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Upgrade, downgrade or migrate an active membership to another product",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "proposeGuidedChoice": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/venues/{venueId}/guided-choice-suggestions",
+  "reads": [
+   "whitelabel.guided_choice",
+   "whitelabel.guided_choice_answer",
+   "whitelabel.guided_choice_question"
+  ],
+  "writes": [
+   "whitelabel.guided_choice",
+   "whitelabel.guided_choice_answer",
+   "whitelabel.guided_choice_question"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Record an AI-proposed Help me choose set-up for review",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "publishGuidedChoice": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/guided-choices/{guidedChoiceId}/publish",
+  "reads": [
+   "whitelabel.guided_choice",
+   "whitelabel.guided_choice_answer",
+   "whitelabel.guided_choice_question"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_PUBLISH",
+  "offline": false,
+  "summary": "Publish a Help me choose set-up to guests",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "publishHardwareDeployment": {
+  "contract": "access",
+  "verb": "POST",
+  "path": "/hardware-deployments",
+  "reads": [
+   "access.hardware_deployment"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Deploy a gate configuration version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "publishTransportTimetable": {
+  "contract": "transport",
+  "verb": "POST",
+  "path": "/transport/timetables/{timetableId}/publish",
+  "reads": [
+   "transport.timetable",
+   "transport.timetable_run"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Publish a timetable and release its departures",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "quoteTransportFare": {
+  "contract": "transport",
+  "verb": "POST",
+  "path": "/transport/fare-quotes",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Price a one-way trip or a pass for a party",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "public",
+   "service"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "raiseResourceRequest": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resource-requests",
+  "reads": [
+   "resources.resource_request"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": true,
+  "summary": "Ask for a replacement, extra equipment or a change to an assignment",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "recordConsentAnswers": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/consent-answers",
+  "reads": [
+   "marketing.booking_consent_record"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Answer the consent questions a booking asks",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "relinquishResourceHold": {
+  "contract": "resources",
+  "verb": "DELETE",
+  "path": "/resource-holds/{holdId}",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Give up a resource hold",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "replaceCredential": {
+  "contract": "access",
+  "verb": "POST",
+  "path": "/credentials/{credentialId}/replace",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ORDER_EXCHANGE",
+  "offline": false,
+  "summary": "Replace a credential's media",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "resolveApprovedActionExecution": {
+  "contract": "approvals",
+  "verb": "POST",
+  "path": "/approved-action-executions/{executionId}/resolve",
+  "reads": [
+   "approvals.approved_action_execution"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "APPROVAL_ACT",
+  "offline": false,
+  "summary": "Retry, investigate or escalate an approved action that failed",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "resolveCredentialException": {
+  "contract": "access",
+  "verb": "POST",
+  "path": "/credential-exceptions/{exceptionId}/resolve",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Act on a credential exception",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "resolveMembershipActivation": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/memberships/{membershipId}/activation/resolve",
+  "reads": [
+   "orders.membership_activation_action"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Act on a membership in the activation queue",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "resolveWalletDispute": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-disputes/{disputeId}/resolve",
+  "reads": [
+   "wallet.dispute"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Work a wallet dispute or integration exception",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "restoreWalletConfigurationVersion": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-configuration/versions/{version}/restore",
+  "reads": [
+   "wallet.configuration_version"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Put a previous wallet configuration back as the working draft",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "retryCredentialGeneration": {
+  "contract": "access",
+  "verb": "POST",
+  "path": "/credential-generation-issuance/retry",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Retry failed credential generation",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "rollbackAccessPolicy": {
+  "contract": "access",
+  "verb": "POST",
+  "path": "/dynamic-access-policy/{policyId}/rollback",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Put a previous policy version back",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "saveFavouriteRoute": {
+  "contract": "transport",
+  "verb": "POST",
+  "path": "/transport/favourite-routes",
+  "reads": [
+   "transport.favourite_route"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Save route",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "searchTransportDepartures": {
+  "contract": "transport",
+  "verb": "GET",
+  "path": "/transport/departures",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Search Trips — departures between two stations on a date",
+  "source": "derived",
+  "audience": [
+   "guest",
+   "public"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setAccessAttributeCatalog": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/access-attribute-catalog",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Add or amend an access attribute",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setAgentServiceProfile": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/agent-workload-availability",
+  "reads": [
+   "marketing.agent_service_profile"
+  ],
+  "writes": [
+   "marketing.agent_service_profile"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "CASE_MANAGE",
+  "offline": false,
+  "summary": "Set an agent's skills, languages, team and queues",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setApiClientStatus": {
+  "contract": "public-api",
+  "verb": "POST",
+  "path": "/api-clients/{clientId}/status",
+  "reads": [
+   "control.api_client"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "DEVELOPER_MANAGE",
+  "offline": false,
+  "summary": "Suspend or reactivate an integration, reversibly",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "partner"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setBiometricLifecycleRetention": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/biometric-lifecycle-retention",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Save a biometric retention rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setBrandingLocalizationTemplate": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/branding-localization-template",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Save branding and languages for a level",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setBusinessEventMapping": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/business-event-notification",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Create or change a business-event mapping",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setCaseInternalRequest": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/escalation-collaboration-internal",
+  "reads": [
+   "marketing.case_internal_request"
+  ],
+  "writes": [
+   "marketing.case_internal_request"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "CASE_MANAGE",
+  "offline": false,
+  "summary": "Raise or update an internal request on a case",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setCaseResolution": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/case-resolution-closure",
+  "reads": [
+   "marketing.case_resolution"
+  ],
+  "writes": [
+   "marketing.case_resolution"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "CASE_MANAGE",
+  "offline": false,
+  "summary": "Record a case's resolution",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setCommunicationRoutingRule": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/routing-priority-throttling",
+  "reads": [
+   "marketing.communication_routing_rule"
+  ],
+  "writes": [
+   "marketing.communication_routing_rule"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "MARKETING_MANAGE",
+  "offline": false,
+  "summary": "Create or change a routing rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setContactAutomation": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/contact-automation",
+  "reads": [
+   "marketing.contact_automation"
+  ],
+  "writes": [
+   "marketing.contact_automation"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "AI_CONFIGURE",
+  "offline": false,
+  "summary": "Create or change a governed contact-centre automation",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setCookieBannerDesign": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/cookie-banner-preference",
+  "reads": [
+   "marketing.cookie_banner_design"
+  ],
+  "writes": [
+   "marketing.cookie_banner_design"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Save a cookie banner design as a new version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setCredentialActivationDisplay": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/credential-activation-display",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Save a credential activation and display rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setCredentialIssuanceRetryPolicy": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/credential-issuance-retry-policy",
+  "reads": [
+   "access.credential_issuance_retry_policy"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Set the credential issuance retry policy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setDataProcessingPurpose": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/data-processing-purpose",
+  "reads": [
+   "marketing.processing_purpose"
+  ],
+  "writes": [
+   "marketing.processing_purpose"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Create or change a processing purpose",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setDynamicFieldQuestion": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/dynamic-field-question",
+  "reads": [
+   "marketing.form_definition_field",
+   "marketing.waiver_field_rule"
+  ],
+  "writes": [
+   "marketing.form_definition_field",
+   "marketing.waiver_field_rule"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Create, change or remove one field of a draft waiver version",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setEntitlementConsumption": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/entitlement-consumption",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Save an entitlement consumption rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setFaceMatchingVerification": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/face-matching-verification",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Save face matching and verification thresholds",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setFaceTagTemporaryEnrollment": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/face-tag-temporary",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Save a Face Tag profile",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setFraudDetectionRule": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/fraud-detection-rule",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Save an access fraud detection rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGroupCustomerOrganization": {
+  "contract": "orders",
+  "verb": "PUT",
+  "path": "/group-customer-organization",
+  "reads": [
+   "orders.group_customer_organization",
+   "orders.group_customer_organization_contact"
+  ],
+  "writes": [
+   "orders.group_customer_organization_contact"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Save a group customer organisation's profile",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGroupPaymentSchedule": {
+  "contract": "orders",
+  "verb": "PUT",
+  "path": "/group-bookings/{groupBookingId}/payment-schedule",
+  "reads": [
+   "orders.group_payment_milestone",
+   "orders.group_payment_schedule"
+  ],
+  "writes": [
+   "orders.group_payment_milestone"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Set a group's payment schedule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGroupTicketAllocation": {
+  "contract": "orders",
+  "verb": "PUT",
+  "path": "/group-bookings/{groupBookingId}/allocation",
+  "reads": [
+   "orders.group_ticket_allocation",
+   "orders.group_ticket_allocation_line"
+  ],
+  "writes": [
+   "orders.group_ticket_allocation"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Set how a group's tickets are allocated",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGroupTicketFulfillment": {
+  "contract": "orders",
+  "verb": "PUT",
+  "path": "/group-bookings/{groupBookingId}/fulfillment",
+  "reads": [
+   "orders.group_ticket_fulfillment"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Set how a group's tickets are delivered",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setGuestCompanionEligibility": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/guest-companion-eligibility",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Save a companion eligibility rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setHotelWalletExternal": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/hotel-wallet-external",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Save a hotel, wallet or external media integration",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setLegalHold": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/data-retention-expiry",
+  "reads": [
+   "marketing.legal_hold"
+  ],
+  "writes": [
+   "marketing.legal_hold"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Place, approve or release a legal or operational hold",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setMediaIssuanceEncoding": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/media-issuance-encoding",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Save a media issuance and encoding profile",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setMediaReplacementRevocation": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/media-replacement-revocation",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Save a media replacement rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setMediaTypeTechnology": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/media-type-technology",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Add, amend or retire a media type",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setOutletTemplate": {
+  "contract": "fnb",
+  "verb": "PUT",
+  "path": "/outlet-templates",
+  "reads": [
+   "fnb.outlet_template"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Create or replace an outlet template",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "setParticipantGuestList": {
+  "contract": "orders",
+  "verb": "PUT",
+  "path": "/group-bookings/{groupBookingId}/participants",
+  "reads": [
+   "orders.group_participant",
+   "orders.group_participant_list"
+  ],
+  "writes": [
+   "orders.group_participant"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_MODIFY",
+  "offline": false,
+  "summary": "Set a group's participant list",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setPlacedResource": {
+  "contract": "venue-map",
+  "verb": "POST",
+  "path": "/venue-maps/{mapId}/resources",
+  "reads": [
+   "venuemap.placed_resource"
+  ],
+  "writes": [
+   "venuemap.placed_resource"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "VENUE_MAP_MANAGE",
+  "offline": false,
+  "summary": "Place or amend a bookable resource on the map",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setPolicyScopeHierarchy": {
+  "contract": "access",
+  "verb": "PUT",
+  "path": "/policy-scope-hierarchy",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Place a policy in the scope hierarchy",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setPrivacyAction": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/deletion-anonymization-restriction",
+  "reads": [
+   "marketing.privacy_action"
+  ],
+  "writes": [
+   "marketing.privacy_action"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Plan, approve or cancel a privacy action",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setPrivacyRequest": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/data-subject-customer",
+  "reads": [
+   "marketing.privacy_request"
+  ],
+  "writes": [
+   "marketing.privacy_request"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Raise or progress a privacy request",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setPrivacyRequestTypes": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/privacy",
+  "reads": [
+   "marketing.privacy_request_deadline",
+   "marketing.privacy_request_type"
+  ],
+  "writes": [
+   "marketing.privacy_request_deadline",
+   "marketing.privacy_request_type"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Configure a privacy request type",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setQualityEvaluation": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/quality-agent-evaluation",
+  "reads": [
+   "marketing.quality_evaluation"
+  ],
+  "writes": [
+   "marketing.quality_evaluation"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "CASE_MANAGE",
+  "offline": false,
+  "summary": "Record or advance a quality evaluation",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setRefundCalculationPolicy": {
+  "contract": "orders",
+  "verb": "PUT",
+  "path": "/refund-calculation-policy",
+  "reads": [
+   "orders.refund_calculation_policy"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set how a venue calculates a refund and where it goes",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setResourceBookingProgress": {
+  "contract": "resources",
+  "verb": "POST",
+  "path": "/resource-bookings/{bookingId}/progress",
+  "reads": [
+   "resources.booking"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "RESOURCE_BOOK",
+  "offline": true,
+  "summary": "Start or complete a staff or instructor assignment",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setRulePriorityConflict": {
+  "contract": "catalogue",
+  "verb": "PUT",
+  "path": "/rule-priority-conflict",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Reorder, validate, test or save the pricing rule priority",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setTrackingTechnology": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/cookie-tracking-digital",
+  "reads": [
+   "marketing.tracking_technology"
+  ],
+  "writes": [
+   "marketing.tracking_technology"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Add, classify or retire a tracking technology",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setTransportFareTable": {
+  "contract": "transport",
+  "verb": "PUT",
+  "path": "/transport/routes/{routeId}/fare-table",
+  "reads": [
+   "transport.fare_matrix_cell",
+   "transport.fare_passenger_type",
+   "transport.fare_table"
+  ],
+  "writes": [
+   "transport.fare_passenger_type"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_PRICE",
+  "offline": false,
+  "summary": "Set a route's fares and passenger types",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setTransportRouteStatus": {
+  "contract": "transport",
+  "verb": "PUT",
+  "path": "/transport/routes/{routeId}/status",
+  "reads": [
+   "transport.route",
+   "transport.route_stop",
+   "transport.station"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Activate, suspend or retire a route",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWaiverAssociation": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/product-event-experience",
+  "reads": [
+   "marketing.waiver_association"
+  ],
+  "writes": [
+   "marketing.waiver_association"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Attach a waiver to a product, event or scope, or remove it",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWaiverException": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/site-waiver-exception",
+  "reads": [
+   "marketing.waiver_exception"
+  ],
+  "writes": [
+   "marketing.waiver_exception"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Request, approve, reject or revoke a waiver exception",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWaiverTemplateMaster": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/waiver-template-master",
+  "reads": [
+   "marketing.waiver_master"
+  ],
+  "writes": [
+   "marketing.waiver_master"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Create or change a waiver's master record",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWaiverTriggerRule": {
+  "contract": "marketing-crm",
+  "verb": "PUT",
+  "path": "/waiver-trigger-eligibility",
+  "reads": [
+   "marketing.waiver_trigger_rule"
+  ],
+  "writes": [
+   "marketing.waiver_trigger_rule"
+  ],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Create or change a waiver trigger rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWalletAuthenticationPolicy": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/wallet-authentication-policy",
+  "reads": [
+   "wallet.authentication_policy"
+  ],
+  "writes": [
+   "wallet.authentication_policy"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Which proof of identity a wallet spend needs, by amount, channel and kind",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWalletIntegrationMapping": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/wallet-integration-mappings",
+  "reads": [
+   "wallet.integration_mapping"
+  ],
+  "writes": [
+   "wallet.integration_mapping"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "How one integration's fields, currencies, statuses and credit types map onto the wallet",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWalletReconciliationSources": {
+  "contract": "wallet",
+  "verb": "PUT",
+  "path": "/wallet-reconciliation-sources",
+  "reads": [
+   "wallet.reconciliation_source"
+  ],
+  "writes": [
+   "wallet.reconciliation_source"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Which sources the wallet reconciles against, matched how, and when",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setWalletRiskRuleStatus": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-risk-rules/{ruleCode}/status",
+  "reads": [
+   "wallet.risk_rules"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "WALLET_CONFIGURE",
+  "offline": false,
+  "summary": "Suspend, emergency-disable or reactivate one risk rule",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "simulateBiometricConfiguration": {
+  "contract": "access",
+  "verb": "POST",
+  "path": "/biometric/simulate",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Run a biometric scenario before publishing",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "simulateGuestJourney": {
+  "contract": "access",
+  "verb": "POST",
+  "path": "/guest-journey/simulate",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "ACCESS_POINT_CONFIGURE",
+  "offline": false,
+  "summary": "Simulate an access journey",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "AccessService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "submitPricingChangeRequest": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/pricing-change-request/{changeId}/submit",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Submit a draft pricing change for validation and approval",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "testPricingRule": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/pricing-rule/{ruleId}/test",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "Test one pricing rule against a sample booking, on demand",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "testWebhookSubscription": {
+  "contract": "public-api",
+  "verb": "POST",
+  "path": "/webhook-subscriptions/{subscriptionId}/test",
+  "reads": [
+   "control.webhook_delivery"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "DEVELOPER_MANAGE",
+  "offline": false,
+  "summary": "Send a signed test event to the endpoint, now",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "partner"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "unpublishGuidedChoice": {
+  "contract": "white-label",
+  "verb": "POST",
+  "path": "/guided-choices/{guidedChoiceId}/unpublish",
+  "reads": [
+   "whitelabel.guided_choice",
+   "whitelabel.guided_choice_answer",
+   "whitelabel.guided_choice_question"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_PUBLISH",
+  "offline": false,
+  "summary": "Take a Help me choose set-up off the guest app",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateConsentQuestion": {
+  "contract": "marketing-crm",
+  "verb": "PATCH",
+  "path": "/consent-questions/{questionId}",
+  "reads": [
+   "marketing.consent_question",
+   "marketing.consent_question_version"
+  ],
+  "writes": [
+   "marketing.consent_question",
+   "marketing.consent_question_version"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "GUEST_MANAGE",
+  "offline": false,
+  "summary": "Reword, re-scope or retire a consent question",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateGuidedChoice": {
+  "contract": "white-label",
+  "verb": "PATCH",
+  "path": "/guided-choices/{guidedChoiceId}",
+  "reads": [
+   "whitelabel.guided_choice",
+   "whitelabel.guided_choice_answer",
+   "whitelabel.guided_choice_question"
+  ],
+  "writes": [
+   "whitelabel.guided_choice_question"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Edit a Help me choose set-up, or review a suggestion",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateProductVariant": {
+  "contract": "catalogue",
+  "verb": "PATCH",
+  "path": "/products/{productId}/variants/{variantId}",
+  "reads": [
+   "catalogue.variant"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Describe a variant",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateTransportDeparture": {
+  "contract": "transport",
+  "verb": "PATCH",
+  "path": "/transport/departures/{departureId}",
+  "reads": [
+   "transport.departure"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Change a departure's coach or capacity",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateTransportPassType": {
+  "contract": "transport",
+  "verb": "PATCH",
+  "path": "/transport/pass-types/{passTypeId}",
+  "reads": [
+   "transport.pass_type"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_PRICE",
+  "offline": false,
+  "summary": "Amend or retire a pass type",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateTransportRoute": {
+  "contract": "transport",
+  "verb": "PATCH",
+  "path": "/transport/routes/{routeId}",
+  "reads": [
+   "transport.route",
+   "transport.route_stop",
+   "transport.station"
+  ],
+  "writes": [
+   "transport.route_stop"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Amend a route",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateTransportStation": {
+  "contract": "transport",
+  "verb": "PATCH",
+  "path": "/transport/stations/{stationId}",
+  "reads": [
+   "transport.station"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Amend or deactivate a station",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "updateTransportTimetable": {
+  "contract": "transport",
+  "verb": "PATCH",
+  "path": "/transport/timetables/{timetableId}",
+  "reads": [
+   "transport.timetable",
+   "transport.timetable_run"
+  ],
+  "writes": [
+   "transport.timetable_run"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Amend a draft timetable",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "validateGameConfiguration": {
+  "contract": "games",
+  "verb": "POST",
+  "path": "/game-configuration-validations",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Re-run the configuration health checks for some or all games",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "verifyTaxExemption": {
+  "contract": "finance",
+  "verb": "POST",
+  "path": "/tax-exemptions/{exemptionId}/verify",
+  "reads": [
+   "ledger.tax_exemption"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "region",
+  "perm": "TAX_CONFIGURE",
+  "offline": false,
+  "summary": "Record that a tax exemption's evidence was checked",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "LedgerService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "voidEntitlement": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/entitlements/{entitlementId}/void",
+  "reads": [
+   "access.entitlement"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_VOID",
+  "offline": false,
+  "summary": "Void a single ticket",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "withdrawTransportTimetable": {
+  "contract": "transport",
+  "verb": "POST",
+  "path": "/transport/timetables/{timetableId}/withdraw",
+  "reads": [
+   "transport.timetable",
+   "transport.timetable_run"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "TRANSPORT_MANAGE",
+  "offline": false,
+  "summary": "Withdraw a published timetable",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "withdrawWalletDispute": {
+  "contract": "wallet",
+  "verb": "POST",
+  "path": "/wallet-disputes/{disputeId}/withdraw",
+  "reads": [
+   "wallet.dispute"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "WALLET_OPERATE",
+  "offline": false,
+  "summary": "Withdraw a wallet dispute that is still open or under review",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "guest"
+  ],
+  "service": "WalletService",
   "stores": [
    "postgres",
    "redis"

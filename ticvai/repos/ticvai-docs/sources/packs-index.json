@@ -3,23 +3,42 @@
  "generated": "2026-09-29",
  "note": "One record per client document under `sources/`, keyed by content hash. **The folder a document sat in was the only record of what it meant** \u2014 this makes that a field. `authority` keeps every rank any location gave it, and `platforms` is derived twice from independent evidence: `platformsConfirmed` is where the contracts and the pack's own screens agree.",
  "counts": {
-  "documents": 112,
+  "documents": 305,
   "duplicateSets": 34,
   "redundantBytes": 121378838,
-  "drafted": 17,
-  "undrafted": 95,
-  "withPlatform": 36,
-  "platformConfirmed": 17,
+  "drafted": 5,
+  "undrafted": 300,
+  "withPlatform": 37,
+  "platformConfirmed": 5,
   "authorityConflicts": 32,
-  "reusedFromCache": 112
+  "reusedFromCache": 305
  },
  "undraftedDocuments": [
   "526be657-fcbb-4a33-a048-ca1f00c91ac9.png",
+  "Access Control Module_Reference.pdf",
   "ACCREDITATION.pdf",
   "AI_Configuration_Assistant_Reference.pdf",
   "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
   "AI_Governance_Reference.pdf",
   "Approval_Workflows_and_Governance_Reference.pdf",
+  "B2B, Reseller & OTA Partner Management_Reference.pdf",
+  "base.png",
+  "beach-towel.jpg",
+  "bg-ink.png",
+  "bg-wash.png",
+  "btn-outline.png",
+  "btn-pill.png",
+  "cabana-map.jpg",
+  "cabana-map.png",
+  "cards-grid.png",
+  "cards-poster.png",
+  "cards-split.png",
+  "cat-adventure.jpg",
+  "cat-culture.jpg",
+  "cat-family.jpg",
+  "cat-food.jpg",
+  "cat-live.jpg",
+  "cat-water.jpg",
   "Ch01_Executive_Overview_v1_4.docx",
   "Ch02_Technical_Architecture_v1_4.docx",
   "Ch03_Functional_Domain_Coverage_v1_4.docx",
@@ -29,38 +48,187 @@
   "Ch07_Security_Offline_Mobile_v1_4.docx",
   "Ch08_Implementation_and_Delivery_v1_4.docx",
   "Ch09_Platform_Vision_v1_4.docx",
+  "city-after-dark.jpg",
+  "city-night-cta.jpg",
+  "Communication & Notification Platform Services_Reference.pdf",
+  "creek-mug.jpg",
+  "creek-tote.jpg",
+  "cur-inr.png",
+  "cur-usd.png",
+  "Customer Service_Reference.pdf",
+  "density-compact.png",
+  "density-roomy.png",
+  "desert-cap.jpg",
+  "detail-aqua.jpg",
+  "detail-live.jpg",
   "Dev01_Engineering_Handbook_v1_0.docx",
   "Dev02_Repository_Structure_and_Contract_Pipeline_v1_0.docx",
   "Dev03_Local_Development_Environment_v1_0.docx",
   "Digital Asset Management DAM.pdf",
+  "dry-bag.jpg",
+  "dune-jacket.jpg",
   "Email_Attachments_TICVAI.xlsx",
   "Email_Attachments_TICVAI.xlsx",
+  "embed.png",
   "Entitlement Lifecycle.pdf",
   "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+  "explorers.png",
+  "extras-never.png",
   "F&B Dashboard Screens v1.0.pdf",
   "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
+  "gallery-print.jpg",
   "Game_and_Ride_Module.pdf",
+  "hero-cultural-night.jpg",
+  "hero-immersive.jpg",
+  "hero-waterfront.jpg",
+  "icon-dining.png",
+  "icon-events.png",
+  "icon-queue.png",
+  "icon-rides.png",
+  "icon-sahli-curious.png",
+  "icon-sahli-excited.png",
+  "icon-sahli-exit.png",
+  "icon-sahli-idle.png",
+  "icon-sahli-sad.png",
+  "icon-sahli-thinking.png",
+  "icon-shop.png",
+  "icon-shows.png",
+  "icon-zones.png",
   "Inventory_Procurement_Dashboard_Screens.pdf",
+  "kids-cap.jpg",
+  "kids-tee.jpg",
+  "logo-dark.jpg",
+  "logo-duotone.jpg",
+  "logo-duotone.png",
+  "logo-light.jpg",
+  "logo-partner.jpg",
+  "logo-ticvai.jpg",
+  "logo-ticvai.png",
+  "logo-venue.jpg",
+  "maf.png",
+  "marina-bottle.jpg",
   "Marketing_CRM_Configuration_Reference v1.0.pdf",
   "Marketing_CRM_Dashboard_Screens v1.0.pdf",
+  "mascot-off.jpg",
+  "mascot-off.png",
+  "mascot-on.jpg",
+  "mascot-on.png",
+  "mascot2-crying.png",
+  "mascot2-curious.png",
+  "mascot2-excited.png",
+  "mascot2-idle.png",
+  "mascot2-love.png",
+  "mascot2-peek.png",
+  "mascot2-resting.png",
+  "mascot2-sad.png",
+  "mascot2-success.png",
+  "mascot2-surprised.png",
+  "mascot2-thinking.png",
+  "mascot2-walk1.png",
+  "mascot2-walk2.png",
+  "mascot2-walk3.png",
+  "mascot2-walk4.png",
+  "mascot2-wave.png",
+  "mascot2-wink.png",
+  "Membership___Annual_Pass_Management_Reference.pdf",
   "MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx",
   "MultiTenant_Hierarchy_Diagram.png",
+  "palette-gold.png",
+  "palette-midnight.png",
+  "panel-brand.png",
+  "panel-flow.png",
+  "panel-layout.png",
+  "panel-shape.png",
+  "panel-top.png",
+  "park-adventure.jpg",
+  "park-arcade.jpg",
+  "park-desert-dark.jpg",
+  "park-desert-detail.jpg",
+  "park-discovery.jpg",
+  "park-entrance.jpg",
+  "park-family-detail.jpg",
+  "park-family-ride.jpg",
+  "park-family.jpg",
+  "park-hero-dusk.jpg",
+  "park-thrill.jpg",
+  "park-weekend.jpg",
   "Payment_Payment_Orchestration.pdf",
+  "pin-set.jpg",
+  "place-downtown.jpg",
+  "place-old-dubai.jpg",
+  "power-bank.jpg",
+  "Pricing___Revenue_Management_Reference.pdf",
+  "Privacy__Consent___Preference_Management_Reference.pdf",
+  "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+  "progress-dots.png",
+  "progress-num.png",
+  "qty-off.png",
+  "qty-on.png",
+  "race-hoodie.jpg",
+  "radius-0.png",
+  "radius-22.png",
   "Rental_Management.pdf",
   "Resource_Management_Configuration_Reference.pdf",
   "Retail_Backend_Structure_Module_Reference_v1.0.pdf",
   "Retail_Dashboard_Screens_Only.pdf",
+  "rtl.png",
+  "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
+  "sahli-curious.png",
+  "sahli-excited.png",
+  "sahli-head.png",
+  "sahli-idle.png",
+  "sahli-love.png",
+  "sahli-peek.png",
+  "sahli-sad.png",
+  "sahli-success.png",
+  "sahli-surprised.png",
+  "sahli-thinking.png",
+  "sahli-wave.png",
+  "sahli-wink.png",
+  "Sales_Channel_Management_Reference.pdf",
   "Sample - Technical Product Sheet.xlsx",
   "SampleAmpitheater_Seating_1.pdf",
   "Seat_Management_Dashboard_Screens_Reference.pdf",
   "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
   "Seating Manifest.xlsx",
   "Seating_Manifest_1.xlsx",
+  "seats-2d.png",
+  "seats-3d.png",
+  "seats-only.png",
+  "seats-theatre.png",
+  "seats-zones-only.png",
+  "seats-zones-then.png",
+  "single-col.png",
+  "size-compact.png",
+  "size-xl.png",
+  "skyline-poster.jpg",
+  "skyline-tee.jpg",
+  "stadium-crowd.jpg",
+  "stadium-live.jpg",
+  "story-after-dark.jpg",
+  "strip-extras-never.png",
+  "strip-progress-bar.png",
+  "strip-progress-dots.png",
+  "strip-progress-num.png",
   "Subscription_Licensing_AI_Self_Service.pdf",
+  "surface-solid.png",
   "TAIS Platform RFP From Miracle Star Trading.pdf",
   "TAIS_Product_Planning_and_Delivery_Plan_4_1.xlsx",
+  "theatre-alquoz.jpg",
+  "theatre-band.jpg",
+  "theatre-culture.jpg",
+  "theatre-drummer.jpg",
+  "theatre-gallery-night.jpg",
+  "theatre-guitar.jpg",
+  "theatre-piano.jpg",
+  "theatre-place-alquoz.jpg",
+  "theatre-visitor.jpg",
+  "theatre-vocalist.jpg",
+  "Ticket_Media___Credential_Management_Reference.pdf",
   "Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf",
   "TICVAI Finance Backend Structure Reference v1.0.pdf",
+  "ticvai-logo.png",
+  "ticvai.png",
   "TICVAI_BackendDeepDive_MoM_07Aug2026.docx",
   "Ticvai_Design_Vision_Book_v1_1.pdf",
   "TICVAI_Discry_Wrkshp_Day_1_Jul_28_2026.docx",
@@ -105,17 +273,54 @@
   "TICVAI_Ticketing_Configuration_Reference_v1_0.jpeg",
   "TICVAI_UIUX_MoM_03Aug2026.docx",
   "TICVAI_White_Label_Guest_App_UI_Reference_1.pdf",
+  "tier-dining-1.jpg",
+  "tier-dining-2.jpg",
+  "tier-dining-3.jpg",
+  "tier-park-1.jpg",
+  "tier-park-2.jpg",
+  "tier-park-3.jpg",
+  "tier-stadium-1.jpg",
+  "tier-stadium-2.jpg",
+  "tier-stadium-3.jpg",
+  "tier-theatre-1.jpg",
+  "tier-theatre-2.jpg",
+  "tier-theatre-3.jpg",
+  "tier-water-1.jpg",
+  "tier-water-2.jpg",
+  "tier-water-3.jpg",
+  "type-serif.png",
   "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
   "Upsell,CrossSellEngine.pdf",
+  "venue-dining.jpg",
+  "venue-dining.png",
+  "venue-park.jpg",
+  "venue-park.png",
+  "venue-stadium.jpg",
+  "venue-stadium.png",
+  "venue-theatre.jpg",
+  "venue-theatre.png",
+  "venue-water.jpg",
+  "venue-water.png",
   "Virtual_Queue.pdf",
-  "Wallet_Configuration_Backend_Structure_v1.0.pdf"
+  "Waiver, Consent & Digital Form Management_Reference.pdf",
+  "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+  "water-cruise-dining.jpg",
+  "water-cruise.jpg",
+  "water-detail.jpg",
+  "water-marina.jpg",
+  "water-ride.jpg",
+  "water-story.jpg",
+  "wo-grid.jpg",
+  "wo-poster.jpg",
+  "wo-split.jpg",
+  "wo-stacked.jpg"
  ],
  "authorityConflicts": [
   {
    "document": "Access Control Module_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -125,8 +330,8 @@
   {
    "document": "Approval_Workflows_and_Governance_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -136,8 +341,8 @@
   {
    "document": "B2B, Reseller & OTA Partner Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -147,8 +352,8 @@
   {
    "document": "Communication & Notification Platform Services_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -158,8 +363,8 @@
   {
    "document": "Customer Service_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -202,8 +407,8 @@
   {
    "document": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -213,8 +418,8 @@
   {
    "document": "Membership___Annual_Pass_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -224,8 +429,8 @@
   {
    "document": "Order___Reservation_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -235,8 +440,8 @@
   {
    "document": "Pricing___Revenue_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -246,8 +451,8 @@
   {
    "document": "Privacy__Consent___Preference_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -257,8 +462,8 @@
   {
    "document": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -268,8 +473,8 @@
   {
    "document": "Promotions___Bundles_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -301,8 +506,8 @@
   {
    "document": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -312,8 +517,8 @@
   {
    "document": "Sales_Channel_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -345,8 +550,8 @@
   {
    "document": "Ticket Resale Marketplace_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -356,8 +561,8 @@
   {
    "document": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -367,8 +572,8 @@
   {
    "document": "Ticket_Media___Credential_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -444,8 +649,8 @@
   {
    "document": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -455,8 +660,8 @@
   {
    "document": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "heldIn": [
     "packs",
@@ -502,8 +707,8 @@
    "pages": 183,
    "canonical": "sources/packs/Access Control Module_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -516,143 +721,19 @@
    ],
    "duplicated": true,
    "platforms": [
-    "P04",
-    "P08",
-    "P16"
-   ],
-   "platformsConfirmed": [
     "P08"
    ],
-   "platformsFromContractsOnly": [
-    "P04",
-    "P16"
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
+    "P08"
    ],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
-    "P04": "Venue POS \u2014 Terminal and Tablet",
-    "P08": "Venue Management \u2014 Back Office",
-    "P16": "Venue Analytics \u2014 Cross-Domain Reporting"
+    "P08": "Venue Management \u2014 Back Office"
    },
-   "operations": [
-    "approveManualOverrideSupervisor",
-    "listAccess",
-    "listAccessAttributeCatalog",
-    "listAccessExecutiveInsight",
-    "listAccessLocationGrouping",
-    "listAccessMonitoring",
-    "listAccessReportScheduled",
-    "listAccessRiskScoring",
-    "listAccessRule",
-    "listAccessSecurityFraud",
-    "listAccessValidityTime",
-    "listAntiPassbackJourney",
-    "listAttendanceAdmission",
-    "listAuthorizationGovernanceTemporary",
-    "listBiometric",
-    "listBiometricAccess",
-    "listBiometricConsentGuardian",
-    "listBiometricIdentityIntegrity",
-    "listBiometricLifecycleRetention",
-    "listBiometricValidationGate",
-    "listConnectivityFailureDegraded",
-    "listCredentialActivationDisplay",
-    "listCredentialDisableBlacklist",
-    "listCredentialRevocationLifecycle",
-    "listCredentialSecurity",
-    "listCredentialSharingConcurrent",
-    "listCredentialTransferRebinding",
-    "listDeviceBindingSession",
-    "listDeviceGate",
-    "listDeviceTypeHardware",
-    "listDigitalCredentialSecurity",
-    "listDynamicAccessPolicy",
-    "listEdgePackageData",
-    "listEdgeSecurityDeployment",
-    "listEntitlementConsumption",
-    "listEntryExitCrossover",
-    "listEntryExitRule",
-    "listEntryTemporaryExit",
-    "listExternalPartnerCredential",
-    "listFaceChangeEnrollment",
-    "listFaceMatchingVerification",
-    "listFaceTagTemporary",
-    "listFamilyChildPod",
-    "listFastPassAttraction",
-    "listFraudDetectionRule",
-    "listGateModeFree",
-    "listGraphicalAccessMap",
-    "listGroupAdmissionQuantity",
-    "listGroupAttendancePartial",
-    "listGroupLeaderFast",
-    "listGuestCompanionEligibility",
-    "listGuestDwellTime",
-    "listGuestJourney",
-    "listHardwareCompatibilityHealth",
-    "listHotelWalletExternal",
-    "listIdentityMembershipAccreditation",
-    "listLiveAccess",
-    "listLiveGateMode",
-    "listLiveVenueOccupancy",
-    "listMediaCredential",
-    "listMediaIssuanceEncoding",
-    "listMediaSwapReplacement",
-    "listMediaTypeTechnology",
-    "listMultiParkCrossover",
-    "listMultiParkCrossover2",
-    "listOfflineCredentialRevocation",
-    "listOfflineCryptographicValidation",
-    "listOfflineEdge",
-    "listOfflineEntitlementUsage",
-    "listOperatingCalendarSpecial",
-    "listPhysicalDeviceRegistration",
-    "listPodiumConsole",
-    "listPolicyEvaluationArchitecture",
-    "listPolicyScopeHierarchy",
-    "listQueueThroughputLane",
-    "listReconnectionSynchronizationConflict",
-    "listRelationshipCompanionFraud",
-    "listSecurityDetectionGovernance",
-    "listShiftHandoverSummary",
-    "listSpecialEventFree",
-    "listThroughputQueueValidation",
-    "listTicketCredentialInvestigation",
-    "listUnifiedIdentityCredential",
-    "listValidationExceptionReason",
-    "listValidationOutcomeRejection",
-    "listVenueParkAccess",
-    "listVerificationMethodSelection",
-    "listVirtualCredentialMedia",
-    "publishMediaCompatibilityTesting",
-    "publishRuleConflictCheck",
-    "publishTopologyValidation",
-    "setAccessAreaZone",
-    "setAccessGraphicalMap",
-    "setAttractionAccess",
-    "setBiometricVerificationProfile",
-    "setBleBeaconGeofence",
-    "setContextTimeEvent",
-    "setDeviceSoftwareContent",
-    "setDynamicSecurityProfile",
-    "setEdgeNodeLocal",
-    "setEmbeddedEntitlementPayload",
-    "setFacePassEnrollment",
-    "setGateLane",
-    "setGroupAdmissionProfile",
-    "setHandheldMobileAccess",
-    "setOperationalIncidentException",
-    "setReaderScannerPeripheral",
-    "setRealTimeSecurity",
-    "setRfidNfc",
-    "setSecurityInvestigationEvidence",
-    "setTurnstileLaneBehavior",
-    "setValidationOutcomeGuest",
-    "setVisualAccessRule",
-    "setVisualDynamicPolicy",
-    "simulateOfflineResilienceTesting",
-    "simulatePolicyConflictImpact"
-   ],
+   "operations": [],
    "packScreensMatched": 120,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
    "lastSeen": "2026-09-29"
   },
@@ -799,8 +880,8 @@
    "pages": 81,
    "canonical": "sources/packs/Approval_Workflows_and_Governance_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -839,8 +920,8 @@
    "pages": 63,
    "canonical": "sources/packs/B2B, Reseller & OTA Partner Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -853,58 +934,496 @@
    ],
    "duplicated": true,
    "platforms": [
-    "P09",
-    "P10",
-    "P17"
-   ],
-   "platformsConfirmed": [
     "P10"
    ],
-   "platformsFromContractsOnly": [
-    "P09",
-    "P17"
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
+    "P10"
    ],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
-    "P09": "TICVAI Web \u2014 Platform Console",
-    "P10": "Partner Web \u2014 Reseller Portal",
-    "P17": "TICVAI Sign-up \u2014 Onboarding & Purchase"
+    "P10": "Partner Web \u2014 Reseller Portal"
    },
-   "operations": [
-    "approveBookingLimitCommercial",
-    "approvePartnerStatuLifecycle",
-    "listCommercialAgreement",
-    "listCommercialAgreementHealth",
-    "listCommercialAllocationQuota",
-    "listCommissionCalculationSettlement",
-    "listCommissionMarginIncentive",
-    "listCreditLimitExposure",
-    "listDepositGuaranteeFinancial",
-    "listPartner",
-    "listPartner2",
-    "listPartnerAccessRole",
-    "listPartnerCancellationRefund",
-    "listPartnerContactUser",
-    "listPartnerDisputeCase",
-    "listPartnerDocumentationCompliance",
-    "listPartnerOnboardingApplication",
-    "listPartnerOrderBooking",
-    "listPartnerPerformanceScorecard",
-    "listPartnerProfileReadiness",
-    "listPartnerReconciliationException",
-    "listPartnerRelationship",
-    "listPartnerStatementAccount",
-    "listReservationHoldRelease",
-    "listTerritoryMarketDistribution",
-    "setAgreementContractTerm",
-    "setPartnerBrandVenue",
-    "setPartnerProfileOrganization",
-    "setPartnerRateNet",
-    "setPaymentTermBilling"
-   ],
+   "operations": [],
    "packScreensMatched": 30,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "base.png",
+   "sha256": "a497e3d3ce4455d1f291101c10bc43afabf66456b0eaecc210344b8445755a34",
+   "bytes": 35766,
+   "pages": null,
+   "canonical": "sources/packs/base.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/base.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "beach-towel.jpg",
+   "sha256": "0b4e7bde06495c4739e2f084695cfe53b10b5ab4f4e30513320a6a9357625e57",
+   "bytes": 11660,
+   "pages": null,
+   "canonical": "sources/packs/beach-towel.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/beach-towel.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "bg-ink.png",
+   "sha256": "6cbe3c8c0eeced08655e3f904f07b9005cad67be35cbbc661553a12dd79c9081",
+   "bytes": 37307,
+   "pages": null,
+   "canonical": "sources/packs/bg-ink.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/bg-ink.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "bg-wash.png",
+   "sha256": "731123d5baf0b8b0929209233834ecb568da01a73f90db0301e5abe2b1ddda8d",
+   "bytes": 35996,
+   "pages": null,
+   "canonical": "sources/packs/bg-wash.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/bg-wash.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "btn-outline.png",
+   "sha256": "70492811c3dd1220492dc2fbc2855b92fcae221e8e5df9bc6e2bd18ddb80b296",
+   "bytes": 35438,
+   "pages": null,
+   "canonical": "sources/packs/btn-outline.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/btn-outline.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "btn-pill.png",
+   "sha256": "b31e448081ff13735bab0da0bfeee67f0fbd36a7a72249f22c17476c0c4e222e",
+   "bytes": 35455,
+   "pages": null,
+   "canonical": "sources/packs/btn-pill.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/btn-pill.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cabana-map.jpg",
+   "sha256": "da913c6acc481462766c2b0082066f2171408d11a2ef005fe91b7ded9e108408",
+   "bytes": 517867,
+   "pages": null,
+   "canonical": "sources/packs/cabana-map.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/cabana-map.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cabana-map.png",
+   "sha256": "a3da5b483cd71c5cd1b28ef536c0907127cc0f2a809ee75e33dd53b9b050f061",
+   "bytes": 3579583,
+   "pages": null,
+   "canonical": "sources/packs/cabana-map.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/cabana-map.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cards-grid.png",
+   "sha256": "ca1b14d57724ee01596e0a197349157130282dbb1ae44fe32232b970c0776928",
+   "bytes": 41097,
+   "pages": null,
+   "canonical": "sources/packs/cards-grid.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/cards-grid.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cards-poster.png",
+   "sha256": "7be1148eebc1fd197d3da956a777949b9416a6afd83ad39823b017922a40315a",
+   "bytes": 42128,
+   "pages": null,
+   "canonical": "sources/packs/cards-poster.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/cards-poster.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cards-split.png",
+   "sha256": "171108cc9064ff7ba1cd38ad0d80e31f38f47c7360c96aeeb5411f4ea62e87e9",
+   "bytes": 35612,
+   "pages": null,
+   "canonical": "sources/packs/cards-split.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/cards-split.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cat-adventure.jpg",
+   "sha256": "f71606e006fef587ac029bddec2efd51e57565d0b27e212db90ef28dc4d9b51c",
+   "bytes": 173936,
+   "pages": null,
+   "canonical": "sources/packs/cat-adventure.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/cat-adventure.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cat-culture.jpg",
+   "sha256": "0cb09cc9486d59e1e7fcfcfc94c82e881170d54e232af284224f0ff0603d63de",
+   "bytes": 138506,
+   "pages": null,
+   "canonical": "sources/packs/cat-culture.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/cat-culture.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cat-family.jpg",
+   "sha256": "db4f3062741375824fdaf5c83467f9df86b6666491038099f86b444834d3e593",
+   "bytes": 176215,
+   "pages": null,
+   "canonical": "sources/packs/cat-family.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/cat-family.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cat-food.jpg",
+   "sha256": "0ab0b1e4e2eef3595fb2894419f0fe23d86b1f5cb5642514a62c0d0408f006b1",
+   "bytes": 117747,
+   "pages": null,
+   "canonical": "sources/packs/cat-food.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/cat-food.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cat-live.jpg",
+   "sha256": "251595da484eff85c71a3491ceb671d535f4052153366ffee86588218bd28841",
+   "bytes": 108674,
+   "pages": null,
+   "canonical": "sources/packs/cat-live.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/cat-live.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cat-water.jpg",
+   "sha256": "bbcb688cf8b183837d4f7559db56ef69c37c2756e7c34d19b541af8d7588ba13",
+   "bytes": 216427,
+   "pages": null,
+   "canonical": "sources/packs/cat-water.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/cat-water.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   },
   {
@@ -1160,14 +1679,70 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "city-after-dark.jpg",
+   "sha256": "f6ebfb50bc7d6f8e5bb5a6140712f00c3f559b838a17c7d6e7888e3892648ae3",
+   "bytes": 104741,
+   "pages": null,
+   "canonical": "sources/packs/city-after-dark.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/city-after-dark.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "city-night-cta.jpg",
+   "sha256": "c7b1c22051a42cd069ae7959732570c9183e6e5f731c49fbfea67e2e40e060d1",
+   "bytes": 104376,
+   "pages": null,
+   "canonical": "sources/packs/city-night-cta.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/city-night-cta.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Communication & Notification Platform Services_Reference.pdf",
    "sha256": "0ed54bf3bce4b69fdf954cf253e6e0f2a862e128853f7866d29bebf020adb142",
    "bytes": 738678,
    "pages": 22,
    "canonical": "sources/packs/Communication & Notification Platform Services_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -1180,35 +1755,132 @@
    ],
    "duplicated": true,
    "platforms": [
-    "P08",
     "P09"
    ],
-   "platformsConfirmed": [
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
     "P09"
    ],
-   "platformsFromContractsOnly": [
-    "P08"
-   ],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
-    "P08": "Venue Management \u2014 Back Office",
     "P09": "TICVAI Web \u2014 Platform Console"
    },
-   "operations": [
-    "listBusinessEventNotification",
-    "listCommunicationService",
-    "listConsentPreferenceCommunication",
-    "listDeliveryCommunicationPlatform",
-    "listDeliveryQueueFailure",
-    "listProviderHealthUsage",
-    "listRoutingPriorityThrottling",
-    "listSystemTransactionalTemplate",
-    "setChannelProvider",
-    "setSenderIdentityDomain"
-   ],
+   "operations": [],
    "packScreensMatched": 10,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "creek-mug.jpg",
+   "sha256": "250012bde5ee306525a061ca0267e530a7b38db30564acfa74d55b02d485596c",
+   "bytes": 11786,
+   "pages": null,
+   "canonical": "sources/packs/creek-mug.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/creek-mug.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "creek-tote.jpg",
+   "sha256": "da0e38ddb7021fd9e4e5b1bb262ec3a81d315331dce4329cc6bb1e7567e9c283",
+   "bytes": 11878,
+   "pages": null,
+   "canonical": "sources/packs/creek-tote.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/creek-tote.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cur-inr.png",
+   "sha256": "d0b555969b94e13576efa524fb2ba0540f0b9863b043d826f1104b1f26e653a5",
+   "bytes": 35224,
+   "pages": null,
+   "canonical": "sources/packs/cur-inr.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/cur-inr.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "cur-usd.png",
+   "sha256": "8d924328443f8f3ed58115d090902011c0873598c834d110a6593b8d2d4c6c0a",
+   "bytes": 35146,
+   "pages": null,
+   "canonical": "sources/packs/cur-usd.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/cur-usd.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   },
   {
@@ -1218,8 +1890,8 @@
    "pages": 43,
    "canonical": "sources/packs/Customer Service_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -1232,44 +1904,160 @@
    ],
    "duplicated": true,
    "platforms": [
-    "P08",
     "P12"
    ],
-   "platformsConfirmed": [
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
     "P12"
    ],
-   "platformsFromContractsOnly": [
-    "P08"
-   ],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
-    "P08": "Venue Management \u2014 Back Office",
     "P12": "Venue Support \u2014 Agent Console"
    },
-   "operations": [
-    "createCaseClassificationIntelligent",
-    "listAgentWorkloadAvailability",
-    "listCaseResolutionClosure",
-    "listContact",
-    "listContactAutomation",
-    "listCustomerSatisfactionFeedback",
-    "listCustomerService",
-    "listCustomerServiceProfile",
-    "listEscalationCollaborationInternal",
-    "listEscalationCriticalCase",
-    "listQualityAgentEvaluation",
-    "listServiceRootCause",
-    "listSlaPolicyService",
-    "listUnifiedInteractionCommunication",
-    "setCaseInvestigationResolution",
-    "setCustomerServiceCopilot",
-    "setIntelligentRoutingSkill",
-    "setOrderBookingTicket",
-    "setRefundCompensationService"
-   ],
+   "operations": [],
    "packScreensMatched": 20,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "density-compact.png",
+   "sha256": "f5f02187006213f0b97b7777df4c15440d86c9e388bff66d39c14ef0019c5703",
+   "bytes": 36969,
+   "pages": null,
+   "canonical": "sources/packs/density-compact.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/density-compact.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "density-roomy.png",
+   "sha256": "18fab35c8003436f8d2dba5186b2a3328529609a1161c021d46b16d23f313fd0",
+   "bytes": 34681,
+   "pages": null,
+   "canonical": "sources/packs/density-roomy.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/density-roomy.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "desert-cap.jpg",
+   "sha256": "756ca6681981f21a5de1fa6df499aa02614db3a4705c3eef698e713e0ec0da38",
+   "bytes": 11559,
+   "pages": null,
+   "canonical": "sources/packs/desert-cap.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/desert-cap.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "detail-aqua.jpg",
+   "sha256": "22058e86fbd97f9ea8fa5b7fa9751ec23d96f4bfdf6e1f2b5f120c352ce72153",
+   "bytes": 121073,
+   "pages": null,
+   "canonical": "sources/packs/detail-aqua.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/detail-aqua.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "detail-live.jpg",
+   "sha256": "0e1b1ba3bc77921ef76368b43050f0bc0d82482fc3032a490a2afc8e4298de72",
+   "bytes": 56120,
+   "pages": null,
+   "canonical": "sources/packs/detail-live.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/detail-live.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   },
   {
@@ -1391,6 +2179,62 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "dry-bag.jpg",
+   "sha256": "06572650f40b0ebdfe46217950f911f3733c8d215ea6986da549f7b96a612a87",
+   "bytes": 11325,
+   "pages": null,
+   "canonical": "sources/packs/dry-bag.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/dry-bag.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "dune-jacket.jpg",
+   "sha256": "4e6f5e659457d1e511942e09ec3f74c8cd5e8d42b71acf4939b616954c2d884a",
+   "bytes": 11891,
+   "pages": null,
+   "canonical": "sources/packs/dune-jacket.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/dune-jacket.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Email_Attachments_TICVAI.xlsx",
    "sha256": "7de3721fd2bbb3133285c46662041dffb4c0e70bd17ff56439db56d907ada78d",
    "bytes": 7567,
@@ -1445,6 +2289,34 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "embed.png",
+   "sha256": "58b3312fdebe5d8ba8e86c133b5968fb3d7fdb599c123c9e8b2816d0040d06de",
+   "bytes": 35213,
+   "pages": null,
+   "canonical": "sources/packs/embed.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/embed.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   },
   {
@@ -1510,6 +2382,62 @@
    "packScreensMatched": 31,
    "drafted": false,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "explorers.png",
+   "sha256": "2a3a406aaee81de13099cf63408791ba3885dde39d6e9dad1d70d65297c83e69",
+   "bytes": 8192,
+   "pages": null,
+   "canonical": "sources/packs/explorers.png",
+   "authority": [
+    "logos"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "logos"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/logos/explorers.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "extras-never.png",
+   "sha256": "44f653729c21e059ddcc73e88bc33fc50d4225b1147a0a46dfffce45b6f5953c",
+   "bytes": 46419,
+   "pages": null,
+   "canonical": "sources/packs/extras-never.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/extras-never.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   },
   {
@@ -1584,6 +2512,34 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "gallery-print.jpg",
+   "sha256": "1ce6ba4757cc41719f56c9a9916ffe33bbc6ace4c8512876660622935b27c4d9",
+   "bytes": 13655,
+   "pages": null,
+   "canonical": "sources/packs/gallery-print.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/gallery-print.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Game_and_Ride_Module.pdf",
    "sha256": "c8efb51697ee9c9deb9599a508251be050966116a0b4dd59acd01412d381f42a",
    "bytes": 3107538,
@@ -1624,8 +2580,8 @@
    "pages": 37,
    "canonical": "sources/packs/Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -1676,6 +2632,454 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "hero-cultural-night.jpg",
+   "sha256": "3155b1c40608cf4dc88c43dab3ebd226519a6eeae9a4ee46a6150f855ec8f841",
+   "bytes": 183232,
+   "pages": null,
+   "canonical": "sources/packs/hero-cultural-night.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/hero-cultural-night.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "hero-immersive.jpg",
+   "sha256": "5e12419e03e310f866f9cc069d962555f07332e91ec0f572c96a96bfec392e67",
+   "bytes": 126448,
+   "pages": null,
+   "canonical": "sources/packs/hero-immersive.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/hero-immersive.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "hero-waterfront.jpg",
+   "sha256": "e87ce25c0e17c1ba0ba3fa8f51d8ed0366523203e5ec27fa3aef913d85d40f98",
+   "bytes": 119239,
+   "pages": null,
+   "canonical": "sources/packs/hero-waterfront.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/hero-waterfront.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-dining.png",
+   "sha256": "ad500745cafb4ecd9dc13acef263f9efaef3ace18b75ba619f41349d43e66f0f",
+   "bytes": 741053,
+   "pages": null,
+   "canonical": "sources/packs/icon-dining.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-dining.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-events.png",
+   "sha256": "98ec6825b657fc66c3b610a76f2785004109cd8eb8b322f4c9649c973bf41173",
+   "bytes": 142482,
+   "pages": null,
+   "canonical": "sources/packs/icon-events.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-events.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-queue.png",
+   "sha256": "d8f2433c0514c29f73dc93aba76f02187b0cad2806e6ac0df461eb2f8399bf20",
+   "bytes": 438483,
+   "pages": null,
+   "canonical": "sources/packs/icon-queue.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-queue.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-rides.png",
+   "sha256": "eb9b5409745a41f0eb39abfab6d9cd0b042f62d53fc8a58dc1cd91f0bbffcd36",
+   "bytes": 157685,
+   "pages": null,
+   "canonical": "sources/packs/icon-rides.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-rides.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-sahli-curious.png",
+   "sha256": "7d3915f1459c8ff9e642f81e5fa6abd85cd1f6971623f3d8a1bb850a935230d2",
+   "bytes": 82697,
+   "pages": null,
+   "canonical": "sources/packs/icon-sahli-curious.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-sahli-curious.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-sahli-excited.png",
+   "sha256": "d92bc239f33e2bdba950f8ad3cc7388dafb65151069bae86c2f2db1ada5ac8f8",
+   "bytes": 87541,
+   "pages": null,
+   "canonical": "sources/packs/icon-sahli-excited.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-sahli-excited.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-sahli-exit.png",
+   "sha256": "e846928f30e4c4f39679fedcbc567de0e99a985db4a6c56f3c097e64e5d8ffd9",
+   "bytes": 128046,
+   "pages": null,
+   "canonical": "sources/packs/icon-sahli-exit.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-sahli-exit.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-sahli-idle.png",
+   "sha256": "b1413e3cafd51451a999c3ae175f104e4d383af99aec33b742d0849425386a2a",
+   "bytes": 85845,
+   "pages": null,
+   "canonical": "sources/packs/icon-sahli-idle.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-sahli-idle.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-sahli-sad.png",
+   "sha256": "252beb54c2276efdd732afc3eb504c4c6ebbdc43870e97767e2ef981d1730eb2",
+   "bytes": 84144,
+   "pages": null,
+   "canonical": "sources/packs/icon-sahli-sad.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-sahli-sad.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-sahli-thinking.png",
+   "sha256": "7dcf39927acedc71b189fccd291bfe3f452e6109c576c23abbfdc5ac12d055b3",
+   "bytes": 83447,
+   "pages": null,
+   "canonical": "sources/packs/icon-sahli-thinking.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-sahli-thinking.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-shop.png",
+   "sha256": "42c9b1135f0c07bc056dcbf09c81d82c56dc9807b69ddd3e49d22bfc418b43b9",
+   "bytes": 452848,
+   "pages": null,
+   "canonical": "sources/packs/icon-shop.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-shop.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-shows.png",
+   "sha256": "6ddfb5b2c90444f827eab3329e2681f13cd41f47f50a96480a0361a6f74e8201",
+   "bytes": 115905,
+   "pages": null,
+   "canonical": "sources/packs/icon-shows.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-shows.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "icon-zones.png",
+   "sha256": "93904f975ffc054e0549fc84b71388f3b99800d3d0ee3722c992c422515cab67",
+   "bytes": 114994,
+   "pages": null,
+   "canonical": "sources/packs/icon-zones.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/icon-zones.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Inventory_Procurement_Dashboard_Screens.pdf",
    "sha256": "01034ab1711f6fa2ce0036a5205ac4f1ad7f5c1baf0df4203c94494190724608",
    "bytes": 12683917,
@@ -1701,6 +3105,342 @@
    "packScreensMatched": 0,
    "drafted": false,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "kids-cap.jpg",
+   "sha256": "609a0dee0774cb507aa030ca57084d3a56bd7c3a53b5ce398bd7b0bddd1a3b8d",
+   "bytes": 11357,
+   "pages": null,
+   "canonical": "sources/packs/kids-cap.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/kids-cap.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "kids-tee.jpg",
+   "sha256": "e1c5088044e17a78d3835f7cc1cab1baf235b1a84468656cc3f8ef974d352fbc",
+   "bytes": 10989,
+   "pages": null,
+   "canonical": "sources/packs/kids-tee.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/kids-tee.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "logo-dark.jpg",
+   "sha256": "3e2b8a9cd7f9d7092ce1aa7a8369deb11d02b0ade72d5fd7658fae5c8f0adcb7",
+   "bytes": 54346,
+   "pages": null,
+   "canonical": "sources/packs/logo-dark.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/logo-dark.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "logo-duotone.jpg",
+   "sha256": "205fff6051fd0640fefca4fb3b554bf3c04c9b1dc8ed194899199a690b5acf13",
+   "bytes": 53589,
+   "pages": null,
+   "canonical": "sources/packs/logo-duotone.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/logo-duotone.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "logo-duotone.png",
+   "sha256": "a3ae87d56979f6a2d527251bcb24dabe6ed7a8f099575ca670775c16171eb3a1",
+   "bytes": 43826,
+   "pages": null,
+   "canonical": "sources/packs/logo-duotone.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/logo-duotone.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "logo-light.jpg",
+   "sha256": "47d4515354de9f7ef819221d877130d3a63f8e4d4769c61455f899db6b528093",
+   "bytes": 54346,
+   "pages": null,
+   "canonical": "sources/packs/logo-light.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/logo-light.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "logo-partner.jpg",
+   "sha256": "154e3fd02977c9ebac7f96be6e66e59bc024ecaf4042045074de2abba21c6bbb",
+   "bytes": 19711,
+   "pages": null,
+   "canonical": "sources/packs/logo-partner.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/logo-partner.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "logo-ticvai.jpg",
+   "sha256": "99bbb6a9c057ac785e08cfc79942a83425dc7e69d5155ee6f46d648ecb115f04",
+   "bytes": 20749,
+   "pages": null,
+   "canonical": "sources/packs/logo-ticvai.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/logo-ticvai.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "logo-ticvai.png",
+   "sha256": "7a2a16e0ef14a593bb5c48e6f5d0c8bacb5b76dd25094b534362735820cfb023",
+   "bytes": 47529,
+   "pages": null,
+   "canonical": "sources/packs/logo-ticvai.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/logo-ticvai.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "logo-venue.jpg",
+   "sha256": "f1e2ea552d1d5cc4b903ea85ab8412911848bcb4df4e53b6d762e902c4c879b5",
+   "bytes": 21102,
+   "pages": null,
+   "canonical": "sources/packs/logo-venue.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/logo-venue.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "maf.png",
+   "sha256": "66a35d77282ba86c95fe119a784cd28f4200df0e803f9b0402b6da262740aeec",
+   "bytes": 7991,
+   "pages": null,
+   "canonical": "sources/packs/maf.png",
+   "authority": [
+    "logos"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "logos"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/logos/maf.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "marina-bottle.jpg",
+   "sha256": "e5c73c13fc78a3389255faaad08f575a60856d55515f6161eb7eb2e0a3fbd8d6",
+   "bytes": 10549,
+   "pages": null,
+   "canonical": "sources/packs/marina-bottle.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/marina-bottle.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   },
   {
@@ -1766,14 +3506,602 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "mascot-off.jpg",
+   "sha256": "e4e591d581df812b289c081cb67e19b826f5ae2208d193a8dd16a1a6569a5dd4",
+   "bytes": 56881,
+   "pages": null,
+   "canonical": "sources/packs/mascot-off.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/mascot-off.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot-off.png",
+   "sha256": "c7a60c75d6076363dcb89095606be237d4ac5818130da2b64b43bff10b170741",
+   "bytes": 40799,
+   "pages": null,
+   "canonical": "sources/packs/mascot-off.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/mascot-off.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot-on.jpg",
+   "sha256": "6a07aad7bcf6301c8ee65da955e7e202d6d15793374af3777102b810f0731197",
+   "bytes": 57283,
+   "pages": null,
+   "canonical": "sources/packs/mascot-on.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/mascot-on.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot-on.png",
+   "sha256": "7f38321e31d37203cfa0e5ba282ed03d796be42f449f4daac77fb48ee1191f93",
+   "bytes": 43121,
+   "pages": null,
+   "canonical": "sources/packs/mascot-on.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/mascot-on.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-crying.png",
+   "sha256": "ec5558dad2f5328fcbd01e7856b0cae5f4f2802628b4ab20eb3c0de2d67a9d55",
+   "bytes": 95376,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-crying.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-crying.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-curious.png",
+   "sha256": "fa94398775f47d56752a89bc790e559c68308e55b3d10848bf51d07d8b9a0370",
+   "bytes": 114188,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-curious.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-curious.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-excited.png",
+   "sha256": "bf07fe6c2a124ca4ebed77faf2a7efcd9ab6d045b6f2384e362c450ea420d355",
+   "bytes": 128758,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-excited.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-excited.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-idle.png",
+   "sha256": "94bcf122c50b8b34da4761ea22cf6fd2655736989ea480d9209645432d20582d",
+   "bytes": 129448,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-idle.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-idle.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-love.png",
+   "sha256": "9b987d197f87fd79641ed7708b7b2f1a765ffd74cbdf879a165495e7ab4bee94",
+   "bytes": 103759,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-love.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-love.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-peek.png",
+   "sha256": "5c76e95f1309e0fc762e38400105de62c6be29b74a0ad3c386e825cc64566e95",
+   "bytes": 67936,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-peek.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-peek.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-resting.png",
+   "sha256": "e139b52887aafbd3bb090eb441e0da1b0fd5b22e473ee82449ba45fc35433f51",
+   "bytes": 72186,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-resting.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-resting.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-sad.png",
+   "sha256": "4487fcc49679f226747c347018a6c75bb89a1b1fa2e78660f34bd8018359ff47",
+   "bytes": 94738,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-sad.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-sad.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-success.png",
+   "sha256": "360b1205dac62c51d050626102871077ad6beb36c0707284c2ba29b1f4746f22",
+   "bytes": 104713,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-success.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-success.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-surprised.png",
+   "sha256": "e2867f2588ca5c68273bd087e647c588b90022fc54f19606a398f6ece60bee21",
+   "bytes": 96554,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-surprised.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-surprised.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-thinking.png",
+   "sha256": "fa4bb9b1516e329f7f91ff2f3dca0711495d132b46d2f6b1d0758b67798b8d1d",
+   "bytes": 110233,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-thinking.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-thinking.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-walk1.png",
+   "sha256": "e15598c61f795189a2237de1061e8d8183729b00fb2fe573a25f9cd8bb1571e5",
+   "bytes": 71579,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-walk1.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-walk1.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-walk2.png",
+   "sha256": "b1889a9eede1a925747e0a04aa563531f183cf393183a386275c6c43a75d07ff",
+   "bytes": 68338,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-walk2.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-walk2.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-walk3.png",
+   "sha256": "04d05b95218d8a900d2577e9b2089fb812737003db5f8d554ad2cd87ebed943c",
+   "bytes": 71072,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-walk3.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-walk3.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-walk4.png",
+   "sha256": "f3a553a0018c2cbb7dae8daa4b079c34b4c33bcee5eb5a5a05fff1e4a1b10b48",
+   "bytes": 72451,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-walk4.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-walk4.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-wave.png",
+   "sha256": "429ac2d4fa737ebc75cd587ee1a36bb4e433eb9bdfa4204690d92aa37641a730",
+   "bytes": 108236,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-wave.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-wave.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "mascot2-wink.png",
+   "sha256": "203fdf7ab404336cd44214894d5c6bb6ddda48a1fece0c2c50329356e9296bdd",
+   "bytes": 114198,
+   "pages": null,
+   "canonical": "sources/packs/mascot2-wink.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/mascot2-wink.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Membership___Annual_Pass_Management_Reference.pdf",
    "sha256": "0bcdb177e7cbe91a8f2fd804e65ddc2066390089d624a933c79522f148c6a7b9",
    "bytes": 1330663,
    "pages": 38,
    "canonical": "sources/packs/Membership___Annual_Pass_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -1786,44 +4114,19 @@
    ],
    "duplicated": true,
    "platforms": [
-    "P08",
-    "P09"
-   ],
-   "platformsConfirmed": [
     "P08"
    ],
-   "platformsFromContractsOnly": [
-    "P09"
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
+    "P08"
    ],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
-    "P08": "Venue Management \u2014 Back Office",
-    "P09": "TICVAI Web \u2014 Platform Console"
+    "P08": "Venue Management \u2014 Back Office"
    },
-   "operations": [
-    "approveMembershipProductValidation",
-    "listMember",
-    "listMemberExceptionOverride",
-    "listMemberLifecycleCase",
-    "listMembershipActivationCredential",
-    "listMembershipAnnualPass",
-    "listMembershipCommercialPricing",
-    "listMembershipFreezeSuspension",
-    "listMembershipRenewalRetention",
-    "listMembershipUpgradeDowngrade",
-    "listMembershipUsageVisit",
-    "listRenewalAuto",
-    "listVisitAdmissionEntitlement",
-    "setFamilyHouseholdDependent",
-    "setMemberMembershipAccount",
-    "setMembershipEligibilityQualification",
-    "setMembershipEntitlementAdmission",
-    "setMembershipProductTier",
-    "setRenewalAutoMembership",
-    "setValidityActivationExpiry"
-   ],
+   "operations": [],
    "packScreensMatched": 20,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
    "lastSeen": "2026-09-29"
   },
@@ -1890,8 +4193,8 @@
    "pages": 55,
    "canonical": "sources/packs/Order___Reservation_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -1955,6 +4258,538 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "palette-gold.png",
+   "sha256": "ebbdbb3df758caacf0c758568a13671e2735023089163ebd0eb78fc50683a127",
+   "bytes": 35376,
+   "pages": null,
+   "canonical": "sources/packs/palette-gold.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/palette-gold.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "palette-midnight.png",
+   "sha256": "ddf2e88a953d502b2f6a819a337455e766d1f548b2711ad955816a3f65048a44",
+   "bytes": 35803,
+   "pages": null,
+   "canonical": "sources/packs/palette-midnight.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/palette-midnight.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "panel-brand.png",
+   "sha256": "623f5bf6730c0bfd596ea3f4614b06520200916c414caf26ac0e61be262ea2f9",
+   "bytes": 73502,
+   "pages": null,
+   "canonical": "sources/packs/panel-brand.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/panel-brand.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "panel-flow.png",
+   "sha256": "6f72c4694f6e27e643fda13b200d8debff42137c02337de519e61552e94c3683",
+   "bytes": 76281,
+   "pages": null,
+   "canonical": "sources/packs/panel-flow.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/panel-flow.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "panel-layout.png",
+   "sha256": "2b3138464301be046dd60ac48f2b8d4a33c1f7dc1d4bd0e499a79b36dc984e88",
+   "bytes": 61602,
+   "pages": null,
+   "canonical": "sources/packs/panel-layout.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/panel-layout.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "panel-shape.png",
+   "sha256": "8f9579d0311f64d5a5fc9f20afeca4854d348661ce56b43bc723e85385d31322",
+   "bytes": 59820,
+   "pages": null,
+   "canonical": "sources/packs/panel-shape.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/panel-shape.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "panel-top.png",
+   "sha256": "c620cd31f6c57bc2410fbe1ec2f88f5e1035442fd533fb3fd4303e140859f5de",
+   "bytes": 58139,
+   "pages": null,
+   "canonical": "sources/packs/panel-top.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/panel-top.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-adventure.jpg",
+   "sha256": "8d844b81f368b8fc0324b2600dc60d2d0a539ed73b9e3d3d293e6b60d9f303f0",
+   "bytes": 223299,
+   "pages": null,
+   "canonical": "sources/packs/park-adventure.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-adventure.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-arcade.jpg",
+   "sha256": "56f8aec960153ad12edb9eeba05c0208765537f7935e94e348c2d7529af2d5f9",
+   "bytes": 496222,
+   "pages": null,
+   "canonical": "sources/packs/park-arcade.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-arcade.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-desert-dark.jpg",
+   "sha256": "f6b0e46d237f04379bb36875b33de69e1736c088e09afd93e069cb745e731fe5",
+   "bytes": 96056,
+   "pages": null,
+   "canonical": "sources/packs/park-desert-dark.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-desert-dark.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-desert-detail.jpg",
+   "sha256": "4578902b6128183cd77387e57b9a03e1c4e93db3dbc7d10dd8c3d48e90f691c9",
+   "bytes": 173984,
+   "pages": null,
+   "canonical": "sources/packs/park-desert-detail.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-desert-detail.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-discovery.jpg",
+   "sha256": "cea3baa877e5b722b3bcb771b914a756b34193c963b65f1208c1ce7cb344be4e",
+   "bytes": 129750,
+   "pages": null,
+   "canonical": "sources/packs/park-discovery.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-discovery.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-entrance.jpg",
+   "sha256": "1b3c33d269dbe5cb88caeea8ffa940e5b9dfde09e3837a48d2f8c2f558602a63",
+   "bytes": 617990,
+   "pages": null,
+   "canonical": "sources/packs/park-entrance.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-entrance.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-family-detail.jpg",
+   "sha256": "1b5c92ee4ff9b1d4ee94a4e68d7170fee5990671d2dc1cd7528e9b660f5e8c9a",
+   "bytes": 133574,
+   "pages": null,
+   "canonical": "sources/packs/park-family-detail.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-family-detail.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-family-ride.jpg",
+   "sha256": "b10d188027644ad88a251e2477292e23f0cd2262a04375c346975e7555d42a0c",
+   "bytes": 407704,
+   "pages": null,
+   "canonical": "sources/packs/park-family-ride.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-family-ride.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-family.jpg",
+   "sha256": "96d9259f202f6a250215cba55d2e7a0753d2e00bf37fc21556ac2294aa159990",
+   "bytes": 223682,
+   "pages": null,
+   "canonical": "sources/packs/park-family.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-family.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-hero-dusk.jpg",
+   "sha256": "a729954a96bb6d60151fb5a3a2af2f51c83f4fb0b14a4f7c51c4867cd2aca15e",
+   "bytes": 150103,
+   "pages": null,
+   "canonical": "sources/packs/park-hero-dusk.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-hero-dusk.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-thrill.jpg",
+   "sha256": "f5b6d907ebcefd42d5449a79de11ade6e6ebb47f4232836e52d3009b7eaa430f",
+   "bytes": 452932,
+   "pages": null,
+   "canonical": "sources/packs/park-thrill.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-thrill.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "park-weekend.jpg",
+   "sha256": "9cad50240ce9bfa9478806a9f02cbecd1417fb311828a63bca90f59bdea15732",
+   "bytes": 143057,
+   "pages": null,
+   "canonical": "sources/packs/park-weekend.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/park-weekend.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Payment_Payment_Orchestration.pdf",
    "sha256": "21d8d1f252e09c9804cc13b072ae654b73d7f6a515d1e0f867daca24f975bcb4",
    "bytes": 5225223,
@@ -1989,14 +4824,126 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "pin-set.jpg",
+   "sha256": "bc52dfad1a44afb6f11580c46fb0eec9bfb13b00c2d0721eaa5505f7b20fa820",
+   "bytes": 16872,
+   "pages": null,
+   "canonical": "sources/packs/pin-set.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/pin-set.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "place-downtown.jpg",
+   "sha256": "f5f25108294e713645c716eb16fb8d6845e6de8ed0158f6fc4a88910fec9501d",
+   "bytes": 242146,
+   "pages": null,
+   "canonical": "sources/packs/place-downtown.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/place-downtown.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "place-old-dubai.jpg",
+   "sha256": "2ce14d8b7478db5e2f6514ac948813cd6b1c5517fba330ac749692dbd96e4607",
+   "bytes": 267280,
+   "pages": null,
+   "canonical": "sources/packs/place-old-dubai.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/place-old-dubai.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "power-bank.jpg",
+   "sha256": "9f3765c6a7287530fd8ee5585120113601c22b1033ed8b0761d2d9135297b337",
+   "bytes": 12358,
+   "pages": null,
+   "canonical": "sources/packs/power-bank.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/power-bank.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Pricing___Revenue_Management_Reference.pdf",
    "sha256": "a940230ea9dec389ffeffe6d3fb2e255031cd435e029fb39e61e1ced866ab6d8",
    "bytes": 4263542,
    "pages": 132,
    "canonical": "sources/packs/Pricing___Revenue_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2009,94 +4956,19 @@
    ],
    "duplicated": true,
    "platforms": [
-    "P08",
     "P09"
    ],
-   "platformsConfirmed": [
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
     "P09"
    ],
-   "platformsFromContractsOnly": [
-    "P08"
-   ],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
-    "P08": "Venue Management \u2014 Back Office",
     "P09": "TICVAI Web \u2014 Platform Console"
    },
-   "operations": [
-    "approvePricingWorkflowAuthority",
-    "createLiveDynamicPrice",
-    "listAutomationPolicyAutonomous",
-    "listBulkPricingUpdate",
-    "listCalculationValidationReconciliation",
-    "listChannelBasedPricing",
-    "listChannelCustomerSegment",
-    "listCommercialPricing",
-    "listCommercialPricingStructure",
-    "listCompetitorPricingMarket",
-    "listCurrencyPrecisionRounding",
-    "listCustomerSegmentProfile",
-    "listDemandBookingCurve",
-    "listDynamicPriceBand",
-    "listDynamicPricingAutomation",
-    "listDynamicPricingGuardrail",
-    "listDynamicPricingPerformance",
-    "listDynamicPricingStrategy",
-    "listEffectiveDateSeason",
-    "listFeeSurcharge",
-    "listFeeWaiverTax",
-    "listInternalDemandBooking",
-    "listLearningModelPerformance",
-    "listLocationVenueEvent",
-    "listMarketTourismHoliday",
-    "listMarketVenueCurrency",
-    "listMembershipLoyaltyPricing",
-    "listNearbyEventExhibition",
-    "listPackageBundleAdd",
-    "listPriceCalculationSequence",
-    "listPriceCategoryRate",
-    "listPriceElasticityRevenue",
-    "listPriceListTemplate",
-    "listPricing",
-    "listPricingChangeImpact",
-    "listPricingCompliance",
-    "listPricingDistributionSynchronization",
-    "listPricingGovernance",
-    "listPricingRecommendationExplainability",
-    "listPricingRollbackEmergency",
-    "listPricingRule",
-    "listPricingRulePriority",
-    "listPricingVersionBaseline",
-    "listQuantityGroupVolume",
-    "listRecommendationReviewDecision",
-    "listResidencyNationalityMarket",
-    "listRevenue",
-    "listRevenueDemandImpact",
-    "listRulePriorityConflict",
-    "listScenarioModelingWhat",
-    "listSeasonalCalendarDay",
-    "listSignalDataQuality",
-    "listTaxFeeCalculation",
-    "listTimeslotPerformanceTime",
-    "listWeatherDemandImpact",
-    "publishPricingEffectiveDate",
-    "setBookingVelocityTime",
-    "setDemandOccupancyAvailability",
-    "setDynamicPricingStrategy",
-    "setFeeApplicabilityCharging",
-    "setPriceHierarchyInheritance",
-    "setPriceListMaster",
-    "setPricing",
-    "setPricingChangeRequest",
-    "setPricingExperiment",
-    "setProductServicePrice",
-    "setRateStructure",
-    "setTaxProfileJurisdiction",
-    "setTaxRuleTreatment",
-    "simulatePriceBreakdownCalculation"
-   ],
+   "operations": [],
    "packScreensMatched": 70,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
    "lastSeen": "2026-09-29"
   },
@@ -2107,8 +4979,8 @@
    "pages": 38,
    "canonical": "sources/packs/Privacy__Consent___Preference_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2121,43 +4993,19 @@
    ],
    "duplicated": true,
    "platforms": [
-    "P08",
     "P13"
    ],
-   "platformsConfirmed": [
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
     "P13"
    ],
-   "platformsFromContractsOnly": [
-    "P08"
-   ],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
-    "P08": "Venue Management \u2014 Back Office",
     "P13": "Venue CMS \u2014 White Label"
    },
-   "operations": [
-    "approvePrivacyTesting",
-    "listConsentEvidenceWithdrawal",
-    "listCookieBannerPreference",
-    "listCookieTrackingDigital",
-    "listCustomerPrivacyConsent",
-    "listDataProcessingPurpose",
-    "listDataRetentionExpiry",
-    "listDataSubjectCustomer",
-    "listDeletionAnonymizationRestriction",
-    "listPrivacy",
-    "listPrivacyCompliance",
-    "listPrivacyConsent",
-    "listPrivacyEvidenceCompliance",
-    "listPrivacyNoticePolicy",
-    "setCommunicationPreferenceMarketing",
-    "setConsentCapturePoint",
-    "setDataDiscoveryAccess",
-    "setMinorGuardianAge",
-    "setPrivacyComplianceException"
-   ],
+   "operations": [],
    "packScreensMatched": 20,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
    "lastSeen": "2026-09-29"
   },
@@ -2168,8 +5016,8 @@
    "pages": 27,
    "canonical": "sources/packs/Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2182,43 +5030,76 @@
    ],
    "duplicated": true,
    "platforms": [
-    "P08",
     "P09"
    ],
-   "platformsConfirmed": [
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
     "P09"
    ],
-   "platformsFromContractsOnly": [
-    "P08"
-   ],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
-    "P08": "Venue Management \u2014 Back Office",
     "P09": "TICVAI Web \u2014 Platform Console"
    },
-   "operations": [
-    "approveReviewDecision",
-    "approveWorkflow",
-    "createBulkProductCatalogue",
-    "listChangeImpactAnalysis",
-    "listChangePropagationDependency",
-    "listGovernanceRiskMonitoring",
-    "listProductDuplicationTemplate",
-    "listProductGovernance",
-    "listProductImportExport",
-    "listProductLifecycle",
-    "listProductRetirementSuspension",
-    "listProductTrailChange",
-    "listRollbackRecovery",
-    "publishActivationScheduler",
-    "publishChannelAvailability",
-    "setCatalogueReview",
-    "setLifecycleStatuWorkflow",
-    "setProductContextOwnership"
-   ],
+   "operations": [],
    "packScreensMatched": 20,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "progress-dots.png",
+   "sha256": "30db0a9a227d57f368386974ef81604f3d96789d7c03907c8eb5c060e6104177",
+   "bytes": 47350,
+   "pages": null,
+   "canonical": "sources/packs/progress-dots.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/progress-dots.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "progress-num.png",
+   "sha256": "a8899110e61fee16d62dfeb9832028f2931e7a131247e9e34ab6e9488452208f",
+   "bytes": 68837,
+   "pages": null,
+   "canonical": "sources/packs/progress-num.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/progress-num.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   },
   {
@@ -2228,8 +5109,8 @@
    "pages": 158,
    "canonical": "sources/packs/Promotions___Bundles_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2360,6 +5241,146 @@
    "packScreensMatched": 100,
    "drafted": true,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "qty-off.png",
+   "sha256": "fb8a2e8c47a3a516ad39e8bac9adec07a32387c37693b44278bcea58a76330a2",
+   "bytes": 38136,
+   "pages": null,
+   "canonical": "sources/packs/qty-off.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/qty-off.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "qty-on.png",
+   "sha256": "4c9f66afb0788a3d02531801cb542c77fbc275b3f413e33277a88787f29b4cfa",
+   "bytes": 36208,
+   "pages": null,
+   "canonical": "sources/packs/qty-on.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/qty-on.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "race-hoodie.jpg",
+   "sha256": "a28f766c66864ef29445e53cb203d1a293ffd5e2e47e0960b966e4cb21bf74d2",
+   "bytes": 10860,
+   "pages": null,
+   "canonical": "sources/packs/race-hoodie.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/race-hoodie.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "radius-0.png",
+   "sha256": "8f545317d5fa9b6729bb7f33b51f70f28ea06875a517a825dedf37cf6c483dae",
+   "bytes": 35532,
+   "pages": null,
+   "canonical": "sources/packs/radius-0.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/radius-0.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "radius-22.png",
+   "sha256": "c0f570ce0c9d4e6147075d335a267c2e89e7ab4643196c947696cb6b3cacf5fe",
+   "bytes": 35361,
+   "pages": null,
+   "canonical": "sources/packs/radius-22.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/radius-22.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   },
   {
@@ -2499,14 +5520,42 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "rtl.png",
+   "sha256": "a7e150c9f22d81b284595728e6b48707685b323ddbcaa4a6936bdcd9031e5003",
+   "bytes": 36210,
+   "pages": null,
+   "canonical": "sources/packs/rtl.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/rtl.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "sha256": "f1ce9b1d6c3b3e9d559df3c302c2928a6f8541fa3d9983b910c04e99f933e653",
    "bytes": 1238959,
    "pages": 41,
    "canonical": "sources/packs/Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2519,45 +5568,356 @@
    ],
    "duplicated": true,
    "platforms": [
-    "P08",
     "P09"
    ],
-   "platformsConfirmed": [
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
     "P09"
    ],
-   "platformsFromContractsOnly": [
-    "P08"
-   ],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
-    "P08": "Venue Management \u2014 Back Office",
     "P09": "TICVAI Web \u2014 Platform Console"
    },
-   "operations": [
-    "approveMatrixMultiLevel",
-    "approveRoleAuthorityDelegation",
-    "approveUnifiedDecision",
-    "approveVersioningGovernance",
-    "createAutomationAutonomouAction",
-    "listConditionDecisionLogic",
-    "listCrossModuleOrchestration",
-    "listProcessAutomationOpportunity",
-    "listRuleWorkflow",
-    "listSlaEscalationBottleneck",
-    "listSlaEscalationReminder",
-    "listWorkflow",
-    "listWorkflowAutonomouGovernance",
-    "listWorkflowExceptionFailure",
-    "listWorkflowInstanceProcess",
-    "listWorkflowProcessPerformance",
-    "setTriggerActionCross",
-    "setVisualBusinessRule",
-    "setVisualWorkflow",
-    "simulateWorkflowTestingImpact"
-   ],
+   "operations": [],
    "packScreensMatched": 20,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-curious.png",
+   "sha256": "84f18268b6b329e20a350c3f21f9f008fb4d128df1c75d4b7a215e48248bef33",
+   "bytes": 110680,
+   "pages": null,
+   "canonical": "sources/packs/sahli-curious.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-curious.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-excited.png",
+   "sha256": "ae77cb8f6067c8fe0fa1195292ccfe03deeb2937da51906d6f9dbd1e3bda838c",
+   "bytes": 123356,
+   "pages": null,
+   "canonical": "sources/packs/sahli-excited.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-excited.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-head.png",
+   "sha256": "c2e428d79d46fb3bd64cf4b848b9d5526e7cb258603333efaeb8b59ffd6289fa",
+   "bytes": 50702,
+   "pages": null,
+   "canonical": "sources/packs/sahli-head.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-head.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-idle.png",
+   "sha256": "fe05dd0e66f4cf1de9cd2849754ff1e7fbe9ade3912e28dec2788331d71e2129",
+   "bytes": 125137,
+   "pages": null,
+   "canonical": "sources/packs/sahli-idle.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-idle.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-love.png",
+   "sha256": "be5b3edc856c6592bdcd72076adb5d40e1f860abc17bacf76e7a9057b6aaa904",
+   "bytes": 100528,
+   "pages": null,
+   "canonical": "sources/packs/sahli-love.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-love.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-peek.png",
+   "sha256": "334298f885d346cecb5086709e12cb90767d25fd9bcf66ffd340c6323af8dae9",
+   "bytes": 66051,
+   "pages": null,
+   "canonical": "sources/packs/sahli-peek.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-peek.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-sad.png",
+   "sha256": "1284f403b83818f968dbcb8ab0b50792e6e0e3b19f9ee04580ed9237d67560a0",
+   "bytes": 90765,
+   "pages": null,
+   "canonical": "sources/packs/sahli-sad.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-sad.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-success.png",
+   "sha256": "99e977e938a5244dfad161fd2be300f08da8072aee274fe1eb07ccc93915a2fb",
+   "bytes": 102740,
+   "pages": null,
+   "canonical": "sources/packs/sahli-success.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-success.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-surprised.png",
+   "sha256": "4e474c1fd5a10480bceac96a2bfd6bcac54e23275345e3b24774a949415f28b3",
+   "bytes": 92988,
+   "pages": null,
+   "canonical": "sources/packs/sahli-surprised.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-surprised.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-thinking.png",
+   "sha256": "cd73b4b0deac022ee751ed610271311ee188df2dbd60b7c9f3fc4816c47090a5",
+   "bytes": 107666,
+   "pages": null,
+   "canonical": "sources/packs/sahli-thinking.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-thinking.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-wave.png",
+   "sha256": "b1786658535a5920eef56e984b21890152a448de4aface80b34b962ad4faba39",
+   "bytes": 105231,
+   "pages": null,
+   "canonical": "sources/packs/sahli-wave.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-wave.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "sahli-wink.png",
+   "sha256": "5bd529f30c942ff6a657672d2de7dd427a61ab1ecdbd5265be57c03170d90b46",
+   "bytes": 107696,
+   "pages": null,
+   "canonical": "sources/packs/sahli-wink.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/sahli-wink.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   },
   {
@@ -2567,8 +5927,8 @@
    "pages": 36,
    "canonical": "sources/packs/Sales_Channel_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2581,44 +5941,19 @@
    ],
    "duplicated": true,
    "platforms": [
-    "P09",
-    "P17"
-   ],
-   "platformsConfirmed": [
     "P09"
    ],
-   "platformsFromContractsOnly": [
-    "P17"
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
+    "P09"
    ],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
-    "P09": "TICVAI Web \u2014 Platform Console",
-    "P17": "TICVAI Sign-up \u2014 Onboarding & Purchase"
+    "P09": "TICVAI Web \u2014 Platform Console"
    },
-   "operations": [
-    "createChannelProfile",
-    "listChannel",
-    "listChannel2",
-    "listChannelAllocationRebalancing",
-    "listChannelConnectionIntegration",
-    "listChannelExceptionIncident",
-    "listChannelGovernanceSla",
-    "listChannelLogTransaction",
-    "listChannelPerformanceCommercial",
-    "listChannelSaleRule",
-    "listChannelSaleSchedule",
-    "listCustomerEligibilityRule",
-    "listInventoryCapacityChannel",
-    "listProductPriceAvailability",
-    "listRealTimeChannel",
-    "listSaleChannel",
-    "publishChannelReadinessValidation",
-    "setChannelFeePayment",
-    "setChannelPricingCommercial",
-    "setProductCatalogue"
-   ],
+   "operations": [],
    "packScreensMatched": 20,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
    "lastSeen": "2026-09-29"
   },
@@ -2810,6 +6145,510 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "seats-2d.png",
+   "sha256": "9af1907728e0782d59048ba8d5f6ab9bb2f15ace3bdc3ea322748bb9f231a9ca",
+   "bytes": 36479,
+   "pages": null,
+   "canonical": "sources/packs/seats-2d.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/seats-2d.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "seats-3d.png",
+   "sha256": "667caeacc992fd6491e5ef238c74d9638dc8cf9ef1f4c53af75cd7c4c6dc416d",
+   "bytes": 32825,
+   "pages": null,
+   "canonical": "sources/packs/seats-3d.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/seats-3d.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "seats-only.png",
+   "sha256": "827c1a9e575e01b222d75f0b487ee478fa78e2ad9b1b1869cac43b2b50229913",
+   "bytes": 33009,
+   "pages": null,
+   "canonical": "sources/packs/seats-only.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/seats-only.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "seats-theatre.png",
+   "sha256": "07dec80330305a3766b831ee68b12f7ef511e7f026fab203cb1b2ba108d1c107",
+   "bytes": 35515,
+   "pages": null,
+   "canonical": "sources/packs/seats-theatre.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/seats-theatre.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "seats-zones-only.png",
+   "sha256": "d8f29a11e852c3a061efcea343c9347dff239a1633c666a7d1a672164c912900",
+   "bytes": 30710,
+   "pages": null,
+   "canonical": "sources/packs/seats-zones-only.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/seats-zones-only.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "seats-zones-then.png",
+   "sha256": "a5f289023fb6fb950c19babdc77504a020a7ee9a4f4fbee11009e775c8c280fb",
+   "bytes": 30021,
+   "pages": null,
+   "canonical": "sources/packs/seats-zones-then.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/seats-zones-then.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "single-col.png",
+   "sha256": "c2a0dc724e5d1f99806a4da7c4fb153613ff461bd0b14821cbcd0d82b2c91d4f",
+   "bytes": 34969,
+   "pages": null,
+   "canonical": "sources/packs/single-col.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/single-col.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "size-compact.png",
+   "sha256": "124c573eee182d79735bbc4b414b8b22ec66ff7cbba8940e50f05f971fd9b94b",
+   "bytes": 38710,
+   "pages": null,
+   "canonical": "sources/packs/size-compact.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/size-compact.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "size-xl.png",
+   "sha256": "1a290e19c8dc4eecbc6ec1e84aa71a9cb33270e57535843eaee9756cb5ad6c7c",
+   "bytes": 34959,
+   "pages": null,
+   "canonical": "sources/packs/size-xl.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/size-xl.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "skyline-poster.jpg",
+   "sha256": "394df28c04f1368bfb9ee1e7d693348ab71e00b4aa0e77908e809a63f7d2baa1",
+   "bytes": 10564,
+   "pages": null,
+   "canonical": "sources/packs/skyline-poster.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/skyline-poster.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "skyline-tee.jpg",
+   "sha256": "f3b36b7f4ec3f9f4f1764d978da41c40bbef47d3e348f331f3e6541376e948c0",
+   "bytes": 11194,
+   "pages": null,
+   "canonical": "sources/packs/skyline-tee.jpg",
+   "authority": [
+    "shop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "shop"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/shop/skyline-tee.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "stadium-crowd.jpg",
+   "sha256": "23128c136c84b72786a7a7e330078a937b00f27e24ad5f42f78d1cac26f418cb",
+   "bytes": 124588,
+   "pages": null,
+   "canonical": "sources/packs/stadium-crowd.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/stadium-crowd.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "stadium-live.jpg",
+   "sha256": "b9d84d95c865bf44bd9880ef204889d980d2453d57b2c0fb4456b4697702bfe4",
+   "bytes": 71720,
+   "pages": null,
+   "canonical": "sources/packs/stadium-live.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/stadium-live.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "story-after-dark.jpg",
+   "sha256": "cd3b9e6e74df82948d8d1390ff421fde9126983129cb862a2a57e8a562da7c8b",
+   "bytes": 181276,
+   "pages": null,
+   "canonical": "sources/packs/story-after-dark.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/story-after-dark.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "strip-extras-never.png",
+   "sha256": "5f881cbba4e8e3f81d44b11633a1fc4e77160fc68ce60e1eade614adbae64a16",
+   "bytes": 123007,
+   "pages": null,
+   "canonical": "sources/packs/strip-extras-never.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/strip-extras-never.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "strip-progress-bar.png",
+   "sha256": "9a647b66a6c6ad2f212189bde890399e0d06cdbd90598ec164d054f5459fb235",
+   "bytes": 55901,
+   "pages": null,
+   "canonical": "sources/packs/strip-progress-bar.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/strip-progress-bar.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "strip-progress-dots.png",
+   "sha256": "574984d263c52bbc78852bde7f5ca0d56117491fdd04ac36b2bf0b3cc63336ae",
+   "bytes": 57382,
+   "pages": null,
+   "canonical": "sources/packs/strip-progress-dots.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/strip-progress-dots.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "strip-progress-num.png",
+   "sha256": "b734b9e8e476221560b21accd1397c1c29f336ba1d3c9cf58ae2df5807f71aff",
+   "bytes": 147742,
+   "pages": null,
+   "canonical": "sources/packs/strip-progress-num.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/strip-progress-num.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Subscription_Licensing_AI_Self_Service.pdf",
    "sha256": "0c34b9ff7e0eb2de7dd09f1663dd561789e9eeaa019a5bcf2bec18529a5b7039",
    "bytes": 3410587,
@@ -2847,6 +6686,34 @@
    "packScreensMatched": 100,
    "drafted": false,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "surface-solid.png",
+   "sha256": "8d1f82a7ead40914526f02c6462fb2be032602cc95e51bea02f9a674ed4817ca",
+   "bytes": 36311,
+   "pages": null,
+   "canonical": "sources/packs/surface-solid.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/surface-solid.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   },
   {
@@ -2907,14 +6774,294 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "theatre-alquoz.jpg",
+   "sha256": "7037b0726bf1aec88d0dc309eb7861042930154706b5df39b4b54bb6f61811b2",
+   "bytes": 157241,
+   "pages": null,
+   "canonical": "sources/packs/theatre-alquoz.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/theatre-alquoz.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "theatre-band.jpg",
+   "sha256": "9c64053e42f2cb284d3e9daad0919049e8999c6d1b5dafa51dd4b7e155fcd674",
+   "bytes": 127026,
+   "pages": null,
+   "canonical": "sources/packs/theatre-band.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/theatre-band.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "theatre-culture.jpg",
+   "sha256": "839630c2957c2a3b627d282a2874d36499908c851f6790260a752b1cd275b2ef",
+   "bytes": 184264,
+   "pages": null,
+   "canonical": "sources/packs/theatre-culture.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/theatre-culture.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "theatre-drummer.jpg",
+   "sha256": "1bc67e49d7ae4e4fd07eacf5ee1f17402c73fcb2b6a62eb7275cd27dbc3bfca7",
+   "bytes": 137137,
+   "pages": null,
+   "canonical": "sources/packs/theatre-drummer.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/theatre-drummer.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "theatre-gallery-night.jpg",
+   "sha256": "0b413994e8cb77025fa175628c2fce3ce1864435a11dd2397d4740b9ec3c5396",
+   "bytes": 93654,
+   "pages": null,
+   "canonical": "sources/packs/theatre-gallery-night.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/theatre-gallery-night.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "theatre-guitar.jpg",
+   "sha256": "ca6e86e122abdaf8af109d6c83a68f6dc65e4e1feec034c610e084c4f057bc1f",
+   "bytes": 173889,
+   "pages": null,
+   "canonical": "sources/packs/theatre-guitar.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/theatre-guitar.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "theatre-piano.jpg",
+   "sha256": "ab687c45eef88dd67ed21cc614876f373d4c0aced40312974ad4e1dce71470a6",
+   "bytes": 136204,
+   "pages": null,
+   "canonical": "sources/packs/theatre-piano.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/theatre-piano.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "theatre-place-alquoz.jpg",
+   "sha256": "5874542c1af9158688291b7cdbe38a49568ebdf8cebcc04e7b97a30d44771e2d",
+   "bytes": 345432,
+   "pages": null,
+   "canonical": "sources/packs/theatre-place-alquoz.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/theatre-place-alquoz.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "theatre-visitor.jpg",
+   "sha256": "d35cc8c2ecc38de4bdc8dc208abf5b0e31f57e3480ac0a685ca96c9a706c28d4",
+   "bytes": 246123,
+   "pages": null,
+   "canonical": "sources/packs/theatre-visitor.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/theatre-visitor.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "theatre-vocalist.jpg",
+   "sha256": "7e1d57fd7c4db2dbbf0bd307748c04d62cb8a33a0c1b132d2ea2140b1fea7ec0",
+   "bytes": 120398,
+   "pages": null,
+   "canonical": "sources/packs/theatre-vocalist.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/theatre-vocalist.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Ticket Resale Marketplace_Reference.pdf",
    "sha256": "4a36197abd339d1b5577d55f25621239ffd548c46066214019bb7e4ee16edd0f",
    "bytes": 1812873,
    "pages": 59,
    "canonical": "sources/packs/Ticket Resale Marketplace_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -2981,8 +7128,8 @@
    "pages": 23,
    "canonical": "sources/packs/Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -3029,8 +7176,8 @@
    "pages": 59,
    "canonical": "sources/packs/Ticket_Media___Credential_Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -3045,48 +7192,17 @@
    "platforms": [
     "P08"
    ],
-   "platformsConfirmed": [
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
     "P08"
    ],
-   "platformsFromContractsOnly": [],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
     "P08": "Venue Management \u2014 Back Office"
    },
-   "operations": [
-    "approveMultiMediaPreview",
-    "listBrandingLocalizationTemplate",
-    "listCredential",
-    "listCredentialDeliveryDistribution",
-    "listCredentialGenerationIssuance",
-    "listCredentialIdentityToken",
-    "listCredentialReplacementReissue",
-    "listCredentialSecurityOperational",
-    "listCredentialUsageCross",
-    "listEntitlementCrossMedia",
-    "listFailedGenerationDelivery",
-    "listMediaActivationPriority",
-    "listMediaDesign",
-    "listMediaReplacementRevocation",
-    "listMediaTypeCredential",
-    "listMultiMediaBinding",
-    "listTicketMedia",
-    "listVirtualTicket",
-    "listVirtualTicketArchitecture",
-    "listVirtualTicketStatus",
-    "setAppleWalletPass",
-    "setDigitalBarcodeTicket",
-    "setDigitalCardMembership",
-    "setDynamicFieldData",
-    "setGoogleWalletPass",
-    "setMediaBindingActivation",
-    "setPdfPrintablePos",
-    "setRfidNfcCard",
-    "setVirtualTicketCredential",
-    "setVirtualTicketIdentity"
-   ],
+   "operations": [],
    "packScreensMatched": 30,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
    "lastSeen": "2026-09-29"
   },
@@ -3150,6 +7266,68 @@
    "packScreensMatched": 2,
    "drafted": false,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "ticvai-logo.png",
+   "sha256": "e8e39ca451bb41e19da4db2073c280066445c68faba71fdc1b743bb2f4b76152",
+   "bytes": 100187,
+   "pages": null,
+   "canonical": "sources/packs/ticvai-logo.png",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/ticvai-logo.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "ticvai.png",
+   "sha256": "5dd549da46c2d7c0cace0e58745c3e6d81fa39d74b43f86621be70790c54e4d8",
+   "bytes": 100187,
+   "pages": null,
+   "canonical": "sources/packs/ticvai.png",
+   "authority": [
+    "logos"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "logos"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/logos/ticvai.png"
+   ],
+   "duplicated": false,
+   "platforms": [
+    "P08"
+   ],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
+    "P08"
+   ],
+   "platformNames": {
+    "P08": "Venue Management \u2014 Back Office"
+   },
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   },
   {
@@ -4403,14 +8581,462 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "tier-dining-1.jpg",
+   "sha256": "ec806258e7d594ae29282a1ff61fdc77d0a1b39ae9f10534b03d174c33b2c09b",
+   "bytes": 118613,
+   "pages": null,
+   "canonical": "sources/packs/tier-dining-1.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-dining-1.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-dining-2.jpg",
+   "sha256": "9c70bcef27afc25e58cd6d299ca0a0a3ab84d8d42922b985657748dcfe020d25",
+   "bytes": 89809,
+   "pages": null,
+   "canonical": "sources/packs/tier-dining-2.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-dining-2.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-dining-3.jpg",
+   "sha256": "b28444153c6f966b9a2e7864a3324e06c793251f5281d88890041812d6cfee51",
+   "bytes": 87183,
+   "pages": null,
+   "canonical": "sources/packs/tier-dining-3.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-dining-3.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-park-1.jpg",
+   "sha256": "30631e3a6fcbd4b16fbcab66f78b51a9cb35d84148283872f73f34695bf0fe9b",
+   "bytes": 73809,
+   "pages": null,
+   "canonical": "sources/packs/tier-park-1.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-park-1.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-park-2.jpg",
+   "sha256": "1b6a39769ee66fff2ce6f4dbdf69d25ce121017882e430b7bf4a819ddceb3f42",
+   "bytes": 87062,
+   "pages": null,
+   "canonical": "sources/packs/tier-park-2.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-park-2.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-park-3.jpg",
+   "sha256": "4123dd662af0872c58ba56b8fdb92b9f334b7c980ec65976a141f0bf12eace5a",
+   "bytes": 113541,
+   "pages": null,
+   "canonical": "sources/packs/tier-park-3.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-park-3.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-stadium-1.jpg",
+   "sha256": "f24a06a1b0fce2cfbcaa4c8671b5487af0e5f16d60c78da0db397f348bd640cb",
+   "bytes": 147363,
+   "pages": null,
+   "canonical": "sources/packs/tier-stadium-1.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-stadium-1.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-stadium-2.jpg",
+   "sha256": "4973791fe19d75310a4b45cdf9b6737ac6d8d6d843a6df8b0ce8a7d8ecb433c5",
+   "bytes": 171285,
+   "pages": null,
+   "canonical": "sources/packs/tier-stadium-2.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-stadium-2.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-stadium-3.jpg",
+   "sha256": "dd4f6f017cc09c70de289369914d63b8858386c98dcd3cc04f743ab77308c549",
+   "bytes": 56120,
+   "pages": null,
+   "canonical": "sources/packs/tier-stadium-3.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-stadium-3.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-theatre-1.jpg",
+   "sha256": "17f4950e98ed7be5228e8f550b105a3edf6187759489f77467f899999bf27b08",
+   "bytes": 98101,
+   "pages": null,
+   "canonical": "sources/packs/tier-theatre-1.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-theatre-1.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-theatre-2.jpg",
+   "sha256": "f974efa84162b88cf5ba38186ef645524c2500ac39bc6508b6a80b419cb0eddc",
+   "bytes": 107690,
+   "pages": null,
+   "canonical": "sources/packs/tier-theatre-2.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-theatre-2.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-theatre-3.jpg",
+   "sha256": "459fa684b17e75a8373561f7a5fb8b1048af9ac7cafc114e3b43605ce59623a6",
+   "bytes": 71164,
+   "pages": null,
+   "canonical": "sources/packs/tier-theatre-3.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-theatre-3.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-water-1.jpg",
+   "sha256": "3aa58fb69cbcf5917621dba37a29055d179a31f411a63699369bd0b4109a03a1",
+   "bytes": 206391,
+   "pages": null,
+   "canonical": "sources/packs/tier-water-1.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-water-1.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-water-2.jpg",
+   "sha256": "9c52ca1a06f5868969378a9c7f667413c6d1b532fbe2634ee6cc38d21c0d522a",
+   "bytes": 181490,
+   "pages": null,
+   "canonical": "sources/packs/tier-water-2.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-water-2.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "tier-water-3.jpg",
+   "sha256": "b7da6be94de88df49fe0dc1bd64d35cf116e686786f4db25930f4a2e3eb3532f",
+   "bytes": 121073,
+   "pages": null,
+   "canonical": "sources/packs/tier-water-3.jpg",
+   "authority": [
+    "images"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "images"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/tier-water-3.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "type-serif.png",
+   "sha256": "ba3d46c4d05244104ab8542f6500e86c7852725b989e16621ba1054c3c3465ca",
+   "bytes": 35764,
+   "pages": null,
+   "canonical": "sources/packs/type-serif.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/type-serif.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "sha256": "fa0c3a9b1db3bb821fc962d0d1543d1911bf2b4656acff3e1e60bdf773f3d14c",
    "bytes": 3208731,
    "pages": 136,
    "canonical": "sources/packs/Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -4477,6 +9103,286 @@
    "lastSeen": "2026-09-29"
   },
   {
+   "document": "venue-dining.jpg",
+   "sha256": "719b1b8ddf07bda31f00116fb91e1fe6d0275f913a01c8b338013beca918932a",
+   "bytes": 59445,
+   "pages": null,
+   "canonical": "sources/packs/venue-dining.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/venue-dining.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "venue-dining.png",
+   "sha256": "fadc1ee0d46dc469e68cbe3cf6f5eb36164a82c534fbf45d9b3f82304e1db97e",
+   "bytes": 308914,
+   "pages": null,
+   "canonical": "sources/packs/venue-dining.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/venue-dining.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "venue-park.jpg",
+   "sha256": "c8f6b3d3122e110538e909b9f4fc4a4f233d9467feafe766e61f3620fe1a2a9f",
+   "bytes": 56725,
+   "pages": null,
+   "canonical": "sources/packs/venue-park.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/venue-park.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "venue-park.png",
+   "sha256": "45d254e7cb01b757a799f1284ded0cae55a975c5d2193d6f0f8713d5d789269d",
+   "bytes": 260840,
+   "pages": null,
+   "canonical": "sources/packs/venue-park.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/venue-park.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "venue-stadium.jpg",
+   "sha256": "75dfdb8dfc1a6fad16dcad8ef42f635ce51e137386f5a1cc08099f33f4f8a67c",
+   "bytes": 51022,
+   "pages": null,
+   "canonical": "sources/packs/venue-stadium.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/venue-stadium.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "venue-stadium.png",
+   "sha256": "b06cfc9732895f9f3a1a7b8ddb1518874db055a9f48d74df819a1b3e6da4d3aa",
+   "bytes": 266869,
+   "pages": null,
+   "canonical": "sources/packs/venue-stadium.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/venue-stadium.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "venue-theatre.jpg",
+   "sha256": "9f85825727cdc739bf21918a4d24bba0097974c6fdef601d5d286d89bb8b1031",
+   "bytes": 48714,
+   "pages": null,
+   "canonical": "sources/packs/venue-theatre.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/venue-theatre.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "venue-theatre.png",
+   "sha256": "592f6ea14d69feb81148ec7b0675b2d2bd372d91611c50fcf137a67f1890bae2",
+   "bytes": 276463,
+   "pages": null,
+   "canonical": "sources/packs/venue-theatre.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/venue-theatre.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "venue-water.jpg",
+   "sha256": "c7342f80790d85225f911f2ee262a11c992bfc2cbea09eff1e5d4258151c17ef",
+   "bytes": 61639,
+   "pages": null,
+   "canonical": "sources/packs/venue-water.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/venue-water.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "venue-water.png",
+   "sha256": "0d67c4da7f34668be8f850ab5768922591a70450effddf54bd77eb2afa473820",
+   "bytes": 219563,
+   "pages": null,
+   "canonical": "sources/packs/venue-water.png",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/venue-water.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
    "document": "Virtual_Queue.pdf",
    "sha256": "68771787d1cba48de3cff895a934657d6b2aa2a42df95e46b82b4e1e9ef80a66",
    "bytes": 2186868,
@@ -4511,8 +9417,8 @@
    "pages": 44,
    "canonical": "sources/packs/Waiver, Consent & Digital Form Management_Reference.pdf",
    "authority": [
-    "reference",
-    "workshop"
+    "workshop",
+    "reference"
    ],
    "authorityConflict": true,
    "heldIn": [
@@ -4525,47 +9431,19 @@
    ],
    "duplicated": true,
    "platforms": [
-    "P08",
-    "P09",
     "P13"
    ],
-   "platformsConfirmed": [
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
     "P13"
    ],
-   "platformsFromContractsOnly": [
-    "P08",
-    "P09"
-   ],
-   "platformsFromPackScreensOnly": [],
    "platformNames": {
-    "P08": "Venue Management \u2014 Back Office",
-    "P09": "TICVAI Web \u2014 Platform Console",
     "P13": "Venue CMS \u2014 White Label"
    },
-   "operations": [
-    "approveWaiverTesting",
-    "listComplianceEvidenceWaiver",
-    "listDigitalSigningCollection",
-    "listDynamicFieldQuestion",
-    "listMinorGuardianGroup",
-    "listMissingExpiredInvalid",
-    "listParticipantWaiverStatus",
-    "listProductEventExperience",
-    "listSiteWaiverException",
-    "listVersioningEffectiveDate",
-    "listWaiver",
-    "listWaiverComplianceOperational",
-    "listWaiverComplianceRisk",
-    "listWaiverConsent",
-    "listWaiverTemplateMaster",
-    "listWaiverTriggerEligibility",
-    "setDigitalWaiverForm",
-    "setLocalizationBrandingCustomer",
-    "setSignatorySignatureGuardian",
-    "setWaiverVerificationValidation"
-   ],
+   "operations": [],
    "packScreensMatched": 20,
-   "drafted": true,
+   "drafted": false,
    "firstIndexed": "2026-09-18",
    "lastSeen": "2026-09-29"
   },
@@ -4601,6 +9479,286 @@
    "packScreensMatched": 100,
    "drafted": false,
    "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "water-cruise-dining.jpg",
+   "sha256": "8aa64a8e4c85b437c6e7cf16f5f7e34a1ac82a0526cdf6e6426ae8732a7ba1dc",
+   "bytes": 141472,
+   "pages": null,
+   "canonical": "sources/packs/water-cruise-dining.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/water-cruise-dining.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "water-cruise.jpg",
+   "sha256": "79b36447fa073027f5f243ad43c9a8e8c056947c1f6eb25f8df928fb4aad13a9",
+   "bytes": 120380,
+   "pages": null,
+   "canonical": "sources/packs/water-cruise.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/water-cruise.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "water-detail.jpg",
+   "sha256": "c74fcb5376593f93da82df18d4851eafc0847821a4bc5f73e49547ed8b08c90d",
+   "bytes": 206391,
+   "pages": null,
+   "canonical": "sources/packs/water-detail.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/water-detail.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "water-marina.jpg",
+   "sha256": "4b3a548036a448c08865f7a6fdee3ebc158356848a5e812c2bf21b11929f6b33",
+   "bytes": 264393,
+   "pages": null,
+   "canonical": "sources/packs/water-marina.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/water-marina.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "water-ride.jpg",
+   "sha256": "794a4fa98f2eedca1ffaad20106986a6d46eb35e5fc43f2e53afa176cb3b62fb",
+   "bytes": 915848,
+   "pages": null,
+   "canonical": "sources/packs/water-ride.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/water-ride.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "water-story.jpg",
+   "sha256": "7ffae522da8ae7d85f92598135aaeb31ca4d9fba25b026368656c6609ec004ba",
+   "bytes": 141963,
+   "pages": null,
+   "canonical": "sources/packs/water-story.jpg",
+   "authority": [
+    "lib"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "lib"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/images/lib/water-story.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "wo-grid.jpg",
+   "sha256": "1a1bbdc2413f93c7855693c16f2f1097edccf2f0523c0dfcad075c7adf9b722d",
+   "bytes": 68928,
+   "pages": null,
+   "canonical": "sources/packs/wo-grid.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/wo-grid.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "wo-poster.jpg",
+   "sha256": "7248c1cd078a6be2a69eed88fdbbce0bd42dbe7d881a31c82b2f0c8d56957002",
+   "bytes": 61934,
+   "pages": null,
+   "canonical": "sources/packs/wo-poster.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/wo-poster.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "wo-split.jpg",
+   "sha256": "c16eed2f1244890711e9bc7820b018c65a777654201f310dad9a2824b006fd3e",
+   "bytes": 47675,
+   "pages": null,
+   "canonical": "sources/packs/wo-split.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/wo-split.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
+   "lastSeen": "2026-09-29"
+  },
+  {
+   "document": "wo-stacked.jpg",
+   "sha256": "38a4a7044c4080d4050f08963c3566884fe8af5a4e3261a5ff143abb71302762",
+   "bytes": 49050,
+   "pages": null,
+   "canonical": "sources/packs/wo-stacked.jpg",
+   "authority": [
+    "img"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "img"
+   ],
+   "copies": [
+    "sources/designs/guest-rev3-28-september/manual/img/wo-stacked.jpg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-29",
    "lastSeen": "2026-09-29"
   }
  ]

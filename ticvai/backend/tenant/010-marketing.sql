@@ -1,4 +1,4 @@
--- marketing — 70 tables
+-- marketing — 113 tables
 -- **Derived. Do not hand-edit.**
 
 -- Available, busy, away or offline, with a concurrency limit. Expires — an agent who forgets to go
@@ -11,6 +11,21 @@ CREATE TABLE IF NOT EXISTS marketing.agent_availability (
     max_concurrent                    integer,
     queue_ids                         text[],
     expires_at                        timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.agent_service_profile (
+    id                                uuid PRIMARY KEY,
+    principal_id                      uuid NOT NULL,
+    team                              text CONSTRAINT agent_service_profile_team_chk CHECK (char_length(team) <= 100),
+    skills                            text[] NOT NULL,
+    languages                         text[] NOT NULL,
+    queue_ids                         text[],
+    max_concurrent_cases              integer,
+    availability_override             jsonb,
+    scope_path                        ltree NOT NULL,
     updated_at                        timestamptz
 );
 
@@ -86,6 +101,31 @@ CREATE TABLE IF NOT EXISTS marketing.badge (
     updated_at                        timestamptz
 );
 
+-- Holds 20 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS marketing.booking_consent_record (
+    id                                text PRIMARY KEY NOT NULL,
+    question_id                       text NOT NULL,
+    question_version                  integer NOT NULL,
+    question_kind                     text NOT NULL CONSTRAINT booking_consent_record_question_kind_chk CHECK (question_kind IN ('swim', 'scuba', 'risk', 'custom')),
+    answer                            text NOT NULL CONSTRAINT booking_consent_record_answer_chk CHECK (answer IN ('yes', 'no')),
+    scope                             text NOT NULL CONSTRAINT booking_consent_record_scope_chk CHECK (scope IN ('perPerson', 'perBooking')),
+    blocks_booking                    boolean,
+    cart_id                           uuid,
+    cart_line_id                      uuid,
+    order_id                          text,
+    order_line_id                     text,
+    person_index                      integer,
+    person_name                       text CONSTRAINT booking_consent_record_person_name_chk CHECK (char_length(person_name) <= 120),
+    person_subject_id                 uuid,
+    answered_by_subject_id            uuid,
+    answered_by_principal_id          uuid,
+    source                            text NOT NULL CONSTRAINT booking_consent_record_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded')),
+    answered_at                       timestamptz NOT NULL,
+    superseded_at                     timestamptz,
+    scope_path                        ltree NOT NULL
+);
+
 -- A send with an audience and a schedule. Every dispatch it produces is a message_dispatch row,
 -- which is where consent was checked
 CREATE TABLE IF NOT EXISTS marketing.campaign (
@@ -148,6 +188,64 @@ CREATE TABLE IF NOT EXISTS marketing."case" (
     resolution_note                   text
 );
 
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.case_compensation_request (
+    id                                text PRIMARY KEY NOT NULL,
+    scope_path                        ltree NOT NULL,
+    case_id                           text NOT NULL,
+    order_id                          text,
+    line_ids                          text[],
+    request_type                      text NOT NULL CONSTRAINT case_compensation_request_request_type_chk CHECK (request_type IN ('fullRefund', 'partialRefund', 'serviceCredit', 'walletCredit', 'voucher', 'complimentaryTicket', 'feeWaiver', 'upgrade', 'discount', 'policyException')),
+    value                             numeric(18,4) NOT NULL,
+    reason                            text NOT NULL CONSTRAINT case_compensation_request_reason_chk CHECK (char_length(reason) <= 1000),
+    is_policy_exception               boolean DEFAULT false,
+    exception_reason                  text CONSTRAINT case_compensation_request_exception_reason_chk CHECK (char_length(exception_reason) <= 1000),
+    is_submit                         boolean DEFAULT false,
+    status                            text CONSTRAINT case_compensation_request_status_chk CHECK (status IN ('draft', 'pendingApproval', 'approved', 'declined', 'fulfilled', 'failed', 'withdrawn')),
+    approval_request_id               text,
+    fulfilment_operation              text,
+    fulfilment_reference              text,
+    requested_by_principal_id         uuid,
+    updated_at                        timestamptz
+);
+
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.case_internal_request (
+    id                                text PRIMARY KEY NOT NULL,
+    scope_path                        ltree NOT NULL,
+    case_id                           text NOT NULL,
+    department                        text NOT NULL CONSTRAINT case_internal_request_department_chk CHECK (department IN ('ticketing', 'finance', 'operations', 'accessControl', 'membership', 'crm', 'fnb', 'retail', 'groupSales', 'technicalSupport', 'venueManagement', 'management')),
+    assignee_principal_id             uuid,
+    request                           text NOT NULL CONSTRAINT case_internal_request_request_chk CHECK (char_length(request) <= 2000),
+    priority                          text NOT NULL CONSTRAINT case_internal_request_priority_chk CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
+    escalation_type                   text NOT NULL CONSTRAINT case_internal_request_escalation_type_chk CHECK (escalation_type IN ('functional', 'supervisor', 'management', 'technical', 'financial', 'emergencyEventDay')),
+    due_at                            timestamptz,
+    related_transaction               jsonb,
+    attachment_refs                   text[],
+    status                            text DEFAULT 'open' CONSTRAINT case_internal_request_status_chk CHECK (status IN ('open', 'inProgress', 'completed', 'cancelled')),
+    response                          text CONSTRAINT case_internal_request_response_chk CHECK (char_length(response) <= 2000),
+    requested_by_principal_id         uuid,
+    created_at                        timestamptz,
+    completed_at                      timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.case_linked_record (
+    id                                uuid PRIMARY KEY,
+    scope_path                        ltree NOT NULL,
+    case_id                           text NOT NULL,
+    kind                              text NOT NULL CONSTRAINT case_linked_record_kind_chk CHECK (kind IN ('order', 'ticket', 'payment', 'refund', 'membership', 'walletTransaction', 'groupBooking', 'accessEvent')),
+    reference_id                      text NOT NULL CONSTRAINT case_linked_record_reference_id_chk CHECK (char_length(reference_id) <= 64),
+    note                              text CONSTRAINT case_linked_record_note_chk CHECK (char_length(note) <= 500),
+    is_active                         boolean DEFAULT true,
+    linked_by_principal_id            uuid,
+    updated_at                        timestamptz
+);
+
 -- One exchange in a case, from either side
 CREATE TABLE IF NOT EXISTS marketing.case_message (
     resolution                        text,
@@ -161,6 +259,69 @@ CREATE TABLE IF NOT EXISTS marketing.case_message (
     recorded_at                       timestamptz NOT NULL,
     synced_at                         timestamptz,
     case_id                           text
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.case_resolution (
+    id                                uuid PRIMARY KEY,
+    scope_path                        ltree NOT NULL,
+    case_id                           text NOT NULL,
+    resolution_category               text NOT NULL CONSTRAINT case_resolution_resolution_category_chk CHECK (resolution_category IN ('informationProvided', 'ticketReissued', 'bookingChanged', 'refundProcessed', 'compensationIssued', 'technicalIssueResolved', 'customerError', 'policyApplied', 'duplicate', 'noActionRequired', 'other')),
+    resolution_summary                text NOT NULL CONSTRAINT case_resolution_resolution_summary_chk CHECK (char_length(resolution_summary) <= 2000),
+    action_taken                      text CONSTRAINT case_resolution_action_taken_chk CHECK (char_length(action_taken) <= 2000),
+    financial_impact                  numeric(18,4),
+    compensation_request_ids          text[],
+    root_cause                        text NOT NULL CONSTRAINT case_resolution_root_cause_chk CHECK (root_cause IN ('customer', 'product', 'payment', 'system', 'integration', 'operational', 'content', 'policy', 'staff', 'unknown')),
+    duplicate_of_case_id              text,
+    customer_notification             jsonb,
+    resolved_by                       uuid,
+    resolution_date                   timestamptz,
+    updated_at                        timestamptz
+);
+
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.case_routing_rule (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL CONSTRAINT case_routing_rule_code_chk CHECK (char_length(code) <= 60),
+    name                              text NOT NULL CONSTRAINT case_routing_rule_name_chk CHECK (char_length(name) <= 150),
+    rank                              integer NOT NULL,
+    queue_id                          uuid,
+    match                             jsonb,
+    strategy                          text NOT NULL CONSTRAINT case_routing_rule_strategy_chk CHECK (strategy IN ('roundRobin', 'leastBusy', 'skillBased', 'priorityBased', 'languageBased', 'customerTierBased', 'aiRecommended')),
+    required_skills                   text[],
+    require_language_match            boolean DEFAULT true,
+    max_utilization_rate              numeric(18,4),
+    respect_sla_capability            boolean DEFAULT true,
+    sticky_ownership                  boolean DEFAULT false,
+    sticky_window_hours               integer,
+    fallback_queue_id                 uuid,
+    is_active                         boolean NOT NULL,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.case_service_action (
+    id                                text PRIMARY KEY NOT NULL,
+    scope_path                        ltree NOT NULL,
+    mode                              text NOT NULL CONSTRAINT case_service_action_mode_chk CHECK (mode IN ('evaluate', 'execute')),
+    case_id                           text,
+    order_id                          text NOT NULL,
+    line_ids                          text[],
+    action                            text CONSTRAINT case_service_action_action_chk CHECK (action IN ('resendTicket', 'downloadTicket', 'reissue', 'transfer', 'changeName', 'reschedule', 'exchange', 'upgrade', 'cancel')),
+    target_performance_id             uuid,
+    target_product_id                 uuid,
+    recipient_subject_id              uuid,
+    delivery_channel                  text,
+    reason                            text CONSTRAINT case_service_action_reason_chk CHECK (char_length(reason) <= 500),
+    status                            text CONSTRAINT case_service_action_status_chk CHECK (status IN ('completed', 'pendingPayment', 'refused', 'failed')),
+    downstream_operation              text,
+    downstream_reference              text,
+    performed_by_principal_id         uuid,
+    updated_at                        timestamptz
 );
 
 -- A challenge, mission or streak (22.6, CF-137). Gamification is not loyalty — loyalty pays for
@@ -196,6 +357,91 @@ CREATE TABLE IF NOT EXISTS marketing.challenge_progress (
     reward_issued_at                  timestamptz
 );
 
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS marketing.communication_preference_type (
+    category_code                     text NOT NULL CONSTRAINT communication_preference_type_category_code_chk CHECK (char_length(category_code) <= 60),
+    name                              text NOT NULL CONSTRAINT communication_preference_type_name_chk CHECK (char_length(name) <= 150),
+    description                       text CONSTRAINT communication_preference_type_description_chk CHECK (char_length(description) <= 1000),
+    classification                    text NOT NULL CONSTRAINT communication_preference_type_classification_chk CHECK (classification IN ('transactional', 'marketing')),
+    communication_type                text CONSTRAINT communication_preference_type_communication_type_chk CHECK (communication_type IN ('orderConfirmation', 'ticketDelivery', 'paymentInformation', 'eventChanges', 'securityMessages', 'promotions', 'newEvents', 'membershipOffers', 'loyaltyOffers', 'birthdayCampaigns', 'partnerOffers', 'surveys', 'other')),
+    consent_purpose                   text,
+    available_channels                text[] NOT NULL,
+    applicable_brand_ids              text[],
+    applicable_countries              text[],
+    is_customer_editable              boolean NOT NULL,
+    default_behavior                  text NOT NULL CONSTRAINT communication_preference_type_default_behavior_chk CHECK (default_behavior IN ('on', 'off')),
+    reconfirm_after_months            integer,
+    status                            text DEFAULT 'active' CONSTRAINT communication_preference_type_status_chk CHECK (status IN ('active', 'retired')),
+    id                                uuid PRIMARY KEY NOT NULL,
+    version                           integer NOT NULL,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 21 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS marketing.communication_provider (
+    id                                uuid PRIMARY KEY,
+    scope_path                        ltree NOT NULL,
+    provider_name                     text NOT NULL CONSTRAINT communication_provider_provider_name_chk CHECK (char_length(provider_name) <= 120),
+    channel                           text NOT NULL CONSTRAINT communication_provider_channel_chk CHECK (channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'post')),
+    account                           text NOT NULL CONSTRAINT communication_provider_account_chk CHECK (char_length(account) <= 200),
+    environment                       text NOT NULL CONSTRAINT communication_provider_environment_chk CHECK (environment IN ('production', 'sandbox')),
+    region                            text,
+    country                           text,
+    brand_id                          uuid,
+    legal_entity_id                   uuid,
+    credentials_secret_ref            text NOT NULL,
+    api_configuration                 jsonb,
+    webhook_configuration             jsonb,
+    rate_limit_per_second             integer,
+    rate_limit_per_minute             integer,
+    timeout_seconds                   integer,
+    retry_policy                      jsonb,
+    role                              text NOT NULL CONSTRAINT communication_provider_role_chk CHECK (role IN ('primary', 'secondary', 'emergencyFallback')),
+    priority                          integer,
+    status                            text NOT NULL CONSTRAINT communication_provider_status_chk CHECK (status IN ('active', 'standby', 'degraded', 'suspended', 'disabled')),
+    updated_at                        timestamptz
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.communication_routing_rule (
+    id                                uuid PRIMARY KEY NOT NULL,
+    scope_path                        ltree NOT NULL,
+    channel                           text NOT NULL CONSTRAINT communication_routing_rule_channel_chk CHECK (channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'post')),
+    country                           text,
+    brand_id                          uuid,
+    message_class                     text CONSTRAINT communication_routing_rule_message_class_chk CHECK (message_class IN ('transactional', 'operational', 'service', 'marketing')),
+    priority_class                    text CONSTRAINT communication_routing_rule_priority_class_chk CHECK (priority_class IN ('P1', 'P2', 'P3', 'P4')),
+    recipient_type                    text CONSTRAINT communication_routing_rule_recipient_type_chk CHECK (recipient_type IN ('customer', 'partner', 'employee')),
+    skip_unhealthy_providers          boolean,
+    cost_aware                        boolean,
+    channel_fallback                  text[],
+    throttle                          jsonb,
+    is_active                         boolean NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 13 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS marketing.consent_capture_point (
+    capture_point                     text NOT NULL CONSTRAINT consent_capture_point_capture_point_chk CHECK (capture_point IN ('accountRegistration', 'guestCheckout', 'ticketPurchase', 'membershipEnrolment', 'annualPassEnrolment', 'mobileAppRegistration', 'posCustomerCreation', 'kiosk', 'crmCustomerCreation', 'walletEnrolment', 'faceEnrolment', 'newsletterSignup', 'customerPortal', 'competitionPromotion', 'apiPartnerJourney')),
+    channel                           text NOT NULL CONSTRAINT consent_capture_point_channel_chk CHECK (channel IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded')),
+    brand_id                          uuid,
+    country                           text,
+    customer_type                     text CONSTRAINT consent_capture_point_customer_type_chk CHECK (customer_type IN ('individual', 'member', 'corporate', 'group', 'school')),
+    skip_if_current_version_accepted  boolean DEFAULT true,
+    languages                         text[],
+    status                            text DEFAULT 'active' CONSTRAINT consent_capture_point_status_chk CHECK (status IN ('active', 'retired')),
+    id                                uuid PRIMARY KEY NOT NULL,
+    version                           integer NOT NULL,
+    publication_status                text NOT NULL CONSTRAINT consent_capture_point_publication_status_chk CHECK (publication_status IN ('draft', 'review', 'approved', 'published', 'superseded')),
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- What a tenant may ask consent for. The question is the tenant’s; the answer is the guest’s
 CREATE TABLE IF NOT EXISTS marketing.consent_purpose (
     purpose                           text NOT NULL CONSTRAINT consent_purpose_purpose_chk CHECK (purpose IN ('marketing', 'personalisation', 'profiling', 'thirdPartySharing', 'aiProcessing', 'transactional')),
@@ -214,6 +460,31 @@ CREATE TABLE IF NOT EXISTS marketing.consent_purpose_channel (
     consent_purpose_id                uuid NOT NULL,
     channel                           text NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 11 operations read it and 2 write it.
+CREATE TABLE IF NOT EXISTS marketing.consent_question (
+    id                                text PRIMARY KEY NOT NULL,
+    kind                              text NOT NULL CONSTRAINT consent_question_kind_chk CHECK (kind IN ('swim', 'scuba', 'risk', 'custom')),
+    text                              jsonb NOT NULL,
+    help_text                         jsonb,
+    version                           integer NOT NULL,
+    scope                             text NOT NULL DEFAULT 'perPerson' CONSTRAINT consent_question_scope_chk CHECK (scope IN ('perPerson', 'perBooking')),
+    is_required                       boolean NOT NULL DEFAULT true,
+    blocking_answer                   text NOT NULL DEFAULT 'none' CONSTRAINT consent_question_blocking_answer_chk CHECK (blocking_answer IN ('yes', 'no', 'none')),
+    status                            text NOT NULL DEFAULT 'active' CONSTRAINT consent_question_status_chk CHECK (status IN ('active', 'retired')),
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS marketing.consent_question_version (
+    id                                uuid PRIMARY KEY NOT NULL,
+    question_id                       text NOT NULL,
+    version                           integer NOT NULL,
+    text                              jsonb NOT NULL,
+    published_at                      timestamptz NOT NULL,
+    published_by                      uuid
 );
 
 -- What a guest agreed to and when. A merge takes the narrower of two (CF-160)
@@ -237,10 +508,37 @@ CREATE TABLE IF NOT EXISTS marketing.consent_record_channel (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 22 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.contact_automation (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL CONSTRAINT contact_automation_code_chk CHECK (char_length(code) <= 60),
+    name                              text NOT NULL CONSTRAINT contact_automation_name_chk CHECK (char_length(name) <= 150),
+    owner_principal_id                uuid,
+    level                             text NOT NULL CONSTRAINT contact_automation_level_chk CHECK (level IN ('recommendOnly', 'agentConfirmation', 'supervisorGoverned', 'fullyAutomated')),
+    trigger                           jsonb NOT NULL,
+    scope                             jsonb,
+    allowed_actions                   text[] NOT NULL,
+    confidence_threshold              numeric(18,4) NOT NULL,
+    on_exception                      text NOT NULL CONSTRAINT contact_automation_on_exception_chk CHECK (on_exception IN ('leaveForAgent', 'routeToQueue', 'notifySupervisor')),
+    exception_queue_id                uuid,
+    effective_from                    timestamptz,
+    effective_to                      timestamptz,
+    kill_switch                       boolean DEFAULT false,
+    status                            text NOT NULL CONSTRAINT contact_automation_status_chk CHECK (status IN ('draft', 'approved', 'active', 'paused', 'retired')),
+    version                           integer,
+    approved_by_principal_id          uuid,
+    approved_at                       timestamptz,
+    last_simulation                   jsonb,
+    executions_last30_days            integer,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- A live session with somebody waiting. Not a case — a case is a ticket measured in hours, this is
 -- measured in seconds. A conversation may create a case; it is not one Hangs off: reaches
 -- marketing.guest_profile through its keys; references identity.principal, marketing.case,
--- marketing.kiosk_assist_session. Reached by: 8 operations read it and 6 write it; 1 tables
+-- marketing.kiosk_assist_session. Reached by: 8 operations read it and 6 write it; 2 tables
 -- reference it.
 CREATE TABLE IF NOT EXISTS marketing.conversation (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -289,6 +587,27 @@ CREATE TABLE IF NOT EXISTS marketing.conversation_message_attachment (
     asset_id                          uuid,
     kind                              text,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.cookie_banner_design (
+    id                                uuid PRIMARY KEY,
+    brand_id                          uuid,
+    inherits_from_id                  uuid,
+    channel                           text NOT NULL CONSTRAINT cookie_banner_design_channel_chk CHECK (channel IN ('b2cWebsite', 'customerPortal', 'mobileApp', 'embeddedCheckout', 'whiteLabelSite', 'partnerMicrosite')),
+    logo_asset_id                     uuid,
+    title                             jsonb,
+    body                              jsonb,
+    position                          text NOT NULL CONSTRAINT cookie_banner_design_position_chk CHECK (position IN ('top', 'bottom', 'popup', 'modal')),
+    theme_id                          text,
+    reject_is_one_click               boolean NOT NULL DEFAULT true,
+    languages                         text[] NOT NULL,
+    notice_version                    text,
+    version                           integer,
+    status                            text CONSTRAINT cookie_banner_design_status_chk CHECK (status IN ('draft', 'published', 'superseded')),
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -343,22 +662,35 @@ CREATE TABLE IF NOT EXISTS marketing.form_definition (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.form_definition_field (
-    form_definition_id                uuid NOT NULL,
-    key                               text NOT NULL,
-    label                             text NOT NULL,
     label_localised                   jsonb,
     type                              text NOT NULL,
     options                           text[],
     is_required                       boolean,
-    is_personal_data                  boolean,
     consent_purpose_id                uuid,
     show_when                         jsonb,
+    form_definition_id                uuid NOT NULL,
+    form_id                           uuid NOT NULL,
+    form_version                      integer NOT NULL,
+    key                               text NOT NULL CONSTRAINT form_definition_field_key_chk CHECK (char_length(key) <= 60),
+    label                             jsonb NOT NULL,
+    help_text                         jsonb,
+    field_type                        text NOT NULL CONSTRAINT form_definition_field_field_type_chk CHECK (field_type IN ('shortText', 'longText', 'number', 'date', 'yesNo', 'checkbox', 'singleSelect', 'multiSelect', 'dropdown', 'email', 'mobile', 'address', 'customerLookup', 'participantLookup', 'signature', 'initials')),
+    standard_field                    text CONSTRAINT form_definition_field_standard_field_chk CHECK (standard_field IN ('participantName', 'dateOfBirth', 'customerId', 'bookingReference', 'ticketNumber', 'guardianName', 'guardianRelationship', 'emergencyContact')),
+    requirement                       text NOT NULL CONSTRAINT form_definition_field_requirement_chk CHECK (requirement IN ('required', 'optional', 'conditional', 'readOnly', 'autoPopulated')),
+    validation                        jsonb,
+    maps_to                           text CONSTRAINT form_definition_field_maps_to_chk CHECK (maps_to IN ('guestName', 'guestDateOfBirth', 'guestEmail', 'guestMobile', 'guestAddress', 'guestId', 'ticketHolderName', 'orderReference', 'ticketNumber')),
+    is_personal_data                  boolean DEFAULT false,
+    sort_order                        integer DEFAULT 0,
+    is_deleted                        boolean DEFAULT false,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
     id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- The acceptance record, and it is evidence (2.15.13). Bound to the version accepted, not to the
 -- form. Hangs off: reaches marketing.guest_profile through its keys; references
--- assets.media_asset, pii.subject. Reached by: 3 operations read it and 1 write it.
+-- assets.media_asset, pii.subject. Reached by: 3 operations read it and 1 write it; 1 tables
+-- reference it.
 CREATE TABLE IF NOT EXISTS marketing.form_submission (
     id                                uuid PRIMARY KEY NOT NULL,
     form_id                           uuid NOT NULL,
@@ -660,6 +992,27 @@ CREATE TABLE IF NOT EXISTS marketing.kiosk_assist_session (
     ended_at                          timestamptz
 );
 
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.legal_hold (
+    hold_id                           uuid,
+    kind                              text DEFAULT 'legal' CONSTRAINT legal_hold_kind_chk CHECK (kind IN ('legal', 'operational', 'fraudInvestigation', 'regulatorRequest')),
+    reason                            text NOT NULL CONSTRAINT legal_hold_reason_chk CHECK (char_length(reason) <= 1000),
+    scope                             jsonb NOT NULL,
+    owner_principal_id                uuid,
+    starts_at                         timestamptz,
+    review_date                       date,
+    status                            text DEFAULT 'pendingApproval' CONSTRAINT legal_hold_status_chk CHECK (status IN ('pendingApproval', 'active', 'released')),
+    placed_by_principal_id            uuid,
+    approved_by_principal_id          uuid,
+    approved_at                       timestamptz,
+    release_reason                    text CONSTRAINT legal_hold_release_reason_chk CHECK (char_length(release_reason) <= 1000),
+    released_at                       timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- A reported or found item (BL-021). The match between the two is the whole capability — without
 -- both sides modelled, somebody searches a case list by hand
 CREATE TABLE IF NOT EXISTS marketing.lost_item (
@@ -810,6 +1163,26 @@ CREATE TABLE IF NOT EXISTS marketing.message_trigger (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 15 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS marketing.minor_privacy_rule (
+    country                           text NOT NULL,
+    minor_below_age                   integer NOT NULL,
+    guardian_required_below_age       integer NOT NULL,
+    age_verification_method           text NOT NULL CONSTRAINT minor_privacy_rule_age_verification_method_chk CHECK (age_verification_method IN ('selfDeclaredDateOfBirth', 'identityDocument', 'staffVerification', 'accountRecord')),
+    guardian_verification_methods     text[] NOT NULL,
+    guardian_data_required            text[],
+    restrict_marketing                boolean DEFAULT true,
+    restrict_tracking                 boolean DEFAULT true,
+    restrict_personalisation          boolean DEFAULT true,
+    restricted_processing_purpose_codes text[],
+    consent_purposes_requiring_guardian text[],
+    id                                uuid PRIMARY KEY NOT NULL,
+    version                           integer,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- One level, with its threshold and benefits
 CREATE TABLE IF NOT EXISTS marketing.points_earning_rule (
     loyalty_programme_id              uuid NOT NULL,
@@ -838,6 +1211,103 @@ CREATE TABLE IF NOT EXISTS marketing.points_redemption_rule (
     is_active                         boolean NOT NULL
 );
 
+-- Holds 16 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.privacy_action (
+    action_id                         uuid,
+    request_id                        uuid,
+    retention_run_id                  uuid,
+    subject_id                        uuid NOT NULL,
+    action_type                       text NOT NULL CONSTRAINT privacy_action_action_type_chk CHECK (action_type IN ('delete', 'anonymise', 'pseudonymise', 'restrictProcessing', 'suppressMarketing', 'removeBiometricReference', 'disconnectThirdPartyProfile', 'other')),
+    other_action_label                text CONSTRAINT privacy_action_other_action_label_chk CHECK (char_length(other_action_label) <= 100),
+    requires_approval                 boolean,
+    decision                          jsonb,
+    status                            text CONSTRAINT privacy_action_status_chk CHECK (status IN ('planned', 'awaitingApproval', 'approved', 'rejected', 'executing', 'completed', 'completedWithRetention', 'failed', 'manualActionRequired', 'cancelled')),
+    dsar_request_id                   text,
+    evidence_asset_id                 uuid,
+    created_at                        timestamptz,
+    completed_at                      timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 17 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS marketing.privacy_audit_event (
+    event_id                          uuid NOT NULL,
+    subject_id                        uuid,
+    action                            text NOT NULL CONSTRAINT privacy_audit_event_action_chk CHECK (action IN ('consentGranted', 'consentWithdrawn', 'preferenceChanged', 'policyAccepted', 'privacyRequestCreated', 'identityVerified', 'dataExportGenerated', 'correctionRequested', 'deletionApproved', 'anonymisationExecuted', 'retentionAction', 'legalHold', 'administrativeOverride', 'configurationChange')),
+    actor_type                        text CONSTRAINT privacy_audit_event_actor_type_chk CHECK (actor_type IN ('customer', 'guardian', 'staff', 'system', 'ai')),
+    actor_principal_id                uuid,
+    actor_role                        text,
+    source                            text CONSTRAINT privacy_audit_event_source_chk CHECK (source IN ('core', 'ticketing', 'access', 'fnb', 'retail', 'inventory', 'seating', 'membership', 'marketing', 'resources', 'queue', 'transport', 'games', 'maintenance', 'accreditation', 'partner', 'developerApi', 'analytics', 'ai')),
+    channel                           text,
+    occurred_at                       timestamptz NOT NULL,
+    before                            jsonb,
+    after                             jsonb,
+    reason                            text CONSTRAINT privacy_audit_event_reason_chk CHECK (char_length(reason) <= 1000),
+    approval_reference                text,
+    related_request_id                uuid,
+    related_case_id                   uuid,
+    evidence_reference                text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS marketing.privacy_change_set (
+    change_set_id                     uuid NOT NULL,
+    status                            text NOT NULL CONSTRAINT privacy_change_set_status_chk CHECK (status IN ('draft', 'validated', 'submitted', 'approved', 'scheduled', 'published', 'rolledBack', 'rejected')),
+    approval_request_id               text,
+    publish_at                        timestamptz,
+    published_at                      timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 24 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.privacy_exception (
+    id                                uuid PRIMARY KEY NOT NULL,
+    category                          text NOT NULL CONSTRAINT privacy_exception_category_chk CHECK (category IN ('missingConsentEvidence', 'consentPropagationFailure', 'marketingAfterWithdrawal', 'policyVersionMismatch', 'missingGuardianConsent', 'retentionFailure', 'deletionFailure', 'unknownTrackingTechnology', 'unauthorisedDataAccess', 'unmappedProcessingPurpose', 'biometricPrivacyException', 'dataExportFailure', 'other')),
+    severity                          text NOT NULL CONSTRAINT privacy_exception_severity_chk CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+    summary                           text NOT NULL CONSTRAINT privacy_exception_summary_chk CHECK (char_length(summary) <= 1000),
+    subject_id                        uuid,
+    system                            text CONSTRAINT privacy_exception_system_chk CHECK (system IN ('core', 'ticketing', 'access', 'fnb', 'retail', 'inventory', 'seating', 'membership', 'marketing', 'resources', 'queue', 'transport', 'games', 'maintenance', 'accreditation', 'partner', 'developerApi', 'analytics', 'ai')),
+    brand_id                          uuid,
+    country                           text,
+    owner_principal_id                uuid,
+    status                            text DEFAULT 'detected' CONSTRAINT privacy_exception_status_chk CHECK (status IN ('detected', 'triaged', 'assigned', 'investigated', 'correctiveAction', 'reviewed', 'closed')),
+    related_evidence_ids              text[],
+    policy_reference                  text CONSTRAINT privacy_exception_policy_reference_chk CHECK (char_length(policy_reference) <= 200),
+    root_cause                        text CONSTRAINT privacy_exception_root_cause_chk CHECK (char_length(root_cause) <= 2000),
+    corrective_action                 text CONSTRAINT privacy_exception_corrective_action_chk CHECK (char_length(corrective_action) <= 2000),
+    notes                             text CONSTRAINT privacy_exception_notes_chk CHECK (char_length(notes) <= 4000),
+    attachment_asset_ids              text[],
+    escalated_to                      text CONSTRAINT privacy_exception_escalated_to_chk CHECK (escalated_to IN ('privacy', 'legal', 'security', 'it', 'marketing', 'operations', 'dataOwner')),
+    privacy_incident_id               uuid,
+    detected_at                       timestamptz NOT NULL,
+    detected_by                       text CONSTRAINT privacy_exception_detected_by_chk CHECK (detected_by IN ('platformCheck', 'aiDetection', 'user')),
+    sla_due_at                        timestamptz,
+    closed_at                         timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.privacy_export_package (
+    sources                           text[],
+    request_id                        uuid NOT NULL,
+    discovered_at                     timestamptz,
+    export_package                    jsonb,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- A personal-data breach (BL-176). UAE PDPL gives 72 hours from discovery — discoveredAt starts
 -- the clock, and a discovery nobody recorded is a deadline nobody is counting
 CREATE TABLE IF NOT EXISTS marketing.privacy_incident (
@@ -855,6 +1325,92 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_incident (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 29 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it; 3 tables reference it.
+CREATE TABLE IF NOT EXISTS marketing.privacy_request (
+    request_id                        uuid,
+    subject_id                        uuid NOT NULL,
+    request_type                      text NOT NULL CONSTRAINT privacy_request_request_type_chk CHECK (char_length(request_type) <= 60),
+    source                            text NOT NULL CONSTRAINT privacy_request_source_chk CHECK (source IN ('customerPortal', 'b2c', 'mobileApp', 'emailManual', 'customerService', 'pos', 'api')),
+    requester_role                    text NOT NULL CONSTRAINT privacy_request_requester_role_chk CHECK (requester_role IN ('self', 'guardian', 'authorisedRepresentative')),
+    requester_subject_id              uuid,
+    jurisdiction                      text NOT NULL,
+    submitted_at                      timestamptz,
+    due_at                            timestamptz,
+    is_deadline_configured            boolean,
+    days_remaining                    integer,
+    at_risk                           boolean,
+    sla_state                         text CONSTRAINT privacy_request_sla_state_chk CHECK (sla_state IN ('onTrack', 'atRisk', 'overdue', 'escalated', 'noDeadline')),
+    priority                          text DEFAULT 'P3' CONSTRAINT privacy_request_priority_chk CHECK (priority IN ('P1', 'P2', 'P3', 'P4')),
+    owner_principal_id                uuid,
+    verification_method               text CONSTRAINT privacy_request_verification_method_chk CHECK (verification_method IN ('accountLogin', 'otp', 'emailVerification', 'mobileVerification', 'idReview', 'manualVerification')),
+    verification_status               text DEFAULT 'notStarted' CONSTRAINT privacy_request_verification_status_chk CHECK (verification_status IN ('notStarted', 'pending', 'verified', 'failed')),
+    status                            text DEFAULT 'submitted' CONSTRAINT privacy_request_status_chk CHECK (status IN ('submitted', 'inProgress', 'completed')),
+    stage                             text CONSTRAINT privacy_request_stage_chk CHECK (char_length(stage) <= 60),
+    outcome                           text CONSTRAINT privacy_request_outcome_chk CHECK (outcome IN ('fulfilled', 'partiallyFulfilled', 'refused', 'withdrawnByRequester')),
+    outcome_reason                    text CONSTRAINT privacy_request_outcome_reason_chk CHECK (char_length(outcome_reason) <= 1000),
+    is_escalated                      boolean DEFAULT false,
+    dsar_request_id                   text,
+    case_id                           uuid,
+    notes                             text CONSTRAINT privacy_request_notes_chk CHECK (char_length(notes) <= 4000),
+    completed_at                      timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 3 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.privacy_request_deadline (
+    privacy_request_type_id           uuid NOT NULL,
+    verification_method               text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS marketing.privacy_request_type (
+    id                                uuid PRIMARY KEY,
+    code                              text NOT NULL CONSTRAINT privacy_request_type_code_chk CHECK (char_length(code) <= 60),
+    name                              text NOT NULL CONSTRAINT privacy_request_type_name_chk CHECK (char_length(name) <= 150),
+    kind                              text NOT NULL CONSTRAINT privacy_request_type_kind_chk CHECK (kind IN ('access', 'dataExport', 'correction', 'deletion', 'anonymisation', 'restriction', 'objection', 'consentWithdrawal', 'marketingOptOut', 'other')),
+    allow_representatives             boolean DEFAULT true,
+    status                            text NOT NULL DEFAULT 'active' CONSTRAINT privacy_request_type_status_chk CHECK (status IN ('active', 'retired')),
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 26 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.processing_purpose (
+    purpose_id                        uuid,
+    purpose_code                      text NOT NULL CONSTRAINT processing_purpose_purpose_code_chk CHECK (char_length(purpose_code) <= 60),
+    purpose_name                      text NOT NULL CONSTRAINT processing_purpose_purpose_name_chk CHECK (char_length(purpose_name) <= 150),
+    description                       text CONSTRAINT processing_purpose_description_chk CHECK (char_length(description) <= 2000),
+    business_owner                    text CONSTRAINT processing_purpose_business_owner_chk CHECK (char_length(business_owner) <= 150),
+    data_controller_applicable_organization text CONSTRAINT processing_purpose_data_controller_applicable_organization_chk CHECK (char_length(data_controller_applicable_organization) <= 200),
+    data_categories                   text[],
+    data_subject_categories           text[],
+    processing_activities             text[],
+    systems_modules                   text[],
+    countries_jurisdictions           text[],
+    lawful_basis                      text NOT NULL DEFAULT 'unclassified' CONSTRAINT processing_purpose_lawful_basis_chk CHECK (lawful_basis IN ('consent', 'contractualNecessity', 'legalObligation', 'legitimateInterest', 'vitalInterest', 'publicInterest', 'other', 'unclassified')),
+    lawful_basis_note                 text CONSTRAINT processing_purpose_lawful_basis_note_chk CHECK (char_length(lawful_basis_note) <= 500),
+    sensitive_categories              text[],
+    consent_purposes                  text[],
+    policy_ids                        text[],
+    capture_point_ids                 text[],
+    retention_policy_codes            text[],
+    third_party_processors            text[],
+    effective_from                    timestamptz,
+    effective_to                      timestamptz,
+    status                            text NOT NULL DEFAULT 'draft' CONSTRAINT processing_purpose_status_chk CHECK (status IN ('draft', 'active', 'retired')),
+    version                           integer,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.programme_tier (
@@ -869,6 +1425,29 @@ CREATE TABLE IF NOT EXISTS marketing.programme_tier (
     benefits                          text[],
     earn_multiplier                   numeric(18,4),
     is_active                         boolean DEFAULT true
+);
+
+-- Holds 18 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.quality_evaluation (
+    id                                uuid PRIMARY KEY NOT NULL,
+    agent_principal_id                uuid NOT NULL,
+    evaluator_principal_id            uuid,
+    source_type                       text NOT NULL CONSTRAINT quality_evaluation_source_type_chk CHECK (source_type IN ('call', 'chat', 'email', 'whatsapp', 'case', 'complaint')),
+    case_id                           text,
+    conversation_id                   uuid,
+    evaluated_by                      text NOT NULL CONSTRAINT quality_evaluation_evaluated_by_chk CHECK (evaluated_by IN ('human', 'ai')),
+    status                            text NOT NULL CONSTRAINT quality_evaluation_status_chk CHECK (status IN ('draft', 'scored', 'acknowledged')),
+    critical_failures                 text[],
+    overall_score                     integer,
+    feedback                          text CONSTRAINT quality_evaluation_feedback_chk CHECK (char_length(feedback) <= 2000),
+    resolution_seconds                integer,
+    sla_met                           boolean,
+    agent_comment                     text CONSTRAINT quality_evaluation_agent_comment_chk CHECK (char_length(agent_comment) <= 1000),
+    acknowledged_at                   timestamptz,
+    evaluated_at                      timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- A referral code and its reward (BL-034). The reward is conditional on the referred guest doing
@@ -989,6 +1568,50 @@ CREATE TABLE IF NOT EXISTS marketing.segment_criterion (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
+-- Holds 22 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.sender_identity (
+    id                                uuid PRIMARY KEY,
+    scope_path                        ltree NOT NULL,
+    channel                           text NOT NULL CONSTRAINT sender_identity_channel_chk CHECK (channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'post')),
+    brand_id                          uuid NOT NULL,
+    legal_entity_id                   uuid,
+    region                            text,
+    country                           text,
+    provider_id                       uuid NOT NULL,
+    sending_domain                    text CONSTRAINT sender_identity_sending_domain_chk CHECK (char_length(sending_domain) <= 253),
+    from_name                         text CONSTRAINT sender_identity_from_name_chk CHECK (char_length(from_name) <= 120),
+    from_address                      text,
+    reply_to                          text,
+    sender_id                         text CONSTRAINT sender_identity_sender_id_chk CHECK (char_length(sender_id) <= 15),
+    approved_uses                     text[],
+    business_account                  text,
+    phone_number                      text,
+    application                       text,
+    platform                          text CONSTRAINT sender_identity_platform_chk CHECK (platform IN ('ios', 'android', 'web')),
+    environment                       text CONSTRAINT sender_identity_environment_chk CHECK (environment IN ('production', 'sandbox')),
+    status                            text NOT NULL CONSTRAINT sender_identity_status_chk CHECK (status IN ('pendingVerification', 'verified', 'active', 'suspended', 'expired')),
+    approved_template_ids             text[],
+    updated_at                        timestamptz
+);
+
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.service_copilot_config (
+    id                                uuid PRIMARY KEY,
+    scope_level                       text NOT NULL CONSTRAINT service_copilot_config_scope_level_chk CHECK (scope_level IN ('tenant', 'venue')),
+    scope_path                        ltree NOT NULL,
+    is_enabled                        boolean DEFAULT false,
+    data_sources                      text[] NOT NULL,
+    knowledge_collection_ids          text[],
+    draft_channels                    text[] NOT NULL,
+    brand_tone                        text CONSTRAINT service_copilot_config_brand_tone_chk CHECK (char_length(brand_tone) <= 1000),
+    reply_in_customer_language        boolean DEFAULT true,
+    auto_send                         text[],
+    pattern_detection                 jsonb,
+    updated_at                        timestamptz
+);
+
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.sla_policy (
@@ -1043,6 +1666,191 @@ CREATE TABLE IF NOT EXISTS marketing.touch_point (
     order_id                          text
 );
 
+-- Holds 23 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.tracking_technology (
+    technology_id                     uuid,
+    name                              text NOT NULL CONSTRAINT tracking_technology_name_chk CHECK (char_length(name) <= 200),
+    provider                          text NOT NULL CONSTRAINT tracking_technology_provider_chk CHECK (char_length(provider) <= 150),
+    domain_application                text CONSTRAINT tracking_technology_domain_application_chk CHECK (char_length(domain_application) <= 255),
+    technology_type                   text NOT NULL CONSTRAINT tracking_technology_technology_type_chk CHECK (technology_type IN ('firstPartyCookie', 'thirdPartyCookie', 'mobileSdk', 'analyticsTracker', 'advertisingPixel', 'sessionTechnology', 'personalisationTechnology', 'embeddedService', 'other')),
+    category                          text CONSTRAINT tracking_technology_category_chk CHECK (category IN ('strictlyNecessary', 'functional', 'analytics', 'personalisation', 'marketing', 'other')),
+    other_category_label              text CONSTRAINT tracking_technology_other_category_label_chk CHECK (char_length(other_category_label) <= 80),
+    purpose                           text CONSTRAINT tracking_technology_purpose_chk CHECK (char_length(purpose) <= 500),
+    data_collected                    text CONSTRAINT tracking_technology_data_collected_chk CHECK (char_length(data_collected) <= 500),
+    duration_days                     integer,
+    is_third_party                    boolean NOT NULL,
+    channels                          text[] NOT NULL,
+    countries                         text[],
+    processing_purpose_code           text,
+    is_consent_required               boolean DEFAULT true,
+    privacy_information               text CONSTRAINT tracking_technology_privacy_information_chk CHECK (char_length(privacy_information) <= 1000),
+    source                            text DEFAULT 'manual' CONSTRAINT tracking_technology_source_chk CHECK (source IN ('manual', 'scan')),
+    status                            text NOT NULL CONSTRAINT tracking_technology_status_chk CHECK (status IN ('detected', 'approved', 'blocked', 'retired')),
+    first_detected_at                 timestamptz,
+    last_seen_at                      timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 15 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it; 1 tables reference it.
+CREATE TABLE IF NOT EXISTS marketing.waiver_association (
+    id                                uuid PRIMARY KEY,
+    form_id                           uuid NOT NULL,
+    waiver_name                       text,
+    target_type                       text NOT NULL CONSTRAINT waiver_association_target_type_chk CHECK (target_type IN ('global', 'brand', 'venue', 'product', 'ticketType', 'event', 'performance', 'attraction', 'activity', 'membership', 'camp', 'rental', 'resource', 'package', 'addOn')),
+    target_id                         uuid,
+    target_name                       text,
+    requirement                       text NOT NULL CONSTRAINT waiver_association_requirement_chk CHECK (requirement IN ('mandatory', 'optional', 'conditional', 'informational')),
+    condition_rule_id                 uuid,
+    sequence                          integer DEFAULT 1,
+    overrides_association_id          uuid,
+    inherited_from                    jsonb,
+    status                            text NOT NULL DEFAULT 'active' CONSTRAINT waiver_association_status_chk CHECK (status IN ('active', 'removed')),
+    impact                            jsonb,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 19 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.waiver_exception (
+    id                                uuid PRIMARY KEY,
+    requirement_id                    uuid NOT NULL,
+    reason_code                       text NOT NULL CONSTRAINT waiver_exception_reason_code_chk CHECK (reason_code IN ('guardianUnreachable', 'deviceOrConnectivityFailure', 'signedOnPaper', 'accessibilityNeed', 'operationalDecision', 'other')),
+    reason                            text NOT NULL CONSTRAINT waiver_exception_reason_chk CHECK (char_length(reason) <= 1000),
+    supporting_evidence_asset_ids     text[],
+    supervisor_staff_id               uuid,
+    status                            text NOT NULL DEFAULT 'requested' CONSTRAINT waiver_exception_status_chk CHECK (status IN ('requested', 'approved', 'rejected', 'revoked', 'expired')),
+    scope                             text NOT NULL CONSTRAINT waiver_exception_scope_chk CHECK (scope IN ('oneTime', 'ticketSpecific', 'activitySpecific', 'timeLimited')),
+    ticket_id                         text,
+    performance_id                    uuid,
+    valid_until                       timestamptz,
+    decision_note                     text CONSTRAINT waiver_exception_decision_note_chk CHECK (char_length(decision_note) <= 1000),
+    used_at                           timestamptz,
+    requested_by                      uuid,
+    requested_at                      timestamptz,
+    decided_by                        uuid,
+    decided_at                        timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS marketing.waiver_field_rule (
+    form_definition_field_id          uuid NOT NULL,
+    subject                           text NOT NULL,
+    operator                          text NOT NULL,
+    value                             text,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.waiver_form_layout (
+    form_id                           uuid NOT NULL,
+    form_version                      integer NOT NULL,
+    status                            text CONSTRAINT waiver_form_layout_status_chk CHECK (status IN ('draft', 'published', 'superseded', 'retired')),
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.waiver_localisation (
+    form_id                           uuid NOT NULL,
+    form_version                      integer NOT NULL,
+    source_language                   text NOT NULL CONSTRAINT waiver_localisation_source_language_chk CHECK (char_length(source_language) <= 10),
+    branding                          jsonb,
+    channels                          text[],
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 26 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.waiver_master (
+    waiver_id                         uuid NOT NULL,
+    waiver_name                       text,
+    internal_description              text CONSTRAINT waiver_master_internal_description_chk CHECK (char_length(internal_description) <= 2000),
+    waiver_type                       text NOT NULL CONSTRAINT waiver_master_waiver_type_chk CHECK (waiver_type IN ('liabilityWaiver', 'parentGuardianConsent', 'participationConsent', 'medicalDeclaration', 'safetyAcknowledgement', 'mediaConsent', 'rentalAgreement', 'termsAcceptance', 'membershipDeclaration', 'customForm')),
+    custom_type_label                 text CONSTRAINT waiver_master_custom_type_label_chk CHECK (char_length(custom_type_label) <= 80),
+    owner_user_id                     uuid NOT NULL,
+    department                        text CONSTRAINT waiver_master_department_chk CHECK (char_length(department) <= 100),
+    brand_id                          uuid,
+    legal_entity_id                   uuid,
+    default_language                  text NOT NULL CONSTRAINT waiver_master_default_language_chk CHECK (char_length(default_language) <= 10),
+    applicable_countries              text[],
+    applicable_jurisdiction           text CONSTRAINT waiver_master_applicable_jurisdiction_chk CHECK (char_length(applicable_jurisdiction) <= 100),
+    status                            text CONSTRAINT waiver_master_status_chk CHECK (status IN ('draft', 'review', 'pendingApproval', 'approved', 'scheduled', 'published', 'suspended', 'expired', 'archived')),
+    template_source                   text NOT NULL DEFAULT 'createNew' CONSTRAINT waiver_master_template_source_chk CHECK (template_source IN ('createNew', 'duplicateExisting', 'masterTemplate', 'corporateTemplate')),
+    source_waiver_id                  uuid,
+    source_version                    integer,
+    is_master_template                boolean DEFAULT false,
+    business_owner_user_id            uuid NOT NULL,
+    legal_reviewer_user_id            uuid,
+    compliance_owner_user_id          uuid,
+    operational_owner_user_id         uuid,
+    is_legal_review_required          boolean DEFAULT true,
+    usage                             jsonb,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS marketing.waiver_signatory_rule (
+    id                                uuid PRIMARY KEY NOT NULL,
+    form_id                           uuid NOT NULL,
+    form_version                      integer NOT NULL,
+    primary_signatory                 text NOT NULL CONSTRAINT waiver_signatory_rule_primary_signatory_chk CHECK (primary_signatory IN ('ticketHolder', 'purchaser', 'participant', 'parent', 'legalGuardian', 'groupLeader', 'corporateRepresentative', 'member', 'rentalCustomer', 'otherAuthorizedSignatory')),
+    allowed_signatories               text[],
+    co_signature                      text CONSTRAINT waiver_signatory_rule_co_signature_chk CHECK (co_signature IN ('participantAndGuardian', 'customerAndAuthorizedRepresentative')),
+    is_signature_required             boolean DEFAULT true,
+    is_initials_required              boolean DEFAULT false,
+    acceptance_method                 text NOT NULL CONSTRAINT waiver_signatory_rule_acceptance_method_chk CHECK (acceptance_method IN ('drawnSignature', 'typedName', 'checkbox')),
+    capture_relationship              boolean DEFAULT true,
+    identity_verification             text DEFAULT 'none' CONSTRAINT waiver_signatory_rule_identity_verification_chk CHECK (identity_verification IN ('none', 'signedInAccount', 'oneTimeCode', 'idDocumentCheck')),
+    requires_guardian_for_minors      boolean NOT NULL,
+    guardian_threshold_age            integer,
+    guardian_signs_for_each_minor     boolean DEFAULT true,
+    group_signing_modes               text[],
+    recorded_evidence                 text[],
+    legal_approved_by                 text,
+    legal_approved_at                 timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 20 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition) (
+    id                                uuid PRIMARY KEY NOT NULL,
+    form_id                           uuid NOT NULL,
+    form_version                      integer NOT NULL,
+    primary_signatory                 text NOT NULL CONSTRAINT waiver_signatory_rule (guardian threshold and flag_9fcc822f_chk CHECK (primary_signatory IN ('ticketHolder', 'purchaser', 'participant', 'parent', 'legalGuardian', 'groupLeader', 'corporateRepresentative', 'member', 'rentalCustomer', 'otherAuthorizedSignatory')),
+    allowed_signatories               text[],
+    co_signature                      text CONSTRAINT waiver_signatory_rule (guardian threshold and flag_a1241dcb_chk CHECK (co_signature IN ('participantAndGuardian', 'customerAndAuthorizedRepresentative')),
+    is_signature_required             boolean DEFAULT true,
+    is_initials_required              boolean DEFAULT false,
+    acceptance_method                 text NOT NULL CONSTRAINT waiver_signatory_rule (guardian threshold and flag_b0814a86_chk CHECK (acceptance_method IN ('drawnSignature', 'typedName', 'checkbox')),
+    capture_relationship              boolean DEFAULT true,
+    identity_verification             text DEFAULT 'none' CONSTRAINT waiver_signatory_rule (guardian threshold and flag_318dfe24_chk CHECK (identity_verification IN ('none', 'signedInAccount', 'oneTimeCode', 'idDocumentCheck')),
+    requires_guardian_for_minors      boolean NOT NULL,
+    guardian_threshold_age            integer,
+    guardian_signs_for_each_minor     boolean DEFAULT true,
+    group_signing_modes               text[],
+    recorded_evidence                 text[],
+    legal_approved_by                 text,
+    legal_approved_at                 timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.waiver_signature (
@@ -1061,6 +1869,78 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_signature (
     device_info                       text CONSTRAINT waiver_signature_device_info_chk CHECK (char_length(device_info) <= 500),
     status                            text NOT NULL CONSTRAINT waiver_signature_status_chk CHECK (char_length(status) <= 20),
     signed_at                         timestamptz NOT NULL
+);
+
+-- Holds 10 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.waiver_trigger_rule (
+    id                                uuid PRIMARY KEY,
+    form_id                           uuid NOT NULL,
+    name                              text NOT NULL CONSTRAINT waiver_trigger_rule_name_chk CHECK (char_length(name) <= 150),
+    trigger_point                     text NOT NULL CONSTRAINT waiver_trigger_rule_trigger_point_chk CHECK (trigger_point IN ('duringCheckout', 'afterPurchase', 'beforeTicketIssuance', 'beforeTicketDownload', 'beforeEvent', 'beforeCheckIn', 'beforeAccess', 'beforeEquipmentCollection', 'beforeMembershipActivation', 'beforeActivityStart')),
+    completion_deadline               jsonb NOT NULL,
+    enforcement                       text[],
+    allow_staff_override              boolean DEFAULT false,
+    status                            text NOT NULL DEFAULT 'active' CONSTRAINT waiver_trigger_rule_status_chk CHECK (status IN ('active', 'inactive')),
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 14 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 0 operations read it and 1 write it.
+CREATE TABLE IF NOT EXISTS marketing.waiver_verification (
+    id                                uuid PRIMARY KEY,
+    submission_id                     uuid NOT NULL,
+    result                            text NOT NULL CONSTRAINT waiver_verification_result_chk CHECK (result IN ('verified', 'rejected', 'correctionRequired', 'escalated')),
+    participant_match                 boolean,
+    booking_match                     boolean,
+    guardian_relationship_present     boolean,
+    required_evidence_present         boolean,
+    reason_code                       text CONSTRAINT waiver_verification_reason_code_chk CHECK (reason_code IN ('signatoryNotAuthorised', 'participantMismatch', 'wrongVersion', 'incompleteAnswers', 'evidenceMissing', 'suspectedFraud', 'other')),
+    note                              text CONSTRAINT waiver_verification_note_chk CHECK (char_length(note) <= 2000),
+    escalated_to                      uuid,
+    reviewed_by                       uuid,
+    reviewed_at                       timestamptz,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+CREATE TABLE IF NOT EXISTS marketing.waiver_version_control (
+    id                                uuid PRIMARY KEY NOT NULL,
+    form_id                           uuid NOT NULL,
+    form_version                      integer NOT NULL,
+    lifecycle_status                  text NOT NULL CONSTRAINT waiver_version_control_lifecycle_status_chk CHECK (lifecycle_status IN ('draft', 'review', 'pendingApproval', 'approved', 'scheduled', 'published', 'suspended', 'expired', 'archived')),
+    simulation                        jsonb,
+    change_reason                     text,
+    effective_from                    timestamptz,
+    effective_to                      timestamptz,
+    resign_rule                       text CONSTRAINT waiver_version_control_resign_rule_chk CHECK (resign_rule IN ('noResign', 'resignAtNextBooking', 'resignBeforeNextVisit')),
+    publication                       jsonb,
+    is_suspended                      boolean DEFAULT false,
+    suspension_reason                 text,
+    audit                             jsonb,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
+);
+
+-- Holds 15 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time) (
+    id                                uuid PRIMARY KEY NOT NULL,
+    form_id                           uuid NOT NULL,
+    form_version                      integer NOT NULL,
+    lifecycle_status                  text NOT NULL CONSTRAINT waiver_version_control (checklist, simulation and _1766f151_chk CHECK (lifecycle_status IN ('draft', 'review', 'pendingApproval', 'approved', 'scheduled', 'published', 'suspended', 'expired', 'archived')),
+    simulation                        jsonb,
+    change_reason                     text,
+    effective_from                    timestamptz,
+    effective_to                      timestamptz,
+    resign_rule                       text CONSTRAINT waiver_version_control (checklist, simulation and _ef43c00a_chk CHECK (resign_rule IN ('noResign', 'resignAtNextBooking', 'resignBeforeNextVisit')),
+    publication                       jsonb,
+    is_suspended                      boolean DEFAULT false,
+    suspension_reason                 text,
+    audit                             jsonb,
+    scope_path                        ltree NOT NULL,
+    updated_at                        timestamptz
 );
 
 -- Something a guest saved. Per guest, synced across their devices

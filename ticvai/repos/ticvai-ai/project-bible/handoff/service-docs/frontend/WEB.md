@@ -25,17 +25,17 @@
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
 | [WEB-001](#web-001-home-landing) | Home / Landing | Discovery & Browse | 1 | 4 |
-| [WEB-002](#web-002-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 4 |
+| [WEB-002](#web-002-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 5 |
 | [WEB-003](#web-003-search-results) | Search Results | Discovery & Browse | 1 | 2 |
 | [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
-| [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 2 |
-| [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 4 |
-| [WEB-010](#web-010-shopping-cart) | Shopping Cart | Cart & Checkout | 1 | 11 |
-| [WEB-011](#web-011-guest-details-attendee-forms) | Guest Details & Attendee Forms | Cart & Checkout | 1 | 11 |
+| [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 5 |
+| [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 7 |
+| [WEB-010](#web-010-shopping-cart) | Shopping Cart | Cart & Checkout | 1 | 13 |
+| [WEB-011](#web-011-guest-details-attendee-forms) | Guest Details & Attendee Forms | Cart & Checkout | 1 | 13 |
 | [WEB-012](#web-012-checkout-payment) | Checkout — Payment | Cart & Checkout | 1 | 5 |
 | [WEB-013](#web-013-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
 | [WEB-014](#web-014-pay-for-a-booking) | Pay for a Booking | Cart & Checkout | 1 | 2 |
-| [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 11 |
+| [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 13 |
 | [WEB-017](#web-017-my-account-dashboard) | My Account Dashboard | Account & Self-Service | 1 | 9 |
 | [WEB-018](#web-018-my-tickets) | My Tickets | Account & Self-Service | 1 | 8 |
 | [WEB-019](#web-019-order-history) | Order History | Account & Self-Service | 1 | 5 |
@@ -45,7 +45,7 @@
 | [WEB-029](#web-029-error-sold-out-maintenance) | Error / Sold Out / Maintenance | System States | 1 | 1 |
 | [WEB-030](#web-030-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 4 |
 | [WEB-035](#web-035-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 1 | 2 |
-| [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 3 |
+| [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 5 |
 | [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 2 | 4 |
 | [WEB-015](#web-015-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 2 | 3 |
 | [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 2 | 7 |
@@ -55,7 +55,7 @@
 | [WEB-031](#web-031-my-reservations) | My Reservations | Ticketing | 2 | 9 |
 | [WEB-032](#web-032-offers-promotions) | Offers & Promotions | Promotions | 2 | 2 |
 | [WEB-033](#web-033-shop) | Shop | Retail | 2 | 5 |
-| [WEB-036](#web-036-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 2 | 13 |
+| [WEB-036](#web-036-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 2 | 14 |
 | [WEB-037](#web-037-menu-item-detail) | Menu Item Detail | In-venue Services | 2 | 2 |
 | [WEB-038](#web-038-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 2 | 3 |
 | [WEB-039](#web-039-venue-map-wait-times) | Venue Map & Wait Times | In-venue Services | 2 | 4 |
@@ -64,11 +64,15 @@
 | [WEB-042](#web-042-retail-shop-and-drop) | Retail & Shop and Drop | Retail | 2 | 6 |
 | [WEB-043](#web-043-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 5 |
 | [WEB-044](#web-044-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 2 | 7 |
-| [WEB-045](#web-045-help-centre-accessibility) | Help Centre & Accessibility | Support | 2 | 2 |
+| [WEB-045](#web-045-help-centre-accessibility) | Help Centre & Accessibility | Support | 2 | 3 |
+| [WEB-046](#web-046-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 2 | 3 |
 | [WEB-009](#web-009-wishlist) | Wishlist | Booking & Selection | 3 | 3 |
-| [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 3 | 15 |
+| [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 3 | 19 |
 | [WEB-026](#web-026-survey-feedback) | Survey & Feedback | Engagement & Support | 3 | 1 |
 | [WEB-034](#web-034-lost-found) | Lost & Found | Support | 3 | 3 |
+| [WEB-047](#web-047-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 3 | 8 |
+| [WEB-048](#web-048-book-a-space-by-the-hour) | Book a Space by the Hour | Booking & Selection | 3 | 4 |
+| [WEB-049](#web-049-transport-route-schedule) | Transport — Route & Schedule | Transport | 3 | 13 |
 
 ## WEB-001 Home / Landing
 
@@ -120,7 +124,7 @@
 | WEB-043 | Loyalty & Rewards |  |  |
 | WEB-044 | AI Concierge – Home |  |  |
 | WEB-045 | Help Centre & Accessibility |  |  |
-| WEB-046 | In-Venue Notifications |  | a later release: the in-venue notification feed is deferred and not shown in the first release; queue calls and order updates show on the queue and order screens, which poll (decided 28 September, audit R242) |
+| WEB-046 | In-Venue Notifications |  |  |
 | WEB-008 | Add-ons & Upsell |  |  |
 | WEB-009 | Wishlist |  |  |
 | WEB-015 | Branded Queue / Waiting Room |  |  |
@@ -140,6 +144,7 @@
 | WEB-026 | Survey & Feedback |  |  |
 | WEB-028 | Contact & Venue Information |  |  |
 | WEB-029 | Error / Sold Out / Maintenance |  |  |
+| WEB-049 | Book a trip (a transport venue) |  |  |
 | WEB-004 | Opens a product and decides | productId |  |
 
 ## WEB-002 Event & Attraction Listing
@@ -169,6 +174,7 @@
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | List performances of an event | `PRODUCT_VIEW` |
 | `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
+| `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | The category tiles (a tree: parentId, displayOrder, image) | `PRODUCT_VIEW` |
 
 **States**
 
@@ -186,6 +192,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | WEB-004 | Attraction Details | eventId, productId |  |
+| WEB-005 | Book (the ticket counters open as a side panel on the listing) | productId |  |
 
 ## WEB-003 Search Results
 
@@ -272,6 +279,10 @@
 |---|---|---|---|
 | WEB-002 | Event & Attraction Listing | eventId |  |
 | WEB-005 | Chooses ticket types and quantities | productId |  |
+| WEB-006 | Book (a dated product: date first, then time, then tickets) | productId |  |
+| WEB-007 | Book (a fixture with one on-sale performance opens straight on the seat map) | performanceId |  |
+| WEB-047 | Book (a cabana, lounger or other spot placed on the venue map) | productId |  |
+| WEB-048 | Book (a space sold by the hour, e.g. a meeting room) | productId |  |
 
 ## WEB-005 Ticket Type Selection
 
@@ -291,6 +302,7 @@
 | Parameter | From |
 |---|---|
 | productId | WEB-004 |
+| venueId | session |
 
 **Operations**
 
@@ -298,6 +310,9 @@
 |---|---|---|---|---|
 | `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Evaluate promotions against a cart | `PRICE_VIEW` |
 | `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onLoad | List generated variants | `PRODUCT_VIEW` |
+| `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | Category tiles and the experience filter, with descriptions | `PRODUCT_VIEW` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | The tickets of a category or level (`categoryId`, `segmentTag`) | `PRODUCT_VIEW` |
+| `getPublishedGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedguidedchoice) | onLoad | The venue's published Help me choose (404 = none) | `None` |
 
 **States**
 
@@ -314,10 +329,11 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-006 | Picks a date and session |  |  |
+| WEB-006 | Change date or time (the dated flow picks them first) |  |  |
 | WEB-007 | Interactive Seat Selection |  |  |
 | WEB-008 | Add-ons & Upsell |  |  |
-| WEB-010 | Shopping Cart | lineId |  |
+| WEB-010 | Shopping Cart | code, lineId |  |
+| WEB-016 | Continue, when sign-in is asked after add-ons and this booking has no add-ons step | cartId |  |
 
 ## WEB-006 Date & Performance Selection
 
@@ -338,6 +354,7 @@
 |---|---|
 | performanceId | navigation |
 | cartId | navigation |
+| eventId | WEB-004 |
 
 **Operations**
 
@@ -347,6 +364,9 @@
 | `getAvailability` | [CatalogueService](../backend/CatalogueService.md#getavailability) | onLoad | Live remaining capacity | `PRODUCT_VIEW` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Acquire an inventory lease | `None` |
 | `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onAction | The performance being booked | `PRODUCT_VIEW` |
+| `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The times of the event for the picked date or range, filtered by `language` | `PRODUCT_VIEW` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onAction | The cart's `consentQuestions` after the time is added | `None` |
+| `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the booking's consent questions | `ORDER_CREATE` |
 
 **States**
 
@@ -357,15 +377,16 @@
 | emptyFirstRun | No date session selection yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| emptyNoResults | No time matches the part of the day or the language picked, and the other times are still there. Names the filter and offers to clear it. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-005 | Ticket Type Selection |  |  |
+| WEB-005 | Picks a time; the tickets for it appear | performanceId |  |
 | WEB-008 | Add-ons & Upsell |  |  |
-| WEB-007 | Selects seats on the map | performanceId |  |
 | WEB-010 | Reviews the cart and may enter a promotion code | cartId |  |
+| WEB-007 | Selects seats on the map | eventId, performanceId |  |
 
 ## WEB-010 Shopping Cart
 
@@ -387,6 +408,8 @@
 | cartId | WEB-008 |
 | code | deepLink |
 | lineId | deepLink |
+| performanceId | navigation |
+| holdId | navigation |
 
 **Operations**
 
@@ -403,6 +426,8 @@
 | `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Evaluate promotions against a cart | `PRICE_VIEW` |
 | `getCouponCode` | [CatalogueService](../backend/CatalogueService.md#getcouponcode) | onLoad | Look up a code | `PRICE_VIEW` |
 | `createCart` | [OrderService](../backend/OrderService.md#createcart) | onAction | Start a cart | `None` |
+| `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onLoad | The visit date and time of each line (`Performance.startsAt`) | `PRODUCT_VIEW` |
+| `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The countdown of a cabana or spot held on the venue map (`expiresAt`) | `ORDER_VIEW` |
 
 **States**
 
@@ -444,6 +469,7 @@
 | deviceId | deepLink |
 | itemId | deepLink |
 | subjectId | session |
+| cartId | session |
 
 **Operations**
 
@@ -460,6 +486,8 @@
 | `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | Configured consent purposes | `GUEST_VIEW` |
 | `updateMyProfile` | [MarketingService](../backend/MarketingService.md#updatemyprofile) | onAction | A guest correcting their own details | `GUEST_VIEW` |
 | `uploadGuestDocument` | [MarketingService](../backend/MarketingService.md#uploadguestdocument) | onAction | Provide a document a booking requires | `GUEST_VIEW_PII` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart's consent questions still unanswered | `None` |
+| `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record answers to the booking's consent questions | `ORDER_CREATE` |
 
 **States**
 
@@ -476,10 +504,10 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-010 | They check out |  |  |
 | WEB-016 | Chooses to sign in rather than continue as a guest | cartId | no verified guest session — this is the fork of matrix 2.6.1 §2.4, offered here rather than in front of the cart |
 | WEB-013 | Booking Confirmation |  |  |
 | WEB-012 | Pays |  |  |
+| WEB-010 | They check out | cartId, performanceId |  |
 
 ## WEB-012 Checkout — Payment
 
@@ -525,8 +553,9 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-010 | Shopping Cart |  |  |
+| WEB-010 | Shopping Cart | performanceId |  |
 | WEB-011 | Guest Details & Attendee Forms |  |  |
+| WEB-016 | Sign in or use a guest code (when sign-in is asked at payment) | cartId | the guest is not signed in |
 | WEB-013 | Receives confirmation and tickets | orderId |  |
 
 ## WEB-013 Booking Confirmation
@@ -570,7 +599,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-010 | Shopping Cart | lineId |  |
+| WEB-010 | Shopping Cart | lineId, performanceId |  |
 | WEB-011 | Guest Details & Attendee Forms |  |  |
 | WEB-012 | Checkout — Payment | orderId, paymentId |  |
 | WEB-018 | My Tickets | orderId |  |
@@ -620,7 +649,7 @@
 
 ## WEB-016 Login / Register
 
-**Get a guest into the site, fast, on a device that may be shared: a one-time code to the email or mobile, a password, Apple or Google, or UAE Pass, or register a new account. **No enterprise SSO and no second factor at sign-in for guests** (decided 28 September, audit R167).**
+**Get a guest into the site, fast, on a device that may be shared: a one-time code to the email or mobile, a password, Apple or Google, or UAE Pass, or register a new account. **No enterprise SSO for guests** (decided 28 September, audit R167, first part). **A second factor only where the venue enabled guest two-step verification** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of R167).**
 
 |  |  |
 |---|---|
@@ -636,6 +665,7 @@
 | Parameter | From |
 |---|---|
 | cartId | session |
+| challengeId | navigation |
 
 **Operations**
 
@@ -652,6 +682,8 @@
 | `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onAction | Request a one-time code | `None` |
 | `verifyGuestOtp` | [IdentityService](../backend/IdentityService.md#verifyguestotp) | onAction | Verify a one-time code and issue a session | `None` |
 | `claimCart` | [OrderService](../backend/OrderService.md#claimcart) | onAction | Attach an anonymous cart to a guest | `None` |
+| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at a venue with guest two-step verification on | `None` |
+| `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the second-factor code and release the session | `None` |
 
 **States**
 
@@ -674,6 +706,7 @@
 | GST-039 | They set a profile |  |  |
 | WEB-010 | Signed in and verified — back to the cart | cartId | arrived from the cart |
 | WEB-011 | Guest Details & Attendee Forms |  |  |
+| WEB-012 | Checkout — Payment |  |  |
 
 ## WEB-017 My Account Dashboard
 
@@ -1085,6 +1118,8 @@
 | Parameter | From |
 |---|---|
 | performanceId | deepLink |
+| eventId | WEB-006 |
+| holdId | navigation |
 
 **Operations**
 
@@ -1093,6 +1128,8 @@
 | `createSeatHold` | [CatalogueService](../backend/CatalogueService.md#createseathold) | onAction | Hold specific seats | `ORDER_CREATE` |
 | `getSeatAvailability` | [CatalogueService](../backend/CatalogueService.md#getseatavailability) | onLoad | Seat status for a performance | `PRODUCT_VIEW` |
 | `recommendSeats` | [CatalogueService](../backend/CatalogueService.md#recommendseats) | onAction | Recommend seats for a party | `PRODUCT_VIEW` |
+| `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The event's other times, for the time bar and the date and time pop-up | `PRODUCT_VIEW` |
+| `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | onAction | Release the seats held for the old performance when the guest switches time on the time bar (decided 29 September, rev 3 REV3-6); a guest releases only their own hold | `ORDER_CREATE` |
 
 **States**
 
@@ -1103,15 +1140,16 @@
 | emptyFirstRun | No interactive seat selection yet. Offers Create seat hold (`createSeatHold`). |
 | emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| emptyNoResults | The event has no other time to switch to on the time bar; the chosen performance stays. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-010 | Reviews the cart |  |  |
 | WEB-005 | Ticket Type Selection |  |  |
 | WEB-008 | Add-ons & Upsell |  |  |
-| WEB-006 | Date & Performance Selection | performanceId |  |
+| WEB-006 | Date & Performance Selection | eventId, performanceId |  |
+| WEB-010 | Reviews the cart | holdId, performanceId |  |
 
 ## WEB-008 Add-ons & Upsell
 
@@ -1160,7 +1198,8 @@
 | WEB-005 | Ticket Type Selection |  |  |
 | WEB-007 | Interactive Seat Selection |  |  |
 | WEB-006 | Date & Performance Selection | cartId, performanceId |  |
-| WEB-010 | Shopping Cart | cartId, code |  |
+| WEB-010 | Shopping Cart | cartId, code, performanceId |  |
+| WEB-016 | Continue — sign in or use a guest code (when sign-in is asked after add-ons) | cartId | the guest is not signed in |
 
 ## WEB-015 Branded Queue / Waiting Room
 
@@ -1186,7 +1225,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onAction | Join a virtual queue | `None` |
-| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242) | `None` |
+| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242) | `None` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 
 **States**
@@ -1554,6 +1593,7 @@
 | venueId | session |
 | orderId | deepLink |
 | entryId | deepLink |
+| cartId | session |
 
 **Operations**
 
@@ -1572,6 +1612,7 @@
 | `createTableReservation` | [FnbService](../backend/FnbService.md#createtablereservation) | onAction | Reserve a table | `None` |
 | `joinRestaurantWaitlist` | [FnbService](../backend/FnbService.md#joinrestaurantwaitlist) | onAction | Join the waitlist when nothing is free | `ORDER_MODIFY` |
 | `leaveRestaurantWaitlist` | [FnbService](../backend/FnbService.md#leaverestaurantwaitlist) | onAction | Leave the restaurant waitlist; the entry returns cancelled (decided 28 September, audit R073 (d)) | `ORDER_MODIFY` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add a table deposit to the cart when the venue requires one | `None` |
 
 **States**
 
@@ -1646,7 +1687,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onInterval | The order's status (ordered, accepted, in preparation, ready, served, collected or delivered), read on entry and polled while the screen is open; order updates show here, not in a notification feed (decided 28 September, audit R242) | `None` |
+| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onInterval | The order's status (ordered, accepted, in preparation, ready, served, collected or delivered), read on entry and polled while the screen is open; order updates show here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242) | `None` |
 | `getGuestBill` | [FnbService](../backend/FnbService.md#getguestbill) | onLoad | The bill for the guest's table | `None` |
 | `claimTableSession` | [FnbService](../backend/FnbService.md#claimtablesession) | onAction | Identify which table a guest is sitting at | `None` |
 
@@ -1725,7 +1766,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onAction | Join a virtual queue | `None` |
-| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242) | `None` |
+| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242) | `None` |
 | `leaveQueue` | [VenueOpsService](../backend/VenueOpsService.md#leavequeue) | onAction | Leave a queue | `None` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `joinWaitlist` | [CatalogueService](../backend/CatalogueService.md#joinwaitlist) | onAction | Join a virtual queue | `None` |
@@ -1923,6 +1964,7 @@
 |---|---|---|---|---|
 | `listFaqs` | [WhiteLabelService](../backend/WhiteLabelService.md#listfaqs) | onLoad | List FAQs | `TENANT_CONFIGURE` |
 | `listContentPages` | [WhiteLabelService](../backend/WhiteLabelService.md#listcontentpages) | onLoad | List custom content pages | `TENANT_CONFIGURE` |
+| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | App status and the public *What's new* | `None` |
 
 **States**
 
@@ -1934,6 +1976,38 @@
 | emptyNoResults | Nothing matches. |
 | emptyNoAccess | Sign in to see this. A guest who is not signed in is offered the door, not refused. |
 | offline | The offline banner shows. Help already loaded stays readable, marked with its age. Raising a case is disabled offline — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff. |
+
+## WEB-046 In-Venue Notifications
+
+**Queue calls, order updates, venue notices.**
+
+|  |  |
+|---|---|
+| Module | Engagement & Support |
+| Wave | 2 |
+| Licensed module | marketing |
+| Route | `/in-venue-notifications` |
+| Component | `apps/guest-web/src/routes/InVenueNotifications.tsx` |
+| Pattern | configEditor |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `claimLocationSession` | [FnbService](../backend/FnbService.md#claimlocationsession) | onAction | Tell the platform where the guest is | `None` |
+| `listMyNotifications` | [MarketingService](../backend/MarketingService.md#listmynotifications) | onLoad | The guest's notification feed, newest first: queue calls, order ready, booking changes, venue alerts (decided 29 September, rev 3 GAP-C1) | `None` |
+| `markMyNotificationsRead` | [MarketingService](../backend/MarketingService.md#markmynotificationsread) | onAction | Mark the opened notifications, or all of them, read | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Content resolves in place. |
+| error | Could not load. The rest of the site is unaffected. |
+| emptyFirstRun | Nothing here yet for this venue. Names what turns it on rather than showing an empty panel. |
+| emptyNoAccess | Sign in to see this. A guest who is not signed in is offered the door, not refused. |
+| offline | The offline banner shows. Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. |
+| emptyNoResults | No unread notifications. Names the Unread only filter and offers to show all; the read ones are still there. |
 
 ## WEB-009 Wishlist
 
@@ -1979,7 +2053,7 @@
 |---|---|---|---|
 | WEB-005 | Ticket Type Selection |  |  |
 | WEB-007 | Interactive Seat Selection |  |  |
-| WEB-006 | Date & Performance Selection |  |  |
+| WEB-006 | Date & Performance Selection | performanceId |  |
 
 ## WEB-024 Devices, Wishlist & Consent
 
@@ -2002,6 +2076,7 @@
 | itemId | deepLink |
 | subjectId | session |
 | enrolmentId | navigation |
+| methodId | navigation |
 
 **Operations**
 
@@ -2022,6 +2097,10 @@
 | `grantDelegation` | [IdentityService](../backend/IdentityService.md#grantdelegation) | onAction | Let somebody else manage a booking | `GUEST_MANAGE` |
 | `listDelegations` | [IdentityService](../backend/IdentityService.md#listdelegations) | onLoad | Who may act for this guest | `GUEST_VIEW` |
 | `revokeFacePass` | [AccessService](../backend/AccessService.md#revokefacepass) | onAction | Revoke it after losing the phone that made it | `GUEST_MANAGE` |
+| `listMfaMethods` | [IdentityService](../backend/IdentityService.md#listmfamethods) | onLoad | The guest's enrolled second-factor methods | `None` |
+| `enrolMfaMethod` | [IdentityService](../backend/IdentityService.md#enrolmfamethod) | onAction | Enrol an authenticator (email code as fallback) | `None` |
+| `verifyMfaEnrolment` | [IdentityService](../backend/IdentityService.md#verifymfaenrolment) | onAction | Confirm the enrolment with a first code | `None` |
+| `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove a method | `None` |
 
 **States**
 
@@ -2121,3 +2200,164 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-034 | They track it | caseId |  |
+
+## WEB-047 Map Booking — Cabanas & Spots
+
+**Pick a specific cabana, lounger or other spot on the venue map and hold it while you book.**
+
+|  |  |
+|---|---|
+| Module | Booking & Selection |
+| Wave | 3 |
+| Licensed module | resources |
+| Route | `/booking-and-selection/map-booking` |
+| Component | `apps/guest-web/src/routes/booking-and-selection/MapBookingCanvas.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| mapId | WEB-004 |
+| productId | WEB-004 |
+| cartId | session |
+| venueId | session |
+| holdId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getVenueMap` | [VenueOpsService](../backend/VenueOpsService.md#getvenuemap) | onLoad | The map with its placed spots (label, kind, zone, capacity, price band) | `VENUE_MAP_VIEW` |
+| `getMapResourceAvailability` | [VenueOpsService](../backend/VenueOpsService.md#getmapresourceavailability) | onLoad | Every spot's status for the day in one call | `RESOURCE_VIEW` |
+| `createResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#createresourcehold) | onAction | Hold the tapped spot for the window | `ORDER_CREATE` |
+| `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The hold's countdown | `ORDER_VIEW` |
+| `extendResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#extendresourcehold) | onAction | Keep the hold longer while paying | `ORDER_CREATE` |
+| `relinquishResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#relinquishresourcehold) | onAction | Release the hold | `ORDER_CREATE` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the held spot to the basket (`variantId`, `resourceHoldId`) | `None` |
+| `listBookableVenueMaps` | [VenueOpsService](../backend/VenueOpsService.md#listbookablevenuemaps) | onLoad | Find the venue's published map with bookable spots (with productId when the product page opened it); getVenueMap then reads that map's published version (decided 29 September, rev 3 REV3-15) | `VENUE_MAP_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The venue map and the status of every spot for the day, read together. |
+| error | Could not load the map or the spots. Names which read failed; nothing is held. |
+| emptyFirstRun | No bookable spots are placed on this map yet. Says so and offers the venue's other ways to book, rather than an empty map. |
+| emptyNoResults | Every spot in this area is taken for the day. Names the area and offers another area or day. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. The map and the spots already loaded stay on screen with their age, never shown as free now. Holding a spot and adding it to the basket need the connection — a cabana held offline is a cabana two people think they have. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-010 | Go to checkout | cartId | a spot is held and added |
+| WEB-008 | Continue to add-ons (rentals, towels) | cartId |  |
+| WEB-004 | Back to the product | productId |  |
+
+## WEB-048 Book a Space by the Hour
+
+**Book a meeting room or other space for a start time and a length; the price is the room rate for that length.**
+
+|  |  |
+|---|---|
+| Module | Booking & Selection |
+| Wave | 3 |
+| Licensed module | resources |
+| Route | `/booking-and-selection/space-by-the-hour` |
+| Component | `apps/guest-web/src/routes/booking-and-selection/SpaceByTheHourWizard.tsx` |
+| Pattern | multiStepForm |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| productId | WEB-004 |
+| cartId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Room types sold by the hour (`requiresTimeWindow`) and their add-ons | `PRODUCT_VIEW` |
+| `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onLoad | The lengths of a room type, each with its price | `PRODUCT_VIEW` |
+| `listProductStartTimes` | [VenueOpsService](../backend/VenueOpsService.md#listproductstarttimes) | onAction | Start times free for the room type and length on the date | `RESOURCE_VIEW` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the room type for the booked window, then the add-ons | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The room types and their lengths for this venue. |
+| error | Could not load. Names which read failed; nothing is booked. |
+| emptyFirstRun | This venue sells no space by the hour yet. Says so rather than an empty list. |
+| emptyNoResults | No room of the type is free at that time for that length. Offers the next free start time. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. Rooms and times already loaded stay on screen with their age. Picking a start time and adding the booking need the connection — a room held offline is a room two people think they have. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-010 | Add to basket, then review the cart | cartId | date, start time, length and room type chosen |
+| WEB-004 | Back to the product | productId |  |
+
+## WEB-049 Transport — Route & Schedule
+
+**Find a departure between two stations and buy a trip, a multi-trip or unlimited pass, or rebook a saved route.**
+
+|  |  |
+|---|---|
+| Module | Transport |
+| Wave | 3 |
+| Licensed module | transport |
+| Route | `/transport/route-and-schedule` |
+| Component | `apps/guest-web/src/routes/transport/RouteAndScheduleSplit.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| cartId | session |
+| favouriteId | navigation |
+| routeId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listTransportStations` | [VenueOpsService](../backend/VenueOpsService.md#listtransportstations) | onLoad | The stations to pick From and To | `None` |
+| `listTransportRoutes` | [VenueOpsService](../backend/VenueOpsService.md#listtransportroutes) | onAction | The routes between two stations (the swap uses the paired route) | `None` |
+| `getTransportFareTable` | [VenueOpsService](../backend/VenueOpsService.md#gettransportfaretable) | onLoad | Passenger types and fares of the route | `None` |
+| `searchTransportDepartures` | [VenueOpsService](../backend/VenueOpsService.md#searchtransportdepartures) | onAction | Departures for the stations, date, period and party, with counts per period | `None` |
+| `getNextTransportDeparture` | [VenueOpsService](../backend/VenueOpsService.md#getnexttransportdeparture) | onAction | The next departure with room for the party | `None` |
+| `getTransportRoute` | [VenueOpsService](../backend/VenueOpsService.md#gettransportroute) | onLoad | The route and its stops | `None` |
+| `getTransportRouteMap` | [VenueOpsService](../backend/VenueOpsService.md#gettransportroutemap) | onLoad | Stop list, line and bounds for the map | `None` |
+| `quoteTransportFare` | [VenueOpsService](../backend/VenueOpsService.md#quotetransportfare) | onAction | The price for the stations and passengers | `None` |
+| `listTransportPassOffers` | [VenueOpsService](../backend/VenueOpsService.md#listtransportpassoffers) | onLoad | Multi-trip and unlimited passes for the station pair | `None` |
+| `listMyFavouriteRoutes` | [VenueOpsService](../backend/VenueOpsService.md#listmyfavouriteroutes) | onLoad | The guest's saved routes | `None` |
+| `saveFavouriteRoute` | [VenueOpsService](../backend/VenueOpsService.md#savefavouriteroute) | onAction | Save this route | `None` |
+| `deleteFavouriteRoute` | [VenueOpsService](../backend/VenueOpsService.md#deletefavouriteroute) | onAction | Remove a saved route | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the trip or pass to the basket (`attributes.transport`) | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The stations, routes and passenger types. |
+| error | Could not load. Names which read failed; nothing is bought. |
+| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). |
+| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. |
+| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
+| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-007 | Choose seats on this departure | performanceId | the departure has a seat map |
+| WEB-010 | Continue to payment | cartId |  |
+| WEB-016 | Sign in to save or see favourite routes |  |  |
+| WEB-001 | Home |  |  |

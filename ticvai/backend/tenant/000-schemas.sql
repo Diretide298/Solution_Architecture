@@ -1,12 +1,12 @@
 -- TICVAI — the tenant template.
 -- **Derived by tools/derive-ddl.py. Do not hand-edit.**
 --
--- 32 schemas. The boundary is the service boundary (ADR-0028): no
+-- 35 schemas. The boundary is the service boundary (ADR-0028): no
 -- service spans a schema it does not own, and no schema is written by two services.
 -- **ADR-0038 left that decomposition untouched** — what changed is that this set now
 -- exists once per tenant rather than once for everybody.
 --
--- 630 tables. Applied to every tenant database by provision-tenant.sh.
+-- 718 tables. Applied to every tenant database by provision-tenant.sh.
 --
 -- **`control` is not here.** It left the template in ADR-0039 and is a database of its own.
 
@@ -16,6 +16,8 @@ CREATE SCHEMA IF NOT EXISTS ai;
 CREATE SCHEMA IF NOT EXISTS approvals;
 CREATE SCHEMA IF NOT EXISTS assets;
 CREATE SCHEMA IF NOT EXISTS catalogue;
+CREATE SCHEMA IF NOT EXISTS embedded as attributes (jsonb) on orders;
+CREATE SCHEMA IF NOT EXISTS embedded as window_starts_at and window_ends_at on orders;
 CREATE SCHEMA IF NOT EXISTS fnb;
 CREATE SCHEMA IF NOT EXISTS games;
 CREATE SCHEMA IF NOT EXISTS identity;
@@ -38,6 +40,7 @@ CREATE SCHEMA IF NOT EXISTS seating;
 CREATE SCHEMA IF NOT EXISTS subscription;
 CREATE SCHEMA IF NOT EXISTS sync;
 CREATE SCHEMA IF NOT EXISTS tenancy;
+CREATE SCHEMA IF NOT EXISTS transport;
 CREATE SCHEMA IF NOT EXISTS venuemap;
 CREATE SCHEMA IF NOT EXISTS wallet;
 CREATE SCHEMA IF NOT EXISTS whitelabel;

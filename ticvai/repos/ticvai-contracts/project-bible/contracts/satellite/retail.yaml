@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Retail
   version: 0.1.0
-  x-ticvai-screen-count: 17
+  x-ticvai-screen-count: 18
   x-ticvai-tier: satellite
   x-ticvai-module: "6 — Retail POS"
   x-ticvai-requirements: 78
@@ -181,6 +181,8 @@ paths:
         schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
     post:
       operationId: disposeShopAndDrop
+      x-ticvai-consumed-by:
+        - "P08 BO-143 Retail Global Settings & Controls"
       x-ticvai-audience: [staff]
       summary: Dispose of an uncollected item
       description: >
@@ -1079,6 +1081,7 @@ paths:
         - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-062 Shop & Drop Collection"
         - "P05 KSK-011 Collect a booking"
+        - "P08 BO-143 Retail Global Settings & Controls"
       x-ticvai-audience: [staff, guest]
       summary: Find a guest's dropped goods
       description: >

@@ -3797,7 +3797,7 @@ screens:
         provenance: contract orders.yaml POST /payments
       - kind: textField
         label: tenderedAmount
-        bindsTo: CreatePaymentRequest.tenderedAmount
+        bindsTo: CreatePaymentRequest.tenderAmount
         provenance: contract orders.yaml POST /payments
       - kind: textField
         label: walletAuthorisationId
@@ -6386,51 +6386,51 @@ screens:
       - kind: metricTile
         label: Total Partners
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.totalPartners
+        bindsTo: PartnerManagementCommandCenterSummary.totalPartners
       - kind: metricTile
         label: Active Partners
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.activePartners
+        bindsTo: PartnerManagementCommandCenterSummary.activePartners
       - kind: metricTile
         label: Pending Onboarding
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.pendingOnboarding
+        bindsTo: PartnerManagementCommandCenterSummary.pendingOnboarding
       - kind: metricTile
         label: Pending Approval
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.pendingApproval
+        bindsTo: PartnerManagementCommandCenterSummary.pendingApproval
       - kind: metricTile
         label: Suspended Partners
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.suspendedPartners
+        bindsTo: PartnerManagementCommandCenterSummary.suspendedPartners
       - kind: metricTile
         label: Expiring Agreements
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.expiringAgreements
+        bindsTo: PartnerManagementCommandCenterSummary.expiringAgreements
       - kind: metricTile
         label: Documentation Issues
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.documentationIssues
+        bindsTo: PartnerManagementCommandCenterSummary.documentationIssues
       - kind: metricTile
         label: Partners With Credit Holds
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.partnersWithCreditHolds
+        bindsTo: PartnerManagementCommandCenterSummary.partnersWithCreditHolds
       - kind: metricTile
         label: Connected OTA/API Partners
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.connectedOtaApiPartners
+        bindsTo: PartnerManagementCommandCenterSummary.connectedOtaApiPartners
       - kind: metricTile
         label: Partner Sales YTD
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.partnerSalesYtd
+        bindsTo: PartnerManagementCommandCenterSummary.partnerSalesYtd
       - kind: metricTile
         label: Partner Revenue YTD
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.partnerRevenueYtd
+        bindsTo: PartnerManagementCommandCenterSummary.partnerRevenueYtd
       - kind: metricTile
         label: High-Risk Partners
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
-        bindsTo: PartnerManagementCommandCenterView.highRiskPartners
+        bindsTo: PartnerManagementCommandCenterSummary.highRiskPartners
     - name: contentBody
       slot: moduleTiles
       components:
@@ -7641,51 +7641,51 @@ screens:
       - kind: metricTile
         label: Active Agreements
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.activeAgreements
+        bindsTo: CommercialAgreementCommandCenterSummary.activeAgreements
       - kind: metricTile
         label: Draft Agreements
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.draftAgreements
+        bindsTo: CommercialAgreementCommandCenterSummary.draftAgreements
       - kind: metricTile
         label: Pending Approval
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.pendingApproval
+        bindsTo: CommercialAgreementCommandCenterSummary.pendingApproval
       - kind: metricTile
         label: Agreements Expiring Soon
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.agreementsExpiringSoon
+        bindsTo: CommercialAgreementCommandCenterSummary.agreementsExpiringSoon
       - kind: metricTile
         label: Expired Agreements
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.expiredAgreements
+        bindsTo: CommercialAgreementCommandCenterSummary.expiredAgreements
       - kind: metricTile
         label: Partners on Credit Hold
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.partnersOnCreditHold
+        bindsTo: CommercialAgreementCommandCenterSummary.partnersOnCreditHold
       - kind: metricTile
         label: Total Approved Credit
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.totalApprovedCredit
+        bindsTo: CommercialAgreementCommandCenterSummary.totalApprovedCredit
       - kind: metricTile
         label: Current Credit Exposure
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.currentCreditExposure
+        bindsTo: CommercialAgreementCommandCenterSummary.currentCreditExposure
       - kind: metricTile
         label: Outstanding Receivables
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.outstandingReceivables
+        bindsTo: CommercialAgreementCommandCenterSummary.outstandingReceivables
       - kind: metricTile
         label: Active Commercial Allocations
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.activeCommercialAllocations
+        bindsTo: CommercialAgreementCommandCenterSummary.activeCommercialAllocations
       - kind: metricTile
         label: Agreements With Exceptions
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.agreementsWithExceptions
+        bindsTo: CommercialAgreementCommandCenterSummary.agreementsWithExceptions
       - kind: metricTile
         label: Commercial Risk Alerts
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
-        bindsTo: CommercialAgreementCommandCenterView.commercialRiskAlerts
+        bindsTo: CommercialAgreementCommandCenterSummary.commercialRiskAlerts
     - name: contentBody
       slot: moduleTiles
       components:
@@ -7697,11 +7697,11 @@ screens:
         - CommercialAgreementCommandCenterView.agreementType
         - CommercialAgreementCommandCenterView.brandVenue
         - CommercialAgreementCommandCenterView.market
-        - CommercialAgreementCommandCenterView.effectiveFrom
-        - CommercialAgreementCommandCenterView.effectiveTo
+        - CommercialAgreementCommandCenterView.validFrom
+        - CommercialAgreementCommandCenterView.validTo
         - CommercialAgreementCommandCenterView.pricingModel
         - CommercialAgreementCommandCenterView.commissionModel
-        - CommercialAgreementCommandCenterView.paymentTerms
+        - CommercialAgreementCommandCenterView.creditTermDays
         - CommercialAgreementCommandCenterView.creditLimit
         - CommercialAgreementCommandCenterView.currentExposure
         - CommercialAgreementCommandCenterView.allocationModel
@@ -7723,11 +7723,11 @@ screens:
         - CommercialAgreementCommandCenterView.agreementType
         - CommercialAgreementCommandCenterView.brandVenue
         - CommercialAgreementCommandCenterView.market
-        - CommercialAgreementCommandCenterView.effectiveFrom
-        - CommercialAgreementCommandCenterView.effectiveTo
+        - CommercialAgreementCommandCenterView.validFrom
+        - CommercialAgreementCommandCenterView.validTo
         - CommercialAgreementCommandCenterView.pricingModel
         - CommercialAgreementCommandCenterView.commissionModel
-        - CommercialAgreementCommandCenterView.paymentTerms
+        - CommercialAgreementCommandCenterView.creditTermDays
         - CommercialAgreementCommandCenterView.creditLimit
         - CommercialAgreementCommandCenterView.currentExposure
         - CommercialAgreementCommandCenterView.allocationModel
@@ -8206,11 +8206,10 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - CreditLimitExposureManagementView.approvedCreditLimitAed500000
     - 'Open Invoices: AED 210,000'
-    - CreditLimitExposureManagementView.unbilledTransactionsAed95000
-    - CreditLimitExposureManagementView.activeHoldsReservationsAed40000
-    - CreditLimitExposureManagementView.availableCreditAed155000
+    - CreditLimitExposureManagementView.unbilledTransactions
+    - CreditLimitExposureManagementView.activeHoldsReservations
+    - CreditLimitExposureManagementView.availableCredit
   wireframe:
     status: notStarted
     provenance: generated
@@ -8270,9 +8269,9 @@ screens:
       - kind: dataTable
         label: Every deposit guarantee financial
         columns:
-        - DepositGuaranteeFinancialSecurityManagementView.creditExposureAed500000
-        - DepositGuaranteeFinancialSecurityManagementView.guaranteeAed300000
-        - DepositGuaranteeFinancialSecurityManagementView.unsecuredExposureAed200000
+        - DepositGuaranteeFinancialSecurityManagementView.creditExposure
+        - DepositGuaranteeFinancialSecurityManagementView.securityCoverage
+        - DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure
         bindsTo: DepositGuaranteeFinancialSecurityManagementView
         operation: listDepositGuaranteeFinancial
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Display
@@ -8283,9 +8282,9 @@ screens:
         label: The selected deposit guarantee financial
         bindsTo: DepositGuaranteeFinancialSecurityManagementView
         columns:
-        - DepositGuaranteeFinancialSecurityManagementView.creditExposureAed500000
-        - DepositGuaranteeFinancialSecurityManagementView.guaranteeAed300000
-        - DepositGuaranteeFinancialSecurityManagementView.unsecuredExposureAed200000
+        - DepositGuaranteeFinancialSecurityManagementView.creditExposure
+        - DepositGuaranteeFinancialSecurityManagementView.securityCoverage
+        - DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure
         notes: null
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Display
     - name: actionBar
@@ -8319,9 +8318,9 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - DepositGuaranteeFinancialSecurityManagementView.creditExposureAed500000
-    - DepositGuaranteeFinancialSecurityManagementView.guaranteeAed300000
-    - DepositGuaranteeFinancialSecurityManagementView.unsecuredExposureAed200000
+    - DepositGuaranteeFinancialSecurityManagementView.creditExposure
+    - DepositGuaranteeFinancialSecurityManagementView.securityCoverage
+    - DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure
   wireframe:
     status: notStarted
     provenance: generated
@@ -8828,7 +8827,6 @@ screens:
   entryState:
     preloaded:
     - CommercialAgreement360HealthAiReviewView.contractStatus
-    - CommercialAgreement360HealthAiReviewView.effectiveDates
     - CommercialAgreement360HealthAiReviewView.renewal
     - CommercialAgreement360HealthAiReviewView.rateModel
     - CommercialAgreement360HealthAiReviewView.averageDiscount
@@ -8949,50 +8947,50 @@ screens:
       - kind: metricTile
         label: Partner Sales Today
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
-        bindsTo: PartnerOperationsCommandCenterView.partnerSalesToday
+        bindsTo: PartnerOperationsCommandCenterSummary.partnerSalesToday
       - kind: metricTile
         label: Partner Sales MTD
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
-        bindsTo: PartnerOperationsCommandCenterView.partnerSalesMtd
+        bindsTo: PartnerOperationsCommandCenterSummary.partnerSalesMtd
       - kind: metricTile
         label: Active Partner Orders
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
-        bindsTo: PartnerOperationsCommandCenterView.activePartnerOrders
+        bindsTo: PartnerOperationsCommandCenterSummary.activePartnerOrders
       - kind: metricTile
         label: Active Reservations/Holds
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
       - kind: metricTile
         label: Tickets Sold
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
-        bindsTo: PartnerOperationsCommandCenterView.ticketsSold
+        bindsTo: PartnerOperationsCommandCenterSummary.ticketsSold
       - kind: metricTile
         label: Cancellations
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
-        bindsTo: PartnerOperationsCommandCenterView.cancellations
+        bindsTo: PartnerOperationsCommandCenterSummary.cancellations
       - kind: metricTile
         label: Refunds
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
-        bindsTo: PartnerOperationsCommandCenterView.refunds
+        bindsTo: PartnerOperationsCommandCenterSummary.refunds
       - kind: metricTile
         label: Outstanding Receivables
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
-        bindsTo: PartnerOperationsCommandCenterView.outstandingReceivables
+        bindsTo: PartnerOperationsCommandCenterSummary.outstandingReceivables
       - kind: metricTile
         label: Commission Payable
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
-        bindsTo: PartnerOperationsCommandCenterView.commissionPayable
+        bindsTo: PartnerOperationsCommandCenterSummary.commissionPayable
       - kind: metricTile
         label: Pending Settlements
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
-        bindsTo: PartnerOperationsCommandCenterView.pendingSettlements
+        bindsTo: PartnerOperationsCommandCenterSummary.pendingSettlements
       - kind: metricTile
         label: Operational Exceptions
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
-        bindsTo: PartnerOperationsCommandCenterView.operationalExceptions
+        bindsTo: PartnerOperationsCommandCenterSummary.operationalExceptions
       - kind: metricTile
         label: Partners Requiring Attention
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
-        bindsTo: PartnerOperationsCommandCenterView.partnersRequiringAttention
+        bindsTo: PartnerOperationsCommandCenterSummary.partnersRequiringAttention
     - name: contentBody
       slot: moduleTiles
       components:
@@ -9140,7 +9138,7 @@ screens:
         - PartnerOrdersBookingManagementView.partnerReference
         - Partner
         - PartnerOrdersBookingManagementView.agentUser
-        - PartnerOrdersBookingManagementView.customerGuestWhereApplicable
+        - PartnerOrdersBookingManagementView.customerName
         - Booking Date
         - Event
         - PartnerOrdersBookingManagementView.products
@@ -9166,7 +9164,7 @@ screens:
         - PartnerOrdersBookingManagementView.partnerReference
         - Partner
         - PartnerOrdersBookingManagementView.agentUser
-        - PartnerOrdersBookingManagementView.customerGuestWhereApplicable
+        - PartnerOrdersBookingManagementView.customerName
         - Booking Date
         - Event
         - PartnerOrdersBookingManagementView.products
@@ -9209,7 +9207,7 @@ screens:
     - PartnerOrdersBookingManagementView.partnerReference
     - Partner
     - PartnerOrdersBookingManagementView.agentUser
-    - PartnerOrdersBookingManagementView.customerGuestWhereApplicable
+    - PartnerOrdersBookingManagementView.customerName
     - Booking Date
   wireframe:
     status: notStarted
@@ -9259,18 +9257,48 @@ screens:
     template: split
     regions:
     - name: contentBody
+      slot: headline
+      components:
+      - kind: metricTile
+        label: Active Holds
+        bindsTo: ReservationsHoldsReleaseManagementSummary.activeHolds
+        operation: listReservationHoldRelease
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Held Tickets
+        bindsTo: ReservationsHoldsReleaseManagementSummary.heldTickets
+        operation: listReservationHoldRelease
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Held Value
+        bindsTo: ReservationsHoldsReleaseManagementSummary.heldValue
+        operation: listReservationHoldRelease
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Expiring Today
+        bindsTo: ReservationsHoldsReleaseManagementSummary.expiringToday
+        operation: listReservationHoldRelease
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Expired Holds
+        bindsTo: ReservationsHoldsReleaseManagementSummary.expiredHolds
+        operation: listReservationHoldRelease
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Converted Holds
+        bindsTo: ReservationsHoldsReleaseManagementSummary.convertedHolds
+        operation: listReservationHoldRelease
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Released Inventory, tickets
+        bindsTo: ReservationsHoldsReleaseManagementSummary.releasedInventory
+        operation: listReservationHoldRelease
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+    - name: contentBody
       slot: collection
       components:
       - kind: dataTable
         label: Every reservations holds release
-        columns:
-        - ReservationsHoldsReleaseManagementView.activeHolds
-        - ReservationsHoldsReleaseManagementView.heldTickets
-        - ReservationsHoldsReleaseManagementView.heldValue
-        - ReservationsHoldsReleaseManagementView.expiringToday
-        - ReservationsHoldsReleaseManagementView.expiredHolds
-        - ReservationsHoldsReleaseManagementView.convertedHolds
-        - ReservationsHoldsReleaseManagementView.releasedInventory
         bindsTo: ReservationsHoldsReleaseManagementView
         operation: listReservationHoldRelease
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 48 §Display
@@ -9280,14 +9308,6 @@ screens:
       - kind: detailPanel
         label: The selected reservations holds release
         bindsTo: ReservationsHoldsReleaseManagementView
-        columns:
-        - ReservationsHoldsReleaseManagementView.activeHolds
-        - ReservationsHoldsReleaseManagementView.heldTickets
-        - ReservationsHoldsReleaseManagementView.heldValue
-        - ReservationsHoldsReleaseManagementView.expiringToday
-        - ReservationsHoldsReleaseManagementView.expiredHolds
-        - ReservationsHoldsReleaseManagementView.convertedHolds
-        - ReservationsHoldsReleaseManagementView.releasedInventory
         notes: 'The pack groups this record''s detail under its own headings: “When a hold expires”.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 48 §Display
     - name: actionBar
@@ -9316,12 +9336,12 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - ReservationsHoldsReleaseManagementView.activeHolds
-    - ReservationsHoldsReleaseManagementView.heldTickets
-    - ReservationsHoldsReleaseManagementView.heldValue
-    - ReservationsHoldsReleaseManagementView.expiringToday
-    - ReservationsHoldsReleaseManagementView.expiredHolds
-    - ReservationsHoldsReleaseManagementView.convertedHolds
+    - ReservationsHoldsReleaseManagementSummary.activeHolds
+    - ReservationsHoldsReleaseManagementSummary.heldTickets
+    - ReservationsHoldsReleaseManagementSummary.heldValue
+    - ReservationsHoldsReleaseManagementSummary.expiringToday
+    - ReservationsHoldsReleaseManagementSummary.expiredHolds
+    - ReservationsHoldsReleaseManagementSummary.convertedHolds
   wireframe:
     status: notStarted
     provenance: generated
@@ -9404,11 +9424,7 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - PartnerCancellationsRefundsAmendmentsView.fullCancellation
-    - PartnerCancellationsRefundsAmendmentsView.partialCancellation
-    - PartnerCancellationsRefundsAmendmentsView.dateChange
-    - PartnerCancellationsRefundsAmendmentsView.performanceChange
-    - PartnerCancellationsRefundsAmendmentsView.quantityReduction
+    - PartnerCancellationsRefundsAmendmentsView.requestType
   wireframe:
     status: notStarted
     provenance: generated
@@ -9462,47 +9478,47 @@ screens:
       - kind: metricTile
         label: Opening Balance
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
-        bindsTo: PartnerStatementAccountActivityView.openingBalance
+        bindsTo: PartnerStatementAccountActivitySummary.openingBalance
       - kind: metricTile
         label: Sales
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
-        bindsTo: PartnerStatementAccountActivityView.sales
+        bindsTo: PartnerStatementAccountActivitySummary.sales
       - kind: metricTile
         label: Payments
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
-        bindsTo: PartnerStatementAccountActivityView.payments
+        bindsTo: PartnerStatementAccountActivitySummary.payments
       - kind: metricTile
         label: Credits
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
-        bindsTo: PartnerStatementAccountActivityView.credits
+        bindsTo: PartnerStatementAccountActivitySummary.credits
       - kind: metricTile
         label: Refunds
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
-        bindsTo: PartnerStatementAccountActivityView.refunds
+        bindsTo: PartnerStatementAccountActivitySummary.refunds
       - kind: metricTile
         label: Commission
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
-        bindsTo: PartnerStatementAccountActivityView.commission
+        bindsTo: PartnerStatementAccountActivitySummary.commission
       - kind: metricTile
         label: Adjustments
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
-        bindsTo: PartnerStatementAccountActivityView.adjustments
+        bindsTo: PartnerStatementAccountActivitySummary.adjustments
       - kind: metricTile
         label: Closing Balance
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
-        bindsTo: PartnerStatementAccountActivityView.closingBalance
+        bindsTo: PartnerStatementAccountActivitySummary.closingBalance
       - kind: metricTile
         label: Overdue Balance
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
-        bindsTo: PartnerStatementAccountActivityView.overdueBalance
+        bindsTo: PartnerStatementAccountActivitySummary.overdueBalance
       - kind: metricTile
         label: Available Credit
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
-        bindsTo: PartnerStatementAccountActivityView.availableCredit
+        bindsTo: PartnerStatementAccountActivitySummary.availableCredit
       - kind: metricTile
         label: Current
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
-        bindsTo: PartnerStatementAccountActivityView.current
+        bindsTo: PartnerStatementAccountActivitySummary.current
       - kind: metricTile
         label: 1–30 Days
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
@@ -9615,19 +9631,53 @@ screens:
     template: split
     regions:
     - name: contentBody
+      slot: headline
+      components:
+      - kind: metricTile
+        label: Records Reconciled
+        bindsTo: PartnerReconciliationExceptionManagementSummary.recordsReconciled
+        operation: listPartnerReconciliationException
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Unmatched Orders
+        bindsTo: PartnerReconciliationExceptionManagementSummary.unmatchedOrders
+        operation: listPartnerReconciliationException
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Amount Mismatches
+        bindsTo: PartnerReconciliationExceptionManagementSummary.amountMismatches
+        operation: listPartnerReconciliationException
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Missing Tickets
+        bindsTo: PartnerReconciliationExceptionManagementSummary.missingTickets
+        operation: listPartnerReconciliationException
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Pricing Differences
+        bindsTo: PartnerReconciliationExceptionManagementSummary.pricingDifferences
+        operation: listPartnerReconciliationException
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Commission Differences
+        bindsTo: PartnerReconciliationExceptionManagementSummary.commissionDifferences
+        operation: listPartnerReconciliationException
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Payment Differences
+        bindsTo: PartnerReconciliationExceptionManagementSummary.paymentDifferences
+        operation: listPartnerReconciliationException
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Pending Investigation
+        bindsTo: PartnerReconciliationExceptionManagementSummary.pendingInvestigation
+        operation: listPartnerReconciliationException
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+    - name: contentBody
       slot: collection
       components:
       - kind: dataTable
         label: Every partner reconciliation exception
-        columns:
-        - PartnerReconciliationExceptionManagementView.recordsReconciled
-        - PartnerReconciliationExceptionManagementView.unmatchedOrders
-        - PartnerReconciliationExceptionManagementView.amountMismatches
-        - PartnerReconciliationExceptionManagementView.missingTickets
-        - PartnerReconciliationExceptionManagementView.pricingDifferences
-        - PartnerReconciliationExceptionManagementView.commissionDifferences
-        - PartnerReconciliationExceptionManagementView.paymentDifferences
-        - PartnerReconciliationExceptionManagementView.pendingInvestigation
         bindsTo: PartnerReconciliationExceptionManagementView
         operation: listPartnerReconciliationException
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Display
@@ -9637,15 +9687,6 @@ screens:
       - kind: detailPanel
         label: The selected partner reconciliation exception
         bindsTo: PartnerReconciliationExceptionManagementView
-        columns:
-        - PartnerReconciliationExceptionManagementView.recordsReconciled
-        - PartnerReconciliationExceptionManagementView.unmatchedOrders
-        - PartnerReconciliationExceptionManagementView.amountMismatches
-        - PartnerReconciliationExceptionManagementView.missingTickets
-        - PartnerReconciliationExceptionManagementView.pricingDifferences
-        - PartnerReconciliationExceptionManagementView.commissionDifferences
-        - PartnerReconciliationExceptionManagementView.paymentDifferences
-        - PartnerReconciliationExceptionManagementView.pendingInvestigation
         notes: 'The pack groups this record''s detail under its own headings: “Partner Orders”, “Partner
           Reference OTA-82714”, “Exception Types”.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Display
@@ -9675,12 +9716,12 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - PartnerReconciliationExceptionManagementView.recordsReconciled
-    - PartnerReconciliationExceptionManagementView.unmatchedOrders
-    - PartnerReconciliationExceptionManagementView.amountMismatches
-    - PartnerReconciliationExceptionManagementView.missingTickets
-    - PartnerReconciliationExceptionManagementView.pricingDifferences
-    - PartnerReconciliationExceptionManagementView.commissionDifferences
+    - PartnerReconciliationExceptionManagementSummary.recordsReconciled
+    - PartnerReconciliationExceptionManagementSummary.unmatchedOrders
+    - PartnerReconciliationExceptionManagementSummary.amountMismatches
+    - PartnerReconciliationExceptionManagementSummary.missingTickets
+    - PartnerReconciliationExceptionManagementSummary.pricingDifferences
+    - PartnerReconciliationExceptionManagementSummary.commissionDifferences
   wireframe:
     status: notStarted
     provenance: generated
@@ -9734,19 +9775,53 @@ screens:
     template: split
     regions:
     - name: contentBody
+      slot: headline
+      components:
+      - kind: metricTile
+        label: Commission Earned
+        bindsTo: CommissionCalculationSettlementManagementSummary.commissionEarned
+        operation: listCommissionCalculationSettlement
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Commission Pending
+        bindsTo: CommissionCalculationSettlementManagementSummary.commissionPending
+        operation: listCommissionCalculationSettlement
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Approved
+        bindsTo: CommissionCalculationSettlementManagementSummary.approved
+        operation: listCommissionCalculationSettlement
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: On Hold
+        bindsTo: CommissionCalculationSettlementManagementSummary.onHold
+        operation: listCommissionCalculationSettlement
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Paid
+        bindsTo: CommissionCalculationSettlementManagementSummary.paid
+        operation: listCommissionCalculationSettlement
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Reversed
+        bindsTo: CommissionCalculationSettlementManagementSummary.reversed
+        operation: listCommissionCalculationSettlement
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Incentives Earned
+        bindsTo: CommissionCalculationSettlementManagementSummary.incentivesEarned
+        operation: listCommissionCalculationSettlement
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+      - kind: metricTile
+        label: Next Settlement date
+        bindsTo: CommissionCalculationSettlementManagementSummary.nextSettlement
+        operation: listCommissionCalculationSettlement
+        provenance: moved from the row table to the list summary (decided 29 September, readiness close-out)
+    - name: contentBody
       slot: collection
       components:
       - kind: dataTable
         label: Every commission calculation settlement
-        columns:
-        - CommissionCalculationSettlementManagementView.commissionEarned
-        - CommissionCalculationSettlementManagementView.commissionPending
-        - CommissionCalculationSettlementManagementView.approved
-        - CommissionCalculationSettlementManagementView.onHold
-        - CommissionCalculationSettlementManagementView.paid
-        - CommissionCalculationSettlementManagementView.reversed
-        - CommissionCalculationSettlementManagementView.incentivesEarned
-        - CommissionCalculationSettlementManagementView.nextSettlement
         bindsTo: CommissionCalculationSettlementManagementView
         operation: listCommissionCalculationSettlement
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Display
@@ -9756,15 +9831,6 @@ screens:
       - kind: detailPanel
         label: The selected commission calculation settlement
         bindsTo: CommissionCalculationSettlementManagementView
-        columns:
-        - CommissionCalculationSettlementManagementView.commissionEarned
-        - CommissionCalculationSettlementManagementView.commissionPending
-        - CommissionCalculationSettlementManagementView.approved
-        - CommissionCalculationSettlementManagementView.onHold
-        - CommissionCalculationSettlementManagementView.paid
-        - CommissionCalculationSettlementManagementView.reversed
-        - CommissionCalculationSettlementManagementView.incentivesEarned
-        - CommissionCalculationSettlementManagementView.nextSettlement
         notes: 'The pack groups this record''s detail under its own headings: “For each transaction”,
           “Automatically account for”, “Exception states”, “Settlement Batch”, “Important Boundary”.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Display
@@ -9790,12 +9856,12 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - CommissionCalculationSettlementManagementView.commissionEarned
-    - CommissionCalculationSettlementManagementView.commissionPending
-    - CommissionCalculationSettlementManagementView.approved
-    - CommissionCalculationSettlementManagementView.onHold
-    - CommissionCalculationSettlementManagementView.paid
-    - CommissionCalculationSettlementManagementView.reversed
+    - CommissionCalculationSettlementManagementSummary.commissionEarned
+    - CommissionCalculationSettlementManagementSummary.commissionPending
+    - CommissionCalculationSettlementManagementSummary.approved
+    - CommissionCalculationSettlementManagementSummary.onHold
+    - CommissionCalculationSettlementManagementSummary.paid
+    - CommissionCalculationSettlementManagementSummary.reversed
   wireframe:
     status: notStarted
     provenance: generated
@@ -9975,9 +10041,7 @@ screens:
       - kind: dataTable
         label: Every partner performance scorecard
         columns:
-        - PartnerPerformanceScorecardRiskMonitoringView.improving
-        - PartnerPerformanceScorecardRiskMonitoringView.stable
-        - PartnerPerformanceScorecardRiskMonitoringView.declining
+        - PartnerPerformanceScorecardRiskMonitoringView.trend
         bindsTo: PartnerPerformanceScorecardRiskMonitoringView
         operation: listPartnerPerformanceScorecard
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 57 §Show
@@ -9988,9 +10052,7 @@ screens:
         label: The selected partner performance scorecard
         bindsTo: PartnerPerformanceScorecardRiskMonitoringView
         columns:
-        - PartnerPerformanceScorecardRiskMonitoringView.improving
-        - PartnerPerformanceScorecardRiskMonitoringView.stable
-        - PartnerPerformanceScorecardRiskMonitoringView.declining
+        - PartnerPerformanceScorecardRiskMonitoringView.trend
         notes: 'The pack groups this record''s detail under its own headings: “Commercial”, “Allocation”,
           “Financial”, “Operational”, “Technical”, “Compliance”.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 57 §Show
@@ -10010,9 +10072,7 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - PartnerPerformanceScorecardRiskMonitoringView.improving
-    - PartnerPerformanceScorecardRiskMonitoringView.stable
-    - PartnerPerformanceScorecardRiskMonitoringView.declining
+    - PartnerPerformanceScorecardRiskMonitoringView.trend
   wireframe:
     status: notStarted
     provenance: generated
@@ -10063,20 +10123,7 @@ screens:
       - kind: dataTable
         label: Every partner intelligence relationship
         columns:
-        - PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile
-        - PartnerAiIntelligenceRelationshipOptimizationView.territory
-        - PartnerAiIntelligenceRelationshipOptimizationView.agreements
-        - PartnerAiIntelligenceRelationshipOptimizationView.rates
-        - PartnerAiIntelligenceRelationshipOptimizationView.commission
-        - PartnerAiIntelligenceRelationshipOptimizationView.credit
-        - PartnerAiIntelligenceRelationshipOptimizationView.paymentBehavior
-        - PartnerAiIntelligenceRelationshipOptimizationView.allocation
-        - PartnerAiIntelligenceRelationshipOptimizationView.orders
-        - PartnerAiIntelligenceRelationshipOptimizationView.cancellations
-        - PartnerAiIntelligenceRelationshipOptimizationView.settlement
-        - PartnerAiIntelligenceRelationshipOptimizationView.cases
-        - PartnerAiIntelligenceRelationshipOptimizationView.channelPerformance
-        - PartnerAiIntelligenceRelationshipOptimizationView.historicalTrends
+        - PartnerAiIntelligenceRelationshipOptimizationView.inputsConsidered
         bindsTo: PartnerAiIntelligenceRelationshipOptimizationView
         operation: listPartnerRelationship
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 59 §Analyze
@@ -10087,20 +10134,7 @@ screens:
         label: The selected partner intelligence relationship
         bindsTo: PartnerAiIntelligenceRelationshipOptimizationView
         columns:
-        - PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile
-        - PartnerAiIntelligenceRelationshipOptimizationView.territory
-        - PartnerAiIntelligenceRelationshipOptimizationView.agreements
-        - PartnerAiIntelligenceRelationshipOptimizationView.rates
-        - PartnerAiIntelligenceRelationshipOptimizationView.commission
-        - PartnerAiIntelligenceRelationshipOptimizationView.credit
-        - PartnerAiIntelligenceRelationshipOptimizationView.paymentBehavior
-        - PartnerAiIntelligenceRelationshipOptimizationView.allocation
-        - PartnerAiIntelligenceRelationshipOptimizationView.orders
-        - PartnerAiIntelligenceRelationshipOptimizationView.cancellations
-        - PartnerAiIntelligenceRelationshipOptimizationView.settlement
-        - PartnerAiIntelligenceRelationshipOptimizationView.cases
-        - PartnerAiIntelligenceRelationshipOptimizationView.channelPerformance
-        - PartnerAiIntelligenceRelationshipOptimizationView.historicalTrends
+        - PartnerAiIntelligenceRelationshipOptimizationView.inputsConsidered
         notes: 'The pack groups this record''s detail under its own headings: “Commercial”, “Allocation”,
           “Credit”, “Risk”, “Growth”, “Natural-Language Analysis”.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 59 §Analyze
@@ -10120,12 +10154,7 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile
-    - PartnerAiIntelligenceRelationshipOptimizationView.territory
-    - PartnerAiIntelligenceRelationshipOptimizationView.agreements
-    - PartnerAiIntelligenceRelationshipOptimizationView.rates
-    - PartnerAiIntelligenceRelationshipOptimizationView.commission
-    - PartnerAiIntelligenceRelationshipOptimizationView.credit
+    - PartnerAiIntelligenceRelationshipOptimizationView.inputsConsidered
   wireframe:
     status: notStarted
     provenance: generated

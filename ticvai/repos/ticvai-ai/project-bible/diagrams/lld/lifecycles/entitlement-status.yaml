@@ -1,5 +1,5 @@
 id: LLD-Entitlement
-title: Entitlement — 10 transitions
+title: Entitlement — 11 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/entitlement-status.yaml
@@ -49,6 +49,12 @@ transitions:
   trigger: timer
   guard: Lapsed with entries remaining. **Whether that refunds is a policy question, not a technical
     one**
+- from: issued
+  to: cancelled
+  operation: voidEntitlement
+  trigger: operation
+  guard: One ticket voided before settlement, within the same shift (decided 29 September, readiness
+    close-out). After settlement it is a refund, because the money has moved
 - from: issued
   to: cancelled
   operation: createRefund

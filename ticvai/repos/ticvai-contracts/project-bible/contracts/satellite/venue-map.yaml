@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Venue map
   version: 1.0.0
-  x-ticvai-screen-count: 11
+  x-ticvai-screen-count: 15
   x-ticvai-tier: satellite
   x-ticvai-module: "21 — Seat Management & Venue Mapping"
   x-ticvai-platforms:
@@ -17,8 +17,20 @@ info:
     avoid.**
 
     A seat map is an auditorium: sections, rows, numbered seats, each one sellable inventory. A
-    venue map is a park: rides, restaurants, shops, toilets, first aid, exits, parking. **Nothing on
-    a venue map is sold** — it is what a guest navigates by and what an operator watches.
+    venue map is a park: rides, restaurants, shops, toilets, first aid, exits, parking. **Points and
+    paths on a venue map are not sold** — they are what a guest navigates by and what an operator
+    watches.
+
+    **The exception is a placed resource** (decided 29 September, rev 3 REV3-15 and GAP-C2). A venue
+    map can carry cabanas, loungers, tables and other bookable resources, each with a label (B09),
+    a zone (Beach), a capacity (15) and a price band (Large). They arrive the way the stadium's seats
+    do in `seating`: in the drawing and a manifest, through `importVenueGeometry`, checked by
+    `validateVenueMapGraph`, and live at `publishVenueMap`. A guest picks one on the map, holds it
+    with `resources.createResourceHold` (an expiring hold, like a seat hold) and buys it; the whole
+    map's availability for a date is one call, `resources.getMapResourceAvailability`. **This
+    supersedes audit R073 (c)** ("cabanas stay staff-booked", 28 September) and the 26 August minute
+    ("never a specific room by itself") for resources on an ingested map. The object, its bookings
+    and its holds stay in `resources`; this contract holds where it is and what it is labelled.
 
     `seating` already does the first. This does the second, and they share exactly one thing: both
     are drawn by an architect and arrive as a file nobody wants to retype.
@@ -156,7 +168,9 @@ paths:
       operationId: getVenueMap
       x-ticvai-consumed-by:
         - "P01 WEB-039 Venue Map & Wait Times"
+        - "P01 WEB-047 Map Booking — Cabanas & Spots"
         - "P02 GST-021 Interactive Map"
+        - "P02 GST-074 Map Booking — Cabanas & Spots"
         - "P06 EMP-030 Venue map"
         - "P08 BO-094 Map Editor & Publish"
       summary: A map with its points and paths
@@ -170,6 +184,11 @@ paths:
         `VenueMapVersion` snapshot. With `draft=true`, the working draft the editor changes, which
         is what BO-094 loads. `VenueMapDetail.version` says which published version came back,
         and is null for the draft.
+
+        **Placed resources come back with the map** (decided 29 September, rev 3 REV3-15): each
+        cabana, lounger or table with its label, zone, capacity, price band and shape. What is free
+        on a date is not here, because it changes by the minute and the map by the month; that is
+        `resources.getMapResourceAvailability`, one call for the whole map, keyed by `resourceId`.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_VIEW
       x-ticvai-guest-callable: true
@@ -305,6 +324,15 @@ paths:
                         Where a drawing already marks toilets, first aid and the rest. Keyed by
                         `VenuePoint.kind`. **Absent is normal** — points are placed on screen after
                         import, and the assistant proposes most of them.
+                    resourceLayer:
+                      type: array
+                      items: { type: string }
+                      description: >
+                        **The bookable resources drawn on the plan** — cabanas, loungers, tables
+                        (decided 29 September, rev 3 REV3-15). Each shape becomes a draft
+                        `PlacedResource`, its label read from the shape's text or joined from
+                        `resourceManifestRef`. Absent, the platform matches `VC-Resources`,
+                        `Cabanas`, `Loungers` and `Tables`.
                     keepOutLayer:
                       type: array
                       items: { type: string }
@@ -364,6 +392,45 @@ paths:
 
                     **`Section` must match the drawing character for character**, which is what §4
                     of the spec is about.
+                resourceManifestRef:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  x-ticvai-references: assets.MediaAsset
+                  description: >
+                    **The resource manifest, where this map carries bookable resources** (decided
+                    29 September, rev 3 REV3-15), uploaded like `manifestRef`. One sheet, header on
+                    row 3, five columns: **Label, Kind, Zone, Capacity, Price band** (`B09`, `cabana`,
+                    `Beach`, `15`, `Large`). It is the seat manifest's pattern: the drawing gives
+                    where, the manifest gives what, and `Label` must match the drawing character for
+                    character after digit normalisation. `Price band` names a band in
+                    `priceBands` below.
+                priceBands:
+                  type: array
+                  nullable: true
+                  description: >
+                    **What each price band sells as**, so a placed resource can be bought: the band
+                    code the manifest uses and the `catalogue.ProductVariant` that prices it (Family 6,
+                    Medium 10, Large 15, XL 20 on the Coastal Aqua map). The price is the variant's;
+                    the map never holds a price of its own.
+                  items:
+                    type: object
+                    required: [code, variantId]
+                    properties:
+                      code: { type: string, maxLength: 40 }
+                      name: { type: string, nullable: true }
+                      variantId:
+                        type: string
+                        format: uuid
+                        x-ticvai-references: catalogue.ProductVariant
+                createMissingResources:
+                  type: boolean
+                  default: false
+                  description: >
+                    Where a manifest label has no `resources.Resource` with that `code` at this
+                    venue, create one through `resources.createResource` (kind, capacity and zone as
+                    attributes) instead of reporting `resourceCodeUnmatched`. **Off by default**:
+                    a mistyped label must not quietly become a new cabana.
       responses:
         '202':
           headers:
@@ -387,6 +454,8 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getVenueMapImportJob
+      x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
       summary: Import progress and findings
       description: >
         **The read the `202` from `importVenueGeometry` points at**, following
@@ -529,6 +598,53 @@ paths:
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
 
+  /venue-maps/{mapId}/resources:
+    parameters:
+      - name: mapId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: setPlacedResource
+      x-ticvai-consumed-by:
+        - "P08 BO-094 Map Editor & Publish"
+      summary: Place or amend a bookable resource on the map
+      description: >
+        **The hand correction after an import** (decided 29 September, rev 3 REV3-15 and GAP-C2):
+        place a cabana, lounger or table the drawing missed, move one, or change its label, zone,
+        capacity or price band. Mirrors `setVenuePoint`: writes the working draft only, reaches
+        guests at the next `publishVenueMap`, and `placedResourceId` decides place or amend.
+
+        **The resource must exist in `resources`** at this venue; a `resourceId` that does not
+        returns 404. A label already used on this map returns `409` `duplicate-code`. A price band
+        the map does not know returns 400.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_MANAGE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetPlacedResourceRequest' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Placed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlacedResource' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
+
   /venue-maps/{mapId}/walkway-proposals:
     parameters:
       - name: mapId
@@ -537,6 +653,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: acceptWalkwayProposals
+      x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
       summary: Accept or reject proposed walkways
       description: >
         The human half of `ai.proposeWalkways`, and **a stricter gate than label acceptance.**
@@ -671,6 +789,11 @@ paths:
         **Orphan components** — two parts of the venue with no route between them. **Never
         publishable** (decided 28 September, audit R106 (8)): `publishVenueMap` refuses a map with
         more than one component, so a site of two buildings is mapped as two maps.
+
+        **Placed resources are checked too** (decided 29 September, rev 3 REV3-15), the way
+        `seating.validateSeatMap` checks seats before a seat map publishes: every placed resource
+        has a label unique on the map, a linked `resources.Resource` and a price band with a variant
+        (capacity of at least 1 is enforced on the schema). Each failure is a `resourceFindings` entry naming the label.
 
         **Validates the working draft**, because that is what the next publish would make live.
       tags: [venueMap]
@@ -808,6 +931,13 @@ paths:
         Where `validateVenueMapGraph` finds more than one component, or a public point with no
         path to it, the publish is refused with a `disconnectedArea` blocker per unreachable point.
         A venue made of two sites is two maps.
+
+        **Refuses a draft with a placed resource a guest could not buy** (decided 29 September,
+        rev 3 REV3-15): no linked resource (`resourceUnlinked`), no price band or a band with no
+        variant (`resourcePriceBandMissing`), or a label used twice (`duplicateResourceLabel`).
+        Publishing copies placed resources into the snapshot with the points and paths; from then on
+        a guest can pick them. Holds and bookings on a resource survive a republish because they
+        are keyed by `resourceId`, not by the placement.
       tags: [venueMap]
       x-ticvai-permission: VENUE_MAP_PUBLISH
       x-ticvai-audience: [staff]
@@ -875,6 +1005,64 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+  /bookable-venue-maps:
+    get:
+      operationId: listBookableVenueMaps
+      x-ticvai-consumed-by:
+        - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-074 Map Booking — Cabanas & Spots"
+      summary: The published maps of a venue that carry bookable spots
+      description: >
+        **How a guest finds the map to pick a cabana on** (decided 29 September, readiness
+        close-out, S1 guest screens). `getVenueMap` needs a `mapId` and `listVenueMaps` is staff
+        only, so WEB-047 / GST-074 had nothing to start from unless the screen that opened them
+        handed a map over. This answers it for any venue: the **published** maps of `venueId` whose
+        published version carries at least one placed resource, with how many of each kind.
+
+        **Published only, always.** A draft or archived map never appears here, whoever calls, so
+        unfinished work cannot reach a guest; staff read drafts through `listVenueMaps`.
+
+        **No date filter, by design.** A map changes when it is republished, not by day; what is
+        free on a date is `resources.getMapResourceAvailability` for the chosen `mapId`. With
+        `productId`, only maps carrying a spot sold by one of that product's price-band variants are
+        returned, which is how the product page (WEB-004) opens straight onto the right map.
+        A venue with one bookable map returns one entry and the screen skips the choice.
+
+        A venue with no published bookable map is an empty `maps` list, not a 404.
+      tags: [venueMap]
+      x-ticvai-permission: VENUE_MAP_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience: [staff, guest]
+      x-ticvai-agreed: '29 September: readiness close-out, S1 guest screens (WEB-047 / GST-074 had no way to reach a mapId); shape follows getVenueMap, published versions only'
+      x-ticvai-bounded: 'a venue''s published maps with bookable spots: a handful, capped at 50 (BookableVenueMaps.maps maxItems)'
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+          description: The venue whose bookable maps are wanted.
+        - name: productId
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
+          description: >
+            Only maps with a placed resource sold by this product's price-band variants. Absent
+            returns every bookable map of the venue.
+        - name: kind
+          in: query
+          required: false
+          schema: { type: string, enum: [cabana, lounger, table, pitch, other] }
+          description: Only maps carrying at least one placed resource of this kind (`PlacedResource.kind`).
+      responses:
+        '200':
+          description: The venue's published bookable maps, park maps first, then by `name`.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BookableVenueMaps' }
 
 components:
   # **Server-owned fields are `readOnly`.** createVenueMap, setVenuePoint and the two accept
@@ -887,6 +1075,41 @@ components:
   # working draft; each publish copies them into a `VenueMapVersion` snapshot, and a guest reads a
   # snapshot. Closures sit on the path row and apply to both.
   schemas:
+    BookableVenueMaps:
+      type: object
+      description: >
+        What `listBookableVenueMaps` returns: the published maps of one venue that carry bookable
+        spots (decided 29 September, readiness close-out). **Bounded by the venue**: a venue has a
+        handful of maps, so the list is capped at 50 rather than paged.
+      required: [venueId, maps]
+      properties:
+        venueId: { type: string, format: uuid }
+        maps:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/BookableVenueMapRef' }
+    BookableVenueMapRef:
+      type: object
+      description: >
+        One published map with bookable spots on it: enough to pick it and call `getVenueMap`
+        (with `publishedVersion`) and `resources.getMapResourceAvailability`.
+      required: [mapId, name, kind, publishedVersion, placedResourceCount]
+      properties:
+        mapId: { type: string, format: uuid }
+        name: { type: string }
+        kind: { type: string, enum: [park, floor, zone, parking] }
+        floorLevel: { type: integer, nullable: true }
+        publishedVersion:
+          type: integer
+          description: The `VenueMap.publishedVersion` a guest is served; send it to `getVenueMap` as `version`.
+        placedResourceCount:
+          type: integer
+          minimum: 1
+          description: Placed resources on the published version.
+        kinds:
+          type: array
+          description: The kinds of spot on this map, e.g. `[cabana, lounger]`, for the picker's chips.
+          items: { type: string, enum: [cabana, lounger, table, pitch, other] }
     VenueMap:
       type: object
       x-ticvai-persistence: "venuemap.map"
@@ -1012,6 +1235,12 @@ components:
         paths:
           type: array
           items: { $ref: '#/components/schemas/VenuePath' }
+        resources:
+          type: array
+          description: >
+            The bookable resources placed on this version of the map (rev 3 REV3-15). Empty on a map
+            that carries none.
+          items: { $ref: '#/components/schemas/PlacedResource' }
 
     VenuePoint:
       type: object
@@ -1126,6 +1355,103 @@ components:
               format: uuid
               nullable: true
               description: The point to amend. Absent or null places a new point.
+
+    PlacedResource:
+      type: object
+      x-ticvai-persistence: "venuemap.placed_resource"
+      description: >
+        **A bookable resource where it stands on the map** (decided 29 September, rev 3 REV3-15 and
+        GAP-C2): cabana B09 on the Beach, 15 guests, Large. The resource itself, its bookings and its
+        holds live in `resources`; this row says where it is drawn and what the guest sees. Written
+        into the working draft by `importVenueGeometry` or `setPlacedResource`, copied into the
+        `VenueMapVersion` snapshot at publish. A guest picks one on the published map, holds it with
+        `resources.createResourceHold` and buys it. **Supersedes audit R073 (c) and the 26 August
+        minute for resources on an ingested map.**
+      required: [id, mapId, resourceId, label, kind, zone, capacity, priceBandCode, position]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        mapId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of the operation that writes it.
+        resourceId:
+          type: string
+          format: uuid
+          x-ticvai-references: resources.Resource
+          description: >
+            The `resources.Resource` this is. **Availability, holds and bookings are keyed by this**,
+            so a republished map with the cabana moved keeps its bookings.
+        label:
+          type: string
+          maxLength: 40
+          x-ticvai-unique: map
+          description: >
+            What the guest sees and taps, e.g. `B09`. **Unique on the map**, compared without case
+            after digit normalisation; normally the resource's `code`.
+        kind:
+          type: string
+          enum: [cabana, lounger, table, pitch, other]
+          description: A subset of `resources.ResourceKind`, the kinds a guest books from a map. A `table`
+            here is a non-dining spot (a beach or event table) sold like a cabana; restaurant tables stay
+            `fnb` table reservations (decided 29 September, rev 3 GAP-C2).
+        zone:
+          type: string
+          maxLength: 80
+          description: The area the guest reads it by, e.g. `Beach`, `River`, `Terrace`.
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 500
+          description: Guests it takes, e.g. 15. Shown on the map and checked against the party at hold.
+        priceBandCode:
+          type: string
+          maxLength: 40
+          description: >
+            The band it sells in, e.g. `Large`, one of the `priceBands` given at import. The band's
+            `variantId` prices it; the map holds no price.
+        variantId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: catalogue.ProductVariant
+          description: Resolved from the price band. What a cart line for this resource names.
+        position:
+          type: object
+          required: [x, y]
+          description: Drawing coordinates of its label anchor, as on `VenuePoint`.
+          properties:
+            x: { type: number }
+            y: { type: number }
+        boundary:
+          type: array
+          nullable: true
+          description: The shape drawn, as a polygon in drawing coordinates. Null for a pin.
+          items:
+            type: object
+            properties:
+              x: { type: number }
+              y: { type: number }
+        isBookable:
+          type: boolean
+          default: true
+          description: >
+            False keeps it on the map and off sale, e.g. a cabana kept for staff use. Shown greyed.
+
+    SetPlacedResourceRequest:
+      description: >
+        What `setPlacedResource` takes: a `PlacedResource` without its server-owned fields.
+        **`placedResourceId` absent places a new one; present amends that one**, as `setVenuePoint`.
+      allOf:
+        - $ref: '#/components/schemas/PlacedResource'
+        - type: object
+          properties:
+            placedResourceId:
+              type: string
+              format: uuid
+              nullable: true
+              description: The placed resource to amend. Absent or null places a new one.
 
     VenuePath:
       type: object
@@ -1311,6 +1637,20 @@ components:
               pointId: { type: string, format: uuid }
               name: { type: string }
               kind: { type: string }
+        resourceFindings:
+          type: array
+          description: >
+            **Placed resources a guest could not buy** (rev 3 REV3-15), named by label. Any entry
+            here makes `isValid` false, and `publishVenueMap` refuses with the matching blocker.
+          items:
+            type: object
+            required: [placedResourceId, label, reason]
+            properties:
+              placedResourceId: { type: string, format: uuid }
+              label: { type: string }
+              reason:
+                type: string
+                enum: [resourceUnlinked, resourcePriceBandMissing, duplicateResourceLabel]
 
     VenueMapImportJob:
       type: object
@@ -1335,6 +1675,19 @@ components:
           type: array
           items: { type: string }
         manifestRowsRead: { type: integer, nullable: true }
+        resourcesFound:
+          type: integer
+          nullable: true
+          description: >
+            Bookable resource shapes found on the resource layer (rev 3 REV3-15). Null where the map
+            has none.
+        resourceRowsJoined:
+          type: integer
+          nullable: true
+          description: >
+            Resource manifest rows that joined a shape and a `resources.Resource`. **The number to
+            check against your own count**, as `manifestRowsJoined` is for seats: 34 cabanas on the
+            plan and 30 joined is four labels that differ.
         manifestRowsJoined:
           type: integer
           nullable: true
@@ -1356,10 +1709,15 @@ components:
                 enum: [duplicateLayerName, geometryOnLayerZero, unmappedLayer, mixedLayerContent,
                        sectionCodeMismatch, digitScriptMismatch, mergedCells, totalRowDetected,
                        manifestSectionMissingFromPlan, planSectionMissingFromManifest,
-                       exitLayerNotSplit, noGeoreference, layerNameUndecodable, rasterOnly]
+                       exitLayerNotSplit, noGeoreference, layerNameUndecodable, rasterOnly,
+                       resourceLabelMissing, resourceLabelDuplicate, resourceManifestMissingFromPlan,
+                       resourcePlanMissingFromManifest, resourceCodeUnmatched, resourcePriceBandUnknown]
                 description: >
                   **A closed set, and each one names a rule in the spec.** Free-text findings are
-                  findings a drawing office cannot act on.
+                  findings a drawing office cannot act on. The six `resource*` codes check placed
+                  resources (rev 3 REV3-15): a shape with no label, two with one label, a manifest
+                  row with no shape or the reverse, a label with no `resources.Resource`, and a
+                  price band not in `priceBands`.
               severity:
                 type: string
                 enum: [error, warning, info]
@@ -1411,6 +1769,10 @@ components:
             paths:
               type: array
               items: { $ref: '#/components/schemas/VenuePath' }
+            resources:
+              type: array
+              description: The placed resources as they were published (rev 3 REV3-15).
+              items: { $ref: '#/components/schemas/PlacedResource' }
 
     PathClosureResult:
       description: >
@@ -1475,10 +1837,13 @@ components:
                 properties:
                   reason:
                     type: string
-                    enum: [unresolvedProposal, brokenLink, disconnectedArea]
+                    enum: [unresolvedProposal, brokenLink, disconnectedArea, resourceUnlinked,
+                           resourcePriceBandMissing, duplicateResourceLabel]
                     description: >
                       `disconnectedArea`: the point cannot be reached from the rest of the map
-                      (audit R106 (8)); `pointId` and `name` name it.
+                      (audit R106 (8)); `pointId` and `name` name it. The three `resource*` and
+                      `duplicateResourceLabel` reasons name a placed resource by `placedResourceId`
+                      and its label in `name` (rev 3 REV3-15).
                   proposalId:
                     type: string
                     format: uuid
@@ -1489,6 +1854,11 @@ components:
                     format: uuid
                     nullable: true
                     description: For `brokenLink`, the point whose link no longer resolves.
+                  placedResourceId:
+                    type: string
+                    format: uuid
+                    nullable: true
+                    description: For the resource reasons, the `PlacedResource` that blocks.
                   name:
                     type: string
                     nullable: true

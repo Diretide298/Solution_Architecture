@@ -41,7 +41,7 @@ modulesUsed:
   screens: 10
 servicesCalled:
 - service: FnbService
-  operationCalls: 35
+  operationCalls: 37
 - service: ReportingService
   operationCalls: 2
 - service: TenancyService
@@ -202,6 +202,7 @@ screens:
   operations:
   - listKitchenStations
   - listKitchenTickets
+  - rebalanceStationLoad
   - setKitchenStations
   states:
   - emptyFirstRun
@@ -322,6 +323,7 @@ screens:
   density: touchLarge
   operations:
   - prioritiseKitchenTicket
+  - setKitchenSla
   - setVenueSettings
   states:
   - emptyFirstRun
@@ -333,6 +335,7 @@ screens:
   entryParams:
   - venueId<-session
   - stationId<-session
+  - outletId<-session
   - ticketId<-KIT-002
   goesTo:
   - KIT-001

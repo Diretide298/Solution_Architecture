@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `fnb` |
 | Schemas owned | `fnb` |
-| Operations in the slice | 58 of 115 |
+| Operations in the slice | 60 of 117 |
 | Scale | Write-heavy during service, idle between. Two peaks a day, sharply. |
 | If it is down | Down means the kitchen falls back to paper. Offline-capable by design. |
 
@@ -31,7 +31,7 @@
 | bill | [`closeTableVisit`](#closetablevisit) | POST | `/table-visits/{visitId}/close` | core | 1 | EMP-059, POS-028 |
 | fnb | [`chaseStation`](#chasestation) | POST | `/kitchen-stations/{stationId}/chase` | core | 2 | KIT-006 |
 | fnb | [`createTableReservation`](#createtablereservation) | POST | `/table-reservations` | core | 2 | EMP-055, GST-070, WEB-036 |
-| fnb | [`escalateCorrectiveAction`](#escalatecorrectiveaction) | POST | `/food-safety/corrective-actions/{actionId}/escalate` | setup | 2 |  |
+| fnb | [`escalateCorrectiveAction`](#escalatecorrectiveaction) | POST | `/food-safety/corrective-actions/{actionId}/escalate` | setup | 2 | BO-044 |
 | fnb | [`fireCourse`](#firecourse) | POST | `/kitchen-tickets/{ticketId}/fire` | core | 2 | EMP-058, KIT-002, KIT-003 |
 | fnb | [`getHaccpStatus`](#gethaccpstatus) | GET | `/food-safety/status` | core | 2 | BO-044, EMP-062, KIT-008 |
 | fnb | [`holdCourse`](#holdcourse) | POST | `/kitchen-tickets/{ticketId}/hold` | core | 2 | EMP-058, KIT-002, KIT-003 |
@@ -46,14 +46,16 @@
 | fnb | [`moveTableVisit`](#movetablevisit) | POST | `/table-visits/{visitId}/move` | core | 1 | EMP-058, POS-028 |
 | fnb | [`notifyServer`](#notifyserver) | POST | `/table-visits/{visitId}/notify-server` | core | 2 | EMP-058, KIT-002 |
 | fnb | [`printOrderLabel`](#printorderlabel) | POST | `/kitchen-tickets/{ticketId}/label` | core | 2 | KIT-006 |
+| fnb | [`rebalanceStationLoad`](#rebalancestationload) | POST | `/kitchen-stations/rebalance` | core | 2 | KIT-005 |
 | fnb | [`recallKitchenTicket`](#recallkitchenticket) | POST | `/kitchen-tickets/{ticketId}/recall` | core | 2 | KIT-002 |
 | fnb | [`refireItem`](#refireitem) | POST | `/kitchen-tickets/{ticketId}/refire` | core | 2 | KIT-002 |
 | fnb | [`seatTableReservation`](#seattablereservation) | POST | `/table-reservations/{reservationId}/seat` | core | 1 | EMP-058, POS-028 |
 | fnb | [`setCourseRules`](#setcourserules) | PUT | `/outlets/{outletId}/course-rules` | core | 2 | KIT-003 |
+| fnb | [`setKitchenSla`](#setkitchensla) | PUT | `/outlets/{outletId}/kitchen-sla` | core | 2 | BO-134, KIT-009 |
 | fnb | [`setTableCombinations`](#settablecombinations) | PUT | `/outlets/{outletId}/table-combinations` | core | 1 | EMP-058, POS-024 |
 | fnb | [`signCorrectiveAction`](#signcorrectiveaction) | POST | `/food-safety/corrective-actions/{actionId}/sign` | setup | 2 | BO-044, EMP-067 |
 | fnb | [`updateTableReservation`](#updatetablereservation) | PATCH | `/table-reservations/{reservationId}` | core | 2 | GST-070, WEB-031 |
-| guestOrdering | [`claimLocationSession`](#claimlocationsession) | POST | `/location-sessions` | core | 2 | GST-024, WEB-036 |
+| guestOrdering | [`claimLocationSession`](#claimlocationsession) | POST | `/location-sessions` | core | 2 | GST-024, GST-030, WEB-036, WEB-046 |
 | guestOrdering | [`claimTableSession`](#claimtablesession) | POST | `/table-sessions` | core | 2 | GST-024, GST-025, WEB-036, WEB-038 |
 | guestOrdering | [`createGuestFnbOrder`](#createguestfnborder) | POST | `/guest-orders` | core | 2 | GST-024, GST-032, KSK-016, WEB-036 |
 | guestOrdering | [`getFnbDeliveryPolicy`](#getfnbdeliverypolicy) | GET | `/fnb-delivery-policy` | core | 2 | BO-044, GST-024, WEB-036 |
@@ -76,7 +78,7 @@
 | menu | [`setItemAvailability`](#setitemavailability) | PUT | `/menu-items/{itemId}/availability` | core | 1 | BO-014, BO-049, BO-140, EMP-062, KIT-008, POS-021 … |
 | menu | [`setMenuSections`](#setmenusections) | PUT | `/menus/{menuId}/sections` | core | 2 | BO-045, BO-109, CMS-009 |
 | menu | [`updateMenu`](#updatemenu) | PATCH | `/menus/{menuId}` | core | 2 | BO-045, BO-111, CMS-009 |
-| modifier | [`createModifierGroup`](#createmodifiergroup) | POST | `/modifier-groups` | setup | 1 |  |
+| modifier | [`createModifierGroup`](#createmodifiergroup) | POST | `/modifier-groups` | setup | 1 | BO-045 |
 | modifier | [`listModifierGroups`](#listmodifiergroups) | GET | `/modifier-groups` | core | 1 | GST-024, GST-061, POS-021, WEB-036, WEB-037 |
 | order | [`createFnbOrder`](#createfnborder) | POST | `/fnb-orders` | core | 1 | BO-020, EMP-058, EMP-059, POS-022 |
 | order | [`getFnbOrder`](#getfnborder) | GET | `/fnb-orders/{orderId}` | core | 2 | BO-020, KIT-004 |
@@ -231,7 +233,9 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 
 4.9.13. **Distinct from `claimTableSession`**, which identifies a table a guest is already sitting at. This is a booking with a time, a party size and nobody present.
 **Does not name a specific table by default.** A host seats a party on the night, and committing table 7 at booking time means every later booking is refused against a constraint that did not need to exist. A table may be named where a guest asked for one.
-**No deposit and no no-show fee in the first release** (decided 28 September, audit R077 (a)). Booking takes no payment, and cancelling or not arriving costs the guest nothing; GST-070 says so at booking and at cancel.
+**Dining tables only** (decided 29 September, rev 3 GAP-C2). A table on a venue map is a `resources.Resource` of kind `table`: a non-dining spot, such as a beach or event table, picked on the map and sold like a cabana (`resources.createResourceHold`, then the order). A restaurant table is booked here, with the waitlist (audit R073 (d)), and is never placed on a venue map as a bookable resource.
+**No deposit unless the venue switches one on** (decided 29 September, rev 3 REV3-8b, which supersedes audit R077 (a) "no table deposit in the first release": the capability ships, disabled by default). The venue's `orders.DepositPolicy.dining` says whether a table deposit is held, from what party size, and how much (per guest, per table, or a percentage of a minimum spend); nothing about the amount is fixed in code. **With `dining.enabled` false, the default, or a party below `dining.appliesFromPartySize`, the booking takes no payment and never enters the cart**: it is created `booked` and the guest sees a "no card needed" confirmation straight after this call (decided 29 September, rev 3 REV3-8). A basket line for a free table is prototype-only.
+**Where a deposit applies, the booking is created `awaitingDeposit`** and `deposit` carries the amount, the basis and `holdExpiresAt`. The cover is held while the guest pays: the client adds the deposit to the cart with `orders.addCartLine` (`variantId` from `deposit.variantId`, and `tableReservationId`) and pays through `checkoutCart` like any other line. When the payment is authorised the booking moves to `booked`; if `holdExpiresAt` passes first, it is `cancelled` and the cover released (states/table-reservation.yaml). The deposit is an `orders.deposit` row, held and later released, applied to the bill or forfeited under the policy; it is not a sale.
 
 |  |  |
 |---|---|
@@ -241,10 +245,10 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation` |
-| Writes | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
+| Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
+| Writes | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
 | Called by | EMP-055, GST-070, WEB-036 |
-| State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): created as `booked` |
+| State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): created as `booked` or `awaitingDeposit` |
 
 **Parameters**
 
@@ -268,11 +272,22 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 | tables[].reservationId | string (uuid) | yes |  |
 | tables[].tableId | string (uuid) | yes |  |
 | tables[].createdAt | string (date-time) | yes |  |
-| status | TableReservationStatus: enum (booked, confirmed, seated, completed, cancelled, noShow) |  |  |
+| status | TableReservationStatus: enum (awaitingDeposit, booked, confirmed, seated, completed, cancelled, noShow) |  | awaitingDeposit only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts booked. |
 | groupId | string (uuid) |  | 5.1.2. (nullable) |
 | notes | string |  | Allergies |
 | actualPartySize | integer |  | (read-only; nullable) |
 | tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| deposit | TableReservationDeposit |  | The deposit this booking holds, snapshotted from orders.DepositPolicy.dining when it was made (decided 29 September, rev 3 REV3-8b). (read-only; nullable) |
+| deposit.amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| deposit.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| deposit.amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| deposit.amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| deposit.basis | enum (fixedPerGuest, fixedPerTable, percentOfMinimumSpend) | yes |  |
+| deposit.holdExpiresAt | string (date-time) |  | While awaitingDeposit, when the held cover is released if the deposit has not been authorised. (nullable) |
+| deposit.refundableUntil | string (date-time) |  | startsAt less dining.refundableUntilHours. (nullable) |
+| deposit.variantId | string (uuid) |  | The venue's table-deposit variant, DepositPolicy.dining.depositVariantId, which the client sends to addCartLine with this booking's id. |
+| deposit.cartLineId | string (uuid) |  | The orders.CartLine carrying the deposit, once added. (nullable) |
+| deposit.depositId | string (uuid) |  | The orders.deposit row, once the payment is authorised. (nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 
 **Response**: `TableReservation`
@@ -291,18 +306,29 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 | tables[].reservationId | string (uuid) | yes |  |
 | tables[].tableId | string (uuid) | yes |  |
 | tables[].createdAt | string (date-time) | yes |  |
-| status | TableReservationStatus: enum (booked, confirmed, seated, completed, cancelled, noShow) |  |  |
+| status | TableReservationStatus: enum (awaitingDeposit, booked, confirmed, seated, completed, cancelled, noShow) |  | awaitingDeposit only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts booked. |
 | groupId | string (uuid) |  | 5.1.2. (nullable) |
 | notes | string |  | Allergies |
 | actualPartySize | integer |  | (read-only; nullable) |
 | tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| deposit | TableReservationDeposit |  | The deposit this booking holds, snapshotted from orders.DepositPolicy.dining when it was made (decided 29 September, rev 3 REV3-8b). (read-only; nullable) |
+| deposit.amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| deposit.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| deposit.amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| deposit.amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| deposit.basis | enum (fixedPerGuest, fixedPerTable, percentOfMinimumSpend) | yes |  |
+| deposit.holdExpiresAt | string (date-time) |  | While awaitingDeposit, when the held cover is released if the deposit has not been authorised. (nullable) |
+| deposit.refundableUntil | string (date-time) |  | startsAt less dining.refundableUntilHours. (nullable) |
+| deposit.variantId | string (uuid) |  | The venue's table-deposit variant, DepositPolicy.dining.depositVariantId, which the client sends to addCartLine with this booking's id. |
+| deposit.cartLineId | string (uuid) |  | The orders.CartLine carrying the deposit, once added. (nullable) |
+| deposit.depositId | string (uuid) |  | The orders.deposit row, once the payment is authorised. (nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 201 |  | Booked |
+| 201 |  | booked where no deposit applies (no card, no cart; REV3-8), or awaitingDeposit with deposit filled where the venue's dining deposit applies (REV3-8b). |
 | 409 |  | No cover available for that party size at that time. |
 
 ### escalateCorrectiveAction
@@ -323,7 +349,7 @@ Raised above the person who found it — a critical reading, or one nobody actio
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.corrective_action`, `identity.principal` |
 | Writes | `cache:idempotency`, `fnb.corrective_action` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-044 |
 | State model | CorrectiveAction ([states/corrective-action.yaml](../../../states/corrective-action.yaml)): moves `open` -> `escalated`, `actioned` -> `escalated` |
 
 **Parameters**
@@ -550,6 +576,7 @@ Board 3. **The other half of firing, and the one that gets forgotten.** A table 
 
 BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has a party size, a seating preference and a walk-away point.
 **A guest who leaves is not a guest who was served**, and `walkedAway` exists so that distinction survives into the report a manager reads about wait times.
+**Joining takes no payment and never enters the cart** (decided 29 September, rev 3 REV3-8): the guest sees the confirmation straight after this call. A waitlist entry never holds a deposit, even where the venue's `DepositPolicy.dining` is on, because it is not a promise of a table.
 
 |  |  |
 |---|---|
@@ -735,7 +762,7 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation` |
+| Reads | `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
 | Writes | - |
 | Called by | EMP-051, EMP-054, EMP-060, POS-028 |
 
@@ -765,11 +792,19 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | items[].tables[].reservationId | string (uuid) | yes |  |
 | items[].tables[].tableId | string (uuid) | yes |  |
 | items[].tables[].createdAt | string (date-time) | yes |  |
-| items[].status | TableReservationStatus: enum (booked, confirmed, seated, completed, cancelled, noShow) |  |  |
+| items[].status | TableReservationStatus: enum (awaitingDeposit, booked, confirmed, seated, completed, cancelled, noShow) |  | awaitingDeposit only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts booked. |
 | items[].groupId | string (uuid) |  | 5.1.2. (nullable) |
 | items[].notes | string |  | Allergies |
 | items[].actualPartySize | integer |  | (read-only; nullable) |
 | items[].tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| items[].deposit | TableReservationDeposit |  | The deposit this booking holds, snapshotted from orders.DepositPolicy.dining when it was made (decided 29 September, rev 3 REV3-8b). (read-only; nullable) |
+| items[].deposit.amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].deposit.basis | enum (fixedPerGuest, fixedPerTable, percentOfMinimumSpend) | yes |  |
+| items[].deposit.holdExpiresAt | string (date-time) |  | While awaitingDeposit, when the held cover is released if the deposit has not been authorised. (nullable) |
+| items[].deposit.refundableUntil | string (date-time) |  | startsAt less dining.refundableUntilHours. (nullable) |
+| items[].deposit.variantId | string (uuid) |  | The venue's table-deposit variant, DepositPolicy.dining.depositVariantId, which the client sends to addCartLine with this booking's id. |
+| items[].deposit.cartLineId | string (uuid) |  | The orders.CartLine carrying the deposit, once added. (nullable) |
+| items[].deposit.depositId | string (uuid) |  | The orders.deposit row, once the payment is authorised. (nullable) |
 | items[].createdAt | string (date-time) |  | (read-only) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
@@ -1250,6 +1285,57 @@ A label that omits an allergen on a sealed bag is the failure mode this exists t
 |---|---|---|
 | 200 |  | Label content |
 
+### rebalanceStationLoad
+
+**`POST /kitchen-stations/rebalance`**: Move work between stations mid-service
+
+Board 3. **A grill twenty tickets deep and a cold section idle.** The routing rules that put them there were set at configuration time and the service does not match them.
+**A rebalance is temporary and reverts at close.** A permanent change is `setKitchenStations` — **conflating the two means a Friday-night fix quietly becomes the venue's routing.**
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `fnb.kitchen_station` |
+| Writes | `cache:idempotency`, `cache:resolution`, `fnb.kitchen_station` |
+| Called by | KIT-005 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `StationRebalance`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| moves | array of object | yes |  |
+| moves[].fromStationId | string (uuid) | yes |  |
+| moves[].toStationId | string (uuid) | yes |  |
+| moves[].categoryIds | array of string (uuid) |  |  |
+| revertAt | string (date-time) |  | (nullable) |
+
+**Response**: `StationRebalance`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| moves | array of object | yes |  |
+| moves[].fromStationId | string (uuid) | yes |  |
+| moves[].toStationId | string (uuid) | yes |  |
+| moves[].categoryIds | array of string (uuid) |  |  |
+| revertAt | string (date-time) |  | (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Rebalanced for this service |
+
 ### recallKitchenTicket
 
 **`POST /kitchen-tickets/{ticketId}/recall`**: Bring back a ticket that was bumped by mistake
@@ -1415,7 +1501,7 @@ A party seated at a different size from the booking is recorded as such. A booki
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
-| Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation` |
+| Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
 | Writes | `cache:idempotency`, `fnb.table_reservation`, `fnb.table_session`, `fnb.table_visit` |
 | Called by | EMP-058, POS-028 |
 | State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): moves `booked` -> `seated`, `confirmed` -> `seated`, `noShow` -> `seated` |
@@ -1451,11 +1537,22 @@ A party seated at a different size from the booking is recorded as such. A booki
 | tables[].reservationId | string (uuid) | yes |  |
 | tables[].tableId | string (uuid) | yes |  |
 | tables[].createdAt | string (date-time) | yes |  |
-| status | TableReservationStatus: enum (booked, confirmed, seated, completed, cancelled, noShow) |  |  |
+| status | TableReservationStatus: enum (awaitingDeposit, booked, confirmed, seated, completed, cancelled, noShow) |  | awaitingDeposit only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts booked. |
 | groupId | string (uuid) |  | 5.1.2. (nullable) |
 | notes | string |  | Allergies |
 | actualPartySize | integer |  | (read-only; nullable) |
 | tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| deposit | TableReservationDeposit |  | The deposit this booking holds, snapshotted from orders.DepositPolicy.dining when it was made (decided 29 September, rev 3 REV3-8b). (read-only; nullable) |
+| deposit.amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| deposit.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| deposit.amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| deposit.amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| deposit.basis | enum (fixedPerGuest, fixedPerTable, percentOfMinimumSpend) | yes |  |
+| deposit.holdExpiresAt | string (date-time) |  | While awaitingDeposit, when the held cover is released if the deposit has not been authorised. (nullable) |
+| deposit.refundableUntil | string (date-time) |  | startsAt less dining.refundableUntilHours. (nullable) |
+| deposit.variantId | string (uuid) |  | The venue's table-deposit variant, DepositPolicy.dining.depositVariantId, which the client sends to addCartLine with this booking's id. |
+| deposit.cartLineId | string (uuid) |  | The orders.CartLine carrying the deposit, once added. (nullable) |
+| deposit.depositId | string (uuid) |  | The orders.deposit row, once the payment is authorised. (nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 
 **Responses**
@@ -1513,6 +1610,68 @@ Board 3. **Coursing was a per-ticket field with no default**, so every table was
 | autoFireMinutes | integer |  | (nullable) |
 | serviceModeOverrides | object |  | A different default per service mode. |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+
+### setKitchenSla
+
+**`PUT /outlets/{outletId}/kitchen-sla`**: How long a ticket may sit before it is late
+
+Board 3. **`getKitchenSla` was drawn on the board and nothing set the target.** A rail that colours tickets red needs a number, and the package had none.
+**Per service mode, deliberately.** A delivery order and a dine-in main do not share a target, and one number for both makes the rail either permanently red or useless.
+**`setPriorityWeights` sits here too**: what pushes a ticket up the rail — age, promise time (`KitchenTicket.targetReadyAt`), table stage, a VIP marker — and in what proportion. The weights are what `listKitchenTickets` orders the rail by.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | outlet |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency` |
+| Writes | `cache:idempotency`, `cache:resolution` |
+| Called by | BO-134, KIT-009 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| outletId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `KitchenSla`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| targets | array of object |  |  |
+| targets[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
+| targets[].targetMinutes | integer | yes | (min 1) |
+| targets[].warnAtPercent | integer |  | (default 80) |
+| priorityWeights | object |  | The weight of each signal the board names — age, promise time, table stage, a VIP marker. |
+| priorityWeights.age | integer |  | (min 0) |
+| priorityWeights.targetReadyAt | integer |  | Promise time. (min 0) |
+| priorityWeights.tableStage | integer |  | (min 0) |
+| priorityWeights.vip | integer |  | (min 0) |
+
+**Response**: `KitchenSla`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| targets | array of object |  |  |
+| targets[].serviceMode | ServiceMode: enum (quickService, tableService, roomService, collection, delivery) | yes |  |
+| targets[].targetMinutes | integer | yes | (min 1) |
+| targets[].warnAtPercent | integer |  | (default 80) |
+| priorityWeights | object |  | The weight of each signal the board names — age, promise time, table stage, a VIP marker. |
+| priorityWeights.age | integer |  | (min 0) |
+| priorityWeights.targetReadyAt | integer |  | Promise time. (min 0) |
+| priorityWeights.tableStage | integer |  | (min 0) |
+| priorityWeights.vip | integer |  | (min 0) |
 
 **Responses**
 
@@ -1642,7 +1801,7 @@ Board 5J. **The signature is the record.** *Discarded and reset* with nobody aga
 **`PATCH /table-reservations/{reservationId}`**: Change or cancel a booking
 
 Party size, time, or cancelled. **A reduced party size releases cover immediately** — four seats returned at 18:00 can be sold for the same evening.
-**Cancelling is free** (decided 28 September, audit R077 (a)): no deposit is held and no no-show or late-cancel fee is charged in the first release.
+**Cancelling is free where no deposit is held** (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a)). Where the venue's `DepositPolicy.dining` took a deposit, cancelling at least `dining.refundableUntilHours` before `startsAt` releases it in full; later, or a `noShow`, keeps it as `dining.onLateCancelOrNoShow` says. A party size change re-prices the deposit only where the basis is per guest: a larger party is asked for the difference, a smaller one has the excess released. Cancelling an `awaitingDeposit` booking releases the cover and nothing is charged.
 
 |  |  |
 |---|---|
@@ -1652,10 +1811,10 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 | Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
-| Writes | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
+| Reads | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
+| Writes | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation`, `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)` |
 | Called by | GST-070, WEB-031 |
-| State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): moves `booked` -> `confirmed`, `booked` -> `cancelled`, `confirmed` -> `cancelled` |
+| State model | Table reservation ([states/table-reservation.yaml](../../../states/table-reservation.yaml)): moves `awaitingDeposit` -> `cancelled`, `booked` -> `confirmed`, `booked` -> `cancelled`, `confirmed` -> `cancelled` |
 
 **Parameters**
 
@@ -1680,11 +1839,22 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 | tables[].reservationId | string (uuid) | yes |  |
 | tables[].tableId | string (uuid) | yes |  |
 | tables[].createdAt | string (date-time) | yes |  |
-| status | TableReservationStatus: enum (booked, confirmed, seated, completed, cancelled, noShow) |  |  |
+| status | TableReservationStatus: enum (awaitingDeposit, booked, confirmed, seated, completed, cancelled, noShow) |  | awaitingDeposit only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts booked. |
 | groupId | string (uuid) |  | 5.1.2. (nullable) |
 | notes | string |  | Allergies |
 | actualPartySize | integer |  | (read-only; nullable) |
 | tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| deposit | TableReservationDeposit |  | The deposit this booking holds, snapshotted from orders.DepositPolicy.dining when it was made (decided 29 September, rev 3 REV3-8b). (read-only; nullable) |
+| deposit.amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| deposit.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| deposit.amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| deposit.amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| deposit.basis | enum (fixedPerGuest, fixedPerTable, percentOfMinimumSpend) | yes |  |
+| deposit.holdExpiresAt | string (date-time) |  | While awaitingDeposit, when the held cover is released if the deposit has not been authorised. (nullable) |
+| deposit.refundableUntil | string (date-time) |  | startsAt less dining.refundableUntilHours. (nullable) |
+| deposit.variantId | string (uuid) |  | The venue's table-deposit variant, DepositPolicy.dining.depositVariantId, which the client sends to addCartLine with this booking's id. |
+| deposit.cartLineId | string (uuid) |  | The orders.CartLine carrying the deposit, once added. (nullable) |
+| deposit.depositId | string (uuid) |  | The orders.deposit row, once the payment is authorised. (nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 
 **Response**: `TableReservation`
@@ -1703,11 +1873,22 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 | tables[].reservationId | string (uuid) | yes |  |
 | tables[].tableId | string (uuid) | yes |  |
 | tables[].createdAt | string (date-time) | yes |  |
-| status | TableReservationStatus: enum (booked, confirmed, seated, completed, cancelled, noShow) |  |  |
+| status | TableReservationStatus: enum (awaitingDeposit, booked, confirmed, seated, completed, cancelled, noShow) |  | awaitingDeposit only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts booked. |
 | groupId | string (uuid) |  | 5.1.2. (nullable) |
 | notes | string |  | Allergies |
 | actualPartySize | integer |  | (read-only; nullable) |
 | tableVisitId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| deposit | TableReservationDeposit |  | The deposit this booking holds, snapshotted from orders.DepositPolicy.dining when it was made (decided 29 September, rev 3 REV3-8b). (read-only; nullable) |
+| deposit.amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| deposit.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| deposit.amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| deposit.amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| deposit.basis | enum (fixedPerGuest, fixedPerTable, percentOfMinimumSpend) | yes |  |
+| deposit.holdExpiresAt | string (date-time) |  | While awaitingDeposit, when the held cover is released if the deposit has not been authorised. (nullable) |
+| deposit.refundableUntil | string (date-time) |  | startsAt less dining.refundableUntilHours. (nullable) |
+| deposit.variantId | string (uuid) |  | The venue's table-deposit variant, DepositPolicy.dining.depositVariantId, which the client sends to addCartLine with this booking's id. |
+| deposit.cartLineId | string (uuid) |  | The orders.CartLine carrying the deposit, once added. (nullable) |
+| deposit.depositId | string (uuid) |  | The orders.deposit row, once the payment is authorised. (nullable) |
 | createdAt | string (date-time) |  | (read-only) |
 
 **Responses**
@@ -1737,7 +1918,7 @@ Codes rotate. A static code photographed once lets someone order to a cabana the
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.location_session` |
 | Writes | `cache:idempotency`, `fnb.location_session` |
-| Called by | GST-024, WEB-036 |
+| Called by | GST-024, GST-030, WEB-036, WEB-046 |
 
 **Parameters**
 
@@ -3280,7 +3461,7 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.modifier_group`, `fnb.modifier_option` |
 | Writes | `cache:idempotency`, `fnb.modifier_group`, `fnb.modifier_option` |
-| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| Called by | BO-045 |
 
 **Parameters**
 
@@ -4372,6 +4553,26 @@ Every table this service owns that the slice reads or writes, with its columns a
 | actual_party_size | integer | no |  |
 | table_visit_id | text | no |  |
 | created_at | timestamptz | no |  |
+| amount | numeric(18,4) | yes |  |
+| basis | text | yes |  |
+| hold_expires_at | timestamptz | no | While awaitingDeposit, when the held cover is released if the deposit has not been authorised. |
+| refundable_until | timestamptz | no | startsAt less dining.refundableUntilHours. |
+| variant_id | uuid | no | The venue's table-deposit variant, DepositPolicy.dining.depositVariantId, which the client sends to addCartLine with this booking's id. |
+| cart_line_id | uuid | no | The orders.CartLine carrying the deposit, once added. |
+| deposit_id | uuid | no | The orders.deposit row, once the payment is authorised. |
+
+### `fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| amount | numeric(18,4) | yes |  |
+| basis | text | yes |  |
+| hold_expires_at | timestamptz | no | While awaitingDeposit, when the held cover is released if the deposit has not been authorised. |
+| refundable_until | timestamptz | no | startsAt less dining.refundableUntilHours. |
+| variant_id | uuid | no | The venue's table-deposit variant, DepositPolicy.dining.depositVariantId, which the client sends to addCartLine with this booking's id. |
+| cart_line_id | uuid | no | The orders.CartLine carrying the deposit, once added. |
+| deposit_id | uuid | no | The orders.deposit row, once the payment is authorised. |
 
 ### `fnb.table_session`
 
@@ -4445,9 +4646,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Group | Operations |
 |---|---|
 | bill | `getBill`, `splitBill` |
-| fnb | `applyMenuActions`, `attachModifierGroup`, `buildProductionPlan`, `closeCorrectiveAction`, `compItem`, `completeProductionRun`, `createCombo`, `createTable`, `enterCountLine`, `getAllergenVerification`, `getFnbReservationPolicy`, `getFnbServiceChargePolicy`, `getProductionRun`, `listFnbRecommendations`, `listIngredientSubstitutes`, `listProductionRuns`, `listTemperatureCheckpoints`, `notifyWaitlistParty`, `planProductionRun`, `publishMenu`, `quoteWaitTime`, `reassignServer`, `rebalanceStationLoad`, `recordCorrectiveAction`, `releaseProductionPlan`, `requestBill`, `requestRecount`, `resolveBookingConflict`, `rollbackMenu`, `scheduleMenuPublish`, `sendBookingConfirmation`, `sendOrderNotification`, `setComboSlots`, `setFnbReservationPolicy`, `setFnbServiceChargePolicy`, `setIngredientSubstitutes`, `setKitchenSla`, `setSectionLayout`, `setServiceStage`, `setSubstitutionRules`, `setTemperatureCheckpoint`, `transferOrderItems`, `transferTableVisit`, `updateTable`, `verifyAllergens` |
+| fnb | `applyMenuActions`, `attachModifierGroup`, `buildProductionPlan`, `closeCorrectiveAction`, `compItem`, `completeProductionRun`, `createCombo`, `createTable`, `enterCountLine`, `getAllergenVerification`, `getFnbReservationPolicy`, `getFnbServiceChargePolicy`, `getProductionRun`, `listFnbRecommendations`, `listIngredientSubstitutes`, `listProductionRuns`, `listTemperatureCheckpoints`, `notifyWaitlistParty`, `planProductionRun`, `publishMenu`, `quoteWaitTime`, `reassignServer`, `recordCorrectiveAction`, `releaseProductionPlan`, `requestBill`, `requestRecount`, `resolveBookingConflict`, `rollbackMenu`, `scheduleMenuPublish`, `sendBookingConfirmation`, `sendOrderNotification`, `setComboSlots`, `setFnbReservationPolicy`, `setFnbServiceChargePolicy`, `setIngredientSubstitutes`, `setSectionLayout`, `setServiceStage`, `setSubstitutionRules`, `setTemperatureCheckpoint`, `transferOrderItems`, `transferTableVisit`, `updateTable`, `verifyAllergens` |
 | menu | `listMenuSchedules`, `listMenuVersions` |
 | order | `amendFnbOrder` |
+| outlet | `listOutletTemplates`, `setOutletTemplate` |
 | production | `listRecipes`, `recordWaste`, `setRecipe` |
 | service | `acceptFnbOrder`, `cancelFnbOrder` |
 | table | `getTableVisit`, `updateTableVisit` |

@@ -1,13 +1,13 @@
 id: HLD-LIFECYCLES
 sourceFiles:
   folder: states/
-  files: 126
-  drawn: 125
+  files: 135
+  drawn: 134
   skipped:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 125 state models and 29 events
+title: 134 state models and 29 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -98,7 +98,7 @@ stateModels:
   owner: public-api
   service: PlatformService
   states: null
-  transitions: 4
+  transitions: 6
   initial:
   - active
   terminal:
@@ -106,7 +106,8 @@ stateModels:
   operations:
   - revokeApiCredential
   - rotateApiCredential
-  guarded: 4
+  - setApiClientStatus
+  guarded: 6
   ref: diagrams/lld/lifecycles/api-client.yaml
 - entity: API version
   contract: public-api
@@ -126,7 +127,7 @@ stateModels:
   owner: approvals
   service: TenancyService
   states: null
-  transitions: 13
+  transitions: 21
   initial:
   - draft
   - pending
@@ -141,8 +142,22 @@ stateModels:
   - resubmitApprovalRequest
   - submitApprovalRequest
   - withdrawApprovalRequest
-  guarded: 13
+  guarded: 21
   ref: diagrams/lld/lifecycles/approval-request.yaml
+- entity: Approved action execution
+  contract: approvals
+  owner: approvals
+  service: TenancyService
+  states: null
+  transitions: 10
+  initial:
+  - queued
+  terminal:
+  - succeeded
+  operations:
+  - resolveApprovedActionExecution
+  guarded: 10
+  ref: diagrams/lld/lifecycles/approved-action-execution.yaml
 - entity: Asset
   contract: maintenance
   owner: maintenance
@@ -219,7 +234,7 @@ stateModels:
   owner: marketing
   service: MarketingService
   states: null
-  transitions: 9
+  transitions: 11
   initial:
   - open
   terminal:
@@ -228,8 +243,9 @@ stateModels:
   - addCaseMessage
   - escalateCase
   - reopenCase
+  - setCaseResolution
   - updateCase
-  guarded: 9
+  guarded: 11
   ref: diagrams/lld/lifecycles/case.yaml
 - entity: Catalogue import job
   contract: catalogue
@@ -555,7 +571,7 @@ stateModels:
   owner: orders
   service: CatalogueService
   states: null
-  transitions: 10
+  transitions: 11
   initial:
   - issued
   terminal:
@@ -569,7 +585,8 @@ stateModels:
   - suspendEntitlement
   - transferOrderTickets
   - validateAccess
-  guarded: 10
+  - voidEntitlement
+  guarded: 11
   ref: diagrams/lld/lifecycles/entitlement-status.yaml
 - entity: F&B order
   contract: fnb
@@ -593,14 +610,15 @@ stateModels:
 - entity: Form definition
   contract: marketing-crm
   owner: marketing-crm
-  service: null
+  service: MarketingService
   states: null
   transitions: 5
   initial:
   - draft
   terminal:
   - retired
-  operations: []
+  operations:
+  - approveWaiverTesting
   guarded: 5
   ref: diagrams/lld/lifecycles/form-definition.yaml
 - entity: Game card
@@ -627,6 +645,7 @@ stateModels:
   transitions: 7
   initial:
   - inService
+  - outOfService
   terminal:
   - retired
   operations:
@@ -695,6 +714,35 @@ stateModels:
   operations: []
   guarded: 6
   ref: diagrams/lld/lifecycles/guest-membership-status.yaml
+- entity: Guided choice
+  contract: white-label
+  owner: white-label
+  service: WhiteLabelService
+  states: null
+  transitions: 3
+  initial:
+  - draft
+  terminal: []
+  operations:
+  - publishGuidedChoice
+  - unpublishGuidedChoice
+  guarded: 3
+  ref: diagrams/lld/lifecycles/guided-choice.yaml
+- entity: HardwareDeployment
+  contract: access
+  owner: access
+  service: AccessService
+  states: null
+  transitions: 7
+  initial:
+  - queued
+  terminal:
+  - completed
+  - rolledBack
+  operations:
+  - publishHardwareDeployment
+  guarded: 7
+  ref: diagrams/lld/lifecycles/hardware-deployment.yaml
 - entity: Seat import job
   contract: seating
   owner: seating
@@ -1074,7 +1122,7 @@ stateModels:
   owner: orders
   service: OrderService
   states: null
-  transitions: 9
+  transitions: 11
   initial:
   - authorised
   - pendingConfirmation
@@ -1085,10 +1133,11 @@ stateModels:
   - refunded
   operations:
   - capturePayment
+  - cleanupFailedPayment
   - createRefund
   - inquirePaymentStatus
   - voidPayment
-  guarded: 9
+  guarded: 11
   ref: diagrams/lld/lifecycles/payment.yaml
 - entity: Performance
   contract: catalogue
@@ -1419,7 +1468,7 @@ stateModels:
   owner: resources
   service: VenueOpsService
   states: null
-  transitions: 7
+  transitions: 10
   initial:
   - reserved
   terminal:
@@ -1430,8 +1479,26 @@ stateModels:
   - bookResource
   - checkInResource
   - checkOutResource
-  guarded: 7
+  - setResourceBookingProgress
+  guarded: 10
   ref: diagrams/lld/lifecycles/resource-booking.yaml
+- entity: Resource hold
+  contract: resources
+  owner: resources
+  service: OrderService
+  states: null
+  transitions: 3
+  initial:
+  - held
+  terminal:
+  - converted
+  - released
+  - expired
+  operations:
+  - createOrder
+  - relinquishResourceHold
+  guarded: 3
+  ref: diagrams/lld/lifecycles/resource-hold.yaml
 - entity: Resource
   contract: resources
   owner: resources
@@ -1773,16 +1840,17 @@ stateModels:
   owner: fnb
   service: FnbService
   states: null
-  transitions: 9
+  transitions: 12
   initial:
   - booked
+  - awaitingDeposit
   terminal:
   - completed
   - cancelled
   operations:
   - seatTableReservation
   - updateTableReservation
-  guarded: 9
+  guarded: 12
   ref: diagrams/lld/lifecycles/table-reservation.yaml
 - entity: Table visit
   contract: fnb
@@ -1889,6 +1957,67 @@ stateModels:
   - receiveStockTransfer
   guarded: 6
   ref: diagrams/lld/lifecycles/transfer.yaml
+- entity: Transport departure
+  contract: transport
+  owner: transport
+  service: null
+  states: null
+  transitions: 8
+  initial:
+  - scheduled
+  - onSale
+  terminal:
+  - departed
+  - cancelled
+  operations: []
+  guarded: 8
+  ref: diagrams/lld/lifecycles/transport-departure.yaml
+- entity: Transport network import
+  contract: transport
+  owner: transport
+  service: VenueOpsService
+  states: null
+  transitions: 4
+  initial:
+  - validating
+  terminal:
+  - failed
+  - applied
+  - expired
+  operations:
+  - applyTransportNetworkImport
+  guarded: 4
+  ref: diagrams/lld/lifecycles/transport-network-import.yaml
+- entity: Transport route
+  contract: transport
+  owner: transport
+  service: VenueOpsService
+  states: null
+  transitions: 6
+  initial:
+  - draft
+  terminal:
+  - retired
+  operations:
+  - setTransportRouteStatus
+  guarded: 6
+  ref: diagrams/lld/lifecycles/transport-route.yaml
+- entity: Transport timetable
+  contract: transport
+  owner: transport
+  service: VenueOpsService
+  states: null
+  transitions: 4
+  initial:
+  - draft
+  terminal:
+  - superseded
+  - withdrawn
+  operations:
+  - publishTransportTimetable
+  - withdrawTransportTimetable
+  guarded: 4
+  ref: diagrams/lld/lifecycles/transport-timetable.yaml
 - entity: Shift variance review
   contract: finance
   owner: ledger
@@ -1985,6 +2114,23 @@ stateModels:
   - relinquishWalletAuthorisation
   guarded: 7
   ref: diagrams/lld/lifecycles/wallet-authorisation.yaml
+- entity: Wallet dispute
+  contract: wallet
+  owner: wallet
+  service: WalletService
+  states: null
+  transitions: 13
+  initial:
+  - open
+  terminal:
+  - upheld
+  - rejected
+  - withdrawn
+  operations:
+  - resolveWalletDispute
+  - withdrawWalletDispute
+  guarded: 13
+  ref: diagrams/lld/lifecycles/wallet-dispute.yaml
 - entity: Wallet pass
   contract: orders
   owner: orders

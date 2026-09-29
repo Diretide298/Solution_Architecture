@@ -22,7 +22,7 @@ platform:
     deviceOwnership: tenant workstation
     networkAssumption: public internet
     releaseCadence: weekly
-  screenCount: 99
+  screenCount: 100
   designReferences:
   - path: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
     note: The CMS **is** the White Label Builder. These six boards are the design, not a reference for
@@ -418,6 +418,7 @@ screens:
         columns:
         - BrandIdentity.logoAssetRef
         - BrandIdentity.logoDarkAssetRef
+        - BrandIdentity.logoVariant
         - BrandIdentity.faviconAssetRef
         - BrandIdentity.splashImageAssetRefs
         - BrandIdentity.splashDurationSeconds
@@ -486,8 +487,10 @@ screens:
     component: modal
     trigger: Save brand identity
     body: '**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional:
-      `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`,
-      `showLoadingIndicator`, `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.'
+      `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading
+      of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`,
+      `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`,
+      `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: BrandIdentity
     confirm:
       label: Save brand identity
@@ -497,6 +500,7 @@ screens:
       discards:
       - logoAssetRef
       - logoDarkAssetRef
+      - logoVariant
       - faviconAssetRef
       - splashImageAssetRefs
       - splashDurationSeconds
@@ -618,6 +622,8 @@ screens:
         - Theme.textColour
         - Theme.darkMode
         - Theme.cornerRadius
+        - Theme.surfaceStyle
+        - Theme.buttonStyle
         operation: getTheme
         provenance: contract white-label.yaml GET /tenant-config/theme
     - name: actionBar
@@ -702,8 +708,9 @@ screens:
     component: modal
     trigger: Save theme
     body: '**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`,
-      `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`. Dismissing
-      sends nothing; the screen behind is unchanged.'
+      `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle`
+      (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided
+      29 September, rev 3 CFG-3). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: Theme
     confirm:
       label: Save theme
@@ -718,6 +725,8 @@ screens:
       - accentColour
       - darkMode
       - cornerRadius
+      - surfaceStyle
+      - buttonStyle
     provenance: contract white-label.yaml PUT /tenant-config/theme
 - id: CMS-004
   name: Logo & Assets
@@ -805,6 +814,7 @@ screens:
         columns:
         - BrandIdentity.logoAssetRef
         - BrandIdentity.logoDarkAssetRef
+        - BrandIdentity.logoVariant
         - BrandIdentity.faviconAssetRef
         - BrandIdentity.splashImageAssetRefs
         - BrandIdentity.splashDurationSeconds
@@ -853,8 +863,10 @@ screens:
     component: modal
     trigger: Save brand identity
     body: '**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional:
-      `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`,
-      `showLoadingIndicator`, `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.'
+      `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading
+      of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`,
+      `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`,
+      `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: BrandIdentity
     confirm:
       label: Save brand identity
@@ -864,6 +876,7 @@ screens:
       discards:
       - logoAssetRef
       - logoDarkAssetRef
+      - logoVariant
       - faviconAssetRef
       - splashImageAssetRefs
       - splashDurationSeconds
@@ -942,6 +955,8 @@ screens:
         - Theme.textColour
         - Theme.darkMode
         - Theme.cornerRadius
+        - Theme.surfaceStyle
+        - Theme.buttonStyle
         operation: getTheme
         provenance: contract white-label.yaml GET /tenant-config/theme
     - name: actionBar
@@ -989,10 +1004,11 @@ screens:
     component: modal
     trigger: Save theme
     body: '**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`,
-      `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`. **A colour
-      pair that fails contrast is refused** (`400 ContrastProblem`, decided 28 September, audit R139 (a)):
-      the modal stays open with the failing pairs marked. Dismissing sends nothing; the screen behind
-      is unchanged.'
+      `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle`
+      (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided
+      29 September, rev 3 CFG-3). **A colour pair that fails contrast is refused** (`400 ContrastProblem`,
+      decided 28 September, audit R139 (a)): the modal stays open with the failing pairs marked. Dismissing
+      sends nothing; the screen behind is unchanged.'
     bindsTo: Theme
     confirm:
       label: Save theme
@@ -1007,6 +1023,8 @@ screens:
       - accentColour
       - darkMode
       - cornerRadius
+      - surfaceStyle
+      - buttonStyle
     provenance: contract white-label.yaml PUT /tenant-config/theme
 - id: CMS-006
   name: Component Preview
@@ -1391,6 +1409,24 @@ screens:
     purpose: Which modules are on, so a section whose module is off is disabled in the builder (decided
       28 September, audit R163 (4))
     trigger: onLoad
+  - operationId: setHeader
+    contract: white-label
+    purpose: Configure the header
+    trigger: onAction
+    provenance: decided 29 September, VM close-out (venue management and configuration)
+    invalidates:
+    - listContentPages
+    - getHomepageLayout
+    - getModuleEnablement
+  - operationId: deleteContentPage
+    contract: white-label
+    purpose: Delete a content page
+    trigger: onAction
+    provenance: decided 29 September, VM close-out (venue management and configuration)
+    invalidates:
+    - listContentPages
+    - getHomepageLayout
+    - getModuleEnablement
   wireframe:
     status: notStarted
     provenance: generated
@@ -1661,6 +1697,14 @@ screens:
     contract: white-label
     purpose: List banners
     trigger: onLoad
+  - operationId: deleteBanner
+    contract: white-label
+    purpose: Delete a banner
+    trigger: onAction
+    provenance: decided 29 September, VM close-out (venue management and configuration)
+    invalidates:
+    - listPromoBlocks
+    - listBanners
   entryState:
     preloaded:
     - PromoBlock.id
@@ -1918,6 +1962,11 @@ screens:
     trigger: onAction
     invalidates:
     - listMenus
+  - operationId: setNavigation
+    contract: white-label
+    purpose: Set main and overflow navigation
+    trigger: onAction
+    provenance: decided 29 September, VM close-out (venue management and configuration)
   entryState:
     params:
     - name: menuId
@@ -3127,6 +3176,7 @@ screens:
     - CMS-013
     - CMS-017
     - CMS-018
+    - CMS-101
     inferred: false
     entryFrom:
     - CMS-001
@@ -3153,8 +3203,12 @@ screens:
         so the edge carries nothing and CMS-017 opens cold
     - to: CMS-018
       trigger: Consent & Legal
-      provenance: derived — CMS-018 declares entryState.params policyKind and CMS-016 holds none of them,
-        so the edge carries nothing and CMS-018 opens cold
+      provenance: derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds
+        none of them, so the edge carries nothing and CMS-018 opens cold
+    - to: CMS-101
+      trigger: Help me choose
+      provenance: authored 29 September, rev 3 REV3-11 — Help me choose sits on the booking page these
+        settings shape, so it is set up from here
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
     sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
@@ -3162,7 +3216,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getTenantConfig` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: The values the whole site inherits from.
+  purpose: The values the whole site inherits from, and the booking-flow settings each venue may override
+    (decided 29 September, rev 3 CFG-11).
   layout:
     template: detail
     regions:
@@ -3208,8 +3263,73 @@ screens:
         - BookingFlowConfig.searchInBanner
         - BookingFlowConfig.singleEventPage
         - BookingFlowConfig.quantitiesOnAddOns
+        - BookingFlowConfig.cartSideInRtl
+        - BookingFlowConfig.categoryDisplay
+        - BookingFlowConfig.eventBannerDates
+        - BookingFlowConfig.timesPerPage
+        - BookingFlowConfig.dayPartFilter
+        - BookingFlowConfig.dayPartBoundaries
+        - BookingFlowConfig.performanceReveal
+        - BookingFlowConfig.signInAt
+        - BookingFlowConfig.seatEventDateMode
+        - BookingFlowConfig.seatViewPosition
+        - BookingFlowConfig.seatTimeBar
+        - BookingFlowConfig.ticketCategories
+        - BookingFlowConfig.ticketTags
+        - BookingFlowConfig.cardInfo
+        - BookingFlowConfig.quickTour
+        - BookingFlowConfig.conciergeMascot
+        - BookingFlowConfig.showInfoOnly
+        - BookingFlowConfig.locationSwitcher
+        - BookingFlowConfig.consentQuestionIds
+        - BookingFlowConfig.venueOverrides
         operation: getBookingFlowConfig
+        notes: '**The rev 3 booking rules, each with its default** (decided 29 September, rev 3). `timesPerPage`
+          8, 12, 24 or all (24) and `dayPartFilter` (on), with `dayPartBoundaries` afternoon from 12:00
+          and evening from 17:00 in the venue time zone (REV3-1); `performanceReveal` date, then time,
+          then tickets, or all at once (REV3-2); `signInAt` after add-ons or at payment (REV3-3); `seatEventDateMode`
+          an inline step or a pop-up on the seat map (REV3-4); `seatViewPosition` bottom, right, left
+          or top, web only (REV3-5); `seatTimeBar` (on, REV3-6); `cartLayout` gains `floatingIcon` and
+          `cartSideInRtl` keeps the basket right or mirrors it (REV3-10); `showInfoOnly` (on, REV3-14);
+          `ticketCategories` category then subcategory, or a flat list (REV3-16); `locationSwitcher` (REV3-18);
+          `quickTour` (off, REV3-20); `ticketTags` (on, 23SEP-3); `cardInfo` (on, 23SEP-6); `categoryDisplay`
+          grid or row strip (23SEP-18); `eventBannerDates` (off, 23SEP-19); `conciergeMascot` (on, CFG-5).
+          `cardLayout`, `cardSize` and `density` are fixed lists now: stacked rows, split rows, cards
+          across, poster cards; compact, standard, large, extra large; compact, standard, roomy (DG-6).
+          **There is no swim-consent toggle and no F&B-modifier toggle**: a consent question is attached
+          to the flow or the product (REV3-26), and modifiers show when an item has groups attached (REV3-9).'
         provenance: contract white-label.yaml GET /tenant-config/booking-flow
+      - kind: selectField
+        label: Settings for
+        operation: getBookingFlowConfig
+        notes: '**Which level is being edited** (decided 29 September, rev 3 CFG-11). *All venues* edits
+          the tenant settings; picking a venue edits that venue''s entry in `venueOverrides` and shows
+          beside each field the tenant value it inherits. Sends `?effectiveForVenueId=` to show the settings
+          in force at that venue, resolved field by field. Venues from `listOrgUnits`.'
+        provenance: contract white-label.yaml GET /tenant-config/booking-flow
+      - kind: dataTable
+        label: Venues that differ from the tenant
+        bindsTo: BookingFlowVenueOverride
+        columns:
+        - BookingFlowVenueOverride.venueId
+        - BookingFlowVenueOverride.settings
+        operation: getBookingFlowConfig
+        notes: '**One row per venue that overrides anything** (decided 29 September, rev 3 CFG-11). The
+          editor sets only the fields that differ; a field left empty inherits the tenant value, and clearing
+          one removes it from the override. A venue that is not one of the tenant''s active venues, or
+          a second row for the same venue, is refused `400` and the row is marked. An override kept for
+          a closed venue is shown greyed: it has no effect.'
+        provenance: contract white-label.yaml GET /tenant-config/booking-flow
+      - kind: multiSelect
+        label: Consent questions this booking flow asks
+        bindsTo: BookingFlowConfig.consentQuestionIds
+        operation: listConsentQuestions
+        notes: '**The questions every booking in this flow asks, whatever the product** (decided 29 September,
+          rev 3 REV3-26), e.g. a water park''s "Are you able to swim?". Options are the active questions
+          from `listConsentQuestions`, written on CMS-018; a product''s own questions are attached on
+          BO-008. The guest is asked the union, each question once. Overridable per venue like every other
+          setting here.'
+        provenance: contract marketing-crm.yaml GET /consent-questions
     - name: actionBar
       slot: rowActions
       components:
@@ -3220,6 +3340,8 @@ screens:
   states:
     loading: The site settings, read by `getTenantConfig`.
     error: Could not load. Names which read failed and leaves the site settings untouched.
+    emptyNoResults: A venue picked in Settings for with no override shows the tenant settings it inherits,
+      labelled as inherited, rather than an empty form (rev 3 CFG-11).
     emptyFirstRun: No site settings yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
     emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `getBookingFlowConfig` requires,
@@ -3238,6 +3360,14 @@ screens:
     contract: white-label
     purpose: Full working configuration
     trigger: onLoad
+  - operationId: listConsentQuestions
+    contract: marketing-crm
+    purpose: The venue's consent questions, to attach to the booking flow (rev 3 REV3-26)
+    trigger: onLoad
+  - operationId: listOrgUnits
+    contract: tenancy
+    purpose: The tenant's venues, for the per-venue override picker (rev 3 CFG-11)
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated
@@ -3251,7 +3381,10 @@ screens:
     trigger: Save booking flow config
     body: '**Collects what `setBookingFlowConfig` sends before it is called.** Nothing in the body is
       required. Optional: `preset`, `stepIndicator`, `cartLayout`, `cardLayout`, `cardSize`, `extrasStep`,
-      `seatPicker`, `mapView`, `density`, `embedMode`, `heroBanner`, `searchInBanner` and 2 more. Dismissing
+      `seatPicker`, `mapView`, `density`, `embedMode`, `heroBanner`, `searchInBanner`, `singleEventPage`,
+      `quantitiesOnAddOns`, the rev 3 booking rules on the panel above, `consentQuestionIds` and `venueOverrides`
+      (decided 29 September, rev 3 CFG-11). **The body is the tenant settings plus every venue override**:
+      saving a venue''s override sends the whole configuration with that venue''s row changed. Dismissing
       sends nothing; the screen behind is unchanged.'
     bindsTo: BookingFlowConfig
     confirm:
@@ -3274,6 +3407,26 @@ screens:
       - searchInBanner
       - singleEventPage
       - quantitiesOnAddOns
+      - cartSideInRtl
+      - categoryDisplay
+      - eventBannerDates
+      - timesPerPage
+      - dayPartFilter
+      - dayPartBoundaries
+      - performanceReveal
+      - signInAt
+      - seatEventDateMode
+      - seatViewPosition
+      - seatTimeBar
+      - ticketCategories
+      - ticketTags
+      - cardInfo
+      - quickTour
+      - conciergeMascot
+      - showInfoOnly
+      - locationSwitcher
+      - consentQuestionIds
+      - venueOverrides
     provenance: contract white-label.yaml PUT /tenant-config/booking-flow
 - id: CMS-017
   name: Domain & Certificate
@@ -3486,14 +3639,17 @@ screens:
   pattern: listDetail
   patternReason: '`listPolicies` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: Manage the notices every consent is captured against.
+  purpose: Manage the notices every consent is captured against, and the booking consent questions a venue
+    asks ("Are you able to swim?", "I accept the risk"), with the record of every answer (decided 29 September,
+    rev 3 REV3-26).
   states:
     loading: The consent legal list.
     error: Could not load. Names which read failed and leaves the consent legal untouched.
     emptyFirstRun: No consent legal yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
-    emptyNoResults: 'Never shown: `listPolicies` takes no filter, so an empty list is always the first-run
-      state above.'
+    emptyNoResults: '`listPolicies` takes no filter. The consent questions (kind, status) and the consent
+      records (order, guest, question) do: an empty result names the active filter and offers to clear
+      it.'
     emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires, and
       names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
       to support with the wrong question.
@@ -3518,6 +3674,26 @@ screens:
     trigger: onAction
     invalidates:
     - listPolicies
+  - operationId: listConsentQuestions
+    contract: marketing-crm
+    purpose: The venue's booking consent questions (rev 3 REV3-26)
+    trigger: onLoad
+  - operationId: createConsentQuestion
+    contract: marketing-crm
+    purpose: Define a consent question, created at version 1
+    trigger: onAction
+    invalidates:
+    - listConsentQuestions
+  - operationId: updateConsentQuestion
+    contract: marketing-crm
+    purpose: Change a question (a new version) or retire it
+    trigger: onAction
+    invalidates:
+    - listConsentQuestions
+  - operationId: listConsentAnswers
+    contract: marketing-crm
+    purpose: The consent records, filtered by order, guest or question
+    trigger: onAction
   wireframe:
     status: notStarted
     provenance: generated
@@ -3558,6 +3734,46 @@ screens:
         - ConsentPurposeConfig.expiresAfterMonths
         operation: listConsentPurposes
         provenance: contract marketing-crm.yaml GET /consent-purposes
+      - kind: dataTable
+        label: Every booking consent question
+        bindsTo: ConsentQuestion
+        columns:
+        - ConsentQuestion.kind
+        - ConsentQuestion.text
+        - ConsentQuestion.version
+        - ConsentQuestion.scope
+        - ConsentQuestion.required
+        - ConsentQuestion.blockingAnswer
+        - ConsentQuestion.status
+        - ConsentQuestion.updatedAt
+        operation: listConsentQuestions
+        notes: '**A consent, not a data field** (decided 29 September, rev 3 REV3-26). Each question has
+          its own text per locale, a version, and whether it is asked for each person or once per booking.
+          Filter by `kind` and `status`. **Attaching** is done where the question is used: to a booking
+          flow on CMS-016 (`BookingFlowConfig.consentQuestionIds`, per venue), to a product on BO-008
+          (`Product.consentQuestionIds`).'
+        provenance: contract marketing-crm.yaml GET /consent-questions
+      - kind: dataTable
+        label: Consent records
+        bindsTo: BookingConsentRecord
+        columns:
+        - BookingConsentRecord.answeredAt
+        - BookingConsentRecord.questionId
+        - BookingConsentRecord.questionVersion
+        - BookingConsentRecord.answer
+        - BookingConsentRecord.scope
+        - BookingConsentRecord.personName
+        - BookingConsentRecord.orderId
+        - BookingConsentRecord.answeredBySubjectId
+        - BookingConsentRecord.answeredByPrincipalId
+        - BookingConsentRecord.source
+        - BookingConsentRecord.blocksBooking
+        - BookingConsentRecord.supersededAt
+        operation: listConsentAnswers
+        notes: '**What was asked, at which version, what was answered, for whom, by whom and when** (rev
+          3 REV3-26). Filter by order, guest or question. Read-only: an answer is never edited here, and
+          a superseded answer stays listed with `supersededAt`.'
+        provenance: contract marketing-crm.yaml GET /consent-answers
     - name: contextPanel
       slot: selection
       components:
@@ -3575,6 +3791,20 @@ screens:
         - Policy.scopePath
         operation: listPolicies
         provenance: contract white-label.yaml GET /tenant-config/policies
+      - kind: detailPanel
+        label: The selected consent question
+        bindsTo: ConsentQuestion
+        columns:
+        - ConsentQuestion.kind
+        - ConsentQuestion.text
+        - ConsentQuestion.helpText
+        - ConsentQuestion.version
+        - ConsentQuestion.scope
+        - ConsentQuestion.required
+        - ConsentQuestion.blockingAnswer
+        - ConsentQuestion.status
+        operation: listConsentQuestions
+        provenance: contract marketing-crm.yaml GET /consent-questions
     - name: actionBar
       slot: rowActions
       components:
@@ -3586,9 +3816,28 @@ screens:
         label: Save consent purposes
         operation: setConsentPurposes
         provenance: contract marketing-crm.yaml PUT /consent-purposes
+      - kind: secondaryButton
+        label: New consent question
+        operation: createConsentQuestion
+        provenance: contract marketing-crm.yaml POST /consent-questions
+      - kind: secondaryButton
+        label: Save as new version
+        operation: updateConsentQuestion
+        notes: '**A change to what the guest is asked is a new version, never an edit** (rev 3 REV3-26):
+          changing the text, scope, required or blocking answer raises `version` by one, and every answer
+          already given keeps the version it was given against.'
+        provenance: contract marketing-crm.yaml PATCH /consent-questions/{questionId}
+      - kind: destructiveButton
+        label: Retire question
+        operation: updateConsentQuestion
+        notes: Sets `status` to `retired`. It stops being asked on every flow and product it is attached
+          to and changes no version; the answers already given stay on record.
+        provenance: contract marketing-crm.yaml PATCH /consent-questions/{questionId}
   entryState:
     params:
     - name: policyKind
+      from: navigation
+    - name: questionId
       from: navigation
     preloaded:
     - Policy.kind
@@ -3625,6 +3874,48 @@ screens:
       discards:
       - purposes
     provenance: contract marketing-crm.yaml PUT /consent-purposes
+  - id: formCreateConsentQuestion
+    component: modal
+    trigger: New consent question
+    body: '**Collects what `createConsentQuestion` sends before it is called.** Required: `kind`, `text`
+      (every tenant language). Optional: `helpText`, `scope` (`perPerson`, the default, or `perBooking`),
+      `required` (default true: checkout waits for it) and `blockingAnswer` (`yes`, `no` or `none`, the
+      default: the answer that stops the booking for the person or booking it covers). Created at version
+      1 (rev 3 REV3-26). Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ConsentQuestion
+    confirm:
+      label: Create question
+      operation: createConsentQuestion
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - text
+      - helpText
+      - scope
+      - required
+      - blockingAnswer
+    provenance: contract marketing-crm.yaml POST /consent-questions
+  - id: formUpdateConsentQuestion
+    component: modal
+    trigger: Save as new version
+    body: '**Says, before saving, that the guest will be asked version N+1 from the next cart read** and
+      that answers already given keep their version (rev 3 REV3-26). Optional: `text`, `helpText`, `scope`,
+      `required`, `blockingAnswer`, `status`. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: ConsentQuestion
+    confirm:
+      label: Save new version
+      operation: updateConsentQuestion
+    dismiss:
+      label: Cancel
+      discards:
+      - text
+      - helpText
+      - scope
+      - required
+      - blockingAnswer
+      - status
+    provenance: contract marketing-crm.yaml PATCH /consent-questions/{questionId}
 - id: CMS-019
   name: User Access
   module: White Label
@@ -4408,11 +4699,7 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - CookieTrackingDigitalTechnologyRegistryView.firstPartyCookie
-    - CookieTrackingDigitalTechnologyRegistryView.thirdPartyCookie
-    - CookieTrackingDigitalTechnologyRegistryView.mobileSdk
-    - CookieTrackingDigitalTechnologyRegistryView.analyticsTracker
-    - CookieTrackingDigitalTechnologyRegistryView.advertisingPixel
+    - CookieTrackingDigitalTechnologyRegistryView.technologyType
   wireframe:
     status: notStarted
     provenance: generated
@@ -4790,11 +5077,7 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - PrivacyNoticePolicyTermsVersionManagementView.privacyPolicy
-    - PrivacyNoticePolicyTermsVersionManagementView.privacyNotice
-    - PrivacyNoticePolicyTermsVersionManagementView.cookieNotice
-    - PrivacyNoticePolicyTermsVersionManagementView.marketingNotice
-    - PrivacyNoticePolicyTermsVersionManagementView.biometricPrivacyNotice
+    - PrivacyNoticePolicyTermsVersionManagementView.documentType
   wireframe:
     status: notStarted
     provenance: generated
@@ -5323,11 +5606,10 @@ screens:
       - kind: dataTable
         label: Every customer privacy consent
         columns:
-        - CustomerPrivacyConsentPreference360View.privacyPolicyVersion
-        - CustomerPrivacyConsentPreference360View.cookieNoticeVersion
-        - CustomerPrivacyConsentPreference360View.biometricNotice
-        - CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice
-        - CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments
+        - CustomerPrivacyConsentPreference360View.policyAcceptance[].documentType
+        - CustomerPrivacyConsentPreference360View.policyAcceptance[].acceptedVersion
+        - CustomerPrivacyConsentPreference360View.policyAcceptance[].currentVersion
+        - CustomerPrivacyConsentPreference360View.policyAcceptance[].requiresReacceptance
         bindsTo: CustomerPrivacyConsentPreference360View
         operation: listCustomerPrivacyConsent
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 22 §Display
@@ -5338,11 +5620,10 @@ screens:
         label: The selected customer privacy consent
         bindsTo: CustomerPrivacyConsentPreference360View
         columns:
-        - CustomerPrivacyConsentPreference360View.privacyPolicyVersion
-        - CustomerPrivacyConsentPreference360View.cookieNoticeVersion
-        - CustomerPrivacyConsentPreference360View.biometricNotice
-        - CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice
-        - CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments
+        - CustomerPrivacyConsentPreference360View.policyAcceptance[].documentType
+        - CustomerPrivacyConsentPreference360View.policyAcceptance[].acceptedVersion
+        - CustomerPrivacyConsentPreference360View.policyAcceptance[].currentVersion
+        - CustomerPrivacyConsentPreference360View.policyAcceptance[].requiresReacceptance
         notes: 'The pack groups this record''s detail under its own headings: “Display appropriate information
           such as”, “Email Consente”, “SMS Withdraw”, “Consente”, “Personalizatio”, “Show current”.'
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 22 §Display
@@ -5361,12 +5642,7 @@ screens:
     purpose: Customer Privacy, Consent & Preference 360°
     trigger: onLoad
   entryState:
-    preloaded:
-    - CustomerPrivacyConsentPreference360View.privacyPolicyVersion
-    - CustomerPrivacyConsentPreference360View.cookieNoticeVersion
-    - CustomerPrivacyConsentPreference360View.biometricNotice
-    - CustomerPrivacyConsentPreference360View.childrenSPrivacyNotice
-    - CustomerPrivacyConsentPreference360View.otherApplicablePrivacyDocuments
+    preloaded: []
   wireframe:
     status: notStarted
     provenance: generated
@@ -5419,12 +5695,8 @@ screens:
       - kind: dataTable
         label: Every consent evidence history
         columns:
-        - ConsentEvidenceHistoryWithdrawalManagementView.requested
-        - ConsentEvidenceHistoryWithdrawalManagementView.processed
-        - ConsentEvidenceHistoryWithdrawalManagementView.propagated
-        - ConsentEvidenceHistoryWithdrawalManagementView.acknowledged
-        - ConsentEvidenceHistoryWithdrawalManagementView.failed
-        - Retry Required
+        - ConsentEvidenceHistoryWithdrawalManagementView.propagation[].target
+        - ConsentEvidenceHistoryWithdrawalManagementView.propagation[].status
         bindsTo: ConsentEvidenceHistoryWithdrawalManagementView
         operation: listConsentEvidenceWithdrawal
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 24 §Display
@@ -5435,12 +5707,8 @@ screens:
         label: The selected consent evidence history
         bindsTo: ConsentEvidenceHistoryWithdrawalManagementView
         columns:
-        - ConsentEvidenceHistoryWithdrawalManagementView.requested
-        - ConsentEvidenceHistoryWithdrawalManagementView.processed
-        - ConsentEvidenceHistoryWithdrawalManagementView.propagated
-        - ConsentEvidenceHistoryWithdrawalManagementView.acknowledged
-        - ConsentEvidenceHistoryWithdrawalManagementView.failed
-        - Retry Required
+        - ConsentEvidenceHistoryWithdrawalManagementView.propagation[].target
+        - ConsentEvidenceHistoryWithdrawalManagementView.propagation[].status
         notes: 'The pack groups this record''s detail under its own headings: “Consent Evidence Record”,
           “Evidence Principle”, “Withdrawal”, “Central Consent Engine”.'
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 24 §Display
@@ -5460,11 +5728,6 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - ConsentEvidenceHistoryWithdrawalManagementView.requested
-    - ConsentEvidenceHistoryWithdrawalManagementView.processed
-    - ConsentEvidenceHistoryWithdrawalManagementView.propagated
-    - ConsentEvidenceHistoryWithdrawalManagementView.acknowledged
-    - ConsentEvidenceHistoryWithdrawalManagementView.failed
     - Retry Required
   wireframe:
     status: notStarted
@@ -5644,11 +5907,8 @@ screens:
       - kind: dataTable
         label: Every data discovery access
         columns:
-        - DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records
-        - DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records
-        - DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record
-        - DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records
-        - DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records
+        - DataDiscoveryAccessExportCorrectionWorkspaceView.results[].source
+        - DataDiscoveryAccessExportCorrectionWorkspaceView.results[].recordCount
         bindsTo: DataDiscoveryAccessExportCorrectionWorkspaceView
         operation: setDataDiscoveryAccess
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 28 §Show
@@ -5659,11 +5919,8 @@ screens:
         label: The selected data discovery access
         bindsTo: DataDiscoveryAccessExportCorrectionWorkspaceView
         columns:
-        - DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records
-        - DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records
-        - DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record
-        - DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records
-        - DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records
+        - DataDiscoveryAccessExportCorrectionWorkspaceView.results[].source
+        - DataDiscoveryAccessExportCorrectionWorkspaceView.results[].recordCount
         notes: 'The pack groups this record''s detail under its own headings: “Search using”, “Potential
           sources”, “Export Package”, “Correction”, “Before release”.'
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 28 §Show
@@ -5688,12 +5945,7 @@ screens:
     purpose: Data Discovery, Access, Export & Correction Workspace
     trigger: onAction
   entryState:
-    preloaded:
-    - DataDiscoveryAccessExportCorrectionWorkspaceView.ticketing82Records
-    - DataDiscoveryAccessExportCorrectionWorkspaceView.orders26Records
-    - DataDiscoveryAccessExportCorrectionWorkspaceView.membership1Record
-    - DataDiscoveryAccessExportCorrectionWorkspaceView.crm14Records
-    - DataDiscoveryAccessExportCorrectionWorkspaceView.consent17Records
+    preloaded: []
   wireframe:
     status: notStarted
     provenance: generated
@@ -5808,11 +6060,7 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - DeletionAnonymizationRestrictionOperationsView.anonymize
-    - DeletionAnonymizationRestrictionOperationsView.pseudonymizeWhereConfigured
-    - DeletionAnonymizationRestrictionOperationsView.restrictProcessing
-    - DeletionAnonymizationRestrictionOperationsView.suppressMarketing
-    - DeletionAnonymizationRestrictionOperationsView.disconnectThirdPartyProfile
+    - DeletionAnonymizationRestrictionOperationsView.actionType
   wireframe:
     status: notStarted
     provenance: generated
@@ -6014,14 +6262,14 @@ screens:
         label: Every privacy compliance exception
         columns:
         - PrivacyComplianceExceptionInvestigationWorkspaceView.severity
-        - PrivacyComplianceExceptionInvestigationWorkspaceView.exception
-        - PrivacyComplianceExceptionInvestigationWorkspaceView.customer
+        - PrivacyComplianceExceptionInvestigationWorkspaceView.category
+        - PrivacyComplianceExceptionInvestigationWorkspaceView.subjectId
         - PrivacyComplianceExceptionInvestigationWorkspaceView.system
-        - PrivacyComplianceExceptionInvestigationWorkspaceView.brand
+        - PrivacyComplianceExceptionInvestigationWorkspaceView.brandId
         - PrivacyComplianceExceptionInvestigationWorkspaceView.country
         - PrivacyComplianceExceptionInvestigationWorkspaceView.detectedAt
-        - PrivacyComplianceExceptionInvestigationWorkspaceView.owner
-        - PrivacyComplianceExceptionInvestigationWorkspaceView.sla
+        - PrivacyComplianceExceptionInvestigationWorkspaceView.ownerPrincipalId
+        - PrivacyComplianceExceptionInvestigationWorkspaceView.slaDueAt
         - PrivacyComplianceExceptionInvestigationWorkspaceView.status
         bindsTo: PrivacyComplianceExceptionInvestigationWorkspaceView
         operation: setPrivacyComplianceException
@@ -6034,14 +6282,14 @@ screens:
         bindsTo: PrivacyComplianceExceptionInvestigationWorkspaceView
         columns:
         - PrivacyComplianceExceptionInvestigationWorkspaceView.severity
-        - PrivacyComplianceExceptionInvestigationWorkspaceView.exception
-        - PrivacyComplianceExceptionInvestigationWorkspaceView.customer
+        - PrivacyComplianceExceptionInvestigationWorkspaceView.category
+        - PrivacyComplianceExceptionInvestigationWorkspaceView.subjectId
         - PrivacyComplianceExceptionInvestigationWorkspaceView.system
-        - PrivacyComplianceExceptionInvestigationWorkspaceView.brand
+        - PrivacyComplianceExceptionInvestigationWorkspaceView.brandId
         - PrivacyComplianceExceptionInvestigationWorkspaceView.country
         - PrivacyComplianceExceptionInvestigationWorkspaceView.detectedAt
-        - PrivacyComplianceExceptionInvestigationWorkspaceView.owner
-        - PrivacyComplianceExceptionInvestigationWorkspaceView.sla
+        - PrivacyComplianceExceptionInvestigationWorkspaceView.ownerPrincipalId
+        - PrivacyComplianceExceptionInvestigationWorkspaceView.slaDueAt
         - PrivacyComplianceExceptionInvestigationWorkspaceView.status
         notes: 'The pack groups this record''s detail under its own headings: “Provide”, “Workflow”, “Important
           Boundary”.'
@@ -6078,10 +6326,7 @@ screens:
   entryState:
     preloaded:
     - PrivacyComplianceExceptionInvestigationWorkspaceView.severity
-    - PrivacyComplianceExceptionInvestigationWorkspaceView.exception
-    - PrivacyComplianceExceptionInvestigationWorkspaceView.customer
     - PrivacyComplianceExceptionInvestigationWorkspaceView.system
-    - PrivacyComplianceExceptionInvestigationWorkspaceView.brand
     - PrivacyComplianceExceptionInvestigationWorkspaceView.country
   wireframe:
     status: notStarted
@@ -6279,12 +6524,12 @@ screens:
         - PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate
         - PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory
         - PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests
-        - PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime
-        - PrivacyAnalyticsAiComplianceIntelligenceView.slaCompliance
+        - PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionSeconds
+        - PrivacyAnalyticsAiComplianceIntelligenceView.slaComplianceRate
         - PrivacyAnalyticsAiComplianceIntelligenceView.deletionCompletionRate
-        - PrivacyAnalyticsAiComplianceIntelligenceView.retentionCompliance
-        - PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptance
-        - PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletion
+        - PrivacyAnalyticsAiComplianceIntelligenceView.retentionComplianceRate
+        - PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptanceRate
+        - PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletionRate
         - PrivacyAnalyticsAiComplianceIntelligenceView.privacyExceptions
         - PrivacyAnalyticsAiComplianceIntelligenceView.consentPropagationFailures
         bindsTo: PrivacyAnalyticsAiComplianceIntelligenceView
@@ -6302,12 +6547,12 @@ screens:
         - PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate
         - PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory
         - PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests
-        - PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime
-        - PrivacyAnalyticsAiComplianceIntelligenceView.slaCompliance
+        - PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionSeconds
+        - PrivacyAnalyticsAiComplianceIntelligenceView.slaComplianceRate
         - PrivacyAnalyticsAiComplianceIntelligenceView.deletionCompletionRate
-        - PrivacyAnalyticsAiComplianceIntelligenceView.retentionCompliance
-        - PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptance
-        - PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletion
+        - PrivacyAnalyticsAiComplianceIntelligenceView.retentionComplianceRate
+        - PrivacyAnalyticsAiComplianceIntelligenceView.policyAcceptanceRate
+        - PrivacyAnalyticsAiComplianceIntelligenceView.guardianConsentCompletionRate
         - PrivacyAnalyticsAiComplianceIntelligenceView.privacyExceptions
         - PrivacyAnalyticsAiComplianceIntelligenceView.consentPropagationFailures
         notes: 'The pack groups this record''s detail under its own headings: “Privacy request cases”,
@@ -6348,7 +6593,6 @@ screens:
     - PrivacyAnalyticsAiComplianceIntelligenceView.marketingOptInRate
     - PrivacyAnalyticsAiComplianceIntelligenceView.cookieAcceptanceByCategory
     - PrivacyAnalyticsAiComplianceIntelligenceView.privacyRequests
-    - PrivacyAnalyticsAiComplianceIntelligenceView.averageResolutionTime
   wireframe:
     status: notStarted
     provenance: generated
@@ -6479,43 +6723,66 @@ screens:
       - kind: metricTile
         label: Total Templates
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display
-        bindsTo: WaiverConsentCommandCenterView.totalTemplates
+        bindsTo: WaiverConsentCommandCenterView.waiverId
+        notes: Shows `kpis.totalTemplates` of the `listWaiverConsent` response. That KPI object is inline
+          in the response, not a named schema, so the binding names the row field the count is taken over.
       - kind: metricTile
         label: Published
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display
-        bindsTo: WaiverConsentCommandCenterView.published
+        bindsTo: WaiverConsentCommandCenterView.status
+        notes: Shows `kpis.published` of the `listWaiverConsent` response. That KPI object is inline in
+          the response, not a named schema, so the binding names the row field the count is taken over.
       - kind: metricTile
         label: Draft
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display
-        bindsTo: WaiverConsentCommandCenterView.draft
+        bindsTo: WaiverConsentCommandCenterView.status
+        notes: Shows `kpis.draft` of the `listWaiverConsent` response. That KPI object is inline in the
+          response, not a named schema, so the binding names the row field the count is taken over.
       - kind: metricTile
         label: Pending Approval
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display
-        bindsTo: WaiverConsentCommandCenterView.pendingApproval
+        bindsTo: WaiverConsentCommandCenterView.status
+        notes: Shows `kpis.pendingApproval` of the `listWaiverConsent` response. That KPI object is inline
+          in the response, not a named schema, so the binding names the row field the count is taken over.
       - kind: metricTile
         label: Scheduled
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display
-        bindsTo: WaiverConsentCommandCenterView.scheduled
+        bindsTo: WaiverConsentCommandCenterView.status
+        notes: Shows `kpis.scheduled` of the `listWaiverConsent` response. That KPI object is inline in
+          the response, not a named schema, so the binding names the row field the count is taken over.
       - kind: metricTile
         label: Expiring
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display
-        bindsTo: WaiverConsentCommandCenterView.expiring
+        bindsTo: WaiverConsentCommandCenterView.effectiveTo
+        notes: Shows `kpis.expiring` of the `listWaiverConsent` response. That KPI object is inline in
+          the response, not a named schema, so the binding names the row field the count is taken over.
       - kind: metricTile
         label: Archived
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display
-        bindsTo: WaiverConsentCommandCenterView.archived
+        bindsTo: WaiverConsentCommandCenterView.status
+        notes: Shows `kpis.archived` of the `listWaiverConsent` response. That KPI object is inline in
+          the response, not a named schema, so the binding names the row field the count is taken over.
       - kind: metricTile
         label: Products Requiring Waiver
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display
-        bindsTo: WaiverConsentCommandCenterView.productsRequiringWaiver
+        bindsTo: WaiverConsentCommandCenterView.associatedProducts
+        notes: Shows `kpis.productsRequiringWaiver` of the `listWaiverConsent` response. That KPI object
+          is inline in the response, not a named schema, so the binding names the row field the count
+          is taken over.
       - kind: metricTile
         label: Active Waiver Versions
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display
-        bindsTo: WaiverConsentCommandCenterView.activeWaiverVersions
+        bindsTo: WaiverConsentCommandCenterView.publishedVersion
+        notes: Shows `kpis.activeWaiverVersions` of the `listWaiverConsent` response. That KPI object
+          is inline in the response, not a named schema, so the binding names the row field the count
+          is taken over.
       - kind: metricTile
         label: Waivers Requiring Review
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Display
-        bindsTo: WaiverConsentCommandCenterView.waiversRequiringReview
+        bindsTo: WaiverConsentCommandCenterView.status
+        notes: Shows `kpis.waiversRequiringReview` of the `listWaiverConsent` response. That KPI object
+          is inline in the response, not a named schema, so the binding names the row field the count
+          is taken over.
     - name: contentBody
       slot: moduleTiles
       components:
@@ -7211,11 +7478,7 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - ProductEventExperienceAssociationView.product
-    - ProductEventExperienceAssociationView.ticketType
-    - ProductEventExperienceAssociationView.event
-    - ProductEventExperienceAssociationView.performance
-    - ProductEventExperienceAssociationView.attraction
+    - ProductEventExperienceAssociationView.targetType
   wireframe:
     status: notStarted
     provenance: generated
@@ -7492,10 +7755,11 @@ screens:
         label: Every localization branding customer
         columns:
         - LocalizationBrandingCustomerExperienceConfigurationView.sourceLanguage
-        - LocalizationBrandingCustomerExperienceConfigurationView.translationStatus
-        - LocalizationBrandingCustomerExperienceConfigurationView.translatorReviewer
-        - LocalizationBrandingCustomerExperienceConfigurationView.approvalStatus
-        - LocalizationBrandingCustomerExperienceConfigurationView.lastUpdated
+        - LocalizationBrandingCustomerExperienceConfigurationView.languages[].translationStatus
+        - LocalizationBrandingCustomerExperienceConfigurationView.languages[].translatorUserId
+        - LocalizationBrandingCustomerExperienceConfigurationView.languages[].reviewerUserId
+        - LocalizationBrandingCustomerExperienceConfigurationView.languages[].approvalStatus
+        - LocalizationBrandingCustomerExperienceConfigurationView.languages[].lastUpdated
         bindsTo: LocalizationBrandingCustomerExperienceConfigurationView
         operation: setLocalizationBrandingCustomer
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 19 §Each version
@@ -7508,10 +7772,11 @@ screens:
         bindsTo: LocalizationBrandingCustomerExperienceConfigurationView
         columns:
         - LocalizationBrandingCustomerExperienceConfigurationView.sourceLanguage
-        - LocalizationBrandingCustomerExperienceConfigurationView.translationStatus
-        - LocalizationBrandingCustomerExperienceConfigurationView.translatorReviewer
-        - LocalizationBrandingCustomerExperienceConfigurationView.approvalStatus
-        - LocalizationBrandingCustomerExperienceConfigurationView.lastUpdated
+        - LocalizationBrandingCustomerExperienceConfigurationView.languages[].translationStatus
+        - LocalizationBrandingCustomerExperienceConfigurationView.languages[].translatorUserId
+        - LocalizationBrandingCustomerExperienceConfigurationView.languages[].reviewerUserId
+        - LocalizationBrandingCustomerExperienceConfigurationView.languages[].approvalStatus
+        - LocalizationBrandingCustomerExperienceConfigurationView.languages[].lastUpdated
         notes: 'The pack groups this record''s detail under its own headings: “Preview for”, “Accessibility”.'
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 19 §Each version
           should show
@@ -7538,10 +7803,9 @@ screens:
   entryState:
     preloaded:
     - LocalizationBrandingCustomerExperienceConfigurationView.sourceLanguage
-    - LocalizationBrandingCustomerExperienceConfigurationView.translationStatus
-    - LocalizationBrandingCustomerExperienceConfigurationView.translatorReviewer
-    - LocalizationBrandingCustomerExperienceConfigurationView.approvalStatus
-    - LocalizationBrandingCustomerExperienceConfigurationView.lastUpdated
+    - LocalizationBrandingCustomerExperienceConfigurationView.languages[].translationStatus
+    - LocalizationBrandingCustomerExperienceConfigurationView.languages[].approvalStatus
+    - LocalizationBrandingCustomerExperienceConfigurationView.languages[].lastUpdated
   wireframe:
     status: notStarted
     provenance: generated
@@ -7744,9 +8008,6 @@ screens:
         label: Filter by
         columns:
         - Brand
-        - WaiverOperationsCommandCenterView.venue
-        - WaiverOperationsCommandCenterView.event
-        - WaiverOperationsCommandCenterView.product
         - Waiver
         - Date
         - Status
@@ -7812,17 +8073,17 @@ screens:
       - kind: dataTable
         label: Every waiver operations
         columns:
-        - WaiverOperationsCommandCenterView.eventActivity
-        - WaiverOperationsCommandCenterView.venue
-        - WaiverOperationsCommandCenterView.dateTime
-        - WaiverOperationsCommandCenterView.participants
-        - WaiverOperationsCommandCenterView.waiversRequired
-        - WaiverOperationsCommandCenterView.completed
-        - WaiverOperationsCommandCenterView.missing
-        - WaiverOperationsCommandCenterView.completion
-        - WaiverOperationsCommandCenterView.guardianPending
-        - WaiverOperationsCommandCenterView.exceptions
-        - WaiverOperationsCommandCenterView.operationalRisk
+        - WaiverOperationsCommandCenterView.upcomingActivities[].eventActivity
+        - WaiverOperationsCommandCenterView.upcomingActivities[].venue
+        - WaiverOperationsCommandCenterView.upcomingActivities[].dateTime
+        - WaiverOperationsCommandCenterView.upcomingActivities[].participants
+        - WaiverOperationsCommandCenterView.upcomingActivities[].waiversRequired
+        - WaiverOperationsCommandCenterView.upcomingActivities[].completed
+        - WaiverOperationsCommandCenterView.upcomingActivities[].missing
+        - WaiverOperationsCommandCenterView.upcomingActivities[].completion
+        - WaiverOperationsCommandCenterView.upcomingActivities[].guardianPending
+        - WaiverOperationsCommandCenterView.upcomingActivities[].exceptions
+        - WaiverOperationsCommandCenterView.upcomingActivities[].operationalRisk
         bindsTo: WaiverOperationsCommandCenterView
         operation: listWaiver
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Each record
@@ -7834,17 +8095,17 @@ screens:
         label: The selected waiver operations
         bindsTo: WaiverOperationsCommandCenterView
         columns:
-        - WaiverOperationsCommandCenterView.eventActivity
-        - WaiverOperationsCommandCenterView.venue
-        - WaiverOperationsCommandCenterView.dateTime
-        - WaiverOperationsCommandCenterView.participants
-        - WaiverOperationsCommandCenterView.waiversRequired
-        - WaiverOperationsCommandCenterView.completed
-        - WaiverOperationsCommandCenterView.missing
-        - WaiverOperationsCommandCenterView.completion
-        - WaiverOperationsCommandCenterView.guardianPending
-        - WaiverOperationsCommandCenterView.exceptions
-        - WaiverOperationsCommandCenterView.operationalRisk
+        - WaiverOperationsCommandCenterView.upcomingActivities[].eventActivity
+        - WaiverOperationsCommandCenterView.upcomingActivities[].venue
+        - WaiverOperationsCommandCenterView.upcomingActivities[].dateTime
+        - WaiverOperationsCommandCenterView.upcomingActivities[].participants
+        - WaiverOperationsCommandCenterView.upcomingActivities[].waiversRequired
+        - WaiverOperationsCommandCenterView.upcomingActivities[].completed
+        - WaiverOperationsCommandCenterView.upcomingActivities[].missing
+        - WaiverOperationsCommandCenterView.upcomingActivities[].completion
+        - WaiverOperationsCommandCenterView.upcomingActivities[].guardianPending
+        - WaiverOperationsCommandCenterView.upcomingActivities[].exceptions
+        - WaiverOperationsCommandCenterView.upcomingActivities[].operationalRisk
         notes: 'The pack groups this record''s detail under its own headings: “Display by”, “Activity
           Status”, “Youth Attentio”, “Climbing”, “Session”.'
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Each record
@@ -8185,12 +8446,12 @@ screens:
       - kind: dataTable
         label: Every minor guardian group
         columns:
-        - MinorGuardianGroupConsentManagementView.organization
-        - MinorGuardianGroupConsentManagementView.groupLeader
-        - MinorGuardianGroupConsentManagementView.contact
-        - MinorGuardianGroupConsentManagementView.groupBooking
-        - MinorGuardianGroupConsentManagementView.responsibility
-        - MinorGuardianGroupConsentManagementView.permittedActions
+        - MinorGuardianGroupConsentManagementView.group.organization
+        - MinorGuardianGroupConsentManagementView.group.groupLeader
+        - MinorGuardianGroupConsentManagementView.group.contact
+        - MinorGuardianGroupConsentManagementView.group.groupBooking
+        - MinorGuardianGroupConsentManagementView.group.responsibility
+        - MinorGuardianGroupConsentManagementView.group.permittedActions
         bindsTo: MinorGuardianGroupConsentManagementView
         operation: listMinorGuardianGroup
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 31 §Display
@@ -8201,12 +8462,12 @@ screens:
         label: The selected minor guardian group
         bindsTo: MinorGuardianGroupConsentManagementView
         columns:
-        - MinorGuardianGroupConsentManagementView.organization
-        - MinorGuardianGroupConsentManagementView.groupLeader
-        - MinorGuardianGroupConsentManagementView.contact
-        - MinorGuardianGroupConsentManagementView.groupBooking
-        - MinorGuardianGroupConsentManagementView.responsibility
-        - MinorGuardianGroupConsentManagementView.permittedActions
+        - MinorGuardianGroupConsentManagementView.group.organization
+        - MinorGuardianGroupConsentManagementView.group.groupLeader
+        - MinorGuardianGroupConsentManagementView.group.contact
+        - MinorGuardianGroupConsentManagementView.group.groupBooking
+        - MinorGuardianGroupConsentManagementView.group.responsibility
+        - MinorGuardianGroupConsentManagementView.group.permittedActions
         notes: 'The pack groups this record''s detail under its own headings: “Multiple Children”.'
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 31 §Display
     - name: actionBar
@@ -8237,12 +8498,7 @@ screens:
     trigger: onLoad
   entryState:
     preloaded:
-    - MinorGuardianGroupConsentManagementView.organization
-    - MinorGuardianGroupConsentManagementView.groupLeader
-    - MinorGuardianGroupConsentManagementView.contact
-    - MinorGuardianGroupConsentManagementView.groupBooking
-    - MinorGuardianGroupConsentManagementView.responsibility
-    - MinorGuardianGroupConsentManagementView.permittedActions
+    - MinorGuardianGroupConsentManagementView.guardians[].contact
   wireframe:
     status: notStarted
     provenance: generated
@@ -8415,7 +8671,7 @@ screens:
         - MissingExpiredInvalidWaiverManagementView.visitTime
         - MissingExpiredInvalidWaiverManagementView.waiver
         - MissingExpiredInvalidWaiverManagementView.problem
-        - MissingExpiredInvalidWaiverManagementView.timeRemaining
+        - MissingExpiredInvalidWaiverManagementView.timeRemainingSeconds
         - MissingExpiredInvalidWaiverManagementView.accessImpact
         - MissingExpiredInvalidWaiverManagementView.owner
         - MissingExpiredInvalidWaiverManagementView.status
@@ -8435,7 +8691,7 @@ screens:
         - MissingExpiredInvalidWaiverManagementView.visitTime
         - MissingExpiredInvalidWaiverManagementView.waiver
         - MissingExpiredInvalidWaiverManagementView.problem
-        - MissingExpiredInvalidWaiverManagementView.timeRemaining
+        - MissingExpiredInvalidWaiverManagementView.timeRemainingSeconds
         - MissingExpiredInvalidWaiverManagementView.accessImpact
         - MissingExpiredInvalidWaiverManagementView.owner
         - MissingExpiredInvalidWaiverManagementView.status
@@ -8720,7 +8976,7 @@ screens:
         - WaiverAnalyticsComplianceOperationalInsightsView.completionRate
         - WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion
         - WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion
-        - WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime
+        - WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionSeconds
         - WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate
         - WaiverAnalyticsComplianceOperationalInsightsView.rejectionRate
         - WaiverAnalyticsComplianceOperationalInsightsView.exceptionRate
@@ -8728,7 +8984,6 @@ screens:
         - WaiverAnalyticsComplianceOperationalInsightsView.reminderEffectiveness
         - WaiverAnalyticsComplianceOperationalInsightsView.checkInDelays
         - WaiverAnalyticsComplianceOperationalInsightsView.staffInterventions
-        - WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletions
         - WaiverAnalyticsComplianceOperationalInsightsView.exceptions
         bindsTo: WaiverAnalyticsComplianceOperationalInsightsView
         operation: listWaiverComplianceOperational
@@ -8744,7 +8999,7 @@ screens:
         - WaiverAnalyticsComplianceOperationalInsightsView.completionRate
         - WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion
         - WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion
-        - WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime
+        - WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionSeconds
         - WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate
         - WaiverAnalyticsComplianceOperationalInsightsView.rejectionRate
         - WaiverAnalyticsComplianceOperationalInsightsView.exceptionRate
@@ -8752,7 +9007,6 @@ screens:
         - WaiverAnalyticsComplianceOperationalInsightsView.reminderEffectiveness
         - WaiverAnalyticsComplianceOperationalInsightsView.checkInDelays
         - WaiverAnalyticsComplianceOperationalInsightsView.staffInterventions
-        - WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletions
         - WaiverAnalyticsComplianceOperationalInsightsView.exceptions
         notes: 'The pack groups this record''s detail under its own headings: “Visualize”, “Abandonment
           Analysis”, “Reminder Analysis”.'
@@ -8777,7 +9031,6 @@ screens:
     - WaiverAnalyticsComplianceOperationalInsightsView.completionRate
     - WaiverAnalyticsComplianceOperationalInsightsView.preArrivalCompletion
     - WaiverAnalyticsComplianceOperationalInsightsView.onSiteCompletion
-    - WaiverAnalyticsComplianceOperationalInsightsView.averageCompletionTime
     - WaiverAnalyticsComplianceOperationalInsightsView.guardianCompletionRate
   wireframe:
     status: notStarted
@@ -10516,20 +10769,57 @@ screens:
   purpose: Allow users to find visually related or similar media.
   gaps:
   - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Digital Asset Management DAM.pdf, page 29
-  - operation: null
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Digital Asset Management DAM.pdf, page 29
   layout:
     template: split
     regions:
+    - name: filters
+      slot: filters
+      components:
+      - kind: searchField
+        label: Source asset
+        operation: findSimilarMediaAssets
+        notes: Sends `?assetId=` (required).
+        provenance: contract assets.yaml GET /media-assets/similar
+      - kind: numberField
+        label: Minimum similarity
+        operation: findSimilarMediaAssets
+        notes: Sends `?minSimilarity=`.
+        provenance: contract assets.yaml GET /media-assets/similar
     - name: contentBody
-      components: []
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Similar assets
+        bindsTo: MediaSimilarity
+        columns:
+        - MediaSimilarity.assetId
+        - MediaSimilarity.similarity
+        - MediaSimilarity.relation
+        - MediaSimilarity.differingFields
+        - Thumbnail
+        operation: findSimilarMediaAssets
+        notes: '`relation` keeps similar, duplicate candidate and variant apart, as the pack requires;
+          the pack''s Version and Rendition are not among its values.'
+        provenance: pack Digital Asset Management DAM.pdf, page 29
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected match
+        bindsTo: MediaSimilarity
+        columns:
+        - MediaSimilarity.assetId
+        - MediaSimilarity.similarity
+        - MediaSimilarity.relation
+        - MediaSimilarity.differingFields
+        - Similarity factors
+        - Matched because
+        operation: findSimilarMediaAssets
+        notes: The pack's Explain Match ("94% - Family, Water Attraction, Outdoor, Daytime").
+        provenance: pack Digital Asset Management DAM.pdf, page 29
   states:
     loading: The visual similarity related list.
     error: Could not load. Names which read failed and leaves the visual similarity related untouched.
@@ -10549,10 +10839,13 @@ screens:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-074
     workshopBoard: wireframes/WS45 Digital Asset Management DAM Board 2.dc.html#cms-074
-  apisNote: Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 29. 0 of 0 labels
+  apisNote: 'Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 29. 0 of 0 labels
     bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
-    here.
+    here. **Layout drafted 29 September (VM close-out)** from pack Digital Asset Management DAM.pdf p.29;
+    contract assets.yaml GET /media-assets/similar. Pack labels with no schema field yet (shown as plain
+    labels): Thumbnail, Similarity factors (composition, objects, scene, colours, subject), Matched-because
+    explanation, Relation values: version, rendition.'
 - id: CMS-075
   name: Duplicate & Near-Duplicate Management
   module: Media Library
@@ -13420,3 +13713,257 @@ screens:
     bound to a contract property; 1 of 152 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+- id: CMS-101
+  name: Help Me Choose
+  module: White Label
+  requiresModule: core
+  wave: 2
+  implementation:
+    app: venue-management-web
+    route: /white-label/help-me-choose
+    component: apps/venue-management-web/src/routes/white-label/HelpMeChoose.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - CMS-016
+    exitTo:
+    - CMS-016
+    inferred: false
+    notes: '**Reached from CMS-016 Site Settings**, beside the booking-flow settings, because Help me
+      choose sits on the booking page those settings shape (decided 29 September, rev 3 REV3-11).'
+    transitions:
+    - to: CMS-016
+      trigger: Back to Site Settings
+      provenance: authored 29 September, rev 3 REV3-11
+      back: true
+  notes: '**Added 29 September for rev 3 REV3-11: Help me choose is venue configuration, never hard-coded.**
+    A venue sets up one or two questions, each with two to four answers (title, one-liner, icon, optional
+    badge), and the answer picked on the last question opens the product, category, event or booking module
+    that fits through a result card. **Two sources, one review**: staff write a set-up here, and once
+    the venue''s products are uploaded the `ai` service proposes set-ups (`source` `aiSuggested`), which
+    land here as drafts. **A suggestion is never published by itself**: a person reviews it, edits it
+    or dismisses it, previews it and publishes it. One published set-up per venue; publishing another
+    returns the old one to draft.'
+  density: compact
+  pattern: listDetail
+  patternReason: '`listGuidedChoices` reads the venue''s set-ups and the editor acts on one of them —
+    list, select, act'
+  purpose: Set up a venue's Help me choose, review what the assistant suggests from the venue's products,
+    preview it and publish it.
+  layout:
+    template: split
+    regions:
+    - name: filters
+      slot: filters
+      components:
+      - kind: selectField
+        label: Venue
+        operation: listGuidedChoices
+        notes: The venue whose set-ups are shown (path `venueId`); defaults to the session venue.
+        provenance: contract white-label.yaml GET /venues/{venueId}/guided-choices
+      - kind: selectField
+        label: Source
+        operation: listGuidedChoices
+        notes: Sends `?source=`, `manual` or `aiSuggested`. **Suggestions awaiting review** is `aiSuggested`
+          with status `draft`, and is the default view while any exist.
+        provenance: contract white-label.yaml GET /venues/{venueId}/guided-choices
+      - kind: selectField
+        label: Status
+        operation: listGuidedChoices
+        notes: Sends `?status=`, `draft` or `published`.
+        provenance: contract white-label.yaml GET /venues/{venueId}/guided-choices
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Every Help me choose set-up at this venue
+        bindsTo: GuidedChoice
+        columns:
+        - GuidedChoice.name
+        - GuidedChoice.status
+        - GuidedChoice.source
+        - GuidedChoice.mode
+        - GuidedChoice.showBanner
+        - GuidedChoice.publishedAt
+        - GuidedChoice.updatedAt
+        operation: listGuidedChoices
+        notes: '**An AI suggestion is labelled as one** on its row, and keeps `source` `aiSuggested` after
+          a person edits it, so a report can count how many proposals were published.'
+        provenance: contract white-label.yaml GET /venues/{venueId}/guided-choices
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected set-up
+        bindsTo: GuidedChoice
+        columns:
+        - GuidedChoice.name
+        - GuidedChoice.mode
+        - GuidedChoice.showBanner
+        - GuidedChoice.questions
+        - GuidedChoice.status
+        - GuidedChoice.source
+        - GuidedChoice.suggestionRef
+        - GuidedChoice.publishedAt
+        - GuidedChoice.publishedBy
+        operation: listGuidedChoices
+        notes: '**The editor.** `mode`: a button on the booking page, a pop-up on the guest''s first arrival
+          as well, or off (configured but not shown). `showBanner`: the dark banner under the products.
+          One or two questions, two to four answers each: title, one-liner (140 characters), icon, badge
+          (24 characters), target (a product, category, event or booking module, picked from `listProducts`,
+          `listProductCategories` and `listEvents`) and the result card (title, body, image; absent fields
+          fall back to the target''s own). Every text in every tenant language.'
+        provenance: contract white-label.yaml GET /venues/{venueId}/guided-choices
+      - kind: livePreview
+        label: Preview
+        notes: '**Renders the draft as a guest would meet it**: the button or pop-up, the banner, each
+          question and the result card, in each language and in both directions. Drawn from the record
+          in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up
+          until Publish.'
+        provenance: authored 29 September, rev 3 REV3-11
+      - kind: publishGate
+        label: What publishing changes
+        impliedBy: publishGuidedChoice
+        notes: Names the venue, says that guests there see this set-up from now on, and that **the set-up
+          published there before returns to draft** (one published per venue). Refused `422` when an answer
+          targets a product, category, event or module that is not on sale or not enabled, naming the
+          answer; only staff publish (`TENANT_PUBLISH`), never the assistant.
+        provenance: contract white-label.yaml POST /guided-choices/{guidedChoiceId}/publish
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: New set-up
+        operation: createGuidedChoice
+        provenance: contract white-label.yaml POST /venues/{venueId}/guided-choices
+      - kind: secondaryButton
+        label: Save draft
+        operation: updateGuidedChoice
+        notes: A draft only. A published set-up is refused `409`; unpublish it first or create a new draft.
+        provenance: contract white-label.yaml PATCH /guided-choices/{guidedChoiceId}
+      - kind: secondaryButton
+        label: Publish
+        operation: publishGuidedChoice
+        provenance: contract white-label.yaml POST /guided-choices/{guidedChoiceId}/publish
+      - kind: secondaryButton
+        label: Unpublish
+        operation: unpublishGuidedChoice
+        notes: Guests stop seeing Help me choose at this venue; the set-up returns to draft.
+        provenance: contract white-label.yaml POST /guided-choices/{guidedChoiceId}/unpublish
+      - kind: destructiveButton
+        label: Delete draft or dismiss suggestion
+        operation: deleteGuidedChoice
+        notes: A draft only; a published set-up is refused `409`. Dismissing an AI suggestion is this
+          delete.
+        provenance: contract white-label.yaml DELETE /guided-choices/{guidedChoiceId}
+  states:
+    loading: The venue's Help me choose set-ups, read by `listGuidedChoices`.
+    error: Could not load. Names which read failed and leaves the set-ups untouched.
+    emptyFirstRun: '**No Help me choose at this venue, so guests see none.** Offers New set-up, and says
+      that once the venue''s products are uploaded the assistant proposes set-ups here as drafts for review.'
+    emptyNoResults: The source or status filter matched nothing and the venue's other set-ups are still
+      there. Names the active filter and offers to clear it.
+    emptyNoAccess: Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
+  apis:
+  - operationId: listGuidedChoices
+    contract: white-label
+    purpose: The venue's set-ups, filtered by source and status (rev 3 REV3-11)
+    trigger: onLoad
+  - operationId: createGuidedChoice
+    contract: white-label
+    purpose: Start a set-up by hand, as a draft
+    trigger: onAction
+    invalidates:
+    - listGuidedChoices
+  - operationId: updateGuidedChoice
+    contract: white-label
+    purpose: Edit a draft, including an AI suggestion under review
+    trigger: onAction
+    invalidates:
+    - listGuidedChoices
+  - operationId: deleteGuidedChoice
+    contract: white-label
+    purpose: Delete a draft or dismiss a suggestion
+    trigger: onAction
+    invalidates:
+    - listGuidedChoices
+  - operationId: publishGuidedChoice
+    contract: white-label
+    purpose: Make a reviewed set-up the one guests see at this venue
+    trigger: onAction
+    invalidates:
+    - listGuidedChoices
+  - operationId: unpublishGuidedChoice
+    contract: white-label
+    purpose: Stop showing it to guests; back to draft
+    trigger: onAction
+    invalidates:
+    - listGuidedChoices
+  - operationId: listProducts
+    contract: catalogue
+    purpose: Products an answer can open
+    trigger: onAction
+  - operationId: listProductCategories
+    contract: catalogue
+    purpose: Categories an answer can open
+    trigger: onAction
+  - operationId: listEvents
+    contract: catalogue
+    purpose: Events an answer can open
+    trigger: onAction
+  entryState:
+    params:
+    - name: venueId
+      from: session
+    - name: guidedChoiceId
+      from: navigation
+    coldEntry: Resolves the venue from the session and opens on the suggestions awaiting review, or on
+      the list when there are none.
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-101
+  overlays:
+  - id: formCreateGuidedChoice
+    component: modal
+    trigger: New set-up
+    body: '**Collects what `createGuidedChoice` sends before it is called.** Required: `name` (staff-facing),
+      `mode`, `questions` (one or two, each with two to four answers and a target per answer). Optional:
+      `showBanner` (default on). Created as a draft; guests see nothing until it is published. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: GuidedChoice
+    confirm:
+      label: Create draft
+      operation: createGuidedChoice
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - mode
+      - showBanner
+      - questions
+    provenance: contract white-label.yaml POST /venues/{venueId}/guided-choices
+  - id: confirmPublishGuidedChoice
+    component: confirmDialog
+    trigger: Publish
+    body: '**Names the venue and the set-up that stops showing there**, since only one is published per
+      venue. An answer whose target is not on sale or not enabled blocks the publish and is named (`422`).'
+    confirm:
+      label: Publish to guests
+      operation: publishGuidedChoice
+    dismiss:
+      label: Cancel
+    provenance: contract white-label.yaml POST /guided-choices/{guidedChoiceId}/publish
+  - id: confirmDeleteGuidedChoice
+    component: confirmDialog
+    trigger: Delete draft or dismiss suggestion
+    body: Names the set-up and, for an AI suggestion, says that dismissing it removes it and the assistant's
+      reasoning with it. A published set-up cannot be deleted (`409`).
+    confirm:
+      label: Delete
+      operation: deleteGuidedChoice
+    dismiss:
+      label: Keep it
+    provenance: contract white-label.yaml DELETE /guided-choices/{guidedChoiceId}

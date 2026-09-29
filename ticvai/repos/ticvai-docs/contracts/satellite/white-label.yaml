@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 46
+  x-ticvai-screen-count: 57
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
   x-ticvai-requirements: 107
@@ -483,9 +483,11 @@ paths:
         - "P01 WEB-025 Help Centre / FAQ"
         - "P01 WEB-028 Contact & Venue Information"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
+        - "P01 WEB-045 Help Centre & Accessibility"
         - "P02 GST-001 Home – Default"
         - "P02 GST-029 Venue Info & Services"
         - "P02 GST-038 Digital Companion Mode"
+        - "P02 GST-040 Help & Support"
         - "P02 GST-047 Maintenance / Upgrade Page"
         - "P05 KSK-002 Language Select"
         - "P13 CMS-001 Tenant Workspace"
@@ -500,7 +502,7 @@ paths:
 
         **Two views of one schema.** Called without a staff session, the response carries only `tenantId`,
         `isPublished`, `publishedVersion`, `publishedAt`, `isInMaintenance`, `maintenanceMessage`,
-        `expectedBackAt`, `minimumAppVersion`, `contact`, `availability`, `availabilityMessage` and `venues`. The draft and CMS fields (`draftVersion`, `hasUnpublishedChanges`, the module
+        `expectedBackAt`, `minimumAppVersion`, `contact`, `availability`, `availabilityMessage`, `venues` and `whatsNew`. The draft and CMS fields (`draftVersion`, `hasUnpublishedChanges`, the module
         and page counts, `recentChanges`) are returned only to a staff session holding `TENANT_CONFIGURE`
         — a public, cacheable response must not carry who changed what.
 
@@ -513,6 +515,11 @@ paths:
         guest picks a venue on first open of WEB-001 or GST-001, the choice is remembered on the device
         and changeable, and on a visit day the app suggests the venue on the guest''s ticket. `venues` lists
         the tenant''s active venues so that picker has a source without a session.
+
+        **And what is new, for guests (decided 29 September, rev 3 GAP-B2)**: `whatsNew` is the public,
+        localised release notes the guest Help screen reads (WEB-025, WEB-045, GST-040), newest first, at
+        most 10, filled from `platform-ops.Release.guestReleaseNotes` of the releases the tenant''s cell
+        has received, skipping releases with none. It names no person. `recentChanges` stays staff only.
 
         '
       tags:
@@ -770,6 +777,16 @@ paths:
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: effectiveForVenueId
+        in: query
+        required: false
+        description: Return the settings in force at this venue, the tenant's with the venue's override
+          laid over them, and no `venueOverrides` (decided 29 September, rev 3 CFG-11). Absent returns
+          the tenant settings and every override as stored.
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
           description: The working draft's setting. Before it has ever been saved, every field comes back
@@ -789,6 +806,18 @@ paths:
         step indicator, card and cart layout, extras step, seat picker, map view, density, embed mode) and
         White Labelling had no setting or screen for any of it. **Part of the published tenant config**,
         like the theme: a change goes live through `publishTenantConfig`, never directly.
+
+        **Rev 3 settings (decided 29 September, rev 3).** Times per page and the day-part chips with their
+        boundaries (REV3-1), where sign-in is asked (REV3-3), date and time on seated events (REV3-4), the
+        seat-view box position (REV3-5), the time bar above the seat map (REV3-6), the floating cart icon
+        and the cart side in Arabic (REV3-10), ticket categories (REV3-16), the quick tour (REV3-20), tags
+        on tickets (23SEP-3), extra info on cards (23SEP-6), category display (23SEP-18), dates in the
+        event banner (23SEP-19), the card layout, size and density enums (DG-6), and the concierge mascot
+        (CFG-5). Help me choose is a venue''s `GuidedChoice`, not a field here (REV3-11).
+
+        **Per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** `venueOverrides`
+        holds the fields a venue changes; everything else it inherits. A `venueId` not among the tenant''s
+        active venues, or one given twice, is refused with 400.
 
         '
       tags:
@@ -968,6 +997,8 @@ paths:
   /tenant-config/header:
     put:
       operationId: setHeader
+      x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
       - staff
       summary: Configure the header
@@ -1019,6 +1050,8 @@ paths:
           $ref: '#/components/responses/NotConfigured'
     put:
       operationId: setNavigation
+      x-ticvai-consumed-by:
+        - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
       - staff
       summary: Set main and overflow navigation
@@ -1273,6 +1306,8 @@ paths:
                 $ref: '#/components/schemas/Banner'
     delete:
       operationId: deleteBanner
+      x-ticvai-consumed-by:
+        - "P13 CMS-008 Content Blocks"
       x-ticvai-audience:
       - staff
       summary: Delete a banner
@@ -1638,6 +1673,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
     delete:
       operationId: deleteContentPage
+      x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
       - staff
       summary: Delete a content page
@@ -2291,6 +2328,7 @@ paths:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-006 Component Preview"
         - "P13 CMS-015 Version History"
+      x-ticvai-config-scope: tenant
       x-ticvai-audience:
       - staff
       summary: Restore a previous version
@@ -2359,8 +2397,639 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConfigDiff'
+  /venues/{venueId}/guided-choices:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listGuidedChoices
+      x-ticvai-consumed-by:
+        - "P13 CMS-101 Help Me Choose"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      summary: List a venue's Help me choose set-ups
+      description: 'Drafts, AI suggestions awaiting review and the published one (decided 29 September,
+        rev 3 REV3-11). Filter by `status` or `source` to show the suggestions waiting for a person.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/GuidedChoiceStatus'
+      - name: source
+        in: query
+        schema:
+          type: string
+          enum:
+          - manual
+          - aiSuggested
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Help me choose set-ups, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/GuidedChoice'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+    post:
+      operationId: createGuidedChoice
+      x-ticvai-consumed-by:
+        - "P13 CMS-101 Help Me Choose"
+      x-ticvai-audience:
+      - staff
+      summary: Set up Help me choose for a venue
+      description: '**Venue configuration (decided 29 September, rev 3 REV3-11).** Created as `draft`
+        with `source` `manual`; guests see nothing until `publishGuidedChoice`. Every target must belong
+        to this venue, or 400.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GuidedChoice'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created as a draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuidedChoice'
+        '400':
+          description: A target is not in this venue, a required target id is missing for its `kind`, or
+            the question and answer counts are outside their bounds
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /venues/{venueId}/guided-choice-suggestions:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: proposeGuidedChoice
+      x-ticvai-audience:
+      - service
+      summary: Record an AI-proposed Help me choose set-up for review
+      description: '**Where the AI''s proposal lands (decided 29 September, rev 3 REV3-11).** After a
+        venue''s products are uploaded, the `ai` service analyses them and calls this once per proposed
+        set-up. It is stored as `draft` with `source` `aiSuggested` and the proposing job in `suggestionRef`,
+        and appears in `listGuidedChoices` for a person to review, edit, publish or delete. **A suggestion
+        is never published by the system**: this operation cannot publish, and `publishGuidedChoice` refuses
+        a service caller.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: null
+      x-ticvai-auth: service
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - serviceAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/GuidedChoice'
+              - type: object
+                required:
+                - suggestionRef
+                properties:
+                  suggestionRef:
+                    type: string
+                    description: The id of the `ai` job that produced the proposal.
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Stored as a draft suggestion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuidedChoice'
+        '400':
+          description: A target is not in this venue, or the counts are outside their bounds
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /venues/{venueId}/guided-choice:
+    parameters:
+    - name: venueId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getPublishedGuidedChoice
+      x-ticvai-consumed-by:
+        - "P01 WEB-005 Ticket Type Selection"
+        - "P02 GST-008 Tickets & Add-ons"
+      x-ticvai-audience:
+      - guest
+      x-ticvai-read-routing: replica
+      summary: The venue's published Help me choose
+      description: '**What the guest booking page shows (decided 29 September, rev 3 REV3-11).** Public
+        and cacheable, like the rest of the published app. Returns only a `published` choice; `name`,
+        `source`, `suggestionRef` and `publishedBy` are left out of this view. 404 when the venue has none
+        published, and the page shows no Help me choose.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      security:
+      - {}
+      - guestAuth: []
+      responses:
+        '200':
+          description: The published choice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuidedChoice'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /guided-choices/{guidedChoiceId}:
+    parameters:
+    - name: guidedChoiceId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    patch:
+      operationId: updateGuidedChoice
+      x-ticvai-consumed-by:
+        - "P13 CMS-101 Help Me Choose"
+      x-ticvai-audience:
+      - staff
+      summary: Edit a Help me choose set-up, or review a suggestion
+      description: 'A partial update. Only a `draft` may be edited: a `published` choice is unpublished
+        first, or 409, so guests never see a half-edited set of questions (decided 29 September, rev 3
+        REV3-11). Editing an AI suggestion keeps its `source`.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name:
+                  type: string
+                  maxLength: 80
+                mode:
+                  type: string
+                  enum:
+                  - button
+                  - popupOnArrival
+                  - 'off'
+                showBanner:
+                  type: boolean
+                questions:
+                  type: array
+                  minItems: 1
+                  maxItems: 2
+                  description: Replaces the whole question list; same shape and bounds as `GuidedChoice.questions`.
+                  items:
+                    type: object
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuidedChoice'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The choice is `published`; unpublish it first
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+    delete:
+      operationId: deleteGuidedChoice
+      x-ticvai-consumed-by:
+        - "P13 CMS-101 Help Me Choose"
+      x-ticvai-audience:
+      - staff
+      summary: Delete a Help me choose set-up, or dismiss a suggestion
+      description: A `published` choice is unpublished first, or 409.
+      tags:
+      - content
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Deleted
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The choice is `published`
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /guided-choices/{guidedChoiceId}/publish:
+    parameters:
+    - name: guidedChoiceId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    post:
+      operationId: publishGuidedChoice
+      x-ticvai-consumed-by:
+        - "P13 CMS-101 Help Me Choose"
+      x-ticvai-audience:
+      - staff
+      summary: Publish a Help me choose set-up to guests
+      description: '**A person publishes, always (decided 29 September, rev 3 REV3-11).** Needs a staff
+        session; a service caller is refused with 403, so an AI suggestion cannot publish itself. Every
+        target is checked at this moment: a product or event not on sale, a category with no products on
+        sale, or a module not enabled is refused with 422 naming the answer. **One published choice per
+        venue**: publishing this one returns the venue''s previously published choice to `draft` in the
+        same transaction. Live at once; not part of `publishTenantConfig`.
+
+        '
+      tags:
+      - content
+      x-ticvai-permission: TENANT_PUBLISH
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuidedChoice'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: Already `published`
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: An answer's target is not on sale or not enabled; the problem names the answer
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /guided-choices/{guidedChoiceId}/unpublish:
+    parameters:
+    - name: guidedChoiceId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    post:
+      operationId: unpublishGuidedChoice
+      x-ticvai-consumed-by:
+        - "P13 CMS-101 Help Me Choose"
+      x-ticvai-audience:
+      - staff
+      summary: Take a Help me choose set-up off the guest app
+      description: Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing it at
+        once.
+      tags:
+      - content
+      x-ticvai-permission: TENANT_PUBLISH
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Back to draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuidedChoice'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: Not `published`
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+
 components:
   schemas:
+    GuidedChoiceStatus:
+      type: string
+      description: '**Draft until a person publishes it (decided 29 September, rev 3 REV3-11).** Guests
+        see only a `published` choice. An AI-proposed choice arrives as `draft` and is never published
+        by the system. Moves as `states/guided-choice.yaml` says: `publishGuidedChoice` and `unpublishGuidedChoice`,
+        and a publish returns the venue''s previously published choice to `draft`.
+
+        '
+      enum:
+      - draft
+      - published
+      default: draft
+    GuidedChoiceTarget:
+      x-ticvai-persistence: none — embedded
+      type: object
+      description: '**What an answer opens (decided 29 September, rev 3 REV3-11).** A product (its kind
+        picks the booking flow), a product category (its tickets, as `ticketCategories` shows them), an
+        event, or a module such as `membership`. Each id must belong to the choice''s venue and be on sale
+        or enabled when the choice is published, or `publishGuidedChoice` refuses it.
+
+        '
+      required:
+      - kind
+      properties:
+        kind:
+          type: string
+          enum:
+          - product
+          - productCategory
+          - event
+          - module
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Required when `kind` is `product`. A catalogue `Product`.
+        productCategoryId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Required when `kind` is `productCategory`. A catalogue `ProductCategory`.
+        eventId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Required when `kind` is `event`.
+        moduleKey:
+          allOf:
+          - $ref: '#/components/schemas/ModuleKey'
+          nullable: true
+          description: Required when `kind` is `module`. The module must be enabled.
+    GuidedChoice:
+      x-ticvai-persistence: whitelabel.guided_choice + whitelabel.guided_choice_question + whitelabel.guided_choice_answer
+      type: object
+      description: '**Help me choose (decided 29 September, rev 3 REV3-11).** A venue''s short set of
+        questions that ends on a result card opening the booking flow, product, category or event that
+        fits. Each question has a few answers with a title, a one-line body, an icon and an optional badge;
+        **the answer the guest picks on the last question decides the result**, and each earlier answer
+        carries a target too, so a one-question setting still ends on a result. Venue configuration, never
+        hard-coded: set up in Venue Management, off unless the venue publishes one.
+
+        **Two sources, one review.** `manual` is written by staff; `aiSuggested` is proposed by the `ai`
+        service from the venue''s uploaded products (a suggestion, reviewed and published by a person,
+        never auto-published). Both arrive as `draft`.
+
+        '
+      required:
+      - id
+      - venueId
+      - name
+      - mode
+      - questions
+      - status
+      - source
+      properties:
+        id:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          readOnly: true
+          description: ULID.
+        venueId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: From the path of `createGuidedChoice`.
+        name:
+          type: string
+          maxLength: 80
+          description: Staff-facing name, e.g. "Water park day planner". Not shown to guests.
+        mode:
+          type: string
+          enum:
+          - button
+          - popupOnArrival
+          - 'off'
+          default: button
+          description: '**How the guest reaches it (rev 3 REV3-11).** `button` puts a Help me choose button
+            on the booking page; `popupOnArrival` also opens it once on the guest''s first arrival at the
+            booking page (whether it was seen is kept on the device only); `off` keeps a published choice
+            configured but not shown.
+
+            '
+        showBanner:
+          type: boolean
+          default: true
+          description: The dark banner under the products ("Choose from the experiences above or let us
+            help you decide") with a Help me choose button. Ignored when `mode` is `off`.
+        questions:
+          type: array
+          minItems: 1
+          maxItems: 2
+          description: '**One or two questions**, as the prototype''s Questions setting offers (proposed,
+            client to correct; decided 29 September, rev 3 REV3-11). Shown in `sortOrder`.
+
+            '
+          items:
+            type: object
+            required:
+            - title
+            - sortOrder
+            - answers
+            properties:
+              id:
+                type: string
+                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                readOnly: true
+                description: ULID. The row's own key.
+              title:
+                $ref: '#/components/schemas/LocalisedText'
+              sortOrder:
+                type: integer
+                minimum: 0
+              answers:
+                type: array
+                minItems: 2
+                maxItems: 4
+                description: Two to four answers; the prototype shows three (proposed, client to correct,
+                  rev 3 REV3-11).
+                items:
+                  type: object
+                  required:
+                  - title
+                  - target
+                  - sortOrder
+                  properties:
+                    id:
+                      type: string
+                      pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                      readOnly: true
+                      description: ULID. The row's own key.
+                    title:
+                      $ref: '#/components/schemas/LocalisedText'
+                    body:
+                      allOf:
+                      - $ref: '#/components/schemas/LocalisedText'
+                      description: The one-liner under the title, at most 140 characters in each language.
+                    icon:
+                      type: string
+                      maxLength: 40
+                      nullable: true
+                      description: An icon name from the guest app's icon set.
+                    badge:
+                      allOf:
+                      - $ref: '#/components/schemas/LocalisedText'
+                      nullable: true
+                      description: Optional, e.g. "Best value". At most 24 characters in each language.
+                    sortOrder:
+                      type: integer
+                      minimum: 0
+                    target:
+                      $ref: '#/components/schemas/GuidedChoiceTarget'
+                    result:
+                      type: object
+                      nullable: true
+                      description: The result card when this answer decides the result. Absent fields
+                        fall back to the target's own name, summary and image.
+                      properties:
+                        title:
+                          $ref: '#/components/schemas/LocalisedText'
+                        body:
+                          $ref: '#/components/schemas/LocalisedText'
+                        imageAssetRef:
+                          type: string
+                          format: uuid
+                          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/GuidedChoiceStatus'
+          readOnly: true
+        source:
+          type: string
+          enum:
+          - manual
+          - aiSuggested
+          readOnly: true
+          description: '`manual` when staff created it; `aiSuggested` when the `ai` service proposed it
+            (a service caller). Kept after a person edits a suggestion, so a report can say how many AI
+            proposals were published.'
+        suggestionRef:
+          type: string
+          nullable: true
+          readOnly: true
+          description: For `aiSuggested`, the id of the `ai` job that proposed it. Null for `manual`.
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+        publishedBy:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The person who published it. Never a service.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
     LocalisedText:
       x-ticvai-persistence: none — jsonb column
       type: object
@@ -2771,6 +3440,73 @@ components:
           - $ref: '#/components/schemas/LocalisedText'
           nullable: true
           description: What the sold-out or closed screen says (WEB-029). Null shows the default wording.
+        venues:
+          type: array
+          maxItems: 200
+          x-ticvai-derived: onRead
+          description: >
+            **Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29
+            September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and
+            GST-001, returned with or without a session. **Published only**: a venue is listed when its scope
+            node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published
+            `ConfigVersion`; a venue added or reactivated since the last publish appears after the next
+            publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.
+          items:
+            type: object
+            required:
+            - venueId
+            - name
+            properties:
+              venueId:
+                type: string
+                format: uuid
+                description: '**The venue''s scope node** (`tenancy.OrgUnit.id`, level venue): what every guest
+                  screen that declares `venueId` `from: session` reads once the guest picks it.'
+              name:
+                type: string
+                maxLength: 200
+                description: The venue's name (`tenancy.OrgUnit.name`).
+              city:
+                type: string
+                maxLength: 120
+                nullable: true
+                description: Shown under the name so two venues with similar names can be told apart.
+              openingHoursToday:
+                type: object
+                nullable: true
+                description: Today's opening hours in the venue's time zone, from `tenancy.VenueSettings`
+                  opening hours. Null when the venue is closed today or has none set.
+                properties:
+                  opens:
+                    type: string
+                    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                  closes:
+                    type: string
+                    pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+        whatsNew:
+          type: array
+          maxItems: 10
+          x-ticvai-derived: onRead
+          description: >
+            **Public: the guest "what's new"** (decided 29 September, rev 3 GAP-B2). Newest first, at most
+            10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has
+            received; a release with no guest notes is skipped. Returned with or without a staff session.
+          items:
+            type: object
+            required:
+            - version
+            - publishedAt
+            - notes
+            properties:
+              version:
+                type: string
+                description: The release version.
+              publishedAt:
+                type: string
+                format: date-time
+                description: When the release reached the tenant's cell.
+              notes:
+                $ref: '#/components/schemas/LocalisedText'
         recentChanges:
           type: array
           description: Staff only. Names the principal behind each change, so it never reaches a public
@@ -2869,6 +3605,18 @@ components:
           format: uuid
           nullable: true
           description: Used on dark backgrounds. Falls back to the primary logo.
+        logoVariant:
+          type: string
+          enum:
+          - light
+          - dark
+          - duotone
+          default: light
+          description: '**Which lockup sits in the nav bar, and whose colours drive the theme (decided
+            29 September, rev 3 CFG-4).** `light` uses `logoAssetRef`, `dark` uses `logoDarkAssetRef`
+            (falling back to the primary logo), and `duotone` the two-colour reading of the primary logo.
+
+            '
         faviconAssetRef:
           type: string
           format: uuid
@@ -2944,9 +3692,15 @@ components:
           readOnly: true
           x-ticvai-derived: onRead
           description: True while the draft's source differs from the icon in `liveVersion`.
-    BookingFlowConfig:
+    BookingFlowSettings:
       type: object
       x-ticvai-persistence: none — embedded in tenant_config
+      description: '**Every guest booking-flow setting, once.** `BookingFlowConfig` is these at tenant level
+        plus `venueOverrides`; a `BookingFlowVenueOverride` carries any subset of them for one venue
+        (decided 29 September, rev 3 CFG-11). The Rev 3 settings (`timesPerPage` onwards) are the options
+        the client''s rev 3 prototype shows under Config → Booking rules and Build your experience.
+
+        '
       properties:
         preset:
           type: string
@@ -2960,7 +3714,8 @@ components:
           - season
           - custom
           default: auto
-          description: L1 Ticket box … L6 Season. `auto` picks by venue type; `custom` applies none.
+          description: L1 Ticket box … L6 Season. `auto` picks by venue type; `custom` applies none. The
+            UI preset of the prototype's drawer (rev 3 CFG-1, no change).
         stepIndicator:
           type: string
           enum:
@@ -2981,18 +3736,51 @@ components:
           - slideInRight
           - slideUpBottom
           - singleColumn
+          - floatingIcon
           default: sidebarRight
+          description: '`floatingIcon` is a round basket button with the item count that opens the cart
+            (decided 29 September, rev 3 REV3-10). Which side a sidebar or the icon sits on in a right-to-left
+            language is `cartSideInRtl`.'
+        cartSideInRtl:
+          type: string
+          enum:
+          - keepRight
+          - mirror
+          default: keepRight
+          description: '**The cart side when the guest reads Arabic or another right-to-left language
+            (decided 29 September, rev 3 REV3-10).** `keepRight` keeps the cart (and the floating icon) on
+            the right, as the client confirmed; `mirror` flips it to the left with the rest of the layout.
+
+            '
         cardLayout:
           type: string
-          maxLength: 40
-          nullable: true
+          enum:
+          - stackedRows
+          - splitRows
+          - cardsAcross
+          - posterCards
+          default: stackedRows
+          description: How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). Was
+            a free string; the four values are the design's Stacked rows, Split rows, Cards across and Poster
+            cards.
         cardSize:
           type: string
           enum:
           - compact
-          - regular
+          - standard
           - large
-          nullable: true
+          - extraLarge
+          default: compact
+          description: Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6).
+            `standard` replaces `regular`.
+        categoryDisplay:
+          type: string
+          enum:
+          - grid
+          - rowStrip
+          default: grid
+          description: How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid
+            or a single scrolling row (decided 29 September, rev 3 23SEP-18).
         extrasStep:
           type: string
           enum:
@@ -3007,7 +3795,9 @@ components:
           - zonesThenSeats
           - zonesOnly
           - seatsOnly
-          nullable: true
+          default: bowl
+          description: Default `bowl`, as the prototype has it (decided 29 September, rev 3 CFG-6). Read
+            only for a seated event.
         mapView:
           type: string
           enum:
@@ -3018,9 +3808,11 @@ components:
           type: string
           enum:
           - compact
-          - comfortable
-          - airy
-          default: comfortable
+          - standard
+          - roomy
+          default: compact
+          description: Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29
+            September, rev 3 DG-6). `standard` and `roomy` replace `comfortable` and `airy`.
         embedMode:
           type: string
           enum:
@@ -3034,13 +3826,227 @@ components:
           default: true
         searchInBanner:
           type: boolean
-          default: true
+          default: false
+          description: Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6).
+        eventBannerDates:
+          type: boolean
+          default: false
+          description: '**Dates in event banner (decided 29 September, rev 3 23SEP-19).** On, the event
+            banner lists the next dates; off by default. Either way the date picker sits at the top of the
+            booking step.
+
+            '
         singleEventPage:
           type: boolean
           default: false
         quantitiesOnAddOns:
           type: boolean
           default: true
+        timesPerPage:
+          type: string
+          enum:
+          - '8'
+          - '12'
+          - '24'
+          - all
+          default: '24'
+          description: '**Times per page (decided 29 September, rev 3 REV3-1).** When an event has more
+            performances on the chosen day than fit, WEB-006 and GST-007 show them as compact tiles paged
+            this many at a time with Earlier and Later; `all` shows every one. A string because `all` is
+            one of the values.
+
+            '
+        dayPartFilter:
+          type: boolean
+          default: true
+          description: '**Morning, afternoon and evening chips with counts above the times (decided 29
+            September, rev 3 REV3-1).** Where each part begins is `dayPartBoundaries`.
+
+            '
+        dayPartBoundaries:
+          type: object
+          description: '**Where the day parts divide, in the venue''s time zone (decided 29 September, rev
+            3 REV3-1).** Morning is before `afternoonStartsAt`, afternoon runs to `eveningStartsAt`, evening
+            is from `eveningStartsAt`. A venue sets its own through `venueOverrides`. `afternoonStartsAt`
+            must be earlier than `eveningStartsAt`, or 400.
+
+            '
+          properties:
+            afternoonStartsAt:
+              type: string
+              pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              default: '12:00'
+            eveningStartsAt:
+              type: string
+              pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              default: '17:00'
+        signInAt:
+          type: string
+          enum:
+          - afterAddOns
+          - atPayment
+          default: afterAddOns
+          description: '**Where the guest is asked to sign in, or for a guest-checkout code (decided 29
+            September, rev 3 REV3-3).** `afterAddOns` asks as the guest leaves Add-ons (WEB-008 on web, GST-041
+            on mobile); `atPayment` asks at payment (WEB-012). The basket is kept either way: the sign-in
+            gates checkout, never the cart (`FeatureToggle` `guestCheckout`).
+
+            '
+        seatEventDateMode:
+          type: string
+          enum:
+          - inlineStep
+          - popupOnSeatMap
+          default: inlineStep
+          description: '**Date and time on a seated event (decided 29 September, rev 3 REV3-4).** `inlineStep`
+            asks for them on WEB-006 or GST-007 before the seat map; `popupOnSeatMap` opens the seat map
+            with a date and time pop-up over it. An event with exactly one on-sale performance skips the
+            question in both modes.
+
+            '
+        seatViewPosition:
+          type: string
+          enum:
+          - bottom
+          - right
+          - left
+          - top
+          default: bottom
+          description: '**Where the view-from-your-seat box sits around the seat map (decided 29 September,
+            rev 3 REV3-5).** Web only; on mobile and on a narrow screen it is always below the map.
+
+            '
+        seatTimeBar:
+          type: boolean
+          default: true
+          description: '**Time bar above the seat map (decided 29 September, rev 3 REV3-6).** Shows the
+            chosen performance and lets the guest switch performance or change the date; switching releases
+            the seats held for the previous one.
+
+            '
+        ticketCategories:
+          type: string
+          enum:
+          - categoryThenSubcategory
+          - flatList
+          default: categoryThenSubcategory
+          description: '**How tickets are grouped (decided 29 September, rev 3 REV3-16).** `categoryThenSubcategory`
+            shows the venue''s top product categories as tiles, then the tickets in the chosen one;
+            `flatList` lists every ticket at once.
+
+            '
+        ticketTags:
+          type: boolean
+          default: true
+          description: '**Tags on tickets (decided 29 September, rev 3 23SEP-3).** Shows a product''s
+            display tags (such as "2 Hours", "Min 1.10 m", "Valid 90 days") on its card.
+
+            '
+        cardInfo:
+          type: boolean
+          default: true
+          description: '**Extra info on cards (decided 29 September, rev 3 23SEP-6).** Shows each ticket
+            type''s description, who it is for and what it includes, under its name.
+
+            '
+        quickTour:
+          type: boolean
+          default: false
+          description: '**Quick tour (decided 29 September, rev 3 REV3-20).** On, a first visit gets a
+            four-step coach-mark tour (date, time, tickets, basket) with Back, Next and End, replayable from
+            a Quick tour button. Whether the guest has seen it is kept on the device only, never on the
+            server.
+
+            '
+        conciergeMascot:
+          type: boolean
+          default: true
+          description: '**The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5).**
+            Read only where the `aiConciergeChat` feature is on.
+
+            '
+        performanceReveal:
+          type: string
+          enum:
+          - dateTimeTicket
+          - allAtOnce
+          default: dateTimeTicket
+          description: '**Performance reveal (decided 29 September, rev 3 REV3-2).** `dateTimeTicket` shows
+            the times only once a date is picked and the tickets only once a time is picked, with Continue
+            off until both are chosen; `allAtOnce` shows the three together.
+
+            '
+        showInfoOnly:
+          type: boolean
+          default: true
+          description: '**Show info-only products (decided 29 September, rev 3 REV3-14).** On, a product
+            with `guestListing` `infoOnly` (catalogue) is listed with its not-bookable label and opens its
+            details; off, guests are not shown it.
+
+            '
+        locationSwitcher:
+          type: boolean
+          default: false
+          description: '**Location switcher (decided 29 September, rev 3 REV3-18).** On, the booking screens
+            carry a "Booking at" bar with Change location, reusing the guest''s venue choice (audit R267).
+            Off unless the tenant or venue enables it; it has no effect for a tenant with one venue.
+
+            '
+        consentQuestionIds:
+          type: array
+          maxItems: 10
+          uniqueItems: true
+          default: []
+          description: '**The booking flow''s own consent questions (decided 29 September, rev 3 REV3-26).**
+            Asked on every booking where these settings are in force (a venue sets its own through
+            `venueOverrides`), together with those of each product in the cart (`Product.consentQuestionIds`,
+            catalogue), each question once. Each id names an active `ConsentQuestion` of the tenant in
+            marketing-crm, or 400. Empty asks none.
+
+            '
+          items:
+            type: string
+            format: uuid
+    BookingFlowVenueOverride:
+      type: object
+      x-ticvai-persistence: none — embedded in tenant_config
+      description: '**One venue''s booking-flow settings where they differ from the tenant''s (decided
+        29 September, rev 3 CFG-11).** `settings` carries only the fields the venue changes; a field left
+        out inherits the tenant value, and the schema defaults do not apply inside an override.
+
+        '
+      required:
+      - venueId
+      - settings
+      properties:
+        venueId:
+          type: string
+          format: uuid
+          description: One of the tenant's active venues. At most one override per venue.
+        settings:
+          $ref: '#/components/schemas/BookingFlowSettings'
+    BookingFlowConfig:
+      x-ticvai-persistence: none — embedded in tenant_config
+      description: '**Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).**
+        One tenant with several venues (the Kids Club branches, Coastal Aqua beside Union Arena) needs
+        them to differ. The settings in force at a venue are the tenant''s, with that venue''s entry in
+        `venueOverrides` laid over them field by field. The guest app resolves them for the venue the guest
+        picked (audit R267); `effectiveForVenueId` on `getBookingFlowConfig` returns them resolved.
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/BookingFlowSettings'
+      - type: object
+        properties:
+          venueOverrides:
+            type: array
+            maxItems: 200
+            default: []
+            description: Per-venue overrides, at most one per venue. A `venueId` that is not one of the
+              tenant's active venues, or appears twice, is refused with 400. An override for a venue later
+              closed is kept and has no effect.
+            items:
+              $ref: '#/components/schemas/BookingFlowVenueOverride'
     Theme:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
@@ -3082,6 +4088,24 @@ components:
           type: integer
           minimum: 0
           maximum: 32
+          description: The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change).
+            Its named palettes, font pairs and background tones are presets over the colours here and
+            `FontConfig`, not stored values.
+        surfaceStyle:
+          type: string
+          enum:
+          - glass
+          - solid
+          default: glass
+          description: Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3).
+        buttonStyle:
+          type: string
+          enum:
+          - solid
+          - outline
+          - pill
+          default: solid
+          description: Button shape (decided 29 September, rev 3 CFG-3).
     ContrastProblem:
       x-ticvai-persistence: none — error shape
       allOf:
@@ -4174,3 +5198,8 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Cell-to-cell. The `ai` service proposing Help me choose set-ups (`proposeGuidedChoice`).

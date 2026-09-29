@@ -1,5 +1,5 @@
 id: LLD-P13
-title: P13 Venue CMS — White Label — 99 screens
+title: P13 Venue CMS — White Label — 100 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -20,7 +20,7 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 97
+  screens: 98
 - module: fnb
   screens: 1
 - module: ticketing
@@ -29,19 +29,23 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 71
 - service: WhiteLabelService
-  operationCalls: 56
+  operationCalls: 66
 - service: MarketingService
-  operationCalls: 45
+  operationCalls: 50
 - service: FnbService
   operationCalls: 5
 - service: IdentityService
   operationCalls: 4
+- service: CatalogueService
+  operationCalls: 3
 - service: OrderService
   operationCalls: 2
+- service: TenancyService
+  operationCalls: 1
 coverage:
-  screens: 99
+  screens: 100
   inAFlow: 89
-  drawn: 99
+  drawn: 100
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -240,10 +244,12 @@ screens:
   density: compact
   operations:
   - createContentPage
+  - deleteContentPage
   - getHomepageLayout
   - getModuleEnablement
   - listContentPages
   - setFooter
+  - setHeader
   - setHomepageLayout
   - updateContentPage
   states:
@@ -272,6 +278,7 @@ screens:
   operations:
   - createBanner
   - createPromoBlock
+  - deleteBanner
   - deletePromoBlock
   - listBanners
   - listPromoBlocks
@@ -305,6 +312,7 @@ screens:
   - getMenu
   - listMenus
   - setMenuSections
+  - setNavigation
   - updateMenu
   states:
   - emptyFirstRun
@@ -491,10 +499,13 @@ screens:
   operations:
   - getBookingFlowConfig
   - getTenantConfig
+  - listConsentQuestions
+  - listOrgUnits
   - setBookingFlowConfig
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -506,6 +517,7 @@ screens:
   - CMS-013
   - CMS-017
   - CMS-018
+  - CMS-101
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-016
   inFlows: null
@@ -543,10 +555,14 @@ screens:
   wave: 2
   density: compact
   operations:
+  - createConsentQuestion
+  - listConsentAnswers
   - listConsentPurposes
+  - listConsentQuestions
   - listPolicies
   - setConsentPurposes
   - setPolicy
+  - updateConsentQuestion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -556,6 +572,7 @@ screens:
   offlineState: false
   entryParams:
   - policyKind<-navigation
+  - questionId<-navigation
   goesTo:
   - CMS-001
   - CMS-002
@@ -2458,3 +2475,34 @@ screens:
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-100
   inFlows:
   - 'F186 Digital Asset Management DAM board 4: Asset Distribution & Delivery Command Center'
+- screen: CMS-101
+  name: Help Me Choose
+  module: White Label
+  requiresModule: core
+  wave: 2
+  density: compact
+  operations:
+  - createGuidedChoice
+  - deleteGuidedChoice
+  - listEvents
+  - listGuidedChoices
+  - listProductCategories
+  - listProducts
+  - publishGuidedChoice
+  - unpublishGuidedChoice
+  - updateGuidedChoice
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-session
+  - guidedChoiceId<-navigation
+  goesTo:
+  - CMS-016
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-101
+  inFlows: null

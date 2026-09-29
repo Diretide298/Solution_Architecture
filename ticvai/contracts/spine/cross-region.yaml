@@ -5,7 +5,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Cross-Cell
   version: 0.1.0
-  x-ticvai-screen-count: 4
+  x-ticvai-screen-count: 6
   x-ticvai-tier: spine
   x-ticvai-module: Cross-cutting — multi-region
   x-ticvai-capabilities:
@@ -700,6 +700,8 @@ paths:
   /wallet-allocations:
     get:
       operationId: getWalletAllocation
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -732,6 +734,8 @@ paths:
                 $ref: '#/components/schemas/WalletAllocation'
     put:
       operationId: setWalletAllocationPolicy
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: region

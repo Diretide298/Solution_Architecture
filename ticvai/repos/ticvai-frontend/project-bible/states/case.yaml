@@ -48,6 +48,17 @@ transitions:
   operation: updateCase
   trigger: operation
   guard: Resolved after escalation
+- from: inProgress
+  to: resolved
+  operation: setCaseResolution
+  trigger: operation
+  guard: Resolution record written from the resolution workspace (category, root cause, outcome)
+    (decided 29 September, readiness close-out)
+- from: escalated
+  to: resolved
+  operation: setCaseResolution
+  trigger: operation
+  guard: Resolved after escalation, from the resolution workspace (decided 29 September, readiness close-out)
 - from: resolved
   to: inProgress
   operation: reopenCase

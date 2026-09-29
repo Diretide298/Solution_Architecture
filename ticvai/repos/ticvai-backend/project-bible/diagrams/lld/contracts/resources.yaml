@@ -1,5 +1,5 @@
 id: LLD-resources
-title: resources — 49 operations
+title: resources — 58 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -143,6 +143,18 @@ operations:
   - resources.resource_category
   writes:
   - resources.resource_category
+- operation: createResourceHold
+  verb: POST
+  path: /resource-holds
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - resources.resource_hold
+  writes: []
 - operation: createResourcePackage
   verb: POST
   path: /resource-packages
@@ -169,6 +181,18 @@ operations:
   - resources.resource_type
   writes:
   - resources.resource_type
+- operation: extendResourceHold
+  verb: POST
+  path: /resource-holds/{holdId}/extend
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - resources.resource_hold
+  writes: []
 - operation: getExperienceResourceRequirements
   verb: GET
   path: /experiences/{experienceId}/resource-requirements
@@ -179,6 +203,17 @@ operations:
   offline: false
   reads:
   - resources.resource_requirement
+  writes: []
+- operation: getMapResourceAvailability
+  verb: GET
+  path: /resource-availability
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads: []
   writes: []
 - operation: getPerformanceManifest
   verb: GET
@@ -250,6 +285,16 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: getResourceCostAnalytics
+  verb: GET
+  path: /resource-cost-analytics
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: getResourceDependencies
   verb: GET
   path: /resources/{resourceId}/dependencies
@@ -271,6 +316,18 @@ operations:
   offline: false
   reads:
   - resources.resource_relation
+  writes: []
+- operation: getResourceHold
+  verb: GET
+  path: /resource-holds/{holdId}
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - resources.resource_hold
   writes: []
 - operation: getResourceQualifications
   verb: GET
@@ -301,6 +358,17 @@ operations:
   permission: RESOURCE_VIEW
   audience:
   - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listProductStartTimes
+  verb: GET
+  path: /resource-start-times
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  - guest
   offline: false
   reads: []
   writes: []
@@ -382,6 +450,17 @@ operations:
   reads:
   - resources.resource
   writes: []
+- operation: raiseResourceRequest
+  verb: POST
+  path: /resource-requests
+  scope: venue
+  permission: RESOURCE_VIEW
+  audience:
+  - staff
+  offline: true
+  reads:
+  - resources.resource_request
+  writes: []
 - operation: releaseResourceBlock
   verb: DELETE
   path: /resource-blocks/{blockId}
@@ -389,6 +468,17 @@ operations:
   permission: RESOURCE_MANAGE
   audience:
   - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: relinquishResourceHold
+  verb: DELETE
+  path: /resource-holds/{holdId}
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  - guest
   offline: false
   reads: []
   writes: []
@@ -441,6 +531,17 @@ operations:
   - resources.allocation_policy
   writes:
   - resources.allocation_policy
+- operation: setResourceBookingProgress
+  verb: POST
+  path: /resource-bookings/{bookingId}/progress
+  scope: venue
+  permission: RESOURCE_BOOK
+  audience:
+  - staff
+  offline: true
+  reads:
+  - resources.booking
+  writes: []
 - operation: setResourceDependencies
   verb: PUT
   path: /resources/{resourceId}/dependencies

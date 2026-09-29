@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 32 of 75 |
+| Operations in the slice | 34 of 75 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -54,10 +54,12 @@
 | identity | [`selectRole`](#selectrole) | POST | `/auth/select-role` | core | 1 | EMP-002, POS-000, POS-001, SCN-001 |
 | identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-342, ADM-421 |
 | identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-073, WEB-020 |
-| mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
-| mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | setup | 1 | ADM-001, EMP-042 |
-| mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
-| mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | setup | 1 | ADM-001, EMP-042 |
+| mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, EMP-001, GST-042, GST-073, POS-000, PTR-001 … |
+| mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 2 | ADM-001, EMP-042, GST-073, WEB-024 |
+| mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 2 | ADM-001, ADM-342, EMP-001, EMP-002, EMP-042, GST-073 … |
+| mfa | [`removeMfaMethod`](#removemfamethod) | DELETE | `/auth/mfa/methods/{methodId}` | core | 2 | ADM-001, EMP-042, GST-073, WEB-024 |
+| mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | ADM-001, EMP-001, GST-042, GST-073, POS-000, PTR-001 … |
+| mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | core | 2 | ADM-001, EMP-042, GST-073, WEB-024 |
 | session | [`listActiveSessions`](#listactivesessions) | GET | `/auth/sessions` | core | 1 | ADM-001, POS-000, PTR-001, SUP-001 |
 
 ## Group: administration
@@ -449,7 +451,7 @@ Where the guest is linked across cells, the request fans out (ADR-0010).
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `identity.guest_session`, `pii.subject` |
+| Reads | `identity.guest_session`, `identity.mfa_method`, `pii.subject` |
 | Writes | - |
 | Called by | GST-042, GST-073, WEB-016 |
 
@@ -466,6 +468,16 @@ Where the guest is linked across cells, the request fans out (ADR-0010).
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
+| requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
+| mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
+| mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
+| mfaMethods[].label | string |  | (nullable) |
+| mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
+| mfaMethods[].isActive | boolean | yes |  |
+| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].enrolledAt | string (date-time) | yes |  |
+| mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
 | expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
@@ -514,7 +526,7 @@ Ends this device's session. `allDevices` revokes every session for the subject, 
 
 **Decided 28 September, audit R073 (a).** `registerGuest` has always taken an optional password and nothing let a guest sign in with it, so `WEB-016` promised a sign-in that did not exist. This is that sign-in, beside the one-time code, social and UAE Pass routes; it returns the same `GuestSession`.
 **A wrong password, an unknown identifier and an account with no password are one answer** (`401`, the same timing), because a sign-in that tells them apart is an account enumeration tool. **Failed attempts count against `PasswordPolicy.lockoutAfterAttempts`** and lock the account for `lockoutMinutes`, never permanently; the guest can still use a one-time code.
-**No second factor at sign-in** (audit R167): a guest signs in with this, a code, a social provider or UAE Pass, never with enterprise SSO and never with MFA. **One session per device** (audit R126): signing in on a device ends that device's previous guest session.
+**A second factor only in a venue that enabled guest two-step verification** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest MFA"). The venue comes from `venueId` in the body, the venue the guest app or booking is in. Where that venue's `VenueSettings.identity.guestTwoStep.enabled` is false, the default, a guest signs in with this, a code, a social provider or UAE Pass and nothing more. Where it is on and the guest has an enrolled method, the returned `GuestSession` has `requiresMfa` true and is not usable until `createMfaChallenge` (`action: signIn`) and `verifyMfaChallenge` succeed. With no `venueId`, an enrolled guest is asked when any venue of the tenant has it on (fail closed). Never with enterprise SSO (R167, first part, stands). **One session per device** (audit R126): signing in on a device ends that device's previous guest session.
 An unverified account signs in and may browse and fill a cart; the checkout gate on `verifyGuestEmail` still applies.
 
 |  |  |
@@ -525,7 +537,7 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | - |
+| Reads | `identity.mfa_method` |
 | Writes | - |
 | Called by | GST-042, WEB-016 |
 
@@ -542,6 +554,7 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 | identifier | string | yes | The email address or E.164 mobile number the account was registered with. (max length 256) |
 | password | string | yes | (min length 8; max length 256) |
 | deviceId | string |  | Names the device; a new sign-in here ends the previous session on it. |
+| venueId | string (uuid) |  | The venue the guest app or booking is in. (nullable) |
 
 **Response**: `GuestSession`
 
@@ -556,6 +569,16 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
+| requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
+| mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
+| mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
+| mfaMethods[].label | string |  | (nullable) |
+| mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
+| mfaMethods[].isActive | boolean | yes |  |
+| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].enrolledAt | string (date-time) | yes |  |
+| mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
 | expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
@@ -583,7 +606,7 @@ Where the provider's verified email matches an existing account, the identities 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `pii.subject_contact` |
+| Reads | `cache:idempotency`, `identity.mfa_method`, `pii.subject_contact` |
 | Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject` |
 | Called by | GST-042, WEB-016 |
 
@@ -600,6 +623,7 @@ Where the provider's verified email matches an existing account, the identities 
 | provider | enum (apple, google) | yes |  |
 | idToken | string | yes |  |
 | deviceId | string |  |  |
+| venueId | string (uuid) |  | The venue the guest app or booking is in. (nullable) |
 
 **Response**: `GuestSession`
 
@@ -614,6 +638,16 @@ Where the provider's verified email matches an existing account, the identities 
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
+| requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
+| mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
+| mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
+| mfaMethods[].label | string |  | (nullable) |
+| mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
+| mfaMethods[].isActive | boolean | yes |  |
+| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].enrolledAt | string (date-time) | yes |  |
+| mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
 | expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
@@ -640,7 +674,7 @@ Government onboarding has lead time and should be started before it becomes the 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `pii.subject_contact` |
+| Reads | `cache:idempotency`, `identity.mfa_method`, `pii.subject_contact` |
 | Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject`, `pii.subject_document` |
 | Called by | GST-042, WEB-016 |
 
@@ -658,6 +692,7 @@ Government onboarding has lead time and should be started before it becomes the 
 | redirectUri | string | yes |  |
 | state | string |  |  |
 | deviceId | string |  |  |
+| venueId | string (uuid) |  | The venue the guest app or booking is in. (nullable) |
 
 **Response**: `GuestSession`
 
@@ -672,6 +707,16 @@ Government onboarding has lead time and should be started before it becomes the 
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
+| requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
+| mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
+| mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
+| mfaMethods[].label | string |  | (nullable) |
+| mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
+| mfaMethods[].isActive | boolean | yes |  |
+| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].enrolledAt | string (date-time) | yes |  |
+| mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
 | expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
@@ -742,7 +787,7 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `pii.subject` |
+| Reads | `cache:idempotency`, `identity.mfa_method`, `pii.subject` |
 | Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject`, `pii.subject_contact` |
 | Called by | GST-042, WEB-016 |
 
@@ -779,6 +824,16 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
+| requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
+| mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
+| mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
+| mfaMethods[].label | string |  | (nullable) |
+| mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
+| mfaMethods[].isActive | boolean | yes |  |
+| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].enrolledAt | string (date-time) | yes |  |
+| mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
 | expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
@@ -849,7 +904,7 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.otp_challenge`, `pii.subject_contact` |
+| Reads | `cache:idempotency`, `identity.mfa_method`, `identity.otp_challenge`, `pii.subject_contact` |
 | Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject_contact` |
 | Called by | GST-042, WEB-016 |
 
@@ -866,6 +921,7 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | identifier | string | yes |  |
 | code | string | yes | (min length 4; max length 10) |
 | deviceId | string |  |  |
+| venueId | string (uuid) |  | The venue the guest app or booking is in. (nullable) |
 
 **Response**: `GuestSession`
 
@@ -880,6 +936,16 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
+| requiresMfa | boolean |  | True only where the sign-in venue enabled guest two-step verification (VenueSettings.identity.guestTwoStep, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per ve… (default False) |
+| mfaMethods | array of MfaMethod |  | The guest's active methods, so the client can offer the right one. |
+| mfaMethods[].id | string (uuid) | yes |  |
+| mfaMethods[].kind | MfaKind: enum (totp, smsOtp, emailOtp, biometric, hardwareToken) | yes |  |
+| mfaMethods[].label | string |  | (nullable) |
+| mfaMethods[].maskedTarget | string |  | Partially masked destination, so a person can tell two methods apart. (nullable) |
+| mfaMethods[].isActive | boolean | yes |  |
+| mfaMethods[].isPrimary | boolean |  |  |
+| mfaMethods[].enrolledAt | string (date-time) | yes |  |
+| mfaMethods[].lastUsedAt | string (date-time) |  | (nullable) |
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
 | expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
@@ -1592,7 +1658,7 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 
 Issues a short-lived token proving a factor was presented just now. Consumed by operations that require it — high-value refunds, ledger approval, permission grants, tenant termination.
 **For a staff or partner principal it is also the second factor at sign-in** (decided 28 September, audit R135, R126 (5)(6)). When `login` answers `requiresMfa: true`, the client calls this with `action: signIn` on the pending session and then `verifyMfaChallenge`; until that succeeds the session is not usable. POS-000, EMP-001, SCN-001, ADM-001, PTR-001 and SUP-001 do this.
-**Never for guests** (decided 28 September, audit R167): a guest is not asked for a second factor and cannot enrol one.
+**For a guest only in a venue that enabled guest two-step verification** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167). The venue is `venueId` in the body: for `signIn` the venue the guest signed in from, for a step-up the venue of the booking, cart or ticket being acted on (the calling client or service passes it). Where that venue's `VenueSettings.identity.guestTwoStep.enabled` is on, an enrolled guest uses `action: signIn` after a guest sign-in answered `requiresMfa`, and a step-up before any action listed in that venue's `guestTwoStep.stepUpActions`; the token is bound to that venue. Where it is off (the default) a guest caller is refused 403 `guest-two-step-disabled`. **A guest who signed in with an email code cannot use `emailOtp` as the second factor**: the same inbox twice is one factor.
 A session that authenticated hours ago is not the same as a person present at the keyboard now, and for those actions the difference matters.
 
 |  |  |
@@ -1605,7 +1671,7 @@ A session that authenticated hours ago is not the same as a person present at th
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge` |
-| Called by | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
+| Called by | ADM-001, EMP-001, GST-042, GST-073, POS-000, PTR-001, SCN-001, SUP-001, WEB-016 |
 
 **Parameters**
 
@@ -1619,6 +1685,7 @@ A session that authenticated hours ago is not the same as a person present at th
 |---|---|---|---|
 | action | string | yes | What the step-up is for. |
 | methodId | string (uuid) |  |  |
+| venueId | string (uuid) |  | For a guest, the venue whose VenueSettings.identity.guestTwoStep applies (sign-in venue, or the venue of the booking being acted on). (nullable) |
 
 **Response**: `object`
 
@@ -1639,18 +1706,19 @@ A session that authenticated hours ago is not the same as a person present at th
 
 Returns a secret or challenge to complete enrolment. **The method is not active until verified** — enrolling without verifying would lock the principal out of their own account.
 **Staff enrol an authenticator app (`totp`), with email (`emailOtp`) as the fallback** (decided 28 September, audit R126 (5)). A staff or partner principal asking for `smsOtp`, `biometric` or `hardwareToken` is refused `422`.
+**A guest may enrol only where at least one venue of the tenant enabled guest two-step verification** (`VenueSettings.identity.guestTwoStep.enabled`, decided 29 September, rev 3 GAP-B1, per venue): the same kinds as staff, `totp` with `emailOtp` as the fallback. The enrolment belongs to the guest account and is tenant-wide; it is used only in venues that have the setting on. Any other kind is refused `422`; enrolling while no venue has the setting on is refused `403` `guest-two-step-disabled`.
 
 |  |  |
 |---|---|
 | Permission | `None` |
 | Scope level | tenant |
-| Part of slice | setup, makes `identity.mfa_method` non-empty |
-| Wave | 1 |
+| Part of slice | core |
+| Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_recovery_code`, `identity.principal` |
 | Writes | `cache:idempotency`, `identity.mfa_method`, `identity.mfa_recovery_code` |
-| Called by | ADM-001, EMP-042 |
+| Called by | ADM-001, EMP-042, GST-073, WEB-024 |
 
 **Parameters**
 
@@ -1682,7 +1750,63 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Enrolment started, pending verification |
-| 422 |  | A kind staff may not enrol. |
+| 403 |  | A guest caller while no venue of the tenant has guest two-step verification on (rev 3 GAP-B1, per venue). |
+| 422 |  | A kind the caller may not enrol. |
+
+### listMfaMethods
+
+**`GET /auth/mfa/methods`**: Enrolled MFA methods
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `identity.mfa_method` |
+| Writes | - |
+| Called by | ADM-001, ADM-342, EMP-001, EMP-002, EMP-042, GST-073, PTR-001, SCN-001, SUP-001, WEB-024 |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Methods |
+
+### removeMfaMethod
+
+**`DELETE /auth/mfa/methods/{methodId}`**: Remove an MFA method
+
+Refused where it is the only active method and the principal holds a permission listed in `PasswordPolicy.mfaRequiredForPermissions` (MFA is required by permission, not by role — decided 28 September, audit R135). Removing the last factor from an account that must have one is not a choice the account holder gets to make.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `identity.mfa_method` |
+| Writes | `cache:idempotency`, `identity.mfa_method` |
+| Called by | ADM-001, EMP-042, GST-073, WEB-024 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| methodId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Removed |
+| 409 |  | Last remaining method of a principal who holds a permission that requires MFA (audit R135) |
 
 ### verifyMfaChallenge
 
@@ -1700,7 +1824,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code`, `identity.session` |
-| Called by | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
+| Called by | ADM-001, EMP-001, GST-042, GST-073, POS-000, PTR-001, SCN-001, SUP-001, WEB-016 |
 
 **Parameters**
 
@@ -1768,13 +1892,13 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 |---|---|
 | Permission | `None` |
 | Scope level | tenant |
-| Part of slice | setup, makes `identity.mfa_method` non-empty |
-| Wave | 1 |
+| Part of slice | core |
+| Wave | 2 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method` |
 | Writes | `cache:idempotency`, `identity.mfa_method` |
-| Called by | ADM-001, EMP-042 |
+| Called by | ADM-001, EMP-042, GST-073, WEB-024 |
 
 **Parameters**
 
@@ -2065,12 +2189,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-43 operations, added to this service in later releases without changing any of the above.
+41 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | administration | `createAccessPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `deleteDelegatedAccess`, `evaluateAccess`, `getAccessPolicy`, `getAccessPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessPolicies`, `listAccessPolicyHistory`, `listAccessPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listOwnPlatformStaffGrants`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `setAccessPolicyState`, `setCapabilityTemplate`, `setPrincipalModuleAccess`, `simulateAccessPolicy`, `updateAccessPolicy` |
 | identity | `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage`, `setSegregationRules` |
-| mfa | `listMfaMethods`, `removeMfaMethod` |
 | session | `revokeAllSessions` |
 | sso | `completeSsoAuthorization`, `getSsoConfig`, `listSsoProviders`, `setSsoConfig`, `startSsoAuthorization` |

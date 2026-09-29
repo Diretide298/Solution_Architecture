@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Wallet Configuration
   version: 1.0.0
-  x-ticvai-screen-count: 43
+  x-ticvai-screen-count: 53
   x-ticvai-tier: satellite
   x-ticvai-module: 4 — Bundles and Promotions
   x-ticvai-platforms:
@@ -706,6 +706,7 @@ paths:
     get:
       operationId: listSharedWallets
       x-ticvai-consumed-by:
+        - "P08 BO-1086 Wallet Ownership & Account Association"
         - "P08 BO-1113 Shared Wallet Command Center"
         - "P08 BO-1119 Corporate Wallet & Organizational Hierarchy"
         - "P08 BO-1122 Shared Wallet Simulator, Monitoring & Audit"
@@ -739,6 +740,7 @@ paths:
     post:
       operationId: createSharedWallet
       x-ticvai-consumed-by:
+        - "P08 BO-1113 Shared Wallet Command Center"
         - "P08 BO-1114 Shared Wallet Model Configuration"
         - "P08 BO-1119 Corporate Wallet & Organizational Hierarchy"
       summary: Set up a family, household or corporate wallet
@@ -777,6 +779,8 @@ paths:
     put:
       operationId: setSharedWalletMembers
       x-ticvai-consumed-by:
+        - "P08 BO-1086 Wallet Ownership & Account Association"
+        - "P08 BO-1113 Shared Wallet Command Center"
         - "P08 BO-1115 Family & Household Structure Configuration"
         - "P08 BO-1116 Parent–Child Stored Value Distribution"
         - "P08 BO-1117 Allowance & Budget Allocation Engine"
@@ -859,6 +863,7 @@ paths:
     post:
       operationId: createVoucherType
       x-ticvai-consumed-by:
+        - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
         - "P08 BO-1126 Voucher & Coupon Type Configuration"
         - "P08 BO-1127 Voucher Eligibility & Redemption Rule Studio"
       summary: Define a voucher or benefit
@@ -891,6 +896,7 @@ paths:
     put:
       operationId: setGiftCardProduct
       x-ticvai-consumed-by:
+        - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
         - "P08 BO-1124 Gift Card Product Configuration"
       summary: Denominations, validity, activation and distribution
       description: 'Boards 5.2 and 5.3. **`issueGiftCard` and `activateGiftCard` exist in `retail` and
@@ -1307,6 +1313,7 @@ paths:
         - "P08 BO-1168 Gift Card Liability Management"
         - "P08 BO-1170 Wallet Financial Period & Closing Controls"
         - "P08 BO-1171 Wallet Analytics & Management Reporting"
+        - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
         - "P08 BO-1182 Wallet Platform Health, Audit & Administration Center"
       summary: What is outstanding, and what is breakage
       description: 'Boards 9.5, 9.6 and 9.9. **The number the finance director asks for and the package
@@ -1535,6 +1542,9 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: suspendWallet
+      x-ticvai-consumed-by:
+        - "P08 BO-1150 Wallet Block, Freeze & Restriction Management"
+        - "P08 BO-416 Wallet Account & Balance View"
       x-ticvai-audience: [staff]
       summary: Freeze a wallet
       description: >
@@ -1793,8 +1803,10 @@ paths:
     post:
       operationId: adjustWallet
       x-ticvai-consumed-by:
+        - "P08 BO-1100 Funding Reversal & Correction Management"
         - "P08 BO-1149 Administrative Balance Adjustment Studio"
         - "P08 BO-1167 Reconciliation Exception & Resolution Workbench"
+        - "P08 BO-416 Wallet Account & Balance View"
         - "P08 BO-422 Refund, Adjustment & Manual Bonus Control"
       x-ticvai-audience: [staff]
       summary: Manually adjust a wallet balance
@@ -1836,6 +1848,7 @@ paths:
     post:
       operationId: issueGiftCard
       x-ticvai-consumed-by:
+        - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
         - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       x-ticvai-audience: [staff]
       summary: Issue or activate a gift card
@@ -1882,6 +1895,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
+        - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary   # bearer instrument. Stale balance is double-spend
       summary: Check a gift card balance
@@ -2228,8 +2242,776 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WalletHold'
+  /wallet-authentication-policy:
+    put:
+      operationId: setWalletAuthenticationPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-1139 Digital Key & Wallet Authentication Policy"
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
+        board 6 p.68 (Wallet PIN, Device authentication, Digital Key, Customer login, Membership credential);
+        shape follows setWalletChannelRules'
+      summary: Which proof of identity a wallet spend needs, by amount, channel and kind
+      description: 'Board 6, p.68. **`setWalletChannelRules` can only say "PIN above an amount".** The
+        board asks for a risk-tiered policy: a small tap at a kiosk needs nothing, a larger spend on the
+        app needs device authentication, a transfer to another wallet needs the customer to log in.
+        Each tier names the lowest amount it applies above, the channels and transaction kinds it covers,
+        and the methods any one of which satisfies it.
+
+        **The highest matching tier wins**, so tiers are evaluated from the largest `aboveAmount` down and
+        a spend never needs less proof because a smaller tier also matched. Tiers with the same
+        `aboveAmount` and an overlapping channel and transaction kind are refused (422). A venue with no
+        policy falls back to `WalletChannelRules.requiresPin` / `pinAboveAmount` (decided 29 September,
+        readiness close-out).
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletAuthenticationPolicy'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletAuthenticationPolicy'
+        '422':
+          description: Two tiers with the same `aboveAmount` overlap on a channel and a transaction kind,
+            or a tier lists no method.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /wallet-configuration/versions:
+    get:
+      operationId: listWalletConfigurationVersions
+      x-ticvai-consumed-by:
+        - "P08 BO-1162 Security Governance, Audit & Rule Publication"
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
+        board 8 p.98 (Version comparison, Rollback); shape follows white-label listConfigVersions'
+      summary: Wallet configuration versions, newest first
+      description: 'Board 8, p.98. The list that version comparison and rollback pick from. Each entry is
+        what `publishWalletConfiguration` recorded, plus drafts created by
+        `restoreWalletConfigurationVersion` (`publishedAt` null).
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Versions, newest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WalletConfigurationVersion'
+  /wallet-configuration/versions/{version}/diff:
+    parameters:
+    - name: version
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    get:
+      operationId: diffWalletConfigurationVersion
+      x-ticvai-consumed-by:
+        - "P08 BO-1162 Security Governance, Audit & Rule Publication"
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
+        board 8 p.98 (Version comparison); shape follows white-label diffConfigVersion'
+      summary: Compare a wallet configuration version against another or the working draft
+      description: 'Board 8, p.98. **A publish note is not a review; a field-level diff is.** Each change
+        names the configuration area (credit types, consumption, channel rules, authentication, risk
+        rules, accounting, reconciliation sources, integration mappings), the path within it, and the
+        value before and after.
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: against
+        in: query
+        description: Another version. Defaults to the working draft.
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Diff
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletConfigurationDiff'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /wallet-configuration/versions/{version}/restore:
+    parameters:
+    - name: version
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    post:
+      operationId: restoreWalletConfigurationVersion
+      x-ticvai-consumed-by:
+        - "P08 BO-1162 Security Governance, Audit & Rule Publication"
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
+        board 8 p.98 (Rollback); shape follows white-label restoreConfigVersion'
+      summary: Put a previous wallet configuration back as the working draft
+      description: 'Board 8, p.98. Copies the chosen version''s configuration into the working draft and
+        returns it as a new unpublished version with its validation findings. **It does not publish**:
+        restore, review with `diffWalletConfigurationVersion`, then `publishWalletConfiguration`, so a
+        rollback is as deliberate as the change that caused it (same rule as `restoreConfigVersion`,
+        audit R139). A credit type retired since that version is reported as a blocking finding rather
+        than silently revived.
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Restored into the working draft, unpublished
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletConfigurationVersion'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /wallet-risk-rules/{ruleCode}/status:
+    parameters:
+    - name: ruleCode
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: setWalletRiskRuleStatus
+      x-ticvai-consumed-by:
+        - "P08 BO-1162 Security Governance, Audit & Rule Publication"
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
+        board 8 p.98 (Emergency disable, Rule suspension); shape follows setWalletRiskRules'
+      summary: Suspend, emergency-disable or reactivate one risk rule
+      description: 'Board 8, p.98. **Switching one rule off must not mean republishing the rule set.** A
+        rule freezing wallets on a false positive at 20:00 on a Friday is stopped here, at once, without a
+        configuration version.
+
+        `suspended` is planned and may carry `until`, after which the rule returns to `active` by itself.
+        `emergencyDisabled` has no `until` and stays off until someone sets it back to `active`; it is
+        audited and alerts the security owner. `reason` is mandatory for both (decided 29 September,
+        readiness close-out).
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - active
+                  - suspended
+                  - emergencyDisabled
+                reason:
+                  type: string
+                  maxLength: 500
+                  description: Required unless `status` is `active`.
+                until:
+                  type: string
+                  format: date-time
+                  nullable: true
+                  description: Only with `suspended`. Empty means until reactivated.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletRiskRules'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: No `reason` for `suspended` or `emergencyDisabled`, or `until` given with a status
+            other than `suspended`, or `until` in the past.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /wallet-reconciliation-sources:
+    put:
+      operationId: setWalletReconciliationSources
+      x-ticvai-consumed-by:
+        - "P08 BO-1166 Multi-Source Reconciliation Configuration"
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
+        board 9 p.105 (Wallet Ledger, POS, Payment Gateway, Payment Server, Gift Card, Finance); shape
+        follows setWalletAccountingMapping'
+      summary: Which sources the wallet reconciles against, matched how, and when
+      description: 'Board 9, p.105. `getWalletReconciliation` reports the result; this says what goes into
+        it. Each source is switched on or off, names the keys a movement is matched on, the difference
+        below which a pair is treated as agreed, and when it runs.
+
+        **`walletLedger` is always on**: it is the side every other source is compared with, and a
+        request that disables it is refused (422). A tolerance is in the tenant currency and defaults to
+        zero (decided 29 September, readiness close-out).
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletReconciliationSources'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletReconciliationSources'
+        '422':
+          description: '`walletLedger` disabled or missing, or a source kind listed twice.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /wallet-integration-mappings:
+    put:
+      operationId: setWalletIntegrationMapping
+      x-ticvai-consumed-by:
+        - "P08 BO-1175 Integration Profile & System Mapping"
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
+        board 10 pp.118 and 122 (Field mapping, Currency mapping, Status mapping, Credit-type mapping,
+        Date/time mapping, Correct mapping); shape follows setWalletAccountingMapping'
+      summary: How one integration's fields, currencies, statuses and credit types map onto the wallet
+      description: 'Board 10, pp.118 and 122. **One mapping per integration**, keyed by the `public-api`
+        client it authenticates as, replaced whole on each PUT. The workbench''s *Correct mapping* is
+        this operation: an exception caused by an unmapped status or credit type is fixed here and then
+        reprocessed with `resolveWalletDispute`.
+
+        An unmapped inbound value is never guessed: the message is parked as an exception. A credit-type
+        mapping must name a credit type that exists and is not retired (422).
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletIntegrationMapping'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletIntegrationMapping'
+        '422':
+          description: A credit-type mapping names a credit type that does not exist or is retired, or an
+            external value is mapped twice within one list.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /wallet-disputes/{disputeId}/resolve:
+    parameters:
+    - name: disputeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: resolveWalletDispute
+      x-ticvai-consumed-by:
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Wallet_Configuration_Backend_Structure_v1.0.pdf''
+        board 10 p.122 (Reprocess, Escalate, Mark resolved); shape follows raiseWalletDispute'
+      summary: Work a wallet dispute or integration exception
+      description: 'Board 10, p.122. **Disputes could be raised and listed but not worked.** Three
+        actions:
+
+        `reprocess` re-runs the failed or contested movement (typically after `setWalletIntegrationMapping`
+        corrected a mapping); the dispute moves to `investigating` and records the new transaction ids.
+        `escalate` moves it to `escalated` and assigns it to `escalateToRoleId`. `resolve` closes it as
+        `upheld` or `rejected` (`outcome`, required) with a `resolutionNote`; an upheld dispute that
+        needs money moved references the `adjustWallet` adjustment in `adjustmentId` rather than moving
+        money here (decided 29 September, readiness close-out).
+
+        A dispute already `upheld`, `rejected` or `withdrawn` is refused (409).
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_OPERATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - action
+              properties:
+                action:
+                  type: string
+                  enum:
+                  - reprocess
+                  - escalate
+                  - resolve
+                outcome:
+                  type: string
+                  enum:
+                  - upheld
+                  - rejected
+                  description: Required with `resolve`.
+                resolutionNote:
+                  type: string
+                  maxLength: 2000
+                  description: Required with `resolve`.
+                escalateToRoleId:
+                  type: string
+                  format: uuid
+                  description: Required with `escalate`.
+                adjustmentId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The `adjustWallet` adjustment that settled an upheld dispute, if any.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Worked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletDispute'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The dispute is already closed (`upheld`, `rejected` or `withdrawn`).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`resolve` without `outcome` or `resolutionNote`, or `escalate` without
+            `escalateToRoleId`.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /wallet-disputes/{disputeId}/withdraw:
+    parameters:
+    - name: disputeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: withdrawWalletDispute
+      x-ticvai-consumed-by:
+        - "P08 BO-1151 Wallet Disputes & Operational Exception Queue"
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
+      x-ticvai-agreed: '29 September: VM close-out follow-up; our build plan'
+      summary: Withdraw a wallet dispute that is still open or under review
+      description: 'The only way into `withdrawn` (states/wallet-dispute.yaml). **A guest who finds the
+        second arcade charge was their child''s go withdraws the dispute**; staff withdraw it on the
+        guest''s word at the desk or when it was raised in error.
+
+        Allowed only while the dispute is `open`, `investigating` or `escalated`; a dispute already
+        `upheld`, `rejected` or `withdrawn` is refused (409). A guest may withdraw only a dispute they
+        raised (`raisedBy` is the caller) and gets 404 for anyone else''s; staff with `WALLET_OPERATE`
+        may withdraw any in their venue. `reason` is recorded in `resolution` and audited. Nothing is
+        adjusted: money moves only through `adjustWallet` (decided 29 September, VM close-out follow-up).
+
+        '
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_OPERATE
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 500
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Withdrawn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletDispute'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The dispute is already closed (`upheld`, `rejected` or `withdrawn`).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+
 components:
   schemas:
+    WalletAuthenticationPolicy:
+      type: object
+      x-ticvai-persistence: wallet.authentication_policy
+      description: 'Board 6, p.68. **Risk-tiered proof of identity for a wallet spend.** The highest
+        matching tier wins; with no policy, `WalletChannelRules.requiresPin` applies.'
+      required:
+      - tiers
+      properties:
+        tiers:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            required:
+            - aboveAmount
+            - methods
+            properties:
+              aboveAmount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              channels:
+                type: array
+                description: Empty means every channel in `WalletChannelRules.allowedChannels`.
+                items:
+                  type: string
+              transactionKinds:
+                type: array
+                description: Empty means every kind.
+                items:
+                  $ref: '#/components/schemas/WalletTransactionKind'
+              methods:
+                type: array
+                minItems: 1
+                uniqueItems: true
+                description: Any one of these satisfies the tier.
+                items:
+                  type: string
+                  enum:
+                  - walletPin
+                  - deviceAuthentication
+                  - digitalKey
+                  - customerLogin
+                  - membershipCredential
+        scopePath:
+          type: string
+    WalletConfigurationDiff:
+      x-ticvai-persistence: none — computed
+      type: object
+      description: Board 8, p.98. Field-level comparison of two wallet configuration versions, shaped as
+        white-label `ConfigDiff`.
+      required:
+      - fromVersion
+      - toVersion
+      - changes
+      properties:
+        fromVersion:
+          type: integer
+        toVersion:
+          type: integer
+          nullable: true
+          description: Null when compared against the working draft.
+        changes:
+          type: array
+          items:
+            type: object
+            required:
+            - area
+            - path
+            - changeKind
+            properties:
+              area:
+                type: string
+                enum:
+                - walletTypes
+                - creditTypes
+                - consumptionPolicy
+                - fundingRules
+                - channelRules
+                - authenticationPolicy
+                - transferRules
+                - refundPolicy
+                - riskRules
+                - accountingMapping
+                - reconciliationSources
+                - integrationMappings
+              path:
+                type: string
+              changeKind:
+                type: string
+                enum:
+                - added
+                - removed
+                - modified
+              before:
+                type: string
+                nullable: true
+              after:
+                type: string
+                nullable: true
+    WalletReconciliationSources:
+      type: object
+      x-ticvai-persistence: wallet.reconciliation_source
+      description: 'Board 9, p.105. **What `getWalletReconciliation` compares.** `walletLedger` is always
+        on.'
+      required:
+      - sources
+      properties:
+        sources:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required:
+            - kind
+            - enabled
+            properties:
+              kind:
+                type: string
+                enum:
+                - walletLedger
+                - pos
+                - paymentGateway
+                - paymentServer
+                - giftCard
+                - finance
+              enabled:
+                type: boolean
+                default: true
+              matchKeys:
+                type: array
+                description: Fields a movement is matched on, e.g. transactionId, authorisationCode,
+                  terminalId, amount, businessDate.
+                items:
+                  type: string
+              toleranceAmount:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: A pair differing by no more than this is agreed. Default zero.
+              schedule:
+                type: string
+                enum:
+                - realTime
+                - hourly
+                - daily
+                - endOfBusinessDay
+                default: endOfBusinessDay
+        scopePath:
+          type: string
+    WalletIntegrationMapping:
+      type: object
+      x-ticvai-persistence: wallet.integration_mapping
+      description: 'Board 10, pp.118 and 122. **One per integration**, keyed by the `public-api` client.
+        An unmapped inbound value is parked as an exception, never guessed.'
+      required:
+      - apiClientId
+      properties:
+        apiClientId:
+          type: string
+          format: uuid
+          description: The `public-api` ApiClient the integration authenticates as.
+        fieldMappings:
+          type: array
+          items:
+            type: object
+            required:
+            - externalField
+            - walletField
+            properties:
+              externalField:
+                type: string
+              walletField:
+                type: string
+              transform:
+                type: string
+                nullable: true
+        currencyMappings:
+          type: array
+          items:
+            type: object
+            required:
+            - externalCode
+            - currency
+            properties:
+              externalCode:
+                type: string
+              currency:
+                type: string
+                pattern: ^[A-Z]{3}$
+        statusMappings:
+          type: array
+          items:
+            type: object
+            required:
+            - externalStatus
+            - walletStatus
+            properties:
+              externalStatus:
+                type: string
+              walletStatus:
+                type: string
+        creditTypeMappings:
+          type: array
+          items:
+            type: object
+            required:
+            - externalCode
+            - creditTypeId
+            properties:
+              externalCode:
+                type: string
+              creditTypeId:
+                type: string
+                format: uuid
+        dateTimeFormat:
+          type: string
+          default: ISO-8601
+          description: The format the integration sends, e.g. ISO-8601 or a pattern such as dd/MM/yyyy HH:mm.
+        timeZone:
+          type: string
+          nullable: true
+          description: IANA zone the integration's local times are in. Null means UTC offsets are sent.
+        scopePath:
+          type: string
     WalletBalance:
       type: object
       x-ticvai-persistence: wallet.balance
@@ -3302,12 +4084,37 @@ components:
           enum:
           - open
           - investigating
+          - escalated
           - upheld
           - rejected
           - withdrawn
+          description: '`escalated` added with `resolveWalletDispute` (VM close-out, 29 September).
+            `upheld`, `rejected` and `withdrawn` are closed.'
         resolution:
           type: string
           nullable: true
+        escalatedToRoleId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        reprocessedTransactionIds:
+          type: array
+          readOnly: true
+          description: Transactions created by a `reprocess` action.
+          items:
+            type: string
+            format: uuid
+        resolvedBy:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
         adjustmentId:
           type: string
           format: uuid
@@ -3359,6 +4166,26 @@ components:
               alertOnAction:
                 type: boolean
                 default: true
+              status:
+                type: string
+                readOnly: true
+                enum:
+                - active
+                - suspended
+                - emergencyDisabled
+                default: active
+                description: Set by `setWalletRiskRuleStatus`, not by publishing the rule set. A rule not
+                  `active` is evaluated for nothing (VM close-out, 29 September).
+              statusReason:
+                type: string
+                nullable: true
+                readOnly: true
+              statusUntil:
+                type: string
+                format: date-time
+                nullable: true
+                readOnly: true
+                description: When a `suspended` rule returns to `active` by itself.
         scopePath:
           type: string
     WalletAccountingMapping:

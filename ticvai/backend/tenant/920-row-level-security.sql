@@ -96,14 +96,14 @@ BEGIN
 END
 $$;
 
--- **59 tables carry `venue_id` and no `scope_path`, and a policy set built on `scope_path`
+-- **65 tables carry `venue_id` and no `scope_path`, and a policy set built on `scope_path`
 -- alone leaves every one of them open.** `check-migrations` has said so since it was written --
 -- checking only scope_path missed the tables that carry venue_id instead, and they would have
 -- passed with no policy at all -- and the hand-written baseline never closed it because it
 -- protected three tables in total.
 --
 -- A venue id is resolved to its path through the scope tree rather than assumed. **The subquery is
--- the price of not carrying a redundant `scope_path` column on those 59 tables**, and
+-- the price of not carrying a redundant `scope_path` column on those 65 tables**, and
 -- `platform.scope` is small, cached and indexed on `id` and, with GiST, on `path`.
 --
 -- **A null `venue_id` is a tenant-level row, and until 24 September nobody could see it** — not
@@ -172,7 +172,7 @@ BEGIN
 END
 $$;
 
--- **630 tables: 267 scoped by `scope_path`, 59 by `venue_id`, 129 through the parent that owns them, 174 with no policy.**
+-- **718 tables: 317 scoped by `scope_path`, 65 by `venue_id`, 134 through the parent that owns them, 201 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -191,7 +191,9 @@ CREATE POLICY scope_scope ON platform.scope
 SELECT platform.apply_scope_rls('access.access_point'::regclass);
 SELECT platform.apply_scope_rls('access.admission_rules'::regclass);
 SELECT platform.apply_scope_rls('access.blacklist'::regclass);
+SELECT platform.apply_scope_rls('access.credential_issuance_retry_policy'::regclass);
 SELECT platform.apply_scope_rls('access.entitlement'::regclass);
+SELECT platform.apply_scope_rls('access.hardware_deployment'::regclass);
 SELECT platform.apply_scope_rls('access.scan_event'::regclass);
 SELECT platform.apply_scope_rls('accreditation.access_profile'::regclass);
 SELECT platform.apply_scope_rls('accreditation.application'::regclass);
@@ -213,6 +215,7 @@ SELECT platform.apply_scope_rls('ai.layout_draft'::regclass);
 SELECT platform.apply_scope_rls('ai.policy'::regclass);
 SELECT platform.apply_scope_rls('ai.provider'::regclass);
 SELECT platform.apply_scope_rls('ai.suggestion'::regclass);
+SELECT platform.apply_scope_rls('approvals.approved_action_execution'::regclass);
 SELECT platform.apply_scope_rls('approvals.approver_availability'::regclass);
 SELECT platform.apply_scope_rls('approvals.control_policy'::regclass);
 SELECT platform.apply_scope_rls('approvals.decision_record'::regclass);
@@ -243,6 +246,7 @@ SELECT platform.apply_scope_rls('catalogue.group_package'::regclass);
 SELECT platform.apply_scope_rls('catalogue.import_job'::regclass);
 SELECT platform.apply_scope_rls('catalogue.performance_template'::regclass);
 SELECT platform.apply_scope_rls('catalogue.prepaid_minutes'::regclass);
+SELECT platform.apply_scope_rls('catalogue.pricing_recommendation_decision'::regclass);
 SELECT platform.apply_scope_rls('catalogue.product'::regclass);
 SELECT platform.apply_scope_rls('catalogue.product_category'::regclass);
 SELECT platform.apply_scope_rls('catalogue.product_eligibility_rule'::regclass);
@@ -254,6 +258,7 @@ SELECT platform.apply_scope_rls('fnb.menu_schedule'::regclass);
 SELECT platform.apply_scope_rls('fnb.menu_version'::regclass);
 SELECT platform.apply_scope_rls('fnb.modifier_group'::regclass);
 SELECT platform.apply_scope_rls('fnb.order_fulfilment'::regclass);
+SELECT platform.apply_scope_rls('fnb.outlet_template'::regclass);
 SELECT platform.apply_scope_rls('fnb.product_recommendation'::regclass);
 SELECT platform.apply_scope_rls('fnb.reservation_policy'::regclass);
 SELECT platform.apply_scope_rls('fnb.service_charge_policy'::regclass);
@@ -291,11 +296,27 @@ SELECT platform.apply_scope_rls('ledger.fx_provider_assignment'::regclass);
 SELECT platform.apply_scope_rls('ledger.legal_entity'::regclass);
 SELECT platform.apply_scope_rls('ledger.settlement'::regclass);
 SELECT platform.apply_scope_rls('maintenance.asset_category'::regclass);
+SELECT platform.apply_scope_rls('marketing.agent_service_profile'::regclass);
 SELECT platform.apply_scope_rls('marketing.audience_activation'::regclass);
 SELECT platform.apply_scope_rls('marketing.audience_list'::regclass);
+SELECT platform.apply_scope_rls('marketing.booking_consent_record'::regclass);
+SELECT platform.apply_scope_rls('marketing.case_compensation_request'::regclass);
+SELECT platform.apply_scope_rls('marketing.case_internal_request'::regclass);
+SELECT platform.apply_scope_rls('marketing.case_linked_record'::regclass);
+SELECT platform.apply_scope_rls('marketing.case_resolution'::regclass);
+SELECT platform.apply_scope_rls('marketing.case_routing_rule'::regclass);
+SELECT platform.apply_scope_rls('marketing.case_service_action'::regclass);
 SELECT platform.apply_scope_rls('marketing.challenge'::regclass);
+SELECT platform.apply_scope_rls('marketing.communication_preference_type'::regclass);
+SELECT platform.apply_scope_rls('marketing.communication_provider'::regclass);
+SELECT platform.apply_scope_rls('marketing.communication_routing_rule'::regclass);
+SELECT platform.apply_scope_rls('marketing.consent_capture_point'::regclass);
+SELECT platform.apply_scope_rls('marketing.consent_question'::regclass);
+SELECT platform.apply_scope_rls('marketing.contact_automation'::regclass);
+SELECT platform.apply_scope_rls('marketing.cookie_banner_design'::regclass);
 SELECT platform.apply_scope_rls('marketing.duplicate_candidate'::regclass);
 SELECT platform.apply_scope_rls('marketing.form_definition'::regclass);
+SELECT platform.apply_scope_rls('marketing.form_definition_field'::regclass);
 SELECT platform.apply_scope_rls('marketing.guest_attribute_model'::regclass);
 SELECT platform.apply_scope_rls('marketing.guest_match_decision'::regclass);
 SELECT platform.apply_scope_rls('marketing.guest_match_policy'::regclass);
@@ -305,12 +326,36 @@ SELECT platform.apply_scope_rls('marketing.invitation'::regclass);
 SELECT platform.apply_scope_rls('marketing.invitation_campaign'::regclass);
 SELECT platform.apply_scope_rls('marketing.journey'::regclass);
 SELECT platform.apply_scope_rls('marketing.journey_enrollment'::regclass);
+SELECT platform.apply_scope_rls('marketing.legal_hold'::regclass);
 SELECT platform.apply_scope_rls('marketing.message_trigger'::regclass);
+SELECT platform.apply_scope_rls('marketing.minor_privacy_rule'::regclass);
+SELECT platform.apply_scope_rls('marketing.privacy_action'::regclass);
+SELECT platform.apply_scope_rls('marketing.privacy_change_set'::regclass);
+SELECT platform.apply_scope_rls('marketing.privacy_exception'::regclass);
+SELECT platform.apply_scope_rls('marketing.privacy_export_package'::regclass);
 SELECT platform.apply_scope_rls('marketing.privacy_incident'::regclass);
+SELECT platform.apply_scope_rls('marketing.privacy_request'::regclass);
+SELECT platform.apply_scope_rls('marketing.privacy_request_type'::regclass);
+SELECT platform.apply_scope_rls('marketing.processing_purpose'::regclass);
+SELECT platform.apply_scope_rls('marketing.quality_evaluation'::regclass);
 SELECT platform.apply_scope_rls('marketing.referral'::regclass);
 SELECT platform.apply_scope_rls('marketing.retention_policy'::regclass);
+SELECT platform.apply_scope_rls('marketing.sender_identity'::regclass);
+SELECT platform.apply_scope_rls('marketing.service_copilot_config'::regclass);
 SELECT platform.apply_scope_rls('marketing.sla_policy'::regclass);
 SELECT platform.apply_scope_rls('marketing.suppression'::regclass);
+SELECT platform.apply_scope_rls('marketing.tracking_technology'::regclass);
+SELECT platform.apply_scope_rls('marketing.waiver_association'::regclass);
+SELECT platform.apply_scope_rls('marketing.waiver_exception'::regclass);
+SELECT platform.apply_scope_rls('marketing.waiver_form_layout'::regclass);
+SELECT platform.apply_scope_rls('marketing.waiver_localisation'::regclass);
+SELECT platform.apply_scope_rls('marketing.waiver_master'::regclass);
+SELECT platform.apply_scope_rls('marketing.waiver_signatory_rule'::regclass);
+SELECT platform.apply_scope_rls('marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)'::regclass);
+SELECT platform.apply_scope_rls('marketing.waiver_trigger_rule'::regclass);
+SELECT platform.apply_scope_rls('marketing.waiver_verification'::regclass);
+SELECT platform.apply_scope_rls('marketing.waiver_version_control'::regclass);
+SELECT platform.apply_scope_rls('marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)'::regclass);
 SELECT platform.apply_scope_rls('orders.b2b_credit'::regclass);
 SELECT platform.apply_scope_rls('orders.deposit_policy'::regclass);
 SELECT platform.apply_scope_rls('orders.fraud_rule'::regclass);
@@ -397,8 +442,10 @@ SELECT platform.apply_scope_rls('resources.resource_audit'::regclass);
 SELECT platform.apply_scope_rls('resources.resource_block'::regclass);
 SELECT platform.apply_scope_rls('resources.resource_category'::regclass);
 SELECT platform.apply_scope_rls('resources.resource_dependency'::regclass);
+SELECT platform.apply_scope_rls('resources.resource_hold'::regclass);
 SELECT platform.apply_scope_rls('resources.resource_package'::regclass);
 SELECT platform.apply_scope_rls('resources.resource_relation'::regclass);
+SELECT platform.apply_scope_rls('resources.resource_request'::regclass);
 SELECT platform.apply_scope_rls('resources.resource_requirement'::regclass);
 SELECT platform.apply_scope_rls('resources.resource_schedule'::regclass);
 SELECT platform.apply_scope_rls('resources.resource_type'::regclass);
@@ -422,6 +469,7 @@ SELECT platform.apply_scope_rls('tenancy.device_telemetry'::regclass);
 SELECT platform.apply_scope_rls('venuemap.map'::regclass);
 SELECT platform.apply_scope_rls('wallet.accounting_mapping'::regclass);
 SELECT platform.apply_scope_rls('wallet.adjustment'::regclass);
+SELECT platform.apply_scope_rls('wallet.authentication_policy'::regclass);
 SELECT platform.apply_scope_rls('wallet.channel_rules'::regclass);
 SELECT platform.apply_scope_rls('wallet.configuration_version'::regclass);
 SELECT platform.apply_scope_rls('wallet.consumption_policy'::regclass);
@@ -432,6 +480,8 @@ SELECT platform.apply_scope_rls('wallet.credit_type'::regclass);
 SELECT platform.apply_scope_rls('wallet.dispute'::regclass);
 SELECT platform.apply_scope_rls('wallet.funding_rules'::regclass);
 SELECT platform.apply_scope_rls('wallet.gift_card_product'::regclass);
+SELECT platform.apply_scope_rls('wallet.integration_mapping'::regclass);
+SELECT platform.apply_scope_rls('wallet.reconciliation_source'::regclass);
 SELECT platform.apply_scope_rls('wallet.refund_policy'::regclass);
 SELECT platform.apply_scope_rls('wallet.restriction'::regclass);
 SELECT platform.apply_scope_rls('wallet.risk_rules'::regclass);
@@ -514,7 +564,13 @@ SELECT platform.apply_venue_rls('retail.shop_and_drop'::regclass);
 SELECT platform.apply_venue_rls('retail.store_rule'::regclass);
 SELECT platform.apply_venue_rls('seating.seat_category'::regclass);
 SELECT platform.apply_venue_rls('seating.seat_map'::regclass);
+SELECT platform.apply_venue_rls('transport.favourite_route'::regclass);
+SELECT platform.apply_venue_rls('transport.network_import'::regclass);
+SELECT platform.apply_venue_rls('transport.pass_type'::regclass);
+SELECT platform.apply_venue_rls('transport.route'::regclass);
+SELECT platform.apply_venue_rls('transport.station'::regclass);
 SELECT platform.apply_venue_rls('wallet.wallet_transaction'::regclass);
+SELECT platform.apply_venue_rls('whitelabel.guided_choice'::regclass);
 SELECT platform.apply_venue_rls('workforce.announcement'::regclass);
 SELECT platform.apply_venue_rls('workforce.attendance'::regclass);
 SELECT platform.apply_venue_rls('workforce.rota_assignment'::regclass);
@@ -560,14 +616,15 @@ SELECT platform.apply_parent_rls('maintenance.work_order_attachment'::regclass, 
 SELECT platform.apply_parent_rls('marketing.attribution_touch'::regclass, 'campaign_id', 'marketing.campaign'::regclass, 'id');
 SELECT platform.apply_parent_rls('marketing.challenge_progress'::regclass, 'challenge_id', 'marketing.challenge'::regclass, 'id');
 SELECT platform.apply_parent_rls('marketing.conversation_message'::regclass, 'conversation_id', 'marketing.conversation'::regclass, 'id');
-SELECT platform.apply_parent_rls('marketing.form_definition_field'::regclass, 'form_definition_id', 'marketing.form_definition'::regclass, 'id');
 SELECT platform.apply_parent_rls('marketing.guest_profile'::regclass, 'segment_id', 'marketing.segment'::regclass, 'id');
 SELECT platform.apply_parent_rls('marketing.journey_step'::regclass, 'journey_id', 'marketing.journey'::regclass, 'id');
 SELECT platform.apply_parent_rls('marketing.loyalty_position'::regclass, 'programme_id', 'marketing.loyalty_programme'::regclass, 'id');
 SELECT platform.apply_parent_rls('marketing.message_delivery'::regclass, 'campaign_id', 'marketing.campaign'::regclass, 'id');
 SELECT platform.apply_parent_rls('marketing.points_earning_rule'::regclass, 'loyalty_programme_id', 'marketing.loyalty_programme'::regclass, 'id');
+SELECT platform.apply_parent_rls('marketing.privacy_request_deadline'::regclass, 'privacy_request_type_id', 'marketing.privacy_request_type'::regclass, 'id');
 SELECT platform.apply_parent_rls('marketing.programme_tier'::regclass, 'loyalty_programme_id', 'marketing.loyalty_programme'::regclass, 'id');
 SELECT platform.apply_parent_rls('marketing.segment_criterion'::regclass, 'segment_id', 'marketing.segment'::regclass, 'id');
+SELECT platform.apply_parent_rls('marketing.waiver_field_rule'::regclass, 'form_definition_field_id', 'marketing.form_definition_field'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.cart_line'::regclass, 'cart_id', 'orders.cart'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.cash_count_line'::regclass, 'shift_id', 'orders.pos_shift'::regclass, 'id');
 SELECT platform.apply_parent_rls('orders.cash_movement'::regclass, 'shift_id', 'orders.pos_shift'::regclass, 'id');
@@ -616,11 +673,15 @@ SELECT platform.apply_parent_rls('seating.seating_rules'::regclass, 'seat_map_id
 SELECT platform.apply_parent_rls('seating.section_row'::regclass, 'section_id', 'seating.section'::regclass, 'id');
 SELECT platform.apply_parent_rls('seating.zone'::regclass, 'seat_map_id', 'seating.seat_map'::regclass, 'id');
 SELECT platform.apply_parent_rls('sync.rejection'::regclass, 'workstation_id', 'platform.workstation'::regclass, 'id');
+SELECT platform.apply_parent_rls('transport.route_stop'::regclass, 'route_id', 'transport.route'::regclass, 'id');
 SELECT platform.apply_parent_rls('venuemap.path'::regclass, 'map_id', 'venuemap.map'::regclass, 'id');
+SELECT platform.apply_parent_rls('venuemap.placed_resource'::regclass, 'resource_id', 'resources.resource'::regclass, 'id');
 SELECT platform.apply_parent_rls('venuemap.point'::regclass, 'map_id', 'venuemap.map'::regclass, 'id');
 SELECT platform.apply_parent_rls('whitelabel.faq_entry'::regclass, 'faq_category_id', 'whitelabel.faq_category'::regclass, 'id');
 SELECT platform.apply_parent_rls('whitelabel.footer_config_column'::regclass, 'footer_config_id', 'whitelabel.footer_config'::regclass, 'id');
 SELECT platform.apply_parent_rls('whitelabel.footer_config_social_link'::regclass, 'footer_config_id', 'whitelabel.footer_config'::regclass, 'id');
+SELECT platform.apply_parent_rls('whitelabel.guided_choice_answer'::regclass, 'guided_choice_id', 'whitelabel.guided_choice'::regclass, 'id');
+SELECT platform.apply_parent_rls('whitelabel.guided_choice_question'::regclass, 'guided_choice_id', 'whitelabel.guided_choice'::regclass, 'id');
 SELECT platform.apply_parent_rls('workforce.announcement_receipt'::regclass, 'announcement_id', 'workforce.announcement'::regclass, 'id');
 SELECT platform.apply_parent_rls('workforce.shift_swap'::regclass, 'assignment_id', 'workforce.rota_assignment'::regclass, 'id');
 SELECT platform.apply_parent_rls('ai.index_entry'::regclass, 'source_id', 'ai.index_source'::regclass, 'id');
@@ -666,7 +727,10 @@ SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'f
 --   catalogue.membership_benefit  -- no scope column and no declared owner
 --   catalogue.membership_programme  -- no scope column and no declared owner
 --   catalogue.plan_benefit  -- no scope column and no declared owner
+--   catalogue.product_media  -- no scope column and no declared owner
 --   catalogue.product_version  -- only nullable references (product_id -> catalogue.product)
+--   embedded as attributes (jsonb) on orders.cart_line and orders.order_line  -- no scope column and no declared owner
+--   embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line  -- no scope column and no declared owner
 --   fnb.allergen_verdict  -- no scope column and no declared owner
 --   fnb.cold_chain_event  -- no scope column and no declared owner
 --   fnb.combo  -- no scope column and no declared owner
@@ -682,6 +746,7 @@ SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'f
 --   fnb.reservation_table  -- its owner fnb.dining_table has no policy either
 --   fnb.sold_out_item  -- no scope column and no declared owner
 --   fnb.substitution_rule  -- no scope column and no declared owner
+--   fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)  -- no scope column and no declared owner
 --   fnb.temperature_log  -- no scope column and no declared owner
 --   games.play  -- only nullable references (game_id -> games.game)
 --   games.reader_deployment  -- no scope column and no declared owner
@@ -723,6 +788,7 @@ SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'f
 --   marketing.case_message  -- only nullable references (author_principal_id -> identity.principal, case_id -> marketing.case)
 --   marketing.consent_purpose  -- its owner platform.tenant has no policy either
 --   marketing.consent_purpose_channel  -- its owner marketing.consent_purpose has no policy either
+--   marketing.consent_question_version  -- no scope column and no declared owner
 --   marketing.consent_record  -- its owner pii.subject has no policy either
 --   marketing.consent_record_channel  -- its owner marketing.consent_record has no policy either
 --   marketing.customer_badge  -- no scope column and no declared owner
@@ -740,14 +806,30 @@ SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'f
 --   marketing.message_dispatch  -- its owner pii.subject has no policy either
 --   marketing.message_template  -- its owner platform.tenant has no policy either
 --   marketing.points_redemption_rule  -- only nullable references (product_id -> catalogue.product)
+--   marketing.privacy_audit_event  -- no scope column and no declared owner
 --   marketing.review_response  -- no scope column and no declared owner
 --   marketing.reward  -- only nullable references (product_id -> catalogue.product)
 --   marketing.reward_assignment  -- no scope column and no declared owner
 --   marketing.subscription  -- no scope column and no declared owner
 --   marketing.touch_point  -- its owner pii.subject has no policy either
 --   marketing.waiver_signature  -- no scope column and no declared owner
+--   orders.deposit_policy (dining_* columns)  -- no scope column and no declared owner
+--   orders.group_customer_organization  -- no scope column and no declared owner
+--   orders.group_customer_organization_contact  -- its owner orders.group_customer_organization has no policy either
+--   orders.group_enquiry  -- no scope column and no declared owner
+--   orders.group_participant  -- its owner orders.group_participant_list has no policy either
+--   orders.group_participant_list  -- no scope column and no declared owner
+--   orders.group_payment_milestone  -- its owner orders.group_payment_schedule has no policy either
+--   orders.group_payment_schedule  -- no scope column and no declared owner
+--   orders.group_ticket_allocation  -- no scope column and no declared owner
+--   orders.group_ticket_allocation_line  -- its owner orders.group_ticket_allocation has no policy either
+--   orders.group_ticket_fulfillment  -- no scope column and no declared owner
 --   orders.invitation_allowance  -- its owner identity.principal has no policy either
+--   orders.member_exception  -- no scope column and no declared owner
+--   orders.membership_activation_action  -- no scope column and no declared owner
+--   orders.membership_migration  -- no scope column and no declared owner
 --   orders.membership_renewal  -- only nullable references (order_id -> orders.sales_order)
+--   orders.refund_calculation_policy  -- no scope column and no declared owner
 --   orders.ticket_template  -- no scope column and no declared owner
 --   orders.ticket_template_channel  -- its owner orders.ticket_template has no policy either
 --   payments.deposit_activity  -- only nullable references (payment_id -> orders.payment)
@@ -804,6 +886,12 @@ SELECT platform.apply_parent_rls('fnb.production_run'::regclass, 'recipe_id', 'f
 --   sync.cell_connection  -- no scope column and no declared owner
 --   sync.cross_cell_request  -- no scope column and no declared owner
 --   tenancy.device_firmware  -- no scope column and no declared owner
+--   transport.departure  -- no scope column and no declared owner
+--   transport.fare_matrix_cell  -- its owner transport.fare_table has no policy either
+--   transport.fare_passenger_type  -- its owner transport.fare_table has no policy either
+--   transport.fare_table  -- no scope column and no declared owner
+--   transport.timetable  -- no scope column and no declared owner
+--   transport.timetable_run  -- its owner transport.timetable has no policy either
 --   venuemap.import_job  -- only nullable references (map_id -> venuemap.map)
 --   venuemap.map_version  -- no scope column and no declared owner
 --   wallet.balance  -- no scope column and no declared owner

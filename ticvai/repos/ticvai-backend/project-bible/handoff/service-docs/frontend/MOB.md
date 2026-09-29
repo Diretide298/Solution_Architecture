@@ -25,20 +25,20 @@
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
 | [GST-001](#gst-001-home-default) | Home – Default | Discovery & Browse | 1 | 5 |
-| [GST-002](#gst-002-explore-categories) | Explore Categories | Discovery & Browse | 1 | 1 |
+| [GST-002](#gst-002-explore-categories) | Explore Categories | Discovery & Browse | 1 | 2 |
 | [GST-003](#gst-003-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 4 |
 | [GST-004](#gst-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
 | [GST-005](#gst-005-what-s-on) | What's On | Discovery & Browse | 1 | 2 |
 | [GST-006](#gst-006-event-exhibition-details) | Event / Exhibition Details | Discovery & Browse | 1 | 2 |
-| [GST-007](#gst-007-select-date-time) | Select Date & Time | Booking & Selection | 1 | 3 |
-| [GST-008](#gst-008-tickets-add-ons) | Tickets & Add-ons | Booking & Selection | 1 | 1 |
+| [GST-007](#gst-007-select-date-time) | Select Date & Time | Booking & Selection | 1 | 8 |
+| [GST-008](#gst-008-tickets-add-ons) | Tickets & Add-ons | Booking & Selection | 1 | 5 |
 | [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 9 |
 | [GST-010](#gst-010-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
 | [GST-012](#gst-012-my-tickets) | My Tickets | Account & Self-Service | 1 | 6 |
 | [GST-013](#gst-013-ticket-details) | Ticket Details | Account & Self-Service | 1 | 4 |
 | [GST-039](#gst-039-profile) | Profile | Account & Self-Service | 1 | 2 |
-| [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 9 |
-| [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 10 |
+| [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 11 |
+| [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 12 |
 | [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 0 |
 | [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 3 |
 | [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 1 |
@@ -56,17 +56,18 @@
 | [GST-025](#gst-025-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 2 | 3 |
 | [GST-026](#gst-026-retail-merchandise) | Retail / Merchandise | Retail | 2 | 7 |
 | [GST-029](#gst-029-venue-info-services) | Venue Info & Services | In-venue Services | 2 | 3 |
+| [GST-030](#gst-030-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 2 | 3 |
 | [GST-031](#gst-031-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 2 | 5 |
 | [GST-032](#gst-032-ai-concierge-chat) | AI Concierge – Chat | Engagement & Support | 2 | 8 |
 | [GST-033](#gst-033-ai-concierge-contextual-help) | AI Concierge – Contextual Help | Engagement & Support | 2 | 1 |
 | [GST-034](#gst-034-lost-found) | Lost & Found | Support | 2 | 3 |
 | [GST-036](#gst-036-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 3 |
 | [GST-037](#gst-037-offers-promotions) | Offers & Promotions | Promotions | 2 | 3 |
-| [GST-040](#gst-040-help-support) | Help & Support | Engagement & Support | 2 | 5 |
+| [GST-040](#gst-040-help-support) | Help & Support | Engagement & Support | 2 | 6 |
 | [GST-044](#gst-044-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 2 | 2 |
 | [GST-045](#gst-045-ticket-delivery-sharing) | Ticket Delivery & Sharing | Account & Self-Service | 2 | 1 |
 | [GST-048](#gst-048-upsell-cross-sell) | Upsell / Cross-Sell | Booking & Selection | 2 | 2 |
-| [GST-049](#gst-049-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 3 |
+| [GST-049](#gst-049-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 5 |
 | [GST-056](#gst-056-bundle-package) | Bundle Package | Booking & Selection | 2 | 3 |
 | [GST-057](#gst-057-accessibility-information) | Accessibility Information | Discovery & Browse | 2 | 1 |
 | [GST-061](#gst-061-menu-item-detail) | Menu Item Detail | In-Venue Experience | 2 | 2 |
@@ -74,10 +75,10 @@
 | [GST-067](#gst-067-refunds-resale) | Refunds & Resale | Account & Self-Service | 2 | 3 |
 | [GST-068](#gst-068-help-my-cases) | Help & My Cases | Engagement & Support | 2 | 3 |
 | [GST-069](#gst-069-face-pass) | Face Pass | Account & Self-Service | 2 | 4 |
-| [GST-070](#gst-070-reserve-a-table) | Reserve a Table | In-venue Services | 2 | 6 |
+| [GST-070](#gst-070-reserve-a-table) | Reserve a Table | In-venue Services | 2 | 7 |
 | [GST-071](#gst-071-payment-methods) | Payment Methods | Account & Self-Service | 2 | 5 |
 | [GST-072](#gst-072-share-group-booking) | Share & Group Booking | Booking & Selection | 2 | 8 |
-| [GST-073](#gst-073-security-sign-in) | Security & Sign-in | Account & Self-Service | 2 | 6 |
+| [GST-073](#gst-073-security-sign-in) | Security & Sign-in | Account & Self-Service | 2 | 12 |
 | [GST-018](#gst-018-add-to-calendar-reminders) | Add to Calendar / Reminders | Account & Self-Service | 3 | 6 |
 | [GST-020](#gst-020-saved-items-wishlist) | Saved Items / Wishlist | Account & Self-Service | 3 | 3 |
 | [GST-023](#gst-023-virtual-queue) | Virtual Queue | In-venue Services | 3 | 5 |
@@ -89,6 +90,12 @@
 | [GST-058](#gst-058-resource-availability-cabana) | Resource Availability (Cabana) | Booking & Selection | 3 | 2 |
 | [GST-062](#gst-062-shop-drop-collection) | Shop & Drop Collection | In-Venue Experience | 3 | 1 |
 | [GST-065](#gst-065-newsletter-preferences) | Newsletter & Preferences | Marketing | 3 | 4 |
+| [GST-074](#gst-074-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 3 | 8 |
+| [GST-075](#gst-075-book-a-space-by-the-hour) | Book a Space by the Hour | Booking & Selection | 3 | 4 |
+| [GST-076](#gst-076-intercity-trip-route-schedule) | Intercity Trip — Route & Schedule | Transport | 3 | 4 |
+| [GST-077](#gst-077-intercity-trip-route-passengers) | Intercity Trip — Route & Passengers | Transport | 3 | 6 |
+| [GST-078](#gst-078-intercity-trip-multi-trip-passes) | Intercity Trip — Multi-trip Passes | Transport | 3 | 3 |
+| [GST-079](#gst-079-intercity-trip-favourite-routes) | Intercity Trip — Favourite Routes | Transport | 3 | 2 |
 
 ## GST-001 Home – Default
 
@@ -140,7 +147,7 @@
 | GST-005 | What's On |  |  |
 | GST-006 | Event / Exhibition Details | productId |  |
 | GST-007 | Select Date & Time |  |  |
-| GST-008 | Tickets & Add-ons | orderId |  |
+| GST-008 | Tickets & Add-ons | productId |  |
 | GST-009 | Review & Payment | orderId |  |
 | GST-010 | Booking Confirmation | orderId |  |
 | GST-011 | Wallet Overview | subjectId |  |
@@ -181,7 +188,7 @@
 | GST-022 | Attraction Wait Times |  |  |
 | GST-028 | Parking – Reservation Confirmed | orderId |  |
 | GST-029 | Venue Info & Services |  |  |
-| GST-030 | In-Venue Notifications |  | a later release: the in-venue notification feed is deferred and not shown in the first release; queue calls and order updates show on the queue and order screens, which poll (decided 28 September, audit R242) |
+| GST-030 | In-Venue Notifications |  |  |
 | GST-035 | Feedback & Ratings |  |  |
 | GST-036 | Loyalty & Rewards |  |  |
 | GST-038 | Digital Companion Mode |  |  |
@@ -197,6 +204,7 @@
 | GST-062 | Shop & Drop Collection |  |  |
 | GST-063 | Search |  |  |
 | GST-068 | Help & My Cases |  |  |
+| GST-076 | Book a trip (a transport venue) |  |  |
 
 ## GST-002 Explore Categories
 
@@ -216,6 +224,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
+| `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | The category tiles (a tree, with images and descriptions) | `PRODUCT_VIEW` |
 
 **States**
 
@@ -330,6 +339,11 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 | GST-003 | Event & Attraction Listing | eventId |  |
+| GST-007 | Book (a dated product: date, then time, then tickets) | eventId |  |
+| GST-008 | Book (an undated product: tickets straight away) | productId |  |
+| GST-049 | Book (a fixture with one on-sale performance opens straight on the seat map) | performanceId |  |
+| GST-074 | Book (a cabana, lounger or other spot on the venue map) | productId |  |
+| GST-075 | Book (a space sold by the hour) | productId |  |
 
 ## GST-005 What's On
 
@@ -421,7 +435,7 @@
 
 ## GST-007 Select Date & Time
 
-**See select date & time for this venue.**
+**Pick a date, then a time that has room; the tickets for it come next.**
 
 |  |  |
 |---|---|
@@ -437,6 +451,7 @@
 | Parameter | From |
 |---|---|
 | eventId | deepLink |
+| cartId | session |
 
 **Operations**
 
@@ -445,6 +460,11 @@
 | `checkBookingEligibility` | [CatalogueService](../backend/CatalogueService.md#checkbookingeligibility) | onAction | Check the party's ages and heights | `PRODUCT_VIEW` |
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | List performances of an event | `PRODUCT_VIEW` |
 | `getAvailability` | [CatalogueService](../backend/CatalogueService.md#getavailability) | onLoad | Live remaining capacity | `PRODUCT_VIEW` |
+| `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | The experience filter with descriptions | `PRODUCT_VIEW` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Products of a category or level | `PRODUCT_VIEW` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the chosen time to the cart (the lease is taken server-side) | `None` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onAction | The cart's `consentQuestions` after the time is added | `None` |
+| `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the booking's consent questions | `ORDER_CREATE` |
 
 **States**
 
@@ -463,10 +483,12 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 | GST-003 | Event & Attraction Listing | eventId |  |
+| GST-008 | Picks a time; the tickets for it appear | performanceId |  |
+| GST-049 | Picks a time on a seated event (inline step) | performanceId |  |
 
 ## GST-008 Tickets & Add-ons
 
-**Find tickets & add-ons for this venue.**
+**Choose which tickets and how many, and any add-ons, for the date and time picked.**
 
 |  |  |
 |---|---|
@@ -475,35 +497,47 @@
 | Licensed module | ticketing |
 | Route | `/general/tickets-and-add-ons` |
 | Component | `apps/guest-app/src/routes/general/TicketsAndAddOnsList.tsx` |
-| Pattern | configEditor |
+| Pattern | listDetail |
 
 **Entry parameters**
 
 | Parameter | From |
 |---|---|
-| orderId | deepLink |
+| productId | GST-004 |
+| performanceId | GST-007 |
+| cartId | session |
+| venueId | session |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
+| `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onLoad | The ticket types and prices | `PRODUCT_VIEW` |
+| `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | Ticket categories | `PRODUCT_VIEW` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | The add-ons, and the tickets of a category | `PRODUCT_VIEW` |
+| `getPublishedGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedguidedchoice) | onLoad | The venue's published Help me choose (404 = none) | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the tickets and add-ons | `None` |
 
 **States**
 
 | State | Behaviour |
 |---|---|
-| loading | The saved tickets add-ons. |
-| error | Could not load. Names which read failed and leaves the tickets add-ons untouched. |
-| emptyFirstRun | No tickets add-ons configured. The form opens empty and `transferOrderTickets` saves the first one; it says what the platform does in the meantime. |
+| loading | The ticket types of the product, with prices. |
+| error | Could not load. Names which read failed; nothing is added. |
+| emptyFirstRun | This product has no ticket types on sale. Says so and offers the product page. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| emptyNoResults | No ticket in the category picked. Names the category and offers the others. |
 
 **Goes to**
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
+| GST-041 | Continue to the basket | cartId | a date and time (dated products) and at least one ticket chosen |
+| GST-042 | Continue — sign in or use a guest code (when sign-in is asked after add-ons) | cartId | the guest is not signed in |
+| GST-007 | Change date or time |  |  |
+| GST-072 | Booking for a group or a party | productId, token |  |
 | GST-001 | Home – Default |  |  |
-| GST-072 | Share & Group Booking |  |  |
 
 ## GST-009 Review & Payment
 
@@ -740,6 +774,7 @@
 | GST-001 | Home – Default |  |  |
 | GST-069 | Face Pass |  |  |
 | GST-071 | Payment Methods |  |  |
+| GST-073 | Security & Sign-in |  |  |
 
 ## GST-041 Checkout Entry
 
@@ -761,6 +796,8 @@
 | cartId | session |
 | lineId | navigation |
 | productId | navigation |
+| performanceId | navigation |
+| holdId | navigation |
 
 **Operations**
 
@@ -775,6 +812,8 @@
 | `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onAction | Which variant each line is | `PRODUCT_VIEW` |
 | `removeCartLine` | [OrderService](../backend/OrderService.md#removecartline) | onAction | Take a line out of the basket | `None` |
 | `updateCartLine` | [OrderService](../backend/OrderService.md#updatecartline) | onAction | Change a quantity before paying | `None` |
+| `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onLoad | The visit date of each line (`Performance.startsAt`) | `PRODUCT_VIEW` |
+| `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The countdown of a spot held on the venue map | `ORDER_VIEW` |
 
 **States**
 
@@ -796,7 +835,7 @@
 
 ## GST-042 Simple Registration & OTP
 
-**Get a guest into the app, fast, on a device that may be shared: a one-time code to the email or mobile, a password, Apple or Google, or UAE Pass, or register a new account. **No enterprise SSO and no second factor at sign-in for guests** (decided 28 September, audit R167).**
+**Get a guest into the app, fast, on a device that may be shared: a one-time code to the email or mobile, a password, Apple or Google, or UAE Pass, or register a new account. **No enterprise SSO for guests** (decided 28 September, audit R167, first part). **A second factor only where the venue enabled guest two-step verification** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of R167).**
 
 |  |  |
 |---|---|
@@ -812,6 +851,7 @@
 | Parameter | From |
 |---|---|
 | cartId | session |
+| challengeId | navigation |
 
 **Operations**
 
@@ -827,6 +867,8 @@
 | `refreshToken` | [IdentityService](../backend/IdentityService.md#refreshtoken) | onAction | Rotate the access token | `None` |
 | `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onAction | Request a one-time code | `None` |
 | `verifyGuestOtp` | [IdentityService](../backend/IdentityService.md#verifyguestotp) | onAction | Verify a one-time code and issue a session | `None` |
+| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at a venue with guest two-step verification on | `None` |
+| `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the code and release the session | `None` |
 
 **States**
 
@@ -845,7 +887,7 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 | GST-041 | Signed in and verified — back to the cart | cartId | arrived from the cart |
-| WEB-016 | A guest who checked out anonymously links their order |  |  |
+| WEB-016 | A guest who checked out anonymously links their order | challengeId |  |
 
 ## GST-043 Arabic / RTL Experience
 
@@ -899,7 +941,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
-| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242) | `None` |
+| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242) | `None` |
 | `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onAction | Join a virtual queue | `None` |
 
 **States**
@@ -1308,6 +1350,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
+| GST-067 | Ask for a refund or resell a ticket | orderId |  |
 
 ## GST-021 Interactive Map
 
@@ -1472,7 +1515,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onInterval | The order's status (ordered, accepted, in preparation, ready, served, collected or delivered), read on entry and polled while the screen is open; order updates show here, not in a notification feed (decided 28 September, audit R242) | `None` |
+| `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onInterval | The order's status (ordered, accepted, in preparation, ready, served, collected or delivered), read on entry and polled while the screen is open; order updates show here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242) | `None` |
 | `getGuestBill` | [FnbService](../backend/FnbService.md#getguestbill) | onLoad | Everything ordered at this location this sitting | `None` |
 | `claimTableSession` | [FnbService](../backend/FnbService.md#claimtablesession) | onAction | Identify which table a guest is sitting at | `None` |
 
@@ -1489,7 +1532,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-030 | Their queue place comes up and they are told |  | a later release: the in-venue notification feed is deferred and not shown in the first release; queue calls and order updates show on the queue and order screens, which poll (decided 28 September, audit R242) |
+| GST-030 | Their queue place comes up and they are told |  |  |
 | GST-001 | Home – Default |  |  |
 | GST-023 | Their queue place comes up and the queue screen shows it |  |  |
 | BO-021 | Runner delivers to the lounger | orderId |  |
@@ -1588,6 +1631,44 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
+
+## GST-030 In-Venue Notifications
+
+**Work with in-venue notifications for this venue.**
+
+|  |  |
+|---|---|
+| Module | Engagement & Support |
+| Wave | 2 |
+| Licensed module | fnb |
+| Route | `/general/in-venue-notifications` |
+| Component | `apps/guest-app/src/routes/general/InVenueNotificationsDetail.tsx` |
+| Pattern | configEditor |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `claimLocationSession` | [FnbService](../backend/FnbService.md#claimlocationsession) | onAction | From the flow it appears in | `None` |
+| `listMyNotifications` | [MarketingService](../backend/MarketingService.md#listmynotifications) | onLoad | The guest's notification feed, newest first: queue calls, order ready, booking changes, venue alerts (decided 29 September, rev 3 GAP-C1) | `None` |
+| `markMyNotificationsRead` | [MarketingService](../backend/MarketingService.md#markmynotificationsread) | onAction | Mark the opened notifications, or all of them, read | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The notification feed. |
+| error | Could not load. Names which read failed and leaves the in-venue notifications untouched. |
+| emptyFirstRun | No notifications yet. Queue calls, order updates and venue notices appear here as the venue sends them. |
+| offline | The offline banner shows. Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. |
+| emptyNoResults | No unread notifications. Names the Unread only filter and offers to show all; the read ones are still there. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-001 | Home – Default |  |  |
+| GST-031 | AI Concierge – Home | outletId |  |
 
 ## GST-031 AI Concierge – Home
 
@@ -1885,6 +1966,7 @@
 | `listMyCases` | [MarketingService](../backend/MarketingService.md#listmycases) | onLoad | The cases this guest raised | `None` |
 | `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Report something — lost property, a complaint, a question | `None` |
 | `replyToMyCase` | [MarketingService](../backend/MarketingService.md#replytomycase) | onAction | Reply on a case the guest raised | `None` |
+| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | App status and the public *What's new* | `None` |
 
 **States**
 
@@ -2041,6 +2123,8 @@
 | Parameter | From |
 |---|---|
 | performanceId | deepLink |
+| eventId | GST-007 |
+| holdId | navigation |
 
 **Operations**
 
@@ -2049,6 +2133,8 @@
 | `getSeatAvailability` | [CatalogueService](../backend/CatalogueService.md#getseatavailability) | onLoad | Seat status for a performance | `PRODUCT_VIEW` |
 | `createSeatHold` | [CatalogueService](../backend/CatalogueService.md#createseathold) | onAction | Hold specific seats | `ORDER_CREATE` |
 | `recommendSeats` | [CatalogueService](../backend/CatalogueService.md#recommendseats) | onAction | Recommend seats for a party | `PRODUCT_VIEW` |
+| `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The event's other times (time bar, date and time pop-up) | `PRODUCT_VIEW` |
+| `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | onAction | Release the seats held for the old performance when the guest switches time on the time bar (decided 29 September, rev 3 REV3-6); a guest releases only their own hold | `ORDER_CREATE` |
 
 **States**
 
@@ -2374,7 +2460,7 @@
 
 ## GST-070 Reserve a Table
 
-****Book a restaurant table, or wait for one.** A guest reserves a table ahead, changes or cancels it, or joins and leaves a restaurant's waitlist. Tables only: cabanas are booked by staff (decided 28 September, audit R073 (c)). No deposit and no no-show fee (audit R077 (a)).**
+****Book a restaurant table, or wait for one.** A guest reserves a table ahead, changes or cancels it, or joins and leaves a restaurant's waitlist. Tables only: cabanas, loungers and other spots on a venue map are booked on GST-074 (decided 29 September, rev 3 REV3-15 and GAP-C2, superseding audit R073 (c)). A deposit only where the venue enabled one (rev 3 REV3-8b, superseding audit R077 (a)).**
 
 |  |  |
 |---|---|
@@ -2392,6 +2478,7 @@
 | entryId | deepLink |
 | reservationId | deepLink |
 | subjectId | session |
+| cartId | session |
 
 **Operations**
 
@@ -2403,6 +2490,7 @@
 | `leaveRestaurantWaitlist` | [FnbService](../backend/FnbService.md#leaverestaurantwaitlist) | onAction | Leave the restaurant waitlist; the entry returns cancelled (decided 28 September, audit R073 (d)) | `ORDER_MODIFY` |
 | `joinWaitlist` | [CatalogueService](../backend/CatalogueService.md#joinwaitlist) | onAction | Ask to be told if capacity frees up | `None` |
 | `leaveWaitlist` | [CatalogueService](../backend/CatalogueService.md#leavewaitlist) | onAction | Stop waiting | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the table deposit to the cart when the venue requires one | `None` |
 
 **States**
 
@@ -2420,6 +2508,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-039 | Profile | subjectId |  |
+| GST-041 | Pay the deposit (only when the venue requires one) | cartId | the reservation is awaitingDeposit |
 
 ## GST-071 Payment Methods
 
@@ -2524,7 +2613,7 @@
 
 ## GST-073 Security & Sign-in
 
-****How this guest signs in, and where.** The sign-in methods linked to the account, the email that recovers it, and the devices signed in, with a way to sign a lost phone out. Small screen, and it is the one a guest reaches after losing a phone. No second factor: guests have none (decided 28 September, audit R167).**
+****How this guest signs in, and where.** The sign-in methods linked to the account, the email that recovers it, and the devices signed in, with a way to sign a lost phone out. Small screen, and it is the one a guest reaches after losing a phone. Two-step verification where a venue of the tenant enabled it (decided 29 September, rev 3 GAP-B1, per venue).**
 
 |  |  |
 |---|---|
@@ -2541,6 +2630,8 @@
 |---|---|
 | subjectId | session |
 | deviceId | session |
+| challengeId | navigation |
+| methodId | navigation |
 
 **Operations**
 
@@ -2552,6 +2643,12 @@
 | `registerGuestDevice` | [MarketingService](../backend/MarketingService.md#registerguestdevice) | onAction | Trust this device | `None` |
 | `revokeGuestDevice` | [MarketingService](../backend/MarketingService.md#revokeguestdevice) | onAction | Sign a lost device out | `None` |
 | `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | onAction | Confirm the address before it can recover an account | `GUEST_VIEW` |
+| `listMfaMethods` | [IdentityService](../backend/IdentityService.md#listmfamethods) | onLoad | The guest's enrolled methods | `None` |
+| `enrolMfaMethod` | [IdentityService](../backend/IdentityService.md#enrolmfamethod) | onAction | Enrol an authenticator (email code as fallback) | `None` |
+| `verifyMfaEnrolment` | [IdentityService](../backend/IdentityService.md#verifymfaenrolment) | onAction | Confirm the enrolment with a first code | `None` |
+| `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove a method | `None` |
+| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Step-up before a sensitive act at a venue that has it on | `None` |
+| `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the step-up code | `None` |
 
 **States**
 
@@ -2683,7 +2780,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `joinQueue` | [VenueOpsService](../backend/VenueOpsService.md#joinqueue) | onAction | from page inventory | `None` |
-| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, not in a notification feed (decided 28 September, audit R242) | `None` |
+| `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242) | `None` |
 | `leaveQueue` | [VenueOpsService](../backend/VenueOpsService.md#leavequeue) | onAction | Leave a queue | `None` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `listQueues` | [VenueOpsService](../backend/VenueOpsService.md#listqueues) | onLoad | Which virtual queues are running | `QUEUE_VIEW` |
@@ -2953,6 +3050,7 @@
 |---|---|---|---|
 | GST-050 | They book and pay |  |  |
 | GST-001 | Home – Default |  |  |
+| GST-074 | Choose on the map (a venue with its spots on a map) | productId |  |
 
 ## GST-062 Shop & Drop Collection
 
@@ -3035,3 +3133,294 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
+
+## GST-074 Map Booking — Cabanas & Spots
+
+**Pick a specific cabana, lounger or other spot on the venue map and hold it while you book.**
+
+|  |  |
+|---|---|
+| Module | Booking & Selection |
+| Wave | 3 |
+| Licensed module | resources |
+| Route | `/general/map-booking` |
+| Component | `apps/guest-app/src/routes/general/MapBookingCanvas.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| mapId | GST-004 |
+| productId | GST-004 |
+| cartId | session |
+| venueId | session |
+| holdId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getVenueMap` | [VenueOpsService](../backend/VenueOpsService.md#getvenuemap) | onLoad | The map with its placed spots (label, kind, zone, capacity, price band) | `VENUE_MAP_VIEW` |
+| `getMapResourceAvailability` | [VenueOpsService](../backend/VenueOpsService.md#getmapresourceavailability) | onLoad | Every spot's status for the day in one call | `RESOURCE_VIEW` |
+| `createResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#createresourcehold) | onAction | Hold the tapped spot for the window | `ORDER_CREATE` |
+| `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The hold's countdown | `ORDER_VIEW` |
+| `extendResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#extendresourcehold) | onAction | Keep the hold longer while paying | `ORDER_CREATE` |
+| `relinquishResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#relinquishresourcehold) | onAction | Release the hold | `ORDER_CREATE` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the held spot to the basket (`variantId`, `resourceHoldId`) | `None` |
+| `listBookableVenueMaps` | [VenueOpsService](../backend/VenueOpsService.md#listbookablevenuemaps) | onLoad | Find the venue's published map with bookable spots (with productId when the product page opened it); getVenueMap then reads that map's published version (decided 29 September, rev 3 REV3-15) | `VENUE_MAP_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The venue map and the status of every spot for the day, read together. |
+| error | Could not load the map or the spots. Names which read failed; nothing is held. |
+| emptyFirstRun | No bookable spots are placed on this map yet. Says so and offers the venue's other ways to book, rather than an empty map. |
+| emptyNoResults | Every spot in this area is taken for the day. Names the area and offers another area or day. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. The map and the spots already loaded stay on screen with their age, never shown as free now. Holding a spot and adding it to the basket need the connection — a cabana held offline is a cabana two people think they have. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-041 | Go to checkout | cartId | a spot is held and added |
+| GST-016 | See it in my reservations |  |  |
+| GST-004 | Back to the product | productId |  |
+
+## GST-075 Book a Space by the Hour
+
+**Book a meeting room or other space for a start time and a length; the price is the room rate for that length.**
+
+|  |  |
+|---|---|
+| Module | Booking & Selection |
+| Wave | 3 |
+| Licensed module | resources |
+| Route | `/general/space-by-the-hour` |
+| Component | `apps/guest-app/src/routes/general/SpaceByTheHourWizard.tsx` |
+| Pattern | multiStepForm |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| productId | GST-004 |
+| cartId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Room types sold by the hour (`requiresTimeWindow`) and their add-ons | `PRODUCT_VIEW` |
+| `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onLoad | The lengths of a room type, each with its price | `PRODUCT_VIEW` |
+| `listProductStartTimes` | [VenueOpsService](../backend/VenueOpsService.md#listproductstarttimes) | onAction | Start times free for the room type and length on the date | `RESOURCE_VIEW` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the room type for the booked window, then the add-ons | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The room types and their lengths for this venue. |
+| error | Could not load. Names which read failed; nothing is booked. |
+| emptyFirstRun | This venue sells no space by the hour yet. Says so rather than an empty list. |
+| emptyNoResults | No room of the type is free at that time for that length. Offers the next free start time. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. Rooms and times already loaded stay on screen with their age. Picking a start time and adding the booking need the connection — a room held offline is a room two people think they have. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-041 | Add to basket | cartId | date, start time, length and room type chosen |
+| GST-004 | Back to the product | productId |  |
+
+## GST-076 Intercity Trip — Route & Schedule
+
+**Find a departure between two stations for a date and a time of day.**
+
+|  |  |
+|---|---|
+| Module | Transport |
+| Wave | 3 |
+| Licensed module | transport |
+| Route | `/transport/route-and-schedule` |
+| Component | `apps/guest-app/src/routes/transport/RouteAndScheduleList.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| favouriteId | GST-079 |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listTransportStations` | [VenueOpsService](../backend/VenueOpsService.md#listtransportstations) | onLoad | The stations to pick From and To | `None` |
+| `listTransportRoutes` | [VenueOpsService](../backend/VenueOpsService.md#listtransportroutes) | onAction | The routes between two stations (the swap uses the paired route) | `None` |
+| `searchTransportDepartures` | [VenueOpsService](../backend/VenueOpsService.md#searchtransportdepartures) | onAction | Departures for the stations, date, period and party, with counts per period | `None` |
+| `getNextTransportDeparture` | [VenueOpsService](../backend/VenueOpsService.md#getnexttransportdeparture) | onAction | The next departure with room for the party | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The stations and routes. |
+| error | Could not load. Names which read failed; nothing is bought. |
+| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). |
+| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. |
+| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
+| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-077 | Choose a departure | departureId, routeId |  |
+| GST-078 | Multi-trip cards |  |  |
+| GST-079 | Favourites | favouriteId |  |
+| GST-001 | Home |  |  |
+
+## GST-077 Intercity Trip — Route & Passengers
+
+**See the chosen departure's stops and map, add the passengers and buy the trip.**
+
+|  |  |
+|---|---|
+| Module | Transport |
+| Wave | 3 |
+| Licensed module | transport |
+| Route | `/transport/route-and-passengers` |
+| Component | `apps/guest-app/src/routes/transport/RouteAndPassengersDetail.tsx` |
+| Pattern | statusTracker |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| routeId | GST-076 |
+| departureId | GST-076 |
+| cartId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getTransportRoute` | [VenueOpsService](../backend/VenueOpsService.md#gettransportroute) | onLoad | The route and its stops | `None` |
+| `getTransportRouteMap` | [VenueOpsService](../backend/VenueOpsService.md#gettransportroutemap) | onLoad | Stop list, line and bounds for the map | `None` |
+| `getTransportFareTable` | [VenueOpsService](../backend/VenueOpsService.md#gettransportfaretable) | onLoad | Passenger types and fares of the route | `None` |
+| `quoteTransportFare` | [VenueOpsService](../backend/VenueOpsService.md#quotetransportfare) | onAction | The price for the stations and passengers | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the trip or pass to the basket (`attributes.transport`) | `None` |
+| `saveFavouriteRoute` | [VenueOpsService](../backend/VenueOpsService.md#savefavouriteroute) | onAction | Save this route | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The route of the chosen departure. |
+| error | Could not load. Names which read failed; nothing is bought. |
+| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). |
+| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. |
+| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
+| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-049 | Choose seats on this departure | performanceId | the departure has a seat map |
+| GST-041 | Continue to payment | cartId |  |
+| GST-042 | Sign in to save this route |  |  |
+| GST-076 | Back to departures |  |  |
+
+## GST-078 Intercity Trip — Multi-trip Passes
+
+**Buy a 5- or 10-trip card or a weekly or monthly unlimited pass for a station pair.**
+
+|  |  |
+|---|---|
+| Module | Transport |
+| Wave | 3 |
+| Licensed module | transport |
+| Route | `/transport/multi-trip-passes` |
+| Component | `apps/guest-app/src/routes/transport/MultiTripPassesList.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| cartId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listTransportStations` | [VenueOpsService](../backend/VenueOpsService.md#listtransportstations) | onLoad | The stations to pick From and To | `None` |
+| `listTransportPassOffers` | [VenueOpsService](../backend/VenueOpsService.md#listtransportpassoffers) | onLoad | Multi-trip and unlimited passes for the station pair | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the trip or pass to the basket (`attributes.transport`) | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The passes for the station pair. |
+| error | Could not load. Names which read failed; nothing is bought. |
+| emptyFirstRun | No routes are published for this venue yet. Says so; the client still owes the real network (stations, fares, timetable). |
+| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. |
+| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
+| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-041 | Choose a pass | cartId |  |
+| GST-076 | One-way instead |  |  |
+
+## GST-079 Intercity Trip — Favourite Routes
+
+**Rebook a saved route in two taps, or remove it.**
+
+|  |  |
+|---|---|
+| Module | Transport |
+| Wave | 3 |
+| Licensed module | transport |
+| Route | `/transport/favourite-routes` |
+| Component | `apps/guest-app/src/routes/transport/FavouriteRoutesList.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| favouriteId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listMyFavouriteRoutes` | [VenueOpsService](../backend/VenueOpsService.md#listmyfavouriteroutes) | onLoad | The guest's saved routes | `None` |
+| `deleteFavouriteRoute` | [VenueOpsService](../backend/VenueOpsService.md#deletefavouriteroute) | onAction | Remove a saved route | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The saved routes. |
+| error | Could not load. Names which read failed; nothing is bought. |
+| emptyFirstRun | No saved routes yet. Says how to save one (Save this route on a trip) and offers the one-way search. |
+| emptyNoResults | No departure in that period. Names the period and offers Next Available Trip or another period or date. |
+| emptyNoAccess | Searching and buying need no account. Favourites need a signed-in guest: a guest who is not signed in is offered sign-in and brought back, never shown an empty list. |
+| offline | The offline banner shows. A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-076 | Book this route | favouriteId |  |
+| GST-042 | Sign in to see saved routes |  |  |

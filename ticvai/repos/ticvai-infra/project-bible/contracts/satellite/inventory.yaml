@@ -1579,7 +1579,9 @@ paths:
         - "P08 BO-049 Stock Levels"
         - "P08 BO-080 Stock Transfers"
         - "P08 BO-082 Stock Movements"
+        - "P08 BO-507 Pooled Inventory Management"
         - "P08 BO-511 Inventory Transfer Management"
+        - "P08 BO-513 Inventory Intelligence & Rebalancing"
       x-ticvai-audience:
       - staff
       summary: Send stock to another location

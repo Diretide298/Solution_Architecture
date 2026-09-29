@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 407 operations, 75 tables
+title: CatalogueService — 415 operations, 77 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -15,14 +15,14 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 407
+  operations: 415
   inAFlow: 257
-  percent: 63%
+  percent: 62%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: catalogue
-  tables: 32
+  tables: 34
   stores:
   - postgres
   largestTable: catalogue.entitlement_template
@@ -43,7 +43,7 @@ schemas:
   largestTable: seating.group_request
 operationsByContract:
 - contract: catalogue
-  count: 206
+  count: 214
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -84,7 +84,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 4
-    writes: 0
+    writes: 1
   - operation: assignPerformanceMedia
     verb: POST
     path: /performances/{performanceId}/media
@@ -131,7 +131,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: commitCatalogueImport
     verb: POST
@@ -227,8 +227,32 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
+  - operation: decidePricingChangeRequest
+    verb: POST
+    path: /pricing-change-request/{changeId}/decision
+    scope: venue
+    permission: PRODUCT_APPROVE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: decidePricingRecommendation
+    verb: POST
+    path: /recommendation-review-decision/{recommendationId}/decision
+    scope: venue
+    permission: AI_APPROVE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: estimateEventResourceCost
+    verb: GET
+    path: /events/{eventId}/resource-cost
+    scope: venue
+    permission: EVENT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: forceReleaseInventoryHold
     verb: POST
     path: /inventory-holds/{inventoryHoldId}/force-release
@@ -347,7 +371,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getProductEligibilityRule
     verb: GET
@@ -1051,7 +1075,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: true
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listQuantityGroupVolume
     verb: GET
@@ -1128,6 +1152,14 @@ operationsByContract:
   - operation: listScenarioModelingWhat
     verb: GET
     path: /scenario-modeling-what
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listScheduledLifecycleActions
+    verb: GET
+    path: /activation-scheduler
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
@@ -1299,7 +1331,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: searchCatalogue
     verb: GET
@@ -1307,7 +1339,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: true
-    reads: 3
+    reads: 4
     writes: 0
   - operation: setAlternativeCodes
     verb: PUT
@@ -1597,6 +1629,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setRulePriorityConflict
+    verb: PUT
+    path: /rule-priority-conflict
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setSpace
     verb: PUT
     path: /spaces
@@ -1629,6 +1669,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: submitPricingChangeRequest
+    verb: POST
+    path: /pricing-change-request/{changeId}/submit
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: suspendEntitlement
     verb: POST
     path: /entitlements/{entitlementId}/suspend
@@ -1637,13 +1685,21 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: testPricingRule
+    verb: POST
+    path: /pricing-rule/{ruleId}/test
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: transitionProductLifecycle
     verb: POST
     path: /products/{productId}/lifecycle
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: updateChannelCapacity
     verb: PATCH
@@ -1691,8 +1747,16 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
+  - operation: updateProductVariant
+    verb: PATCH
+    path: /products/{productId}/variants/{variantId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
 - contract: promotions
   count: 146
   operations:
@@ -3521,7 +3585,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.entitlement_template
-  columns: 30
+  columns: 31
   store: postgres
   parent: null
   writtenBy:
@@ -3614,7 +3678,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.performance
-  columns: 9
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -3658,8 +3722,14 @@ tables:
   writtenBy:
   - catalogue
   foreignWriters: null
+- table: catalogue.pricing_recommendation_decision
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: catalogue.product
-  columns: 24
+  columns: 29
   store: postgres
   parent: null
   writtenBy:
@@ -3668,7 +3738,7 @@ tables:
   foreignWriters:
   - inventory
 - table: catalogue.product_category
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -3678,6 +3748,13 @@ tables:
   columns: 14
   store: postgres
   parent: catalogue.product
+  writtenBy:
+  - catalogue
+  foreignWriters: null
+- table: catalogue.product_media
+  columns: 6
+  store: postgres
+  parent: maintenance.asset
   writtenBy:
   - catalogue
   foreignWriters: null
@@ -3705,7 +3782,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.variant
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -4001,7 +4078,7 @@ tables:
   - seating
   foreignWriters: null
 - table: seating.section
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -4082,6 +4159,7 @@ screens:
 - P01:WEB-035 Multi-Currency & Pricing
 - P01:WEB-040 Virtual Queue
 - P01:WEB-043 Loyalty & Rewards
+- P01:WEB-048 Book a Space by the Hour
 - P02:GST-001 Home – Default
 - P02:GST-002 Explore Categories
 - P02:GST-003 Event & Attraction Listing
@@ -4089,6 +4167,7 @@ screens:
 - P02:GST-005 What's On
 - P02:GST-006 Event / Exhibition Details
 - P02:GST-007 Select Date & Time
+- P02:GST-008 Tickets & Add-ons
 - P02:GST-015 Memberships
 - P02:GST-021 Interactive Map
 - P02:GST-036 Loyalty & Rewards
@@ -4109,6 +4188,7 @@ screens:
 - P02:GST-063 Search
 - P02:GST-070 Reserve a Table
 - P02:GST-072 Share & Group Booking
+- P02:GST-075 Book a Space by the Hour
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-003 Sell — Timed Entry
 - P04:POS-004 Sell — Seat Map
@@ -4202,9 +4282,17 @@ screens:
 - P08:BO-1079 Immutable Seat Audit Logs
 - P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-117 Product Import, Governance & AI Configuration Assistant
+- P08:BO-1187 Transport Departure Board
 - P08:BO-119 Cross-Sell, Upsell & Recommendation Rules
+- P08:BO-1190 Donation Campaigns
 - P08:BO-125 Product & Category Button Configuration
 - P08:BO-161 Guest, Companion & Eligibility Rules
+- P08:BO-285 Membership Product & Tier Builder
+- P08:BO-288 Membership Entitlement & Admission Benefit Builder
+- P08:BO-289 Membership Usage, Visit & Consumption Rules
+- P08:BO-291 Membership Commercial, Pricing & Channel Association
+- P08:BO-298 Membership Freeze, Suspension & Reactivation Management
+- P08:BO-301 Member Exceptions, Overrides & Service Recovery
 - P08:BO-374 Approval Decision Workspace
 - P08:BO-441 Price Priority & Conflict Rules
 - P08:BO-443 Pricing Audit, Approval & Publication
@@ -4582,6 +4670,7 @@ screens:
 - P10:PTR-007 Availability Search
 - P10:PTR-009 Group / Bulk Booking
 - P10:PTR-010 Cart & Quote
+- P13:CMS-101 Help Me Choose
 - P16:ANL-004 Product Performance
 - P16:ANL-018 Alerts & Exception Center
 - P17:SGN-005 Sales Channel Assessment
@@ -4621,7 +4710,6 @@ flows:
 - F33 A till goes offline and comes back
 - F34 A retail sale, from scan to return
 - F49 A guest plans a day and follows it
-- F52 A guest books a cabana and uses it
 - F53 A guest earns, sees and spends loyalty
 - F55 A guest buys on the web and transfers to a friend
 - F58 A ticket is sold at a till, added to, and refunded

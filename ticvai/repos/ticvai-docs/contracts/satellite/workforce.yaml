@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Workforce
   version: 1.0.0
-  x-ticvai-screen-count: 23
+  x-ticvai-screen-count: 41
   x-ticvai-module: "18 — Employee Mobile App & AI Assistant (workforce)"
   x-ticvai-platforms:
     - P06 Venue Staff App
@@ -402,6 +402,7 @@ paths:
         - "P06 EMP-025 Break management"
         - "P08 BO-056 Time & Attendance"
         - "P08 BO-889 Staff Check-In, Check-Out & Attendance Exceptions"
+        - "P08 BO-935 Assignment Detail & Operational Brief"
         - "P08 BO-936 Mobile Staff Check-In & Check-Out"
       x-ticvai-audience: [staff]
       summary: Clock in, clock out, or take a break
@@ -1169,6 +1170,8 @@ paths:
   /employees/{employeeId}:
     get:
       operationId: getEmployee
+      x-ticvai-consumed-by:
+        - "P08 BO-874 Staff Resource Profile"
       summary: One person, with their employment, postings and leave balances
       description: 'Four tables and one question. **A profile screen that fans out across four list
         endpoints is four round trips and four chances to show a half-loaded person**, so the
@@ -1206,6 +1209,8 @@ paths:
   /job-titles:
     get:
       operationId: listJobTitles
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
       summary: The job titles a posting can name
       tags:
       - workforce
@@ -1225,6 +1230,8 @@ paths:
                   $ref: '#/components/schemas/WorkforceJobTitle'
     put:
       operationId: setJobTitle
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
       summary: Define a job title
       description: '**Ours to configure even where the HRMS masters the people.** A venue names the
         role a posting fills; the external system names the person who fills it.
@@ -1258,6 +1265,8 @@ paths:
   /leave-types:
     get:
       operationId: listLeaveTypes
+      x-ticvai-consumed-by:
+        - "P08 BO-880 Break, Leave & Absence Configuration"
       summary: Leave types and how each accrues
       description: '**`requestLeave` existed and nothing described what could be requested.** A leave
         request carries a type; the types were a vocabulary nobody could read.
@@ -1281,6 +1290,8 @@ paths:
                   $ref: '#/components/schemas/WorkforceLeaveType'
     put:
       operationId: setLeaveType
+      x-ticvai-consumed-by:
+        - "P08 BO-880 Break, Leave & Absence Configuration"
       summary: Define a leave type
       tags:
       - workforce
@@ -1310,6 +1321,8 @@ paths:
   /leave-balances:
     get:
       operationId: listLeaveBalances
+      x-ticvai-consumed-by:
+        - "P08 BO-880 Break, Leave & Absence Configuration"
       summary: What each person has left, by leave type
       description: '**A leave request that cannot be checked against a balance is a form, not a
         workflow.** `requestLeave` has existed since the contract was written and the balance it
@@ -1346,6 +1359,8 @@ paths:
   /shift-patterns:
     get:
       operationId: listShiftPatterns
+      x-ticvai-consumed-by:
+        - "P08 BO-879 Shift Template & Assignment Configuration"
       summary: Named shift patterns
       description: '**Distinct from `/shift-templates`, and the distinguishing column is
         `crossesMidnight`.** A pattern says that 22:00 to 06:00 is one shift; a template carries two
@@ -1370,6 +1385,8 @@ paths:
                   $ref: '#/components/schemas/WorkforceShift'
     put:
       operationId: setShiftPattern
+      x-ticvai-consumed-by:
+        - "P08 BO-879 Shift Template & Assignment Configuration"
       summary: Define a shift pattern and its break
       tags:
       - workforce
@@ -1399,6 +1416,8 @@ paths:
   /work-assignments:
     get:
       operationId: listWorkAssignments
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
       summary: Where each person is posted, and from when
       description: '**A posting is not a rota slot.** `rota_assignment` says a principal works
         Saturday 14:00 to 22:00; this says they are a Ride Operator at Venue 3, Attractions
@@ -1441,6 +1460,8 @@ paths:
                   $ref: '#/components/schemas/WorkforceWorkAssignment'
     put:
       operationId: setWorkAssignment
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
       summary: Post a person to a job title at a venue
       description: '**A posting ends by `effectiveTo`, never by deletion.** An attendance record from
         March has to resolve against the posting that was in force in March.
@@ -1479,6 +1500,10 @@ paths:
   /integration-sources:
     get:
       operationId: listIntegrationSources
+      x-ticvai-consumed-by:
+        - "P08 BO-874 Staff Resource Profile"
+        - "P08 BO-878 Staff Availability & Working Pattern"
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
       summary: External systems that master workforce data, and their health
       description: 'Resource board 10. **The six-state display the board asks for lives on this row** —
         what is connected, when it last synchronised, and whether its credentials still work.
@@ -1502,6 +1527,8 @@ paths:
                   $ref: '#/components/schemas/WorkforceIntegrationSource'
     put:
       operationId: setIntegrationSource
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
       summary: Connect or reconfigure an external workforce system
       tags:
       - workforce
@@ -1531,6 +1558,8 @@ paths:
   /integration-sources/{sourceId}/field-ownership:
     get:
       operationId: getFieldOwnership
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
       summary: Which fields this source masters
       description: 'Resource board 3, Ownership Rules: *"For every field, administrators shall determine
         ... External System Master. This prevents conflicting updates."*
@@ -1563,6 +1592,9 @@ paths:
                   $ref: '#/components/schemas/WorkforceFieldOwnership'
     put:
       operationId: setFieldOwnership
+      x-ticvai-consumed-by:
+        - "P08 BO-878 Staff Availability & Working Pattern"
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
       summary: Declare who masters each field
       description: '**Set as a whole, not row by row.** Ownership is only meaningful read together —
         a screen showing nine fields owned externally and one owned here is the artefact an
@@ -1608,6 +1640,8 @@ paths:
   /sync-runs:
     get:
       operationId: listSyncRuns
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
       summary: Synchronisation history, with counts
       description: 'Resource board 10 asks the page to show successful records, failed records,
         warnings and mapping errors rather than *"integration failed"*.
@@ -1648,6 +1682,8 @@ paths:
                         $ref: '#/components/schemas/WorkforceSyncRun'
     post:
       operationId: startSync
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
       summary: Run a synchronisation now
       description: '**This is the write path for `workforce.employee`.** The projection is not edited
         through an API; it is replaced by what the system of record says, field by field, subject to
@@ -1699,6 +1735,8 @@ paths:
   /sync-conflicts:
     get:
       operationId: listSyncConflicts
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
       summary: Disagreements a person has to settle
       description: 'Resource board 3 names the cases: an employee in HR and not here, a venue changed
         externally, a certification expired, and *"employee terminated externally but has future TICVAI
@@ -1746,6 +1784,8 @@ paths:
                         $ref: '#/components/schemas/WorkforceSyncConflict'
     post:
       operationId: resolveSyncConflict
+      x-ticvai-consumed-by:
+        - "P08 BO-882 Workforce Integration & Synchronization Center"
       summary: Settle a disagreement
       description: '**Board 3 requires the downstream consequence to be visible, not just the
         conflict.** Resolving a terminated-externally conflict has to say what happens to the future

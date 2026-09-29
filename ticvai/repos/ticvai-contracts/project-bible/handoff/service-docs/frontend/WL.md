@@ -35,19 +35,20 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | [CMS-004](#cms-004-logo-assets) | Logo & Assets | White Label | 2 | 4 |
 | [CMS-005](#cms-005-theme-editor) | Theme Editor | White Label | 2 | 2 |
 | [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 2 | 5 |
-| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 2 | 7 |
-| [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 2 | 7 |
-| [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 2 | 5 |
+| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 2 | 9 |
+| [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 2 | 8 |
+| [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 2 | 6 |
 | [CMS-010](#cms-010-media-library) | Media Library | White Label | 2 | 12 |
 | [CMS-011](#cms-011-translations) | Translations | White Label | 2 | 1 |
 | [CMS-012](#cms-012-rtl-preview) | RTL Preview | White Label | 2 | 2 |
 | [CMS-013](#cms-013-seo-metadata) | SEO & Metadata | White Label | 2 | 1 |
 | [CMS-014](#cms-014-publishing-workflow) | Publishing Workflow | White Label | 2 | 3 |
 | [CMS-015](#cms-015-version-history) | Version History | White Label | 2 | 3 |
-| [CMS-016](#cms-016-site-settings) | Site Settings | White Label | 2 | 3 |
+| [CMS-016](#cms-016-site-settings) | Site Settings | White Label | 2 | 5 |
 | [CMS-017](#cms-017-domain-certificate) | Domain & Certificate | White Label | 2 | 4 |
-| [CMS-018](#cms-018-consent-legal) | Consent & Legal | White Label | 2 | 4 |
+| [CMS-018](#cms-018-consent-legal) | Consent & Legal | White Label | 2 | 8 |
 | [CMS-019](#cms-019-user-access) | User Access | White Label | 2 | 2 |
+| [CMS-101](#cms-101-help-me-choose) | Help Me Choose | White Label | 2 | 9 |
 
 ## ADM-016 White-Label Branding Management
 
@@ -523,6 +524,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `getHomepageLayout` | [WhiteLabelService](../backend/WhiteLabelService.md#gethomepagelayout) | onLoad | Read homepage layout | `TENANT_CONFIGURE` |
 | `setHomepageLayout` | [WhiteLabelService](../backend/WhiteLabelService.md#sethomepagelayout) | onAction | Set homepage section order | `TENANT_CONFIGURE` |
 | `getModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#getmoduleenablement) | onLoad | Which modules are on, so a section whose module is off is disabled in the builder (decided 28 September, audit R163 (4)) | `TENANT_CONFIGURE` |
+| `setHeader` | [WhiteLabelService](../backend/WhiteLabelService.md#setheader) | onAction | Configure the header | `TENANT_CONFIGURE` |
+| `deleteContentPage` | [WhiteLabelService](../backend/WhiteLabelService.md#deletecontentpage) | onAction | Delete a content page | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -573,6 +576,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `deletePromoBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#deletepromoblock) | onAction | Remove a promo block | `TENANT_CONFIGURE` |
 | `listPromoBlocks` | [WhiteLabelService](../backend/WhiteLabelService.md#listpromoblocks) | onLoad | List promotional blocks | `TENANT_CONFIGURE` |
 | `listBanners` | [WhiteLabelService](../backend/WhiteLabelService.md#listbanners) | onLoad | List banners | `TENANT_CONFIGURE` |
+| `deleteBanner` | [WhiteLabelService](../backend/WhiteLabelService.md#deletebanner) | onAction | Delete a banner | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -620,6 +624,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `createMenu` | [FnbService](../backend/FnbService.md#createmenu) | onAction | Create a menu | `PRODUCT_CONFIGURE` |
 | `setMenuSections` | [FnbService](../backend/FnbService.md#setmenusections) | onAction | Set menu sections and their item ordering | `PRODUCT_CONFIGURE` |
 | `updateMenu` | [FnbService](../backend/FnbService.md#updatemenu) | onAction | Amend a menu | `PRODUCT_CONFIGURE` |
+| `setNavigation` | [WhiteLabelService](../backend/WhiteLabelService.md#setnavigation) | onAction | Set main and overflow navigation | `TENANT_CONFIGURE` |
 
 **States**
 
@@ -892,7 +897,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 ## CMS-016 Site Settings
 
-**The values the whole site inherits from.**
+**The values the whole site inherits from, and the booking-flow settings each venue may override (decided 29 September, rev 3 CFG-11).**
 
 |  |  |
 |---|---|
@@ -910,6 +915,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `getBookingFlowConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getbookingflowconfig) | onLoad | How the guest booking flow looks and steps | `TENANT_CONFIGURE` |
 | `setBookingFlowConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#setbookingflowconfig) | onAction | Preset, step indicator, cart layout, embed mode | `TENANT_CONFIGURE` |
 | `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Full working configuration | `TENANT_CONFIGURE` |
+| `listConsentQuestions` | [MarketingService](../backend/MarketingService.md#listconsentquestions) | onLoad | The venue's consent questions, to attach to the booking flow (rev 3 REV3-26) | `GUEST_VIEW` |
+| `listOrgUnits` | [TenancyService](../backend/TenancyService.md#listorgunits) | onLoad | The tenant's venues, for the per-venue override picker (rev 3 CFG-11) | `SCOPE_VIEW` |
 
 **States**
 
@@ -917,6 +924,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 |---|---|
 | loading | The site settings, read by `getTenantConfig`. |
 | error | Could not load. Names which read failed and leaves the site settings untouched. |
+| emptyNoResults | A venue picked in Settings for with no override shows the tenant settings it inherits, labelled as inherited, rather than an empty form (rev 3 CFG-11). |
 | emptyFirstRun | No site settings yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBookingFlowConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
@@ -929,6 +937,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | CMS-003 | Typography | version |  |
 | CMS-017 | Domain & Certificate |  |  |
 | CMS-018 | Consent & Legal |  |  |
+| CMS-101 | Help me choose |  |  |
 
 ## CMS-017 Domain & Certificate
 
@@ -978,7 +987,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 ## CMS-018 Consent & Legal
 
-**Manage the notices every consent is captured against.**
+**Manage the notices every consent is captured against, and the booking consent questions a venue asks ("Are you able to swim?", "I accept the risk"), with the record of every answer (decided 29 September, rev 3 REV3-26).**
 
 |  |  |
 |---|---|
@@ -994,6 +1003,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Parameter | From |
 |---|---|
 | policyKind | navigation |
+| questionId | navigation |
 
 **Operations**
 
@@ -1003,6 +1013,10 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `setPolicy` | [WhiteLabelService](../backend/WhiteLabelService.md#setpolicy) | onAction | Edit and publish a notice | `TENANT_CONFIGURE` |
 | `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | What guests can consent to | `GUEST_VIEW` |
 | `setConsentPurposes` | [MarketingService](../backend/MarketingService.md#setconsentpurposes) | onAction | Set the consent purposes | `GUEST_MANAGE` |
+| `listConsentQuestions` | [MarketingService](../backend/MarketingService.md#listconsentquestions) | onLoad | The venue's booking consent questions (rev 3 REV3-26) | `GUEST_VIEW` |
+| `createConsentQuestion` | [MarketingService](../backend/MarketingService.md#createconsentquestion) | onAction | Define a consent question, created at version 1 | `GUEST_MANAGE` |
+| `updateConsentQuestion` | [MarketingService](../backend/MarketingService.md#updateconsentquestion) | onAction | Change a question (a new version) or retire it | `GUEST_MANAGE` |
+| `listConsentAnswers` | [MarketingService](../backend/MarketingService.md#listconsentanswers) | onAction | The consent records, filtered by order, guest or question | `GUEST_VIEW` |
 
 **States**
 
@@ -1011,7 +1025,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | loading | The consent legal list. |
 | error | Could not load. Names which read failed and leaves the consent legal untouched. |
 | emptyFirstRun | No consent legal yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listPolicies` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoResults | `listPolicies` takes no filter. The consent questions (kind, status) and the consent records (order, guest, question) do: an empty result names the active filter and offers to clear it. |
 | emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 
 **Goes to**
@@ -1059,3 +1073,53 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | CMS-001 | Tenant Workspace |  |  |
 | CMS-002 | Brand Kit |  |  |
 | CMS-003 | Typography |  |  |
+
+## CMS-101 Help Me Choose
+
+**Set up a venue's Help me choose, review what the assistant suggests from the venue's products, preview it and publish it.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 2 |
+| Licensed module | core |
+| Route | `/white-label/help-me-choose` |
+| Component | `apps/venue-management-web/src/routes/white-label/HelpMeChoose.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| guidedChoiceId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listGuidedChoices` | [WhiteLabelService](../backend/WhiteLabelService.md#listguidedchoices) | onLoad | The venue's set-ups, filtered by source and status (rev 3 REV3-11) | `TENANT_CONFIGURE` |
+| `createGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#createguidedchoice) | onAction | Start a set-up by hand, as a draft | `TENANT_CONFIGURE` |
+| `updateGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#updateguidedchoice) | onAction | Edit a draft, including an AI suggestion under review | `TENANT_CONFIGURE` |
+| `deleteGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#deleteguidedchoice) | onAction | Delete a draft or dismiss a suggestion | `TENANT_CONFIGURE` |
+| `publishGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#publishguidedchoice) | onAction | Make a reviewed set-up the one guests see at this venue | `TENANT_PUBLISH` |
+| `unpublishGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#unpublishguidedchoice) | onAction | Stop showing it to guests; back to draft | `TENANT_PUBLISH` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onAction | Products an answer can open | `PRODUCT_VIEW` |
+| `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onAction | Categories an answer can open | `PRODUCT_VIEW` |
+| `listEvents` | [CatalogueService](../backend/CatalogueService.md#listevents) | onAction | Events an answer can open | `PRODUCT_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The venue's Help me choose set-ups, read by `listGuidedChoices`. |
+| error | Could not load. Names which read failed and leaves the set-ups untouched. |
+| emptyFirstRun | No Help me choose at this venue, so guests see none. Offers New set-up, and says that once the venue's products are uploaded the assistant proposes set-ups here as drafts for review. |
+| emptyNoResults | The source or status filter matched nothing and the venue's other set-ups are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-016 | Back to Site Settings |  |  |

@@ -9,30 +9,26 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 56 |
+| Operations with no screen | 45 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 56 operations with no screen here
+### 45 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `enrolFaceTag` | access | POST | Capture a same-visit facial model that dies at close of day |
+| `approveManualOverrideSupervisor` | access | PUT | Manual Override & Supervisor Approval |
 | `listAccessChanges` | access | GET | Changes made to an entitlement's access |
 | `listEntryRulePoints` | access | GET | Which access points an admission rule covers |
-| `setEntryRulePoints` | access | PUT | Set the access points an admission rule covers |
 | `verifyIdentity` | access | POST | Check the person presenting against the person entitled |
 | `authoriseWalletSpend` | cross-region | POST | Hold funds against the guest's home-cell balance |
 | `captureWalletAuthorisation` | cross-region | POST | Capture a held amount |
-| `getWalletAllocation` | cross-region | GET | The consuming cell's bounded offline allocation |
 | `listCellConnections` | cross-region | GET | Which cells may talk to which |
 | `listCrossCellRequests` | cross-region | GET | Calls that had to leave a cell |
 | `relinquishWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
-| `setWalletAllocationPolicy` | cross-region | PUT | Set the allocation cap policy |
-| `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
 | `getAccessPolicy` | identity | GET | One policy, at a version |
 | `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
@@ -49,18 +45,22 @@
 | `listPermissions` | identity | GET | Every permission key the contracts enforce |
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
-| `recordBenefitUsage` | identity | POST | Consume a benefit |
-| `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
-| `setCapabilityTemplate` | identity | PUT | Save a tick-set under a name |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
-| `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
 | `convertReservation` | orders | POST | Convert a reservation into an order |
 | `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
 | `createReservation` | orders | POST | Hold without payment |
 | `extendReservation` | orders | POST | Extend a reservation |
-| `getResaleFeePolicy` | orders | GET | The commission and price cap a resale listing is created under |
 | `issueInvitation` | orders | POST | Issue a complimentary entitlement, with no payment expected |
-| … | | | 16 more |
+| `listDeposits` | orders | GET | Deposits and their authorisation state |
+| `listFraudRules` | orders | GET |  |
+| `listInvitationAllowances` | orders | GET | Who may issue comps, and how many are left |
+| `listMembershipRenewals` | orders | GET | Renewal attempts and why they failed |
+| `listOrderDiscounts` | orders | GET | Discounts applied to orders |
+| `listOrderFees` | orders | GET | Fees charged on an order |
+| `listPaymentProviders` | orders | GET | Gateways configured for this scope |
+| `listUpgrades` | orders | GET | Upgrade requests and their outcome |
+| `openGuestCreditAccount` | orders | POST | A credit limit for an individual booking ahead |
+| … | | | 5 more |
 
 ## Modules
 

@@ -1,5 +1,5 @@
 id: LLD-API client
-title: API client — 4 transitions
+title: API client — 6 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/api-client.yaml
@@ -26,6 +26,18 @@ transitions:
   operation: rotateApiCredential
   trigger: operation
   guard: Resolved
+  isReversal: true
+- from: active
+  to: suspended
+  operation: setApiClientStatus
+  trigger: operation
+  guard: '**An integration misbehaving, paused on purpose.** Credentials, subscriptions and mappings
+    are kept; `reason` is required (VM close-out, 29 September)'
+- from: suspended
+  to: active
+  operation: setApiClientStatus
+  trigger: operation
+  guard: Resumed by the integration owner
   isReversal: true
 - from: active
   to: revoked

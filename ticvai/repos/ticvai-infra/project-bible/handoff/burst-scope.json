@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 34,
-  "ofTotalOperations": 2147,
-  "tables": 45,
-  "ofTotalTables": 683
+  "ofTotalOperations": 2298,
+  "tables": 50,
+  "ofTotalTables": 771
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2113,
-    "tables": 683,
+    "operations": 2264,
+    "tables": 771,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -27,7 +27,7 @@
     "target": "burst environment",
     "services": 3,
     "operations": 34,
-    "tables": 45,
+    "tables": 50,
     "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
     "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
    }
@@ -253,6 +253,28 @@
    "note": "**A short-lived claim on contended stock** while somebody decides. A seat in a basket is held, not sold — CF-115 settled that contended inventory is leased rather than reserved, and the hold expires on its own. Renamed f"
   },
   {
+   "table": "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+   "schema": "embedded as attributes (jsonb) on orders",
+   "columns": 2,
+   "burstOperations": 5,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 2 columns. **No description has been written for this table** — the name is the only thing saying what it is. **Reached by**: 25 operations read it and 6 write it; 3 tables reference it."
+  },
+  {
+   "table": "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+   "schema": "embedded as window_starts_at and window_ends_at on orders",
+   "columns": 3,
+   "burstOperations": 5,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 3 columns. **No description has been written for this table** — the name is the only thing saying what it is. **Reached by**: 25 operations read it and 6 write it; 3 tables reference it."
+  },
+  {
    "table": "orders.payment",
    "schema": "orders",
    "columns": 16,
@@ -288,7 +310,7 @@
   {
    "table": "catalogue.performance",
    "schema": "catalogue",
-   "columns": 9,
+   "columns": 11,
    "burstOperations": 4,
    "written": false,
    "contention": null,
@@ -299,7 +321,7 @@
   {
    "table": "catalogue.product",
    "schema": "catalogue",
-   "columns": 24,
+   "columns": 29,
    "burstOperations": 4,
    "written": false,
    "contention": null,
@@ -338,9 +360,20 @@
    "note": "**A named thing on at a venue**, grouping performances. A concert is an event; each showing is a performance"
   },
   {
+   "table": "catalogue.product_media",
+   "schema": "catalogue",
+   "columns": 6,
+   "burstOperations": 3,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 6 columns. **No description has been written for this table** — the name is the only thing saying what it is. **Reached by**: 8 operations read it and 3 write it."
+  },
+  {
    "table": "orders.order_line",
    "schema": "orders",
-   "columns": 21,
+   "columns": 26,
    "burstOperations": 3,
    "written": true,
    "contention": null,
@@ -406,7 +439,7 @@
   {
    "table": "catalogue.entitlement_template",
    "schema": "catalogue",
-   "columns": 30,
+   "columns": 31,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -417,7 +450,7 @@
   {
    "table": "catalogue.variant",
    "schema": "catalogue",
-   "columns": 8,
+   "columns": 9,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -459,6 +492,28 @@
    "note": "**One side of a double-entry movement.** Renamed from `entry`, which sat beside `journal_entry` and `journal_line` — **three things called entry in one schema is a schema nobody reads twice.** **Hangs off**: reaches `led"
   },
   {
+   "table": "marketing.consent_question",
+   "schema": "marketing",
+   "columns": 11,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Holds 11 columns. **No description has been written for this table** — the name is the only thing saying what it is. **Reached by**: 11 operations read it and 2 write it."
+  },
+  {
+   "table": "marketing.consent_question_version",
+   "schema": "marketing",
+   "columns": 6,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": ""
+  },
+  {
    "table": "orders.cart",
    "schema": "orders",
    "columns": 18,
@@ -472,7 +527,7 @@
   {
    "table": "orders.cart_line",
    "schema": "orders",
-   "columns": 16,
+   "columns": 22,
    "burstOperations": 2,
    "written": true,
    "contention": null,
@@ -725,7 +780,7 @@
   {
    "table": "seating.section",
    "schema": "seating",
-   "columns": 6,
+   "columns": 7,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -760,6 +815,10 @@
    "reads": [
     "catalogue.channel_capacity",
     "catalogue.inventory_hold",
+    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+    "marketing.consent_question",
+    "marketing.consent_question_version",
     "orders.cart",
     "orders.cart_line",
     "promotions.promotion"
@@ -775,7 +834,8 @@
    "contract": "catalogue",
    "callsPerBuyer": 4,
    "reads": [
-    "catalogue.product"
+    "catalogue.product",
+    "catalogue.product_media"
    ],
    "writes": [],
    "lock": null
@@ -805,7 +865,8 @@
    "contract": "catalogue",
    "callsPerBuyer": 3,
    "reads": [
-    "catalogue.product"
+    "catalogue.product",
+    "catalogue.product_media"
    ],
    "writes": [],
    "lock": null
@@ -821,11 +882,17 @@
     "catalogue.channel_capacity",
     "catalogue.performance",
     "catalogue.variant",
+    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+    "marketing.consent_question",
+    "marketing.consent_question_version",
     "orders.cart",
     "orders.cart_line"
    ],
    "writes": [
     "catalogue.inventory_hold",
+    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "orders.cart",
     "orders.cart_line"
    ],
@@ -922,6 +989,8 @@
    "callsPerBuyer": 1,
    "reads": [
     "access.entitlement",
+    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "orders.order_line",
     "orders.order_line_eligibility",
     "orders.payment",
@@ -943,6 +1012,8 @@
    "contract": "orders",
    "callsPerBuyer": 1,
    "reads": [
+    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "orders.order_line",
     "orders.order_line_eligibility",
     "orders.payment",
@@ -983,12 +1054,16 @@
    "contract": "orders",
    "callsPerBuyer": 1,
    "reads": [
+    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "orders.order_line",
     "orders.order_line_eligibility",
     "orders.payment",
     "orders.sales_order"
    ],
    "writes": [
+    "embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+    "embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
     "orders.order_line",
     "orders.payment",
     "orders.sales_order"
@@ -1264,6 +1339,7 @@
    "reads": [
     "catalogue.event",
     "catalogue.product",
+    "catalogue.product_media",
     "catalogue.variant"
    ],
    "writes": [],

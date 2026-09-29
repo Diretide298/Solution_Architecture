@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Approvals
   version: 1.0.0
-  x-ticvai-screen-count: 45
+  x-ticvai-screen-count: 44
   x-ticvai-module: 11 — Approval Workflows and Governance
   x-ticvai-platforms:
   - P04 POS
@@ -94,6 +94,7 @@ paths:
         - "P08 BO-375 Business Context & Evidence Viewer"
         - "P08 BO-940 Manager Mobile Approval Center"
         - "P09 ADM-145 Promotion Approval Inbox"
+        - "P09 ADM-249 Unified Approval Inbox & Decision Workspace"
         - "P09 ADM-351 Approval API Management"
         - "P11 ACC-006 Reviewer Queue"
         - "P11 ACC-007 Reviewer Application Detail"
@@ -162,6 +163,8 @@ paths:
         - "P08 BO-1031 Contracts & Approval Workflow"
         - "P08 BO-1080 Integration Approval & Compliance"
         - "P08 BO-1181 Approval, Publication & Change Management"
+        - "P08 BO-243 Policy Approval, Audit, Analytics & AI Optimization"
+        - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
         - "P08 BO-718 Event Change Request Configuration"
         - "P08 BO-771 Budget, Goals & Forecast"
         - "P08 BO-922 Event Resource Approval & Readiness Gate"
@@ -234,7 +237,7 @@ paths:
       operationId: submitApprovalRequest
       x-ticvai-audience:
       - staff
-      summary: Send a saved draft for approval
+      summary: Send a saved draft, or a returned request, for approval
       description: '11.1.51. **Decided 28 September, audit R129 (3): a person may save a draft and submit
         it later.** Only the requester who saved the draft submits it.
 
@@ -245,6 +248,11 @@ paths:
 
         The body may amend the summary, amount, attributes and justification in the same call; a field
         left out keeps the draft''s value.
+
+        **Also answers a returned request or a request for information (decided 29 September, readiness
+        close-out).** From `returned` or `informationRequested` it resubmits the same request: routing
+        resumes at the level that sent it back, on the matrix version already fixed on the request (R129),
+        and the SLA clock restarts.
 
         '
       tags:
@@ -370,16 +378,18 @@ paths:
         - "P08 BO-084 Approval Inbox"
         - "P08 BO-085 Approval Request"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
+        - "P08 BO-243 Policy Approval, Audit, Analytics & AI Optimization"
         - "P08 BO-367 Approval Request Detail"
         - "P08 BO-377 Approve & Sensitive Action Confirmation"
         - "P08 BO-378 Reject / Return / Request Information"
         - "P08 BO-940 Manager Mobile Approval Center"
         - "P09 ADM-145 Promotion Approval Inbox"
+        - "P09 ADM-249 Unified Approval Inbox & Decision Workspace"
         - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-audience:
       - staff
       - public
-      summary: Approve or reject
+      summary: Approve, reject, return or ask for information
       description: '**Records an authorisation. Does not perform the action.** The requesting contract
         executes afterwards under the approver''s permission.
 
@@ -388,6 +398,14 @@ paths:
 
         A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.20) and usually
         should — six months later the comment is the only record of why the exception was allowed.
+
+        **Return and request information (decided 29 September, readiness close-out; MoM 10 Aug §5.5:
+        Approve, Reject, Return, Request More Information).** `return` sends the request back to the
+        requester to amend (`returned`); `requestInformation` asks the requester a question and pauses the
+        SLA clock (`informationRequested`). Neither is a rejection and neither counts against the
+        requester in the rejection rate. Both need a comment saying what is wanted. The requester answers
+        with `submitApprovalRequest` on the same request, and routing resumes at the level that sent it
+        back.
 
         '
       tags:
@@ -412,6 +430,8 @@ paths:
                   enum:
                   - approve
                   - reject
+                  - return
+                  - requestInformation
                 comment:
                   type: string
                   maxLength: 1000
@@ -635,6 +655,7 @@ paths:
       operationId: listApprovalMatrices
       x-ticvai-consumed-by:
         - "P08 BO-086 Approval Matrix"
+        - "P09 ADM-242 Approval Matrix & Multi-Level Approval Configuration"
         - "P09 ADM-329 Approval Matrix Command Center"
         - "P09 ADM-338 AI Routing Advisor & Matrix Optimization"
       x-ticvai-audience:
@@ -678,7 +699,12 @@ paths:
       operationId: setApprovalMatrix
       x-ticvai-consumed-by:
         - "P08 BO-086 Approval Matrix"
+        - "P08 BO-1120 Corporate Budget, Policy & Approval Rules"
+        - "P08 BO-1149 Administrative Balance Adjustment Studio"
         - "P08 BO-639 Reviewer Assignment & Delegation"
+        - "P08 BO-863 Resource Lifecycle, Governance & Audit"
+        - "P09 ADM-242 Approval Matrix & Multi-Level Approval Configuration"
+        - "P09 ADM-243 Roles, Authority, Delegation & Approval Limits"
         - "P09 ADM-330 Approval Authority Matrix"
         - "P09 ADM-331 Organizational Hierarchy Routing"
         - "P09 ADM-332 Department-Based Approval Matrix"
@@ -784,7 +810,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-087 Approval Delegations"
         - "P08 BO-384 Delegation & Escalation Command Center"
+        - "P08 BO-385 Delegation Management"
         - "P08 BO-386 Temporary Delegation & Availability Calendar"
+        - "P09 ADM-243 Roles, Authority, Delegation & Approval Limits"
       x-ticvai-audience:
       - staff
       summary: Who is standing in for whom
@@ -809,6 +837,8 @@ paths:
       operationId: createApprovalDelegation
       x-ticvai-consumed-by:
         - "P08 BO-087 Approval Delegations"
+        - "P08 BO-385 Delegation Management"
+        - "P09 ADM-243 Roles, Authority, Delegation & Approval Limits"
       x-ticvai-audience:
       - staff
       summary: Delegate approval authority
@@ -878,6 +908,7 @@ paths:
       operationId: revokeApprovalDelegation
       x-ticvai-consumed-by:
         - "P08 BO-087 Approval Delegations"
+        - "P08 BO-385 Delegation Management"
       x-ticvai-audience:
       - staff
       summary: End a delegation early
@@ -1039,26 +1070,33 @@ paths:
       operationId: listRuleWorkflow
       x-ticvai-consumed-by:
         - "P09 ADM-238 Rules & Workflow Command Center"
+        - "P09 ADM-319 Approval Workflow Library"
+        - "P09 ADM-327 Workflow Publication & Lifecycle"
+        - "P09 ADM-328 Workflow Versioning & Change History"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack ''Rules, Workflow, Approval & Automation Engine'' 13.1.1 p.5; MoM
+        10 Aug §5.5 and 8 Sep (one generic configurable engine); our build plan'
       summary: Rules & Workflow Command Center
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 5. The screen says: Provide administrators
-        with a centralized portfolio of all business rules, workflows, approvals and automations configured
-        across TICVAI.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 5. The screen says: Provide administrators with a centralized portfolio of all business
+        rules, workflows, approvals and automations configured across TICVAI.
 
 
         **Every property carries the sentence it came from.** 30 were read from the screen''s own bulleted
-        directory and 9 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 9 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** The classification labels became one type
+        enum and the lifecycle became a status enum; KPI tiles moved to a summary beside the paged list of
+        configurations; type, status and source module are query parameters. AI duplicate-logic detection
+        is advisory analytics only.
+
+        '
       tags:
-      - drafted
+      - approvals
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -1070,9 +1108,37 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/RulesWorkflowCommandCenterView'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/RulesWorkflowCommandCenterView'
+                    summary:
+                      $ref: '#/components/schemas/RulesWorkflowCommandCenterViewSummary'
+      parameters:
+      - name: type
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Type
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Status
+      - name: sourceModule
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Source Module
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
   /visual-business-rule:
     put:
       operationId: setVisualBusinessRule
@@ -1081,24 +1147,28 @@ paths:
         - "P09 ADM-323 Condition & Decision Rule Builder"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.1.2 p.6-7; MoM 10 Aug §5.5 (builder configures who approves
+        and when); our build plan'
       summary: Visual Business Rule Builder
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 6. The screen says: Allow administrators to
-        create business rules without software development.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 6. The screen says: Allow administrators to create business rules without software development.
 
 
         **Every property carries the sentence it came from.** 9 were read from the screen''s own bulleted
-        directory and 15 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 15 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** The supported operators became one operator
+        enum and the rule now names itself, the governed field, the value and the THEN outcome; the sample
+        ''Event Status is not Cancelled'' value was removed. Rules are deterministic and configured by people;
+        a requireApproval outcome hands off to the approvals engine.
+
+        '
       tags:
-      - drafted
-      x-ticvai-permission: APPROVAL_REQUEST
+      - approvals
+      x-ticvai-permission: APPROVAL_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       x-ticvai-offline-capable: false
@@ -1111,7 +1181,7 @@ paths:
             schema:
               $ref: '#/components/schemas/VisualBusinessRuleBuilderInput'
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
           description: Visual Business Rule Builder
@@ -1127,23 +1197,26 @@ paths:
         - "P09 ADM-323 Condition & Decision Rule Builder"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.1.3 p.8-9; our build plan'
       summary: Conditions, Decision Logic & Decision Tables
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 8. The screen says: Configure advanced decision
-        logic where simple IF/THEN rules are insufficient.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 8. The screen says: Configure advanced decision logic where simple IF/THEN rules are
+        insufficient.
 
 
         **Every property carries the sentence it came from.** 13 were read from the screen''s own bulleted
-        directory and 18 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 18 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** Sample decision-table cells were removed;
+        rule precedence and stop/continue became enums and conflict detection a list of detected conflict
+        kinds. AI plain-language explanation is advisory only.
+
+        '
       tags:
-      - drafted
+      - approvals
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -1158,6 +1231,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConditionsDecisionLogicDecisionTablesView'
+      x-ticvai-bounded: a venue's reusable decision tables, defined by hand
   /visual-workflow:
     put:
       operationId: setVisualWorkflow
@@ -1171,24 +1245,28 @@ paths:
         - "P09 ADM-327 Workflow Publication & Lifecycle"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.1.4 p.10; MoM 10 Aug §5.5 (multi-step chain initiator to publish);
+        our build plan'
       summary: Visual Workflow Designer
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 10. The screen says: Allow administrators
-        to visually design complete business processes.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 10. The screen says: Allow administrators to visually design complete business processes.
 
 
         **Every property carries the sentence it came from.** 25 were read from the screen''s own bulleted
-        directory and 9 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 9 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** The palette of node kinds became a nodeTypes
+        list and the designer checks became a read-only validationIssues list; the workflow now carries an
+        id, a trigger and its graph definition, and effective dates are a from/to pair. Approval nodes route
+        through the approvals engine; the engine orchestrates and does not own the business transaction.
+
+        '
       tags:
-      - drafted
-      x-ticvai-permission: APPROVAL_REQUEST
+      - approvals
+      x-ticvai-permission: APPROVAL_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1200,7 +1278,7 @@ paths:
             schema:
               $ref: '#/components/schemas/VisualWorkflowDesignerInput'
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
           description: Visual Workflow Designer
@@ -1211,28 +1289,35 @@ paths:
   /matrix-multi-level:
     put:
       operationId: approveMatrixMultiLevel
-      x-ticvai-consumed-by:
-        - "P09 ADM-242 Approval Matrix & Multi-Level Approval Configuration"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.1.5 p.11-12; MoM 8 Sep (authority by amount and category, N-of-M
+        with a named role always required); audit R129'
       summary: Approval Matrix & Multi-Level Approval Configuration
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 11. The screen says: Configure when approvals
-        are required and who must approve.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 11. The screen says: Configure when approvals are required and who must approve.
 
 
         **Every property carries the sentence it came from.** 32 were read from the screen''s own bulleted
-        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** This duplicates setApprovalMatrix; the sample
+        threshold bands were removed, the approval kinds became one approvalMode enum, and minimumApprovals
+        plus requiredApproverRole express N-of-M. A venue may only tighten a higher rule and in-flight requests
+        keep their matrix version (R129); the approval context list (request, customer, original and proposed
+        value, margin impact, reason, evidence) is what the inbox shows, not a matrix field.
+
+
+        **Overlaps `setApprovalMatrix`,** which stays the operation of record for that write; this one serves
+        the screen''s composite view of it.
+
+        '
       tags:
-      - drafted
-      x-ticvai-permission: APPROVAL_REQUEST
+      - approvals
+      x-ticvai-permission: APPROVAL_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1244,7 +1329,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ApprovalMatrixMultiLevelApprovalConfigurationInput'
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
           description: Approval Matrix & Multi-Level Approval Configuration
@@ -1258,29 +1343,36 @@ paths:
   /role-authority-delegation:
     put:
       operationId: approveRoleAuthorityDelegation
-      x-ticvai-consumed-by:
-        - "P09 ADM-243 Roles, Authority, Delegation & Approval Limits"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.1.6 p.13; MoM 8 Sep (delegation/substitute approver, segregation
+        of duties); audit R129 (delegation same role same venue)'
       summary: Roles, Authority, Delegation & Approval Limits
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 13. The screen says: Define who has authority
-        to perform or approve specific actions. This should work with TICVAI RBAC/PBAC rather than replace
-        it.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 13. The screen says: Define who has authority to perform or approve specific actions.
+        This should work with TICVAI RBAC/PBAC rather than replace it.
 
 
         **Every property carries the sentence it came from.** 24 were read from the screen''s own bulleted
-        directory and 14 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 14 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** Delegation duplicates createApprovalDelegation
+        and authority limits belong in setApprovalMatrix; the pre-assignment checks (user active, delegation
+        valid, scope) and ''requester cannot approve own request'' are engine behaviour, already enforced
+        by decideApprovalRequest, so they were removed as fields. Delegation is same role and same venue (R129);
+        AI authority-gap detection is advisory only.
+
+
+        **Overlaps `createApprovalDelegation`,** which stays the operation of record for that write; this
+        one serves the screen''s composite view of it.
+
+        '
       tags:
-      - drafted
-      x-ticvai-permission: APPROVAL_REQUEST
+      - approvals
+      x-ticvai-permission: APPROVAL_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1292,7 +1384,7 @@ paths:
             schema:
               $ref: '#/components/schemas/RolesAuthorityDelegationApprovalLimitsInput'
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
           description: Roles, Authority, Delegation & Approval Limits
@@ -1301,8 +1393,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/RolesAuthorityDelegationApprovalLimitsView'
       x-ticvai-step-up: mfa
-      x-ticvai-step-up-reason: Grants authority. **The approval that creates approvers** — the one place
-        the permission chain widens.
+      x-ticvai-step-up-reason: Grants authority. **The approval that creates approvers** — the one place the
+        permission chain widens.
   /sla-escalation-reminder:
     get:
       operationId: listSlaEscalationReminder
@@ -1311,23 +1403,29 @@ paths:
         - "P09 ADM-244 SLA, Escalation, Reminder & Timeout Rules"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.1.7 p.14-15; MoM 8 Sep (time to approve, overdue escalates,
+        email reminders); agreed setApprovalSlaPolicy'
       summary: SLA, Escalation, Reminder & Timeout Rules
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 14. The screen says: Define how workflows
-        behave when people or systems do not act within the expected time.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 14. The screen says: Define how workflows behave when people or systems do not act within
+        the expected time.
 
 
         **Every property carries the sentence it came from.** 17 were read from the screen''s own bulleted
-        directory and 12 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 12 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** This is the read side of setApprovalSlaPolicy
+        and now carries its code, target and breach outcome; the sample 4-hour target was removed, the reminder
+        steps are percentages of target, and clock kinds, calendar basis and escalation actions are enums.
+        Auto-approve or auto-reject on breach stays off unless explicitly permitted; reminders go through
+        the Communication Service.
+
+        '
       tags:
-      - drafted
+      - approvals
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -1342,6 +1440,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SlaEscalationReminderTimeoutRulesView'
+      x-ticvai-bounded: a tenant's SLA policies, defined by hand
   /trigger-action-cross:
     put:
       operationId: setTriggerActionCross
@@ -1352,24 +1451,30 @@ paths:
         - "P09 ADM-355 Data & Workflow Mapping Studio"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.1.8 p.16-17; MoM 8 Sep (API/webhook/external workflow integration
+        with data mapping and retry); our build plan'
       summary: Trigger, Action & Cross-Module Orchestration Configuration
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 16. The screen says: Define what starts a
-        workflow and what TICVAI services may be called during execution.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 16. The screen says: Define what starts a workflow and what TICVAI services may be called
+        during execution.
 
 
         **Every property carries the sentence it came from.** 18 were read from the screen''s own bulleted
-        directory and 13 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 13 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** The configuration now names its workflow,
+        trigger type and definition; the callable actions and failure handling became enums. Each action is
+        still checked against workflow authority, user or system authority, module policy and business rule
+        at run time, and repeated events must not create duplicate refunds, orders, payments, approvals or
+        tickets; those are engine rules, not fields.
+
+        '
       tags:
-      - drafted
-      x-ticvai-permission: APPROVAL_REQUEST
+      - approvals
+      x-ticvai-permission: APPROVAL_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1381,7 +1486,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TriggerActionCrossModuleOrchestrationConfigurationInput'
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
           description: Trigger, Action & Cross-Module Orchestration Configuration
@@ -1399,24 +1504,28 @@ paths:
         - "P09 ADM-367 AI Optimization & What-If Simulator"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.1.9 p.18; MoM 8 Sep (builder); our build plan'
       summary: Workflow Testing, Simulation & Impact Analysis
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 18. The screen says: Allow administrators
-        to test rules and workflows before they affect live operations. This is a critical screen.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 18. The screen says: Allow administrators to test rules and workflows before they affect
+        live operations. This is a critical screen.
 
 
         **Every property carries the sentence it came from.** 17 were read from the screen''s own bulleted
-        directory and 19 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 19 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** Sample inputs were removed; the request names
+        the workflow, version and test mode, with a sample payload or a replay window, and the result reports
+        counts of rules evaluated and conditions matched, the approval path and expected outcome. Simulation
+        and historical replay never execute actions; AI-generated edge cases are test inputs only.
+
+        '
       tags:
-      - drafted
-      x-ticvai-permission: APPROVAL_REQUEST
+      - approvals
+      x-ticvai-permission: APPROVAL_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1428,7 +1537,7 @@ paths:
             schema:
               $ref: '#/components/schemas/WorkflowTestingSimulationImpactAnalysisInput'
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
           description: Workflow Testing, Simulation & Impact Analysis
@@ -1443,24 +1552,35 @@ paths:
         - "P09 ADM-247 Versioning, Governance, Approval & Publication"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.1.10 p.19-20; MoM 8 Sep (governance, audit, AI analytics only);
+        audit R129 (in-flight requests keep their version), R144 (rollouts need the release manager)'
       summary: Versioning, Governance, Approval & Publication
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 19. The screen says: Control how rules and
-        workflows move safely from configuration into production.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 19. The screen says: Control how rules and workflows move safely from configuration into
+        production.
 
 
         **Every property carries the sentence it came from.** 32 were read from the screen''s own bulleted
-        directory and 71 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 71 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** Sample version rows were removed; the version
+        names its workflow, lifecycle status, rollout scope and schedule, and the compared-change highlights
+        are a read-only list. Only tested and approved versions go active, through the approvals engine; in-flight
+        requests keep the version they started on. The AI governance review reports historical impact only
+        and does not recommend approving or rejecting.
+
+
+        **The screen''s actions are behaviour, not fields:** Publish Now (no operation yet); Schedule (no
+        operation yet); Submit for Approval (`createApprovalRequest`); Rollback (no operation yet); Kill Switch
+        (no operation yet).
+
+        '
       tags:
-      - drafted
-      x-ticvai-permission: APPROVAL_REQUEST
+      - approvals
+      x-ticvai-permission: APPROVAL_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1472,7 +1592,7 @@ paths:
             schema:
               $ref: '#/components/schemas/VersioningGovernanceApprovalPublicationInput'
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
           description: Versioning, Governance, Approval & Publication
@@ -1487,28 +1607,29 @@ paths:
       operationId: listWorkflow
       x-ticvai-consumed-by:
         - "P09 ADM-248 Workflow Operations Command Center"
-        - "P09 ADM-319 Approval Workflow Library"
-        - "P09 ADM-327 Workflow Publication & Lifecycle"
-        - "P09 ADM-328 Workflow Versioning & Change History"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.2.1 p.23; MoM 8 Sep (command centre, AI analytics only); our
+        build plan'
       summary: Workflow Operations Command Center
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 23. The screen says: Provide administrators
-        and operational managers with a real-time view of all workflow activity across TICVAI.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 23. The screen says: Provide administrators and operational managers with a real-time
+        view of all workflow activity across TICVAI.
 
 
         **Every property carries the sentence it came from.** 37 were read from the screen''s own bulleted
-        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** KPI tiles moved to a summary beside a paged
+        list of running workflow instances; counts are integers and status is an enum; the source module list
+        became one module enum and a filter. The AI problem summary is analytics only.
+
+        '
       tags:
-      - drafted
+      - approvals
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -1520,36 +1641,76 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WorkflowOperationsCommandCenterView'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkflowOperationsCommandCenterView'
+                    summary:
+                      $ref: '#/components/schemas/WorkflowOperationsCommandCenterViewSummary'
+      parameters:
+      - name: module
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Module
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Status
+      - name: priority
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Priority
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
   /unified-decision:
     put:
       operationId: approveUnifiedDecision
-      x-ticvai-consumed-by:
-        - "P09 ADM-249 Unified Approval Inbox & Decision Workspace"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.2.2 p.25-26; MoM 10 Aug §5.5 and 8 Sep (Approve, Reject, Return,
+        Request More Information; AI analytics only, never recommends approve/reject; MFA optional)'
       summary: Unified Approval Inbox & Decision Workspace
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 25. The screen says: Provide users with one
-        approval inbox across all TICVAI modules. This is extremely important. A manager should not need
-        to open Finance for one approval, Pricing for another, Procurement for another, and Customer Service
-        for another.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 25. The screen says: Provide users with one approval inbox across all TICVAI modules.
+        This is extremely important. A manager should not need to open Finance for one approval, Pricing for
+        another, Procurement for another, and Customer Service for another.
 
 
         **Every property carries the sentence it came from.** 16 were read from the screen''s own bulleted
-        directory and 13 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 13 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** This duplicates decideApprovalRequest; the
+        inbox list is listApprovalRequests and the context panels (request, reason, evidence, path) come from
+        the request record. Sample requests were removed. The AI summary may give context and comparison but
+        never a recommendation to approve or reject, per the minutes; step-up MFA applies only where the tenant''s
+        step-up policy requires it.
+
+
+        **The screen''s actions are behaviour, not fields:** Approve (`decideApprovalRequest`); Reject (`decideApprovalRequest`);
+        Return (`decideApprovalRequest`); Request More Information (`decideApprovalRequest`); Bulk Approve
+        (low-risk categories only) (no operation yet).
+
+
+        **Overlaps `decideApprovalRequest`,** which stays the operation of record for that write; this one
+        serves the screen''s composite view of it.
+
+        '
       tags:
-      - drafted
-      x-ticvai-permission: APPROVAL_REQUEST
+      - approvals
+      x-ticvai-permission: APPROVAL_DECIDE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1561,7 +1722,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UnifiedApprovalInboxDecisionWorkspaceInput'
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
           description: Unified Approval Inbox & Decision Workspace
@@ -1570,8 +1731,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnifiedApprovalInboxDecisionWorkspaceView'
       x-ticvai-step-up: mfa
-      x-ticvai-step-up-reason: Decides across modules in one act, so its blast radius is every module
-        it touches.
+      x-ticvai-step-up-reason: Decides across modules in one act, so its blast radius is every module it touches.
   /workflow-instance-process:
     get:
       operationId: listWorkflowInstanceProcess
@@ -1581,23 +1741,32 @@ paths:
         - "P09 ADM-250 Workflow Instance Monitor & Process Timeline"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.2.3 p.27; MoM 8 Sep (approval timeline and trail of who approved
+        at each stage); our build plan'
       summary: Workflow Instance Monitor & Process Timeline
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 27. The screen says: Allow administrators
-        to inspect exactly what is happening inside an individual running workflow.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 27. The screen says: Allow administrators to inspect exactly what is happening inside
+        an individual running workflow.
 
 
         **Every property carries the sentence it came from.** 31 were read from the screen''s own bulleted
-        directory and 6 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 6 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** The screen''s action buttons were removed
+        from the row; statuses are an enum, step times are timestamps and duration is seconds. Every step,
+        rule evaluation and decision is kept so the path to the current state can be reconstructed.
+
+
+        **The screen''s actions are behaviour, not fields:** Reassign (no operation yet); Retry Step (no operation
+        yet); Skip Step where explicitly allowed (no operation yet); Cancel Workflow (no operation yet); Resume
+        (no operation yet); Escalate (`escalateApprovalRequest`); Open Source Record (no operation yet).
+
+        '
       tags:
-      - drafted
+      - approvals
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -1609,9 +1778,35 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WorkflowInstanceMonitorProcessTimelineView'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkflowInstanceMonitorProcessTimelineView'
+      parameters:
+      - name: workflowInstance
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Workflow Instance
+      - name: sourceModule
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Source Module
+      - name: currentStatus
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Current Status
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
   /workflow-exception-failure:
     get:
       operationId: listWorkflowExceptionFailure
@@ -1620,23 +1815,31 @@ paths:
         - "P09 ADM-357 Integration Monitoring, Error & Retry Center"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.2.4 p.28-29; MoM 8 Sep (integration with retry); our build plan'
       summary: Workflow Exception, Failure & Recovery Center
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 28. The screen says: Provide one controlled
-        workspace for failed workflow executions.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 28. The screen says: Provide one controlled workspace for failed workflow executions.
 
 
         **Every property carries the sentence it came from.** 24 were read from the screen''s own bulleted
-        directory and 8 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 8 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** The supported failure kinds became one errorType
+        enum and a filter; recovery buttons were removed from the row; retry count was added from the pack''s
+        display list. Unrecoverable events go to a controlled exception queue and partial executions may be
+        compensated; that is engine behaviour.
+
+
+        **The screen''s actions are behaviour, not fields:** Retry (no operation yet); Retry From Step (no
+        operation yet); Reassign (no operation yet); Correct Data (no operation yet); Use Approved Alternative
+        (no operation yet); Resume (no operation yet); Cancel (no operation yet); Escalate (no operation yet).
+
+        '
       tags:
-      - drafted
+      - approvals
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -1648,9 +1851,35 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WorkflowExceptionFailureRecoveryCenterView'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/WorkflowExceptionFailureRecoveryCenterView'
+      parameters:
+      - name: errorType
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Error Type
+      - name: module
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Module
+      - name: priority
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Priority
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
   /sla-escalation-bottleneck:
     get:
       operationId: listSlaEscalationBottleneck
@@ -1662,23 +1891,33 @@ paths:
         - "P09 ADM-362 Bottleneck Analysis & Heatmap"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.2.5 p.30; MoM 8 Sep (overdue escalates, workload view per approver,
+        AI analytics only)'
       summary: SLA, Escalation & Bottleneck Monitor
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 30. The screen says: Monitor workflows approaching
-        or exceeding configured time limits.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 30. The screen says: Monitor workflows approaching or exceeding configured time limits.
 
 
         **Every property carries the sentence it came from.** 29 were read from the screen''s own bulleted
-        directory and 6 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 6 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** Sample bottleneck durations and the action
+        buttons were removed; KPI tiles moved to a summary beside a paged list of instances, with times as
+        minutes and reminder and escalation steps as timestamps. The per-stage bottleneck breakdown comes
+        from getApprovalAnalytics; AI breach prediction is analytics only; actions capture a mandatory reason
+        where required.
+
+
+        **The screen''s actions are behaviour, not fields:** Reassign (no operation yet); Escalate (`escalateApprovalRequest`);
+        Extend SLA (no operation yet); Add Backup Approver (no operation yet); Change Priority (no operation
+        yet).
+
+        '
       tags:
-      - drafted
+      - approvals
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -1690,9 +1929,37 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/SlaEscalationBottleneckMonitorView'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/SlaEscalationBottleneckMonitorView'
+                    summary:
+                      $ref: '#/components/schemas/SlaEscalationBottleneckMonitorViewSummary'
+      parameters:
+      - name: workflow
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Workflow
+      - name: risk
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Risk
+      - name: escalationLevel
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Escalation Level
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
   /automation-autonomou-action:
     post:
       operationId: createAutomationAutonomouAction
@@ -1700,25 +1967,35 @@ paths:
         - "P09 ADM-253 Automation Execution & Autonomous Action Monitor"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.2.6 p.31-32; MoM 8 Sep (approval is human-governed, AI never
+        recommends or influences approve/reject); our build plan'
       summary: Automation Execution & Autonomous Action Monitor
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 31. The screen says: Provide visibility and
-        governance over actions executed automatically by TICVAI. This becomes especially important as
-        TICVAI becomes more AI-driven.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 31. The screen says: Provide visibility and governance over actions executed automatically
+        by TICVAI. This becomes especially important as TICVAI becomes more AI-driven.
 
 
         **Every property carries the sentence it came from.** 24 were read from the screen''s own bulleted
-        directory and 6 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 6 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** The body was only sample figures; it now controls
+        one automation (pause, resume, disable, kill switch) with a reason, and the returned counts are integers.
+        Auto-approve and auto-reject exist only as deterministic rules people configured; AI-assisted automation
+        never approves or rejects a request, and every action traces to trigger, rule, workflow version, authority,
+        action and result.
+
+
+        **The screen''s actions are behaviour, not fields:** Pause Automation (no operation yet); Resume (no
+        operation yet); Disable (no operation yet); Inspect Rule (no operation yet); Inspect Execution (no
+        operation yet); Review Failures (no operation yet); Trigger Kill Switch (no operation yet).
+
+        '
       tags:
-      - drafted
-      x-ticvai-permission: APPROVAL_REQUEST
+      - approvals
+      x-ticvai-permission: APPROVAL_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1730,7 +2007,7 @@ paths:
             schema:
               $ref: '#/components/schemas/AutomationExecutionAutonomousActionMonitorInput'
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
           description: Automation Execution & Autonomous Action Monitor
@@ -1747,23 +2024,26 @@ paths:
         - "P09 ADM-350 Module Integration Registry"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.2.7 p.33; our build plan'
       summary: Cross-Module Orchestration Monitor
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 33. The screen says: Monitor complex workflows
-        involving multiple TICVAI services. Example — Group Booking Confirmation
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 33. The screen says: Monitor complex workflows involving multiple TICVAI services. Example
+        — Group Booking Confirmation
 
 
         **Every property carries the sentence it came from.** 17 were read from the screen''s own bulleted
-        directory and 10 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 10 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** Sample booking steps were removed; each row
+        is one participating module node with an enum status, timestamps, a retry count and what the workflow
+        does on failure, keyed by the shared correlation id for distributed tracing.
+
+        '
       tags:
-      - drafted
+      - approvals
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -1775,9 +2055,29 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CrossModuleOrchestrationMonitorView'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CrossModuleOrchestrationMonitorView'
+      parameters:
+      - name: correlationId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: a common correlation/workflow ID
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Status
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
   /workflow-process-performance:
     get:
       operationId: listWorkflowProcessPerformance
@@ -1786,24 +2086,27 @@ paths:
         - "P09 ADM-358 Integration Analytics & AI Health Advisor"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.2.8 p.34-35; MoM 8 Sep (reporting is one permission-based module;
+        AI analytics on turnaround and bottlenecks)'
       summary: Workflow Analytics & Process Performance
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 34. The screen says: Measure how effectively
-        TICVAI''s business workflows are performing.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 34. The screen says: Measure how effectively TICVAI''s business workflows are performing.
 
 
         **Every property carries the sentence it came from.** 21 were read from the screen''s own bulleted
-        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** This is one analytics object for the chosen
+        filters; sample version comparisons were removed, times are minutes and date and transaction value
+        are filters. Approval rates and times match getApprovalAnalytics and should come from the same figures.
+
+        '
       tags:
-      - drafted
-      x-ticvai-permission: APPROVAL_VIEW
+      - approvals
+      x-ticvai-permission: REPORT_VIEW_VENUE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1857,15 +2160,37 @@ paths:
         schema:
           type: string
         description: User
+      - name: from
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Date
+      - name: to
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Date
+      - name: minTransactionValue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Transaction Value
+      - name: maxTransactionValue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Transaction Value
       responses:
         '200':
           description: Workflow Analytics & Process Performance
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WorkflowAnalyticsProcessPerformanceView'
+                $ref: '#/components/schemas/WorkflowAnalyticsProcessPerformanceView'
   /process-automation-opportunity:
     get:
       operationId: listProcessAutomationOpportunity
@@ -1873,25 +2198,27 @@ paths:
         - "P09 ADM-256 Process Optimization & Automation Opportunity Center"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.2.9 p.36; MoM 8 Sep (AI analytics only in approvals)'
       summary: Process Optimization & Automation Opportunity Center
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 36. The screen says: Identify business processes
-        that should be simplified, redesigned or automated. This is where TICVAI moves beyond simply running
-        workflows.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 36. The screen says: Identify business processes that should be simplified, redesigned
+        or automated. This is where TICVAI moves beyond simply running workflows.
 
 
         **Every property carries the sentence it came from.** 20 were read from the screen''s own bulleted
-        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** The opportunity kinds became one enum and
+        a filter; sample figures were removed. Findings are process analytics: any change they suggest goes
+        through simulation, versioning and approval, and nothing here approves or rejects an individual request.
+
+        '
       tags:
-      - drafted
-      x-ticvai-permission: APPROVAL_VIEW
+      - approvals
+      x-ticvai-permission: REPORT_VIEW_VENUE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1902,9 +2229,29 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProcessOptimizationAutomationOpportunityCenterView'
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ProcessOptimizationAutomationOpportunityCenterView'
+      parameters:
+      - name: opportunityType
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Identify
+      - name: module
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Module
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
   /workflow-autonomou-governance:
     get:
       operationId: listWorkflowAutonomouGovernance
@@ -1912,24 +2259,33 @@ paths:
         - "P09 ADM-257 AI Workflow Intelligence & Autonomous Governance Center"
       x-ticvai-audience:
       - staff
-      x-ticvai-provisional: true
+      x-ticvai-agreed: '29 September: pack 13.2.10 p.37-38; MoM 8 Sep (approval human-governed, AI analytics
+        only, never recommends or influences approve/reject)'
       summary: AI Workflow Intelligence & Autonomous Governance Center
-      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
-        Rules  Workflow  Approval   Automation Engine, page 37. The screen says: Create the AI intelligence
-        layer across TICVAI''s entire rules, workflow and automation ecosystem. This is the management-level
-        AI brain for Area 13.
+      description: '**Drafted from the workshop pack and checked against it on 29 September.** Rules  Workflow  Approval   Automation
+        Engine, page 37. The screen says: Create the AI intelligence layer across TICVAI''s entire rules,
+        workflow and automation ecosystem. This is the management-level AI brain for Area 13.
 
 
         **Every property carries the sentence it came from.** 29 were read from the screen''s own bulleted
-        directory and 75 bullets were dropped as prose, examples or hierarchy illustrations rather than
-        bent into fields. Names and types are this package''s reading of those sentences and are the part
-        to check; the sentences themselves are the client''s.
+        directory and 75 bullets were dropped as prose, examples or hierarchy illustrations rather than bent
+        into fields. Names and types are this package''s reading of those sentences, checked against the pack
+        on 29 September.
 
 
-        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
-        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+        **Agreed (decided 29 September, readiness close-out).** Each row is one AI use case with its autonomy
+        level, thresholds and owner; the lists of what AI analyses, the sample findings and the architecture
+        register text were removed, and override rate was added from the pack''s list. For approvals AI stays
+        at observe (analytics on turnaround, bottlenecks and approver performance) and never recommends or
+        influences approve or reject; AI-drafted workflow versions are never published automatically.
+
+
+        **The screen''s actions are behaviour, not fields:** Ask a question in natural language (no operation
+        yet); Suspend Specific Use Case (no operation yet).
+
+        '
       tags:
-      - drafted
+      - approvals
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -1944,6 +2300,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AiWorkflowIntelligenceAutonomousGovernanceCenterView'
+      x-ticvai-bounded: a tenant's registered AI use cases, set up by hand
+      parameters:
+      - name: autonomyLevel
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Autonomy Level
   /step-up-policies:
     get:
       operationId: listStepUpPolicies
@@ -2105,6 +2469,7 @@ paths:
     put:
       operationId: setApprovalControlPolicy
       x-ticvai-consumed-by:
+        - "P08 BO-863 Resource Lifecycle, Governance & Audit"
         - "P09 ADM-336 Approver Group & Decision Policy"
         - "P09 ADM-341 Four-Eyes & Dual-Control Policy"
       summary: Require a second, independent pair of eyes
@@ -2466,6 +2831,141 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalEvidencePackage'
+  /approved-action-executions:
+    get:
+      operationId: listApprovedActionExecutions
+      x-ticvai-consumed-by:
+        - "P08 BO-382 Approved Action Execution & Status"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Approval Workflows and Governance'' p.37 (BO-382);
+        label ''Retry | Investigate | Escalate''; the read the resolve acts on'
+      summary: Approved actions and whether they ran
+      description: '**Approval of a request is not execution of the transaction behind it** (decided 29 September,
+        VM close-out). One row per approved action: the requesting contract executes it under the approver''s
+        permission and reports the outcome here, so an approval that was granted and then failed to run is visible
+        rather than assumed done.
+
+        '
+      tags:
+      - request
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - queued
+          - executing
+          - succeeded
+          - failed
+          - investigating
+          - escalated
+      - name: sourceModule
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: approvalRequestId
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Approved action executions
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ApprovedActionExecutionView'
+  /approved-action-executions/{executionId}/resolve:
+    parameters:
+    - name: executionId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    post:
+      operationId: resolveApprovedActionExecution
+      x-ticvai-consumed-by:
+        - "P08 BO-382 Approved Action Execution & Status"
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '29 September: VM close-out; pack ''Approval Workflows and Governance'' p.37 (BO-382);
+        label ''Retry | Investigate | Escalate'''
+      summary: Retry, investigate or escalate an approved action that failed
+      description: '**Acts on an approved action whose execution failed** (decided 29 September, VM close-out).
+
+
+        - `retry` sends it back to the requesting contract to run again (`queued`), under the approver''s permission
+        as before. **Approval does not execute:** this asks the owning contract to, and the approval itself is
+        not reopened.
+
+        - `investigate` assigns it to `assigneeId` and holds it (`investigating`).
+
+        - `escalate` hands it to `assigneeId` at the next level (`escalated`).
+
+
+        Only a `failed`, `investigating` or `escalated` execution can be acted on (`409`); `investigate` and
+        `escalate` need `assigneeId` (`422`). Every action is kept on the execution''s history with the acting
+        principal.
+
+        '
+      tags:
+      - request
+      x-ticvai-permission: APPROVAL_ACT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovedActionExecutionActionInput'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
+          description: Action recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovedActionExecutionView'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The execution is queued, executing or succeeded; there is nothing to resolve
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: assigneeId missing for investigate or escalate
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
 
 components:
   securitySchemes:
@@ -2474,6 +2974,93 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    ApprovedActionExecutionActionInput:
+      type: object
+      x-ticvai-persistence: none — request only (decided 29 September, VM close-out)
+      description: One action on an approved action whose execution failed (decided 29 September, VM close-out).
+      required:
+      - action
+      properties:
+        action:
+          type: string
+          enum:
+          - retry
+          - investigate
+          - escalate
+        assigneeId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Required for investigate and escalate
+        note:
+          type: string
+          maxLength: 500
+    ApprovedActionExecutionView:
+      type: object
+      x-ticvai-persistence: approvals.approved_action_execution
+      description: '**One approved action and whether it ran** (decided 29 September, VM close-out). Written when
+        a request is approved and updated by the requesting contract as it executes; the approval request itself
+        stays immutable (11.1.56).'
+      required:
+      - id
+      - approvalRequestId
+      - sourceModule
+      - actionType
+      - status
+      properties:
+        id:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        approvalRequestId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        sourceModule:
+          type: string
+          description: The contract that owns and executes the action
+        actionType:
+          type: string
+          description: What was approved, e.g. refund, price change
+        subjectRef:
+          type: string
+          description: The record the action applies to
+        status:
+          type: string
+          enum:
+          - queued
+          - executing
+          - succeeded
+          - failed
+          - investigating
+          - escalated
+        attempts:
+          type: integer
+          minimum: 0
+        lastAttemptAt:
+          type: string
+          format: date-time
+          nullable: true
+        failureReason:
+          type: string
+          nullable: true
+        assigneeId:
+          type: string
+          nullable: true
+        lastAction:
+          type: string
+          enum:
+          - retry
+          - investigate
+          - escalate
+          nullable: true
+        note:
+          type: string
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005). Written at venue scope
     ApprovalControlPolicy:
       type: object
       x-ticvai-persistence: approvals.control_policy
@@ -2924,6 +3511,8 @@ components:
       - draft
       - pending
       - escalated
+      - returned
+      - informationRequested
       - approved
       - rejected
       - withdrawn
@@ -3600,11 +4189,73 @@ components:
     RulesWorkflowCommandCenterView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
-      description: '**What Rules & Workflow Command Center displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Rules & Workflow Command Center displays.** Read from the workshop pack''s own
+        display and configuration directory for this screen; each property names the sentence it came from.
+        **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        ruleWorkflowId:
+          type: string
+          description: Rule/Workflow ID
+        name:
+          type: string
+          description: Name
+        type:
+          type: string
+          enum:
+          - businessRule
+          - approvalWorkflow
+          - operationalWorkflow
+          - decisionRule
+          - validationRule
+          - escalationRule
+          - automation
+          - crossModuleWorkflow
+          description: Kind of configuration
+        sourceModule:
+          type: string
+          description: Source Module
+        businessProcess:
+          type: string
+          description: Business Process
+        version:
+          type: string
+          description: Version
+        owner:
+          type: string
+          description: Owner
+        effectiveDate:
+          type: string
+          format: date-time
+          description: Effective Date
+        status:
+          type: string
+          enum:
+          - draft
+          - testing
+          - review
+          - pendingApproval
+          - approved
+          - scheduled
+          - active
+          - suspended
+          - retired
+          description: Lifecycle status
+        lastModified:
+          type: string
+          format: date-time
+          description: Last Modified
+        usage:
+          type: string
+          description: Usage
+      required:
+      - ruleWorkflowId
+    RulesWorkflowCommandCenterViewSummary:
+      type: object
+      x-ticvai-persistence: none - aggregate computed at read time over the rows the page lists
+      description: The KPI tiles shown above the list on this screen. Computed over the whole filtered set,
+        not the current page (decided 29 September, readiness close-out).
       properties:
         activeRules:
           type: integer
@@ -3631,241 +4282,201 @@ components:
           type: integer
           description: Workflows With Warnings
         recentlyModified:
-          type: string
-          description: Recently Modified
-        modulesCovered:
-          type: string
-          description: Modules Covered
-        ruleWorkflowId:
-          type: string
-          description: Rule/Workflow ID
-        name:
-          type: string
-          description: Name
-        type:
-          type: string
-          description: Type
-        sourceModule:
-          type: string
-          description: Source Module
-        businessProcess:
-          type: string
-          description: Business Process
-        version:
-          type: string
-          description: Version
-        owner:
-          type: string
-          description: Owner
-        effectiveDate:
-          type: string
-          format: date-time
-          description: Effective Date
-        status:
           type: integer
-          description: Status
-        lastModified:
-          type: string
-          format: date-time
-          description: Last Modified
-        usage:
-          type: string
-          description: Usage
-        businessRule:
-          type: string
-          description: Business Rule
-        approvalWorkflow:
-          type: string
-          description: Approval Workflow
-        operationalWorkflow:
-          type: string
-          description: Operational Workflow
-        decisionRule:
-          type: string
-          description: Decision Rule
-        validationRule:
-          type: string
-          description: Validation Rule
-        escalationRule:
-          type: string
-          description: Escalation Rule
-        automation:
-          type: string
-          description: Automation
-        crossModuleWorkflow:
-          type: string
-          description: Cross-Module Workflow
-        suspendedRetired:
-          type: string
-          description: Suspended → Retired
+          description: Configurations modified in the recent period
+        modulesCovered:
+          type: integer
+          description: Number of modules using configured rules and workflows
     VisualBusinessRuleBuilderView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
-      description: '**What Visual Business Rule Builder displays.** Read from the workshop pack''s own
-        display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Visual Business Rule Builder displays.** Read from the workshop pack''s own display
+        and configuration directory for this screen; each property names the sentence it came from. **Not
+        a row** - the screen is a view over the module''s existing state.'
       properties:
-        equals:
+        outcome:
           type: string
-          description: Equals
-        notEquals:
+          enum:
+          - allow
+          - reject
+          - requireApproval
+          - requireAdditionalInformation
+          - applyHold
+          - createTask
+          - generateAlert
+          - startWorkflow
+          - executeApprovedAction
+          description: THEN outcome when the conditions match
+        businessObjectField:
           type: string
-          description: Not Equals
-        inList:
+          description: Governed field from a registered module, e.g. Refund.Amount
+        name:
           type: string
-          description: In List
-        exists:
+          description: Rule name
+        operator:
           type: string
-          description: Exists
-        doesNotExist:
+          enum:
+          - equals
+          - notEquals
+          - greaterThan
+          - lessThan
+          - between
+          - contains
+          - inList
+          - exists
+          - doesNotExist
+          - beforeAfter
+          - percentageThreshold
+          - boolean
+          description: Comparison operator of the condition
+        ruleId:
           type: string
-          description: Does Not Exist
-        beforeAfter:
+          description: Rule identifier; absent on input to create a new rule
+        value:
           type: string
-          description: Before/After
-        percentageThreshold:
-          type: integer
-          description: Percentage Threshold
-        boolean:
+          description: Comparison value
+        explanation:
           type: string
-          description: Boolean
-        cancelled:
-          type: integer
-          description: cancelled
+          description: Plain-language rule explanation
+      required:
+      - name
+      - businessObjectField
+      - operator
+      - outcome
     VisualBusinessRuleBuilderInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
+        nothing the package stores today is what this configures
       description: '**What Visual Business Rule Builder submits.** The configurable fields from the pack''s
-        directory for this screen; the metrics the screen displays are deliberately absent, because a
-        figure the system computed is not a figure a client may send back.'
+        directory for this screen; the metrics the screen displays are deliberately absent, because a figure
+        the system computed is not a figure a client may send back.'
       properties:
-        equals:
+        outcome:
           type: string
-          description: Equals
-        notEquals:
+          enum:
+          - allow
+          - reject
+          - requireApproval
+          - requireAdditionalInformation
+          - applyHold
+          - createTask
+          - generateAlert
+          - startWorkflow
+          - executeApprovedAction
+          description: THEN outcome when the conditions match
+        businessObjectField:
           type: string
-          description: Not Equals
-        inList:
+          description: Governed field from a registered module, e.g. Refund.Amount
+        name:
           type: string
-          description: In List
-        exists:
+          description: Rule name
+        operator:
           type: string
-          description: Exists
-        doesNotExist:
+          enum:
+          - equals
+          - notEquals
+          - greaterThan
+          - lessThan
+          - between
+          - contains
+          - inList
+          - exists
+          - doesNotExist
+          - beforeAfter
+          - percentageThreshold
+          - boolean
+          description: Comparison operator of the condition
+        ruleId:
           type: string
-          description: Does Not Exist
-        beforeAfter:
+          description: Rule identifier; absent on input to create a new rule
+        value:
           type: string
-          description: Before/After
-        percentageThreshold:
-          type: integer
-          description: Percentage Threshold
-        boolean:
+          description: Comparison value
+        explanation:
           type: string
-          description: Boolean
-        cancelled:
-          type: integer
-          description: cancelled
+          description: Plain-language rule explanation
+      required:
+      - name
+      - businessObjectField
+      - operator
+      - outcome
     ConditionsDecisionLogicDecisionTablesView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
       description: '**What Conditions, Decision Logic & Decision Tables displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        anyCancelledAutoApprove:
+        name:
           type: string
-          description: Any Cancelled Auto Approve (the pack shows 250, AED 251–)
-        aed251:
+          description: Name
+        decisionTableId:
           type: string
-          description: AED 251–
-        manager:
+          description: Decision table or condition set identifier
+        resolutionStrategy:
           type: string
-          description: Manager +
-        priority:
+          enum:
+          - priority
+          - sequence
+          - specificity
+          description: How to choose when multiple rules apply
+        onMatch:
           type: string
-          description: Priority
-        sequence:
-          type: string
-          description: Sequence
-        specificity:
-          type: string
-          description: Specificity
-        stopProcessing:
-          type: string
-          description: Stop Processing
-        continueEvaluation:
-          type: string
-          description: Continue Evaluation
-        contradictoryRules:
-          type: string
-          description: Contradictory Rules
-        overlappingConditions:
-          type: string
-          description: Overlapping Conditions
-        unreachableOutcomes:
-          type: string
-          description: Unreachable Outcomes
-        circularLogic:
-          type: string
-          description: Circular Logic
-        missingOutcomes:
-          type: string
-          description: Missing Outcomes
+          enum:
+          - stopProcessing
+          - continueEvaluation
+          description: Whether evaluation stops at the first match
+        conflicts:
+          type: array
+          items:
+            type: string
+            enum:
+            - contradictoryRules
+            - overlappingConditions
+            - unreachableOutcomes
+            - circularLogic
+            - missingOutcomes
+          description: Conflicts detected in this decision logic (read-only)
+      required:
+      - decisionTableId
+      - name
     VisualWorkflowDesignerView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
       description: '**What Visual Workflow Designer displays.** Read from the workshop pack''s own display
         and configuration directory for this screen; each property names the sentence it came from. **Not
         a row** - the screen is a view over the module''s existing state.'
       properties:
-        start:
+        definition:
           type: string
-          description: Start
-        task:
-          type: string
-          description: Task
-        decision:
-          type: string
-          description: Decision
-        approval:
-          type: string
-          description: Approval
-        systemAction:
-          type: string
-          description: System Action
-        notification:
-          type: string
-          description: Notification
-        wait:
-          type: string
-          description: Wait
-        timer:
-          type: string
-          description: Timer
-        parallelBranch:
-          type: string
-          description: Parallel Branch
-        escalation:
-          type: string
-          description: Escalation
-        subWorkflow:
-          type: string
-          description: Sub-Workflow
-        end:
-          type: string
-          description: End
-        yesNo:
-          type: string
-          description: ↙ YES ↘ NO
+          description: The workflow graph (nodes and connections) as a JSON document
+        nodeTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - start
+            - trigger
+            - task
+            - decision
+            - approval
+            - systemAction
+            - notification
+            - wait
+            - timer
+            - parallelBranch
+            - merge
+            - escalation
+            - subWorkflow
+            - end
+          description: Node kinds used in this workflow
         workflowName:
           type: string
           description: Workflow Name
@@ -3884,73 +4495,67 @@ components:
         priority:
           type: string
           description: Priority
-        effectiveDates:
+        effectiveFrom:
           type: string
           description: Effective Dates
-        deadEnds:
+        validationIssues:
+          type: array
+          items:
+            type: string
+            enum:
+            - deadEnds
+            - missingOutcomes
+            - circularLoops
+            - missingAssignee
+            - invalidActions
+          description: Design problems the designer found (read-only)
+        workflowId:
           type: string
-          description: Dead Ends
-        missingOutcomes:
+          description: Workflow identifier; absent on input to create a new workflow
+        trigger:
           type: string
-          description: Missing Outcomes
-        circularLoops:
+          description: What starts the workflow
+        effectiveTo:
           type: string
-          description: Circular Loops
-        missingAssignee:
-          type: string
-          description: Missing Assignee
-        invalidActions:
-          type: string
-          description: Invalid Actions
+          format: date-time
+          description: Effective to
+      required:
+      - workflowName
+      - module
+      - definition
     VisualWorkflowDesignerInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is approvals.decision at 4%, so this is not an update to anything the package stores today and
-        no new table has been decided
-      description: '**What Visual Workflow Designer submits.** The configurable fields from the pack''s
-        directory for this screen; the metrics the screen displays are deliberately absent, because a
-        figure the system computed is not a figure a client may send back.'
+      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest is
+        approvals.decision at 4%, so this is not an update to anything the package stores today and no new
+        table has been decided
+      description: '**What Visual Workflow Designer submits.** The configurable fields from the pack''s directory
+        for this screen; the metrics the screen displays are deliberately absent, because a figure the system
+        computed is not a figure a client may send back.'
       properties:
-        start:
+        definition:
           type: string
-          description: Start
-        task:
-          type: string
-          description: Task
-        decision:
-          type: string
-          description: Decision
-        approval:
-          type: string
-          description: Approval
-        systemAction:
-          type: string
-          description: System Action
-        notification:
-          type: string
-          description: Notification
-        wait:
-          type: string
-          description: Wait
-        timer:
-          type: string
-          description: Timer
-        parallelBranch:
-          type: string
-          description: Parallel Branch
-        escalation:
-          type: string
-          description: Escalation
-        subWorkflow:
-          type: string
-          description: Sub-Workflow
-        end:
-          type: string
-          description: End
-        yesNo:
-          type: string
-          description: ↙ YES ↘ NO
+          description: The workflow graph (nodes and connections) as a JSON document
+        nodeTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - start
+            - trigger
+            - task
+            - decision
+            - approval
+            - systemAction
+            - notification
+            - wait
+            - timer
+            - parallelBranch
+            - merge
+            - escalation
+            - subWorkflow
+            - end
+          description: Node kinds used in this workflow
         workflowName:
           type: string
           description: Workflow Name
@@ -3969,75 +4574,57 @@ components:
         priority:
           type: string
           description: Priority
-        effectiveDates:
+        effectiveFrom:
           type: string
           description: Effective Dates
-        deadEnds:
+        validationIssues:
+          type: array
+          items:
+            type: string
+            enum:
+            - deadEnds
+            - missingOutcomes
+            - circularLoops
+            - missingAssignee
+            - invalidActions
+          description: Design problems the designer found (read-only)
+        workflowId:
           type: string
-          description: Dead Ends
-        missingOutcomes:
+          description: Workflow identifier; absent on input to create a new workflow
+        trigger:
           type: string
-          description: Missing Outcomes
-        circularLoops:
+          description: What starts the workflow
+        effectiveTo:
           type: string
-          description: Circular Loops
-        missingAssignee:
-          type: string
-          description: Missing Assignee
-        invalidActions:
-          type: string
-          description: Invalid Actions
+          format: date-time
+          description: Effective to
+      required:
+      - workflowName
+      - module
+      - definition
     ApprovalMatrixMultiLevelApprovalConfigurationView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
-      description: '**What Approval Matrix & Multi-Level Approval Configuration displays.** Read from
-        the workshop pack''s own display and configuration directory for this screen; each property names
-        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Approval Matrix & Multi-Level Approval Configuration displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names the
+        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        singleApproval:
+        code:
           type: string
-          description: Single Approval
-        sequentialApproval:
+          description: Stable rule code the PUT upserts by
+        approvalMode:
           type: string
-          description: Sequential Approval
-        parallelApproval:
-          type: string
-          description: Parallel Approval
-        anyOneApproval:
-          type: string
-          description: Any-One Approval
-        conditionalApproval:
-          type: string
-          description: Conditional Approval
-        multiLevelApproval:
-          type: string
-          description: Multi-Level Approval
-        exampleDiscount:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Example — Discount
-        noApproval:
-          type: string
-          description: No Approval (the pack shows 10.01–15%)
-        salesManager:
-          type: string
-          description: Sales Manager (the pack shows 15.01–20%)
-        commercialDirectorCfo:
-          type: string
-          description: Commercial Director + CFO
-        exampleProcurement:
-          type: string
-          description: Example — Procurement
-        aed10k50k:
-          type: string
-          description: AED 10K–50K
-        departmentHeadFinance:
-          type: string
-          description: Department Head → Finance
-        aed50k100k:
-          type: string
-          description: AED 50K–100K
+          enum:
+          - single
+          - sequential
+          - parallel
+          - anyOne
+          - allMustApprove
+          - conditional
+          - multiLevel
+          description: How approvers at this rule combine
         amount:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Amount
@@ -4068,76 +4655,58 @@ components:
         legalEntity:
           type: string
           description: Legal Entity
-        sequentialParallel:
-          type: string
-          description: Sequential/Parallel
         minimumApprovals:
-          type: string
-          description: Minimum Approvals
+          type: integer
+          description: 'N in N-of-M: approvals needed from the approver group'
         rejectionBehavior:
           type: string
-          description: Rejection Behavior
+          enum:
+          - rejectRequest
+          - returnToPreviousLevel
+          - returnToRequester
+          description: What a rejection at this level does
         requestChanges:
-          type: string
-          description: Request Changes
+          type: boolean
+          description: Approvers may return the request for changes
         delegate:
-          type: string
-          description: Delegate
+          type: boolean
+          description: Approvers may delegate
         reassign:
-          type: string
-          description: Reassign
+          type: boolean
+          description: The request may be reassigned
         skipConditions:
           type: string
           description: Skip Conditions
-        approveAed18000:
+        requiredApproverRole:
           type: string
-          description: “Approve AED 18,000?”
+          description: Role that must always approve, e.g. CFO, in an N-of-M group
+      required:
+      - code
+      - approvalMode
     ApprovalMatrixMultiLevelApprovalConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is approvals.request at 3%, so this is not an update to anything the package stores today and
-        no new table has been decided
+      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest is
+        approvals.request at 3%, so this is not an update to anything the package stores today and no new
+        table has been decided
       description: '**What Approval Matrix & Multi-Level Approval Configuration submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
       properties:
-        singleApproval:
+        code:
           type: string
-          description: Single Approval
-        sequentialApproval:
+          description: Stable rule code the PUT upserts by
+        approvalMode:
           type: string
-          description: Sequential Approval
-        parallelApproval:
-          type: string
-          description: Parallel Approval
-        anyOneApproval:
-          type: string
-          description: Any-One Approval
-        conditionalApproval:
-          type: string
-          description: Conditional Approval
-        multiLevelApproval:
-          type: string
-          description: Multi-Level Approval
-        exampleDiscount:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Example — Discount
-        commercialDirectorCfo:
-          type: string
-          description: Commercial Director + CFO
-        exampleProcurement:
-          type: string
-          description: Example — Procurement
-        aed10k50k:
-          type: string
-          description: AED 10K–50K
-        departmentHeadFinance:
-          type: string
-          description: Department Head → Finance
-        aed50k100k:
-          type: string
-          description: AED 50K–100K
+          enum:
+          - single
+          - sequential
+          - parallel
+          - anyOne
+          - allMustApprove
+          - conditional
+          - multiLevel
+          description: How approvers at this rule combine
         amount:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Amount
@@ -4168,35 +4737,39 @@ components:
         legalEntity:
           type: string
           description: Legal Entity
-        sequentialParallel:
-          type: string
-          description: Sequential/Parallel
         minimumApprovals:
-          type: string
-          description: Minimum Approvals
+          type: integer
+          description: 'N in N-of-M: approvals needed from the approver group'
         rejectionBehavior:
           type: string
-          description: Rejection Behavior
+          enum:
+          - rejectRequest
+          - returnToPreviousLevel
+          - returnToRequester
+          description: What a rejection at this level does
         requestChanges:
-          type: string
-          description: Request Changes
+          type: boolean
+          description: Approvers may return the request for changes
         delegate:
-          type: string
-          description: Delegate
+          type: boolean
+          description: Approvers may delegate
         reassign:
-          type: string
-          description: Reassign
+          type: boolean
+          description: The request may be reassigned
         skipConditions:
           type: string
           description: Skip Conditions
-        approveAed18000:
+        requiredApproverRole:
           type: string
-          description: “Approve AED 18,000?”
+          description: Role that must always approve, e.g. CFO, in an N-of-M group
+      required:
+      - code
+      - approvalMode
     RolesAuthorityDelegationApprovalLimitsView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
       description: '**What Roles, Authority, Delegation & Approval Limits displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -4236,52 +4809,49 @@ components:
           description: Scope
         start:
           type: string
-          description: Start
+          format: date-time
+          description: Delegation start
         end:
           type: string
-          description: End
+          format: date-time
+          description: Delegation end
         reason:
           type: string
           description: Reason
-        leave:
+        delegationType:
           type: string
-          description: Leave
-        travel:
-          type: string
-          description: Travel
-        vacancy:
-          type: string
-          description: Vacancy
-        eventOperations:
-          type: string
-          description: Event operations
-        requesterCannotApproveOwnRequest:
-          type: string
-          description: Requester cannot approve own request
-        userActive:
-          type: integer
-          description: User active
+          enum:
+          - leave
+          - travel
+          - vacancy
+          - eventOperations
+          description: Why temporary authority is granted
         requiredRole:
           type: string
           description: Required role
         authorityAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Authority amount
-        businessScope:
+        requestKind:
           type: string
-          description: Business scope
-        delegationValidity:
-          type: string
-          description: Delegation validity
+          description: What the authority limit covers, e.g. discount, refund, goodwill
+        authorityPercentage:
+          type: number
+          description: Percentage limit where the authority is a percentage, e.g. discount up to 15
+      required:
+      - delegator
+      - delegate
+      - start
+      - end
     RolesAuthorityDelegationApprovalLimitsInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is approvals.decision at 4%, so this is not an update to anything the package stores today and
-        no new table has been decided
-      description: '**What Roles, Authority, Delegation & Approval Limits submits.** The configurable
-        fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
-        absent, because a figure the system computed is not a figure a client may send back.'
+      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest is
+        approvals.decision at 4%, so this is not an update to anything the package stores today and no new
+        table has been decided
+      description: '**What Roles, Authority, Delegation & Approval Limits submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+        because a figure the system computed is not a figure a client may send back.'
       properties:
         user:
           type: string
@@ -4318,100 +4888,83 @@ components:
           description: Scope
         start:
           type: string
-          description: Start
+          format: date-time
+          description: Delegation start
         end:
           type: string
-          description: End
+          format: date-time
+          description: Delegation end
         reason:
           type: string
           description: Reason
-        leave:
+        delegationType:
           type: string
-          description: Leave
-        travel:
-          type: string
-          description: Travel
-        vacancy:
-          type: string
-          description: Vacancy
-        eventOperations:
-          type: string
-          description: Event operations
-        requesterCannotApproveOwnRequest:
-          type: string
-          description: Requester cannot approve own request
-        userActive:
-          type: integer
-          description: User active
+          enum:
+          - leave
+          - travel
+          - vacancy
+          - eventOperations
+          description: Why temporary authority is granted
         requiredRole:
           type: string
           description: Required role
         authorityAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Authority amount
-        businessScope:
+        requestKind:
           type: string
-          description: Business scope
-        delegationValidity:
-          type: string
-          description: Delegation validity
+          description: What the authority limit covers, e.g. discount, refund, goodwill
+        authorityPercentage:
+          type: number
+          description: Percentage limit where the authority is a percentage, e.g. discount up to 15
+      required:
+      - delegator
+      - delegate
+      - start
+      - end
     SlaEscalationReminderTimeoutRulesView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
-      description: '**What SLA, Escalation, Reminder & Timeout Rules displays.** Read from the workshop
-        pack''s own display and configuration directory for this screen; each property names the sentence
-        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What SLA, Escalation, Reminder & Timeout Rules displays.** Read from the workshop pack''s
+        own display and configuration directory for this screen; each property names the sentence it came
+        from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        responseSla:
+        code:
           type: string
-          description: Response SLA
-        approvalSla:
+          description: Policy code, the same key setApprovalSlaPolicy upserts by
+        slaType:
           type: string
-          description: Approval SLA
-        taskSla:
+          enum:
+          - responseSla
+          - approvalSla
+          - taskSla
+          - resolutionSla
+          - systemActionTimeout
+          description: Which clock this policy governs
+        calendarBasis:
           type: string
-          description: Task SLA
-        resolutionSla:
-          type: string
-          description: Resolution SLA
-        systemActionTimeout:
-          type: string
-          description: System Action Timeout
-        target4Hours:
-          type: string
-          description: 'Target: 4 hours'
-        at50:
-          type: number
-          description: At 50%
-        at75:
-          type: number
-          description: At 75%
-        at100:
-          type: number
-          description: At 100%
-        calendarHours:
-          type: string
-          description: Calendar Hours
-        businessHours:
-          type: string
-          description: Business Hours
-        workingDays:
-          type: string
-          description: Working Days
-        venueCalendar:
-          type: string
-          description: Venue Calendar
-        holidayCalendar:
-          type: string
-          description: Holiday Calendar
-        reassign:
-          type: string
-          description: Reassign
-        raisePriority:
-          type: string
-          description: Raise Priority
+          enum:
+          - calendarHours
+          - businessHours
+          - workingDays
+          - venueCalendar
+          - holidayCalendar
+          description: How elapsed time is counted
+        escalationActions:
+          type: array
+          items:
+            type: string
+            enum:
+            - notify
+            - reassign
+            - escalate
+            - addApprover
+            - createTask
+            - raisePriority
+            - triggerBackupWorkflow
+          description: What happens on escalation
         channelsType:
           type: string
           enum:
@@ -4420,174 +4973,173 @@ components:
           - inApp
           - smsWhereAppropriate
           description: Vocabulary listed under Reminder Channels.
+        targetMinutes:
+          type: integer
+          description: SLA target in minutes
+        onBreach:
+          type: string
+          enum:
+          - notifyOnly
+          - escalate
+          - autoApprove
+          - autoReject
+          description: Outcome at breach; auto outcomes only where explicitly permitted
+        autoActionAllowed:
+          type: boolean
+          description: Auto-approve or auto-reject on breach is explicitly permitted; default false
+        firstReminderAtPercent:
+          type: integer
+          description: Percent of target at which the first reminder goes
+        secondReminderAtPercent:
+          type: integer
+          description: Percent of target at which the second reminder goes
+        escalateAtPercent:
+          type: integer
+          description: Percent of target at which the request escalates
+      required:
+      - code
     TriggerActionCrossModuleOrchestrationConfigurationView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
-      description: '**What Trigger, Action & Cross-Module Orchestration Configuration displays.** Read
-        from the workshop pack''s own display and configuration directory for this screen; each property
-        names the sentence it came from. **Not a row** - the screen is a view over the module''s existing
-        state.'
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Trigger, Action & Cross-Module Orchestration Configuration displays.** Read from
+        the workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        authorizedUserStartsWorkflow:
+        triggerType:
           type: string
-          description: Authorized user starts workflow
-        executeRefund:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Execute Refund
-        callApprovedApi:
+          enum:
+          - event
+          - dataCondition
+          - schedule
+          - manual
+          description: What starts the workflow
+        workflowId:
           type: string
-          description: Call Approved API
-        callApprovedService:
+          description: Workflow this trigger and action set belongs to
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+            - createApproval
+            - createTask
+            - updateStatus
+            - applyHold
+            - releaseHold
+            - createNotification
+            - generateDocument
+            - executeRefund
+            - updateAllocation
+            - activateMembership
+            - suspendPartner
+            - callApprovedApi
+            - callApprovedService
+            - startSubWorkflow
+          description: Actions this workflow may call
+        onFailure:
           type: string
-          description: Call Approved Service
-        startSubWorkflow:
+          enum:
+          - retry
+          - rollback
+          - compensate
+          - exceptionQueue
+          - humanIntervention
+          description: What happens when an action fails
+        triggerDefinition:
           type: string
-          description: Start Sub-Workflow
-        workflowAuthority:
-          type: string
-          description: Workflow Authority
-        userSystemAuthority:
-          type: string
-          description: User/System Authority
-        modulePolicy:
-          type: string
-          description: Module Policy
-        businessRule:
-          type: string
-          description: Business Rule
-        rollbackWhereSupported:
-          type: string
-          description: Rollback where supported
-        compensationAction:
-          type: string
-          description: Compensation Action
-        exceptionQueue:
-          type: string
-          description: Exception Queue
-        humanIntervention:
-          type: string
-          description: Human Intervention
-        refunds:
-          type: string
-          description: Refunds
-        orders:
-          type: string
-          description: Orders
-        payments:
-          type: string
-          description: Payments
-        approvals:
-          type: string
-          description: Approvals
-        tickets:
-          type: string
-          description: Tickets
+          description: Event name, data condition (e.g. Balance > Limit) or schedule
+        maxRetries:
+          type: integer
+          description: Retries before the failure handling applies
+      required:
+      - workflowId
+      - triggerType
     TriggerActionCrossModuleOrchestrationConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
+        nothing the package stores today is what this configures
       description: '**What Trigger, Action & Cross-Module Orchestration Configuration submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
       properties:
-        authorizedUserStartsWorkflow:
+        triggerType:
           type: string
-          description: Authorized user starts workflow
-        executeRefund:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Execute Refund
-        callApprovedApi:
+          enum:
+          - event
+          - dataCondition
+          - schedule
+          - manual
+          description: What starts the workflow
+        workflowId:
           type: string
-          description: Call Approved API
-        callApprovedService:
+          description: Workflow this trigger and action set belongs to
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum:
+            - createApproval
+            - createTask
+            - updateStatus
+            - applyHold
+            - releaseHold
+            - createNotification
+            - generateDocument
+            - executeRefund
+            - updateAllocation
+            - activateMembership
+            - suspendPartner
+            - callApprovedApi
+            - callApprovedService
+            - startSubWorkflow
+          description: Actions this workflow may call
+        onFailure:
           type: string
-          description: Call Approved Service
-        startSubWorkflow:
+          enum:
+          - retry
+          - rollback
+          - compensate
+          - exceptionQueue
+          - humanIntervention
+          description: What happens when an action fails
+        triggerDefinition:
           type: string
-          description: Start Sub-Workflow
-        workflowAuthority:
-          type: string
-          description: Workflow Authority
-        userSystemAuthority:
-          type: string
-          description: User/System Authority
-        modulePolicy:
-          type: string
-          description: Module Policy
-        businessRule:
-          type: string
-          description: Business Rule
-        rollbackWhereSupported:
-          type: string
-          description: Rollback where supported
-        compensationAction:
-          type: string
-          description: Compensation Action
-        exceptionQueue:
-          type: string
-          description: Exception Queue
-        humanIntervention:
-          type: string
-          description: Human Intervention
-        refunds:
-          type: string
-          description: Refunds
-        orders:
-          type: string
-          description: Orders
-        payments:
-          type: string
-          description: Payments
-        approvals:
-          type: string
-          description: Approvals
-        tickets:
-          type: string
-          description: Tickets
+          description: Event name, data condition (e.g. Balance > Limit) or schedule
+        maxRetries:
+          type: integer
+          description: Retries before the failure handling applies
+      required:
+      - workflowId
+      - triggerType
     WorkflowTestingSimulationImpactAnalysisView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
       description: '**What Workflow Testing, Simulation & Impact Analysis displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        manualTestCase:
+        workflowId:
           type: string
-          description: Manual Test Case
-        sampleTransaction:
+          description: Workflow under test
+        testMode:
           type: string
-          description: Sample Transaction
-        historicalReplay:
-          type: string
-          description: Historical Replay
-        scenarioSimulation:
-          type: string
-          description: Scenario Simulation
-        batchTest:
-          type: string
-          description: Batch Test
-        refundAed1500:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-          description: 'Refund: AED 1,500'
-        customerGold:
-          type: string
-          description: 'Customer: Gold'
-        eventActive:
-          type: integer
-          description: 'Event: Active'
-        reasonCustomerRequest:
-          type: string
-          description: 'Reason: Customer Request'
+          enum:
+          - manualTestCase
+          - sampleTransaction
+          - historicalReplay
+          - scenarioSimulation
+          - batchTest
+          description: How the workflow is tested
         rulesEvaluated:
-          type: string
+          type: integer
           description: Rules Evaluated
         conditionsMatched:
-          type: string
+          type: integer
           description: Conditions Matched
         decisions:
           type: integer
@@ -4607,60 +5159,79 @@ components:
         expectedOutcome:
           type: string
           description: Expected Outcome
+        version:
+          type: string
+          description: Version under test
+        compareWithVersion:
+          type: string
+          description: Existing version to compare against for regression
+        inputPayload:
+          type: string
+          description: Sample transaction as a JSON document, for manual and sample tests
+        replayFrom:
+          type: string
+          format: date
+          description: Historical replay start
+        replayTo:
+          type: string
+          format: date
+          description: Historical replay end
+      required:
+      - workflowId
+      - testMode
     WorkflowTestingSimulationImpactAnalysisInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
-      description: '**What Workflow Testing, Simulation & Impact Analysis submits.** The configurable
-        fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
-        absent, because a figure the system computed is not a figure a client may send back.'
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
+        nothing the package stores today is what this configures
+      description: '**What Workflow Testing, Simulation & Impact Analysis submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+        because a figure the system computed is not a figure a client may send back.'
       properties:
-        manualTestCase:
+        workflowId:
           type: string
-          description: Manual Test Case
-        sampleTransaction:
+          description: Workflow under test
+        testMode:
           type: string
-          description: Sample Transaction
-        historicalReplay:
+          enum:
+          - manualTestCase
+          - sampleTransaction
+          - historicalReplay
+          - scenarioSimulation
+          - batchTest
+          description: How the workflow is tested
+        version:
           type: string
-          description: Historical Replay
-        scenarioSimulation:
+          description: Version under test
+        compareWithVersion:
           type: string
-          description: Scenario Simulation
-        batchTest:
+          description: Existing version to compare against for regression
+        inputPayload:
           type: string
-          description: Batch Test
-        refundAed1500:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-          description: 'Refund: AED 1,500'
-        customerGold:
+          description: Sample transaction as a JSON document, for manual and sample tests
+        replayFrom:
           type: string
-          description: 'Customer: Gold'
-        eventActive:
-          type: integer
-          description: 'Event: Active'
-        reasonCustomerRequest:
+          format: date
+          description: Historical replay start
+        replayTo:
           type: string
-          description: 'Reason: Customer Request'
+          format: date
+          description: Historical replay end
+      required:
+      - workflowId
+      - testMode
     VersioningGovernanceApprovalPublicationView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
       description: '**What Versioning, Governance, Approval & Publication displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        v10Retired:
+        workflowId:
           type: string
-          description: v1.0 — Retired
-        v11Active:
-          type: integer
-          description: v1.1 — Active
-        v20Draft:
-          type: string
-          description: v2.0 — Draft
+          description: Rule or workflow the version belongs to
         version:
           type: string
           description: Version
@@ -4688,50 +5259,32 @@ components:
           description: Test Results
         approval:
           type: string
-          description: Approval
-        v11V20:
+          description: Approval request id for this version
+        changedAreas:
+          type: array
+          items:
+            type: string
+            enum:
+            - conditions
+            - thresholds
+            - approvers
+            - actions
+            - sla
+            - escalation
+            - integrations
+          description: Areas that differ from the compared version (read-only)
+        rolloutScope:
           type: string
-          description: v1.1 ↔ v2.0
-        conditions:
-          type: string
-          description: Conditions
-        thresholds:
-          type: string
-          description: Thresholds
-        approvers:
-          type: string
-          description: Approvers
-        actions:
-          type: string
-          description: Actions
-        sla:
-          type: string
-          description: SLA
-        escalation:
-          type: string
-          description: Escalation
-        integrations:
-          type: string
-          description: Integrations
-        selectedTenant:
-          type: string
-          description: Selected Tenant
-        selectedVenue:
-          type: string
-          description: Selected Venue
-        selectedBrand:
-          type: string
-          description: Selected Brand
-        controlledRollout:
-          type: string
-          description: Controlled Rollout
-        technicallySafe:
-          type: string
-          description: technically safe
+          enum:
+          - allScopes
+          - selectedTenant
+          - selectedVenue
+          - selectedBrand
+          - controlledRollout
+          description: Where the version is published
         whoCreated:
           type: string
-          format: date-time
-          description: Who created
+          description: User who created the version
         whoChanged:
           type: string
           description: Who changed
@@ -4747,27 +5300,43 @@ components:
         whatChanged:
           type: string
           description: What changed
-        businessTransaction:
+        lifecycleStatus:
           type: string
-          description: business transaction
+          enum:
+          - draft
+          - tested
+          - businessReview
+          - technicalValidation
+          - approval
+          - scheduled
+          - active
+          - suspended
+          - retired
+          description: Version lifecycle status
+        scopeIds:
+          type: array
+          items:
+            type: string
+          description: Tenant, venue or brand ids for a selected rollout
+        effectiveFrom:
+          type: string
+          format: date-time
+          description: Scheduled activation; absent means publish now
+      required:
+      - workflowId
+      - version
     VersioningGovernanceApprovalPublicationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
-      description: '**What Versioning, Governance, Approval & Publication submits.** The configurable
-        fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
-        absent, because a figure the system computed is not a figure a client may send back.'
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
+        nothing the package stores today is what this configures
+      description: '**What Versioning, Governance, Approval & Publication submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+        because a figure the system computed is not a figure a client may send back.'
       properties:
-        v10Retired:
+        workflowId:
           type: string
-          description: v1.0 — Retired
-        v11Active:
-          type: integer
-          description: v1.1 — Active
-        v20Draft:
-          type: string
-          description: v2.0 — Draft
+          description: Rule or workflow the version belongs to
         version:
           type: string
           description: Version
@@ -4795,47 +5364,32 @@ components:
           description: Test Results
         approval:
           type: string
-          description: Approval
-        conditions:
+          description: Approval request id for this version
+        changedAreas:
+          type: array
+          items:
+            type: string
+            enum:
+            - conditions
+            - thresholds
+            - approvers
+            - actions
+            - sla
+            - escalation
+            - integrations
+          description: Areas that differ from the compared version (read-only)
+        rolloutScope:
           type: string
-          description: Conditions
-        thresholds:
-          type: string
-          description: Thresholds
-        approvers:
-          type: string
-          description: Approvers
-        actions:
-          type: string
-          description: Actions
-        sla:
-          type: string
-          description: SLA
-        escalation:
-          type: string
-          description: Escalation
-        integrations:
-          type: string
-          description: Integrations
-        selectedTenant:
-          type: string
-          description: Selected Tenant
-        selectedVenue:
-          type: string
-          description: Selected Venue
-        selectedBrand:
-          type: string
-          description: Selected Brand
-        controlledRollout:
-          type: string
-          description: Controlled Rollout
-        technicallySafe:
-          type: string
-          description: technically safe
+          enum:
+          - allScopes
+          - selectedTenant
+          - selectedVenue
+          - selectedBrand
+          - controlledRollout
+          description: Where the version is published
         whoCreated:
           type: string
-          format: date-time
-          description: Who created
+          description: User who created the version
         whoChanged:
           type: string
           description: Who changed
@@ -4851,55 +5405,40 @@ components:
         whatChanged:
           type: string
           description: What changed
-        businessTransaction:
+        lifecycleStatus:
           type: string
-          description: business transaction
+          enum:
+          - draft
+          - tested
+          - businessReview
+          - technicalValidation
+          - approval
+          - scheduled
+          - active
+          - suspended
+          - retired
+          description: Version lifecycle status
+        scopeIds:
+          type: array
+          items:
+            type: string
+          description: Tenant, venue or brand ids for a selected rollout
+        effectiveFrom:
+          type: string
+          format: date-time
+          description: Scheduled activation; absent means publish now
+      required:
+      - workflowId
+      - version
     WorkflowOperationsCommandCenterView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
-      description: '**What Workflow Operations Command Center displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Workflow Operations Command Center displays.** Read from the workshop pack''s own
+        display and configuration directory for this screen; each property names the sentence it came from.
+        **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        workflowsRunning:
-          type: string
-          description: Workflows Running
-        startedToday:
-          type: string
-          description: Started Today
-        completedToday:
-          type: string
-          description: Completed Today
-        pendingApprovals:
-          type: integer
-          description: Pending Approvals
-        waitingTasks:
-          type: integer
-          description: Waiting Tasks
-        slaAtRisk:
-          type: string
-          description: SLA At Risk
-        slaBreached:
-          type: string
-          description: SLA Breached
-        failedWorkflows:
-          type: integer
-          description: Failed Workflows
-        escalated:
-          type: string
-          description: Escalated
-        automatedExecutions:
-          type: integer
-          description: Automated Executions
-        averageCompletionTime:
-          type: string
-          format: date-time
-          description: Average Completion Time
-        automationSuccessRate:
-          type: number
-          description: Automation Success Rate
         workflowInstanceId:
           type: string
           description: Workflow Instance ID
@@ -4908,7 +5447,22 @@ components:
           description: Workflow
         module:
           type: string
-          description: Module
+          enum:
+          - ticketing
+          - pricing
+          - finance
+          - procurement
+          - crm
+          - resourceManagement
+          - fnb
+          - retail
+          - groupSales
+          - customerService
+          - membership
+          - wallet
+          - waiver
+          - subscriptionLicensing
+          description: Module the workflow originates from
         businessObject:
           type: string
           description: Business Object
@@ -4917,6 +5471,7 @@ components:
           description: Initiated By
         started:
           type: string
+          format: date-time
           description: Started
         currentStep:
           type: string
@@ -4931,59 +5486,78 @@ components:
           type: string
           description: SLA
         status:
-          type: integer
+          type: string
+          enum:
+          - running
+          - waitingApproval
+          - waitingTask
+          - waitingSystem
+          - escalated
+          - failed
+          - completed
+          - cancelled
           description: Status
-        ticketing:
-          type: string
-          description: Ticketing
-        pricing:
-          type: string
-          description: Pricing
-        finance:
-          type: string
-          description: Finance
-        procurement:
-          type: string
-          description: Procurement
-        crm:
-          type: string
-          description: CRM
-        resourceManagement:
-          type: string
-          description: Resource Management
-        fB:
-          type: string
-          description: F&B
-        retail:
-          type: string
-          description: Retail
-        groupSales:
+      required:
+      - workflowInstanceId
+    WorkflowOperationsCommandCenterViewSummary:
+      type: object
+      x-ticvai-persistence: none - aggregate computed at read time over the rows the page lists
+      description: The KPI tiles shown above the list on this screen. Computed over the whole filtered set,
+        not the current page (decided 29 September, readiness close-out).
+      properties:
+        workflowsRunning:
           type: integer
-          description: Group Sales
-        customerService:
-          type: string
-          description: Customer Service
-        membership:
-          type: string
-          description: Membership
-        wallet:
-          type: string
-          description: Wallet
-        waiver:
-          type: string
-          description: Waiver
-        subscriptionLicensing:
-          type: string
-          description: Subscription & Licensing
+          description: Workflows Running
+        startedToday:
+          type: integer
+          description: Started Today
+        completedToday:
+          type: integer
+          description: Completed Today
+        pendingApprovals:
+          type: integer
+          description: Pending Approvals
+        waitingTasks:
+          type: integer
+          description: Waiting Tasks
+        slaAtRisk:
+          type: integer
+          description: SLA At Risk
+        slaBreached:
+          type: integer
+          description: SLA Breached
+        failedWorkflows:
+          type: integer
+          description: Failed Workflows
+        escalated:
+          type: integer
+          description: Escalated
+        automatedExecutions:
+          type: integer
+          description: Automated Executions
+        averageCompletionTime:
+          type: integer
+          description: Minutes
+        automationSuccessRate:
+          type: number
+          description: Automation Success Rate
     UnifiedApprovalInboxDecisionWorkspaceView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
       description: '**What Unified Approval Inbox & Decision Workspace displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
+        decision:
+          type: string
+          enum:
+          - approve
+          - reject
+          - return
+          - requestInformation
+          description: The approver's decision
         approvalId:
           type: string
           description: Approval ID
@@ -5004,66 +5578,53 @@ components:
           description: Priority
         submitted:
           type: string
+          format: date-time
           description: Submitted
         slaRemaining:
-          type: string
-          description: SLA Remaining
+          type: integer
+          description: Minutes until SLA breach
         approvalLevel:
           type: string
           description: Approval Level
         status:
-          type: integer
-          description: Status
-        discountException18:
-          type: number
-          description: Discount Exception — 18%
-        purchaseOrderAed72000:
+          $ref: '#/components/schemas/ApprovalStatus'
+        comment:
           type: string
-          description: Purchase Order — AED 72,000
-        overtimeRequest18Hours:
+        reason:
           type: string
-          description: Overtime Request — 18 Hours
-        whatIsBeingRequested:
-          type: string
-          description: What is being requested?
-        whyIsApprovalRequired:
-          type: string
-          description: Why is approval required?
-        documentsCommentsHistory:
-          type: string
-          description: Documents, comments, history
+          description: Required on reject, return and request for information
+      required:
+      - approvalId
+      - decision
     UnifiedApprovalInboxDecisionWorkspaceInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
+        nothing the package stores today is what this configures
       description: '**What Unified Approval Inbox & Decision Workspace submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
       properties:
-        discountException18:
-          type: number
-          description: Discount Exception — 18%
-        purchaseOrderAed72000:
+        decision:
           type: string
-          description: Purchase Order — AED 72,000
-        overtimeRequest18Hours:
+          enum:
+          - approve
+          - reject
+          - return
+          - requestInformation
+          description: The approver's decision
+        comment:
           type: string
-          description: Overtime Request — 18 Hours
-        whatIsBeingRequested:
+        reason:
           type: string
-          description: What is being requested?
-        whyIsApprovalRequired:
-          type: string
-          description: Why is approval required?
-        documentsCommentsHistory:
-          type: string
-          description: Documents, comments, history
+          description: Required on reject, return and request for information
+      required:
+      - decision
     WorkflowInstanceMonitorProcessTimelineView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
       description: '**What Workflow Instance Monitor & Process Timeline displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
@@ -5091,7 +5652,16 @@ components:
           format: date-time
           description: Start Time
         currentStatus:
-          type: integer
+          type: string
+          enum:
+          - running
+          - waitingApproval
+          - waitingTask
+          - waitingSystem
+          - escalated
+          - failed
+          - completed
+          - cancelled
           description: Current Status
         currentStep:
           type: string
@@ -5107,9 +5677,11 @@ components:
           description: Type
         started:
           type: string
+          format: date-time
           description: Started
         completed:
           type: string
+          format: date-time
           description: Completed
         assignedTo:
           type: string
@@ -5124,9 +5696,8 @@ components:
           type: string
           description: Decision
         duration:
-          type: string
-          format: date-time
-          description: Duration
+          type: integer
+          description: Seconds
         status:
           type: string
           description: Status
@@ -5157,51 +5728,32 @@ components:
         errors:
           type: integer
           description: Errors
-        reassign:
-          type: string
-          description: Reassign
-        skipStepWhereExplicitlyAllowed:
-          type: boolean
-          description: Skip Step where explicitly allowed
+      required:
+      - workflowInstance
     WorkflowExceptionFailureRecoveryCenterView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
       description: '**What Workflow Exception, Failure & Recovery Center displays.** Read from the workshop
         pack''s own display and configuration directory for this screen; each property names the sentence
         it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        businessRuleFailure:
+        errorType:
           type: string
-          description: Business Rule Failure
-        missingData:
-          type: string
-          description: Missing Data
-        missingApprover:
-          type: string
-          description: Missing Approver
-        permissionFailure:
-          type: string
-          description: Permission Failure
-        integrationFailure:
-          type: string
-          description: Integration Failure
-        timeout:
-          type: string
-          description: Timeout
-        actionFailure:
-          type: string
-          description: Action Failure
-        invalidState:
-          type: string
-          description: Invalid State
-        serviceUnavailable:
-          type: string
-          description: Service Unavailable
-        configurationError:
-          type: string
-          description: Configuration Error
+          enum:
+          - businessRuleFailure
+          - missingData
+          - missingApprover
+          - permissionFailure
+          - integrationFailure
+          - timeout
+          - actionFailure
+          - invalidState
+          - duplicateEvent
+          - serviceUnavailable
+          - configurationError
+          description: Kind of failure
         exceptionId:
           type: string
           description: Exception ID
@@ -5215,11 +5767,8 @@ components:
           type: string
           description: Module
         failedStep:
-          type: integer
-          description: Failed Step
-        errorType:
           type: string
-          description: Error Type
+          description: Step that failed
         time:
           type: string
           format: date-time
@@ -5233,50 +5782,20 @@ components:
         owner:
           type: string
           description: Owner
-        reassign:
-          type: string
-          description: Reassign
-        correctData:
-          type: string
-          description: Correct Data
-        useApprovedAlternative:
-          type: string
-          description: Use Approved Alternative
-        disappear:
-          type: string
-          description: disappear
+        retryCount:
+          type: integer
+          description: Retry count
+      required:
+      - exceptionId
     SlaEscalationBottleneckMonitorView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
       description: '**What SLA, Escalation & Bottleneck Monitor displays.** Read from the workshop pack''s
         own display and configuration directory for this screen; each property names the sentence it came
         from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        withinSla:
-          type: string
-          description: Within SLA
-        atRisk:
-          type: string
-          description: At Risk
-        breached:
-          type: string
-          description: Breached
-        escalated:
-          type: string
-          description: Escalated
-        averageProcessingTime:
-          type: string
-          format: date-time
-          description: Average Processing Time
-        averageApprovalTime:
-          type: string
-          format: date-time
-          description: Average Approval Time
-        longestWaitingStep:
-          type: string
-          description: Longest Waiting Step
         workflow:
           type: string
           description: Workflow
@@ -5291,93 +5810,113 @@ components:
           description: Owner
         started:
           type: string
+          format: date-time
           description: Started
         target:
           type: string
-          description: Target
-        timeRemaining:
-          type: string
           format: date-time
-          description: Time Remaining
+          description: SLA deadline
+        timeRemaining:
+          type: integer
+          description: Minutes until breach; negative once breached
         risk:
           type: string
           description: Risk
         escalationLevel:
           type: string
           description: Escalation Level
-        averageWorkflow112Hours:
-          type: number
-          description: 'Average workflow: 11.2 hours'
-        departmentHead42Min:
-          type: string
-          description: Department Head — 42 min
-        finance21Hrs:
-          type: string
-          description: Finance — 2.1 hrs
-        cfo78Hrs:
-          type: string
-          description: CFO — 7.8 hrs
-        execution18Min:
-          type: string
-          description: Execution — 18 min
-        primaryBottleneckCfoApproval:
-          type: string
-          description: 'Primary Bottleneck: CFO Approval'
         firstReminder:
           type: string
+          format: date-time
           description: First Reminder
         secondReminder:
           type: string
+          format: date-time
           description: Second Reminder
         managerEscalation:
           type: string
+          format: date-time
           description: Manager Escalation
         executiveEscalation:
           type: string
+          format: date-time
           description: Executive Escalation
         finalOutcome:
           type: string
           description: Final Outcome
-        reassign:
+      required:
+      - instance
+    SlaEscalationBottleneckMonitorViewSummary:
+      type: object
+      x-ticvai-persistence: none - aggregate computed at read time over the rows the page lists
+      description: The KPI tiles shown above the list on this screen. Computed over the whole filtered set,
+        not the current page (decided 29 September, readiness close-out).
+      properties:
+        withinSla:
+          type: integer
+          description: Within SLA
+        atRisk:
+          type: integer
+          description: At Risk
+        breached:
+          type: integer
+          description: Breached
+        escalated:
+          type: integer
+          description: Escalated
+        averageProcessingTime:
+          type: integer
+          description: Minutes
+        averageApprovalTime:
+          type: integer
+          description: Minutes
+        longestWaitingStep:
           type: string
-          description: Reassign
-        changePriority:
-          type: string
-          description: Change Priority
+          description: Longest Waiting Step
     AutomationExecutionAutonomousActionMonitorView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
-      description: '**What Automation Execution & Autonomous Action Monitor displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names
-        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Automation Execution & Autonomous Action Monitor displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        automatedActionsToday:
+        command:
           type: string
+          enum:
+          - pause
+          - resume
+          - disable
+          - killSwitch
+          description: Control command
+        automationId:
+          type: string
+          description: Automation to control
+        automatedActionsToday:
+          type: integer
           description: Automated Actions Today
         successful:
-          type: string
+          type: integer
           description: Successful
         failed:
           type: integer
           description: Failed
         humanConfirmationRequired:
-          type: boolean
-          description: Human Confirmation Required
+          type: integer
+          description: Actions waiting for human confirmation
         reversed:
-          type: string
+          type: integer
           description: Reversed
         suspended:
-          type: string
+          type: integer
           description: Suspended
         estimatedManualActionsAvoided:
-          type: string
+          type: integer
           description: Estimated Manual Actions Avoided
         estimatedTimeSaved:
-          type: string
-          format: date-time
-          description: Estimated Time Saved
+          type: integer
+          description: Minutes
         automation:
           type: string
           description: Automation
@@ -5394,93 +5933,61 @@ components:
           type: string
           description: Result
         confidenceWhereAiAssisted:
-          type: string
-          description: Confidence where AI-assisted
+          type: number
+          description: Confidence of an AI-assisted non-approval action; never set for approve or reject
         executionTime:
           type: string
           format: date-time
           description: Execution Time
         status:
-          type: integer
+          type: string
+          enum:
+          - active
+          - paused
+          - disabled
+          - killSwitched
           description: Status
-        triggerT24Hours:
+        reason:
           type: string
-          description: 'Trigger: T−24 hours'
-        participantsEvaluated842:
-          type: string
-          description: 'Participants evaluated: 842'
-        incomplete118:
-          type: string
-          description: 'Incomplete: 118'
-        messagesTriggered118:
-          type: string
-          description: 'Messages triggered: 118'
-        successful116:
-          type: string
-          description: 'Successful: 116'
-        failed2:
-          type: integer
-          description: 'Failed: 2'
-        inspectRule:
-          type: string
-          description: Inspect Rule
-        inspectExecution:
-          type: string
-          description: Inspect Execution
+          description: Why the automation is being controlled
+      required:
+      - automationId
+      - command
     AutomationExecutionAutonomousActionMonitorInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
-      description: '**What Automation Execution & Autonomous Action Monitor submits.** The configurable
-        fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
-        absent, because a figure the system computed is not a figure a client may send back.'
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**, so
+        nothing the package stores today is what this configures
+      description: '**What Automation Execution & Autonomous Action Monitor submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+        because a figure the system computed is not a figure a client may send back.'
       properties:
-        triggerT24Hours:
+        command:
           type: string
-          description: 'Trigger: T−24 hours'
-        participantsEvaluated842:
+          enum:
+          - pause
+          - resume
+          - disable
+          - killSwitch
+          description: Control command
+        automationId:
           type: string
-          description: 'Participants evaluated: 842'
-        incomplete118:
+          description: Automation to control
+        reason:
           type: string
-          description: 'Incomplete: 118'
-        messagesTriggered118:
-          type: string
-          description: 'Messages triggered: 118'
-        successful116:
-          type: string
-          description: 'Successful: 116'
-        failed2:
-          type: integer
-          description: 'Failed: 2'
-        inspectRule:
-          type: string
-          description: Inspect Rule
-        inspectExecution:
-          type: string
-          description: Inspect Execution
+          description: Why the automation is being controlled
+      required:
+      - automationId
+      - command
     CrossModuleOrchestrationMonitorView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
-      description: '**What Cross-Module Orchestration Monitor displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Cross-Module Orchestration Monitor displays.** Read from the workshop pack''s own
+        display and configuration directory for this screen; each property names the sentence it came from.
+        **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        bookingConfirmed:
-          type: string
-          description: Booking confirmed ✓
-        reserve420Tickets:
-          type: string
-          description: Reserve 420 tickets ✓
-        reserve4Guides:
-          type: string
-          description: Reserve 4 guides ✓
-        reserve420Meals:
-          type: string
-          description: Reserve 420 meals ✓
         service:
           type: string
           description: Service
@@ -5489,46 +5996,54 @@ components:
           description: Action
         status:
           type: string
+          enum:
+          - notStarted
+          - running
+          - waiting
+          - successful
+          - failed
+          - compensated
           description: Status
         started:
           type: string
+          format: date-time
           description: Started
         completed:
           type: string
+          format: date-time
           description: Completed
         duration:
-          type: string
-          format: date-time
-          description: Duration
+          type: integer
+          description: Seconds
         inputOutput:
           type: string
           description: Input/Output
-        waits:
+        failureHandling:
           type: string
-          description: Waits
+          enum:
+          - waits
+          - retries
+          - rollsBack
+          - continuesPartially
+          - requiresHumanIntervention
+          description: What the workflow does after this node fails
         retries:
           type: integer
           description: Retries
-        rollsBack:
-          type: string
-          description: Rolls back
-        continuesPartially:
-          type: string
-          description: Continues partially
-        requiresHumanIntervention:
-          type: string
-          description: Requires human intervention
-        aCommonCorrelationWorkflowId:
+        correlationId:
           type: string
           description: a common correlation/workflow ID
+      required:
+      - correlationId
+      - service
     WorkflowAnalyticsProcessPerformanceView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
-      description: '**What Workflow Analytics & Process Performance displays.** Read from the workshop
-        pack''s own display and configuration directory for this screen; each property names the sentence
-        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Workflow Analytics & Process Performance displays.** Read from the workshop pack''s
+        own display and configuration directory for this screen; each property names the sentence it came
+        from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         workflowVolume:
           type: integer
@@ -5540,13 +6055,11 @@ components:
           type: number
           description: Failure Rate
         averageCompletionTime:
-          type: string
-          format: date-time
-          description: Average Completion Time
+          type: integer
+          description: Minutes
         approvalTime:
-          type: string
-          format: date-time
-          description: Approval Time
+          type: integer
+          description: Minutes
         automationRate:
           type: number
           description: Automation Rate
@@ -5560,12 +6073,11 @@ components:
           type: number
           description: Rework Rate
         slaCompliance:
-          type: string
-          description: SLA Compliance
+          type: number
+          description: Percent within SLA
         averageApprovalTime:
-          type: string
-          format: date-time
-          description: Average Approval Time
+          type: integer
+          description: Minutes
         approvalRate:
           type: number
           description: Approval Rate
@@ -5575,62 +6087,40 @@ components:
         delegationRate:
           type: number
           description: Delegation Rate
-        workflowV14VsV15:
-          type: string
-          description: Workflow v1.4 vs v1.5
-        v1448Hours:
-          type: string
-          description: v1.4 — 4.8 hours
-        v1529Hours:
-          type: string
-          description: v1.5 — 2.9 hours
         manualStepsRemoved:
-          type: string
+          type: integer
           description: Manual Steps Removed
         processingTimeSaved:
-          type: string
-          format: date-time
-          description: Processing Time Saved
+          type: integer
+          description: Minutes
         workloadReduced:
-          type: string
-          description: Workload Reduced
+          type: number
+          description: Staff hours
         costSavingWhereMeasurable:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Cost Saving where measurable
     ProcessOptimizationAutomationOpportunityCenterView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
-      description: '**What Process Optimization & Automation Opportunity Center displays.** Read from
-        the workshop pack''s own display and configuration directory for this screen; each property names
-        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Process Optimization & Automation Opportunity Center displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names the
+        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        repetitiveApproval:
+        opportunityType:
           type: string
-          description: Repetitive Approval
-        unnecessaryApproval:
-          type: string
-          description: Unnecessary Approval
-        highManualWork:
-          type: string
-          description: High Manual Work
-        excessiveRework:
-          type: string
-          description: Excessive Rework
-        longWaitingTime:
-          type: string
-          format: date-time
-          description: Long Waiting Time
-        highFailureRate:
-          type: number
-          description: High Failure Rate
-        lowRiskManualAction:
-          type: string
-          description: Low-Risk Manual Action
-        processBottleneck:
-          type: string
-          description: Process Bottleneck
+          enum:
+          - repetitiveApproval
+          - unnecessaryApproval
+          - highManualWork
+          - excessiveRework
+          - longWaitingTime
+          - duplicateSteps
+          - highFailureRate
+          - lowRiskManualAction
+          - processBottleneck
+          description: Kind of improvement opportunity
         process:
           type: string
           description: Process
@@ -5644,9 +6134,8 @@ components:
           type: integer
           description: Current Steps
         averageDuration:
-          type: string
-          format: date-time
-          description: Average Duration
+          type: integer
+          description: Minutes
         manualSteps:
           type: integer
           description: Manual Steps
@@ -5659,66 +6148,20 @@ components:
         estimatedOpportunity:
           type: string
           description: Estimated Opportunity
-        monthlyRequests4820:
-          type: string
-          description: 'Monthly Requests: 4,820'
-        approvalRate992:
-          type: number
-          description: 'Approval Rate: 99.2%'
-        averageApprovalDelay18Hours:
-          type: number
-          description: 'Average Approval Delay: 1.8 hours'
+      required:
+      - process
     AiWorkflowIntelligenceAutonomousGovernanceCenterView:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables
-        that already exist
-      description: '**What AI Workflow Intelligence & Autonomous Governance Center displays.** Read from
-        the workshop pack''s own display and configuration directory for this screen; each property names
-        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What AI Workflow Intelligence & Autonomous Governance Center displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names the
+        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
-        rules:
+        useCaseId:
           type: string
-          description: Rules
-        workflows:
-          type: string
-          description: Workflows
-        approvals:
-          type: string
-          description: Approvals
-        executionHistory:
-          type: string
-          description: Execution History
-        sla:
-          type: string
-          description: SLA
-        exceptions:
-          type: string
-          description: Exceptions
-        automation:
-          type: string
-          description: Automation
-        processPerformance:
-          type: string
-          description: Process Performance
-        approverBehavior:
-          type: string
-          description: Approver Behavior
-        moduleActivity:
-          type: string
-          description: Module Activity
-        businessOutcomes:
-          type: string
-          description: Business Outcomes
-        clarificationExecute:
-          type: string
-          description: Clarification → Execute
-        aiIdentifiesExcessiveRework:
-          type: string
-          description: AI identifies excessive rework
-        by34Hours:
-          type: string
-          description: by 3.4 hours
+          description: AI use case identifier
         aiModel:
           type: string
           description: AI Model
@@ -5730,12 +6173,18 @@ components:
           description: Use Case
         autonomyLevel:
           type: string
-          description: Autonomy Level
+          enum:
+          - observe
+          - recommend
+          - prepare
+          - governedAutomation
+          - autonomousLowRisk
+          description: Level 0 to 4; approval decisions are held at observe
         decisionScope:
           type: string
           description: Decision Scope
         confidenceThreshold:
-          type: integer
+          type: number
           description: Confidence Threshold
         humanApprovalRequirement:
           type: string
@@ -5753,18 +6202,11 @@ components:
         owner:
           type: string
           description: Owner
-        humanSystemDecisionFinalAction:
-          type: string
-          description: Human/System Decision → Final Action
-        crossModuleOrchestrationMonitorMultiModuleExecution:
-          type: string
-          description: Cross-Module Orchestration Monitor Multi-module execution
-        area13CompleteArchitecture:
-          type: string
-          description: Area 13 — Complete Architecture
-        employeeApp:
-          type: string
-          description: Employee App
+        overrideRate:
+          type: number
+          description: Override rate
+      required:
+      - useCaseId
     StepUpStrength:
       type: string
       description: '**Ordered, weakest first, and that ordering is what makes *raise only* checkable.**

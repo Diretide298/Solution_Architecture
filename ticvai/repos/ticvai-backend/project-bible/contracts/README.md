@@ -37,6 +37,7 @@ Every operation declares `x-ticvai-permission`, `x-ticvai-scope-level`,
 | `satellite/reporting.yaml` | **23** | Versioned definitions, execution against the reporting replica, schedules under owner permissions, audited exports, dashboards, **natural-language query returning its generated query** | Cross-cutting · AI-57 |
 | `satellite/retail.yaml` | **23** | Merchandise, price and stock check, sales depleting the inventory ledger, returns with condition, exchanges, guest-app wallet, gift cards, collection reservations | Domain 6 |
 | `satellite/seating.yaml` | **29** | Seat maps, manifest + plan import, categories, availability, holds, blocks, seating rules, recommendations | Domain 19 — 112 reqs |
+| `satellite/transport.yaml` | **28** | **Scheduled transport ticketing.** Stations, routes with ordered stops and offsets, timetables releasing departures (each a catalogue performance), fare tables by passenger type, fare quotes, multi-trip and unlimited passes (catalogue `openDated` products), guest favourite routes, route map. Served by VenueOpsService. Real network, fares and timetable are an open value from the client | Decided 29 September, rev 3 REV3-21 |
 
 ## Authentication model
 

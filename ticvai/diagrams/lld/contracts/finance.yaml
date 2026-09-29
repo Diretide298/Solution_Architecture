@@ -1,5 +1,5 @@
 id: LLD-finance
-title: finance — 56 operations
+title: finance — 57 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -773,4 +773,15 @@ operations:
   reads:
   - catalogue.product
   - ledger.recognition_schedule
+  writes: []
+- operation: verifyTaxExemption
+  verb: POST
+  path: /tax-exemptions/{exemptionId}/verify
+  scope: region
+  permission: TAX_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ledger.tax_exemption
   writes: []

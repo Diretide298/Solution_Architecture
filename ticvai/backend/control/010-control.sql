@@ -507,6 +507,7 @@ CREATE TABLE IF NOT EXISTS control.release (
     version                           text NOT NULL,
     required_migrations               text[],
     note                              text NOT NULL CONSTRAINT release_note_chk CHECK (char_length(note) <= 2000),
+    guest_release_notes               jsonb,
     breaking_changes                  text[],
     id                                uuid PRIMARY KEY NOT NULL,
     status                            text NOT NULL CONSTRAINT release_status_chk CHECK (status IN ('draft', 'inDev', 'inStaging', 'inProduction', 'superseded', 'withdrawn')),
@@ -788,6 +789,7 @@ CREATE TABLE IF NOT EXISTS control.webhook_delivery (
     response_code                     integer,
     response_body_excerpt             text,
     is_replay                         boolean DEFAULT false,
+    is_test                           boolean DEFAULT false,
     delivered_at                      timestamptz
 );
 

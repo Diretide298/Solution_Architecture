@@ -69,13 +69,16 @@ def main():
             s = by_id.get(cur)
             if s and ln.startswith("    provenance: ") and s["match"] in ("exact", "partial"):
                 ln = "    provenance: client-verified"
+            elif s and ln.startswith("    provenance: ") and s["match"] == "none":
+                ln = "    provenance: designed"     # the accepted Claude Design frame (29 September)
             out.append(ln)
-            if s and ln.startswith("    board: ") and (i + 1 >= len(lines) or not lines[i + 1].startswith("    prototype:")):
+            if s and ln.startswith("    board: "):
                 if s["match"] == "none":
                     n_none += 1
                     block = [f"      file: {q(proto)}", f"      rev: {q(rev)}", "      match: none",
-                             "      note: 'The prototype has no view for this screen. Build it from this definition "
-                             "with the generated layout (decided 29 September).'"]
+                             "      note: 'The prototype has no view for this screen. It was drawn in Claude Design on 29 "
+                             "September in the prototype''s style and accepted as its design the same day (the frame "
+                             "on this screen''s board): build the layout from that frame.'"]
                 else:
                     n_set += 1
                     block = [f"      file: {q(proto)}", f"      rev: {q(rev)}", f"      verified: {verified}",

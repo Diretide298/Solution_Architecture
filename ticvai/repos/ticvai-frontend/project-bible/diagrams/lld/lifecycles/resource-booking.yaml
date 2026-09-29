@@ -1,5 +1,5 @@
 id: LLD-Resource booking
-title: Resource booking — 7 transitions
+title: Resource booking — 10 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/resource-booking.yaml
@@ -45,6 +45,23 @@ transitions:
   guard: Recorded as not returned. **The capture is the whole deposit and the resource is retired, not
     freed** — a stroller nobody brought back must not appear as available
 - from: reserved
+  to: checkedOut
+  operation: setResourceBookingProgress
+  trigger: operation
+  guard: A staff or instructor assignment started (`state` `started`, decided 29 September, readiness
+    close-out). The same step as a hand-over, in an assignment's words; no deposit on a person
+- from: checkedOut
+  to: returned
+  operation: setResourceBookingProgress
+  trigger: operation
+  guard: A staff or instructor assignment completed (`state` `completed`, decided 29 September, readiness
+    close-out)
+- from: overdue
+  to: returned
+  operation: setResourceBookingProgress
+  trigger: operation
+  guard: A staff or instructor assignment completed after its planned end
+- from: reserved
   to: cancelled
   operation: bookResource
   trigger: operation
@@ -63,4 +80,10 @@ notes: '**A booking outlives its order**, which is why this could not live in `o
 
 
   **`noShow` and `cancelled` are separated for reporting**: both free the resource and only one wasted
-  the window.'
+  the window.
+
+
+  **Created `reserved` three ways**: `bookResource` (staff), `allocateResources` (a product''s requirement
+  filled by rotation), and `orders.createOrder` converting a guest''s `ResourceHold` on a resource picked
+  from a venue map (decided 29 September, rev 3 REV3-15, superseding audit R073 (c) for resources on
+  an ingested map); the last carries `holdId`.'

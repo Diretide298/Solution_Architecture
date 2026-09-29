@@ -3855,6 +3855,11 @@ screens:
     purpose: The dashboard being edited
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: deleteDashboard
+    contract: reporting
+    purpose: Archive this dashboard
+    trigger: onAction
+    provenance: decided 29 September, VM close-out (venue management and configuration)
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-023

@@ -1,5 +1,5 @@
 id: LLD-Table reservation
-title: Table reservation — 9 transitions
+title: Table reservation — 12 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/table-reservation.yaml
@@ -11,10 +11,28 @@ enumSchema: TableReservationStatus
 owner: fnb
 initial:
 - booked
+- awaitingDeposit
 terminal:
 - completed
 - cancelled
 transitions:
+- from: awaitingDeposit
+  to: booked
+  trigger: cascade
+  guard: '**The deposit was authorised** — the cart holding the deposit line (`CartLine.tableReservationId`)
+    was checked out and paid. Only where the venue''s `DepositPolicy.dining` applied at booking (decided
+    29 September, rev 3 REV3-8b)'
+- from: awaitingDeposit
+  to: cancelled
+  trigger: timer
+  guard: '`deposit.holdExpiresAt` passed with no authorised deposit. The held cover is released and
+    nothing is charged'
+- from: awaitingDeposit
+  to: cancelled
+  operation: updateTableReservation
+  trigger: operation
+  guard: The guest gave up before paying the deposit. Nothing was held, so nothing is released but the
+    cover
 - from: booked
   to: confirmed
   operation: updateTableReservation
@@ -70,4 +88,11 @@ notes: '`noShow` is computed on a grace period, not set by a host. An operator c
   refusing to seat them because a timer fired is a system overruling a host.
 
 
-  What happens on a no-show — a fee, a deposit forfeit, nothing — is **CF-85**, and unanswered.'
+  What happens on a no-show is the venue''s `orders.DepositPolicy.dining` (decided 29 September, rev
+  3 REV3-8b, superseding audit R077 (a)): with no dining deposit enabled, the default, nothing; with
+  one, `dining.onLateCancelOrNoShow` forfeits or releases the deposit held. This answers **CF-85** for
+  deposits.
+
+
+  **`awaitingDeposit` exists only where a deposit applies.** A booking with no deposit is created `booked`,
+  confirmed at once and never enters the cart (rev 3 REV3-8).'

@@ -1,0 +1,2288 @@
+openapi: 3.1.0
+info:
+  title: TICVAI Transport Ticketing
+  version: 0.1.0
+  x-ticvai-screen-count: 31
+  x-ticvai-tier: satellite
+  x-ticvai-module: "1 — Ticketing Catalogue (Transport)"
+  x-ticvai-platforms:
+    - "P01 Guest Web"
+    - "P02 Guest App"
+    - "P08 Venue Management"
+  description: >
+    ## What this contract covers
+
+    **Scheduled transport ticketing: stations, routes, timetabled departures, fares, one-way
+    tickets, multi-trip passes, favourite routes and a route map.** In scope as decided 29
+    September, rev 3 REV3-21. The client drew it as a new venue type, *Emirates Link*
+    (intercity coaches, Sharjah – Dubai – Abu Dhabi, line E101), in the rev 3 guest
+    prototype (`sources/designs/guest-rev3-28-september`, client response item 21), laid out
+    after the RTA booking screen: three steps (Route & Schedule, Seat Selection, Payment), the
+    One-way Trip / Multi-Trip / Favourite tabs, one search row, **Search Trips** and **Next
+    Available Trip**.
+
+    | | |
+    |---|---|
+    | **Tier** | satellite |
+    | **Service** | VenueOpsService (licensed as an optional module, venue-scoped, not the sale path) |
+    | **Schema** | `transport` |
+    | **Consumed by** | P01 Guest Web · P02 Guest App · P08 Venue Management |
+
+    **The network is operator configuration, not an open value** (decided 29 September, rev 3
+    REV3-21, restated the same day; this replaces the earlier "the client owes the real network").
+    A venue enters its own stations, routes and stops, fares and passenger types, pass types and
+    timetables in Venue Management through the setup operations below, like every other module,
+    one at a time or in bulk with `importTransportNetwork` (a CSV bundle or a GTFS feed, validated
+    into a preview and then applied, the import-then-publish pattern of the venue map). **The
+    prototype's Emirates Link sample** — nine stations on E101, a fare of AED 5 plus AED 2.50 per
+    stop, the four passenger types, the four pass types and 23 departures a day — is **seed data
+    for the demo tenant, not a default**: a new venue starts with an empty network. Values below
+    marked *proposed, client to correct* are behaviour defaults (release horizon, boarding close,
+    time periods), not network data.
+
+    ## How to read this file
+
+    **This file is a contract.** It is hand-authored and it is the source of truth for one
+    bounded context: server code, client code and mock servers are generated from it, never
+    the other way round. If a field is not here, it does not exist.
+
+    Where `x-ticvai-permission` is null, one of these says why: `x-ticvai-auth: service`
+    (cell-to-cell), `x-ticvai-self-scoped` (acts only on the caller's own resources), or a
+    guest/public read (`x-ticvai-audience: [guest, public]`), which returns published data only.
+
+    ## Why this is its own context, and what it does not own
+
+    **A trip is priced by where you get on and where you get off.** Nothing in `catalogue`
+    prices by a pair of stops: a performance has one price list, and a fare that is a base
+    plus a per-stop amount, times a passenger multiplier, is a fare table rather than a price
+    list. A route with ordered stops and offsets, and a timetable that generates departures
+    for a release horizon, have no home in `catalogue` either.
+
+    **What it deliberately reuses, so there is one purchase path, not two:**
+
+    - **A departure is a catalogue `Performance`.** Publishing a timetable creates one
+      performance per departure under the route's catalogue `Event`, with the coach's seat
+      count as its `ChannelCapacity`. Seats are held with `acquireInventoryHold` and sold
+      through the cart like any timed ticket, seat maps included (the prototype's Seat
+      Selection step is `seating` on that performance). **Seats left is catalogue's
+      availability, read, never a second counter here.**
+    - **A one-way ticket is a cart line and an order line.** The route owns one catalogue
+      product (kind `timedAdmission`) with one variant per passenger type. The cart line
+      carries `performanceId` (the departure) and, in `attributes.transport`, the route and
+      the boarding and alighting stations; the order service prices it by calling
+      `quoteTransportFare`. The ticket is an ordinary `access` entitlement shown as a QR to
+      the driver.
+    - **A multi-trip pass is a catalogue product of kind `openDated`.** Its entitlement
+      carries `entriesAllowed` (5 or 10, null for unlimited) and a validity window — the
+      mechanism `ProductKind.openDated` already describes. Its price is the fare between the
+      two chosen stations times the pass type's multiplier, quoted here.
+    - **Cancelling a departure is `cancelPerformance`** in `catalogue`, with its approval rule
+      and its `performance-cancelled` event, which refunds and notifies the guests. This
+      context moves the departure to `cancelled` on that event.
+
+    **Not the vehicle.** A coach is a `resources` resource of kind `vehicle`; a departure may
+    name one. **Not the refund or change policy** — "change your trip free up to two hours
+    before departure" is the venue's order modification policy in `orders`.
+
+    ## The seat is held for the whole run
+
+    **Proposed, client to correct (rev 3 REV3-21).** A passenger from Union Square to Mall of
+    the Emirates holds one seat on the departure from its origin to its end, not only between
+    the two stops. It keeps one capacity per departure, which is what a catalogue performance
+    has and what a seat map can show. Reselling a seat after a passenger alights is a per-leg
+    inventory the prototype does not draw and the client has not asked for.
+
+servers:
+  - url: https://{cellHost}/api/v1
+    variables:
+      cellHost:
+        default: cell.ticvai.local
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: station
+  - name: route
+  - name: fare
+  - name: timetable
+  - name: departure
+  - name: pass
+  - name: favourite
+  - name: networkImport
+
+paths:
+  # ---------------------------------------------------------------- stations
+  /transport/stations:
+    get:
+      operationId: listTransportStations
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-076 Intercity Trip — Route & Schedule"
+        - "P02 GST-078 Intercity Trip — Multi-trip Passes"
+        - "P08 BO-1183 Transport Stations"
+        - "P08 BO-1184 Transport Routes & Stops"
+      x-ticvai-audience: [guest, public, staff]
+      x-ticvai-read-routing: replica
+      summary: Stations of a venue's transport network
+      description: >
+        The From and To station menus (decided 29 September, rev 3 REV3-21). A guest or public
+        caller sees active stations only, ordered by `name`. **`includeInactive` is honoured only
+        for a caller holding `TRANSPORT_VIEW`** — the setup list in Venue Management — and is
+        ignored for anyone else.
+
+        **The station list is the venue's own configuration**, entered here or with
+        `importTransportNetwork` (decided 29 September, rev 3 REV3-21: the network is operator configuration). The nine E101 stations of the prototype (Sharjah Al Jubail
+        to Abu Dhabi Central) are seed data for the demo tenant, not a default.
+      tags: [station]
+      x-ticvai-permission: null   # guest/public read of published network data
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: venueId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+        - name: includeInactive
+          in: query
+          schema: { type: boolean, default: false }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Stations
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Station' }
+
+    post:
+      operationId: createTransportStation
+      x-ticvai-consumed-by:
+        - "P08 BO-1183 Transport Stations"
+      x-ticvai-audience: [staff]
+      summary: Add a station
+      description: >
+        Venue Management transport setup (decided 29 September, rev 3 REV3-21). **A station
+        carries coordinates** because the route map places it; a station without them is shown
+        in the stop list and left off the map.
+      tags: [station]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateStationRequest' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Station' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409': { $ref: '../shared/common.yaml#/components/responses/DuplicateCode' }
+
+  /transport/stations/{stationId}:
+    parameters:
+      - name: stationId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    patch:
+      operationId: updateTransportStation
+      x-ticvai-consumed-by:
+        - "P08 BO-1183 Transport Stations"
+      x-ticvai-audience: [staff]
+      summary: Amend or deactivate a station
+      description: >
+        **A station on an active route cannot be deactivated** — the route would offer a stop
+        nobody can book. Remove it from the route first, or suspend the route. The refusal is a
+        409 naming the routes.
+      tags: [station]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { $ref: '#/components/schemas/LocalisedText' }
+                shortName: { $ref: '#/components/schemas/LocalisedText' }
+                latitude: { type: number, minimum: -90, maximum: 90, nullable: true }
+                longitude: { type: number, minimum: -180, maximum: 180, nullable: true }
+                active: { type: boolean }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Station' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: The station is a stop on one or more active routes and cannot be deactivated.
+          x-ticvai-problem-types: [station-on-active-route]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- routes
+  /transport/routes:
+    get:
+      operationId: listTransportRoutes
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-076 Intercity Trip — Route & Schedule"
+        - "P08 BO-1184 Transport Routes & Stops"
+        - "P08 BO-1185 Transport Fares & Passenger Types"
+        - "P08 BO-1186 Transport Timetables"
+        - "P08 BO-1187 Transport Departure Board"
+        - "P08 BO-1188 Transport Pass Types"
+      x-ticvai-audience: [guest, public, staff]
+      x-ticvai-read-routing: replica
+      summary: Routes, optionally those serving a pair of stations
+      description: >
+        With `fromStationId` and `toStationId`, returns the active routes on which the first
+        station comes **before** the second — the direction of travel. A line run both ways is
+        two routes (`E101` outbound and inbound) paired by `pairedRouteId`, so the swap button
+        on the search row lands on the paired route (decided 29 September, rev 3 REV3-21).
+
+        A guest or public caller sees `active` routes only; `status` is honoured only for a
+        caller holding `TRANSPORT_VIEW`.
+      tags: [route]
+      x-ticvai-permission: null   # guest/public read of published network data
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: venueId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+        - name: fromStationId
+          in: query
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        - name: toStationId
+          in: query
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/TransportRouteStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Routes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/TransportRoute' }
+
+    post:
+      operationId: createTransportRoute
+      x-ticvai-consumed-by:
+        - "P08 BO-1184 Transport Routes & Stops"
+      x-ticvai-audience: [staff]
+      summary: Define a route with its ordered stops
+      description: >
+        Created as `draft`. **Creating a route creates its catalogue side** — a catalogue
+        `Event` its departures become performances of, and one product of kind
+        `timedAdmission` whose variants are the fare table's passenger types — so a one-way
+        ticket is sold through the ordinary cart (decided 29 September, rev 3 REV3-21). The
+        catalogue ids come back on the route and are not written by the caller.
+
+        **Stops are ordered and carry an offset** in minutes from the first stop; the first
+        stop's offset is 0 and offsets strictly increase. Arrival time and duration on a
+        departure card are the difference of two offsets.
+      tags: [route]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTransportRouteRequest' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created as draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransportRoute' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409': { $ref: '../shared/common.yaml#/components/responses/DuplicateCode' }
+        '422':
+          description: >
+            Fewer than two stops, a station repeated, a station that is inactive or not in this
+            venue, or offsets that do not start at 0 and strictly increase.
+          x-ticvai-problem-types: [route-stops-invalid]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /transport/routes/{routeId}:
+    parameters:
+      - name: routeId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getTransportRoute
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-077 Intercity Trip — Route & Passengers"
+        - "P08 BO-1184 Transport Routes & Stops"
+      x-ticvai-audience: [guest, public, staff]
+      x-ticvai-read-routing: replica
+      summary: A route with its stops
+      description: >
+        The stop list from origin to end. A guest or public caller gets 404 for a route that is
+        not `active`.
+      tags: [route]
+      x-ticvai-permission: null   # guest/public read of published network data
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Route
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransportRoute' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    patch:
+      operationId: updateTransportRoute
+      x-ticvai-consumed-by:
+        - "P08 BO-1184 Transport Routes & Stops"
+      x-ticvai-audience: [staff]
+      summary: Amend a route
+      description: >
+        **Stops can change only while no published timetable covers a future date.** Every
+        departure already on sale was generated from the old stop offsets, and a ticket sold to
+        a stop that no longer exists is a refund. Withdraw the timetable first; the refusal is
+        a 409. Name, colour and booking cut-off change at any time.
+      tags: [route]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { $ref: '#/components/schemas/LocalisedText' }
+                colour: { type: string, pattern: '^#[0-9a-fA-F]{6}$' }
+                pairedRouteId:
+                  type: string
+                  pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+                  nullable: true
+                bookingCutoffMinutes: { type: integer, minimum: 0, maximum: 1440 }
+                stops:
+                  type: array
+                  minItems: 2
+                  items: { $ref: '#/components/schemas/RouteStopInput' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransportRoute' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: Stops changed while a published timetable covers a future date.
+          x-ticvai-problem-types: [route-has-published-timetable]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: Invalid stops, as on `createTransportRoute`.
+          x-ticvai-problem-types: [route-stops-invalid]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /transport/routes/{routeId}/status:
+    parameters:
+      - name: routeId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    put:
+      operationId: setTransportRouteStatus
+      x-ticvai-consumed-by:
+        - "P08 BO-1184 Transport Routes & Stops"
+      x-ticvai-audience: [staff]
+      summary: Activate, suspend or retire a route
+      description: >
+        `draft` → `active` needs a fare table and at least two stops with coordinates or not
+        (the map omits a stop without them). `active` → `suspended` stops new sales and keeps
+        sold tickets valid. **Retiring is refused while a departure on sale has sold seats** —
+        cancel those departures (`cancelPerformance`) first. See `states/transport-route.yaml`.
+
+        **PUT semantics.** The target is the route in the path; this never creates one.
+      tags: [route]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { $ref: '#/components/schemas/TransportRouteStatus' }
+                reason: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Status set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransportRoute' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: >
+            The transition is not allowed from the current status, the route has no fare table,
+            or retiring a route with sold seats on a departure still on sale.
+          x-ticvai-problem-types: [route-transition-refused, route-has-no-fare-table, route-has-sold-departures]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /transport/routes/{routeId}/map:
+    parameters:
+      - name: routeId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getTransportRouteMap
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-077 Intercity Trip — Route & Passengers"
+      x-ticvai-audience: [guest, public]
+      x-ticvai-read-routing: replica
+      summary: The route drawn for a map, with the journey highlighted
+      description: >
+        The stop list from departure to arrival and the street map beside it (decided 29
+        September, rev 3 REV3-21). Every stop comes back with its coordinates, its order and
+        whether it lies on the journey; the boarding and alighting stops are flagged, so the
+        client draws the departure pin, the arrival pin and the highlighted segment. With no
+        `fromStationId`/`toStationId`, nothing is highlighted.
+
+        **The map tiles are the client's, not this operation's.** The street map needs an
+        internet connection and a third-party tile provider, which is an external dependency
+        needing approval under audit R038; the stop list and the schematic line need neither and
+        are what an offline device shows.
+      tags: [route]
+      x-ticvai-permission: null   # guest/public read of published network data
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: fromStationId
+          in: query
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        - name: toStationId
+          in: query
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+      responses:
+        '200':
+          description: Route map
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RouteMap' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '422':
+          description: A station is not on this route, or the alighting stop comes before the boarding stop.
+          x-ticvai-problem-types: [stations-not-on-route]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- fares
+  /transport/routes/{routeId}/fare-table:
+    parameters:
+      - name: routeId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getTransportFareTable
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-077 Intercity Trip — Route & Passengers"
+        - "P08 BO-1185 Transport Fares & Passenger Types"
+      x-ticvai-audience: [guest, public, staff]
+      x-ticvai-read-routing: replica
+      summary: A route's fares and passenger types
+      description: >
+        The passenger picker reads its types from here (adult, child, student, person of
+        determination), with the proof each asks for. 404 when the route has none yet.
+      tags: [fare]
+      x-ticvai-permission: null   # guest/public read of published network data
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Fare table
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FareTable' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+    put:
+      operationId: setTransportFareTable
+      x-ticvai-consumed-by:
+        - "P08 BO-1185 Transport Fares & Passenger Types"
+      x-ticvai-audience: [staff]
+      summary: Set a route's fares and passenger types
+      description: >
+        Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21). **A
+        change applies to sales from `effectiveFrom`; a ticket already sold keeps its price.**
+        Adding or removing a passenger type adds or retires the matching variant on the route's
+        catalogue product.
+
+        **The fares are the venue's own configuration**, set here by a holder of
+        `TRANSPORT_PRICE` (decided 29 September, rev 3 REV3-21: the network is operator configuration); a route has no fare table until one is set. The prototype's values
+        are seed data for the demo tenant, not a default: `stopCount` model, base AED 5, AED 2.50
+        per stop travelled; adult ×1 (age 12+), child ×0.5 (age 5–11), student ×0.5 (valid
+        student card), person of determination ×0 (Sanad card).
+
+        **PUT semantics.** Creates the table if the route has none; otherwise replaces it.
+      tags: [fare]
+      x-ticvai-permission: TRANSPORT_PRICE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetFareTableRequest' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FareTable' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '422':
+          description: >
+            A `matrix` model missing a station pair the route serves, a passenger type code
+            repeated, no passenger type with `isDefault`, or a multiplier outside 0 to 1.
+          x-ticvai-problem-types: [fare-table-invalid]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /transport/fare-quotes:
+    post:
+      operationId: quoteTransportFare
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-077 Intercity Trip — Route & Passengers"
+        - "P08 BO-1185 Transport Fares & Passenger Types"
+      x-ticvai-audience: [guest, public, service]
+      summary: Price a one-way trip or a pass for a party
+      description: >
+        **Creates nothing; POST because the party is a body.** Returns the adult fare between the
+        two stations, the price per passenger type and the total — or, with `passTypeId`, the
+        pass price and its saving against single trips.
+
+        **The order service calls this when a transport line is added to a cart** (a line whose
+        `attributes.transport` names the route and stations), so the price a guest saw on the
+        departure card and the price on the cart line come from one rule.
+
+        Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads the pair.
+        Per passenger, fare × multiplier, rounded to the currency's minor unit. A pass is
+        `round(fare × pass.fareMultiplier)`; its saving is `fare × referenceTrips − price`.
+      tags: [fare]
+      x-ticvai-permission: null   # guest/public quote; also called cell-internally by OrderService
+      x-ticvai-idempotency-exempt: A computation that writes nothing — a replay returns the same quote and duplicates no row.
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+        - serviceAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/FareQuoteRequest' }
+      responses:
+        '200':
+          description: Quote
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FareQuote' }
+        '422':
+          description: >
+            Stations not on the route or in the wrong order, an unknown passenger type, no
+            passengers, or a pass type not offered on this route.
+          x-ticvai-problem-types: [stations-not-on-route, passenger-type-unknown, pass-type-not-offered]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- timetables
+  /transport/routes/{routeId}/timetables:
+    parameters:
+      - name: routeId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: listTransportTimetables
+      x-ticvai-consumed-by:
+        - "P08 BO-1186 Transport Timetables"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: A route's timetables
+      tags: [timetable]
+      x-ticvai-permission: TRANSPORT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/TransportTimetableStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Timetables, by `validFrom` descending
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Timetable' }
+
+    post:
+      operationId: createTransportTimetable
+      x-ticvai-consumed-by:
+        - "P08 BO-1186 Transport Timetables"
+      x-ticvai-audience: [staff]
+      summary: Draft a timetable for a route
+      description: >
+        Departure times from the route's origin by day of week, valid over a date range. Created
+        as `draft`; nothing is on sale until it is published.
+
+        **The timetable is the venue's own configuration**, drafted here or with
+        `importTransportNetwork` (decided 29 September, rev 3 REV3-21: the network is operator configuration). The prototype's 23 daily departures from 05:30 to 00:15 are
+        seed data for the demo tenant, not a default.
+      tags: [timetable]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTimetableRequest' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created as draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Timetable' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /transport/timetables/{timetableId}:
+    parameters:
+      - name: timetableId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    patch:
+      operationId: updateTransportTimetable
+      x-ticvai-consumed-by:
+        - "P08 BO-1186 Transport Timetables"
+      x-ticvai-audience: [staff]
+      summary: Amend a draft timetable
+      description: >
+        **Draft only.** A published timetable has departures on sale; change it by drafting a
+        new one from a later date, which supersedes it from that date. The refusal is a 409.
+      tags: [timetable]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { type: string, maxLength: 120 }
+                validFrom: { type: string, format: date }
+                validTo: { type: string, format: date, nullable: true }
+                releaseHorizonDays: { type: integer, minimum: 1, maximum: 365 }
+                seatCapacity: { type: integer, minimum: 1, maximum: 200 }
+                seatMapId: { type: string, format: uuid, nullable: true }
+                runs:
+                  type: array
+                  minItems: 1
+                  items: { $ref: '#/components/schemas/TimetableRun' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Timetable' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: The timetable is not a draft.
+          x-ticvai-problem-types: [timetable-not-draft]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /transport/timetables/{timetableId}/publish:
+    parameters:
+      - name: timetableId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: publishTransportTimetable
+      x-ticvai-consumed-by:
+        - "P08 BO-1186 Transport Timetables"
+      x-ticvai-audience: [staff]
+      summary: Publish a timetable and release its departures
+      description: >
+        **Generates the departures** for every date from `validFrom` to today plus
+        `releaseHorizonDays` (proposed default 30, the prototype's "Timetables are released 30
+        days ahead", client to correct (rev 3 REV3-21)), and a nightly job releases one more day
+        after that. Each departure is created as a catalogue performance under the route's
+        event with `seatCapacity` as its channel capacity (`createPerformances`,
+        `createChannelCapacity`), and goes on sale.
+
+        **A published timetable whose dates overlap this one is superseded from this one's
+        `validFrom`**; its departures before that date are untouched, and its unsold departures
+        on or after it are removed. **A departure with sold seats is never removed** — the
+        publish is refused with a 409 listing them, and they are cancelled (`cancelPerformance`)
+        or the new `validFrom` moved.
+
+        The route must be `active` and have a fare table.
+      tags: [timetable]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Published, with the number of departures released
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Timetable' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: >
+            Not a draft, the route is not active or has no fare table, or a superseded timetable
+            has departures with sold seats on or after this `validFrom`.
+          x-ticvai-problem-types: [timetable-not-draft, route-not-active, route-has-no-fare-table, timetable-overlaps-sold-departures]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /transport/timetables/{timetableId}/withdraw:
+    parameters:
+      - name: timetableId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: withdrawTransportTimetable
+      x-ticvai-consumed-by:
+        - "P08 BO-1186 Transport Timetables"
+      x-ticvai-audience: [staff]
+      summary: Withdraw a published timetable
+      description: >
+        Removes its unsold future departures and stops releasing new ones. **Refused while any
+        future departure has sold seats** — cancel those first, so every guest affected is
+        refunded and told through `performance-cancelled`.
+      tags: [timetable]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 3, maxLength: 500 }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Withdrawn
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Timetable' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: Not published, or a future departure has sold seats.
+          x-ticvai-problem-types: [timetable-not-published, timetable-overlaps-sold-departures]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- departures
+  /transport/departures:
+    get:
+      operationId: searchTransportDepartures
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-076 Intercity Trip — Route & Schedule"
+      x-ticvai-audience: [guest, public]
+      x-ticvai-read-routing: replica
+      summary: Search Trips — departures between two stations on a date
+      description: >
+        The departure cards (decided 29 September, rev 3 REV3-21): departure and arrival time
+        at the chosen stops, duration, seats left and fare. **`periodCounts` carries the number
+        of departures in each time period** for the period buttons, whatever `period` filters
+        the items to.
+
+        **Time periods, proposed, client to correct (rev 3 REV3-21):** `morning` 05:00–11:59,
+        `afternoon` 12:00–16:59, `evening` 17:00–20:59, `night` 21:00–04:59, by departure time
+        at the boarding stop, venue local time.
+
+        Only departures `onSale` and before the route's booking cut-off are returned; a
+        `soldOut` departure is returned with `seatsLeft` 0 so the card can say so. With
+        `passengers`, a departure with fewer seats left than the party is marked
+        `fitsParty: false` and the fares are totalled for the party.
+      tags: [departure]
+      x-ticvai-permission: null   # guest/public read of published network data
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: fromStationId
+          in: query
+          required: true
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        - name: toStationId
+          in: query
+          required: true
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        - name: date
+          in: query
+          required: true
+          description: Travel date, venue local.
+          schema: { type: string, format: date }
+        - name: period
+          in: query
+          schema: { $ref: '#/components/schemas/TimePeriod' }
+        - name: passengers
+          in: query
+          description: >
+            The party as `code:count` pairs, one per passenger type (`adult:2`, `child:1`). The
+            codes are the fare table's. Omitted, one adult.
+          style: form
+          explode: true
+          schema:
+            type: array
+            maxItems: 10
+            items: { type: string, pattern: '^[a-z][a-zA-Z0-9]{0,31}:[0-9]{1,2}$' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Departures by departure time at the boarding stop
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    required: [periodCounts]
+                    properties:
+                      adultFare: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                      periodCounts:
+                        type: object
+                        description: Departures on sale in each period on this date.
+                        properties:
+                          morning: { type: integer, minimum: 0 }
+                          afternoon: { type: integer, minimum: 0 }
+                          evening: { type: integer, minimum: 0 }
+                          night: { type: integer, minimum: 0 }
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/DepartureOffer' }
+        '422':
+          description: The stations are the same, or no active route serves them in this order.
+          x-ticvai-problem-types: [stations-not-on-route]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /transport/departures/next:
+    get:
+      operationId: getNextTransportDeparture
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-076 Intercity Trip — Route & Schedule"
+      x-ticvai-audience: [guest, public]
+      x-ticvai-read-routing: replica
+      summary: Next Available Trip
+      description: >
+        **The first departure on sale after `after`** (default now) between the two stations
+        with seats for the party, across dates up to the release horizon (decided 29 September,
+        rev 3 REV3-21). The prototype selects it straight away; the client then shows its card
+        and period. 404 when none is on sale within the horizon.
+      tags: [departure]
+      x-ticvai-permission: null   # guest/public read of published network data
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: fromStationId
+          in: query
+          required: true
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        - name: toStationId
+          in: query
+          required: true
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        - name: after
+          in: query
+          schema: { type: string, format: date-time }
+        - name: passengers
+          in: query
+          description: As on `searchTransportDepartures`.
+          style: form
+          explode: true
+          schema:
+            type: array
+            maxItems: 10
+            items: { type: string, pattern: '^[a-z][a-zA-Z0-9]{0,31}:[0-9]{1,2}$' }
+      responses:
+        '200':
+          description: The next departure
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DepartureOffer' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '422':
+          description: The stations are the same, or no active route serves them in this order.
+          x-ticvai-problem-types: [stations-not-on-route]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /transport/routes/{routeId}/departures:
+    parameters:
+      - name: routeId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: listTransportRouteDepartures
+      x-ticvai-consumed-by:
+        - "P08 BO-1187 Transport Departure Board"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: A route's departures, for operations
+      description: Every status, with seats sold and the vehicle. Venue Management departure board.
+      tags: [departure]
+      x-ticvai-permission: TRANSPORT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/TransportDepartureStatus' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Departures by `departsAt`
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/Departure' }
+
+  /transport/departures/{departureId}:
+    parameters:
+      - name: departureId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    patch:
+      operationId: updateTransportDeparture
+      x-ticvai-consumed-by:
+        - "P08 BO-1187 Transport Departure Board"
+      x-ticvai-audience: [staff]
+      summary: Change a departure's coach or capacity
+      description: >
+        A bigger or smaller coach on one run. **Capacity cannot go below the seats already
+        sold**; the refusal is a 422. The new capacity is written to the performance's channel
+        capacity. To cancel a departure use `cancelPerformance` on its `performanceId`.
+      tags: [departure]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                seatCapacity: { type: integer, minimum: 1, maximum: 200 }
+                vehicleResourceId: { type: string, format: uuid, nullable: true }
+                note: { type: string, maxLength: 500, nullable: true }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Departure' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '422':
+          description: Capacity below seats sold.
+          x-ticvai-problem-types: [capacity-below-sold]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  # ---------------------------------------------------------------- passes
+  /transport/pass-offers:
+    get:
+      operationId: listTransportPassOffers
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-078 Intercity Trip — Multi-trip Passes"
+      x-ticvai-audience: [guest, public]
+      x-ticvai-read-routing: replica
+      summary: Multi-trip passes for a pair of stations, priced, with the saving
+      description: >
+        The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip cards and
+        weekly and monthly unlimited, for the chosen route, each with its price and what it saves
+        against single adult trips. A pass bought here is a catalogue `openDated` product
+        (`catalogueProductId`) added to the cart with `attributes.transport` naming the stations.
+      tags: [pass]
+      x-ticvai-permission: null   # guest/public read of published network data
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      parameters:
+        - name: fromStationId
+          in: query
+          required: true
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        - name: toStationId
+          in: query
+          required: true
+          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Pass offers, by `sortOrder`
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/PassOffer' }
+        '422':
+          description: The stations are the same, or no active route serves them in this order.
+          x-ticvai-problem-types: [stations-not-on-route]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /transport/pass-types:
+    get:
+      operationId: listTransportPassTypes
+      x-ticvai-consumed-by:
+        - "P08 BO-1188 Transport Pass Types"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The venue's multi-trip pass types
+      tags: [pass]
+      x-ticvai-permission: TRANSPORT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: venueId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Pass types
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/PassType' }
+
+    post:
+      operationId: createTransportPassType
+      x-ticvai-consumed-by:
+        - "P08 BO-1188 Transport Pass Types"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: venue
+      summary: Define a multi-trip or unlimited pass
+      description: >
+        **Creates the catalogue product** (kind `openDated`) whose entitlement carries
+        `entriesAllowed` = `trips` (null for unlimited) and a validity of `validityDays` from
+        first use or purchase. Each boarding with the pass consumes one entry at the driver's
+        scan (`access`).
+
+        **Pass types are the venue's own configuration** (decided 29 September, rev 3 REV3-21: the network is operator configuration). The prototype's four are seed data
+        for the demo tenant, not a default: 5-trip, valid 30 days, ×4.5 the single fare; 10-trip,
+        valid 60 days, ×8.5; weekly unlimited, 7 days, ×11 (compared with 14 trips); monthly
+        unlimited, 30 days, ×38 (compared with 60 trips). A pass is valid between the two stations it was bought for, either direction.
+      tags: [pass]
+      x-ticvai-permission: TRANSPORT_PRICE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreatePassTypeRequest' }
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PassType' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409': { $ref: '../shared/common.yaml#/components/responses/DuplicateCode' }
+
+  /transport/pass-types/{passTypeId}:
+    parameters:
+      - name: passTypeId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    patch:
+      operationId: updateTransportPassType
+      x-ticvai-consumed-by:
+        - "P08 BO-1188 Transport Pass Types"
+      x-ticvai-audience: [staff]
+      x-ticvai-config-scope: venue
+      summary: Amend or retire a pass type
+      description: >
+        **A pass already sold keeps its trips, validity and price.** A change applies to passes
+        sold after it; `active: false` stops selling it.
+      tags: [pass]
+      x-ticvai-permission: TRANSPORT_PRICE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                name: { $ref: '#/components/schemas/LocalisedText' }
+                description: { $ref: '#/components/schemas/LocalisedText' }
+                fareMultiplier: { type: number, minimum: 0, maximum: 1000 }
+                referenceTrips: { type: integer, minimum: 1, maximum: 1000 }
+                validityDays: { type: integer, minimum: 1, maximum: 366 }
+                routeIds:
+                  type: array
+                  items: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                sortOrder: { type: integer, minimum: 0 }
+                active: { type: boolean }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PassType' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  # ---------------------------------------------------------------- favourites
+  /transport/favourite-routes:
+    get:
+      operationId: listMyFavouriteRoutes
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-079 Intercity Trip — Favourite Routes"
+      x-ticvai-audience: [guest]
+      x-ticvai-read-routing: primary
+      summary: The caller's saved routes
+      description: >
+        The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of stations
+        with its current adult fare and **Book this route**, which fills the one-way search.
+        Scoped to the caller; newest first.
+      tags: [favourite]
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - name: venueId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Saved routes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/FavouriteRoute' }
+        '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+
+    post:
+      operationId: saveFavouriteRoute
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-077 Intercity Trip — Route & Passengers"
+      x-ticvai-audience: [guest]
+      summary: Save route
+      description: >
+        **Save route** on the one-way tab. One favourite per guest per pair of stations in this
+        direction: saving it again returns the existing one with 200. **At most 20 per guest per
+        venue, proposed, client to correct (rev 3 REV3-21)**; the 21st is a 409.
+      tags: [favourite]
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [venueId, fromStationId, toStationId]
+              properties:
+                venueId: { type: string, format: uuid }
+                fromStationId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                toStationId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                label: { type: string, maxLength: 60, nullable: true }
+      responses:
+        '200':
+          description: Already saved; the existing favourite
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FavouriteRoute' }
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Saved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FavouriteRoute' }
+        '409':
+          description: The guest already has the maximum number of saved routes.
+          x-ticvai-problem-types: [favourite-limit-reached]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: The stations are the same, or no active route serves them in this order.
+          x-ticvai-problem-types: [stations-not-on-route]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /transport/favourite-routes/{favouriteId}:
+    parameters:
+      - name: favouriteId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    delete:
+      operationId: deleteFavouriteRoute
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-079 Intercity Trip — Favourite Routes"
+      x-ticvai-audience: [guest]
+      summary: Remove a saved route
+      tags: [favourite]
+      x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-self-scoped: subject
+      security:
+        - guestAuth: []
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '204':
+          description: Removed
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+  # ---------------------------------------------------------------- network import
+  /transport/network-imports:
+    post:
+      operationId: importTransportNetwork
+      x-ticvai-consumed-by:
+        - "P08 BO-1189 Transport Network Import"
+      x-ticvai-audience: [staff]
+      summary: Read a network file into a preview
+      description: >
+        **Bulk entry of a venue's network** — stations, routes with their ordered stops, and
+        timetables — for an operator with more than a handful to type (decided 29 September,
+        rev 3 REV3-21: the network is operator configuration entered in Venue Management, not
+        an open value from the client). The same import-then-publish pattern as the venue map
+        (`venue-map.importVenueGeometry`): **nothing is written to the network until a person
+        applies the preview**, and applying never puts anything on sale.
+
+        **Two formats.** `csvBundle`: a zip of four CSV files, header on row 1, UTF-8 —
+        `stations.csv` (code, name, nameAr, latitude, longitude), `routes.csv` (code, lineCode,
+        name, pairedRouteCode), `route_stops.csv` (routeCode, sequence, stationCode,
+        offsetMinutes) and `timetables.csv` (routeCode, validFrom, validTo, daysOfWeek,
+        departureTimes, seatCapacity). `gtfs`: a GTFS static feed (`stops.txt`, `routes.txt`,
+        `trips.txt`, `stop_times.txt`, `calendar.txt`); stops become stations, each route and
+        direction a route (the two directions paired), a representative trip's stop times the
+        stop offsets, and the trips' first departure times by service calendar the timetable
+        runs. **Fares are not imported** — they are set with `setTransportFareTable` by a
+        holder of `TRANSPORT_PRICE`, the same separation as the permissions.
+
+        **The file is uploaded first, through `assets`** (`createUpload`, the signed URL,
+        `completeUpload`), and its `MediaAsset.id` is `sourceRef`, as for the venue map.
+        Uploading needs `ASSET_LIBRARY_MANAGE` as well.
+
+        **Returns `202` with the import, which is `validating`.** Poll
+        `getTransportNetworkImport` until it is `previewReady` or `failed`. Stations match
+        existing ones by `code` and routes by `code`: a match is an update, anything else is
+        new. A file that yields no station, route or timetable is `failed` with
+        `nothingFound`, never an empty success.
+      tags: [networkImport]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ImportTransportNetworkRequest' }
+      responses:
+        '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Accepted; the file is being validated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransportNetworkImport' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '422':
+          description: The asset is not ready, not in this venue, or not a zip.
+          x-ticvai-problem-types: [asset-not-ready, asset-not-a-zip]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /transport/network-imports/{importId}:
+    parameters:
+      - name: importId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    get:
+      operationId: getTransportNetworkImport
+      x-ticvai-consumed-by:
+        - "P08 BO-1189 Transport Network Import"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: primary
+      summary: An import's status, preview counts and findings
+      description: >
+        What the file would change — stations, routes, stops and timetables to create and to
+        update — and every finding, so the setup screen can show the preview before anyone
+        applies it (rev 3 REV3-21). Read from the primary because it is polled while the
+        import validates.
+      tags: [networkImport]
+      x-ticvai-permission: TRANSPORT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The import
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransportNetworkImport' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+
+  /transport/network-imports/{importId}/apply:
+    parameters:
+      - name: importId
+        in: path
+        required: true
+        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    post:
+      operationId: applyTransportNetworkImport
+      x-ticvai-consumed-by:
+        - "P08 BO-1189 Transport Network Import"
+      x-ticvai-audience: [staff]
+      summary: Apply a previewed import to the network
+      description: >
+        **A person applies; the import never applies itself** (rev 3 REV3-21, the venue-map
+        pattern). Writes the preview in one transaction: stations created or updated, routes
+        created as `draft` with their stops, a `draft` route's stops replaced, and timetables
+        created as `draft`. **Nothing goes on sale**: a route is still activated with
+        `setTransportRouteStatus`, it still needs a fare table, and a timetable is still
+        published with `publishTransportTimetable`.
+
+        **An `active` route's stops are never changed by an import** — a sold ticket names its
+        stops. The preview reports `routeActiveStopsChanged` and the apply skips that route's
+        stops, as `updateTransportRoute` would refuse them.
+
+        Refused `409` while the import has any `error` finding, is not `previewReady`, or the
+        network changed after validation (the preview no longer describes what would happen;
+        import the file again).
+      tags: [networkImport]
+      x-ticvai-permission: TRANSPORT_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Applied, with what was written
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransportNetworkImport' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: Not `previewReady`, has error findings, or the network changed since validation.
+          x-ticvai-problem-types: [import-not-ready, import-has-errors, import-stale]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+components:
+  schemas:
+    TransportNetworkImportStatus:
+      type: string
+      description: >
+        `validating` → `previewReady` or `failed`; `previewReady` → `applied`, or `expired`
+        after 7 days unapplied (proposed, client to correct). States in
+        `states/transport-network-import.yaml` (rev 3 REV3-21).
+      enum: [validating, previewReady, failed, applied, expired]
+
+    ImportTransportNetworkRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [format, sourceRef]
+      properties:
+        format:
+          type: string
+          enum: [csvBundle, gtfs]
+          description: A zip of the four CSV files described on `importTransportNetwork`, or a GTFS static feed.
+        sourceRef:
+          type: string
+          format: uuid
+          description: The uploaded file, as the `MediaAsset.id` from `assets.completeUpload`. Never a URL.
+          x-ticvai-references: assets.MediaAsset
+        include:
+          type: array
+          uniqueItems: true
+          description: Which parts of the file to read. Absent reads all three.
+          items: { type: string, enum: [stations, routes, timetables] }
+
+    TransportNetworkImportFinding:
+      x-ticvai-persistence: "none — stored as jsonb on transport.network_import.findings"
+      type: object
+      required: [code, severity, message]
+      properties:
+        code:
+          type: string
+          enum:
+            - nothingFound
+            - fileMissing
+            - headerMismatch
+            - stationCodeDuplicate
+            - stationCoordinatesMissing
+            - routeCodeDuplicate
+            - routeStopUnknownStation
+            - routeOffsetsNotIncreasing
+            - routePairUnknown
+            - routeActiveStopsChanged
+            - timetableRouteUnknown
+            - timetableTimeInvalid
+            - timetableDatesInvalid
+            - gtfsCalendarUnsupported
+          description: >
+            `stationCoordinatesMissing` is a warning (the station is listed and left off the
+            map); `routeActiveStopsChanged` is a warning (those stops are skipped); every other
+            code is an error and blocks the apply.
+        severity: { type: string, enum: [error, warning] }
+        file: { type: string, nullable: true, description: 'e.g. `route_stops.csv` or `stop_times.txt`.' }
+        row: { type: integer, minimum: 1, nullable: true }
+        reference: { type: string, nullable: true, description: The station, route or timetable code concerned. }
+        message: { type: string, maxLength: 500 }
+
+    TransportNetworkImport:
+      x-ticvai-persistence: "transport.network_import"
+      type: object
+      required: [id, venueId, format, sourceRef, status]
+      properties:
+        id: { $ref: '#/components/schemas/Ulid' }
+        venueId: { type: string, format: uuid, readOnly: true }
+        format: { type: string, enum: [csvBundle, gtfs] }
+        sourceRef:
+          type: string
+          format: uuid
+          x-ticvai-references: assets.MediaAsset
+        status: { $ref: '#/components/schemas/TransportNetworkImportStatus' }
+        preview:
+          type: object
+          nullable: true
+          readOnly: true
+          description: What applying would write. Null until `previewReady`.
+          properties:
+            stationsToCreate: { type: integer, minimum: 0 }
+            stationsToUpdate: { type: integer, minimum: 0 }
+            routesToCreate: { type: integer, minimum: 0 }
+            routesToUpdate: { type: integer, minimum: 0 }
+            stopsToWrite: { type: integer, minimum: 0 }
+            timetablesToCreate: { type: integer, minimum: 0 }
+        findings:
+          type: array
+          readOnly: true
+          maxItems: 1000
+          items: { $ref: '#/components/schemas/TransportNetworkImportFinding' }
+        createdBy: { type: string, format: uuid, readOnly: true }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        appliedBy: { type: string, format: uuid, nullable: true, readOnly: true }
+        appliedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+    LocalisedText:
+      type: object
+      additionalProperties: { type: string }
+
+    Ulid:
+      type: string
+      pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+
+    TransportRouteStatus:
+      type: string
+      enum: [draft, active, suspended, retired]
+
+    TransportTimetableStatus:
+      type: string
+      enum: [draft, published, superseded, withdrawn]
+
+    TransportDepartureStatus:
+      type: string
+      description: >
+        Mirrors the catalogue performance behind the departure, in the words a coach operator
+        uses. `soldOut` is computed from availability, never set.
+      enum: [scheduled, onSale, soldOut, departed, cancelled]
+
+    TimePeriod:
+      type: string
+      description: >
+        Proposed, client to correct (rev 3 REV3-21): `morning` 05:00–11:59, `afternoon`
+        12:00–16:59, `evening` 17:00–20:59, `night` 21:00–04:59.
+      enum: [morning, afternoon, evening, night]
+
+    FareModel:
+      type: string
+      description: >
+        `stopCount`: base plus an amount per stop travelled — the prototype's rule. `matrix`: a
+        fare for each pair of stops, for a network whose fares are zonal or negotiated. Which
+        one a route uses is the venue's choice in `setTransportFareTable` (rev 3 REV3-21).
+      enum: [stopCount, matrix]
+
+    CreateStationRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [venueId, code, name]
+      properties:
+        venueId: { type: string, format: uuid }
+        code:
+          type: string
+          maxLength: 32
+          x-ticvai-unique: venue
+          description: Short operator code, e.g. `SHJ-JUB`. Unique in the venue.
+        name: { $ref: '#/components/schemas/LocalisedText' }
+        shortName:
+          $ref: '#/components/schemas/LocalisedText'
+          description: The label on the route diagram and the map pin (`Union Sq`, `MoE`).
+        latitude: { type: number, minimum: -90, maximum: 90, nullable: true }
+        longitude: { type: number, minimum: -180, maximum: 180, nullable: true }
+
+    Station:
+      x-ticvai-persistence: "transport.station"
+      allOf:
+        - $ref: '#/components/schemas/CreateStationRequest'
+        - type: object
+          required: [id, active]
+          properties:
+            id: { $ref: '#/components/schemas/Ulid' }
+            active: { type: boolean, default: true }
+
+    RouteStopInput:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [stationId, offsetMinutes]
+      properties:
+        stationId: { $ref: '#/components/schemas/Ulid' }
+        offsetMinutes:
+          type: integer
+          minimum: 0
+          maximum: 1440
+          description: >
+            Minutes after the departure from the first stop that the coach leaves this one. 0 on
+            the first stop; strictly increasing along the route.
+        boardingAllowed: { type: boolean, default: true }
+        alightingAllowed: { type: boolean, default: true }
+
+    RouteStop:
+      x-ticvai-persistence: "transport.route_stop"
+      allOf:
+        - $ref: '#/components/schemas/RouteStopInput'
+        - type: object
+          required: [id, sequence]
+          properties:
+            id: { $ref: '#/components/schemas/Ulid' }
+            sequence: { type: integer, minimum: 1, description: 1 for the origin. }
+            station: { $ref: '#/components/schemas/Station' }
+
+    CreateTransportRouteRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [venueId, code, name, stops]
+      properties:
+        venueId: { type: string, format: uuid }
+        code:
+          type: string
+          maxLength: 32
+          x-ticvai-unique: venue
+          description: The line and direction, e.g. `E101-Out`. Unique in the venue.
+        lineCode:
+          type: string
+          maxLength: 16
+          description: The public line number shared by both directions, e.g. `E101`.
+        name: { $ref: '#/components/schemas/LocalisedText' }
+        colour: { type: string, pattern: '^#[0-9a-fA-F]{6}$' }
+        pairedRouteId:
+          type: string
+          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          nullable: true
+          description: The same line run the other way. The swap button lands on it.
+        bookingCutoffMinutes:
+          type: integer
+          minimum: 0
+          maximum: 1440
+          default: 5
+          description: >
+            How long before a departure leaves the boarding stop that online sale stops.
+            Proposed default 5, from the prototype's "Boarding closes five minutes before
+            departure", client to correct (rev 3 REV3-21).
+        stops:
+          type: array
+          minItems: 2
+          maxItems: 100
+          items: { $ref: '#/components/schemas/RouteStopInput' }
+
+    TransportRoute:
+      x-ticvai-persistence: "transport.route + transport.route_stop"
+      allOf:
+        - $ref: '#/components/schemas/CreateTransportRouteRequest'
+        - type: object
+          required: [id, status]
+          properties:
+            id: { $ref: '#/components/schemas/Ulid' }
+            status: { $ref: '#/components/schemas/TransportRouteStatus' }
+            stops:
+              type: array
+              items: { $ref: '#/components/schemas/RouteStop' }
+            totalMinutes:
+              type: integer
+              readOnly: true
+              description: The last stop's offset.
+            catalogueEventId:
+              type: string
+              format: uuid
+              readOnly: true
+              description: The catalogue event its departures are performances of. Created with the route.
+            catalogueProductId:
+              type: string
+              format: uuid
+              readOnly: true
+              description: >
+                The one-way trip product (kind `timedAdmission`); one variant per passenger type.
+                Created with the route.
+
+    RouteMap:
+      x-ticvai-persistence: "none — projection"
+      type: object
+      required: [routeId, stops]
+      properties:
+        routeId: { $ref: '#/components/schemas/Ulid' }
+        lineCode: { type: string }
+        colour: { type: string }
+        stops:
+          type: array
+          description: Every stop in route order.
+          items:
+            type: object
+            required: [stationId, sequence, name, onJourney]
+            properties:
+              stationId: { $ref: '#/components/schemas/Ulid' }
+              sequence: { type: integer }
+              name: { type: string, description: Localised to the caller. }
+              shortName: { type: string }
+              latitude: { type: number, nullable: true }
+              longitude: { type: number, nullable: true }
+              offsetMinutes: { type: integer }
+              onJourney: { type: boolean, description: Between the boarding and alighting stops, inclusive. }
+              isBoarding: { type: boolean }
+              isAlighting: { type: boolean }
+        intermediateStopCount:
+          type: integer
+          description: Stops between boarding and alighting — the number behind "Show full route (n stops)".
+        bounds:
+          type: object
+          nullable: true
+          description: The box around the stops with coordinates, for the map's initial view.
+          properties:
+            south: { type: number }
+            west: { type: number }
+            north: { type: number }
+            east: { type: number }
+
+    PassengerType:
+      x-ticvai-persistence: "transport.fare_passenger_type"
+      type: object
+      required: [code, name, fareMultiplier]
+      properties:
+        code:
+          type: string
+          pattern: '^[a-z][a-zA-Z0-9]{0,31}$'
+          description: '`adult`, `child`, `student`, `determination`. Unique in the fare table.'
+        name: { $ref: '#/components/schemas/LocalisedText' }
+        description:
+          $ref: '#/components/schemas/LocalisedText'
+          description: What the picker shows under the name ("Age 5–11 · half fare").
+        fareMultiplier:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Share of the adult fare, set by the venue. The demo tenant's seed is 1 adult, 0.5 child and student, 0 person of determination (seed data, not a default).
+        minAge: { type: integer, minimum: 0, nullable: true }
+        maxAge: { type: integer, minimum: 0, nullable: true }
+        proofRequired:
+          $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: Checked by the driver at boarding ("Valid student card", "Sanad card").
+        isDefault:
+          type: boolean
+          default: false
+          description: The type a new search starts with, one of it. Exactly one per table.
+        catalogueVariantId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: The variant of the route's trip product this type is sold as.
+
+    SetFareTableRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [model, passengerTypes, effectiveFrom]
+      properties:
+        model: { $ref: '#/components/schemas/FareModel' }
+        baseFare:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: '`stopCount` only. Set by the venue; AED 5 in the demo tenant''s seed data, not a default (rev 3 REV3-21).'
+        perStopFare:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: '`stopCount` only. Set by the venue; AED 2.50 in the demo tenant''s seed data, not a default (rev 3 REV3-21).'
+        matrix:
+          type: array
+          description: '`matrix` only. One adult fare per ordered pair of stops the route serves; the reverse pair is its own row.'
+          items:
+            type: object
+            required: [fromStationId, toStationId, fare]
+            properties:
+              fromStationId: { $ref: '#/components/schemas/Ulid' }
+              toStationId: { $ref: '#/components/schemas/Ulid' }
+              fare: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        passengerTypes:
+          type: array
+          minItems: 1
+          maxItems: 10
+          items: { $ref: '#/components/schemas/PassengerType' }
+        effectiveFrom: { type: string, format: date-time }
+
+    FareTable:
+      x-ticvai-persistence: "transport.fare_table + transport.fare_passenger_type + transport.fare_matrix_cell"
+      allOf:
+        - $ref: '#/components/schemas/SetFareTableRequest'
+        - type: object
+          required: [id, routeId]
+          properties:
+            id: { $ref: '#/components/schemas/Ulid' }
+            routeId: { $ref: '#/components/schemas/Ulid' }
+
+    FareQuoteRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [fromStationId, toStationId]
+      properties:
+        routeId:
+          $ref: '#/components/schemas/Ulid'
+          description: Omitted, the active route serving the two stations in this order.
+        fromStationId: { $ref: '#/components/schemas/Ulid' }
+        toStationId: { $ref: '#/components/schemas/Ulid' }
+        passengers:
+          type: array
+          maxItems: 10
+          description: Omitted, one of the default type. Ignored with `passTypeId`.
+          items:
+            type: object
+            required: [code, count]
+            properties:
+              code: { type: string }
+              count: { type: integer, minimum: 0, maximum: 99 }
+        passTypeId: { $ref: '#/components/schemas/Ulid' }
+        at:
+          type: string
+          format: date-time
+          description: The sale instant the fare table is read at. Default now.
+
+    FareQuote:
+      x-ticvai-persistence: "none — computed"
+      type: object
+      required: [routeId, stopsTravelled, adultFare, total]
+      properties:
+        routeId: { $ref: '#/components/schemas/Ulid' }
+        stopsTravelled: { type: integer, minimum: 1 }
+        adultFare: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [code, count, unitPrice, lineTotal]
+            properties:
+              code: { type: string }
+              catalogueVariantId: { type: string, format: uuid }
+              count: { type: integer }
+              unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+              lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        passTypeId: { $ref: '#/components/schemas/Ulid' }
+        saving:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: With `passTypeId`, single adult fare × `referenceTrips` minus the pass price.
+        total: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    TimetableRun:
+      x-ticvai-persistence: "transport.timetable_run"
+      type: object
+      required: [departsAt, days]
+      properties:
+        departsAt:
+          type: string
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+          description: Venue local time, 24-hour `HH:MM`, at the route's first stop.
+        days:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { type: string, enum: [mon, tue, wed, thu, fri, sat, sun] }
+
+    CreateTimetableRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [name, validFrom, seatCapacity, runs]
+      properties:
+        name: { type: string, maxLength: 120 }
+        validFrom: { type: string, format: date }
+        validTo: { type: string, format: date, nullable: true }
+        releaseHorizonDays:
+          type: integer
+          minimum: 1
+          maximum: 365
+          default: 30
+          description: >
+            How many days ahead departures go on sale. Proposed default 30, from the prototype,
+            client to correct (rev 3 REV3-21).
+        seatCapacity:
+          type: integer
+          minimum: 1
+          maximum: 200
+          description: Seats per departure, unless a departure overrides it.
+        seatMapId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The coach seat map for Seat Selection (`seating`). Null sells unallocated seats.
+        runs:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items: { $ref: '#/components/schemas/TimetableRun' }
+
+    Timetable:
+      x-ticvai-persistence: "transport.timetable + transport.timetable_run"
+      allOf:
+        - $ref: '#/components/schemas/CreateTimetableRequest'
+        - type: object
+          required: [id, routeId, status]
+          properties:
+            id: { $ref: '#/components/schemas/Ulid' }
+            routeId: { $ref: '#/components/schemas/Ulid' }
+            status: { $ref: '#/components/schemas/TransportTimetableStatus' }
+            publishedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+            releasedThrough:
+              type: string
+              format: date
+              nullable: true
+              readOnly: true
+              description: The last date whose departures have been generated.
+            supersededById: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true, readOnly: true }
+
+    Departure:
+      x-ticvai-persistence: "transport.departure"
+      type: object
+      required: [id, routeId, timetableId, performanceId, serviceDate, departsAt, status, seatCapacity]
+      properties:
+        id: { $ref: '#/components/schemas/Ulid' }
+        routeId: { $ref: '#/components/schemas/Ulid' }
+        timetableId: { $ref: '#/components/schemas/Ulid' }
+        performanceId:
+          type: string
+          format: uuid
+          description: The catalogue performance this departure is sold as. Cart lines carry it.
+        serviceDate: { type: string, format: date }
+        departsAt:
+          type: string
+          format: date-time
+          description: At the route's first stop.
+        status: { $ref: '#/components/schemas/TransportDepartureStatus' }
+        seatCapacity: { type: integer, minimum: 1 }
+        seatsSold:
+          type: integer
+          readOnly: true
+          x-ticvai-persisted: false
+          description: From catalogue availability on read; not stored here.
+        vehicleResourceId: { type: string, format: uuid, nullable: true }
+        note: { type: string, nullable: true }
+
+    DepartureOffer:
+      x-ticvai-persistence: "none — projection"
+      type: object
+      required: [departureId, performanceId, routeId, departsAt, arrivesAt, durationMinutes, seatsLeft, fare, period]
+      properties:
+        departureId: { $ref: '#/components/schemas/Ulid' }
+        performanceId: { type: string, format: uuid }
+        routeId: { $ref: '#/components/schemas/Ulid' }
+        routeCode: { type: string, description: 'The price card''s label, e.g. `E101-Out`.' }
+        departsAt: { type: string, format: date-time, description: At the boarding stop. }
+        arrivesAt: { type: string, format: date-time, description: At the alighting stop. }
+        durationMinutes: { type: integer, minimum: 0 }
+        period: { $ref: '#/components/schemas/TimePeriod' }
+        seatsLeft:
+          type: integer
+          minimum: 0
+          description: Catalogue availability for the performance. Display only; the hold decides the sale.
+        fitsParty: { type: boolean }
+        fare:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+          description: One adult, one way.
+        partyTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    CreatePassTypeRequest:
+      x-ticvai-persistence: "none — request only"
+      type: object
+      required: [venueId, code, name, kind, fareMultiplier, referenceTrips, validityDays]
+      properties:
+        venueId: { type: string, format: uuid }
+        code:
+          type: string
+          maxLength: 32
+          x-ticvai-unique: venue
+        name: { $ref: '#/components/schemas/LocalisedText' }
+        description: { $ref: '#/components/schemas/LocalisedText' }
+        kind:
+          type: string
+          enum: [multiTrip, unlimited]
+        trips:
+          type: integer
+          minimum: 2
+          maximum: 100
+          nullable: true
+          description: Journeys included. Required for `multiTrip`; null for `unlimited`.
+        fareMultiplier:
+          type: number
+          minimum: 0
+          maximum: 1000
+          description: The pass price as a multiple of the single adult fare between its two stations.
+        referenceTrips:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          description: >
+            The single trips the saving is measured against — `trips` for a multi-trip card, an
+            number the venue sets for unlimited (14 a week, 60 a month in the demo seed data).
+        validityDays: { type: integer, minimum: 1, maximum: 366 }
+        routeIds:
+          type: array
+          description: Routes it is sold on. Empty means every active route in the venue.
+          items: { $ref: '#/components/schemas/Ulid' }
+        sortOrder: { type: integer, minimum: 0, default: 0 }
+
+    PassType:
+      x-ticvai-persistence: "transport.pass_type"
+      allOf:
+        - $ref: '#/components/schemas/CreatePassTypeRequest'
+        - type: object
+          required: [id, active]
+          properties:
+            id: { $ref: '#/components/schemas/Ulid' }
+            active: { type: boolean, default: true }
+            catalogueProductId:
+              type: string
+              format: uuid
+              readOnly: true
+              description: The catalogue `openDated` product this pass is sold as.
+
+    PassOffer:
+      x-ticvai-persistence: "none — projection"
+      type: object
+      required: [passTypeId, catalogueProductId, name, price, validityDays]
+      properties:
+        passTypeId: { $ref: '#/components/schemas/Ulid' }
+        catalogueProductId: { type: string, format: uuid }
+        routeId: { $ref: '#/components/schemas/Ulid' }
+        name: { type: string }
+        description: { type: string }
+        kind: { type: string, enum: [multiTrip, unlimited] }
+        trips: { type: integer, nullable: true }
+        validityDays: { type: integer }
+        price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        saving: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+    FavouriteRoute:
+      x-ticvai-persistence: "transport.favourite_route"
+      type: object
+      required: [id, venueId, fromStationId, toStationId, createdAt]
+      description: Unique per guest, venue and ordered pair of stations.
+      properties:
+        id: { $ref: '#/components/schemas/Ulid' }
+        venueId: { type: string, format: uuid }
+        fromStationId: { $ref: '#/components/schemas/Ulid' }
+        toStationId: { $ref: '#/components/schemas/Ulid' }
+        fromStationName: { type: string, readOnly: true }
+        toStationName: { type: string, readOnly: true }
+        label: { type: string, nullable: true }
+        adultFare:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+          readOnly: true
+          x-ticvai-persisted: false
+          description: The current fare, read on list.
+        createdAt: { type: string, format: date-time }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    guestAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    serviceAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key

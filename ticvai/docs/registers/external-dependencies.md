@@ -188,6 +188,7 @@ We write each adapter spec against the vendor's own documentation. **Payments fo
 | Password breach check (`requireBreachCheck`, `identity.yaml`) | [client to name] | Open — vendor | [date to be set when named] | [client to name] |
 | Apple and Google wallet pass signing | Apple Wallet and Google Wallet (S-6); the signing account holder is [client to name] | Open — account holder | [date to be set when named] | [client to name] |
 | DNS and certificates for custom domains | [client to name] | Open — vendor | [date to be set when named] | [client to name] |
+| Street-map tiles for the transport route map (`transport.getTransportRouteMap`; S-8 platform service, added 29 September, rev 3 REV3-21) | [client to name] — the prototype uses Leaflet with online tiles. Needs an internet connection; the stop list and the schematic line work offline without it. Approval under audit R038 (approver [client to name], action 14) | Open — vendor and approval | [date to be set when named] | [client to name] |
 
 #### Payment sandboxes (audit R065)
 

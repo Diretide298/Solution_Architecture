@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 182 operations, 10 tables
+title: AccessService — 206 operations, 12 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -9,20 +9,20 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
   precisely because the gate cannot afford the arithmetic.
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
-  operations: 182
+  operations: 206
   inAFlow: 161
-  percent: 88%
+  percent: 78%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: access
-  tables: 10
+  tables: 12
   stores:
   - postgres
   largestTable: access.entitlement
 operationsByContract:
 - contract: access
-  count: 182
+  count: 206
   operations:
   - operation: addBlacklistEntry
     verb: POST
@@ -72,6 +72,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 2
+  - operation: deliverCredential
+    verb: POST
+    path: /credentials/{credentialId}/deliveries
+    scope: venue
+    permission: ORDER_REPRINT
+    offline: false
+    reads: 0
+    writes: 0
   - operation: enrolFacePass
     verb: POST
     path: /face-pass/enrolments
@@ -94,6 +102,14 @@ operationsByContract:
     scope: venue
     permission: SCOPE_VIEW
     offline: true
+    reads: 1
+    writes: 0
+  - operation: getCredentialIssuanceRetryPolicy
+    verb: GET
+    path: /credential-issuance-retry-policy
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
     reads: 1
     writes: 0
   - operation: getEntitlement
@@ -1072,6 +1088,14 @@ operationsByContract:
     offline: true
     reads: 4
     writes: 2
+  - operation: publishHardwareDeployment
+    verb: POST
+    path: /hardware-deployments
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: publishMediaCompatibilityTesting
     verb: PUT
     path: /media-compatibility-testing
@@ -1104,6 +1128,30 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: replaceCredential
+    verb: POST
+    path: /credentials/{credentialId}/replace
+    scope: venue
+    permission: ORDER_EXCHANGE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: resolveCredentialException
+    verb: POST
+    path: /credential-exceptions/{exceptionId}/resolve
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: retryCredentialGeneration
+    verb: POST
+    path: /credential-generation-issuance/retry
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: revokeFacePass
     verb: DELETE
     path: /face-pass/enrolments/{enrolmentId}
@@ -1112,9 +1160,25 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: rollbackAccessPolicy
+    verb: POST
+    path: /dynamic-access-policy/{policyId}/rollback
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setAccessAreaZone
     verb: PUT
     path: /access-area-zone
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setAccessAttributeCatalog
+    verb: PUT
+    path: /access-attribute-catalog
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1152,6 +1216,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setBiometricLifecycleRetention
+    verb: PUT
+    path: /biometric-lifecycle-retention
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setBiometricVerificationProfile
     verb: PUT
     path: /biometric-verification-profile
@@ -1168,6 +1240,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setBrandingLocalizationTemplate
+    verb: PUT
+    path: /branding-localization-template
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setContextTimeEvent
     verb: PUT
     path: /context-time-event
@@ -1175,6 +1255,22 @@ operationsByContract:
     permission: ACCESS_POINT_CONFIGURE
     offline: false
     reads: 0
+    writes: 0
+  - operation: setCredentialActivationDisplay
+    verb: PUT
+    path: /credential-activation-display
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setCredentialIssuanceRetryPolicy
+    verb: PUT
+    path: /credential-issuance-retry-policy
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 1
     writes: 0
   - operation: setDeviceSoftwareContent
     verb: PUT
@@ -1232,6 +1328,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setEntitlementConsumption
+    verb: PUT
+    path: /entitlement-consumption
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setEntryRulePoints
     verb: PUT
     path: /admission-rules/{ruleId}/points
@@ -1240,9 +1344,33 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+  - operation: setFaceMatchingVerification
+    verb: PUT
+    path: /face-matching-verification
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setFacePassEnrollment
     verb: PUT
     path: /face-pass-enrollment
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setFaceTagTemporaryEnrollment
+    verb: PUT
+    path: /face-tag-temporary
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setFraudDetectionRule
+    verb: PUT
+    path: /fraud-detection-rule
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1272,6 +1400,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setGuestCompanionEligibility
+    verb: PUT
+    path: /guest-companion-eligibility
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setHandheldMobileAccess
     verb: PUT
     path: /handheld-mobile-access
@@ -1280,9 +1416,41 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: setHotelWalletExternal
+    verb: PUT
+    path: /hotel-wallet-external
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setMediaBindingActivation
     verb: PUT
     path: /media-binding-activation
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setMediaIssuanceEncoding
+    verb: PUT
+    path: /media-issuance-encoding
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setMediaReplacementRevocation
+    verb: PUT
+    path: /media-replacement-revocation
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setMediaTypeTechnology
+    verb: PUT
+    path: /media-type-technology
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1307,6 +1475,14 @@ operationsByContract:
   - operation: setPdfPrintablePos
     verb: PUT
     path: /pdf-printable-pos
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setPolicyScopeHierarchy
+    verb: PUT
+    path: /policy-scope-hierarchy
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1403,6 +1579,22 @@ operationsByContract:
   - operation: setVisualDynamicPolicy
     verb: PUT
     path: /visual-dynamic-policy
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: simulateBiometricConfiguration
+    verb: POST
+    path: /biometric/simulate
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: simulateGuestJourney
+    verb: POST
+    path: /guest-journey/simulate
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1558,7 +1750,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.admission_rules
-  columns: 11
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -1570,6 +1762,12 @@ tables:
   parent: null
   writtenBy:
   - access
+  foreignWriters: null
+- table: access.credential_issuance_retry_policy
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: access.entitlement
   columns: 26
@@ -1588,6 +1786,12 @@ tables:
   parent: null
   writtenBy:
   - access
+  foreignWriters: null
+- table: access.hardware_deployment
+  columns: 14
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: access.parking_entitlement
   columns: 12
@@ -1688,8 +1892,8 @@ screens:
 - P02:GST-055 Dynamic QR Ticket
 - P02:GST-069 Face Pass
 - P04:POS-002 Sell — Ticket Catalogue
+- P04:POS-005 Payment
 - P04:POS-013 Mobile POS, Event Sales & Offline Operations
-- P04:POS-016 Till Configuration
 - P06:EMP-010 Scan — ready
 - P06:EMP-015 Group scan
 - P06:EMP-017 Sync & reconciliation
@@ -1791,6 +1995,7 @@ screens:
 - P08:BO-220 Multi-Park & Crossover Journey Orchestrator
 - P08:BO-221 Fast Pass & Attraction Access Journey
 - P08:BO-222 Special Event, Free View & Alternative Admission
+- P08:BO-223 Journey Simulation, Audit & Publication
 - P08:BO-224 Live Access Operations Command Center
 - P08:BO-225 Podium Operations Console
 - P08:BO-226 Ticket & Credential Investigation Console
@@ -1810,6 +2015,7 @@ screens:
 - P08:BO-240 Authorization Governance & Temporary Access
 - P08:BO-241 Policy Evaluation Architecture & Offline Distribution
 - P08:BO-242 Policy Simulation, Conflict & Impact Analysis
+- P08:BO-243 Policy Approval, Audit, Analytics & AI Optimization
 - P08:BO-244 Access Security & Fraud Command Center
 - P08:BO-245 Fraud Detection Rule & Signal Library
 - P08:BO-246 Credential Sharing & Concurrent Usage Detection
@@ -1862,7 +2068,6 @@ screens:
 - P08:BO-363 Ticket Media Analytics & AI Operations Intelligence
 - P08:BO-644 Credential Issuance Command Center
 - P08:BO-653 Credential Registry & Credential History
-- P08:BO-780 Guest Engagement Journeys
 - P08:BO-981 Conflict & Impact Simulation
 - P16:ANL-070 Analytics Governance, Security & Audit Center
 flows:

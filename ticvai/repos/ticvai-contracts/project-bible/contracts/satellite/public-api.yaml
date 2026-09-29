@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Public API and developer access
   version: 1.0.0
-  x-ticvai-screen-count: 21
+  x-ticvai-screen-count: 23
   x-ticvai-tier: satellite
   x-ticvai-module: "13 — Developer & API Management"
   x-ticvai-platforms:
@@ -152,6 +152,7 @@ paths:
         - "P08 BO-1071 Integration Command Center"
         - "P08 BO-1073 API Access & OAuth"
         - "P08 BO-1076 Concurrency, Idempotency & Limits"
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P08 BO-691 Accreditation API Management"
         - "P09 ADM-015 API Rate Limit & Quota Management"
         - "P09 ADM-354 External Workflow System Integration"
@@ -178,6 +179,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-067 Integrations"
         - "P08 BO-1073 API Access & OAuth"
+        - "P08 BO-1173 Wallet Integration Command Center"
+        - "P08 BO-1177 API Security, Access & Integration Permissions"
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
       summary: Create a client with scopes and an environment
@@ -442,6 +445,8 @@ paths:
         - "P08 BO-067 Integrations"
         - "P08 BO-1074 Webhook Configuration"
         - "P08 BO-1077 Mapping & Transformation"
+        - "P08 BO-1173 Wallet Integration Command Center"
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P08 BO-692 Accreditation Webhook Management"
         - "P14 DEV-005 Webhooks"
       summary: The tenant's webhook subscriptions, filterable by API client
@@ -475,6 +480,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-067 Integrations"
         - "P08 BO-1074 Webhook Configuration"
+        - "P08 BO-1176 Wallet Events, Webhooks & Notification Orchestration"
         - "P09 ADM-353 Webhook Configuration & Subscription Manager"
         - "P14 DEV-005 Webhooks"
       summary: Subscribe to business events
@@ -551,6 +557,8 @@ paths:
     post:
       operationId: replayEvents
       x-ticvai-consumed-by:
+        - "P08 BO-1173 Wallet Integration Command Center"
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
         - "P14 DEV-005 Webhooks"
       summary: Re-deliver events from a point in time
       description: >
@@ -888,6 +896,125 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ApiLicence' }
+  /api-clients/{clientId}/status:
+    parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: setApiClientStatus
+      x-ticvai-consumed-by:
+        - "P08 BO-1173 Wallet Integration Command Center"
+        - "P08 BO-1179 Integration Monitoring & Exception Workbench"
+      x-ticvai-agreed: >-
+        29 September: VM close-out; pack 'Wallet_Configuration_Backend_Structure_v1.0.pdf' board 10
+        pp.115 and 122 (Suspend Integration); shape follows revokeApiCredential and states/api-client.yaml
+      summary: Suspend or reactivate an integration, reversibly
+      description: >
+        Board 10, pp.115 and 122. **`revokeApiCredential` kills the secret; nothing paused a client
+        reversibly.** An integration flooding the wallet with bad messages is suspended here: token
+        issue is refused and issued tokens stop working while `suspended`, but the credentials, the
+        webhook subscriptions and the mappings are kept, so `active` resumes it without re-onboarding.
+
+        `reason` is required for `suspended` and is audited. A `revoked` client cannot be reactivated
+        (409): revocation stays terminal (states/api-client.yaml). Decided 29 September, readiness
+        close-out.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [active, suspended] }
+                reason:
+                  type: string
+                  maxLength: 500
+                  description: Required with `suspended`.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Status set
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiClient' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: The client is `revoked`, which is terminal.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: '`suspended` without a `reason`.'
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+
+  /webhook-subscriptions/{subscriptionId}/test:
+    parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: testWebhookSubscription
+      x-ticvai-consumed-by:
+        - "P08 BO-1173 Wallet Integration Command Center"
+      x-ticvai-agreed: >-
+        29 September: VM close-out; pack 'Wallet_Configuration_Backend_Structure_v1.0.pdf' board 10
+        p.115 (Test Connection); shape follows replayEvents
+      summary: Send a signed test event to the endpoint, now
+      description: >
+        Board 10, p.115. **Test Connection.** Sends one synthetic event of `eventType` (default: the
+        first of the subscription's `eventTypes`) to the endpoint, signed with the subscription's
+        secret, and waits for the answer. The payload is marked `isTest`, as a replay is marked
+        `isReplay`, so a receiver never books it.
+
+        Returns the delivery attempt with the response code and body excerpt. A test does not count
+        towards `consecutiveFailures` and does not change the subscription's status. An `eventType`
+        the subscription does not take is refused (422).
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_MANAGE
+      x-ticvai-audience: [staff, partner]
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventType: { type: string }
+      responses:
+        '200':
+          description: The test delivery and what the endpoint answered
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WebhookDelivery' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '422':
+          description: '`eventType` is not one this subscription takes.'
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
 
 components:
   # **Server-owned fields are `readOnly`, secrets are `writeOnly`.** The create operations here
@@ -1077,6 +1204,12 @@ components:
             **Truncated, and it is what makes the log useful** — a 500 with the receiver's own error
             message in it answers the question without a conversation.
         isReplay: { type: boolean, default: false }
+        isTest:
+          type: boolean
+          default: false
+          description: >
+            Sent by `testWebhookSubscription` (VM close-out, 29 September). Marked in the payload so a
+            receiver never books it, and never counted towards `consecutiveFailures`.
         deliveredAt: { type: string, format: date-time, nullable: true }
 
     ApiQuota:

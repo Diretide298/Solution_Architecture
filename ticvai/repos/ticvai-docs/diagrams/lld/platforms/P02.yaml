@@ -1,5 +1,5 @@
 id: LLD-P02
-title: P02 Guest App — Mobile — 71 screens
+title: P02 Guest App — Mobile — 77 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: guest
@@ -33,29 +33,33 @@ modulesUsed:
   screens: 4
 - module: ai
   screens: 4
+- module: transport
+  screens: 4
 - module: retail
   screens: 2
 - module: seating
+  screens: 2
+- module: resources
   screens: 2
 - module: games
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 69
+  operationCalls: 76
 - service: CatalogueService
-  operationCalls: 48
+  operationCalls: 59
+- service: VenueOpsService
+  operationCalls: 42
 - service: MarketingService
-  operationCalls: 36
+  operationCalls: 39
+- service: IdentityService
+  operationCalls: 26
 - service: FnbService
   operationCalls: 25
-- service: VenueOpsService
-  operationCalls: 20
 - service: AccessService
   operationCalls: 18
-- service: IdentityService
-  operationCalls: 18
 - service: WhiteLabelService
-  operationCalls: 8
+  operationCalls: 10
 - service: AiService
   operationCalls: 7
 - service: WalletService
@@ -65,9 +69,9 @@ servicesCalled:
 - service: LedgerService
   operationCalls: 1
 coverage:
-  screens: 71
-  inAFlow: 34
-  drawn: 71
+  screens: 77
+  inAFlow: 33
+  drawn: 77
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -157,6 +161,7 @@ screens:
   - GST-063
   - GST-068
   - GST-070
+  - GST-076
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-001
   inFlows: null
@@ -167,6 +172,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - listProductCategories
   - listProducts
   states:
   - emptyFirstRun
@@ -240,6 +246,11 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-007
+  - GST-008
+  - GST-049
+  - GST-074
+  - GST-075
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-004
   inFlows: null
@@ -303,9 +314,14 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - addCartLine
   - checkBookingEligibility
   - getAvailability
+  - getCart
   - listPerformances
+  - listProductCategories
+  - listProducts
+  - recordConsentAnswers
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -316,10 +332,13 @@ screens:
   offlineState: true
   entryParams:
   - eventId<-deepLink
+  - cartId<-session
   goesTo:
   - GST-001
   - GST-002
   - GST-003
+  - GST-008
+  - GST-049
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-007
   inFlows: null
@@ -330,19 +349,29 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - transferOrderTickets
+  - addCartLine
+  - getPublishedGuidedChoice
+  - listProductCategories
+  - listProductVariants
+  - listProducts
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
   offlineState: true
   entryParams:
-  - orderId<-deepLink
+  - productId<-GST-004
+  - performanceId<-GST-007
+  - cartId<-session
+  - venueId<-session
   goesTo:
   - GST-001
-  - GST-002
-  - GST-067
+  - GST-007
+  - GST-041
+  - GST-042
   - GST-072
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-008
@@ -665,6 +694,7 @@ screens:
   goesTo:
   - GST-001
   - GST-002
+  - GST-067
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-019
   inFlows: null
@@ -971,12 +1001,15 @@ screens:
   name: In-Venue Notifications
   module: Engagement & Support
   requiresModule: fnb
-  wave: 4
+  wave: 2
   density: comfortable
   operations:
   - claimLocationSession
+  - listMyNotifications
+  - markMyNotificationsRead
   states:
   - emptyFirstRun
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1240,6 +1273,7 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - getTenantAppStatus
   - listContentPages
   - listFaqs
   - listMyCases
@@ -1275,6 +1309,8 @@ screens:
   - claimCart
   - extendCart
   - getCart
+  - getPerformance
+  - getResourceHold
   - listProductVariants
   - removeCartLine
   - updateCartLine
@@ -1290,6 +1326,8 @@ screens:
   - cartId<-session
   - lineId<-navigation
   - productId<-navigation
+  - performanceId<-navigation
+  - holdId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -1304,6 +1342,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - createMfaChallenge
   - getGuestSession
   - guestLogout
   - guestPasswordLogin
@@ -1314,6 +1353,7 @@ screens:
   - registerGuest
   - requestGuestOtp
   - verifyGuestOtp
+  - verifyMfaChallenge
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1324,6 +1364,7 @@ screens:
   offlineState: true
   entryParams:
   - cartId<-session
+  - challengeId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -1479,7 +1520,9 @@ screens:
   operations:
   - createSeatHold
   - getSeatAvailability
+  - listPerformances
   - recommendSeats
+  - relinquishSeatHold
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1489,6 +1532,8 @@ screens:
   offlineState: true
   entryParams:
   - performanceId<-deepLink
+  - eventId<-GST-007
+  - holdId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -1522,8 +1567,7 @@ screens:
   - GST-016
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-050
-  inFlows:
-  - F52 A guest books a cabana and uses it
+  inFlows: null
 - screen: GST-051
   name: Plan Your Adventure – Start
   module: Engagement & Support
@@ -1736,10 +1780,10 @@ screens:
   - GST-001
   - GST-002
   - GST-050
+  - GST-074
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-058
-  inFlows:
-  - F52 A guest books a cabana and uses it
+  inFlows: null
 - screen: GST-059
   name: Plan My Day – In Progress
   module: Engagement & Support
@@ -1974,6 +2018,7 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - addCartLine
   - createTableReservation
   - joinRestaurantWaitlist
   - joinWaitlist
@@ -1992,8 +2037,10 @@ screens:
   - entryId<-deepLink
   - reservationId<-deepLink
   - subjectId<-session
+  - cartId<-session
   goesTo:
   - GST-039
+  - GST-041
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-070
   inFlows: null
@@ -2067,12 +2114,18 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - createMfaChallenge
+  - enrolMfaMethod
   - getGuestSession
   - guestLogout
   - listGuestDevices
+  - listMfaMethods
   - registerGuestDevice
+  - removeMfaMethod
   - revokeGuestDevice
   - verifyGuestEmail
+  - verifyMfaChallenge
+  - verifyMfaEnrolment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2083,8 +2136,188 @@ screens:
   entryParams:
   - subjectId<-session
   - deviceId<-session
+  - challengeId<-navigation
+  - methodId<-navigation
   goesTo:
   - GST-039
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-073
+  inFlows: null
+- screen: GST-074
+  name: Map Booking — Cabanas & Spots
+  module: Booking & Selection
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations:
+  - addCartLine
+  - createResourceHold
+  - extendResourceHold
+  - getMapResourceAvailability
+  - getResourceHold
+  - getVenueMap
+  - listBookableVenueMaps
+  - relinquishResourceHold
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - mapId<-GST-004
+  - productId<-GST-004
+  - cartId<-session
+  - venueId<-session
+  - holdId<-navigation
+  goesTo:
+  - GST-004
+  - GST-016
+  - GST-041
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-074
+  inFlows:
+  - F52 A guest books a cabana and uses it
+- screen: GST-075
+  name: Book a Space by the Hour
+  module: Booking & Selection
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations:
+  - addCartLine
+  - listProductStartTimes
+  - listProductVariants
+  - listProducts
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - productId<-GST-004
+  - cartId<-session
+  goesTo:
+  - GST-004
+  - GST-041
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-075
+  inFlows: null
+- screen: GST-076
+  name: Intercity Trip — Route & Schedule
+  module: Transport
+  requiresModule: transport
+  wave: 3
+  density: comfortable
+  operations:
+  - getNextTransportDeparture
+  - listTransportRoutes
+  - listTransportStations
+  - searchTransportDepartures
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - favouriteId<-GST-079
+  goesTo:
+  - GST-001
+  - GST-077
+  - GST-078
+  - GST-079
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-076
+  inFlows: null
+- screen: GST-077
+  name: Intercity Trip — Route & Passengers
+  module: Transport
+  requiresModule: transport
+  wave: 3
+  density: comfortable
+  operations:
+  - addCartLine
+  - getTransportFareTable
+  - getTransportRoute
+  - getTransportRouteMap
+  - quoteTransportFare
+  - saveFavouriteRoute
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - routeId<-GST-076
+  - departureId<-GST-076
+  - cartId<-session
+  goesTo:
+  - GST-041
+  - GST-042
+  - GST-049
+  - GST-076
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-077
+  inFlows: null
+- screen: GST-078
+  name: Intercity Trip — Multi-trip Passes
+  module: Transport
+  requiresModule: transport
+  wave: 3
+  density: comfortable
+  operations:
+  - addCartLine
+  - listTransportPassOffers
+  - listTransportStations
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - cartId<-session
+  goesTo:
+  - GST-041
+  - GST-076
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-078
+  inFlows: null
+- screen: GST-079
+  name: Intercity Trip — Favourite Routes
+  module: Transport
+  requiresModule: transport
+  wave: 3
+  density: comfortable
+  operations:
+  - deleteFavouriteRoute
+  - listMyFavouriteRoutes
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - favouriteId<-navigation
+  goesTo:
+  - GST-042
+  - GST-076
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-079
   inFlows: null

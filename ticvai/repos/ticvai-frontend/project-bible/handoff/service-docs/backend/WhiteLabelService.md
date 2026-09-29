@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `white-label` |
 | Schemas owned | `whitelabel` |
-| Operations in the slice | 45 of 52 |
+| Operations in the slice | 56 of 60 |
 | Scale | Read-heavy and heavily cached. Published, not queried. |
 | If it is down | Down freezes the current published config. Guests see the last good version. |
 
@@ -33,17 +33,26 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | branding | [`setBookingFlowConfig`](#setbookingflowconfig) | PUT | `/tenant-config/booking-flow` | core | 2 | CMS-016 |
 | content | [`createBanner`](#createbanner) | POST | `/tenant-config/banners` | core | 2 | CMS-008 |
 | content | [`createContentPage`](#createcontentpage) | POST | `/tenant-config/pages` | core | 2 | BO-837, CMS-007 |
+| content | [`createGuidedChoice`](#createguidedchoice) | POST | `/venues/{venueId}/guided-choices` | core | 2 | CMS-101 |
 | content | [`createPromoBlock`](#createpromoblock) | POST | `/tenant-config/promo-blocks` | core | 2 | CMS-008 |
+| content | [`deleteBanner`](#deletebanner) | DELETE | `/tenant-config/banners/{bannerId}` | core | 2 | CMS-008 |
+| content | [`deleteContentPage`](#deletecontentpage) | DELETE | `/tenant-config/pages/{pageId}` | core | 2 | CMS-007 |
+| content | [`deleteGuidedChoice`](#deleteguidedchoice) | DELETE | `/guided-choices/{guidedChoiceId}` | core | 2 | CMS-101 |
 | content | [`deletePromoBlock`](#deletepromoblock) | DELETE | `/tenant-config/promo-blocks/{promoBlockId}` | core | 2 | CMS-008 |
+| content | [`getPublishedGuidedChoice`](#getpublishedguidedchoice) | GET | `/venues/{venueId}/guided-choice` | core | 1 | GST-008, WEB-005 |
 | content | [`listBanners`](#listbanners) | GET | `/tenant-config/banners` | core | 2 | CMS-008 |
 | content | [`listContentPages`](#listcontentpages) | GET | `/tenant-config/pages` | core | 2 | BO-837, CMS-007, GST-040, GST-057, WEB-045 |
 | content | [`listFaqs`](#listfaqs) | GET | `/tenant-config/faqs` | core | 2 | ADM-018, GST-040, SUP-006, WEB-045 |
+| content | [`listGuidedChoices`](#listguidedchoices) | GET | `/venues/{venueId}/guided-choices` | core | 2 | CMS-101 |
 | content | [`listPolicies`](#listpolicies) | GET | `/tenant-config/policies` | core | 2 | ADM-018, BO-243, CMS-018 |
 | content | [`listPromoBlocks`](#listpromoblocks) | GET | `/tenant-config/promo-blocks` | core | 2 | CMS-008 |
+| content | [`publishGuidedChoice`](#publishguidedchoice) | POST | `/guided-choices/{guidedChoiceId}/publish` | core | 2 | CMS-101 |
 | content | [`setFaqs`](#setfaqs) | PUT | `/tenant-config/faqs` | core | 2 | ADM-018 |
 | content | [`setPolicy`](#setpolicy) | PUT | `/tenant-config/policies/{policyKind}` | core | 2 | ADM-018, CMS-018 |
+| content | [`unpublishGuidedChoice`](#unpublishguidedchoice) | POST | `/guided-choices/{guidedChoiceId}/unpublish` | core | 2 | CMS-101 |
 | content | [`updateBanner`](#updatebanner) | PATCH | `/tenant-config/banners/{bannerId}` | core | 2 | CMS-008 |
 | content | [`updateContentPage`](#updatecontentpage) | PUT | `/tenant-config/pages/{pageId}` | core | 2 | CMS-007 |
+| content | [`updateGuidedChoice`](#updateguidedchoice) | PATCH | `/guided-choices/{guidedChoiceId}` | core | 2 | CMS-101 |
 | content | [`updatePromoBlock`](#updatepromoblock) | PATCH | `/tenant-config/promo-blocks/{promoBlockId}` | core | 2 | CMS-008 |
 | homepage | [`getHomepageLayout`](#gethomepagelayout) | GET | `/tenant-config/homepage` | core | 2 | CMS-007 |
 | homepage | [`setHomepageLayout`](#sethomepagelayout) | PUT | `/tenant-config/homepage` | core | 2 | BO-840, CMS-007 |
@@ -52,7 +61,9 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | modules | [`setFeatureToggles`](#setfeaturetoggles) | PUT | `/tenant-config/features` | core | 2 | CMS-001 |
 | modules | [`setLanguages`](#setlanguages) | PUT | `/tenant-config/languages` | core | 2 | ADM-018, CMS-011 |
 | modules | [`setModuleEnablement`](#setmoduleenablement) | PUT | `/tenant-config/modules` | core | 2 | CMS-001 |
-| overview | [`getTenantAppStatus`](#gettenantappstatus) | GET | `/tenant-config/status` | core | 1 | CMS-001, CMS-014, GST-001, GST-029, GST-038, GST-047 … |
+| navigation | [`setHeader`](#setheader) | PUT | `/tenant-config/header` | core | 2 | CMS-007 |
+| navigation | [`setNavigation`](#setnavigation) | PUT | `/tenant-config/navigation` | core | 2 | CMS-009 |
+| overview | [`getTenantAppStatus`](#gettenantappstatus) | GET | `/tenant-config/status` | core | 1 | CMS-001, CMS-014, GST-001, GST-029, GST-038, GST-040 … |
 | overview | [`getTenantConfig`](#gettenantconfig) | GET | `/tenant-config` | core | 1 | BO-599, BO-834, CMS-001, CMS-012, CMS-016, GST-001 … |
 | overview | [`setMaintenanceMode`](#setmaintenancemode) | PUT | `/tenant-config/status` | core | 2 | CMS-001 |
 | publishing | [`createPreview`](#createpreview) | POST | `/tenant-config/preview` | core | 2 | ADM-016, CMS-006 |
@@ -133,6 +144,7 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 |---|---|---|---|
 | logoAssetRef | string (uuid) | yes | The primary logo. |
 | logoDarkAssetRef | string (uuid) |  | Used on dark backgrounds. (nullable) |
+| logoVariant | enum (light, dark, duotone) |  | Which lockup sits in the nav bar, and whose colours drive the theme (decided 29 September, rev 3 CFG-4). (default light) |
 | faviconAssetRef | string (uuid) |  | The browser tab icon for the guest web app. (nullable) |
 | splashImageAssetRefs | array of string (uuid) |  | Splash images, shown in order. |
 | splashDurationSeconds | integer |  | (min 0; max 10; default 3) |
@@ -230,6 +242,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 |---|---|---|---|
 | logoAssetRef | string (uuid) | yes | The primary logo. |
 | logoDarkAssetRef | string (uuid) |  | Used on dark backgrounds. (nullable) |
+| logoVariant | enum (light, dark, duotone) |  | Which lockup sits in the nav bar, and whose colours drive the theme (decided 29 September, rev 3 CFG-4). (default light) |
 | faviconAssetRef | string (uuid) |  | The browser tab icon for the guest web app. (nullable) |
 | splashImageAssetRefs | array of string (uuid) |  | Splash images, shown in order. |
 | splashDurationSeconds | integer |  | (min 0; max 10; default 3) |
@@ -243,6 +256,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 |---|---|---|---|
 | logoAssetRef | string (uuid) | yes | The primary logo. |
 | logoDarkAssetRef | string (uuid) |  | Used on dark backgrounds. (nullable) |
+| logoVariant | enum (light, dark, duotone) |  | Which lockup sits in the nav bar, and whose colours drive the theme (decided 29 September, rev 3 CFG-4). (default light) |
 | faviconAssetRef | string (uuid) |  | The browser tab icon for the guest web app. (nullable) |
 | splashImageAssetRefs | array of string (uuid) |  | Splash images, shown in order. |
 | splashDurationSeconds | integer |  | (min 0; max 10; default 3) |
@@ -277,24 +291,87 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | Writes | - |
 | Called by | CMS-016 |
 
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| effectiveForVenueId | query |  | string (uuid) | Return the settings in force at this venue, the tenant's with the venue's override laid over them, and no venueOverrides (decided 29 September, rev 3 CFG-11). |
+
 **Response**: `BookingFlowConfig`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | preset | enum (auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom) |  | L1 Ticket box … L6 Season. (default auto) |
 | stepIndicator | enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) |  | (default bar) |
-| cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn) |  | (default sidebarRight) |
-| cardLayout | string |  | (max length 40; nullable) |
-| cardSize | enum (compact, regular, large) |  | (nullable) |
+| cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn, floatingIcon) |  | floatingIcon is a round basket button with the item count that opens the cart (decided 29 September, rev 3 REV3-10). (default sidebarRight) |
+| cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
+| cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
+| cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
+| categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
 | extrasStep | enum (auto, always, never) |  | (default auto) |
-| seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | (nullable) |
+| seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | mapView | enum (2d, 3d) |  | (default 3d) |
-| density | enum (compact, comfortable, airy) |  | (default comfortable) |
+| density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
 | embedMode | enum (fullPage, embedded) |  | embedded hides the hero banner, event page and venue header, for a flow placed inside the venue's own site. (default fullPage) |
 | heroBanner | boolean |  | (default True) |
-| searchInBanner | boolean |  | (default True) |
+| searchInBanner | boolean |  | Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6). (default False) |
+| eventBannerDates | boolean |  | Dates in event banner (decided 29 September, rev 3 23SEP-19). (default False) |
 | singleEventPage | boolean |  | (default False) |
 | quantitiesOnAddOns | boolean |  | (default True) |
+| timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
+| dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
+| dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
+| dayPartBoundaries.afternoonStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 12:00) |
+| dayPartBoundaries.eveningStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 17:00) |
+| signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
+| seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
+| seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
+| seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
+| ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
+| ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
+| cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
+| quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
+| conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
+| performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
+| showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
+| locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
+| consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| venueOverrides | array of BookingFlowVenueOverride |  | Per-venue overrides, at most one per venue. (max items 200; default []) |
+| venueOverrides[].venueId | string (uuid) | yes | One of the tenant's active venues. |
+| venueOverrides[].settings | BookingFlowSettings | yes | Every guest booking-flow setting, once. |
+| venueOverrides[].settings.preset | enum (auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom) |  | L1 Ticket box … L6 Season. (default auto) |
+| venueOverrides[].settings.stepIndicator | enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) |  | (default bar) |
+| venueOverrides[].settings.cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn, floatingIcon) |  | floatingIcon is a round basket button with the item count that opens the cart (decided 29 September, rev 3 REV3-10). (default sidebarRight) |
+| venueOverrides[].settings.cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
+| venueOverrides[].settings.cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
+| venueOverrides[].settings.cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
+| venueOverrides[].settings.categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
+| venueOverrides[].settings.extrasStep | enum (auto, always, never) |  | (default auto) |
+| venueOverrides[].settings.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
+| venueOverrides[].settings.mapView | enum (2d, 3d) |  | (default 3d) |
+| venueOverrides[].settings.density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
+| venueOverrides[].settings.embedMode | enum (fullPage, embedded) |  | embedded hides the hero banner, event page and venue header, for a flow placed inside the venue's own site. (default fullPage) |
+| venueOverrides[].settings.heroBanner | boolean |  | (default True) |
+| venueOverrides[].settings.searchInBanner | boolean |  | Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6). (default False) |
+| venueOverrides[].settings.eventBannerDates | boolean |  | Dates in event banner (decided 29 September, rev 3 23SEP-19). (default False) |
+| venueOverrides[].settings.singleEventPage | boolean |  | (default False) |
+| venueOverrides[].settings.quantitiesOnAddOns | boolean |  | (default True) |
+| venueOverrides[].settings.timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
+| venueOverrides[].settings.dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
+| venueOverrides[].settings.dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
+| venueOverrides[].settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
+| venueOverrides[].settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
+| venueOverrides[].settings.seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
+| venueOverrides[].settings.seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
+| venueOverrides[].settings.ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
+| venueOverrides[].settings.ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
+| venueOverrides[].settings.cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
+| venueOverrides[].settings.quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
+| venueOverrides[].settings.conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
+| venueOverrides[].settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
+| venueOverrides[].settings.showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
+| venueOverrides[].settings.locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
+| venueOverrides[].settings.consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
 
 **Responses**
 
@@ -308,6 +385,8 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 **`PUT /tenant-config/booking-flow`**: Set how the guest booking flow looks and steps
 
 **Design gap, 23 September.** The booking design has a white-label engine drawer (preset, step indicator, card and cart layout, extras step, seat picker, map view, density, embed mode) and White Labelling had no setting or screen for any of it. **Part of the published tenant config**, like the theme: a change goes live through `publishTenantConfig`, never directly.
+**Rev 3 settings (decided 29 September, rev 3).** Times per page and the day-part chips with their boundaries (REV3-1), where sign-in is asked (REV3-3), date and time on seated events (REV3-4), the seat-view box position (REV3-5), the time bar above the seat map (REV3-6), the floating cart icon and the cart side in Arabic (REV3-10), ticket categories (REV3-16), the quick tour (REV3-20), tags on tickets (23SEP-3), extra info on cards (23SEP-6), category display (23SEP-18), dates in the event banner (23SEP-19), the card layout, size and density enums (DG-6), and the concierge mascot (CFG-5). Help me choose is a venue's `GuidedChoice`, not a field here (REV3-11).
+**Per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** `venueOverrides` holds the fields a venue changes; everything else it inherits. A `venueId` not among the tenant's active venues, or one given twice, is refused with 400.
 
 |  |  |
 |---|---|
@@ -334,18 +413,75 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 |---|---|---|---|
 | preset | enum (auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom) |  | L1 Ticket box … L6 Season. (default auto) |
 | stepIndicator | enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) |  | (default bar) |
-| cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn) |  | (default sidebarRight) |
-| cardLayout | string |  | (max length 40; nullable) |
-| cardSize | enum (compact, regular, large) |  | (nullable) |
+| cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn, floatingIcon) |  | floatingIcon is a round basket button with the item count that opens the cart (decided 29 September, rev 3 REV3-10). (default sidebarRight) |
+| cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
+| cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
+| cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
+| categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
 | extrasStep | enum (auto, always, never) |  | (default auto) |
-| seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | (nullable) |
+| seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | mapView | enum (2d, 3d) |  | (default 3d) |
-| density | enum (compact, comfortable, airy) |  | (default comfortable) |
+| density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
 | embedMode | enum (fullPage, embedded) |  | embedded hides the hero banner, event page and venue header, for a flow placed inside the venue's own site. (default fullPage) |
 | heroBanner | boolean |  | (default True) |
-| searchInBanner | boolean |  | (default True) |
+| searchInBanner | boolean |  | Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6). (default False) |
+| eventBannerDates | boolean |  | Dates in event banner (decided 29 September, rev 3 23SEP-19). (default False) |
 | singleEventPage | boolean |  | (default False) |
 | quantitiesOnAddOns | boolean |  | (default True) |
+| timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
+| dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
+| dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
+| dayPartBoundaries.afternoonStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 12:00) |
+| dayPartBoundaries.eveningStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 17:00) |
+| signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
+| seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
+| seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
+| seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
+| ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
+| ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
+| cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
+| quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
+| conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
+| performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
+| showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
+| locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
+| consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| venueOverrides | array of BookingFlowVenueOverride |  | Per-venue overrides, at most one per venue. (max items 200; default []) |
+| venueOverrides[].venueId | string (uuid) | yes | One of the tenant's active venues. |
+| venueOverrides[].settings | BookingFlowSettings | yes | Every guest booking-flow setting, once. |
+| venueOverrides[].settings.preset | enum (auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom) |  | L1 Ticket box … L6 Season. (default auto) |
+| venueOverrides[].settings.stepIndicator | enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) |  | (default bar) |
+| venueOverrides[].settings.cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn, floatingIcon) |  | floatingIcon is a round basket button with the item count that opens the cart (decided 29 September, rev 3 REV3-10). (default sidebarRight) |
+| venueOverrides[].settings.cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
+| venueOverrides[].settings.cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
+| venueOverrides[].settings.cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
+| venueOverrides[].settings.categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
+| venueOverrides[].settings.extrasStep | enum (auto, always, never) |  | (default auto) |
+| venueOverrides[].settings.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
+| venueOverrides[].settings.mapView | enum (2d, 3d) |  | (default 3d) |
+| venueOverrides[].settings.density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
+| venueOverrides[].settings.embedMode | enum (fullPage, embedded) |  | embedded hides the hero banner, event page and venue header, for a flow placed inside the venue's own site. (default fullPage) |
+| venueOverrides[].settings.heroBanner | boolean |  | (default True) |
+| venueOverrides[].settings.searchInBanner | boolean |  | Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6). (default False) |
+| venueOverrides[].settings.eventBannerDates | boolean |  | Dates in event banner (decided 29 September, rev 3 23SEP-19). (default False) |
+| venueOverrides[].settings.singleEventPage | boolean |  | (default False) |
+| venueOverrides[].settings.quantitiesOnAddOns | boolean |  | (default True) |
+| venueOverrides[].settings.timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
+| venueOverrides[].settings.dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
+| venueOverrides[].settings.dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
+| venueOverrides[].settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
+| venueOverrides[].settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
+| venueOverrides[].settings.seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
+| venueOverrides[].settings.seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
+| venueOverrides[].settings.ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
+| venueOverrides[].settings.ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
+| venueOverrides[].settings.cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
+| venueOverrides[].settings.quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
+| venueOverrides[].settings.conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
+| venueOverrides[].settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
+| venueOverrides[].settings.showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
+| venueOverrides[].settings.locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
+| venueOverrides[].settings.consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
 
 **Response**: `BookingFlowConfig`
 
@@ -353,18 +489,75 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 |---|---|---|---|
 | preset | enum (auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom) |  | L1 Ticket box … L6 Season. (default auto) |
 | stepIndicator | enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) |  | (default bar) |
-| cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn) |  | (default sidebarRight) |
-| cardLayout | string |  | (max length 40; nullable) |
-| cardSize | enum (compact, regular, large) |  | (nullable) |
+| cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn, floatingIcon) |  | floatingIcon is a round basket button with the item count that opens the cart (decided 29 September, rev 3 REV3-10). (default sidebarRight) |
+| cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
+| cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
+| cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
+| categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
 | extrasStep | enum (auto, always, never) |  | (default auto) |
-| seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | (nullable) |
+| seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | mapView | enum (2d, 3d) |  | (default 3d) |
-| density | enum (compact, comfortable, airy) |  | (default comfortable) |
+| density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
 | embedMode | enum (fullPage, embedded) |  | embedded hides the hero banner, event page and venue header, for a flow placed inside the venue's own site. (default fullPage) |
 | heroBanner | boolean |  | (default True) |
-| searchInBanner | boolean |  | (default True) |
+| searchInBanner | boolean |  | Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6). (default False) |
+| eventBannerDates | boolean |  | Dates in event banner (decided 29 September, rev 3 23SEP-19). (default False) |
 | singleEventPage | boolean |  | (default False) |
 | quantitiesOnAddOns | boolean |  | (default True) |
+| timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
+| dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
+| dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
+| dayPartBoundaries.afternoonStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 12:00) |
+| dayPartBoundaries.eveningStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 17:00) |
+| signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
+| seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
+| seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
+| seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
+| ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
+| ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
+| cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
+| quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
+| conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
+| performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
+| showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
+| locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
+| consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| venueOverrides | array of BookingFlowVenueOverride |  | Per-venue overrides, at most one per venue. (max items 200; default []) |
+| venueOverrides[].venueId | string (uuid) | yes | One of the tenant's active venues. |
+| venueOverrides[].settings | BookingFlowSettings | yes | Every guest booking-flow setting, once. |
+| venueOverrides[].settings.preset | enum (auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom) |  | L1 Ticket box … L6 Season. (default auto) |
+| venueOverrides[].settings.stepIndicator | enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) |  | (default bar) |
+| venueOverrides[].settings.cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn, floatingIcon) |  | floatingIcon is a round basket button with the item count that opens the cart (decided 29 September, rev 3 REV3-10). (default sidebarRight) |
+| venueOverrides[].settings.cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
+| venueOverrides[].settings.cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
+| venueOverrides[].settings.cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
+| venueOverrides[].settings.categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
+| venueOverrides[].settings.extrasStep | enum (auto, always, never) |  | (default auto) |
+| venueOverrides[].settings.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
+| venueOverrides[].settings.mapView | enum (2d, 3d) |  | (default 3d) |
+| venueOverrides[].settings.density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
+| venueOverrides[].settings.embedMode | enum (fullPage, embedded) |  | embedded hides the hero banner, event page and venue header, for a flow placed inside the venue's own site. (default fullPage) |
+| venueOverrides[].settings.heroBanner | boolean |  | (default True) |
+| venueOverrides[].settings.searchInBanner | boolean |  | Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6). (default False) |
+| venueOverrides[].settings.eventBannerDates | boolean |  | Dates in event banner (decided 29 September, rev 3 23SEP-19). (default False) |
+| venueOverrides[].settings.singleEventPage | boolean |  | (default False) |
+| venueOverrides[].settings.quantitiesOnAddOns | boolean |  | (default True) |
+| venueOverrides[].settings.timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
+| venueOverrides[].settings.dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
+| venueOverrides[].settings.dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
+| venueOverrides[].settings.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
+| venueOverrides[].settings.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
+| venueOverrides[].settings.seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
+| venueOverrides[].settings.seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
+| venueOverrides[].settings.ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
+| venueOverrides[].settings.ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
+| venueOverrides[].settings.cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
+| venueOverrides[].settings.quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
+| venueOverrides[].settings.conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
+| venueOverrides[].settings.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
+| venueOverrides[].settings.showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
+| venueOverrides[].settings.locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
+| venueOverrides[].settings.consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
 
 **Responses**
 
@@ -516,6 +709,98 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | 201 |  | Created in draft |
 | 409 |  | Slug already in use |
 
+### createGuidedChoice
+
+**`POST /venues/{venueId}/guided-choices`**: Set up Help me choose for a venue
+
+**Venue configuration (decided 29 September, rev 3 REV3-11).** Created as `draft` with `source` `manual`; guests see nothing until `publishGuidedChoice`. Every target must belong to this venue, or 400.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Writes | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Called by | CMS-101 |
+| State model | Guided choice ([states/guided-choice.yaml](../../../states/guided-choice.yaml)): created as `draft` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `GuidedChoice`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
+| name | string | yes | Staff-facing name, e.g. (max length 80) |
+| mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
+| showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
+| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].sortOrder | integer | yes | (min 0) |
+| questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
+| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
+| questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
+| questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
+| questions[].answers[].sortOrder | integer | yes | (min 0) |
+| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
+| status | object | yes | (read-only) |
+| source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
+| suggestionRef | string |  | For aiSuggested, the id of the ai job that proposed it. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| publishedBy | string (uuid) |  | The person who published it. (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Response**: `GuidedChoice`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
+| name | string | yes | Staff-facing name, e.g. (max length 80) |
+| mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
+| showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
+| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].sortOrder | integer | yes | (min 0) |
+| questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
+| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
+| questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
+| questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
+| questions[].answers[].sortOrder | integer | yes | (min 0) |
+| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
+| status | object | yes | (read-only) |
+| source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
+| suggestionRef | string |  | For aiSuggested, the id of the ai job that proposed it. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| publishedBy | string (uuid) |  | The person who published it. (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Created as a draft |
+| 400 |  | A target is not in this venue, a required target id is missing for its kind, or the question and answer counts are outside their bounds |
+
 ### createPromoBlock
 
 **`POST /tenant-config/promo-blocks`**: Create a promotional block
@@ -592,6 +877,102 @@ Presentation only. A block may point at a promotion, but it does not create or p
 | 201 |  | Created |
 | 400 |  | endsAt is not after startsAt (audit R163) |
 
+### deleteBanner
+
+**`DELETE /tenant-config/banners/{bannerId}`**: Delete a banner
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `whitelabel.tenant_config` |
+| Writes | `cache:idempotency`, `whitelabel.tenant_config` |
+| Called by | CMS-008 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| bannerId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Deleted |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### deleteContentPage
+
+**`DELETE /tenant-config/pages/{pageId}`**: Delete a content page
+
+Refused where the page is referenced by navigation or the homepage. Deleting a linked page produces a dead end in a live app.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `whitelabel.tenant_config` |
+| Writes | `cache:idempotency`, `whitelabel.tenant_config` |
+| Called by | CMS-007 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| pageId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Deleted |
+| 409 |  | Page is referenced by navigation or the homepage |
+
+### deleteGuidedChoice
+
+**`DELETE /guided-choices/{guidedChoiceId}`**: Delete a Help me choose set-up, or dismiss a suggestion
+
+A `published` choice is unpublished first, or 409.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | - |
+| Writes | - |
+| Called by | CMS-101 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| guidedChoiceId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 204 |  | Deleted |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The choice is published |
+
 ### deletePromoBlock
 
 **`DELETE /tenant-config/promo-blocks/{promoBlockId}`**: Delete a promotional block
@@ -620,6 +1001,67 @@ Presentation only. A block may point at a promotion, but it does not create or p
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Deleted |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+
+### getPublishedGuidedChoice
+
+**`GET /venues/{venueId}/guided-choice`**: The venue's published Help me choose
+
+**What the guest booking page shows (decided 29 September, rev 3 REV3-11).** Public and cacheable, like the rest of the published app. Returns only a `published` choice; `name`, `source`, `suggestionRef` and `publishedBy` are left out of this view. 404 when the venue has none published, and the page shows no Help me choose.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Writes | - |
+| Called by | GST-008, WEB-005 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+
+**Response**: `GuidedChoice`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
+| name | string | yes | Staff-facing name, e.g. (max length 80) |
+| mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
+| showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
+| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].sortOrder | integer | yes | (min 0) |
+| questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
+| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
+| questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
+| questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
+| questions[].answers[].sortOrder | integer | yes | (min 0) |
+| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
+| status | object | yes | (read-only) |
+| source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
+| suggestionRef | string |  | For aiSuggested, the id of the ai job that proposed it. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| publishedBy | string (uuid) |  | The person who published it. (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The published choice |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### listBanners
@@ -759,6 +1201,67 @@ A guest caller sees only entries whose `isPublished` is true, and needs no `TENA
 |---|---|---|
 | 200 |  | FAQ categories with entries |
 
+### listGuidedChoices
+
+**`GET /venues/{venueId}/guided-choices`**: List a venue's Help me choose set-ups
+
+Drafts, AI suggestions awaiting review and the published one (decided 29 September, rev 3 REV3-11). Filter by `status` or `source` to show the suggestions waiting for a person.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Writes | - |
+| Called by | CMS-101 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| status | query |  | GuidedChoiceStatus: enum (draft, published) |  |
+| source | query |  | enum (manual, aiSuggested) |  |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of GuidedChoice | yes |  |
+| items[].id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| items[].venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
+| items[].name | string | yes | Staff-facing name, e.g. (max length 80) |
+| items[].mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
+| items[].showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
+| items[].questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| items[].questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| items[].questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| items[].questions[].sortOrder | integer | yes | (min 0) |
+| items[].questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
+| items[].status | object | yes | (read-only) |
+| items[].source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
+| items[].suggestionRef | string |  | For aiSuggested, the id of the ai job that proposed it. (read-only; nullable) |
+| items[].publishedAt | string (date-time) |  | (read-only; nullable) |
+| items[].publishedBy | string (uuid) |  | The person who published it. (read-only; nullable) |
+| items[].updatedAt | string (date-time) |  | (read-only) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Help me choose set-ups, newest first |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+
 ### listPolicies
 
 **`GET /tenant-config/policies`**: List legal policies
@@ -813,6 +1316,72 @@ A guest caller sees only entries whose `isPublished` is true, and needs no `TENA
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Blocks |
+
+### publishGuidedChoice
+
+**`POST /guided-choices/{guidedChoiceId}/publish`**: Publish a Help me choose set-up to guests
+
+**A person publishes, always (decided 29 September, rev 3 REV3-11).** Needs a staff session; a service caller is refused with 403, so an AI suggestion cannot publish itself. Every target is checked at this moment: a product or event not on sale, a category with no products on sale, or a module not enabled is refused with 422 naming the answer. **One published choice per venue**: publishing this one returns the venue's previously published choice to `draft` in the same transaction. Live at once; not part of `publishTenantConfig`.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_PUBLISH` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Writes | - |
+| Called by | CMS-101 |
+| State model | Guided choice ([states/guided-choice.yaml](../../../states/guided-choice.yaml)): moves `draft` -> `published`, `published` -> `draft` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| guidedChoiceId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Response**: `GuidedChoice`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
+| name | string | yes | Staff-facing name, e.g. (max length 80) |
+| mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
+| showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
+| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].sortOrder | integer | yes | (min 0) |
+| questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
+| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
+| questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
+| questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
+| questions[].answers[].sortOrder | integer | yes | (min 0) |
+| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
+| status | object | yes | (read-only) |
+| source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
+| suggestionRef | string |  | For aiSuggested, the id of the ai job that proposed it. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| publishedBy | string (uuid) |  | The person who published it. (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Published |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Already published |
+| 422 |  | An answer's target is not on sale or not enabled; the problem names the answer |
 
 ### setFaqs
 
@@ -915,6 +1484,70 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 |---|---|---|
 | 201 |  | New version published |
 | 400 |  | The English (en) or Arabic (ar) version is missing (audit R096) |
+
+### unpublishGuidedChoice
+
+**`POST /guided-choices/{guidedChoiceId}/unpublish`**: Take a Help me choose set-up off the guest app
+
+Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing it at once.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_PUBLISH` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Writes | - |
+| Called by | CMS-101 |
+| State model | Guided choice ([states/guided-choice.yaml](../../../states/guided-choice.yaml)): moves `published` -> `draft` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| guidedChoiceId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Response**: `GuidedChoice`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
+| name | string | yes | Staff-facing name, e.g. (max length 80) |
+| mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
+| showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
+| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].sortOrder | integer | yes | (min 0) |
+| questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
+| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
+| questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
+| questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
+| questions[].answers[].sortOrder | integer | yes | (min 0) |
+| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
+| status | object | yes | (read-only) |
+| source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
+| suggestionRef | string |  | For aiSuggested, the id of the ai job that proposed it. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| publishedBy | string (uuid) |  | The person who published it. (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Back to draft |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Not published |
 
 ### updateBanner
 
@@ -1050,6 +1683,79 @@ Replaces the page's editable fields. `status` is taken only to archive the page 
 |---|---|---|
 | 200 |  | Updated |
 | 409 |  | The page is published and the body changes more than its status to archived (audit R163). |
+
+### updateGuidedChoice
+
+**`PATCH /guided-choices/{guidedChoiceId}`**: Edit a Help me choose set-up, or review a suggestion
+
+A partial update. Only a `draft` may be edited: a `published` choice is unpublished first, or 409, so guests never see a half-edited set of questions (decided 29 September, rev 3 REV3-11). Editing an AI suggestion keeps its `source`.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `whitelabel.guided_choice`, `whitelabel.guided_choice_answer`, `whitelabel.guided_choice_question` |
+| Writes | `whitelabel.guided_choice_question` |
+| Called by | CMS-101 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| guidedChoiceId | path | yes | string |  |
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| name | string |  | (max length 80) |
+| mode | enum (button, popupOnArrival, off) |  |  |
+| showBanner | boolean |  |  |
+| questions | array of object |  | Replaces the whole question list; same shape and bounds as GuidedChoice.questions. (min items 1; max items 2) |
+
+**Response**: `GuidedChoice`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
+| name | string | yes | Staff-facing name, e.g. (max length 80) |
+| mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
+| showBanner | boolean |  | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. (default True) |
+| questions | array of object | yes | One or two questions, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). (min items 1; max items 2) |
+| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].sortOrder | integer | yes | (min 0) |
+| questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
+| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
+| questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
+| questions[].answers[].badge | object |  | Optional, e.g. (nullable) |
+| questions[].answers[].sortOrder | integer | yes | (min 0) |
+| questions[].answers[].target | GuidedChoiceTarget | yes | What an answer opens (decided 29 September, rev 3 REV3-11). |
+| questions[].answers[].result | object |  | The result card when this answer decides the result. (nullable) |
+| status | object | yes | (read-only) |
+| source | enum (manual, aiSuggested) | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). (read-only) |
+| suggestionRef | string |  | For aiSuggested, the id of the ai job that proposed it. (read-only; nullable) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+| publishedBy | string (uuid) |  | The person who published it. (read-only; nullable) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+| 400 | BadRequest | Validation failed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The choice is published; unpublish it first |
 
 ### updatePromoBlock
 
@@ -1411,6 +2117,129 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 | 400 |  | Module not licensed, or still referenced by navigation or homepage |
 
 
+## Group: navigation
+
+### setHeader
+
+**`PUT /tenant-config/header`**: Configure the header
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `whitelabel.tenant_config` |
+| Writes | `cache:idempotency`, `whitelabel.tenant_config` |
+| Called by | CMS-007 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `HeaderConfig`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| layout | enum (logoLeft, logoCentre, logoWithMenu) | yes |  |
+| showLogo | boolean |  | (default True) |
+| showMenu | boolean |  | (default True) |
+| showNotifications | boolean |  | (default True) |
+| backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+
+**Response**: `HeaderConfig`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| layout | enum (logoLeft, logoCentre, logoWithMenu) | yes |  |
+| showLogo | boolean |  | (default True) |
+| showMenu | boolean |  | (default True) |
+| showNotifications | boolean |  | (default True) |
+| backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+
+### setNavigation
+
+**`PUT /tenant-config/navigation`**: Set main and overflow navigation
+
+Items pointing at a disabled module are refused. A navigation entry that leads nowhere is worse than an absent one.
+Bottom navigation is capped at five visible items; the remainder moves to the overflow menu.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 2 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `whitelabel.navigation_item` |
+| Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.navigation_item` |
+| Called by | CMS-009 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**: `NavigationConfig`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | Added 20 August. (read-only) |
+| kind | enum (bottomNavigation, drawer, tabs) | yes |  |
+| items | array of object | yes | (max items 12) |
+| items[].id | string (uuid) |  | Added 20 August. (read-only) |
+| items[].label | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| items[].icon | string |  |  |
+| items[].target | LinkTarget | yes |  |
+| items[].target.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
+| items[].target.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| items[].target.contentPageId | string (uuid) |  |  |
+| items[].target.productId | string (uuid) |  |  |
+| items[].target.eventId | string (uuid) |  |  |
+| items[].target.url | string |  |  |
+| items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| items[].sortOrder | integer | yes |  |
+
+**Response**: `NavigationConfig`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | Added 20 August. (read-only) |
+| kind | enum (bottomNavigation, drawer, tabs) | yes |  |
+| items | array of object | yes | (max items 12) |
+| items[].id | string (uuid) |  | Added 20 August. (read-only) |
+| items[].label | LocalisedText | yes | Keyed by ISO 639-1 code. |
+| items[].icon | string |  |  |
+| items[].target | LinkTarget | yes |  |
+| items[].target.kind | enum (module, contentPage, product, event, externalUrl, none) | yes |  |
+| items[].target.moduleKey | ModuleKey: enum (ticketsAndBooking, membership, events, attractions, virtualQueue, diningAndFnb, shop, parking, …) |  |  |
+| items[].target.contentPageId | string (uuid) |  |  |
+| items[].target.productId | string (uuid) |  |  |
+| items[].target.eventId | string (uuid) |  |  |
+| items[].target.url | string |  |  |
+| items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| items[].sortOrder | integer | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Updated |
+| 400 |  | An item targets a disabled module, or more than five are marked visible |
+
+
 ## Group: overview
 
 ### getTenantAppStatus
@@ -1418,9 +2247,10 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 **`GET /tenant-config/status`**: App status and recent changes
 
 Also the endpoint the guest app calls to discover a maintenance window, which is why it is unauthenticated and cacheable.
-**Two views of one schema.** Called without a staff session, the response carries only `tenantId`, `isPublished`, `publishedVersion`, `publishedAt`, `isInMaintenance`, `maintenanceMessage`, `expectedBackAt`, `minimumAppVersion`, `contact`, `availability`, `availabilityMessage` and `venues`. The draft and CMS fields (`draftVersion`, `hasUnpublishedChanges`, the module and page counts, `recentChanges`) are returned only to a staff session holding `TENANT_CONFIGURE` — a public, cacheable response must not carry who changed what.
+**Two views of one schema.** Called without a staff session, the response carries only `tenantId`, `isPublished`, `publishedVersion`, `publishedAt`, `isInMaintenance`, `maintenanceMessage`, `expectedBackAt`, `minimumAppVersion`, `contact`, `availability`, `availabilityMessage`, `venues` and `whatsNew`. The draft and CMS fields (`draftVersion`, `hasUnpublishedChanges`, the module and page counts, `recentChanges`) are returned only to a staff session holding `TENANT_CONFIGURE` — a public, cacheable response must not carry who changed what.
 **It also carries what the guest screens promise (decided 28 September, audit R073)**: the minimum supported app version, so GST-047 can force an upgrade (`minimumAppVersion`); and the venue's contact details with a sold-out or closed signal, for WEB-028 and WEB-029 (`contact`, `availability`). All of them are set with `setMaintenanceMode`.
 **And the tenant's venues, for the guest's venue picker (decided 28 September, audit R267)**: the guest picks a venue on first open of WEB-001 or GST-001, the choice is remembered on the device and changeable, and on a visit day the app suggests the venue on the guest's ticket. `venues` lists the tenant's active venues so that picker has a source without a session.
+**And what is new, for guests (decided 29 September, rev 3 GAP-B2)**: `whatsNew` is the public, localised release notes the guest Help screen reads (WEB-025, WEB-045, GST-040), newest first, at most 10, filled from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received, skipping releases with none. It names no person. `recentChanges` stays staff only.
 
 |  |  |
 |---|---|
@@ -1433,7 +2263,7 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 | Read routing | replica |
 | Reads | `whitelabel.config_version`, `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | CMS-001, CMS-014, GST-001, GST-029, GST-038, GST-047, KSK-002, WEB-001, WEB-025, WEB-028, WEB-029 |
+| Called by | CMS-001, CMS-014, GST-001, GST-029, GST-038, GST-040, GST-047, KSK-002, WEB-001, WEB-025, WEB-028, WEB-029, WEB-045 |
 
 **Response**: `TenantAppStatus`
 
@@ -1462,6 +2292,17 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 | contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
 | availability | AppAvailability: enum (open, soldOut, closed) |  | The sold-out or closed signal (decided 28 September, audit R073). (default open) |
 | availabilityMessage | object |  | What the sold-out or closed screen says (WEB-029). (nullable) |
+| venues | array of object |  | Public: the venues a guest can pick (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). (max items 200) |
+| venues[].venueId | string (uuid) | yes | The venue's scope node (tenancy.OrgUnit.id, level venue): what every guest screen that declares venueId from: session reads once the guest picks it. |
+| venues[].name | string | yes | The venue's name (tenancy.OrgUnit.name). (max length 200) |
+| venues[].city | string |  | Shown under the name so two venues with similar names can be told apart. (max length 120; nullable) |
+| venues[].openingHoursToday | object |  | Today's opening hours in the venue's time zone, from tenancy.VenueSettings opening hours. (nullable) |
+| venues[].openingHoursToday.opens | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| venues[].openingHoursToday.closes | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| whatsNew | array of object |  | Public: the guest "what's new" (decided 29 September, rev 3 GAP-B2). (max items 10) |
+| whatsNew[].version | string | yes | The release version. |
+| whatsNew[].publishedAt | string (date-time) | yes | When the release reached the tenant's cell. |
+| whatsNew[].notes | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | recentChanges | array of object |  | Staff only. |
 | recentChanges[].area | string |  |  |
 | recentChanges[].description | string |  |  |
@@ -1509,6 +2350,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | brand | BrandIdentity |  | Every *AssetRef here is a MediaAsset id from the assets library (createUpload then completeUpload), PNG or SVG and at most 2 MB (decided 28 September, audit R270). |
 | brand.logoAssetRef | string (uuid) | yes | The primary logo. |
 | brand.logoDarkAssetRef | string (uuid) |  | Used on dark backgrounds. (nullable) |
+| brand.logoVariant | enum (light, dark, duotone) |  | Which lockup sits in the nav bar, and whose colours drive the theme (decided 29 September, rev 3 CFG-4). (default light) |
 | brand.faviconAssetRef | string (uuid) |  | The browser tab icon for the guest web app. (nullable) |
 | brand.splashImageAssetRefs | array of string (uuid) |  | Splash images, shown in order. |
 | brand.splashDurationSeconds | integer |  | (min 0; max 10; default 3) |
@@ -1524,21 +2366,45 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | appIcons.changeScope | object | yes | Always buildTime — icons are baked into the binary. (read-only) |
 | appIcons.liveVersion | string |  | Icon currently shipped. (read-only; nullable) |
 | appIcons.requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion. (read-only) |
-| bookingFlow | BookingFlowConfig |  |  |
+| bookingFlow | BookingFlowConfig |  | Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11). |
 | bookingFlow.preset | enum (auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom) |  | L1 Ticket box … L6 Season. (default auto) |
 | bookingFlow.stepIndicator | enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) |  | (default bar) |
-| bookingFlow.cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn) |  | (default sidebarRight) |
-| bookingFlow.cardLayout | string |  | (max length 40; nullable) |
-| bookingFlow.cardSize | enum (compact, regular, large) |  | (nullable) |
+| bookingFlow.cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn, floatingIcon) |  | floatingIcon is a round basket button with the item count that opens the cart (decided 29 September, rev 3 REV3-10). (default sidebarRight) |
+| bookingFlow.cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
+| bookingFlow.cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
+| bookingFlow.cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
+| bookingFlow.categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
 | bookingFlow.extrasStep | enum (auto, always, never) |  | (default auto) |
-| bookingFlow.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | (nullable) |
+| bookingFlow.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | bookingFlow.mapView | enum (2d, 3d) |  | (default 3d) |
-| bookingFlow.density | enum (compact, comfortable, airy) |  | (default comfortable) |
+| bookingFlow.density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
 | bookingFlow.embedMode | enum (fullPage, embedded) |  | embedded hides the hero banner, event page and venue header, for a flow placed inside the venue's own site. (default fullPage) |
 | bookingFlow.heroBanner | boolean |  | (default True) |
-| bookingFlow.searchInBanner | boolean |  | (default True) |
+| bookingFlow.searchInBanner | boolean |  | Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6). (default False) |
+| bookingFlow.eventBannerDates | boolean |  | Dates in event banner (decided 29 September, rev 3 23SEP-19). (default False) |
 | bookingFlow.singleEventPage | boolean |  | (default False) |
 | bookingFlow.quantitiesOnAddOns | boolean |  | (default True) |
+| bookingFlow.timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
+| bookingFlow.dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
+| bookingFlow.dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
+| bookingFlow.dayPartBoundaries.afternoonStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 12:00) |
+| bookingFlow.dayPartBoundaries.eveningStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 17:00) |
+| bookingFlow.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
+| bookingFlow.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
+| bookingFlow.seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
+| bookingFlow.seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
+| bookingFlow.ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
+| bookingFlow.ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
+| bookingFlow.cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
+| bookingFlow.quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
+| bookingFlow.conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
+| bookingFlow.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
+| bookingFlow.showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
+| bookingFlow.locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
+| bookingFlow.consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| bookingFlow.venueOverrides | array of BookingFlowVenueOverride |  | Per-venue overrides, at most one per venue. (max items 200; default []) |
+| bookingFlow.venueOverrides[].venueId | string (uuid) | yes | One of the tenant's active venues. |
+| bookingFlow.venueOverrides[].settings | BookingFlowSettings | yes | Every guest booking-flow setting, once. |
 | theme | Theme |  |  |
 | theme.primaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.secondaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -1549,7 +2415,9 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | theme.darkMode.primaryColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.darkMode.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.darkMode.textColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
-| theme.cornerRadius | integer |  | (min 0; max 32) |
+| theme.cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
+| theme.surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
+| theme.buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
 | fonts | FontConfig |  |  |
 | fonts.primaryLatin | string | yes |  |
 | fonts.primaryArabic | string |  | Required when ar is among the tenant's languages (audit R163). (nullable) |
@@ -1733,6 +2601,17 @@ Renders the branded maintenance screen with an expected-back time. Tenant-brande
 | contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
 | availability | AppAvailability: enum (open, soldOut, closed) |  | The sold-out or closed signal (decided 28 September, audit R073). (default open) |
 | availabilityMessage | object |  | What the sold-out or closed screen says (WEB-029). (nullable) |
+| venues | array of object |  | Public: the venues a guest can pick (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). (max items 200) |
+| venues[].venueId | string (uuid) | yes | The venue's scope node (tenancy.OrgUnit.id, level venue): what every guest screen that declares venueId from: session reads once the guest picks it. |
+| venues[].name | string | yes | The venue's name (tenancy.OrgUnit.name). (max length 200) |
+| venues[].city | string |  | Shown under the name so two venues with similar names can be told apart. (max length 120; nullable) |
+| venues[].openingHoursToday | object |  | Today's opening hours in the venue's time zone, from tenancy.VenueSettings opening hours. (nullable) |
+| venues[].openingHoursToday.opens | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| venues[].openingHoursToday.closes | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| whatsNew | array of object |  | Public: the guest "what's new" (decided 29 September, rev 3 GAP-B2). (max items 10) |
+| whatsNew[].version | string | yes | The release version. |
+| whatsNew[].publishedAt | string (date-time) | yes | When the release reached the tenant's cell. |
+| whatsNew[].notes | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | recentChanges | array of object |  | Staff only. |
 | recentChanges[].area | string |  |  |
 | recentChanges[].description | string |  |  |
@@ -1969,6 +2848,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | Part of slice | core |
 | Wave | 2 |
 | Offline | no |
+| Config scope | tenant |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `cache:resolution`, `whitelabel.feature_toggle`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
@@ -1992,6 +2872,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | brand | BrandIdentity |  | Every *AssetRef here is a MediaAsset id from the assets library (createUpload then completeUpload), PNG or SVG and at most 2 MB (decided 28 September, audit R270). |
 | brand.logoAssetRef | string (uuid) | yes | The primary logo. |
 | brand.logoDarkAssetRef | string (uuid) |  | Used on dark backgrounds. (nullable) |
+| brand.logoVariant | enum (light, dark, duotone) |  | Which lockup sits in the nav bar, and whose colours drive the theme (decided 29 September, rev 3 CFG-4). (default light) |
 | brand.faviconAssetRef | string (uuid) |  | The browser tab icon for the guest web app. (nullable) |
 | brand.splashImageAssetRefs | array of string (uuid) |  | Splash images, shown in order. |
 | brand.splashDurationSeconds | integer |  | (min 0; max 10; default 3) |
@@ -2007,21 +2888,45 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | appIcons.changeScope | object | yes | Always buildTime — icons are baked into the binary. (read-only) |
 | appIcons.liveVersion | string |  | Icon currently shipped. (read-only; nullable) |
 | appIcons.requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion. (read-only) |
-| bookingFlow | BookingFlowConfig |  |  |
+| bookingFlow | BookingFlowConfig |  | Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11). |
 | bookingFlow.preset | enum (auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom) |  | L1 Ticket box … L6 Season. (default auto) |
 | bookingFlow.stepIndicator | enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) |  | (default bar) |
-| bookingFlow.cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn) |  | (default sidebarRight) |
-| bookingFlow.cardLayout | string |  | (max length 40; nullable) |
-| bookingFlow.cardSize | enum (compact, regular, large) |  | (nullable) |
+| bookingFlow.cartLayout | enum (sidebarRight, sidebarLeft, slideInRight, slideUpBottom, singleColumn, floatingIcon) |  | floatingIcon is a round basket button with the item count that opens the cart (decided 29 September, rev 3 REV3-10). (default sidebarRight) |
+| bookingFlow.cartSideInRtl | enum (keepRight, mirror) |  | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). (default keepRight) |
+| bookingFlow.cardLayout | enum (stackedRows, splitRows, cardsAcross, posterCards) |  | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). (default stackedRows) |
+| bookingFlow.cardSize | enum (compact, standard, large, extraLarge) |  | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). (default compact) |
+| bookingFlow.categoryDisplay | enum (grid, rowStrip) |  | How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18). (default grid) |
 | bookingFlow.extrasStep | enum (auto, always, never) |  | (default auto) |
-| bookingFlow.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | (nullable) |
+| bookingFlow.seatPicker | enum (bowl, zonesThenSeats, zonesOnly, seatsOnly) |  | Default bowl, as the prototype has it (decided 29 September, rev 3 CFG-6). (default bowl) |
 | bookingFlow.mapView | enum (2d, 3d) |  | (default 3d) |
-| bookingFlow.density | enum (compact, comfortable, airy) |  | (default comfortable) |
+| bookingFlow.density | enum (compact, standard, roomy) |  | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). (default compact) |
 | bookingFlow.embedMode | enum (fullPage, embedded) |  | embedded hides the hero banner, event page and venue header, for a flow placed inside the venue's own site. (default fullPage) |
 | bookingFlow.heroBanner | boolean |  | (default True) |
-| bookingFlow.searchInBanner | boolean |  | (default True) |
+| bookingFlow.searchInBanner | boolean |  | Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6). (default False) |
+| bookingFlow.eventBannerDates | boolean |  | Dates in event banner (decided 29 September, rev 3 23SEP-19). (default False) |
 | bookingFlow.singleEventPage | boolean |  | (default False) |
 | bookingFlow.quantitiesOnAddOns | boolean |  | (default True) |
+| bookingFlow.timesPerPage | enum (8, 12, 24, all) |  | Times per page (decided 29 September, rev 3 REV3-1). (default 24) |
+| bookingFlow.dayPartFilter | boolean |  | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). (default True) |
+| bookingFlow.dayPartBoundaries | object |  | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
+| bookingFlow.dayPartBoundaries.afternoonStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 12:00) |
+| bookingFlow.dayPartBoundaries.eveningStartsAt | string |  | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; default 17:00) |
+| bookingFlow.signInAt | enum (afterAddOns, atPayment) |  | Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3). (default afterAddOns) |
+| bookingFlow.seatEventDateMode | enum (inlineStep, popupOnSeatMap) |  | Date and time on a seated event (decided 29 September, rev 3 REV3-4). (default inlineStep) |
+| bookingFlow.seatViewPosition | enum (bottom, right, left, top) |  | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). (default bottom) |
+| bookingFlow.seatTimeBar | boolean |  | Time bar above the seat map (decided 29 September, rev 3 REV3-6). (default True) |
+| bookingFlow.ticketCategories | enum (categoryThenSubcategory, flatList) |  | How tickets are grouped (decided 29 September, rev 3 REV3-16). (default categoryThenSubcategory) |
+| bookingFlow.ticketTags | boolean |  | Tags on tickets (decided 29 September, rev 3 23SEP-3). (default True) |
+| bookingFlow.cardInfo | boolean |  | Extra info on cards (decided 29 September, rev 3 23SEP-6). (default True) |
+| bookingFlow.quickTour | boolean |  | Quick tour (decided 29 September, rev 3 REV3-20). (default False) |
+| bookingFlow.conciergeMascot | boolean |  | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). (default True) |
+| bookingFlow.performanceReveal | enum (dateTimeTicket, allAtOnce) |  | Performance reveal (decided 29 September, rev 3 REV3-2). (default dateTimeTicket) |
+| bookingFlow.showInfoOnly | boolean |  | Show info-only products (decided 29 September, rev 3 REV3-14). (default True) |
+| bookingFlow.locationSwitcher | boolean |  | Location switcher (decided 29 September, rev 3 REV3-18). (default False) |
+| bookingFlow.consentQuestionIds | array of string (uuid) |  | The booking flow's own consent questions (decided 29 September, rev 3 REV3-26). (max items 10; default []) |
+| bookingFlow.venueOverrides | array of BookingFlowVenueOverride |  | Per-venue overrides, at most one per venue. (max items 200; default []) |
+| bookingFlow.venueOverrides[].venueId | string (uuid) | yes | One of the tenant's active venues. |
+| bookingFlow.venueOverrides[].settings | BookingFlowSettings | yes | Every guest booking-flow setting, once. |
 | theme | Theme |  |  |
 | theme.primaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.secondaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -2032,7 +2937,9 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | theme.darkMode.primaryColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.darkMode.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.darkMode.textColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
-| theme.cornerRadius | integer |  | (min 0; max 32) |
+| theme.cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
+| theme.surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
+| theme.buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
 | fonts | FontConfig |  |  |
 | fonts.primaryLatin | string | yes |  |
 | fonts.primaryArabic | string |  | Required when ar is among the tenant's languages (audit R163). (nullable) |
@@ -2255,7 +3162,9 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | darkMode.primaryColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.textColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
-| cornerRadius | integer |  | (min 0; max 32) |
+| cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
+| surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
+| buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
 
 **Responses**
 
@@ -2355,7 +3264,9 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | darkMode.primaryColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.textColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
-| cornerRadius | integer |  | (min 0; max 32) |
+| cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
+| surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
+| buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
 
 **Response**: `Theme`
 
@@ -2370,7 +3281,9 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | darkMode.primaryColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.backgroundColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | darkMode.textColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
-| cornerRadius | integer |  | (min 0; max 32) |
+| cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
+| surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
+| buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
 
 **Responses**
 
@@ -2762,6 +3675,40 @@ Every table this service owns that the slice reads or writes, with its columns a
 | url | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
+### `whitelabel.guided_choice`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | text | yes | ULID. |
+| venue_id | uuid | yes | From the path of createGuidedChoice. |
+| name | text | yes | Staff-facing name, e.g. |
+| mode | text | yes | How the guest reaches it (rev 3 REV3-11). |
+| show_banner | boolean | no | The dark banner under the products ("Choose from the experiences above or let us help you decide") with a Help me choose button. |
+| status | text | yes |  |
+| source | text | yes | manual when staff created it; aiSuggested when the ai service proposed it (a service caller). |
+| suggestion_ref | text | no | For aiSuggested, the id of the ai job that proposed it. |
+| published_at | timestamptz | no |  |
+| published_by | uuid | no | The person who published it. |
+| updated_at | timestamptz | no |  |
+
+### `whitelabel.guided_choice_answer`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| guided_choice_id | text | yes | The parent row. |
+| id | text | no | ULID. |
+| title | jsonb | yes |  |
+| sort_order | integer | yes |  |
+
+### `whitelabel.guided_choice_question`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| guided_choice_id | text | yes | The parent row. |
+| id | text | no | ULID. |
+| title | jsonb | yes |  |
+| sort_order | integer | yes |  |
+
 ### `whitelabel.homepage_section`
 
 | Column | Type | Required | Notes |
@@ -2853,10 +3800,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-7 operations, added to this service in later releases without changing any of the above.
+4 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| content | `deleteBanner`, `deleteContentPage` |
-| navigation | `getNavigation`, `setHeader`, `setNavigation` |
+| content | `proposeGuidedChoice` |
+| navigation | `getNavigation` |
 | whiteLabel | `createContentBlock`, `publishContentBlock` |

@@ -63,7 +63,8 @@ steps:
   screen: ADM-242
   action: Works in Approval Matrix & Multi-Level Approval Configuration
   operations:
-  - approveMatrixMultiLevel
+  - listApprovalMatrices
+  - setApprovalMatrix
   outcome: Configure when approvals are required and who must approve.
 - step: 9
   screen: ADM-238
@@ -75,7 +76,8 @@ steps:
   screen: ADM-243
   action: Works in Roles, Authority, Delegation & Approval Limits
   operations:
-  - approveRoleAuthorityDelegation
+  - listApprovalDelegations
+  - createApprovalDelegation
   outcome: Define who has authority to perform or approve specific actions. This should work with TICVAI
     RBAC/PBAC rather than replace it.
 - step: 11

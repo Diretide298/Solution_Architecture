@@ -205,6 +205,13 @@
    "module": "4 — Bundles and Promotions",
    "title": "TICVAI — Wallet Configuration",
    "tip": "**Two vocabularies, and confusing them is why the wallet was built five times.** > `Wallet Type` — *who owns a wallet*: guest, registered customer, family, parent, child, corporate, school, employee. > > `Credit Type` — *what value sits inside one*: cash, refund, bonus, promotional, gift card, membership, loyalty, ride, attraction. The 27 August workshop settled this and the pack's acceptance condition states the consequence: **\"new wallet credit types can be introduced through configuration wit"
+  },
+  "transport": {
+   "tier": "satellite",
+   "operations": 28,
+   "module": "1 — Ticketing Catalogue (Transport)",
+   "title": "TICVAI Transport Ticketing",
+   "tip": "**Scheduled transport ticketing: stations, routes, timetabled departures, fares, one-way tickets, multi-trip passes, favourite routes and a route map.** In scope as decided 29 September, rev 3 REV3-21 (Emirates Link, line E101, in the rev 3 guest prototype). **A trip is priced by where you get on and where you get off**, which is a fare table, not a catalogue price list. The sale reuses catalogue and orders: a departure is a catalogue performance, a one-way ticket a cart line on it, a pass an openDated product. The real stations, fares and timetable are an open value from the client."
   }
  },
  "modules": {

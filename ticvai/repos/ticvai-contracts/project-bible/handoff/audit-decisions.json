@@ -62,7 +62,8 @@
   "who": "Client product",
   "default": "(a) Add a guest password sign-in, since registration already takes a password. (b) Add a minimum supported app version to the app status. (c) Cabanas stay staff-booked and GST-070 becomes table-only. (d) Add a guest leave-waitlist. (e) Add apply-promo-code to the cart. (f) Add contact details and a sold-out/closed flag to the app status.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September"
+  "applied": "applied 28 September",
+  "superseded": "Part (c) superseded 29 September (rev 3 REV3-15, GAP-C2): cabanas, loungers and non-dining tables placed on an ingested venue map are chosen and bought by the guest, like seats. See docs/registers/rev3-decisions.md."
  },
  {
   "id": "R077",
@@ -75,7 +76,8 @@
   "who": "Client product (with client counsel for b)",
   "default": "(a) No deposit and no no-show fee in the first release. (b) The SDK of the facial-reader vendor you have contracted, named by you. (c) Rotating code with countdown. No screenshot blocking on web.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September, one value open: Face-capture SDK and template format are the client's contracted facial-reader vendor's; the client must name the vendor."
+  "applied": "applied 28 September, one value open: Face-capture SDK and template format are the client's contracted facial-reader vendor's; the client must name the vendor.",
+  "superseded": "Part (a) superseded 29 September (rev 3 REV3-8b): the dining deposit ships as a venue option, off unless the venue enables it; basis and amount are venue configuration."
  },
  {
   "id": "R080",
@@ -504,7 +506,8 @@
   "who": "Client product",
   "default": "No SSO for guests and no guest MFA at sign-in. Guests use one-time code, social sign-in and UAE Pass.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September"
+  "applied": "applied 28 September",
+  "superseded": "Part 2 superseded 29 September (rev 3 GAP-B1): guest two-step verification is a per-venue setting, off by default. Part 1 stands: guests never use enterprise SSO."
  },
  {
   "id": "R169",
@@ -816,7 +819,8 @@
   "who": "Client product",
   "default": "Not in the first release. Take GST-030 and WEB-046 out of Block A. Queue calls and order status show on the queue and order screens that already poll for them.",
   "decision": "adopted: our recommendation, 28 September 2026",
-  "applied": "applied 28 September"
+  "applied": "applied 28 September",
+  "superseded": "The notifications-feed deferral is reversed 29 September (rev 3 GAP-C1): the in-venue notifications feed (GST-030, WEB-046) is in the first release."
  },
  {
   "id": "R251",

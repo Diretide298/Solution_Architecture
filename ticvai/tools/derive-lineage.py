@@ -240,6 +240,11 @@ NEW_CONTRACT_SERVICE = {
     # invalidate those caches and whose deploys would restart the gates. TenancyService already
     # holds `workforce` and `approvals`; accreditation is an approvals workflow about people.
     "accreditation": "TenancyService",
+    # **Transport ticketing is VenueOps, beside rental and queue** (decided 29 September, rev 3
+    # REV3-21). It owns stations, routes, timetables, fares, passes and favourites; the sale runs
+    # through catalogue and orders (a departure is a performance, a pass an openDated product),
+    # so it is not on the sale path, it is venue-scoped, and it is licensed as an optional module.
+    "transport": "VenueOpsService",
 }
 
 

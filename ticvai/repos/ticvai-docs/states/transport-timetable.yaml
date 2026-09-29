@@ -1,0 +1,38 @@
+# Transport timetable — state model
+# Contract: transport.TransportTimetableStatus
+# Checked by tools/check-states.py.
+# Added 29 September: transport ticketing is in scope (decided 29 September, rev 3 REV3-21).
+
+entity: Transport timetable
+contract: transport
+enum: TransportTimetableStatus
+enumKind: named
+enumSchema: TransportTimetableStatus
+owner: transport
+initial:
+- draft
+terminal:
+- superseded
+- withdrawn
+transitions:
+- from: draft
+  to: published
+  operation: publishTransportTimetable
+  trigger: operation
+  guard: The route is active and has a fare table. Departures are generated as catalogue performances up to the release horizon and go on sale
+- from: published
+  to: superseded
+  operation: publishTransportTimetable
+  trigger: cascade
+  guard: '**A newer timetable for the same route was published over its dates.** Its departures before the new `validFrom` stand; unsold ones on or after it are removed. Refused while any of those has sold seats'
+- from: published
+  to: withdrawn
+  operation: withdrawTransportTimetable
+  trigger: operation
+  guard: No future departure has sold seats. Unsold future departures are removed and no more are released
+- from: draft
+  to: withdrawn
+  operation: withdrawTransportTimetable
+  trigger: operation
+  guard: A draft discarded
+notes: '**A published timetable is never edited.** A change is a new draft from a later date, which supersedes it from that date — a ticket already sold was sold against the old times.'

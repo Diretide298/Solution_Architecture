@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Resources
   version: 1.0.0
-  x-ticvai-screen-count: 48
+  x-ticvai-screen-count: 57
   x-ticvai-tier: satellite
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-platforms:
@@ -42,6 +42,20 @@ info:
     **Not stock.** `inventory` owns quantities of interchangeable things. **A resource is not interchangeable**
     — that is the whole distinction, and a venue with forty identical strollers has forty resources because
     guest number twelve returned stroller number twelve.
+
+
+    ## Resources on a venue map: the guest picks one (decided 29 September, rev 3 REV3-15)
+
+    **A venue map can carry cabanas, loungers, tables and other bookable resources**, ingested the way
+    a stadium seat map is (`venue-map.importVenueGeometry`, `validateVenueMapGraph`, `publishVenueMap`),
+    each placed with a label, zone, capacity and price band (`venue-map.PlacedResource`). A guest reads
+    the whole map''s availability for a date in one call (`getMapResourceAvailability`), picks a specific
+    one, holds it with an expiring `ResourceHold` exactly as a seat is held (`createResourceHold`), and
+    buys it: the order converts the hold into a `ResourceBooking`. **This supersedes audit R073 (c)**
+    (*"cabanas stay staff-booked"*, 28 September) **and the 26 August minute** (*"never a specific
+    room/vehicle/instructor by itself"*) **for resources on an ingested map.** Resources that are not on
+    a published map (instructors, rooms, vehicles, lockers) keep the minute: the guest buys a product and
+    `allocateResources` picks.
 
     '
 servers:
@@ -97,6 +111,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-095 Resources"
         - "P08 BO-857 Resource Creation & Profile"
+        - "P08 BO-863 Resource Lifecycle, Governance & Audit"
       summary: Define a bookable resource
       tags:
       - resources
@@ -146,6 +161,10 @@ paths:
         Includes maintenance windows and blackouts. **A resource under repair is unavailable for a different
         reason from one that is booked**, and the response says which — an operator looking for something
         free needs to know whether to wait or to look elsewhere.
+
+        **Per resource.** A guest booking a meeting room never names one, so the start times they choose
+        from come from `listProductStartTimes` (product, length variant, date), not from here (decided 29
+        September, rev 3 REV3-13).
 
         '
       tags:
@@ -259,6 +278,18 @@ paths:
         **This closes the open question on `F25-a-guest-rents-a-cabana`**, which recorded that the venue
         had not said whether a guest may book a cabana themselves. They had; it was minuted on 26 August
         and nothing read the minutes.
+
+        ## Superseded 29 September for resources on a venue map (rev 3 REV3-15)
+
+        **The minute above, and audit R073 (c) (*"cabanas stay staff-booked"*), no longer hold for a
+        resource placed on a published venue map** (decided 29 September, rev 3 REV3-15 and GAP-C2). There
+        a guest picks the specific cabana, lounger or table on the map, holds it with `createResourceHold`
+        and buys it; the order converts the hold into a booking. **This operation stays staff-only**: the
+        guest route is hold then order, never a direct booking. For resources not on a map the minute
+        still holds.
+
+        **A live `ResourceHold` is a conflict here** like a booking: staff cannot book a cabana a guest
+        is holding at checkout.
 
         '
       tags:
@@ -1058,6 +1089,7 @@ paths:
       operationId: updateResource
       x-ticvai-consumed-by:
         - "P08 BO-857 Resource Creation & Profile"
+        - "P08 BO-863 Resource Lifecycle, Governance & Audit"
       summary: Change a resource
       tags:
       - resources
@@ -1873,6 +1905,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-864 Resource Calendar Command Center"
         - "P08 BO-870 Operational Time & Resource Blocking"
+        - "P08 BO-880 Break, Leave & Absence Configuration"
         - "P08 BO-910 Maintenance & Resource Blocking"
       summary: Take a resource out of service for a window, with a reason
       description: 'Board 2.07. **A block is not a booking and the difference is operational.** An
@@ -1963,6 +1996,19 @@ paths:
 
         Fills resource-type placeholders in a package, evaluates dependencies before confirming, and
         refuses naming what is missing rather than allocating a stage without its sound system.
+
+        **Not how a map-placed resource is sold** (decided 29 September, rev 3 REV3-15): a cabana, lounger
+        or table on a published venue map is picked by the guest and held with `createResourceHold`, so
+        rotation does not apply to it. A live hold counts as taken when this allocates.
+
+        **It assigns the room for a space booked by the hour** (decided 29 September, rev 3 REV3-13).
+        When `orders.checkoutCart` (or `createOrder`) turns a cart line with a `bookedWindow` into an order
+        line, the order service calls this service to service with `from`/`to` = the window,
+        `requirements` = the product''s (`setExperienceResourceRequirements`, the experience being the
+        product) and the `orderId`, and one concrete room of the type is booked for the window, rotating
+        as above. The guest chose the room type, length and start time and never a room (26 August
+        minute). If no room is free, which the line''s capacity hold should have prevented, `409` names
+        the requirement and the checkout refuses the line `windowUnavailable`.
 
         '
       tags:
@@ -2177,6 +2223,11 @@ paths:
         the resource** — the same instructor is choosable in the private lesson and invisible in the
         group one, and nothing about the instructor changed.
 
+        **Superseded for resources on a venue map** (decided 29 September, rev 3 REV3-15, superseding
+        audit R073 (c) and the first minute above for them): a resource placed on a published venue map
+        is chosen by the guest on the map whatever this policy says. This policy still governs every
+        resource that is not on a map.
+
         '
       tags:
       - resources
@@ -2226,6 +2277,8 @@ paths:
         - "P08 BO-894 Staff-to-Experience Qualification Mapping"
         - "P08 BO-898 Skill-Based & Smart Resource Selection"
         - "P08 BO-899 Customer / Cashier Resource Assignment Experience"
+        - "P08 BO-924 Optimal Resource Recommendation Engine"
+        - "P08 BO-930 Alternative & Replacement Resource"
       summary: Resources matching a requirement, by attribute
       description: '**Deliberately not AI, and 26 August says so.** *"skill-based resource matching
         should rely on straightforward keyword/attribute matching (e.g., skill level, language) rather
@@ -2309,6 +2362,7 @@ paths:
     put:
       operationId: setExperienceResourceRequirements
       x-ticvai-consumed-by:
+        - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P08 BO-893 Experience Resource Requirement Builder"
       summary: Bind resource requirements to an experience
       description: 'Board 5.01. **This is the join between the catalogue and the pool**, and it is what
@@ -2414,9 +2468,943 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ResourceUtilisation'
+  /resource-availability:
+    get:
+      operationId: getMapResourceAvailability
+      x-ticvai-consumed-by:
+        - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-074 Map Booking — Cabanas & Spots"
+      summary: Every bookable resource on a venue map, free or taken, in one call
+      description: '**The whole map in one call** (decided 29 September, rev 3 REV3-15 and GAP-C2). A guest
+        opening the Coastal Aqua map sees 34 cabanas at once, sold ones greyed, and one request per
+        cabana is 34 round trips before the map can be drawn. So this returns every placed resource on
+        the map''s published version with its status for the window, its capacity and price band, and
+        the band''s price; the client joins it to `venue-map.getVenueMap` `resources` by `resourceId`.
+
+
+        **Status is computed the way `getResourceAvailability` computes it**, with setup and teardown
+        subtracted, and a live `ResourceHold` shows as `held`. A resource the map marks `isBookable`
+        false comes back `unavailable`.
+
+
+        **Not paged, deliberately.** A map carries tens of resources, not thousands, and a paged answer
+        would make the client stitch pages before it could grey a single cabana.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: mapId
+        in: query
+        required: true
+        description: The `venue-map.VenueMap` whose placed resources to report.
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        required: true
+        description: Start of the window. A whole day for a cabana (the venue's opening), a seating slot
+          for a table.
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: kind
+        in: query
+        description: Only resources of this kind, e.g. `table` on a table-booking screen.
+        schema:
+          $ref: '#/components/schemas/ResourceKind'
+      responses:
+        '200':
+          description: Every placed resource with its status for the window
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapResourceAvailability'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /resource-holds:
+    post:
+      operationId: createResourceHold
+      x-ticvai-consumed-by:
+        - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-074 Map Booking — Cabanas & Spots"
+      summary: Hold a specific resource picked on the map
+      description: '**A seat hold for a cabana** (decided 29 September, rev 3 REV3-15 and GAP-C2). The guest
+        taps B09 on the map; this holds it for the window and returns `expiresAt`, so the client shows
+        the same remaining-time counter the seat map shows. Short-lived and explicit, like
+        `seating.createSeatHold`, and for the same reason: a cabana that expires silently while the guest
+        enters card details is the worst outcome in the flow.
+
+
+        **Only a resource placed on the published map may be held**, and only while it is free for the
+        whole window, setup and teardown included; otherwise `409` names it. A party larger than the
+        resource''s `capacity` is refused `422`.
+
+
+        **The order converts it.** The cart line carries `holdId`; `orders.createOrder` turns the hold
+        into a `ResourceBooking` (status `reserved`) without releasing it first, so nobody takes the
+        cabana between the two calls. **8 minutes by default, extendable to 30 in all** (audit R169), as a
+        seat hold.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+        - "cache:idempotency"
+      x-ticvai-lock-excludes-note: ADR-0037, as `seating.createSeatHold`; the idempotency record is resolved before the transaction opens, never inside the lock.
+      x-ticvai-lock-note: 'ADR-0031, as `seating.createSeatHold`. **The guest chose this cabana**, so they
+        wait or are told no, and must not silently receive a different one.
+
+        '
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateResourceHoldRequest'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Held
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceHold'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'Taken for some of the window, held by someone else, not placed on the published map,
+            or marked not bookable. The response names the resource and the clash with its times.
+
+            '
+          x-ticvai-problem-types:
+          - resource-conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ResourceConflictProblem'
+        '422':
+          description: 'The party is larger than the resource''s `capacity` (`party-exceeds-capacity`).
+
+            '
+          x-ticvai-problem-types:
+          - party-exceeds-capacity
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resource-holds/{holdId}:
+    parameters:
+    - name: holdId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    get:
+      operationId: getResourceHold
+      x-ticvai-consumed-by:
+        - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-041 Checkout Entry"
+        - "P02 GST-074 Map Booking — Cabanas & Spots"
+      summary: Read a resource hold
+      description: The countdown's source of truth, as `seating.getSeatHold`.
+      tags:
+      - resources
+      x-ticvai-permission: ORDER_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: Hold
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceHold'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+    delete:
+      operationId: relinquishResourceHold
+      x-ticvai-consumed-by:
+        - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-074 Map Booking — Cabanas & Spots"
+      summary: Give up a resource hold
+      description: The guest picked another cabana or left the map. The resource is free at once.
+      tags:
+      - resources
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Released
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+  /resource-holds/{holdId}/extend:
+    parameters:
+    - name: holdId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+    post:
+      operationId: extendResourceHold
+      x-ticvai-consumed-by:
+        - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-074 Map Booking — Cabanas & Spots"
+      summary: Extend a resource hold
+      description: 'For a guest still completing payment. **The same bounds as a seat hold**:
+        `VenueSettings.seating.seatHoldExtensionSeconds` per extension and at most
+        `VenueSettings.seating.seatHoldMaxExtensions` extensions (audit R094), and no hold outlives 30
+        minutes from creation (audit R169).
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Extended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceHold'
+        '409':
+          description: Already expired or converted, or the extension limit is reached. `refusedReason`
+            says which.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ResourceHoldExtendProblem'
+  /resource-start-times:
+    get:
+      operationId: listProductStartTimes
+      x-ticvai-consumed-by:
+        - "P01 WEB-048 Book a Space by the Hour"
+        - "P02 GST-075 Book a Space by the Hour"
+      summary: Start times a space sold by the hour can be booked at, for one length on one day
+      description: '**The guest''s start-time step for a meeting room** (decided 29 September, rev 3
+        REV3-13: meeting rooms by the hour are in scope). A guest never names a room, so
+        `getResourceAvailability`, which is per resource, cannot answer them. Given the product (a room
+        type such as *boardroom*, `catalogue.Product.requiresTimeWindow` true), the chosen length variant
+        and a date, this returns every start time at which **at least one resource satisfying the
+        product''s resource requirements** (`setExperienceResourceRequirements`, the experience being
+        the product) is free for the variant''s `durationMinutes`, setup and teardown included, with live
+        bookings, resource holds and cart windows already counted as taken. `freeCount` says how many.
+
+        Start times fall on `stepMinutes` from the venue''s opening on that date, and a window must end
+        by its close. The chosen start becomes the cart line''s `bookedWindow`; `allocateResources` picks
+        the room at checkout. **Display only**, like any availability read: the cart line is what holds.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: productId
+        in: query
+        required: true
+        description: A `catalogue.Product` with `requiresTimeWindow` true, else `422`.
+        schema:
+          type: string
+          format: uuid
+      - name: variantId
+        in: query
+        required: true
+        description: The length variant; its `length` value's `durationMinutes` is the window.
+        schema:
+          type: string
+          format: uuid
+      - name: date
+        in: query
+        required: true
+        description: The venue-local date.
+        schema:
+          type: string
+          format: date
+      - name: stepMinutes
+        in: query
+        description: Spacing of the offered start times. Proposed default 30, client to correct (rev 3 REV3-13).
+        schema:
+          type: integer
+          enum:
+          - 15
+          - 30
+          - 60
+          default: 30
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: Free start times, earliest first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ProductStartTime'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: The product is not sold by time window, the variant is not one of its lengths, or
+            it has no resource requirements (`product-not-time-windowed`, `variant-has-no-duration`,
+            `no-resource-requirements`).
+          x-ticvai-problem-types:
+          - product-not-time-windowed
+          - variant-has-no-duration
+          - no-resource-requirements
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resource-bookings/{bookingId}/progress:
+    parameters:
+    - name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: setResourceBookingProgress
+      x-ticvai-consumed-by:
+        - "P08 BO-935 Assignment Detail & Operational Brief"
+      x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-935 (Start assignment, Complete assignment); shape follows checkInResource'
+      summary: Start or complete a staff or instructor assignment
+      description: '**Start assignment and Complete assignment on BO-935** (decided 29 September, readiness
+        close-out). A person booked as a resource (kind `staff` or `instructor`) is not handed over and
+        returned like a stroller, so check-out and check-in are the wrong acts; this is the same lifecycle
+        in an assignment''s words, with no new states. `started` moves the booking `reserved` to `checkedOut`
+        and records `checkedOutAt`; `completed` moves `checkedOut` or `overdue` to `returned` and records
+        `returnedAt`, both from `recordedAt` (the device time, as `checkInResource`). No deposit is held or
+        settled on a person.
+
+        A booking of any other resource kind answers `422` `useCheckOutCheckIn`; a booking not in the state
+        the step needs answers `409` `invalidProgressStep`.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_BOOK
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceBookingProgressInput'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceBooking'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: '`invalidProgressStep`: `started` on a booking that is not `reserved`, or `completed` on
+            one that is not `checkedOut` or `overdue`.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`useCheckOutCheckIn`: the booked resource is not of kind `staff` or `instructor`.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resource-requests:
+    post:
+      operationId: raiseResourceRequest
+      x-ticvai-consumed-by:
+        - "P08 BO-935 Assignment Detail & Operational Brief"
+        - "P08 BO-938 Employee Requests & Resource Support"
+      x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-935 and BO-938 (Request replacement, Replacement resource, Additional equipment, Resource issue, Maintenance request, Assignment change, Venue change request, Schedule clarification, Custom operational request); shape follows bookResource'
+      summary: Ask for a replacement, extra equipment or a change to an assignment
+      description: '**An employee''s request about the resources on their assignment** (decided 29 September,
+        readiness close-out). One operation for the nine request kinds the pack lists, because they share a
+        record and a queue: what is asked, about which booking or resource, by whom, and its status. It is
+        raised `open` and answered by the resource manager; it changes no booking by itself (a replacement
+        is a new `bookResource`, a maintenance request is a `maintenance` work order raised from it).
+
+        The client sends the `id` (a ULID) so a request raised offline on a device is not duplicated on
+        sync; the same `id` again returns the existing request. `bookingId` or `resourceId` is required
+        except for `scheduleClarification` and `other`.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceRequestInput'
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Raised
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceRequest'
+        '422':
+          description: '`subjectRequired`: no `bookingId` or `resourceId` on a kind that needs one; or a
+            `bookingId` / `resourceId` that does not exist at this venue (`unknownSubject`).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /resource-cost-analytics:
+    get:
+      operationId: getResourceCostAnalytics
+      x-ticvai-consumed-by:
+        - "P08 BO-945 Resource Cost, Revenue & Efficiency Analytics"
+      x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-945 (Transfer cost, Asset operating cost, Resource replacement cost); shape follows getResourceUtilisation'
+      summary: What resources cost and earn, grouped
+      description: '**The cost half of BO-945** (decided 29 September, readiness close-out). `getResourceUtilisation`
+        returns minutes only; this returns money for the same grouping and window: transfer cost (moving a
+        resource between locations), operating cost (running and maintenance cost booked against it),
+        replacement cost (retired or lost items replaced), revenue from its bookings, and cost per booked
+        hour. One row per group, bounded by the grouping (a venue''s resources, types, categories or venues),
+        so not paged, like `getResourceUtilisation`.
+
+        A window longer than 366 days is refused with `400`.
+
+        '
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - resource
+          - resourceType
+          - category
+          - venue
+          default: resourceType
+      responses:
+        '200':
+          description: Cost and revenue per group
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResourceCostAnalytics'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
 
 components:
   schemas:
+    ResourceBookingProgressInput:
+      type: object
+      x-ticvai-persistence: none — request only; the step is recorded on resources.booking
+      description: What `setResourceBookingProgress` takes (decided 29 September, readiness close-out).
+      required:
+      - state
+      - recordedAt
+      properties:
+        state:
+          type: string
+          enum:
+          - started
+          - completed
+          description: '`started` is recorded as `checkedOut`, `completed` as `returned`.'
+        note:
+          type: string
+          maxLength: 1000
+          nullable: true
+        recordedAt:
+          type: string
+          format: date-time
+          description: When the employee pressed the button on the device, not when the write reached the server.
+    ResourceRequestKind:
+      type: string
+      enum:
+      - replacementResource
+      - additionalEquipment
+      - resourceIssue
+      - maintenanceRequest
+      - assignmentChange
+      - venueChange
+      - scheduleClarification
+      - other
+      description: The request kinds on BO-935 / BO-938 (decided 29 September, readiness close-out). `other`
+        is the pack's custom operational request.
+    ResourceRequestInput:
+      type: object
+      x-ticvai-persistence: none — request only
+      description: What `raiseResourceRequest` takes.
+      required:
+      - id
+      - kind
+      - detail
+      - recordedAt
+      properties:
+        id:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Client-generated ULID, so a request raised offline is not duplicated on sync.
+        kind:
+          $ref: '#/components/schemas/ResourceRequestKind'
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+        resourceId:
+          type: string
+          format: uuid
+          nullable: true
+        detail:
+          type: string
+          minLength: 3
+          maxLength: 2000
+        recordedAt:
+          type: string
+          format: date-time
+    ResourceRequest:
+      type: object
+      x-ticvai-persistence: resources.resource_request
+      description: '**An employee''s request about the resources on an assignment** (decided 29 September,
+        readiness close-out; BO-935, BO-938). New table. Raised `open`, then `acknowledged`, `resolved` or
+        `declined` by the resource manager.
+
+        '
+      required:
+      - id
+      - kind
+      - detail
+      - status
+      - raisedByPrincipalId
+      - recordedAt
+      properties:
+        id:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        kind:
+          $ref: '#/components/schemas/ResourceRequestKind'
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+        resourceId:
+          type: string
+          format: uuid
+          nullable: true
+        detail:
+          type: string
+        status:
+          type: string
+          enum:
+          - open
+          - acknowledged
+          - resolved
+          - declined
+          readOnly: true
+          description: '`open` on raise.'
+        raisedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+        recordedAt:
+          type: string
+          format: date-time
+        syncedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        resolutionNote:
+          type: string
+          nullable: true
+          readOnly: true
+        scopePath:
+          type: string
+          readOnly: true
+    ResourceCostAnalytics:
+      type: object
+      x-ticvai-persistence: none — projection over bookings, transfers, maintenance and replacement costs, computed at read time
+      description: One group's cost and revenue for the window (decided 29 September, readiness close-out; BO-945).
+      required:
+      - key
+      - label
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        transferCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        operatingCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        replacementCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        revenue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        bookedHours:
+          type: number
+        costPerBookedHour:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: Total cost over booked hours; null when nothing was booked.
+    ProductStartTime:
+      x-ticvai-persistence: none — computed on read
+      type: object
+      description: One start time a room type can be booked at for the chosen length (rev 3 REV3-13).
+      required:
+      - startsAt
+      - endsAt
+      - freeCount
+      properties:
+        startsAt:
+          type: string
+          format: date-time
+        endsAt:
+          type: string
+          format: date-time
+          description: '`startsAt` plus the variant''s `durationMinutes`; the cart line''s `bookedWindow.endsAt`.'
+        freeCount:
+          type: integer
+          minimum: 1
+          description: Resources of the room type free for the whole window. Only times with at least one are returned.
+    MapResourceAvailability:
+      x-ticvai-persistence: none — computed from placed resources, bookings, holds and blocks
+      type: object
+      description: 'What `getMapResourceAvailability` returns: **every placed resource on one map, for
+        one window, in one answer** (rev 3 REV3-15).
+
+        '
+      required:
+      - mapId
+      - mapVersion
+      - from
+      - to
+      - resources
+      properties:
+        mapId:
+          type: string
+          format: uuid
+        mapVersion:
+          type: integer
+          description: The published `venue-map` version the placements were read from; the client checks
+            it against the map it cached.
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        totals:
+          type: object
+          properties:
+            total:
+              type: integer
+            available:
+              type: integer
+            held:
+              type: integer
+            booked:
+              type: integer
+            unavailable:
+              type: integer
+        resources:
+          type: array
+          items:
+            type: object
+            required:
+            - resourceId
+            - label
+            - status
+            properties:
+              resourceId:
+                type: string
+                format: uuid
+              placedResourceId:
+                type: string
+                format: uuid
+                description: The `venue-map.PlacedResource` it was read from.
+              label:
+                type: string
+                description: As on the map, e.g. `B09`.
+              kind:
+                $ref: '#/components/schemas/ResourceKind'
+              zone:
+                type: string
+              capacity:
+                type: integer
+              priceBandCode:
+                type: string
+              variantId:
+                type: string
+                format: uuid
+                description: What the cart line names to buy it.
+              price:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              status:
+                type: string
+                enum:
+                - available
+                - held
+                - booked
+                - unavailable
+                description: '`unavailable` covers maintenance, a blackout, a block and a placement marked
+                  not bookable; the map greys all of them the same way.
+
+                  '
+    CreateResourceHoldRequest:
+      x-ticvai-persistence: none — request only
+      type: object
+      required:
+      - id
+      - mapId
+      - resourceIds
+      - from
+      - to
+      properties:
+        id:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          description: Client-generated ULID, as a seat hold's.
+        mapId:
+          type: string
+          format: uuid
+          description: The published venue map the guest picked from.
+        resourceIds:
+          type: array
+          minItems: 1
+          maxItems: 10
+          description: Placed resources on that map, e.g. two adjoining loungers. All or none are held.
+          items:
+            type: string
+            format: uuid
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        partySize:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Checked against each resource's `capacity`; above it the hold is refused `422`.
+        ttlSeconds:
+          type: integer
+          minimum: 60
+          maximum: 1800
+          default: 480
+          description: 8 minutes by default, 30 in all with extensions (audit R169), as a seat hold.
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+    ResourceHold:
+      x-ticvai-persistence: resources.resource_hold
+      type: object
+      description: '**A guest''s pick on the map, held while they pay** (decided 29 September, rev 3
+        REV3-15). The resource counterpart of `seating.SeatHold`: named resources, short-lived, converted
+        by the order rather than released. States in `states/resource-hold.yaml`.
+
+        '
+      required:
+      - id
+      - mapId
+      - resourceIds
+      - from
+      - to
+      - status
+      - createdAt
+      - expiresAt
+      properties:
+        id:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        mapId:
+          type: string
+          format: uuid
+        resourceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        partySize:
+          type: integer
+          nullable: true
+        status:
+          type: string
+          enum:
+          - held
+          - converted
+          - released
+          - expired
+        totalPrice:
+          x-ticvai-column: gross_amount
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        heldByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Set when the order converts it.
+        extensionCount:
+          type: integer
+          default: 0
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005), written at `venue` scope.
+    ResourceHoldExtendProblem:
+      x-ticvai-persistence: none — error shape
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required:
+        - refusedReason
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - holdExpired
+            - holdConverted
+            - extensionLimitReached
+          extensionCount:
+            type: integer
+          expiresAt:
+            type: string
+            format: date-time
     ResourceType:
       type: object
       x-ticvai-persistence: resources.resource_type
@@ -2786,6 +3774,9 @@ components:
       x-ticvai-persistence: resources.resource_requirement
       description: '**A type and a quantity, never a named resource.** This is what makes the 26 August
         rule enforceable — the product states what it needs and the platform decides which one.
+
+        For resources placed on a published venue map the rule is superseded (decided 29 September, rev 3
+        REV3-15): the guest names the resource through a `ResourceHold`, and no requirement is needed.
 
         '
       required:
@@ -3264,11 +4255,16 @@ components:
                 type: string
                 enum:
                 - booked
+                - held
                 - setup
                 - teardown
                 - maintenance
                 - blackout
                 - closed
+                description: '`held` is a live `ResourceHold` (rev 3 REV3-15): taken now, free again if
+                  it expires.
+
+                  '
     ResourceBooking:
       type: object
       x-ticvai-persistence: resources.booking
@@ -3301,6 +4297,14 @@ components:
           format: date-time
         status:
           $ref: '#/components/schemas/ResourceBookingStatus'
+        holdId:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          nullable: true
+          description: 'The `ResourceHold` this booking was converted from, where a guest picked the
+            resource on a venue map (rev 3 REV3-15). Null for a staff booking or an allocation.
+
+            '
         recurrenceGroupId:
           type: string
           format: uuid
@@ -3475,9 +4479,15 @@ components:
         A seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it
         with `createResourceType`, not by waiting for this list to grow.
 
+        **`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach
+        or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then
+        the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with
+        `fnb.createTableReservation` and the waitlist (audit R073 (d)).
+
         '
       enum:
       - cabana
+      - lounger
       - locker
       - wheelchair
       - stroller

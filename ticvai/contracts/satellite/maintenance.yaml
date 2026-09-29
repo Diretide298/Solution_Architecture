@@ -1578,6 +1578,7 @@ paths:
         - "P06 EMP-029 Guest assistance"
         - "P08 BO-072 Incident Log"
         - "P08 BO-125 Product & Category Button Configuration"
+        - "P08 BO-935 Assignment Detail & Operational Brief"
       x-ticvai-audience: [staff]
       summary: Report an incident
       description: >

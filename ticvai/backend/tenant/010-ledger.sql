@@ -310,14 +310,20 @@ CREATE TABLE IF NOT EXISTS ledger.tax_code (
 );
 
 -- Who does not pay, and on what evidence. Hangs off: reaches ledger.account through its keys;
--- references ledger.tax_code. Reached by: 2 operations read it and 1 write it.
+-- references ledger.tax_code. Reached by: 3 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS ledger.tax_exemption (
     id                                uuid PRIMARY KEY NOT NULL,
     scope                             text NOT NULL CONSTRAINT tax_exemption_scope_chk CHECK (scope IN ('account', 'productKind', 'channel', 'legalEntity')),
     scope_ref                         text,
     tax_code_id                       uuid NOT NULL,
     reason                            text NOT NULL CONSTRAINT tax_exemption_reason_chk CHECK (char_length(reason) <= 500),
-    certificate_reference             text,
+    exemption_type                    text CONSTRAINT tax_exemption_exemption_type_chk CHECK (exemption_type IN ('diplomatic', 'export', 'businessToBusiness', 'charity', 'governmentEntity', 'freeZone', 'zeroRated', 'other')),
+    certificate_reference             text CONSTRAINT tax_exemption_certificate_reference_chk CHECK (char_length(certificate_reference) <= 100),
+    evidence_document_id              uuid,
+    verification_status               text DEFAULT 'pending' CONSTRAINT tax_exemption_verification_status_chk CHECK (verification_status IN ('notRequired', 'pending', 'verified', 'rejected', 'expired')),
+    verified_by                       uuid,
+    verified_at                       timestamptz,
+    verification_note                 text CONSTRAINT tax_exemption_verification_note_chk CHECK (char_length(verification_note) <= 500),
     valid_from                        date,
     valid_to                          date
 );

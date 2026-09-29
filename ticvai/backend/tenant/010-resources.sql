@@ -1,4 +1,4 @@
--- resources — 16 tables
+-- resources — 18 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS resources.booking (
     valid_from                        timestamptz NOT NULL,
     valid_to                          timestamptz NOT NULL,
     status                            text NOT NULL CONSTRAINT booking_status_chk CHECK (status IN ('reserved', 'checkedOut', 'returned', 'overdue', 'cancelled', 'noShow')),
+    hold_id                           text,
     recurrence_group_id               uuid,
     deposit_authorisation_id          uuid,
     checked_out_at                    timestamptz,
@@ -88,7 +89,7 @@ CREATE TABLE IF NOT EXISTS resources.resource (
     id                                uuid PRIMARY KEY NOT NULL,
     code                              text NOT NULL,
     name                              text NOT NULL,
-    kind                              text NOT NULL CONSTRAINT resource_kind_chk CHECK (kind IN ('cabana', 'locker', 'wheelchair', 'stroller', 'equipment', 'room', 'auditorium', 'vehicle', 'instructor', 'staff', 'table', 'pitch', 'studio', 'other')),
+    kind                              text NOT NULL CONSTRAINT resource_kind_chk CHECK (kind IN ('cabana', 'lounger', 'locker', 'wheelchair', 'stroller', 'equipment', 'room', 'auditorium', 'vehicle', 'instructor', 'staff', 'table', 'pitch', 'studio', 'other')),
     venue_id                          uuid NOT NULL,
     scope_path                        ltree NOT NULL,
     parent_resource_id                uuid,
@@ -169,6 +170,26 @@ CREATE TABLE IF NOT EXISTS resources.resource_dependency (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 15 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 3 operations read it and 0 write it; 3 tables reference it.
+CREATE TABLE IF NOT EXISTS resources.resource_hold (
+    id                                text PRIMARY KEY NOT NULL,
+    map_id                            uuid NOT NULL,
+    resource_ids                      text[] NOT NULL,
+    valid_from                        timestamptz NOT NULL,
+    valid_to                          timestamptz NOT NULL,
+    party_size                        integer,
+    status                            text NOT NULL CONSTRAINT resource_hold_status_chk CHECK (status IN ('held', 'converted', 'released', 'expired')),
+    gross_amount                      numeric(18,4),
+    held_by_principal_id              uuid,
+    subject_id                        uuid,
+    order_id                          uuid,
+    extension_count                   integer DEFAULT 0,
+    created_at                        timestamptz NOT NULL,
+    expires_at                        timestamptz NOT NULL,
+    scope_path                        ltree NOT NULL
+);
+
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_package (
@@ -196,6 +217,22 @@ CREATE TABLE IF NOT EXISTS resources.resource_relation (
     priority                          integer DEFAULT 0,
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
+);
+
+-- Holds 11 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 0 write it.
+CREATE TABLE IF NOT EXISTS resources.resource_request (
+    id                                text PRIMARY KEY NOT NULL,
+    kind                              text NOT NULL CONSTRAINT resource_request_kind_chk CHECK (kind IN ('replacementResource', 'additionalEquipment', 'resourceIssue', 'maintenanceRequest', 'assignmentChange', 'venueChange', 'scheduleClarification', 'other')),
+    booking_id                        uuid,
+    resource_id                       uuid,
+    detail                            text NOT NULL,
+    status                            text NOT NULL CONSTRAINT resource_request_status_chk CHECK (status IN ('open', 'acknowledged', 'resolved', 'declined')),
+    raised_by_principal_id            uuid NOT NULL,
+    recorded_at                       timestamptz NOT NULL,
+    synced_at                         timestamptz,
+    resolution_note                   text,
+    scope_path                        ltree NOT NULL
 );
 
 -- Holds 10 columns. No description has been written for this table — the name is the only thing

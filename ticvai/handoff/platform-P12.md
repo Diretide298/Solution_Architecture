@@ -9,12 +9,12 @@
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 83 |
+| Operations with no screen | 88 |
 | Waves | wave2 2 · wave3 26 |
 
 ## Gaps
 
-### 83 operations with no screen here
+### 88 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -38,7 +38,6 @@
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
 | `setFxProvider` | finance | PUT | Which provider serves which purpose |
-| `createEmergencyAccessOverride` | identity | POST | Bypass the policy, loudly |
 | `evaluateAccess` | identity | POST | Decide, now, and say why |
 | `getAccessPolicy` | identity | GET | One policy, at a version |
 | `getAccessPolicyBundle` | identity | GET | The policies a device needs to decide for itself |
@@ -55,12 +54,13 @@
 | `listPermissions` | identity | GET | Every permission key the contracts enforce |
 | `listSegregationRules` | identity | GET | Read the conflicting-permission rules back |
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
-| `recordBenefitUsage` | identity | POST | Consume a benefit |
-| `setAccessPolicyState` | identity | POST | Submit, approve, activate or retire a policy |
-| `setCapabilityTemplate` | identity | PUT | Save a tick-set under a name |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
-| `updateAccessPolicy` | identity | PUT | Change a policy, as a new version |
-| … | | | 43 more |
+| `actOnWaiverRequirements` | marketing-crm | POST | Send, resend or correct participant waiver requirements, one or in bulk |
+| `getCaseInvestigationResolution` | marketing-crm | GET | Read the case workspace |
+| `getDigitalWaiverForm` | marketing-crm | GET | Load the layout of a waiver version |
+| `getForm` | marketing-crm | GET | One form, to fill in or to edit |
+| `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
+| … | | | 48 more |
 
 ## Modules
 

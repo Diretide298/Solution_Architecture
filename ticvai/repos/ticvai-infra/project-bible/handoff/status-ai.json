@@ -48,7 +48,7 @@
   "tables": 51,
   "screens": 37,
   "flows": 10,
-  "documents": 42,
+  "documents": 43,
   "openConflicts": 1
  },
  "metrics": {
@@ -240,6 +240,11 @@
   {
    "file": "docs\\active\\deployment-configs-costed.md",
    "title": "Deployment architecture \u2014 four configurations, costed on AWS and GCP",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\design-pack-coverage.md",
+   "title": "Design pack coverage: the 40 \"undrafted\" PDFs",
    "status": ""
   },
   {

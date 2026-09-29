@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `wallet` |
 | Schemas owned | `wallet` |
-| Operations in the slice | 5 of 50 |
+| Operations in the slice | 5 of 59 |
 | Scale | Read-heavy on the sale path — every till and reader resolves a balance — and write-heavy on top-up. Latency-critical in a way LedgerService is not, which is why the two are separate: the ledger is append-only and batch-tolerant, a balance check is neither. |
 | If it is down | It holds a liability owed to a customer. A wallet that double-spends is a financial loss, not a bug report. Deduction order across credit lots is FEFO and is decided here, once, rather than per caller. |
 
@@ -27,7 +27,7 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | card | [`loadGameCredits`](#loadgamecredits) | POST | `/game-cards/{cardCode}/load` | core | 1 | POS-002 |
-| giftCard | [`getGiftCard`](#getgiftcard) | GET | `/gift-cards/{cardCode}` | core | 2 | GST-071, WEB-021 |
+| giftCard | [`getGiftCard`](#getgiftcard) | GET | `/gift-cards/{cardCode}` | core | 2 | BO-1123, GST-071, WEB-021 |
 | retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 2 | BO-1116, BO-1121, GST-071, WEB-021 |
 | wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 2 | BO-1086, BO-414, BO-416, BO-448, BO-487, GST-011 … |
 | wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 2 | BO-1093, BO-1102, BO-1142, BO-1143, BO-414, BO-423 … |
@@ -130,7 +130,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Read routing | primary |
 | Reads | `wallet.gift_card` |
 | Writes | - |
-| Called by | GST-071, WEB-021 |
+| Called by | BO-1123, GST-071, WEB-021 |
 
 **Parameters**
 
@@ -426,11 +426,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-45 operations, added to this service in later releases without changing any of the above.
+54 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | card | `adjustGameCard` |
 | giftCard | `blockGiftCard`, `issueGiftCard` |
 | retail | `activateGiftCard`, `closeWallet`, `redeemGiftCard`, `reinstateWallet`, `suspendWallet` |
-| wallet | `adjustWallet`, `createCreditType`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `expireCreditLots`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletReconciliation`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `publishWalletConfiguration`, `raiseWalletDispute`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAccountingMapping`, `setWalletChannelRules`, `setWalletFundingRules`, `setWalletRefundPolicy`, `setWalletRestriction`, `setWalletRiskRules`, `setWalletTransferRules`, `simulateCreditConsumption`, `topUpWallet`, `updateCreditType`, `updateWalletType` |
+| wallet | `adjustWallet`, `createCreditType`, `createSharedWallet`, `createVoucherType`, `createWalletType`, `diffWalletConfigurationVersion`, `expireCreditLots`, `getCreditConsumptionPolicy`, `getWalletBalance`, `getWalletFundingRules`, `getWalletLiability`, `getWalletReconciliation`, `linkWalletCredential`, `listCreditLots`, `listCreditTypes`, `listSharedWallets`, `listVoucherTypes`, `listWalletConfigurationVersions`, `listWalletDisputes`, `listWalletHolds`, `listWalletTypes`, `publishWalletConfiguration`, `raiseWalletDispute`, `resolveWalletDispute`, `restoreWalletConfigurationVersion`, `reverseWalletFunding`, `setCreditConsumptionPolicy`, `setCreditEligibilityRules`, `setGiftCardProduct`, `setSharedWalletMembers`, `setWalletAccountingMapping`, `setWalletAuthenticationPolicy`, `setWalletChannelRules`, `setWalletFundingRules`, `setWalletIntegrationMapping`, `setWalletReconciliationSources`, `setWalletRefundPolicy`, `setWalletRestriction`, `setWalletRiskRuleStatus`, `setWalletRiskRules`, `setWalletTransferRules`, `simulateCreditConsumption`, `topUpWallet`, `updateCreditType`, `updateWalletType`, `withdrawWalletDispute` |

@@ -13,7 +13,7 @@
 | **Tables** | 51 |
 | **Screens** | 37 |
 | **Flows** | 10 |
-| **Documents** | 42 |
+| **Documents** | 43 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -239,6 +239,7 @@
 | [Deep audit — module-wise build clearance](..\docs\active\deep-audit-21-september.md) |  | 1 |
 | [Deep audit — ten invariants, run adversarially](..\docs\active\deep-audit-24-august.md) |  | 3 |
 | [Deployment architecture — four configurations, costed on AWS and GCP](..\docs\active\deployment-configs-costed.md) |  | 7 |
+| [Design pack coverage: the 40 "undrafted" PDFs](..\docs\active\design-pack-coverage.md) |  | 11 |
 | [Audit — the 3 September dump, its checks, and what trickles down](..\docs\active\dump-audit-3-september.md) |  | 2 |
 | [Full-layer audit — 20 August](..\docs\active\full-layer-audit-20aug.md) |  | 3 |
 | [TICVAI — Hierarchy, Data Segregation and Services](..\docs\active\hierarchy-segregation-services.md) |  | 1 |

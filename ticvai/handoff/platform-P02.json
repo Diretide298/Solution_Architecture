@@ -10,18 +10,18 @@
  "generated": "2026-09-29",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 71,
-  "operations": 157,
-  "contracts": 17,
-  "modules": 16,
+  "screens": 77,
+  "operations": 188,
+  "contracts": 19,
+  "modules": 17,
   "undrawn": 0,
   "operationsWithNoScreen": 18
  },
  "waves": {
   "wave1": 20,
-  "wave2": 34,
-  "wave3": 11,
-  "wave4": 6
+  "wave2": 35,
+  "wave3": 17,
+  "wave4": 5
  },
  "modules": [
   {
@@ -43,18 +43,18 @@
    ]
   },
   {
-   "module": "In-venue Services",
+   "module": "Booking & Selection",
    "screens": 10,
    "waves": [
+    1,
     2,
     3
    ]
   },
   {
-   "module": "Booking & Selection",
-   "screens": 8,
+   "module": "In-venue Services",
+   "screens": 10,
    "waves": [
-    1,
     2,
     3
    ]
@@ -72,6 +72,13 @@
    "screens": 4,
    "waves": [
     2
+   ]
+  },
+  {
+   "module": "Transport",
+   "screens": 4,
+   "waves": [
+    3
    ]
   },
   {
@@ -153,26 +160,34 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 30
+   "operations": 33
+  },
+  {
+   "contract": "identity",
+   "operations": 21
   },
   {
    "contract": "catalogue",
-   "operations": 16
+   "operations": 17
   },
   {
    "contract": "fnb",
    "operations": 15
   },
   {
-   "contract": "identity",
-   "operations": 15
+   "contract": "transport",
+   "operations": 12
   },
   {
    "contract": "access",
    "operations": 10
   },
   {
-   "contract": "promotions",
+   "contract": "resources",
+   "operations": 6
+  },
+  {
+   "contract": "white-label",
    "operations": 5
   },
   {
@@ -180,7 +195,19 @@
    "operations": 5
   },
   {
+   "contract": "promotions",
+   "operations": 5
+  },
+  {
+   "contract": "retail",
+   "operations": 4
+  },
+  {
    "contract": "ai",
+   "operations": 4
+  },
+  {
+   "contract": "seating",
    "operations": 4
   },
   {
@@ -188,31 +215,19 @@
    "operations": 4
   },
   {
-   "contract": "white-label",
-   "operations": 4
-  },
-  {
-   "contract": "retail",
-   "operations": 4
-  },
-  {
-   "contract": "seating",
-   "operations": 3
-  },
-  {
    "contract": "venue-map",
-   "operations": 2
+   "operations": 3
   },
   {
    "contract": "payments",
    "operations": 2
   },
   {
-   "contract": "games",
+   "contract": "finance",
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "games",
    "operations": 1
   }
  ],
@@ -232,7 +247,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/explore-categories",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -277,7 +292,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/select-date-and-time",
-   "operations": 3,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -286,7 +301,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/tickets-and-add-ons",
-   "operations": 1,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -482,9 +497,9 @@
    "id": "GST-030",
    "name": "In-Venue Notifications",
    "module": "Engagement & Support",
-   "wave": 4,
+   "wave": 2,
    "route": "/general/in-venue-notifications",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -574,7 +589,7 @@
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/general/help-and-support",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -583,7 +598,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/checkout-entry",
-   "operations": 9,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -592,7 +607,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/simple-registration-and-otp",
-   "operations": 10,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -655,7 +670,7 @@
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/general/interactive-seat-selection",
-   "operations": 3,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -826,7 +841,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/account/reserve-table-cabana",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -853,7 +868,61 @@
    "module": "Account & Self-Service",
    "wave": 2,
    "route": "/account/security-sign-in",
+   "operations": 12,
+   "drawn": true
+  },
+  {
+   "id": "GST-074",
+   "name": "Map Booking \u2014 Cabanas & Spots",
+   "module": "Booking & Selection",
+   "wave": 3,
+   "route": "/general/map-booking",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "GST-075",
+   "name": "Book a Space by the Hour",
+   "module": "Booking & Selection",
+   "wave": 3,
+   "route": "/general/space-by-the-hour",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "GST-076",
+   "name": "Intercity Trip \u2014 Route & Schedule",
+   "module": "Transport",
+   "wave": 3,
+   "route": "/transport/route-and-schedule",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "GST-077",
+   "name": "Intercity Trip \u2014 Route & Passengers",
+   "module": "Transport",
+   "wave": 3,
+   "route": "/transport/route-and-passengers",
    "operations": 6,
+   "drawn": true
+  },
+  {
+   "id": "GST-078",
+   "name": "Intercity Trip \u2014 Multi-trip Passes",
+   "module": "Transport",
+   "wave": 3,
+   "route": "/transport/multi-trip-passes",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-079",
+   "name": "Intercity Trip \u2014 Favourite Routes",
+   "module": "Transport",
+   "wave": 3,
+   "route": "/transport/favourite-routes",
+   "operations": 2,
    "drawn": true
   }
  ],

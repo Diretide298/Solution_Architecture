@@ -72,6 +72,49 @@ transitions:
   emits:
   - approval.rejected
 - from: pending
+  to: returned
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: '**Sent back to the requester to amend** (decision `return`, with a comment saying what to change).
+    Not a rejection and not counted as one (decided 29 September, readiness close-out; MoM 10 Aug §5.5)'
+- from: escalated
+  to: returned
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Sent back to the requester after escalation
+- from: pending
+  to: informationRequested
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: '**The approver asked the requester a question** (decision `requestInformation`). The SLA clock
+    pauses until the requester answers (decided 29 September, readiness close-out; MoM 10 Aug §5.5)'
+- from: escalated
+  to: informationRequested
+  operation: decideApprovalRequest
+  trigger: operation
+  guard: Asked for information after escalation
+- from: returned
+  to: pending
+  operation: submitApprovalRequest
+  trigger: operation
+  guard: The requester amended and resubmitted the same request; routing resumes at the level that returned
+    it, on the matrix version already fixed (R129)
+- from: informationRequested
+  to: pending
+  operation: submitApprovalRequest
+  trigger: operation
+  guard: The requester answered; routing resumes at the same level and the SLA clock restarts
+- from: returned
+  to: withdrawn
+  operation: withdrawApprovalRequest
+  trigger: operation
+  guard: The requester gave up rather than amend
+- from: informationRequested
+  to: withdrawn
+  operation: withdrawApprovalRequest
+  trigger: operation
+  guard: The requester gave up rather than answer
+- from: pending
   to: withdrawn
   operation: withdrawApprovalRequest
   trigger: operation
@@ -105,4 +148,9 @@ notes: 'No transition out of `approved` or `rejected`. **A completed approval is
 
   `withdrawn` and `expired` are deliberately distinct from `rejected`. One is the requester changing
   their mind, one is nobody answering, and only the third is an approver saying no. Collapsing them
-  makes the rejection rate meaningless.'
+  makes the rejection rate meaningless.
+
+
+  `returned` and `informationRequested` (decided 29 September, readiness close-out) are the Return and
+  Request More Information decisions from the 10 August minutes. They are waits on the requester, not
+  outcomes: neither counts as a rejection, and both go back to `pending` on the same request.'

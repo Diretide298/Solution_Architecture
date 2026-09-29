@@ -27,7 +27,8 @@ steps:
   screen: ADM-249
   action: Works in Unified Approval Inbox & Decision Workspace
   operations:
-  - approveUnifiedDecision
+  - listApprovalRequests
+  - decideApprovalRequest
   outcome: Provide users with one approval inbox across all TICVAI modules. This is extremely important.
     A manager should not need to open Finance for one approval, Pricing for another, Procurement for another,
     and Customer Service for another.

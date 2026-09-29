@@ -371,6 +371,30 @@
    "evidence": "data-screen-label=\"WEB-046 In-venue notifications\": Queue 'Summit Coaster is calling your party', Order 'FNB-4471 is being made', Venue notices, 'Your locker was opened'",
    "differences": "Deferred in the YAML (release later, R242: no in-app feed in the first release), but the prototype draws it as a live section, so the client will expect it.",
    "deferred": true
+  },
+  {
+   "id": "WEB-047",
+   "name": "Map Booking — Cabanas & Spots",
+   "match": "exact",
+   "view": "Coastal Aqua → 'Cabana & locker rentals' → cabana map ('Remaining time' counter)",
+   "evidence": "added 29 September with the rev 3 decisions (group S1)",
+   "differences": ""
+  },
+  {
+   "id": "WEB-048",
+   "name": "Book a Space by the Hour",
+   "match": "exact",
+   "view": "House of Pages → 'Meeting room by the hour'",
+   "evidence": "added 29 September with the rev 3 decisions (group S1)",
+   "differences": ""
+  },
+  {
+   "id": "WEB-049",
+   "name": "Transport — Route & Schedule",
+   "match": "exact",
+   "view": "Emirates Link → 'Route & schedule · one-way, multi-trip, favourites'",
+   "evidence": "added 29 September with the rev 3 decisions (group S1)",
+   "differences": ""
   }
  ],
  "unmappedViews": [

@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS ai.conversation (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
     scope_path                        ltree NOT NULL,
-    module                            text NOT NULL CONSTRAINT conversation_module_chk CHECK (module IN ('core', 'ticketing', 'access', 'fnb', 'retail', 'inventory', 'seating', 'membership', 'marketing', 'resources', 'queue', 'games', 'maintenance', 'accreditation', 'partner', 'developerApi', 'analytics', 'ai')),
+    module                            text NOT NULL CONSTRAINT conversation_module_chk CHECK (module IN ('core', 'ticketing', 'access', 'fnb', 'retail', 'inventory', 'seating', 'membership', 'marketing', 'resources', 'queue', 'transport', 'games', 'maintenance', 'accreditation', 'partner', 'developerApi', 'analytics', 'ai')),
     locale                            text,
     message_count                     integer,
     started_at                        timestamptz NOT NULL,

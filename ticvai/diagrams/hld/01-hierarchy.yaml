@@ -34,8 +34,8 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 441
-  configurations: 74
+  operations: 451
+  configurations: 80
   configuredBy:
   - claimCustomDomain
   - createAccessPolicy
@@ -68,7 +68,7 @@ levels:
 - level: region
   branch: organisational
   parent: brand
-  operations: 55
+  operations: 56
   configurations: 11
   configuredBy:
   - createSeatMapTemplate
@@ -91,17 +91,17 @@ levels:
 - level: venue
   branch: organisational
   parent: region
-  operations: 1585
-  configurations: 110
+  operations: 1725
+  configurations: 136
   configuredBy:
+  - cloneReaderConfiguration
+  - cloneTicketTemplate
   - configureQueueFeed
   - configureWorkstation
   - createAccreditationProgramme
   - createAdmissionRules
+  - createConsentQuestion
   - createDonationCampaign
-  - createEntitlementTemplate
-  - createRecommendationStrategy
-  - createRentalProduct
   owns:
   - Almost everything operational
   - Kitchen SLA and section layout

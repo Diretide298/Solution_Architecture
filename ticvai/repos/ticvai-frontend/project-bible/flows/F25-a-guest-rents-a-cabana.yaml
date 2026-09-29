@@ -188,6 +188,12 @@ answeredQuestions:
     **The question was open because nothing read the minutes**, not because the venue had not decided.
     It had, on 26 August, three weeks before this flow was written.
 
+    **Superseded 29 September for resources on an ingested venue map** (decided 29 September, rev 3
+    REV3-15 and GAP-C2, superseding audit R073 (c) for them): cabana maps work like the stadium seat map,
+    so a guest picks a specific cabana, lounger or non-dining table on the map, holds it
+    (`createResourceHold`) and buys it — F52 on GST-074 / WEB-047. The answer above still holds at a venue
+    with no map, and for the attendant''s side walked here.
+
     '
   source: TICVAI MoM 2026-08-26
   answeredOn: '2026-09-19'

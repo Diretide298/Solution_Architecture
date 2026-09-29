@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `access` |
 | Schemas owned | `access` |
-| Operations in the slice | 20 of 182 |
+| Operations in the slice | 20 of 206 |
 | Scale | Read-heavy, extreme latency sensitivity, edge-cached. `frozenDays` is held rather than replayed precisely because the gate cannot afford the arithmetic. |
 | If it is down | Down means the gates stop. Runs at the edge with a local decision cache. |
 
@@ -29,6 +29,7 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | access | [`enrolFacePass`](#enrolfacepass) | POST | `/face-pass/enrolments` | core | 2 | GST-069 |
+| access | [`enrolFaceTag`](#enrolfacetag) | POST | `/face-tag/enrolments` | core | 1 | POS-005 |
 | access | [`getEntitlement`](#getentitlement) | GET | `/entitlements/{entitlementId}` | core | 1 | GST-012, GST-013, GST-055, WEB-018 |
 | access | [`getEntitlementCredential`](#getentitlementcredential) | GET | `/entitlements/{entitlementId}/credential` | core | 1 | GST-012, GST-013, GST-055, WEB-018 |
 | access | [`getEntitlementHistory`](#getentitlementhistory) | GET | `/entitlements/{entitlementId}/history` | core | 1 | GST-012, GST-013, WEB-018 |
@@ -40,14 +41,13 @@
 | access | [`setParkingFacility`](#setparkingfacility) | PUT | `/parking-facilities` | setup | 2 | BO-006 |
 | access | [`updateParkingEntitlement`](#updateparkingentitlement) | PATCH | `/parking-entitlements/{entitlementId}` | core | 2 | GST-027, WEB-041 |
 | accessPoint | [`addBlacklistEntry`](#addblacklistentry) | POST | `/blacklist` | setup | 1 | BO-033 |
-| accessPoint | [`createAccessPoint`](#createaccesspoint) | POST | `/access-points` | setup | 1 | BO-064 |
-| accessPoint | [`createAdmissionRules`](#createadmissionrules) | POST | `/admission-rules` | setup | 1 | BO-032 |
+| accessPoint | [`createAccessPoint`](#createaccesspoint) | POST | `/access-points` | setup | 1 | BO-064, BO-144 |
+| accessPoint | [`createAdmissionRules`](#createadmissionrules) | POST | `/admission-rules` | setup | 1 | BO-032, BO-154, BO-214, BO-222 |
 | accessPoint | [`setAccessPointGeofence`](#setaccesspointgeofence) | PUT | `/access-points/{accessPointId}/geofence` | setup | 1 | BO-064 |
-| accessPoint | [`setTurnstileMode`](#setturnstilemode) | PUT | `/access-points/{accessPointId}/mode` | setup | 1 | BO-064, SCN-002, SCN-016 |
+| accessPoint | [`setTurnstileMode`](#setturnstilemode) | PUT | `/access-points/{accessPointId}/mode` | setup | 1 | BO-064, BO-194, BO-230, SCN-002, SCN-016 |
 | accessPoint | [`updateAccessPoint`](#updateaccesspoint) | PATCH | `/access-points/{accessPointId}` | setup | 1 | BO-006, BO-064 |
-| accessPoint | [`updateAdmissionRules`](#updateadmissionrules) | PUT | `/admission-rules/{profileId}` | setup | 1 | BO-032 |
-| drafted | [`setReaderScannerPeripheral`](#setreaderscannerperipheral) | PUT | `/reader-scanner-peripheral` | core | 1 | BO-199, POS-016 |
-| sync | [`getOfflinePackage`](#getofflinepackage) | GET | `/access/offline-package` | core | 1 | BO-034, BO-035, BO-037, BO-060, EMP-010, EMP-015 … |
+| accessPoint | [`updateAdmissionRules`](#updateadmissionrules) | PUT | `/admission-rules/{profileId}` | setup | 1 | BO-032, BO-156, BO-158, BO-160, BO-219, BO-220 |
+| sync | [`getOfflinePackage`](#getofflinepackage) | GET | `/access/offline-package` | core | 1 | BO-034, BO-035, BO-037, BO-060, BO-207, EMP-010 … |
 
 ## Group: access
 
@@ -121,6 +121,73 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | 409 |  | This face is already on another annual pass. |
 | 403 |  | A guest enrolling a subject who is neither themselves nor a child linked to them by a familyMember or primaryHolder delegation (audit R205). |
 | 422 |  | Capture quality too low to enrol. |
+
+### enrolFaceTag
+
+**`POST /face-tag/enrolments`**: Capture a same-visit facial model that dies at close of day
+
+3.2.44. **A Face Tag is not a short Face Pass.** It is taken at a ticket counter or an entry gate, it is anchored to the ticket rather than to a pass, and it is purged at the close of the operating day — which is the posture that makes it defensible at all.
+**Consent is still explicit and still recorded.** PDPL Article 4 is a closed list of exceptions with **no legitimate-interests basis**, so there is no route that makes a short-lived biometric consent-free. What a short life changes is what the consent is *for*, not whether it is needed — and a design that skipped it because the data dies at midnight would be wrong about the law rather than lenient about it.
+**Refused where `VenueSettings.biometrics.isEnabled` is false**, and that switch cannot be turned on without a DPIA reference and a consent-notice acknowledgement (CF-35).
+**A template is stored, never an image**, and the template cannot reconstruct the face.
+
+|  |  |
+|---|---|
+| Permission | `GUEST_MANAGE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `pii.subject_biometric` |
+| Writes | - |
+| Called by | POS-005 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string | Client-generated ULID. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| subjectId | string (uuid) | yes |  |
+| entitlementId | string | yes | An Entitlement.id, which is a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| template | string (password) | yes | Write-only, never returned. |
+| capturedAt | string (date-time) | yes |  |
+| source | enum (ticketCounter, entryGate) | yes | The two surfaces 3.2.44 allows, and a gate is present here exactly where it is absent from Face Pass: this one does not outlive the visit. |
+| consent | object | yes | Per-visit rather than enduring, and still explicit. |
+| consent.purposeId | string (uuid) | yes |  |
+| consent.givenAt | string (date-time) | yes |  |
+| consent.guardianSubjectId | string (uuid) |  | Required where the subject is a minor (3.2.12). (nullable) |
+| consent.guardianRelationship | string |  | (nullable) |
+
+**Response**: `FacePassEnrolment`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| subjectId | string (uuid) | yes |  |
+| entitlementId | string | yes | The Entitlement.id, a ULID (pii.subject_biometric.entitlement_id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| kind | BiometricKind: enum (facePass, faceTag) | yes | BL-106, CF-35. |
+| retentionAnchor | object |  | BL-106. |
+| source | enum (guestApp, ticketCounter, annualPassCounter, entryGate) | yes | entryGate is valid for faceTag only, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. |
+| capturedAt | string (date-time) | yes |  |
+| consentPurposeId | string (uuid) |  |  |
+| consentGivenAt | string (date-time) |  |  |
+| guardianSubjectId | string (uuid) |  | Where the subject is a minor (3.2.12). (nullable) |
+| isActive | boolean |  | (read-only) |
+| expiresAt | string (date-time) |  | Bounded by whatever retentionAnchor names, and a face outliving it is a biometric held for no stated purpose. (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Tagged |
+| 409 |  | Biometrics are not enabled at this venue, or this ticket type's biometricPolicy is disabled. |
+| 422 |  | Capture quality too low to match against later in the visit. |
 
 ### getEntitlement
 
@@ -757,7 +824,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Conflict policy | serverWins |
 | Reads | `access.access_point`, `cache:idempotency` |
 | Writes | `access.access_point`, `cache:idempotency` |
-| Called by | BO-064 |
+| Called by | BO-064, BO-144 |
 
 **Parameters**
 
@@ -826,7 +893,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Conflict policy | serverWins |
 | Reads | `access.admission_rules`, `cache:idempotency` |
 | Writes | `access.admission_rules`, `cache:idempotency` |
-| Called by | BO-032 |
+| Called by | BO-032, BO-154, BO-214, BO-222 |
 
 **Parameters**
 
@@ -847,6 +914,35 @@ Denies outright regardless of entitlement state. Included in the offline package
 | maxDurationMinutes | integer |  | (nullable) |
 | requiresExitBeforeReentry | boolean |  | (default False) |
 | maxReentries | integer |  | (nullable) |
+| entryLimit | object |  | How many times the credential may enter (decided 29 September, VM close-out). |
+| entryLimit.mode | enum (unlimited, once, nTimes, nPerDay, nPerPeriod) | yes | (default unlimited) |
+| entryLimit.count | integer |  | N for nTimes, nPerDay and nPerPeriod; required for those modes (422 without it) (min 1) |
+| entryLimit.periodDays | integer |  | The period for nPerPeriod (min 1) |
+| exitScan | enum (required, optional, none) |  | (decided 29 September, VM close-out) required: re-entry needs a recorded exit. (default optional) |
+| maxExits | integer |  | Null is unlimited (decided 29 September, VM close-out) (min 0; nullable) |
+| reEntryWindowMinutes | integer |  | Minutes after an exit within which re-entry is allowed; null is any time the credential is valid (decided 29 September, VM close-out) (min 1; nullable) |
+| sameDayOnly | boolean |  | Re-entry only on the day of the exit (decided 29 September, VM close-out) (default True) |
+| designatedAccessPointIds | array of string (uuid) |  | Re-entry only through these access points; empty is any allowed access point (decided 29 September, VM close-out) |
+| validity | object |  | When the credential is valid (decided 29 September, VM close-out). |
+| validity.anchor | enum (fixedRange, afterSale, afterActivation, afterFirstUse) | yes | fixedRange uses from and to; the others count days from the event |
+| validity.days | integer |  | N days after the anchor; required unless the anchor is fixedRange (min 1) |
+| validity.from | string (date) |  |  |
+| validity.to | string (date) |  | Inclusive. |
+| validity.endOf | enum (day, week, month, year) |  | Validity runs to the end of the day, week, month or year the relative period ends in (nullable) |
+| validity.daysOfWeek | array of enum (mon, tue, wed, thu, fri, sat, sun) |  | Empty is every day |
+| validity.dayTypes | array of enum (peakDates, offPeakDates, holidays, seasons, eventDates) |  | Calendar day types on which access is allowed; empty is every day type |
+| validity.blackoutDates | array of string (date) |  | Dates on which access is refused whatever else allows it |
+| crossover | object |  | Crossover between parks (decided 29 September, VM close-out). (nullable) |
+| crossover.allowedParkOrgUnitIds | array of string (uuid) | yes | (min items 2) |
+| crossover.parkOrder | array of string (uuid) |  | Required order of parks, if any; empty is any order |
+| crossover.sameDayOnly | boolean |  | (default True) |
+| crossover.differentDayAccess | boolean |  | (default False) |
+| crossover.dayPattern | enum (consecutiveFromFirstScan, flexibleWithinValidity) |  | (default flexibleWithinValidity) |
+| crossover.maxParkEntries | integer |  | Null is unlimited (min 1; nullable) |
+| crossover.crossoverQuantity | integer |  | How many crossovers; null is unlimited (min 1; nullable) |
+| crossover.crossoverAfterTime | string |  | Earliest venue-local time HH:MM a crossover is allowed (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| crossover.prerequisiteParkOrgUnitId | string (uuid) |  | The park that must be entered first (nullable) |
+| crossover.reEntryAfterCrossover | boolean |  | (default False) |
 | allowedAccessPointIds | array of string (uuid) |  | Empty means any access point in the venue. |
 | scopePath | string |  | The partition key (ADR-0005). |
 
@@ -863,6 +959,35 @@ Denies outright regardless of entitlement state. Included in the offline package
 | maxDurationMinutes | integer |  | (nullable) |
 | requiresExitBeforeReentry | boolean |  | (default False) |
 | maxReentries | integer |  | (nullable) |
+| entryLimit | object |  | How many times the credential may enter (decided 29 September, VM close-out). |
+| entryLimit.mode | enum (unlimited, once, nTimes, nPerDay, nPerPeriod) | yes | (default unlimited) |
+| entryLimit.count | integer |  | N for nTimes, nPerDay and nPerPeriod; required for those modes (422 without it) (min 1) |
+| entryLimit.periodDays | integer |  | The period for nPerPeriod (min 1) |
+| exitScan | enum (required, optional, none) |  | (decided 29 September, VM close-out) required: re-entry needs a recorded exit. (default optional) |
+| maxExits | integer |  | Null is unlimited (decided 29 September, VM close-out) (min 0; nullable) |
+| reEntryWindowMinutes | integer |  | Minutes after an exit within which re-entry is allowed; null is any time the credential is valid (decided 29 September, VM close-out) (min 1; nullable) |
+| sameDayOnly | boolean |  | Re-entry only on the day of the exit (decided 29 September, VM close-out) (default True) |
+| designatedAccessPointIds | array of string (uuid) |  | Re-entry only through these access points; empty is any allowed access point (decided 29 September, VM close-out) |
+| validity | object |  | When the credential is valid (decided 29 September, VM close-out). |
+| validity.anchor | enum (fixedRange, afterSale, afterActivation, afterFirstUse) | yes | fixedRange uses from and to; the others count days from the event |
+| validity.days | integer |  | N days after the anchor; required unless the anchor is fixedRange (min 1) |
+| validity.from | string (date) |  |  |
+| validity.to | string (date) |  | Inclusive. |
+| validity.endOf | enum (day, week, month, year) |  | Validity runs to the end of the day, week, month or year the relative period ends in (nullable) |
+| validity.daysOfWeek | array of enum (mon, tue, wed, thu, fri, sat, sun) |  | Empty is every day |
+| validity.dayTypes | array of enum (peakDates, offPeakDates, holidays, seasons, eventDates) |  | Calendar day types on which access is allowed; empty is every day type |
+| validity.blackoutDates | array of string (date) |  | Dates on which access is refused whatever else allows it |
+| crossover | object |  | Crossover between parks (decided 29 September, VM close-out). (nullable) |
+| crossover.allowedParkOrgUnitIds | array of string (uuid) | yes | (min items 2) |
+| crossover.parkOrder | array of string (uuid) |  | Required order of parks, if any; empty is any order |
+| crossover.sameDayOnly | boolean |  | (default True) |
+| crossover.differentDayAccess | boolean |  | (default False) |
+| crossover.dayPattern | enum (consecutiveFromFirstScan, flexibleWithinValidity) |  | (default flexibleWithinValidity) |
+| crossover.maxParkEntries | integer |  | Null is unlimited (min 1; nullable) |
+| crossover.crossoverQuantity | integer |  | How many crossovers; null is unlimited (min 1; nullable) |
+| crossover.crossoverAfterTime | string |  | Earliest venue-local time HH:MM a crossover is allowed (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| crossover.prerequisiteParkOrgUnitId | string (uuid) |  | The park that must be entered first (nullable) |
+| crossover.reEntryAfterCrossover | boolean |  | (default False) |
 | allowedAccessPointIds | array of string (uuid) |  | Empty means any access point in the venue. |
 | scopePath | string |  | The partition key (ADR-0005). |
 
@@ -961,7 +1086,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 | Conflict policy | serverWins |
 | Reads | `access.access_point`, `cache:idempotency` |
 | Writes | `access.access_point`, `cache:idempotency` |
-| Called by | BO-064, SCN-002, SCN-016 |
+| Called by | BO-064, BO-194, BO-230, SCN-002, SCN-016 |
 
 **Parameters**
 
@@ -1088,6 +1213,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 
 Changes take effect at terminals after the next offline package refresh, not immediately. A profile change during trading is not retroactive.
 **PUT semantics — replaces the profile the path names, whole.** A field left out takes its default or null; it does not keep its stored value. `perProductRules` is replaced as one list, never merged product by product. The body's `id` is read-only and ignored — the path decides which profile is written — and an unknown `profileId` is a `404`, never a create.
+**Entry limits, re-entry, validity and crossover are blocks of the same profile (decided 29 September, VM close-out).** `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly` and `designatedAccessPointIds` (BO-156, pack p.19), `validity` (BO-158, p.21) and `crossover` (BO-160 and BO-220, p.23) extend `AdmissionRules` rather than adding operations, so one profile states every admission rule a gate evaluates. A count missing for an `n*` entry mode, `days` missing for a relative validity anchor, or `to` before `from` is a `422`.
 
 |  |  |
 |---|---|
@@ -1100,7 +1226,7 @@ Changes take effect at terminals after the next offline package refresh, not imm
 | Conflict policy | serverWins |
 | Reads | `access.admission_rules`, `cache:idempotency` |
 | Writes | `access.admission_rules`, `cache:idempotency` |
-| Called by | BO-032 |
+| Called by | BO-032, BO-156, BO-158, BO-160, BO-219, BO-220 |
 
 **Parameters**
 
@@ -1122,6 +1248,35 @@ Changes take effect at terminals after the next offline package refresh, not imm
 | maxDurationMinutes | integer |  | (nullable) |
 | requiresExitBeforeReentry | boolean |  | (default False) |
 | maxReentries | integer |  | (nullable) |
+| entryLimit | object |  | How many times the credential may enter (decided 29 September, VM close-out). |
+| entryLimit.mode | enum (unlimited, once, nTimes, nPerDay, nPerPeriod) | yes | (default unlimited) |
+| entryLimit.count | integer |  | N for nTimes, nPerDay and nPerPeriod; required for those modes (422 without it) (min 1) |
+| entryLimit.periodDays | integer |  | The period for nPerPeriod (min 1) |
+| exitScan | enum (required, optional, none) |  | (decided 29 September, VM close-out) required: re-entry needs a recorded exit. (default optional) |
+| maxExits | integer |  | Null is unlimited (decided 29 September, VM close-out) (min 0; nullable) |
+| reEntryWindowMinutes | integer |  | Minutes after an exit within which re-entry is allowed; null is any time the credential is valid (decided 29 September, VM close-out) (min 1; nullable) |
+| sameDayOnly | boolean |  | Re-entry only on the day of the exit (decided 29 September, VM close-out) (default True) |
+| designatedAccessPointIds | array of string (uuid) |  | Re-entry only through these access points; empty is any allowed access point (decided 29 September, VM close-out) |
+| validity | object |  | When the credential is valid (decided 29 September, VM close-out). |
+| validity.anchor | enum (fixedRange, afterSale, afterActivation, afterFirstUse) | yes | fixedRange uses from and to; the others count days from the event |
+| validity.days | integer |  | N days after the anchor; required unless the anchor is fixedRange (min 1) |
+| validity.from | string (date) |  |  |
+| validity.to | string (date) |  | Inclusive. |
+| validity.endOf | enum (day, week, month, year) |  | Validity runs to the end of the day, week, month or year the relative period ends in (nullable) |
+| validity.daysOfWeek | array of enum (mon, tue, wed, thu, fri, sat, sun) |  | Empty is every day |
+| validity.dayTypes | array of enum (peakDates, offPeakDates, holidays, seasons, eventDates) |  | Calendar day types on which access is allowed; empty is every day type |
+| validity.blackoutDates | array of string (date) |  | Dates on which access is refused whatever else allows it |
+| crossover | object |  | Crossover between parks (decided 29 September, VM close-out). (nullable) |
+| crossover.allowedParkOrgUnitIds | array of string (uuid) | yes | (min items 2) |
+| crossover.parkOrder | array of string (uuid) |  | Required order of parks, if any; empty is any order |
+| crossover.sameDayOnly | boolean |  | (default True) |
+| crossover.differentDayAccess | boolean |  | (default False) |
+| crossover.dayPattern | enum (consecutiveFromFirstScan, flexibleWithinValidity) |  | (default flexibleWithinValidity) |
+| crossover.maxParkEntries | integer |  | Null is unlimited (min 1; nullable) |
+| crossover.crossoverQuantity | integer |  | How many crossovers; null is unlimited (min 1; nullable) |
+| crossover.crossoverAfterTime | string |  | Earliest venue-local time HH:MM a crossover is allowed (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| crossover.prerequisiteParkOrgUnitId | string (uuid) |  | The park that must be entered first (nullable) |
+| crossover.reEntryAfterCrossover | boolean |  | (default False) |
 | allowedAccessPointIds | array of string (uuid) |  | Empty means any access point in the venue. |
 | scopePath | string |  | The partition key (ADR-0005). |
 
@@ -1138,6 +1293,35 @@ Changes take effect at terminals after the next offline package refresh, not imm
 | maxDurationMinutes | integer |  | (nullable) |
 | requiresExitBeforeReentry | boolean |  | (default False) |
 | maxReentries | integer |  | (nullable) |
+| entryLimit | object |  | How many times the credential may enter (decided 29 September, VM close-out). |
+| entryLimit.mode | enum (unlimited, once, nTimes, nPerDay, nPerPeriod) | yes | (default unlimited) |
+| entryLimit.count | integer |  | N for nTimes, nPerDay and nPerPeriod; required for those modes (422 without it) (min 1) |
+| entryLimit.periodDays | integer |  | The period for nPerPeriod (min 1) |
+| exitScan | enum (required, optional, none) |  | (decided 29 September, VM close-out) required: re-entry needs a recorded exit. (default optional) |
+| maxExits | integer |  | Null is unlimited (decided 29 September, VM close-out) (min 0; nullable) |
+| reEntryWindowMinutes | integer |  | Minutes after an exit within which re-entry is allowed; null is any time the credential is valid (decided 29 September, VM close-out) (min 1; nullable) |
+| sameDayOnly | boolean |  | Re-entry only on the day of the exit (decided 29 September, VM close-out) (default True) |
+| designatedAccessPointIds | array of string (uuid) |  | Re-entry only through these access points; empty is any allowed access point (decided 29 September, VM close-out) |
+| validity | object |  | When the credential is valid (decided 29 September, VM close-out). |
+| validity.anchor | enum (fixedRange, afterSale, afterActivation, afterFirstUse) | yes | fixedRange uses from and to; the others count days from the event |
+| validity.days | integer |  | N days after the anchor; required unless the anchor is fixedRange (min 1) |
+| validity.from | string (date) |  |  |
+| validity.to | string (date) |  | Inclusive. |
+| validity.endOf | enum (day, week, month, year) |  | Validity runs to the end of the day, week, month or year the relative period ends in (nullable) |
+| validity.daysOfWeek | array of enum (mon, tue, wed, thu, fri, sat, sun) |  | Empty is every day |
+| validity.dayTypes | array of enum (peakDates, offPeakDates, holidays, seasons, eventDates) |  | Calendar day types on which access is allowed; empty is every day type |
+| validity.blackoutDates | array of string (date) |  | Dates on which access is refused whatever else allows it |
+| crossover | object |  | Crossover between parks (decided 29 September, VM close-out). (nullable) |
+| crossover.allowedParkOrgUnitIds | array of string (uuid) | yes | (min items 2) |
+| crossover.parkOrder | array of string (uuid) |  | Required order of parks, if any; empty is any order |
+| crossover.sameDayOnly | boolean |  | (default True) |
+| crossover.differentDayAccess | boolean |  | (default False) |
+| crossover.dayPattern | enum (consecutiveFromFirstScan, flexibleWithinValidity) |  | (default flexibleWithinValidity) |
+| crossover.maxParkEntries | integer |  | Null is unlimited (min 1; nullable) |
+| crossover.crossoverQuantity | integer |  | How many crossovers; null is unlimited (min 1; nullable) |
+| crossover.crossoverAfterTime | string |  | Earliest venue-local time HH:MM a crossover is allowed (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
+| crossover.prerequisiteParkOrgUnitId | string (uuid) |  | The park that must be entered first (nullable) |
+| crossover.reEntryAfterCrossover | boolean |  | (default False) |
 | allowedAccessPointIds | array of string (uuid) |  | Empty means any access point in the venue. |
 | scopePath | string |  | The partition key (ADR-0005). |
 
@@ -1147,59 +1331,7 @@ Changes take effect at terminals after the next offline package refresh, not imm
 |---|---|---|
 | 200 |  | Updated |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-
-
-## Group: drafted
-
-### setReaderScannerPeripheral
-
-**`PUT /reader-scanner-peripheral`**: Reader, Scanner & Peripheral Configuration
-
-**Drafted from the workshop pack; the shape below is read out of it, not invented.** Access Control Module, page 77. The screen says: Configure the technologies attached to a gate/device.
-
-**Every property carries the sentence it came from.** 2 were read from the screen's own bulleted directory and 13 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences and are the part to check; the sentences themselves are the client's.
-
-**Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build it, and the schema says so in its own persistence tag: it is a request, not a table.
-
-|  |  |
-|---|---|
-| Permission | `ACCESS_POINT_CONFIGURE` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | primary |
-| Status | **Provisional**: not yet agreed; do not build |
-| Reads | - |
-| Writes | - |
-| Called by | BO-199, POS-016 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
-
-**Request body**: `ReaderScannerPeripheralConfigurationInput`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| whereSupported | string |  | where supported |
-| yellowOperatorVerification | string |  | Yellow → Operator Verification |
-
-**Response**: `ReaderScannerPeripheralConfigurationView`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| whereSupported | string |  | where supported |
-| yellowOperatorVerification | string |  | Yellow → Operator Verification |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Reader, Scanner & Peripheral Configuration |
+| 422 |  | A count missing for an n* entry mode, days missing for a relative validity anchor, or validity.to before validity.from |
 
 
 ## Group: sync
@@ -1223,7 +1355,7 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | Read routing | replica |
 | Reads | `access.access_point`, `access.admission_rules`, `access.blacklist`, `cache:resolution`, `catalogue.entitlement_template`, `identity.principal`, `venuemap.map`, `venuemap.path`, `venuemap.point` |
 | Writes | `cache:resolution` |
-| Called by | BO-034, BO-035, BO-037, BO-060, EMP-010, EMP-015, EMP-017, POS-013, SCN-003, SCN-007, SCN-008, SCN-009, SCN-013, SCN-014, SCN-015 |
+| Called by | BO-034, BO-035, BO-037, BO-060, BO-207, EMP-010, EMP-015, EMP-017, POS-013, SCN-003, SCN-007, SCN-008, SCN-009, SCN-013, SCN-014, SCN-015 |
 
 **Parameters**
 
@@ -1318,6 +1450,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | max_duration_minutes | integer | no |  |
 | requires_exit_before_reentry | boolean | no |  |
 | max_reentries | integer | no |  |
+| entry_limit | jsonb | no | How many times the credential may enter (decided 29 September, VM close-out). |
+| exit_scan | text | no | (decided 29 September, VM close-out) required: re-entry needs a recorded exit. |
+| max_exits | integer | no | Null is unlimited (decided 29 September, VM close-out) |
+| re_entry_window_minutes | integer | no | Minutes after an exit within which re-entry is allowed; null is any time the credential is valid (decided 29 September, VM close-out) |
+| same_day_only | boolean | no | Re-entry only on the day of the exit (decided 29 September, VM close-out) |
+| designated_access_point_ids | text[] | no | Re-entry only through these access points; empty is any allowed access point (decided 29 September, VM close-out) |
+| validity | jsonb | no | When the credential is valid (decided 29 September, VM close-out). |
+| crossover | jsonb | no | Crossover between parks (decided 29 September, VM close-out). |
 | allowed_access_point_ids | text[] | no | Empty means any access point in the venue. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
@@ -1422,12 +1562,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-162 operations, added to this service in later releases without changing any of the above.
+186 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| access | `createParkingEntitlement`, `enrolFaceTag`, `listAccessChanges`, `listEntryRulePoints`, `setEntryRulePoints`, `verifyIdentity` |
+| access | `approveManualOverrideSupervisor`, `approveMultiMediaPreview`, `createParkingEntitlement`, `deliverCredential`, `getCredentialIssuanceRetryPolicy`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `rollbackAccessPolicy`, `setAccessAreaZone`, `setAccessAttributeCatalog`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBiometricVerificationProfile`, `setBleBeaconGeofence`, `setBrandingLocalizationTemplate`, `setContextTimeEvent`, `setCredentialActivationDisplay`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFaceMatchingVerification`, `setFacePassEnrollment`, `setFaceTagTemporaryEnrollment`, `setFraudDetectionRule`, `setGateLane`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHotelWalletExternal`, `setMediaBindingActivation`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setRfidNfc`, `setRfidNfcCard`, `setSecurityInvestigationEvidence`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVirtualTicketCredential`, `setVirtualTicketIdentity`, `setVisualAccessRule`, `setVisualDynamicPolicy`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `verifyIdentity` |
 | accessPoint | `getAccessPoint`, `listAccessPoints`, `listAdmissionRules`, `listBlacklist`, `removeBlacklistEntry` |
-| drafted | `approveManualOverrideSupervisor`, `approveMultiMediaPreview`, `listAccess`, `listAccessAttributeCatalog`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricConsentGuardian`, `listBiometricIdentityIntegrity`, `listBiometricLifecycleRetention`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `setAccessAreaZone`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricVerificationProfile`, `setBleBeaconGeofence`, `setContextTimeEvent`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setFacePassEnrollment`, `setGateLane`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setHandheldMobileAccess`, `setMediaBindingActivation`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setRealTimeSecurity`, `setRfidNfc`, `setRfidNfcCard`, `setSecurityInvestigationEvidence`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVirtualTicketCredential`, `setVirtualTicketIdentity`, `setVisualAccessRule`, `setVisualDynamicPolicy`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact` |
+| drafted | `listBiometricConsentGuardian`, `listBiometricLifecycleRetention` |
 | sync | `listScans`, `syncScans` |
 | validation | `lookupTicket`, `overrideAccess`, `validateAccess`, `validateGroupAccess` |

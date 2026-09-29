@@ -278,7 +278,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listKitchenTickets · listKitchenStations · setKitchenStations</div>
+          <div><b>OPERATIONS</b> &middot; listKitchenTickets · listKitchenStations · setKitchenStations · rebalanceStationLoad</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, stationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#kit-001">KIT-001</a>  &mdash; <i>Kitchen Operations Command Center</i></div>
@@ -398,9 +398,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; prioritiseKitchenTicket · setVenueSettings</div>
+          <div><b>OPERATIONS</b> &middot; prioritiseKitchenTicket · setVenueSettings · setKitchenSla</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, stationId&larr;session, ticketId&larr;KIT-002</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, stationId&larr;session, outletId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#kit-001">KIT-001</a>  &mdash; <i>Kitchen Operations Command Center</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetVenueSettings &middot; <i>Save venue settings</i> &middot; <b>Save venue settings</b> &middot; Cancel <span class="dis">discards id · venueId · currencyCode · currencyScale · supportHours · quietHours · biometrics · segregatedAccess · alerting</span></div></div>

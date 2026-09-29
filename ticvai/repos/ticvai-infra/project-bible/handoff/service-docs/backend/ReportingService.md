@@ -28,7 +28,7 @@
 |---|---|---|---|---|---|---|
 | catalogue | [`deleteReport`](#deletereport) | DELETE | `/reports/{reportId}` | core | 2 | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018 … |
 | catalogue | [`getReport`](#getreport) | GET | `/reports/{reportId}` | core | 2 | BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018 … |
-| catalogue | [`listReports`](#listreports) | GET | `/reports` | core | 2 | ANL-031, BO-029, BO-058, BO-059, BO-060, POS-008 … |
+| catalogue | [`listReports`](#listreports) | GET | `/reports` | core | 2 | ANL-031, BO-029, BO-058, BO-059, BO-060, BO-262 … |
 | dashboard | [`createDashboard`](#createdashboard) | POST | `/dashboards` | setup | 2 | ADM-031, ANL-021, ANL-022, ANL-053 |
 | dashboard | [`getDashboard`](#getdashboard) | GET | `/dashboards/{dashboardId}` | core | 2 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
 | dashboard | [`updateDashboard`](#updatedashboard) | PUT | `/dashboards/{dashboardId}` | setup | 2 | ADM-031, ANL-023, ANL-027, ANL-028, ANL-029 |
@@ -162,7 +162,7 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 | Read routing | analytical |
 | Reads | `reporting.report_column`, `reporting.report_definition`, `reporting.report_filter`, `reporting.report_parameter` |
 | Writes | - |
-| Called by | ANL-031, BO-029, BO-058, BO-059, BO-060, POS-008, PTR-018, SUP-008 |
+| Called by | ANL-031, BO-029, BO-058, BO-059, BO-060, BO-262, POS-008, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -486,7 +486,7 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.execution`, `reporting.report_definition`, `reporting.report_parameter` |
 | Writes | `cache:idempotency`, `reporting.execution` |
-| Called by | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-009, ANL-039, ANL-040, BO-010, BO-029, BO-058, BO-059, BO-060, BO-1059, BO-1082, BO-115, BO-118, BO-126, BO-133, POS-008, POS-020, PTR-018, SUP-008 |
+| Called by | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-009, ANL-039, ANL-040, BO-010, BO-029, BO-058, BO-059, BO-060, BO-1059, BO-1082, BO-115, BO-118, BO-126, BO-133, BO-262, POS-008, POS-020, PTR-018, SUP-008 |
 
 **Parameters**
 

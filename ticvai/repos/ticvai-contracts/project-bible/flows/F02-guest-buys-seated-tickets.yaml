@@ -20,14 +20,19 @@ steps:
   action: Picks a performance
   operations:
   - getAvailability
-  outcome: Seated performances route to the map rather than to the cart
+  outcome: 'Seated performances route to the map rather than to the cart. Per `BookingFlowConfig.seatEventDateMode`
+    the date and time are this inline step (`inlineStep`, default) or a pop-up over the seat map (`popupOnSeatMap`);
+    an event with exactly one on-sale performance skips this step and opens on the map, and the two steps may
+    render as one page (decided 29 September, rev 3 REV3-4 and REV3-7)'
 - step: 2
   screen: WEB-007
   action: Selects seats on the map
   operations:
   - getSeatAvailability
   - createSeatHold
-  outcome: Seats held with a visible countdown
+  outcome: 'Seats held with a visible countdown. At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats
+    per booking on a guest channel (default 10, bounds 1-50; `422 seat-limit-exceeded`), and the basket lists each
+    seat (decided 29 September, rev 3 REV3-7). A time bar switches performance and re-holds (rev 3 REV3-6)'
   duration: The hold TTL is the clock the guest is racing
 - step: 3
   screen: WEB-010
