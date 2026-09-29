@@ -1,6 +1,6 @@
 # WS145 — Marketing CRM Configuration Reference v1.0 board 11
 
-**10 screens · 13 operations · 33 schemas · 5 permissions**
+**10 screens · 14 operations · 39 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `ASSET_LIBRARY_VIEW, GUEST_MANAGE, MARKETING_MANAGE, TENANT_CONFIGURE, TENANT_PUBLISH`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `ASSET_LIBRARY_VIEW, GUEST_MANAGE, MARKETING_MANAGE, MARKETING_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-834` | Digital Experience Center | listDetail | 1 | 0 | — |
+| `BO-834` | Digital Experience Center | listDetail | 2 | 0 | — |
 | `BO-835` | Site, Brand & Domain Setup | listDetail | 1 | 0 | — |
 | `BO-836` | Design System & Components | listDetail | 1 | 0 | — |
 | `BO-837` | Page & Landing Builder | listDetail | 2 | 0 | — |
@@ -69,7 +69,7 @@ convincingly. It is never a caption.
 | `BO-840` | Mobile App CMS | listDetail | 1 | 0 | — |
 | `BO-841` | Personalization & Localization | listDetail | 1 | 0 | — |
 | `BO-842` | SEO Management | listDetail | 2 | 0 | — |
-| `BO-843` | Publishing, Analytics & Audit | listDetail | 1 | 0 | — |
+| `BO-843` | Publishing, Analytics & Audit | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -89,6 +89,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "notes": "**Merged into P13 CMS-001 Tenant Workspace and CMS-102 Site Builder** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds the overview of what is set up and what is left; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -333,6 +334,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Site and tenant configuration",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getStorefrontInsights",
+    "contract": "white-label",
+    "purpose": "Low-performing pages and conversion",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -370,6 +378,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "notes": "**Merged into P13 CMS-002 Brand Kit and CMS-017 Domain & Certificate** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds site, brand and domain set-up; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -494,6 +503,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "notes": "**Merged into P13 CMS-005 Theme Editor, CMS-002 Brand Kit and CMS-006 Component Preview** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds the theme and the component set; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -613,6 +623,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "notes": "**Merged into P13 CMS-007 Page Builder** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds pages and landing pages from fixed sections; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -750,6 +761,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "notes": "**Merged into P13 CMS-008 Content Blocks and CMS-010 Media Library** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds content, media and forms; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -883,6 +895,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "notes": "**Merged into P13 CMS-008 Content Blocks** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds product content blocks; dynamic product pages (matrix 22.10.18) are later, not Block A; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -1002,6 +1015,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "notes": "**Merged into P13 CMS-007 Page Builder, CMS-009 Navigation & Menus and CMS-104 App Build & Store Publishing** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds the mobile app: home sections, tabs and the Buy tickets button, and store publishing; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -1121,6 +1135,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "notes": "**Merged into P13 CMS-011 Translations** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds localisation; personalisation (22.10.12, 22.10.27) is later; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -1240,6 +1255,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "notes": "**Merged into P13 CMS-013 SEO & Metadata** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds SEO and redirects; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -1366,6 +1382,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "notes": "**Merged into P13 CMS-014 Publishing Workflow and CMS-015 Version History** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds publishing, audit and rollback; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -1454,6 +1471,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Publish",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getStorefrontInsights",
+    "contract": "white-label",
+    "purpose": "Page/app views, engagement, conversion and visitor behaviour",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1546,6 +1570,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "ContentPage",
@@ -1588,6 +1617,45 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "UrlRedirect",
   "responds": "UrlRedirect"
+ },
+ "getStorefrontInsights": {
+  "method": "GET",
+  "path": "/tenant-config/analytics-insights",
+  "contract": "white-label",
+  "summary": "Page performance, engagement, conversion and visitor behaviour",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "surface",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "topPages",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "StorefrontPageInsights"
  },
  "getTenantConfig": {
   "method": "GET",
@@ -1758,6 +1826,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "HomepageLayout",
@@ -1914,6 +1987,73 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "BookingFlow": {
+  "x-ticvai-persistence": "whitelabel.booking_flow",
+  "type": "object",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "required": [
+   "flowTypeKey",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `createBookingFlowDefinition`."
+   },
+   "flowTypeKey": {
+    "$ref": "#/components/schemas/BookingFlowTypeKey"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
+   },
+   "isDefaultForType": {
+    "type": "boolean",
+    "default": false,
+    "description": "At most one per venue and type; setting it takes it from the previous default."
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
+   },
+   "steps": {
+    "type": "array",
+    "maxItems": 30,
+    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlowStep"
+    }
+   },
+   "settings": {
+    "$ref": "#/components/schemas/BookingFlowLevelSettings"
+   },
+   "isValid": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "BookingFlowConfig": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "description": "**Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** One tenant with several venues (the Kids Club branches, Coastal Aqua beside Union Arena) needs them to differ. The settings in force at a venue are the tenant's, with that venue's entry in `venueOverrides` laid over them field by field. The guest app resolves them for the venue the guest picked (audit R267); `effectiveForVenueId` on `getBookingFlowConfig` returns them resolved.\n",
@@ -2002,6 +2142,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "readOnly": true,
     "description": "Always `buildTime` for native apps. The guest web app takes a splash change at the publish, with no build (audit R163)."
+   },
+   "introVideoAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The optional intro video (decided 29 September, MOB-5).** A video `MediaAsset` from the media library (CMS-010). Streamed, so a change reaches guests with the publish and needs no app build.\n"
+   },
+   "introVideoMode": {
+    "type": "string",
+    "enum": [
+     "off",
+     "firstLaunch",
+     "everyLaunch"
+    ],
+    "default": "off",
+    "description": "When GST-001 plays it full screen. \"Skip introduction\" is always shown. Anything but `off` needs `introVideoAssetRef`, or 400."
    }
   }
  },
@@ -2795,7 +2951,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "maxItems": {
        "type": "integer",
-       "nullable": true
+       "nullable": true,
+       "description": "How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3)."
+      },
+      "heroStyle": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "carousel",
+        "video",
+        "poster",
+        "split",
+        null
+       ],
+       "description": "For `heroBanner` only (decided 29 September, MOB-3)."
       }
      }
     }
@@ -2804,7 +2973,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "HomepageSectionKind": {
   "type": "string",
-  "description": "**Which module each section needs, proposed, client to correct (decided 28 September, audit R163).** `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events`; `attractions` needs `attractions`; `membership` needs `membership`; `dining` needs `diningAndFnb`; `shop` needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent` and `spacer` need no module. `setHomepageLayout` refuses a visible section whose module is not enabled, and `setModuleEnablement` refuses to disable a module a section still needs.\n",
+  "description": "**Which module each section needs, proposed, client to correct (decided 28 September, audit R163).** `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events`; `attractions` needs `attractions`; `membership` needs `membership`; `dining` needs `diningAndFnb`; `shop` needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent`, `venueOverview` and `spacer` need no module. `venueOverview` (decided 29 September, MOB-3) is the mobile Home's description, opening hours (from `getTenantAppStatus`) and type tiles. `setHomepageLayout` refuses a visible section whose module is not enabled, and `setModuleEnablement` refuses to disable a module a section still needs.\n",
   "enum": [
    "heroBanner",
    "quickActions",
@@ -2817,6 +2986,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "promotions",
    "map",
    "customContent",
+   "venueOverview",
    "spacer"
   ]
  },
@@ -3047,6 +3217,235 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "MediaAsset": {
+  "x-ticvai-persistence": "assets.media_asset",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "filename",
+   "contentType",
+   "sizeBytes",
+   "referenceCount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MediaKind"
+   },
+   "status": {
+    "$ref": "#/components/schemas/MediaStatus"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
+   },
+   "width": {
+    "type": "integer",
+    "nullable": true
+   },
+   "height": {
+    "type": "integer",
+    "nullable": true
+   },
+   "durationSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "customMetadata": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"
+   },
+   "sharedWithTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "url": {
+    "type": "string",
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "referenceCount": {
+    "type": "integer",
+    "description": "How many surfaces reference this asset. Non-zero refuses deletion.\n"
+   },
+   "rights": {
+    "$ref": "#/components/schemas/MediaRights"
+   },
+   "isRightsExpired": {
+    "type": "boolean"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "uploadedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MediaKind": {
+  "type": "string",
+  "enum": [
+   "image",
+   "video",
+   "audio",
+   "document",
+   "vector",
+   "font",
+   "archive"
+  ]
+ },
+ "MediaRights": {
+  "x-ticvai-persistence": "none — embedded in asset",
+  "type": "object",
+  "description": "Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n",
+  "properties": {
+   "licenceKind": {
+    "type": "string",
+    "enum": [
+     "owned",
+     "royaltyFree",
+     "rightsManaged",
+     "creativeCommons",
+     "editorialOnly",
+     "unknown"
+    ]
+   },
+   "licensor": {
+    "type": "string",
+    "nullable": true
+   },
+   "licenceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "permittedUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "web",
+      "print",
+      "socialMedia",
+      "inVenue",
+      "advertising",
+      "internal"
+     ]
+    }
+   },
+   "attributionRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "attributionText": {
+    "type": "string",
+    "nullable": true
+   },
+   "permittedTerritories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"
+   },
+   "permittedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"
+   },
+   "modelReleaseHeld": {
+    "type": "boolean",
+    "default": false
+   },
+   "renewalOwner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "MediaStatus": {
+  "type": "string",
+  "enum": [
+   "processing",
+   "ready",
+   "quarantined",
+   "failed",
+   "archived"
+  ]
+ },
  "MinimumAppVersion": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -3101,6 +3500,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_item",
   "type": "object",
+  "description": "**The mobile tab set is venue configuration (decided 29 September, MOB-1; 29 September brief decision 6).** Before a tenant saves its own, `bottomNavigation` is Home, Explore, Plan and Tickets (each an `appSection` link), with the Buy tickets button beside them; Map is an optional tab. Plan is left out while `visitPlanner` is off.\n",
   "required": [
    "kind",
    "items"
@@ -3154,6 +3554,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "sortOrder": {
        "type": "integer"
       }
+     }
+    }
+   },
+   "buyButton": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The persistent Buy tickets button (decided 29 September, MOB-2).** On every screen of the mobile app except the booking and checkout steps; it opens GST-003. Read with `bottomNavigation`.\n",
+    "properties": {
+     "style": {
+      "type": "string",
+      "enum": [
+       "raised",
+       "floating",
+       "flat",
+       "hidden"
+      ],
+      "default": "raised",
+      "description": "`raised` sits in the centre of the tab bar, as the v4 prototype shows; `hidden` turns it off."
+     },
+     "label": {
+      "$ref": "#/components/schemas/LocalisedText"
      }
     }
    }
@@ -3268,6 +3689,138 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "StorefrontPageInsights": {
+  "type": "object",
+  "x-ticvai-persistence": "none — read through from the connected analytics platform's reporting API at request time",
+  "description": "Page performance, engagement, conversion and visitor behaviour for a period (22.10.29).",
+  "required": [
+   "from",
+   "to",
+   "provider",
+   "totals"
+  ],
+  "properties": {
+   "from": {
+    "type": "string",
+    "format": "date"
+   },
+   "to": {
+    "type": "string",
+    "format": "date"
+   },
+   "provider": {
+    "type": "string"
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the platform last processed the data it answered with."
+   },
+   "totals": {
+    "type": "object",
+    "properties": {
+     "sessions": {
+      "type": "integer"
+     },
+     "users": {
+      "type": "integer"
+     },
+     "newUsers": {
+      "type": "integer"
+     },
+     "pageViews": {
+      "type": "integer"
+     },
+     "averageEngagementSeconds": {
+      "type": "number"
+     },
+     "bounceRate": {
+      "type": "number",
+      "description": "0 to 1."
+     },
+     "conversions": {
+      "type": "integer"
+     },
+     "conversionRate": {
+      "type": "number",
+      "description": "Conversions per session, 0 to 1."
+     }
+    }
+   },
+   "topPages": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "path": {
+       "type": "string"
+      },
+      "title": {
+       "type": "string",
+       "nullable": true
+      },
+      "pageViews": {
+       "type": "integer"
+      },
+      "averageEngagementSeconds": {
+       "type": "number"
+      },
+      "exitRate": {
+       "type": "number"
+      },
+      "conversions": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "bySource": {
+    "type": "array",
+    "description": "Visitor behaviour by where they came from.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "source": {
+       "type": "string"
+      },
+      "medium": {
+       "type": "string",
+       "nullable": true
+      },
+      "sessions": {
+       "type": "integer"
+      },
+      "conversions": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "byDevice": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "deviceCategory": {
+       "type": "string",
+       "enum": [
+        "desktop",
+        "mobile",
+        "tablet",
+        "app"
+       ]
+      },
+      "sessions": {
+       "type": "integer"
+      },
+      "conversions": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
  "TenantConfig": {
   "x-ticvai-persistence": "whitelabel.tenant_config",
   "type": "object",
@@ -3298,6 +3851,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "bookingFlow": {
     "$ref": "#/components/schemas/BookingFlowConfig"
+   },
+   "bookingFlows": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Every venue's booking flows in the draft (`whitelabel.booking_flow`), so a publish snapshots them with the rest (decided 29 September, W12).",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlow"
+    }
    },
    "theme": {
     "$ref": "#/components/schemas/Theme"
@@ -3534,6 +4096,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "default": "solid",
     "description": "Button shape (decided 29 September, rev 3 CFG-3)."
+   },
+   "componentColours": {
+    "type": "object",
+    "description": "**Colours for single interactive elements (decided 17 September, M17-11).** Each is optional and falls back to the theme colours. Every pair passes the same contrast check as the theme (`ContrastProblem`), or `setTheme` refuses it with 400. The guest flow stays the standard one; only the colours change.\n",
+    "properties": {
+     "primaryCta": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "payButton": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "addToCart": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "buyTicketsButton": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "link": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "badge": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     }
+    }
    }
   }
  },

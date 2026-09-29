@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-046` | Branded Queue / Waiting Room | statusTracker | 3 | 0 | — |
+| `GST-046` | Branded Queue / Waiting Room | statusTracker | 3 | 1 | — |
 
 ## Thin screens in this batch
 

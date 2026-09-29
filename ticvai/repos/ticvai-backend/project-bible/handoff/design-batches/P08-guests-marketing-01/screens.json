@@ -602,6 +602,34 @@
     "contract": "ai",
     "purpose": "Records an index could not embed, and at which stage",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAiCapabilities",
+    "contract": "ai",
+    "purpose": "The capability registry",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getEffectiveAiPolicy",
+    "contract": "ai",
+    "purpose": "The policy in force for a capability at a scope",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "configureAssistantProfile",
+    "contract": "ai",
+    "purpose": "Define an assistant profile",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAssistantProfiles",
+    "contract": "ai",
+    "purpose": "Assistant profiles",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -611,6 +639,12 @@
     "AiPolicy.enabledCapabilities",
     "AiPolicy.allowedRoleIds",
     "AiPolicy.maskedFields"
+   ],
+   "params": [
+    {
+     "name": "profileKey",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -705,6 +739,11 @@
      "to": "BO-073",
      "trigger": "Lost & Found Register",
      "provenance": "derived — BO-073 declares entryState.params itemId and BO-107 holds none of them, so the edge carries nothing and BO-073 opens cold"
+    },
+    {
+     "to": "BO-091",
+     "trigger": "AI Policy & Spend",
+     "provenance": "derived — BO-091 declares entryState.params profileKey and BO-107 holds none of them, so the edge carries nothing and BO-091 opens cold"
     }
    ]
   },

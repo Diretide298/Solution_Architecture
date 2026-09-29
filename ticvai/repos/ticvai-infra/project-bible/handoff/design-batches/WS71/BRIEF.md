@@ -1,6 +1,6 @@
 # WS71 — Unified BI Reporting and AI Analytics Platform board 10
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 13 operations · 16 schemas · 3 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `REPORT_MANAGE, REPORT_VIEW_TENANT, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ANL-061` | BI & Analytics Administration Command Center | commandCentre | 0 | 0 | — |
-| `ANL-062` | Enterprise KPI Library | listDetail | 0 | 0 | — |
-| `ANL-063` | KPI Targets, Thresholds & Scorecards | configEditor | 0 | 0 | — |
-| `ANL-064` | Benchmark & Comparative Analytics Configuration | commandCentre | 0 | 0 | — |
-| `ANL-065` | Data Source & Integration Registry | listDetail | 0 | 0 | — |
-| `ANL-066` | Semantic Model & Business Data Catalogue | listDetail | 0 | 0 | — |
-| `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | commandCentre | 0 | 0 | — |
-| `ANL-068` | Embedded BI, Workspace & Tenant Administration | configEditor | 0 | 0 | — |
-| `ANL-069` | Analytics Performance, Usage & Cost Monitor | commandCentre | 0 | 0 | — |
-| `ANL-070` | Analytics Governance, Security & Audit Center | listDetail | 0 | 0 | — |
+| `ANL-061` | BI & Analytics Administration Command Center | commandCentre | 2 | 0 | — |
+| `ANL-062` | Enterprise KPI Library | listDetail | 2 | 0 | — |
+| `ANL-063` | KPI Targets, Thresholds & Scorecards | configEditor | 2 | 0 | — |
+| `ANL-064` | Benchmark & Comparative Analytics Configuration | commandCentre | 3 | 1 | — |
+| `ANL-065` | Data Source & Integration Registry | listDetail | 1 | 0 | — |
+| `ANL-066` | Semantic Model & Business Data Catalogue | listDetail | 2 | 0 | — |
+| `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | commandCentre | 1 | 0 | — |
+| `ANL-068` | Embedded BI, Workspace & Tenant Administration | configEditor | 1 | 0 | — |
+| `ANL-069` | Analytics Performance, Usage & Cost Monitor | commandCentre | 1 | 0 | — |
+| `ANL-070` | Analytics Governance, Security & Audit Center | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

@@ -21,37 +21,25 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-020"
    ],
    "transitions": [
     {
-     "to": "GST-020",
-     "trigger": "Saved items carry across sessions",
-     "provenance": "flow F53 step 4→5"
-    },
-    {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-011 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
+     "to": "GST-020",
+     "trigger": "Saved items carry across sessions",
+     "provenance": "flow F53 step 4→5",
      "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+      "subjectId"
+     ]
     }
    ]
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "Inventory cites `GET /wallet` — no matching operation. Written before the contracts existed."
-  ],
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act",
@@ -65,7 +53,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every wallet overview",
+       "label": "Every wallet transaction",
        "bindsTo": "WalletTransaction",
        "columns": [
         "WalletTransaction.id",
@@ -89,7 +77,25 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected wallet overview",
+       "label": "The selected wallet transaction",
+       "bindsTo": "WalletTransaction",
+       "columns": [
+        "WalletTransaction.id",
+        "WalletTransaction.kind",
+        "WalletTransaction.amount",
+        "WalletTransaction.balanceAfter",
+        "WalletTransaction.orderId",
+        "WalletTransaction.venueId",
+        "WalletTransaction.reason",
+        "WalletTransaction.principalId",
+        "WalletTransaction.recordedAt"
+       ],
+       "operation": "listWalletTransactions",
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}/transactions"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wallet",
        "bindsTo": "Wallet",
        "columns": [
         "Wallet.id",
@@ -104,7 +110,7 @@
         "Wallet.lastActivityAt"
        ],
        "operation": "getWallet",
-       "provenance": "contract retail.yaml GET /wallets/{subjectId}"
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}"
       }
      ]
     }
@@ -113,23 +119,51 @@
   "states": {
    "loading": "The wallet overview list.",
    "error": "Could not load. Names which read failed and leaves the wallet overview untouched.",
-   "emptyFirstRun": "No wallet overview yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the wallet overview are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No wallet overview yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "apis": [
    {
     "operationId": "getWallet",
-    "contract": "retail",
+    "contract": "wallet",
     "purpose": "Read a guest wallet",
     "trigger": "onLoad"
    },
    {
     "operationId": "listWalletTransactions",
-    "contract": "retail",
+    "contract": "wallet",
     "purpose": "Wallet transaction history",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWalletAutoReloadSetting",
+    "contract": "wallet",
+    "purpose": "Show auto top-up",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setWalletAutoReloadSetting",
+    "contract": "wallet",
+    "purpose": "Set auto top-up",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getWalletExitBalance",
+    "contract": "wallet",
+    "purpose": "Balance due / refundable at exit",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "settleWalletAtExit",
+    "contract": "wallet",
+    "purpose": "Settle the wallet at exit",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -137,21 +171,32 @@
     {
      "name": "subjectId",
      "from": "GST-001"
+    },
+    {
+     "name": "walletId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "Wallet.id",
-    "Wallet.subjectId",
-    "Wallet.balance",
-    "Wallet.credits",
-    "Wallet.bonusBalance"
+    "WalletTransaction.id",
+    "WalletTransaction.kind",
+    "WalletTransaction.amount",
+    "WalletTransaction.balanceAfter",
+    "WalletTransaction.orderId"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-011"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-011",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Wallet overview"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -205,26 +250,14 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "fromFlows": true,
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-015 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
      "to": "ADM-003",
@@ -235,21 +268,11 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Membership. **`listDelegations` and `grantDelegation` are the member list and add-member** Pranay asked for — CF-132 built them as delegated authority rather than a household table. **Rewired on the 20 August review.** **`getGuestLink` restored** — F19 step 1 calls it from here and my rewire dropped it. **A membership that works in another country resolves through the guest link**, and the flow checker caught what the screen edit did not. **Cross-platform navigation removed 24 August**: ADM-003. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Wired 24 August from review**: getSubscription, listSubscriptionInvoices. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **`getSubscription` and `listSubscriptionInvoices` removed the same day they were wired.** `check-screens` refused them: **both carry a staff permission and this is a guest surface.** The reviewer asked for `GET /memberships/current` — a guest-scoped read that does not exist. **That is the correct finding and the wiring was the wrong fix**: it is a new operation, not a missing link. **`getGuestLink` is `service` audience** — a cross-region pseudonymous lookup (ADR-0010), not something a membership screen calls. Removed 24 August. **`getMyMemberships` and `listGuestMemberships` wired 24 August**, replacing `getGuestLink`. A guest reading their own membership calls a guest operation; **`getGuestLink` is the cross-region pseudonymous lookup a service makes on their behalf** (ADR-0010), and F19 was walking it from a guest screen.",
-  "openQuestions": [
-   "Inventory cites `GET /memberships` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Membership. **`listDelegations` and `grantDelegation` are the member list and add-member** Pranay asked for — CF-132 built them as delegated authority rather than a household table. **Rewired on the 20 August review.** **`getGuestLink` restored** — F19 step 1 calls it from here and my rewire dropped it. **A membership that works in another country resolves through the guest link**, and the flow checker caught what the screen edit did not. **Cross-platform navigation removed 24 August**: ADM-003. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Wired 24 August from review**: getSubscription, listSubscriptionInvoices. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **`getSubscription` and `listSubscriptionInvoices` removed the same day they were wired.** `check-screens` refused them: **both carry a staff permission and this is a guest surface.** The reviewer asked for `GET /memberships/current` — a guest-scoped read that does not exist. **That is the correct finding and the wiring was the wrong fix**: it is a new operation, not a missing link. **`getGuestLink` is `service` audience** — a cross-region pseudonymous lookup (ADR-0010), not something a membership screen calls. Removed 24 August. **`getMyMemberships` and `listGuestMemberships` wired 24 August**, replacing `getGuestLink`. A guest reading their own membership calls a guest operation; **`getGuestLink` is the cross-region pseudonymous lookup a service makes on their behalf** (ADR-0010), and F19 was walking it from a guest screen.\n\n**Rev 3 (decided 29 September).** Billing statement decline states (DG-2, no contract change): soft decline → *Retry now* and *Use another card*; hard decline → another card only; declined again → the next retry date; paid.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listDelegations` reads the population and `getMyMemberships` reads one of them — list, select, act",
   "purpose": "Find memberships for this venue.",
-  "gaps": [
-   {
-    "operation": "listProducts",
-    "why": "**2 declared operations reach no component on this screen**: listProducts, listGuestMemberships. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -277,6 +300,98 @@
        ],
        "operation": "listDelegations",
        "provenance": "contract identity.yaml GET /guests/{subjectId}/delegations"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listBillingStatements",
+       "notes": "Sends `?from=` to `listBillingStatements`.",
+       "provenance": "contract orders.yaml GET /billing-statements"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listBillingStatements",
+       "notes": "Sends `?to=` to `listBillingStatements`.",
+       "provenance": "contract orders.yaml GET /billing-statements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every billing statement",
+       "bindsTo": "BillingStatement",
+       "columns": [
+        "BillingStatement.id",
+        "BillingStatement.subjectId",
+        "BillingStatement.periodStart",
+        "BillingStatement.periodEnd",
+        "BillingStatement.lines",
+        "BillingStatement.total",
+        "BillingStatement.isTaxInvoice"
+       ],
+       "operation": "listBillingStatements",
+       "provenance": "contract orders.yaml GET /billing-statements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every dunning case",
+       "bindsTo": "DunningCase",
+       "columns": [
+        "DunningCase.id",
+        "DunningCase.subjectId",
+        "DunningCase.orderId",
+        "DunningCase.amount",
+        "DunningCase.state",
+        "DunningCase.declineClass",
+        "DunningCase.attemptsMade",
+        "DunningCase.nextAttemptAt",
+        "DunningCase.firstFailedAt",
+        "DunningCase.resolvedAt",
+        "DunningCase.resolution",
+        "DunningCase.resolutionNote"
+       ],
+       "operation": "listMyPaymentIssues",
+       "provenance": "contract payments.yaml GET /guests/me/payment-issues"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every guest membership",
+       "bindsTo": "GuestMembership",
+       "columns": [
+        "GuestMembership.entitlementId",
+        "GuestMembership.productId",
+        "GuestMembership.name",
+        "GuestMembership.tier",
+        "GuestMembership.status",
+        "GuestMembership.validFrom",
+        "GuestMembership.validTo",
+        "GuestMembership.frozenDays",
+        "GuestMembership.benefits",
+        "GuestMembership.renewsOn",
+        "GuestMembership.previousTerms"
+       ],
+       "operation": "listGuestMemberships",
+       "provenance": "contract catalogue.yaml GET /guest/memberships"
       }
      ]
     },
@@ -286,7 +401,23 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected memberships",
+       "label": "The selected billing statement",
+       "bindsTo": "BillingStatement",
+       "columns": [
+        "BillingStatement.id",
+        "BillingStatement.subjectId",
+        "BillingStatement.periodStart",
+        "BillingStatement.periodEnd",
+        "BillingStatement.lines",
+        "BillingStatement.total",
+        "BillingStatement.isTaxInvoice"
+       ],
+       "operation": "getBillingStatement",
+       "provenance": "contract orders.yaml GET /billing-statements/{statementId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The guest membership",
        "bindsTo": "GuestMembership",
        "columns": [
         "GuestMembership.entitlementId",
@@ -312,9 +443,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Grant",
+       "label": "Grant delegation",
        "operation": "grantDelegation",
        "provenance": "contract identity.yaml POST /guests/{subjectId}/delegations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Retry my dunning payment",
+       "operation": "retryMyDunningPayment",
+       "provenance": "contract payments.yaml POST /dunning-cases/{caseId}/retry"
       }
      ]
     }
@@ -323,12 +460,36 @@
   "states": {
    "loading": "The memberships list.",
    "error": "Could not load. Names which read failed and leaves the memberships untouched.",
-   "emptyFirstRun": "No memberships yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the memberships are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No memberships yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on from, to and the memberships are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getMyMemberships` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
+   {
+    "operationId": "listBillingStatements",
+    "contract": "orders",
+    "purpose": "Membership billing statements",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getBillingStatement",
+    "contract": "orders",
+    "purpose": "One statement, line by line",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listMyPaymentIssues",
+    "contract": "payments",
+    "purpose": "Declined renewals waiting on the guest",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "retryMyDunningPayment",
+    "contract": "payments",
+    "purpose": "Retry a declined payment, on another card if needed",
+    "trigger": "onAction"
+   },
    {
     "operationId": "getMyMemberships",
     "contract": "catalogue",
@@ -361,6 +522,20 @@
     "contract": "catalogue",
     "purpose": "A guest's memberships, benefits and history",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listInstalmentPlans",
+    "contract": "payments",
+    "purpose": "Instalment plans and schedule",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createInstalmentPlan",
+    "contract": "payments",
+    "purpose": "Pay in instalments",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -372,23 +547,82 @@
     {
      "name": "subjectId",
      "from": "GST-001"
+    },
+    {
+     "name": "caseId",
+     "from": "navigation"
+    },
+    {
+     "name": "statementId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `guestLinkId`.",
    "preloaded": [
-    "GuestMembership.entitlementId",
-    "GuestMembership.productId",
-    "GuestMembership.name",
-    "GuestMembership.tier",
-    "GuestMembership.status"
+    "BillingStatement.id",
+    "BillingStatement.subjectId",
+    "BillingStatement.periodStart",
+    "BillingStatement.periodEnd",
+    "BillingStatement.lines"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-015"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-015",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Memberships; billing in \"Also built, not in the plan\" → Membership billing (#billing)",
+    "differences": "Prototype splits the screen in two (benefits and delegation vs billing statement and dunning retries)."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRetryMyDunningPayment",
+    "component": "modal",
+    "trigger": "Retry my dunning payment",
+    "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RetryDunningPaymentRequest",
+    "confirm": {
+     "label": "Retry my dunning payment",
+     "operation": "retryMyDunningPayment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "paymentTokenId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formGrantDelegation",
+    "component": "modal",
+    "trigger": "Grant delegation",
+    "body": "**Collects what `grantDelegation` sends before it is called.** Required: `overSubjectId`, `delegationKind`, `permission`. Optional: `overObjectRef`, `quota`, `validTo`, `isRevocableBySubject`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Grant delegation",
+     "operation": "grantDelegation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "overSubjectId",
+      "delegationKind",
+      "permission",
+      "overObjectRef",
+      "quota",
+      "validTo",
+      "isRevocableBySubject"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -440,25 +674,13 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-036 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
      "to": "WEB-024",
@@ -469,10 +691,7 @@
     }
    ]
   },
-  "notes": "Merged with GST-064 on 18 August. **I created GST-064 in the parity sweep without noticing this screen existed** — same two operations, same capability, and the fuzzy match against the client storyboard is what surfaced it. Board 6 panel 6 shows one Loyalty & Rewards screen, not two. **Cross-surface parity, 31 August**: added evaluatePromotions, listPromotions. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
-  "openQuestions": [
-   "Inventory cites `GET /loyalty` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "Merged with GST-064 on 18 August. **I created GST-064 in the parity sweep without noticing this screen existed** — same two operations, same capability, and the fuzzy match against the client storyboard is what surfaced it. Board 6 panel 6 shows one Loyalty & Rewards screen, not two. **Cross-surface parity, 31 August**: added evaluatePromotions, listPromotions. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate. **Pull audit, 27 September**: evaluatePromotions removed again. It evaluates a cart — `EvaluatePromotionsRequest` requires venueId, channel and at least one line — and this screen has no cart: no entry params, nothing in a basket. The parity pass copied it across without asking what it would be sent. Promotions are evaluated where the cart is.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listLoyaltyProgrammes` reads the population and `getLoyaltyPosition` reads one of them — list, select, act",
@@ -480,8 +699,8 @@
   "gaps": [
    {
     "operation": "getLoyaltyPosition",
-    "why": "**2 declared operations reach no component on this screen**: getLoyaltyPosition, listPromotions. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getLoyaltyPosition` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract marketing-crm.yaml GET /loyalty/position"
    }
   ],
   "layout": {
@@ -493,7 +712,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every loyalty rewards",
+       "label": "Every loyalty programme",
        "bindsTo": "LoyaltyProgramme",
        "columns": [
         "LoyaltyProgramme.id",
@@ -508,18 +727,40 @@
        ],
        "operation": "listLoyaltyProgrammes",
        "provenance": "contract marketing-crm.yaml GET /loyalty/programmes"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every promotion",
+       "bindsTo": "Promotion",
+       "columns": [
+        "Promotion.code",
+        "Promotion.name",
+        "Promotion.description",
+        "Promotion.venueId",
+        "Promotion.discount",
+        "Promotion.conditions",
+        "Promotion.stackingMode",
+        "Promotion.stackingGroup",
+        "Promotion.precedence",
+        "Promotion.validFrom",
+        "Promotion.validTo",
+        "Promotion.maxRedemptions"
+       ],
+       "operation": "listPromotions",
+       "provenance": "contract promotions.yaml GET /promotions"
       }
      ]
     },
     {
-     "name": "actionBar",
-     "slot": "rowActions",
+     "name": "contextPanel",
+     "slot": "reads",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Evaluate",
-       "operation": "evaluatePromotions",
-       "provenance": "contract promotions.yaml POST /promotions/evaluate"
+       "kind": "detailPanel",
+       "label": "Loyalty position",
+       "operation": "getLoyaltyPosition",
+       "notes": "Shows `subjectId`, `programmeId`, `pointsBalance`, `pointsPending`, `tier`, `nextTier`, `pointsToNextTier`, `expiringPoints`, `expiringAt` from `getLoyaltyPosition`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract marketing-crm.yaml GET /loyalty/position"
       }
      ]
     }
@@ -528,9 +769,9 @@
   "states": {
    "loading": "The loyalty rewards list.",
    "error": "Could not load. Names which read failed and leaves the loyalty rewards untouched.",
-   "emptyFirstRun": "No loyalty rewards yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the loyalty rewards are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No loyalty rewards yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listLoyaltyProgrammes` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** — and that is said. Redeeming and referring need the connection."
   },
   "apis": [
@@ -547,27 +788,39 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "evaluatePromotions",
-    "contract": "promotions",
-    "purpose": "Evaluate promotions against a cart",
-    "trigger": "onAction",
-    "invalidates": [
-     "listLoyaltyProgrammes"
-    ]
-   },
-   {
     "operationId": "listPromotions",
     "contract": "promotions",
     "purpose": "List promotions",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideRecommendations",
+    "contract": "ai",
+    "purpose": "Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordRecommendationEvents",
+    "contract": "ai",
+    "purpose": "Report impressions, clicks and declines of recommended items",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-036"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-036",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Loyalty & rewards"
+   }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions removed 27 September), not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
    "code": "P02",
    "audience": "guest",

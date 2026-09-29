@@ -1,4 +1,23 @@
 {
+ "configureAssistantProfile": {
+  "method": "PUT",
+  "path": "/assistant-profiles/{profileKey}",
+  "contract": "ai",
+  "summary": "Define an assistant profile",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiAssistantProfile",
+  "responds": "AiAssistantProfile"
+ },
  "createCampaign": {
   "method": "POST",
   "path": "/campaigns",
@@ -61,6 +80,35 @@
   "requestBody": null,
   "responds": "AiUsageReport"
  },
+ "getEffectiveAiPolicy": {
+  "method": "GET",
+  "path": "/governance/effective-policy",
+  "contract": "ai",
+  "summary": "The policy in force for a capability at a scope",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "environment",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiEffectivePolicy"
+ },
  "getKpiValues": {
   "method": "GET",
   "path": "/kpi-values",
@@ -95,6 +143,16 @@
     "name": "compareTo",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -112,6 +170,74 @@
   "parameters": [],
   "requestBody": null,
   "responds": "VenueSettings"
+ },
+ "listAiCapabilities": {
+  "method": "GET",
+  "path": "/governance/capabilities",
+  "contract": "ai",
+  "summary": "The capability registry",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "family",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "riskClass",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAssistantProfiles": {
+  "method": "GET",
+  "path": "/assistant-profiles",
+  "contract": "ai",
+  "summary": "Assistant profiles",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "audience",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listAuditRecords": {
   "method": "GET",

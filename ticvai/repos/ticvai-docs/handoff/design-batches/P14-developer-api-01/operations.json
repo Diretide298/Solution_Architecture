@@ -75,6 +75,25 @@
   "requestBody": "WebhookSubscription",
   "responds": "WebhookSubscription"
  },
+ "decideProductionAccess": {
+  "method": "POST",
+  "path": "/production-access-requests/{requestId}/decide",
+  "contract": "public-api",
+  "summary": "Approve or reject production access",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductionAccessRequest"
+ },
  "deprecateApiVersion": {
   "method": "POST",
   "path": "/api-versions/{version}/deprecate",
@@ -118,6 +137,40 @@
   "requestBody": null,
   "responds": "ApiUsageSummary"
  },
+ "listApiAnomalies": {
+  "method": "GET",
+  "path": "/api-anomalies",
+  "contract": "public-api",
+  "summary": "Flagged API traffic",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "clientId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listApiClients": {
   "method": "GET",
   "path": "/api-clients",
@@ -130,6 +183,35 @@
   "parameters": [],
   "requestBody": null,
   "responds": "ApiClient"
+ },
+ "listApiScopes": {
+  "method": "GET",
+  "path": "/api-scopes",
+  "contract": "public-api",
+  "summary": "The scope catalogue, one read and one write scope per module",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listApiVersions": {
   "method": "GET",
@@ -157,6 +239,35 @@
   "requestBody": null,
   "responds": "IntegrationListing"
  },
+ "listProductionAccessRequests": {
+  "method": "GET",
+  "path": "/production-access-requests",
+  "contract": "public-api",
+  "summary": "Production access requests, pending first",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listSandboxes": {
   "method": "GET",
   "path": "/sandboxes",
@@ -183,16 +294,51 @@
   "requestBody": null,
   "responds": "WebhookDelivery"
  },
- "listWebhookSubscriptions": {
+ "listWebhookEventTypes": {
   "method": "GET",
-  "path": "/webhook-subscriptions",
+  "path": "/webhook-event-types",
   "contract": "public-api",
-  "summary": "What this client is subscribed to",
+  "summary": "The events a webhook may subscribe to",
   "permission": "DEVELOPER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "publisher",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWebhookSubscriptions": {
+  "method": "GET",
+  "path": "/webhook-subscriptions",
+  "contract": "public-api",
+  "summary": "The tenant's webhook subscriptions, filterable by API client",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "clientId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "WebhookSubscription"
  },
@@ -234,6 +380,25 @@
   "requestBody": null,
   "responds": null
  },
+ "requestProductionAccess": {
+  "method": "POST",
+  "path": "/api-clients/{clientId}/production-access",
+  "contract": "public-api",
+  "summary": "Ask for production keys for a sandbox client that passed certification",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductionAccessRequest"
+ },
  "resetSandbox": {
   "method": "POST",
   "path": "/sandboxes/{sandboxId}/reset",
@@ -262,7 +427,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": null
  },
@@ -284,6 +455,25 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "setApiAnomalyRule": {
+  "method": "PUT",
+  "path": "/api-anomaly-rules",
+  "contract": "public-api",
+  "summary": "When API traffic is flagged as abnormal",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApiAnomalyRule",
+  "responds": "ApiAnomalyRule"
  },
  "setApiLicensing": {
   "method": "PUT",
@@ -346,7 +536,7 @@
   "method": "POST",
   "path": "/listings",
   "contract": "public-api",
-  "summary": "Submit an integration for certification and listing",
+  "summary": "Submit an integration for certification (and, if public, listing)",
   "permission": "DEVELOPER_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",

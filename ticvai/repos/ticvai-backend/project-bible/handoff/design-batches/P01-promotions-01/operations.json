@@ -1,23 +1,4 @@
 {
- "evaluatePromotions": {
-  "method": "POST",
-  "path": "/promotions/evaluate",
-  "contract": "promotions",
-  "summary": "Evaluate promotions against a cart",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "EvaluatePromotionsRequest",
-  "responds": "PromotionEvaluation"
- },
  "getPromotion": {
   "method": "GET",
   "path": "/promotions/{promotionId}",

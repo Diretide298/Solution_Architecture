@@ -3,7 +3,7 @@
   "method": "POST",
   "path": "/auth/mfa/challenge",
   "contract": "identity",
-  "summary": "Step-up authentication for a sensitive action",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -53,7 +53,7 @@
     "required": null
    }
   ],
-  "requestBody": "ResaleListing",
+  "requestBody": "CreateResaleListingRequest",
   "responds": "ResaleListing"
  },
  "enrolFacePass": {
@@ -75,6 +75,25 @@
   "requestBody": null,
   "responds": "FacePassEnrolment"
  },
+ "enrolMfaMethod": {
+  "method": "POST",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrol an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaEnrolment"
+ },
  "getFacePassEnrolment": {
   "method": "GET",
   "path": "/face-pass/enrolments/{enrolmentId}",
@@ -91,15 +110,41 @@
  "getGiftCard": {
   "method": "GET",
   "path": "/gift-cards/{cardCode}",
-  "contract": "retail",
+  "contract": "wallet",
   "summary": "Check a gift card balance",
-  "permission": "ORDER_VIEW",
+  "permission": "WALLET_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
   "responds": "GiftCard"
+ },
+ "getGuestSession": {
+  "method": "GET",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "Read the current guest session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "getMyIdentityVerification": {
+  "method": "GET",
+  "path": "/auth/guest/identity-verifications/current",
+  "contract": "identity",
+  "summary": "The guest's own latest identity verification",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "IdentityGuestVerification"
  },
  "getWaiverStatus": {
   "method": "GET",
@@ -119,6 +164,54 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "guestLogout": {
+  "method": "DELETE",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "End a guest session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "allDevices",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listDelegations": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/delegations",
+  "contract": "identity",
+  "summary": "Who may act for this guest, and for whom they may act",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listGuestDevices": {
   "method": "GET",
@@ -142,7 +235,20 @@
    }
   ],
   "requestBody": null,
-  "responds": "GuestDevice"
+  "responds": "Page"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
  },
  "listPaymentTokens": {
   "method": "GET",
@@ -166,7 +272,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "PaymentToken"
+  "responds": "Page"
  },
  "redeemLoyaltyPoints": {
   "method": "POST",
@@ -205,6 +311,25 @@
   ],
   "requestBody": null,
   "responds": "GuestDevice"
+ },
+ "removeMfaMethod": {
+  "method": "DELETE",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Remove an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "revokeFacePass": {
   "method": "DELETE",
@@ -263,12 +388,31 @@
   "requestBody": null,
   "responds": "PaymentToken"
  },
+ "submitGuestIdentityDocument": {
+  "method": "POST",
+  "path": "/auth/guest/identity-verifications",
+  "contract": "identity",
+  "summary": "Submit an identity document for verification",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IdentityGuestDocumentSubmission",
+  "responds": "IdentityGuestVerification"
+ },
  "transferWalletBalance": {
   "method": "POST",
   "path": "/wallets/{walletId}/transfer",
-  "contract": "retail",
+  "contract": "wallet",
   "summary": "Send balance to another guest",
-  "permission": "ORDER_MODIFY",
+  "permission": "WALLET_OPERATE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -280,7 +424,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "WalletTransaction"
  },
  "verifyGuestEmail": {
   "method": "POST",
@@ -300,5 +444,43 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "verifyMfaEnrolment": {
+  "method": "POST",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Complete enrolment",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaMethod"
  }
 }

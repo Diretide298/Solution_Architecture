@@ -113,6 +113,19 @@
   "requestBody": null,
   "responds": "BookingFlowConfig"
  },
+ "getGuidedChoiceSuggestion": {
+  "method": "GET",
+  "path": "/guided-choice-suggestions/{suggestionId}",
+  "contract": "ai",
+  "summary": "The reasons behind a Help me choose suggestion",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiGuidedChoiceSuggestion"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",
@@ -144,6 +157,64 @@
   ],
   "requestBody": null,
   "responds": "TenantConfig"
+ },
+ "listAnalyticsProviders": {
+  "method": "GET",
+  "path": "/tenant-config/analytics-providers",
+  "contract": "white-label",
+  "summary": "The analytics platforms the storefront and app report to",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listBookingFlows": {
+  "method": "GET",
+  "path": "/venues/{venueId}/booking-flows",
+  "contract": "white-label",
+  "summary": "A venue's booking flows, in the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "flowTypeKey",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listConfigVersions": {
   "method": "GET",
@@ -483,6 +554,11 @@
     "required": null
    },
    {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -596,6 +672,25 @@
   "requestBody": null,
   "responds": "TenantConfig"
  },
+ "setAnalyticsProvider": {
+  "method": "PUT",
+  "path": "/tenant-config/analytics-providers",
+  "contract": "white-label",
+  "summary": "Connect the storefront and app to an analytics platform",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "StorefrontAnalyticsProvider",
+  "responds": "StorefrontAnalyticsProvider"
+ },
  "setBookingFlowConfig": {
   "method": "PUT",
   "path": "/tenant-config/booking-flow",
@@ -690,6 +785,25 @@
   ],
   "requestBody": "SeoMetadata",
   "responds": "SeoMetadata"
+ },
+ "suggestGuidedChoice": {
+  "method": "POST",
+  "path": "/venues/{venueId}/guided-choice-suggestions",
+  "contract": "ai",
+  "summary": "Suggest a Help me choose set-up from the venue's catalogue",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "unpublishGuidedChoice": {
   "method": "POST",

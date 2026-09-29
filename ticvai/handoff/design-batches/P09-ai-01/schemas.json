@@ -1,4 +1,68 @@
 {
+ "AiByokEnablement": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.byok_enablement",
+  "description": "**Whether a tenant may bring its own model key** (decided 29 September, design 8 on 5.9). TICVAI decides it per tenant with `PLATFORM_AI_MANAGE`; it is not tenant self-service. Until it is enabled, `setAiProvider` refuses `managedBy: tenant`. One row per tenant.",
+  "required": [
+   "tenantId",
+   "enabled"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "enabled": {
+    "type": "boolean"
+   },
+   "coverage": {
+    "type": "string",
+    "enum": [
+     "perTask",
+     "allTasks"
+    ],
+    "default": "perTask",
+    "description": "Whether the tenant may supply a key per task or one key for everything."
+   },
+   "allowedTasks": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Where `coverage` is `perTask`: the gateway tasks a tenant key may serve. Empty means any."
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "platformStaffGrantId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The open platform-staff grant the change was made under (audit R098)."
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "AiCapability": {
   "type": "string",
   "description": "What a capability needs, not which provider serves it. This indirection is what makes \"no provider SDK in capability code\" enforceable.\n**`speechToText` and `textToSpeech` added 18 August (BL-164)** — voice added rather than declined. **Speech is the capability where UAE residency is hardest to satisfy**: the major providers run it in fewer regions than text, and a guest speaking into a kiosk is producing personal data in the moment. `AiProvider.residency` already carries the constraint and **speech is the capability most likely to fail it**, which is why it is separate rather than folded into `chat`.\n",
@@ -10,6 +74,267 @@
    "speechToText",
    "textToSpeech"
   ]
+ },
+ "AiModel": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.model",
+  "description": "**The model catalogue** (design 3.1 Registry, 3.3; AIC-013, AIC-026). One row per model a task can be routed to: large language models, embedding and reranking models, and classical models (LightGBM, statistical forecasters) registered the same way so lifecycle, release and audit are uniform. **Platform rows** are mastered in the control plane and replicated read-only into each tenant database with the tenant root as `scopePath`; a tenant row exists only where bring-your-own-key is enabled for the tenant.",
+  "required": [
+   "layer",
+   "modelName",
+   "producerType"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "layer": {
+    "type": "string",
+    "enum": [
+     "platform",
+     "tenant"
+    ]
+   },
+   "providerKind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiProviderKind"
+     }
+    ],
+    "nullable": true
+   },
+   "producerType": {
+    "type": "string",
+    "enum": [
+     "llm",
+     "embedding",
+     "reranker",
+     "classical",
+     "rule"
+    ]
+   },
+   "modelName": {
+    "type": "string",
+    "description": "The deployment or model name as the provider knows it, or the package and version for a classical model."
+   },
+   "capabilities": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiCapability"
+    }
+   },
+   "contextTokens": {
+    "type": "integer",
+    "nullable": true
+   },
+   "toolCalling": {
+    "type": "boolean",
+    "default": false
+   },
+   "structuredOutput": {
+    "type": "boolean",
+    "default": false
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "residency": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where inference happens. Checked against `tenancy.RegionSettings.allowedAiResidencies`."
+   },
+   "inputCostPerMillionTokens": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "outputCostPerMillionTokens": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "lifecycle": {
+    "type": "object",
+    "description": "Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production.",
+    "properties": {
+     "development": {
+      "type": "string",
+      "enum": [
+       "draft",
+       "pilot",
+       "active",
+       "retired"
+      ]
+     },
+     "staging": {
+      "type": "string",
+      "enum": [
+       "draft",
+       "pilot",
+       "active",
+       "retired"
+      ]
+     },
+     "production": {
+      "type": "string",
+      "enum": [
+       "draft",
+       "pilot",
+       "active",
+       "retired"
+      ]
+     }
+    }
+   },
+   "isDefaultForTasks": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Tasks this model is the default for (AIC-010), e.g. `assistant.guest.answer`, `config.extract`."
+   },
+   "taskFitness": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**Evaluated fitness per task** (21 September minutes, M21-09, our proposal): a score from the task's golden set (`runAiEvaluation`) and the band the task needs. Below `floor` the model is underpowered for the task; far above `ceiling` it is overpowered (it costs more than the task needs). `setAiProvider` returns a warning (`AiProvider.fitnessWarnings`) when a choice falls outside the band, and ADM-037 shows the band beside `setAiModel`; neither refuses on it.",
+    "items": {
+     "type": "object",
+     "required": [
+      "taskKey",
+      "score"
+     ],
+     "properties": {
+      "taskKey": {
+       "type": "string"
+      },
+      "score": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "floor": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "ceiling": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1,
+       "nullable": true
+      },
+      "evaluationRunId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "evaluatedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiPromptTemplate": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.prompt_template",
+  "description": "**The prompt registry** (design 3.1 Registry, AIC-022). Versioned and **immutable once published**: a change is a new version, so every decision record can name the exact template it used. Platform templates are replicated read-only like platform models; a tenant may publish its own variant of a task's template.",
+  "required": [
+   "templateKey",
+   "version",
+   "layer",
+   "task",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "templateKey": {
+    "type": "string"
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "layer": {
+    "type": "string",
+    "enum": [
+     "platform",
+     "tenant"
+    ]
+   },
+   "task": {
+    "type": "string",
+    "description": "The gateway task it serves (design 3.3), e.g. `assistant.guest.answer`, `case.summarise`, `guidedChoice.wording`."
+   },
+   "body": {
+    "type": "string",
+    "description": "The template text. Stable content first, so the provider's prefix cache applies (ADR-0034)."
+   },
+   "variables": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "outputSchema": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "JSON Schema the structured output must satisfy, where the task has one."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "retired"
+    ]
+   },
+   "contentHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
  },
  "AiProvider": {
   "type": "object",
@@ -24,7 +349,7 @@
    "id": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true
+    "description": "Assigned on create. Sent to `setAiProvider` to replace that provider; left out to create one."
    },
    "kind": {
     "$ref": "#/components/schemas/AiProviderKind"
@@ -57,7 +382,7 @@
      "tenant",
      "venue"
     ],
-    "description": "**Where this provider configuration applies, and therefore whose token pays for it.** A tenant-scoped provider means that tenant's usage bills against their own key at the provider — **an independent reconciliation source against our own meter**, which is the point of per-tenant tokens rather than one platform key.\n`venue` exists for the case where one venue's volume justifies its own key, or where a venue is billed separately from the rest of its tenant.\n"
+    "description": "**Where this provider configuration applies, and therefore whose token pays for it.** A tenant-scoped provider means that tenant's usage bills against their own key at the provider — **an independent reconciliation source against our own meter**, which is the point of per-tenant tokens rather than one platform key.\n`venue` exists for the case where one venue's volume justifies its own key, or where a venue is billed separately from the rest of its tenant.\n**`tenant` is the decided level** (audit R203, ADR-0009): a tenant's provider is set per tenant, by platform staff on ADM-037. `venue` narrows inside a tenant; `platform` is only the platform's fallback. **No provider is configured per region**: a region restricts the choice through `tenancy.RegionSettings.allowedAiResidencies` and nothing else, and the table's `region_id` is the tenant's home region, recorded so that gate can be re-checked.\n"
    },
    "scopePath": {
     "type": "string",
@@ -105,6 +430,57 @@
    },
    "isActive": {
     "type": "boolean"
+   },
+   "managedBy": {
+    "type": "string",
+    "enum": [
+     "ticvai",
+     "tenant"
+    ],
+    "default": "ticvai",
+    "description": "**Who holds the provider account, and so who pays** (AI design 5.9, decided 29 September). `ticvai`: TICVAI-managed, metered per tenant and re-billed per token. `tenant`: bring-your-own-key, accepted only where TICVAI enabled it for the tenant (`setAiByokEnablement`); the tenant pays the provider and TICVAI meters for visibility.\n"
+   },
+   "modelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.model",
+    "description": "The model in the catalogue (`listAiModels`) this provider serves. Null for an older row that names its model only in `model`."
+   },
+   "taskKeys": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "**Which agent tasks this provider serves** (21 September minutes, M21-03: different agents may use different models chosen for the task). Empty means every task of its `capability`. A task listed on two providers goes to the lower `priority`. **AI-D02 stands:** one managed provider (Azure OpenAI in UAE North) serves every task by default, with a small and a stronger model per task; a second provider or a tenant's own key is added only where TICVAI enables it for the tenant (AI-D14, `setAiByokEnablement`)."
+   },
+   "fitnessWarnings": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**The model-fitness check at the last write** (21 September minutes, M21-09). For each task in `taskKeys` whose model scores outside the task's band in `AiModel.taskFitness`, or has no score, one warning. A warning never blocks the write; it is shown on ADM-037 and kept so the choice is auditable.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "taskKey": {
+       "type": "string"
+      },
+      "score": {
+       "type": "number",
+       "nullable": true
+      },
+      "floor": {
+       "type": "number"
+      },
+      "direction": {
+       "type": "string",
+       "enum": [
+        "underpowered",
+        "overpowered",
+        "unscored"
+       ]
+      }
+     }
+    }
    }
   }
  },
@@ -115,7 +491,497 @@
    "gemini",
    "anthropic",
    "azureOpenai",
-   "localLlm"
+   "localLlm",
+   "openaiCompatible"
+  ],
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Permission": {
+  "type": "string",
+  "enum": [
+   "SESSION_FORCE_LOGOUT",
+   "USER_MANAGE",
+   "ROLE_MANAGE",
+   "PERMISSION_GRANT",
+   "PERMISSION_VIEW",
+   "PERMISSION_MANAGE",
+   "PLATFORM_TENANT_VIEW",
+   "PLATFORM_TENANT_MANAGE",
+   "PLATFORM_TENANT_TERMINATE",
+   "PLATFORM_PLAN_MANAGE",
+   "PLATFORM_CELL_VIEW",
+   "PLATFORM_CELL_MANAGE",
+   "PLATFORM_BILLING_VIEW",
+   "PLATFORM_AI_MANAGE",
+   "PLATFORM_BILLING_MANAGE",
+   "PLATFORM_RELEASE_VIEW",
+   "PLATFORM_RELEASE_MANAGE",
+   "PLATFORM_RELEASE_PROMOTE",
+   "PLATFORM_MIGRATION_VIEW",
+   "PLATFORM_MIGRATION_APPLY",
+   "PLATFORM_TENANT_ACCESS",
+   "TENANT_CONFIGURE",
+   "TENANT_VIEW",
+   "TENANT_PUBLISH",
+   "SCOPE_VIEW",
+   "SCOPE_MANAGE",
+   "REGION_CONFIGURE",
+   "WORKSTATION_CONFIGURE",
+   "PRODUCT_VIEW",
+   "PRODUCT_CONFIGURE",
+   "PRODUCT_APPROVE",
+   "PRODUCT_PUBLISH",
+   "PRICE_VIEW",
+   "PRICE_CONFIGURE",
+   "EVENT_CONFIGURE",
+   "PERFORMANCE_CONFIGURE",
+   "CAPACITY_CONFIGURE",
+   "ORDER_VIEW",
+   "ORDER_VIEW_OTHER",
+   "ORDER_CREATE",
+   "ORDER_MODIFY",
+   "ORDER_DISCOUNT",
+   "ORDER_CANCEL",
+   "ORDER_VOID",
+   "ORDER_REFUND",
+   "ORDER_REFUND_APPROVE",
+   "ORDER_REFUND_BULK",
+   "ORDER_EXCHANGE",
+   "ORDER_RESCHEDULE",
+   "ORDER_REPRINT",
+   "PRICE_OVERRIDE",
+   "DISCOUNT_APPLY",
+   "CREDIT_MANAGE",
+   "CREDIT_OVERRIDE",
+   "WALLET_VIEW",
+   "WALLET_OPERATE",
+   "WALLET_CONFIGURE",
+   "PAYMENT_VIEW",
+   "PAYMENT_CONFIGURE",
+   "PAYMENT_PROVIDER_MANAGE",
+   "PAYMENT_DISPUTE",
+   "SHIFT_OPEN",
+   "SHIFT_CLOSE",
+   "SHIFT_SUSPEND",
+   "SHIFT_CLOSE_OTHER",
+   "SHIFT_APPROVE_OPEN",
+   "SHIFT_APPROVE_CLOSE",
+   "SHIFT_REOPEN",
+   "CASH_LIFT",
+   "CASH_ADD",
+   "CASH_NO_SALE",
+   "DEPOSIT_BOX_MODIFY_OWN",
+   "DEPOSIT_BOX_MODIFY_OTHER",
+   "OVERSHORT_ACCEPT",
+   "ACCESS_VALIDATE",
+   "ACCESS_OVERRIDE",
+   "ACCESS_POINT_CONFIGURE",
+   "TURNSTILE_MODE_SET",
+   "TICKET_LOOKUP",
+   "ACCREDITATION_VIEW",
+   "ACCREDITATION_APPLY",
+   "ACCREDITATION_APPROVE",
+   "ACCREDITATION_ISSUE",
+   "ACCREDITATION_MANAGE",
+   "ACCREDITATION_CONFIGURE",
+   "REPORT_VIEW_OWN",
+   "REPORT_VIEW_WORKSTATION",
+   "REPORT_VIEW_VENUE",
+   "REPORT_VIEW_REGION",
+   "REPORT_VIEW_TENANT",
+   "REPORT_EXPORT",
+   "REPORT_EXPORT_PII",
+   "REPORT_MANAGE",
+   "REPORT_SCHEDULE",
+   "LEDGER_VIEW",
+   "LEDGER_POST",
+   "LEDGER_APPROVE",
+   "TAX_CONFIGURE",
+   "ACCOUNT_CONFIGURE",
+   "SETTLEMENT_VIEW",
+   "SETTLEMENT_RECONCILE",
+   "GUEST_VIEW",
+   "GUEST_VIEW_PII",
+   "GUEST_MANAGE",
+   "VENUE_MAP_VIEW",
+   "VENUE_MAP_MANAGE",
+   "VENUE_MAP_PUBLISH",
+   "RESOURCE_VIEW",
+   "RESOURCE_BOOK",
+   "RESOURCE_MANAGE",
+   "RESOURCE_CONFIGURE",
+   "RENTAL_VIEW",
+   "RENTAL_BOOK",
+   "RENTAL_OPERATE",
+   "RENTAL_MANAGE",
+   "RENTAL_CONFIGURE",
+   "RENTAL_PRICE",
+   "RENTAL_APPROVE",
+   "RENTAL_OVERRIDE",
+   "DEVELOPER_VIEW",
+   "DEVELOPER_MANAGE",
+   "DEVELOPER_ADMIN",
+   "LOYALTY_ACCRUE",
+   "LOYALTY_REDEEM",
+   "LOYALTY_ADJUST",
+   "MARKETING_VIEW",
+   "MARKETING_MANAGE",
+   "MARKETING_SEND",
+   "CASE_VIEW",
+   "CASE_MANAGE",
+   "ASSET_LIBRARY_VIEW",
+   "ASSET_LIBRARY_MANAGE",
+   "ASSET_LIBRARY_APPROVE",
+   "ASSET_LIBRARY_SHARE",
+   "QUEUE_VIEW",
+   "QUEUE_MANAGE",
+   "QUEUE_REDEEM",
+   "QUEUE_OVERRIDE",
+   "TRANSPORT_VIEW",
+   "TRANSPORT_MANAGE",
+   "TRANSPORT_PRICE",
+   "ASSET_VIEW",
+   "ASSET_MANAGE",
+   "WORK_ORDER_VIEW",
+   "WORK_ORDER_MANAGE",
+   "WORK_ORDER_VERIFY",
+   "INSPECTION_VIEW",
+   "INSPECTION_SUBMIT",
+   "INSPECTION_MANAGE",
+   "INCIDENT_REPORT",
+   "INCIDENT_VIEW",
+   "INCIDENT_MANAGE",
+   "KIOSK_ATTEND",
+   "DEVICE_VIEW",
+   "DEVICE_CONFIGURE",
+   "DEVICE_MANAGE",
+   "APPROVAL_ACT",
+   "APPROVAL_DELEGATE",
+   "AI_USE",
+   "AI_CONFIGURE",
+   "AI_APPROVE",
+   "AI_AUDIT_VIEW",
+   "RISK_REVIEW",
+   "RISK_INVESTIGATE",
+   "AUDIT_VIEW",
+   "APPROVAL_VIEW",
+   "APPROVAL_REQUEST",
+   "APPROVAL_DECIDE",
+   "APPROVAL_CONFIGURE",
+   "MAINTENANCE_EXECUTE",
+   "MAINTENANCE_APPROVE",
+   "WORKFORCE_VIEW",
+   "WORKFORCE_MANAGE",
+   "ATTENDANCE_RECORD",
+   "ANNOUNCEMENT_PUBLISH",
+   "ANNOUNCEMENT_EMERGENCY",
+   "PARTNER_VIEW",
+   "PARTNER_MANAGE",
+   "PARKING_CONFIGURE",
+   "PAYMENT_VOID",
+   "PROCUREMENT_VIEW",
+   "PROCUREMENT_REQUEST",
+   "PROCUREMENT_MANAGE",
+   "PROCUREMENT_RECEIVE"
+  ]
+ },
+ "Placement": {
+  "x-ticvai-persistence": "none — embedded in region_settings",
+  "type": "object",
+  "description": "Read-only here. Set by the Control Plane at provisioning.\nEvery region is its own logical cell. Placement determines the infrastructure backing it, which is how cost is controlled without varying the split rule: `shared` puts several regions' databases on one cluster; `dedicated` and `isolated` give a region its own. Regions in different countries MUST have placements in their respective jurisdictions.\n",
+  "readOnly": true,
+  "required": [
+   "mode"
+  ],
+  "properties": {
+   "mode": {
+    "type": "string",
+    "enum": [
+     "shared",
+     "dedicated",
+     "isolated",
+     "clientHosted"
+    ]
+   },
+   "cellName": {
+    "type": "string"
+   },
+   "cloudRegion": {
+    "type": "string"
+   }
+  }
+ },
+ "PlatformStaffGrant": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.platform_staff_grant",
+  "description": "**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n",
+  "required": [
+   "id",
+   "operatorPrincipalId",
+   "permissions",
+   "reason",
+   "openedAt",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The platform operator, from the Control Plane token. Set by the server."
+   },
+   "operatorDisplayName": {
+    "type": "string",
+    "readOnly": true
+   },
+   "permissions": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/Permission"
+    }
+   },
+   "reason": {
+    "type": "string"
+   },
+   "ticketRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The tenant root. **Operations write it at `tenant` scope**; the server sets it."
+   }
+  }
+ },
+ "RegionSettings": {
+  "x-ticvai-persistence": "platform.region_settings",
+  "type": "object",
+  "required": [
+   "countryCode",
+   "currencyCode",
+   "currencyScale",
+   "timeZone",
+   "fiscalYearStartMonth"
+  ],
+  "properties": {
+   "countryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "description": "ISO 3166-1 alpha-2. Determines the jurisdiction, and therefore the cell."
+   },
+   "currencyCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "description": "Decimal places for this region's currency. Varies by currency — some use 2, some use 3. Money columns are numeric(18,4) and carry the scale explicitly, because a fixed 2-place type silently truncates 3-place currencies.\n"
+   },
+   "timeZone": {
+    "type": "string",
+    "description": "IANA zone, e.g. `Asia/Dubai`."
+   },
+   "dateFormat": {
+    "type": "string",
+    "default": "dd/MM/yyyy"
+   },
+   "numberFormat": {
+    "type": "string",
+    "default": "#,##0.00"
+   },
+   "fiscalYearStartMonth": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 12,
+    "description": "Varies by country."
+   },
+   "allowedAiResidencies": {
+    "type": "array",
+    "description": "**The region's compliance gate on AI providers** (decided 28 September, audit R203; ADR-0009). The `AiProvider.residency` values a tenant in this region may use; empty means no restriction. `ai.setAiProvider` refuses any other residency with `409 residency-refused`. A prompt carrying guest data that reaches a provider hosted elsewhere is a cross-border transfer, and this is where a region says which it allows.\n",
+    "default": [],
+    "items": {
+     "type": "string"
+    }
+   },
+   "placement": {
+    "$ref": "#/components/schemas/Placement"
+   },
+   "cellName": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The cell serving this region. One cell per tenant per region (ADR-0014).\n"
+   }
+  }
+ },
+ "SuspensionMode": {
+  "type": "string",
+  "description": "Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n",
+  "enum": [
+   "readOnly",
+   "noNewSales",
+   "fullLockout"
+  ]
+ },
+ "Tenant": {
+  "x-ticvai-persistence": "control.tenant",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/TenantStatus"
+   },
+   "suspensionMode": {
+    "$ref": "#/components/schemas/SuspensionMode"
+   },
+   "suspensionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "suspensionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
+   },
+   "suspensionNoticeMessage": {
+    "$ref": "#/components/schemas/LocalisedText",
+    "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
+   },
+   "terminationScheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When `terminateTenant` started the retention window. Null when no termination is under way."
+   },
+   "terminationRetentionUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."
+   },
+   "terminationReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "terminationRequestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planName": {
+    "type": "string",
+    "nullable": true
+   },
+   "cellCount": {
+    "type": "integer"
+   },
+   "venueCount": {
+    "type": "integer"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"
+   },
+   "billingEmail": {
+    "type": "string"
+   },
+   "billingAddress": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
+   },
+   "accountManagerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "TenantStatus": {
+  "type": "string",
+  "enum": [
+   "onboarding",
+   "active",
+   "suspended",
+   "terminating",
+   "terminated"
   ]
  }
 }

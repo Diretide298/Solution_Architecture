@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-218 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-219",
@@ -215,7 +212,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-218"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-218",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-218"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 125. 12 of 12 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -285,7 +283,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Total campaign budget. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Total campaign budget, Venue budget. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Support"
    }
   ],
@@ -345,6 +343,53 @@
        "kind": "selectField",
        "label": "Funding source",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "textField",
+       "label": "Owner principal id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?q=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every commercial campaign",
+       "bindsTo": "CommercialCampaign",
+       "columns": [
+        "CommercialCampaign.id",
+        "CommercialCampaign.venueId",
+        "CommercialCampaign.code",
+        "CommercialCampaign.name",
+        "CommercialCampaign.description",
+        "CommercialCampaign.ownerPrincipalId",
+        "CommercialCampaign.legalEntityId",
+        "CommercialCampaign.validFrom",
+        "CommercialCampaign.validTo",
+        "CommercialCampaign.budgets"
+       ],
+       "operation": "listCommercialCampaigns",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
       }
      ]
     },
@@ -356,6 +401,27 @@
        "kind": "primaryButton",
        "label": "Total campaign budget",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue budget",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create commercial campaign",
+       "operation": "createCommercialCampaign",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "Creates the campaign header (`promotions.campaign`) without budget lines, so a promotion, coupon campaign or bundle can name it by `campaignId` before its budget is set.",
+       "provenance": "contract promotions.yaml POST /commercial-campaigns"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save commercial campaign",
+       "operation": "updateCommercialCampaign",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "Amends the campaign header (`promotions.campaign`): name, code, description, owner, business entity and dates.",
+       "provenance": "contract promotions.yaml PATCH /commercial-campaigns/{campaignId}"
       }
      ]
     }
@@ -372,18 +438,98 @@
     "operationId": "setCampaignBudgetFinancial",
     "contract": "promotions",
     "purpose": "Campaign Budget & Financial Limit Setup",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listCommercialCampaigns",
+    "contract": "promotions",
+    "purpose": "List commercial campaigns",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCommercialCampaign",
+    "contract": "promotions",
+    "purpose": "Create a commercial campaign",
     "trigger": "onAction",
     "invalidates": [
-     "setCampaignBudgetFinancial"
+     "listCommercialCampaigns"
+    ]
+   },
+   {
+    "operationId": "updateCommercialCampaign",
+    "contract": "promotions",
+    "purpose": "Amend a commercial campaign",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCommercialCampaigns"
     ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-219"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-219",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-219"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 126. 0 of 0 labels bound to a contract property; 11 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 126. 0 of 0 labels bound to a contract property; 12 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateCommercialCampaign",
+    "component": "modal",
+    "trigger": "Create commercial campaign",
+    "body": "**Collects what `createCommercialCampaign` sends before it is called.** Required: `venueId`, `name`. Optional: `code`, `description`, `ownerPrincipalId`, `legalEntityId`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCommercialCampaignRequest",
+    "confirm": {
+     "label": "Create commercial campaign",
+     "operation": "createCommercialCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "name",
+      "code",
+      "description",
+      "ownerPrincipalId",
+      "legalEntityId",
+      "validFrom",
+      "validTo"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /commercial-campaigns"
+   },
+   {
+    "id": "formUpdateCommercialCampaign",
+    "component": "modal",
+    "trigger": "Save commercial campaign",
+    "body": "**Collects what `updateCommercialCampaign` sends before it is called.** Nothing in the body is required. Optional: `code`, `name`, `description`, `ownerPrincipalId`, `legalEntityId`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save commercial campaign",
+     "operation": "updateCommercialCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "description",
+      "ownerPrincipalId",
+      "legalEntityId",
+      "validFrom",
+      "validTo"
+     ]
+    },
+    "provenance": "contract promotions.yaml PATCH /commercial-campaigns/{campaignId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "campaignId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -508,7 +654,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-220"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-220",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-220"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 128. 0 of 0 labels bound to a contract property; 5 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -652,7 +799,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-221"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-221",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-221"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 129. 7 of 7 labels bound to a contract property; 7 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -838,17 +986,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "ThresholdActionsAutomaticSuspensionView.warn",
-    "ThresholdActionsAutomaticSuspensionView.requireApproval",
-    "ThresholdActionsAutomaticSuspensionView.reduceAllocation",
-    "ThresholdActionsAutomaticSuspensionView.stopSpecificChannel",
-    "ThresholdActionsAutomaticSuspensionView.stopPartner"
+    "ThresholdActionsAutomaticSuspensionView.action"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-222"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-222",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-222"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 130. 0 of 0 labels bound to a contract property; 10 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -984,16 +1129,14 @@
     "operationId": "approveCampaignWorkflow",
     "contract": "promotions",
     "purpose": "Campaign Approval Workflow Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveCampaignWorkflow"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-223"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-223",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-223"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 131. 0 of 0 labels bound to a contract property; 5 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1144,10 +1287,7 @@
     "operationId": "approveDecision",
     "contract": "promotions",
     "purpose": "Approval Inbox & Decision Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveDecision"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1163,7 +1303,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-224"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-224",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-224"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 132. 13 of 13 labels bound to a contract property; 13 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1317,7 +1458,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-225"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-225",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-225"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 133. 12 of 12 labels bound to a contract property; 12 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1439,6 +1581,17 @@
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 134 §Measure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "AI recommendation",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 134 §Support"
+      }
+     ]
     }
    ]
   },
@@ -1470,9 +1623,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-226"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-226",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-226"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 134. 8 of 8 labels bound to a contract property; 8 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 134. 8 of 8 labels bound to a contract property; 9 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1567,7 +1721,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-227"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-227",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-227"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 136. 0 of 0 labels bound to a contract property; 2 of 102 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

@@ -37,6 +37,25 @@
   "requestBody": "CreateSegmentRequest",
   "responds": "Segment"
  },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
  "getAudienceOverlap": {
   "method": "GET",
   "path": "/audience-overlap",
@@ -194,5 +213,24 @@
   ],
   "requestBody": null,
   "responds": "SegmentPreview"
+ },
+ "proposeLookalikeSegment": {
+  "method": "POST",
+  "path": "/ai/segment-suggestions",
+  "contract": "ai",
+  "summary": "Propose a lookalike segment from a seed, for a person to save",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiLookalikeSegmentProposal"
  }
 }

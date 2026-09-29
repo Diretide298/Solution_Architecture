@@ -20,7 +20,6 @@
    "exitTo": [
     "PTR-001",
     "PTR-003",
-    "PTR-004",
     "PTR-007"
    ],
    "flowDerived": true,
@@ -35,26 +34,14 @@
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
      "carries": [
-      "accountId",
-      "sessionId"
+      "accountId"
      ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-002 holds accountId, so an edge into it carries them"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-004",
-     "trigger": "Notifications",
-     "carries": [
-      "messageId"
-     ],
-     "provenance": "derived — PTR-004 declares entryState.params messageId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-002 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -66,13 +53,6 @@
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getB2bCredit` reads one of them — list, select, act",
   "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
-  "gaps": [
-   {
-    "operation": "getOrder",
-    "why": "**3 declared operations reach no component on this screen**: getOrder, getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -81,8 +61,50 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every partner",
+       "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -95,6 +117,27 @@
        ],
        "operation": "listOrders",
        "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every refund",
+       "bindsTo": "Refund",
+       "columns": [
+        "Refund.id",
+        "Refund.orderId",
+        "Refund.batchId",
+        "Refund.fxRate",
+        "Refund.taxReversalEntryId",
+        "Refund.settleTo",
+        "Refund.fxVariance",
+        "Refund.amount",
+        "Refund.appliedPercentage",
+        "Refund.status",
+        "Refund.reason",
+        "Refund.requestedByPrincipalId"
+       ],
+       "operation": "listOrderRefunds",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
       }
      ]
     },
@@ -104,7 +147,68 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected partner",
+       "label": "The selected order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order statement",
+       "bindsTo": "OrderStatement",
+       "columns": [
+        "OrderStatement.orderId",
+        "OrderStatement.orderNumber",
+        "OrderStatement.currency",
+        "OrderStatement.currencyScale",
+        "OrderStatement.entries",
+        "OrderStatement.totalPaid",
+        "OrderStatement.totalRefunded",
+        "OrderStatement.currentBalance"
+       ],
+       "operation": "getOrderStatement",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/statement"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The credit position",
        "bindsTo": "CreditPosition",
        "columns": [
         "CreditPosition.id",
@@ -132,67 +236,67 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Apply",
+       "label": "Apply manual discount",
        "operation": "applyManualDiscount",
        "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Exchange",
+       "label": "Exchange order lines",
        "operation": "exchangeOrderLines",
        "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
       },
       {
        "kind": "secondaryButton",
-       "label": "Hold",
+       "label": "Hold order",
        "operation": "holdOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
       },
       {
        "kind": "secondaryButton",
-       "label": "Modify",
+       "label": "Modify order",
        "operation": "modifyOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
       },
       {
        "kind": "destructiveButton",
-       "label": "Override",
+       "label": "Override credit limit",
        "operation": "overrideCreditLimit",
        "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reprint",
+       "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reschedule",
+       "label": "Reschedule order",
        "operation": "rescheduleOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
+       "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save b2b credit limit",
        "operation": "setB2bCreditLimit",
        "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
       },
       {
        "kind": "destructiveButton",
-       "label": "Void",
+       "label": "Void order",
        "operation": "voidOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
       }
@@ -204,24 +308,201 @@
    {
     "id": "confirmOverrideCreditLimit",
     "component": "confirmDialog",
-    "trigger": "Override",
-    "body": "**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather than the verb. A partner this affects should be identified in the dialog, not just counted.",
+    "trigger": "Override credit limit",
+    "body": "**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather than the verb. A partner this affects should be identified in the dialog, not just counted. **Collects what `overrideCreditLimit` sends before it is called.** Required: `orderId`, `amount`, `reason`. Optional: `expiresAt`.",
     "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
    },
    {
     "id": "confirmVoidOrder",
     "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A partner this affects should be identified in the dialog, not just counted.",
+    "trigger": "Void order",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A partner this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.",
     "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   },
+   {
+    "id": "formApplyManualDiscount",
+    "component": "modal",
+    "trigger": "Apply manual discount",
+    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ManualDiscountRequest",
+    "confirm": {
+     "label": "Apply manual discount",
+     "operation": "applyManualDiscount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "lineId",
+      "amount",
+      "percentage",
+      "reasonCode",
+      "approverPrincipalId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders"
+   },
+   {
+    "id": "formExchangeOrderLines",
+    "component": "modal",
+    "trigger": "Exchange order lines",
+    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ExchangeOrderRequest",
+    "confirm": {
+     "label": "Exchange order lines",
+     "operation": "exchangeOrderLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outgoingLineIds",
+      "incomingLines",
+      "recordedAt",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+   },
+   {
+    "id": "formHoldOrder",
+    "component": "modal",
+    "trigger": "Hold order",
+    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold order",
+     "operation": "holdOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "label",
+      "holdUntil"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+   },
+   {
+    "id": "formModifyOrder",
+    "component": "modal",
+    "trigger": "Modify order",
+    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ModifyOrderRequest",
+    "confirm": {
+     "label": "Modify order",
+     "operation": "modifyOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "recordedAt",
+      "addLines",
+      "removeLineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+   },
+   {
+    "id": "formReprintOrder",
+    "component": "modal",
+    "trigger": "Reprint order",
+    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reprint order",
+     "operation": "reprintOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "recordedAt",
+      "destination",
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+   },
+   {
+    "id": "formRescheduleOrder",
+    "component": "modal",
+    "trigger": "Reschedule order",
+    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reschedule order",
+     "operation": "rescheduleOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetPerformanceId",
+      "recordedAt",
+      "lineIds",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
+   },
+   {
+    "id": "formSetB2bCreditLimit",
+    "component": "modal",
+    "trigger": "Save b2b credit limit",
+    "body": "**Collects what `setB2bCreditLimit` sends before it is called.** Required: `creditLimit`, `reason`. Optional: `paymentTermsDays`, `isSuspended`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save b2b credit limit",
+     "operation": "setB2bCreditLimit"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "creditLimit",
+      "reason",
+      "paymentTermsDays",
+      "isSuspended"
+     ]
+    },
+    "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
    }
   ],
   "states": {
    "loading": "The partner list.",
    "error": "Could not load. Names which read failed and leaves the partner untouched.",
-   "emptyFirstRun": "No partner yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the partner are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No partner yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the partner are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -267,13 +548,13 @@
     "operationId": "getOrder",
     "contract": "orders",
     "purpose": "Read an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getOrderStatement",
     "contract": "orders",
     "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "holdOrder",
@@ -288,7 +569,7 @@
     "operationId": "listOrderRefunds",
     "contract": "orders",
     "purpose": "List refunds against an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "modifyOrder",
@@ -367,17 +648,18 @@
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "CreditPosition.id",
-    "CreditPosition.accountId",
-    "CreditPosition.accountName",
-    "CreditPosition.creditLimit",
-    "CreditPosition.used"
+    "OrderSummary.id",
+    "OrderSummary.orderNumber",
+    "OrderSummary.status",
+    "OrderSummary.grossAmount",
+    "OrderSummary.refundedAmount"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-002",
+   "derivedFrom": "wireframes/reference/Dashboards Board.dc.html",
    "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",

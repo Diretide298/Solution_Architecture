@@ -1,6 +1,6 @@
 # WS108 — ACCREDITATION board 1
 
-**10 screens · 7 operations · 6 schemas · 4 permissions**
+**10 screens · 12 operations · 6 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,15 +61,15 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-615` | Accreditation Command Center | listDetail | 2 | 0 | — |
-| `BO-616` | Accreditation Application Directory | listDetail | 1 | 0 | — |
-| `BO-617` | New Accreditation Application | listDetail | 1 | 0 | — |
-| `BO-618` | Accreditation Form Builder | configEditor | 1 | 0 | — |
+| `BO-616` | Accreditation Application Directory | listDetail | 2 | 0 | — |
+| `BO-617` | New Accreditation Application | listDetail | 3 | 0 | — |
+| `BO-618` | Accreditation Form Builder | configEditor | 2 | 0 | — |
 | `BO-619` | Accreditation Category Management | listDetail | 1 | 0 | — |
-| `BO-620` | Accreditation Program Setup | listDetail | 1 | 0 | — |
+| `BO-620` | Accreditation Program Setup | listDetail | 4 | 0 | — |
 | `BO-621` | Applicant Type Configuration | listDetail | 1 | 0 | — |
 | `BO-622` | Application Requirements Matrix | listDetail | 1 | 0 | — |
 | `BO-623` | Accreditation Intake Monitor | listDetail | 1 | 0 | — |
-| `BO-624` | Registration Rules & Publication | listDetail | 1 | 0 | — |
+| `BO-624` | Registration Rules & Publication | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -137,7 +137,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-618",
      "trigger": "Accreditation Form Builder",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "programmeId"
+     ]
     },
     {
      "to": "BO-619",
@@ -147,7 +150,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-620",
      "trigger": "Accreditation Program Setup",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "programmeId"
+     ]
     },
     {
      "to": "BO-621",
@@ -167,7 +173,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-624",
      "trigger": "Registration Rules & Publication",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "programmeId"
+     ]
     }
    ]
   },
@@ -373,6 +382,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "The directory",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "withdrawAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Withdraw an application on the applicant's behalf",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -383,6 +399,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "Accreditation category",
     "Organization/company",
     "Event"
+   ],
+   "params": [
+    {
+     "name": "applicationId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -505,6 +527,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listAccreditationApplications"
     ]
+   },
+   {
+    "operationId": "updateAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Save a draft application",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "submitAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Submit the draft",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -513,6 +549,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS01 ACCREDITATION Board 1.dc.html#bo-617"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "applicationId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -616,6 +660,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Build the application form",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updateAccreditationProgramme",
+    "contract": "accreditation",
+    "purpose": "Link the built form to the programme (formId)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -624,6 +675,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS01 ACCREDITATION Board 1.dc.html#bo-618"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 5. 0 of 0 labels bound to a contract property; 2 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "programmeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -854,6 +913,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listAccreditationProgrammes"
     ]
+   },
+   {
+    "operationId": "listAccreditationProgrammes",
+    "contract": "accreditation",
+    "purpose": "Templates to start from (isTemplate=true)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "cloneAccreditationProgramme",
+    "contract": "accreditation",
+    "purpose": "Create from template or from last season",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "updateAccreditationProgramme",
+    "contract": "accreditation",
+    "purpose": "Amend a programme, or save it as a template",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -862,6 +942,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS01 ACCREDITATION Board 1.dc.html#bo-620"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "programmeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1373,6 +1461,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listAccreditationProgrammes"
     ]
+   },
+   {
+    "operationId": "updateAccreditationProgramme",
+    "contract": "accreditation",
+    "purpose": "Set the application window and open or close the programme",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1381,6 +1476,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS01 ACCREDITATION Board 1.dc.html#bo-624"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "programmeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1413,6 +1516,25 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "cloneAccreditationProgramme": {
+  "method": "POST",
+  "path": "/accreditation-programmes/{programmeId}/clone",
+  "contract": "accreditation",
+  "summary": "Start a programme from a template or last season's programme",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationProgramme"
+ },
  "createAccreditationApplication": {
   "method": "POST",
   "path": "/accreditation-applications",
@@ -1420,7 +1542,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Apply, or apply on behalf of somebody",
   "permission": "ACCREDITATION_APPLY",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1439,7 +1561,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Define a programme, its categories and its window",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1542,7 +1664,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": null,
   "conflictPolicy": null,
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "isTemplate",
+    "in": "query",
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AccreditationProgramme"
  },
@@ -1553,7 +1681,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "What each applicant type must supply and pass",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1564,6 +1692,82 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "AccreditationRequirements",
   "responds": "AccreditationRequirements"
+ },
+ "submitAccreditationApplication": {
+  "method": "POST",
+  "path": "/accreditation-applications/{applicationId}/submit",
+  "contract": "accreditation",
+  "summary": "Send a draft for review",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
+ "updateAccreditationApplication": {
+  "method": "PUT",
+  "path": "/accreditation-applications/{applicationId}",
+  "contract": "accreditation",
+  "summary": "Save a draft, or amend an application returned for information",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationApplication",
+  "responds": "AccreditationApplication"
+ },
+ "updateAccreditationProgramme": {
+  "method": "PUT",
+  "path": "/accreditation-programmes/{programmeId}",
+  "contract": "accreditation",
+  "summary": "Amend a programme, link its registration form, or mark it a template",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationProgramme",
+  "responds": "AccreditationProgramme"
+ },
+ "withdrawAccreditationApplication": {
+  "method": "POST",
+  "path": "/accreditation-applications/{applicationId}/withdraw",
+  "contract": "accreditation",
+  "summary": "Withdraw an application before it is decided",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
  }
 }
 ```
@@ -1652,6 +1856,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "nullable": true
    },
+   "missingRequirements": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting",
+    "items": {
+     "type": "string"
+    }
+   },
+   "decisionDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a decision is due — the approvals request's SLA. **A date, not a queue position**"
+   },
    "approvalRequestId": {
     "type": "string",
     "format": "uuid",
@@ -1661,6 +1880,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "renewsHolderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"
+   },
+   "resubmissionOfApplicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.33. The rejected application this one resubmits, so the rejection stays in the record"
+   },
+   "resubmissionNote": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "What the applicant changed, from `resubmitAccreditationApplication`"
    },
    "submittedAt": {
     "type": "string",
@@ -1714,6 +1954,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "nationality": {
     "type": "string",
     "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "12.1.16. The holder's own address — where a mobile credential and renewal notices go"
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.16. E.164"
    },
    "identityDocumentVerified": {
     "type": "boolean",
@@ -1818,6 +2069,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "integer",
        "nullable": true,
        "description": "**A cap on how many may be accredited in this category.** Without one, a category is a promise nobody counted.\n"
+      },
+      "badgeTemplateId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "The badge printed for this category; travels with the category when a programme is cloned"
       }
      }
     }
@@ -1842,6 +2099,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "formId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "12.1.2. The `marketing-crm` form definition (`createForm`, BO-618) the applicant fills in. The requirements matrix's `field` rows name the form fields they check, so the form is configured without software development and what blocks approval stays in one place.\n"
+   },
+   "isTemplate": {
+    "type": "boolean",
+    "default": false,
+    "description": "12.1.56. **A reusable programme template**: never opened for applications, and what `cloneAccreditationProgramme` copies its categories, requirements, validity, notification rules and form link from.\n"
+   },
+   "templateProgrammeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The programme or template this one was cloned from"
    },
    "status": {
     "type": "string",
@@ -1907,6 +2182,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "expiryMonths": {
        "type": "integer",
        "nullable": true
+      },
+      "formFieldKey": {
+       "type": "string",
+       "nullable": true,
+       "description": "For a `field` row, the key of the field on the programme's form that it checks"
+      },
+      "fieldType": {
+       "type": "string",
+       "nullable": true,
+       "description": "12.1.2. For a `field` row, what kind of answer it takes",
+       "enum": [
+        "text",
+        "email",
+        "phone",
+        "date",
+        "country",
+        "number",
+        "boolean",
+        "singleChoice",
+        "multipleChoice"
+       ]
+      },
+      "visibility": {
+       "type": "string",
+       "default": "mandatory",
+       "description": "Pack page 5 (BO-618) — mandatory, optional, conditional on another answer, or hidden",
+       "enum": [
+        "mandatory",
+        "optional",
+        "conditional",
+        "hidden"
+       ]
+      },
+      "condition": {
+       "type": "object",
+       "nullable": true,
+       "description": "For `conditional`, the answer that makes this row apply",
+       "properties": {
+        "requirementCode": {
+         "type": "string"
+        },
+        "equals": {
+         "type": "string"
+        }
+       }
+      },
+      "validation": {
+       "type": "object",
+       "nullable": true,
+       "description": "Checked on save and on submit; a failing answer is refused with the row's label",
+       "properties": {
+        "pattern": {
+         "type": "string",
+         "nullable": true
+        },
+        "minLength": {
+         "type": "integer",
+         "nullable": true
+        },
+        "maxLength": {
+         "type": "integer",
+         "nullable": true
+        },
+        "minValue": {
+         "type": "number",
+         "nullable": true
+        },
+        "maxValue": {
+         "type": "number",
+         "nullable": true
+        },
+        "allowedValues": {
+         "type": "array",
+         "items": {
+          "type": "string"
+         }
+        }
+       }
       }
      }
     }

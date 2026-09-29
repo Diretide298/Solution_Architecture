@@ -18,44 +18,6 @@
   "requestBody": "ManualDiscountRequest",
   "responds": "Order"
  },
- "copyPriceList": {
-  "method": "POST",
-  "path": "/price-lists/{priceListId}/copy",
-  "contract": "catalogue",
-  "summary": "Copy a price list, optionally with an adjustment",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "createChannelCapacity": {
-  "method": "POST",
-  "path": "/channel-capacities",
-  "contract": "catalogue",
-  "summary": "Create a capacity envelope",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateEnvelopeRequest",
-  "responds": "ChannelCapacity"
- },
  "createOrder": {
   "method": "POST",
   "path": "/orders",
@@ -74,44 +36,6 @@
   ],
   "requestBody": "CreateOrderRequest",
   "responds": "Order"
- },
- "createPriceList": {
-  "method": "POST",
-  "path": "/price-lists",
-  "contract": "catalogue",
-  "summary": "Create a price list",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreatePriceListRequest",
-  "responds": "PriceList"
- },
- "createProduct": {
-  "method": "POST",
-  "path": "/products",
-  "contract": "catalogue",
-  "summary": "Create a product",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateProductRequest",
-  "responds": "Product"
  },
  "exchangeOrderLines": {
   "method": "POST",
@@ -151,10 +75,35 @@
     "name": "channelCapacityId",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PerformanceAvailabilityPage"
  },
  "getChannelAllocations": {
   "method": "GET",
@@ -178,7 +127,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
  },
@@ -257,7 +212,7 @@
   "method": "GET",
   "path": "/channel-capacities",
   "contract": "catalogue",
-  "summary": "List capacity envelopes",
+  "summary": "List channel capacities",
   "permission": "PRODUCT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -304,7 +259,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Refund"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -463,6 +418,21 @@
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -594,158 +564,6 @@
   ],
   "requestBody": null,
   "responds": "OrderResumeResult"
- },
- "setAlternativeCodes": {
-  "method": "PUT",
-  "path": "/products/{productId}/alternative-codes",
-  "contract": "catalogue",
-  "summary": "Set external identifiers",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AlternativeCode"
- },
- "setChannelAllocations": {
-  "method": "PUT",
-  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
-  "contract": "catalogue",
-  "summary": "Allocate envelope capacity across channels",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ChannelAllocationSet"
- },
- "setPrices": {
-  "method": "PUT",
-  "path": "/price-lists/{priceListId}/prices",
-  "contract": "catalogue",
-  "summary": "Set prices in bulk",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "setProductAttributes": {
-  "method": "PUT",
-  "path": "/products/{productId}/attributes",
-  "contract": "catalogue",
-  "summary": "Set the attribute axes for a product",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "transitionProductLifecycle": {
-  "method": "POST",
-  "path": "/products/{productId}/lifecycle",
-  "contract": "catalogue",
-  "summary": "Move a product through its lifecycle",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Product"
- },
- "updateChannelCapacity": {
-  "method": "PATCH",
-  "path": "/channel-capacities/{channelCapacityId}",
-  "contract": "catalogue",
-  "summary": "Amend an envelope",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ChannelCapacity"
- },
- "updatePriceList": {
-  "method": "PATCH",
-  "path": "/price-lists/{priceListId}",
-  "contract": "catalogue",
-  "summary": "Amend a price list",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PriceList"
- },
- "updateProduct": {
-  "method": "PATCH",
-  "path": "/products/{productId}",
-  "contract": "catalogue",
-  "summary": "Update a product",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "UpdateProductRequest",
-  "responds": "Product"
  },
  "voidOrder": {
   "method": "POST",

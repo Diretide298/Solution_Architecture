@@ -1,6 +1,6 @@
 # P09-branding-localisation-01 — P09 · Branding & Localisation
 
-**4 screens · 24 operations · 29 schemas · 4 permissions**
+**4 screens · 28 operations · 41 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: listFaqs
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-016` | White-Label Branding Management | listDetail | 11 | 0 | — |
-| `ADM-017` | Domain & Certificate Management | listDetail | 4 | 0 | — |
-| `ADM-018` | Localisation & Language Pack | listDetail | 5 | 0 | — |
-| `ADM-019` | Global Configuration & Defaults | listDetail | 4 | 0 | — |
+| `ADM-016` | White-Label Branding Management | listDetail | 13 | 6 | — |
+| `ADM-017` | Domain & Certificate Management | listDetail | 6 | 2 | — |
+| `ADM-018` | Localisation & Language Pack | listDetail | 7 | 4 | — |
+| `ADM-019` | Global Configuration & Defaults | listDetail | 8 | 4 | — |

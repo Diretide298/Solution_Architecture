@@ -1,0 +1,184 @@
+{
+ "createRecommendationStrategy": {
+  "method": "POST",
+  "path": "/recommendation-strategies",
+  "contract": "promotions",
+  "summary": "Define objective, placements, ranking and guardrails",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecommendationStrategy",
+  "responds": "RecommendationStrategy"
+ },
+ "getRecommendationPerformance": {
+  "method": "GET",
+  "path": "/recommendation-performance",
+  "contract": "promotions",
+  "summary": "Impressions, acceptance, revenue and incremental lift",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationPerformance"
+ },
+ "listProductRelationships": {
+  "method": "GET",
+  "path": "/product-relationships",
+  "contract": "promotions",
+  "summary": "Upgrade ladders, cross-sells, affinities and substitutes",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductRelationship"
+ },
+ "listRecommendationStrategies": {
+  "method": "GET",
+  "path": "/recommendation-strategies",
+  "contract": "promotions",
+  "summary": "The strategies deciding what gets offered where",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "placement",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationStrategy"
+ },
+ "setProductRelationships": {
+  "method": "PUT",
+  "path": "/product-relationships",
+  "contract": "promotions",
+  "summary": "Declare what upgrades to, pairs with or replaces what",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductRelationship"
+ },
+ "setRecommendationSuppression": {
+  "method": "PUT",
+  "path": "/recommendation-suppressions",
+  "contract": "promotions",
+  "summary": "Fatigue limits, frequency caps and hard exclusions",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecommendationSuppression",
+  "responds": "RecommendationSuppression"
+ },
+ "simulateRecommendationStrategy": {
+  "method": "POST",
+  "path": "/recommendation-simulations",
+  "contract": "promotions",
+  "summary": "Replay a strategy against history before it goes live",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationPerformance"
+ },
+ "updateRecommendationStrategy": {
+  "method": "PUT",
+  "path": "/recommendation-strategies/{strategyId}",
+  "contract": "promotions",
+  "summary": "Change a strategy",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecommendationStrategy",
+  "responds": "RecommendationStrategy"
+ }
+}

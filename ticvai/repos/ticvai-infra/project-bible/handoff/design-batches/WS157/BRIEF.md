@@ -1,6 +1,6 @@
 # WS157 — Resource Management Configuration board 3
 
-**10 screens · 30 operations · 26 schemas · 6 permissions**
+**10 screens · 30 operations · 30 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

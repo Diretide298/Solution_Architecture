@@ -21,7 +21,7 @@
     "WEB-001"
    ]
   },
-  "notes": "Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's failure, not ours. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's failure, not ours. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Bound 28 September** — sold out and closed come from `getTenantAppStatus.availability` (`open`, `soldOut`, `closed`) and `availabilityMessage` (decided 28 September, audit R073 (f)). The forced upgrade (`minimumAppVersion`) is the app's alone, since a website is always the current version.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
@@ -35,7 +35,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected error sold out",
+       "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
        "columns": [
         "TenantAppStatus.isPublished",
@@ -49,9 +49,19 @@
         "TenantAppStatus.isInMaintenance",
         "TenantAppStatus.maintenanceMessage",
         "TenantAppStatus.expectedBackAt",
+        "TenantAppStatus.availability",
+        "TenantAppStatus.availabilityMessage",
         "TenantAppStatus.recentChanges"
        ],
        "operation": "getTenantAppStatus",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      },
+      {
+       "kind": "banner",
+       "label": "Sold out or closed today",
+       "bindsTo": "TenantAppStatus.availabilityMessage",
+       "operation": "getTenantAppStatus",
+       "notes": "**From `getTenantAppStatus.availability`** (`open`, `soldOut`, `closed`) and its `availabilityMessage`, set live from CMS-001 through `setMaintenanceMode` (decided 28 September, audit R073 (f)). `soldOut` and `closed` read differently: sold out means come another day, closed means the venue is not open. Nothing shows while it is `open`.",
        "provenance": "contract white-label.yaml GET /tenant-config/status"
       }
      ]
@@ -62,9 +72,10 @@
    "loading": "—",
    "error": "**This screen is the error state.** It distinguishes sold out, closed, and platform unavailable — three different things a guest must not confuse, because only one means come back later",
    "emptyFirstRun": "—",
-   "emptyNoResults": "The filter narrowed it and the error sold out are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down."
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down.",
+   "soldOut": "**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)).",
+   "closed": "**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f))."
   },
   "apis": [
    {
@@ -75,9 +86,17 @@
    }
   ],
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-029"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-029",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Footer 'Service status', or Discover → 'Service status'",
+    "differences": "Prototype has 'Maintenance' where YAML has 'closed'; sold-out offers 'Join the waitlist' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus only) cannot call."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {

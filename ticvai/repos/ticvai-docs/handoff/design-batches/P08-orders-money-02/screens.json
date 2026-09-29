@@ -3559,6 +3559,27 @@
     "contract": "tenancy",
     "purpose": "The venue's settings, with the tenant default each empty one inherits",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDeliveryLocationOutletMapping",
+    "contract": "fnb",
+    "purpose": "Assign serving outlets to delivery locations",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createDeliveryLocation",
+    "contract": "fnb",
+    "purpose": "Add a delivery location",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "updateDeliveryLocation",
+    "contract": "fnb",
+    "purpose": "Edit a delivery location",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -3566,6 +3587,10 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "locationId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",

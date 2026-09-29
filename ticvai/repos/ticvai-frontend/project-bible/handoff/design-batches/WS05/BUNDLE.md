@@ -1,6 +1,6 @@
 # WS05 — Access Control board 5
 
-**10 screens · 15 operations · 15 schemas · 4 permissions**
+**10 screens · 16 operations · 21 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, GUEST_MANAGE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, GUEST_MANAGE, SCOPE_VIEW, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -68,7 +68,7 @@ convincingly. It is never a caption.
 | `BO-189` | Face Matching & Verification Thresholds | configEditor | 2 | 0 | — |
 | `BO-190` | Face Change, Re-enrollment & Identity Protection | listDetail | 2 | 1 | — |
 | `BO-191` | Biometric Validation at Gate | listDetail | 2 | 0 | — |
-| `BO-192` | Biometric Lifecycle, Retention & Deletion | configEditor | 2 | 0 | — |
+| `BO-192` | Biometric Lifecycle, Retention & Deletion | configEditor | 3 | 0 | — |
 | `BO-193` | Biometric Simulation, Audit & Publication | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
@@ -1499,6 +1499,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Save retention rule",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listDataRetentionSettings",
+    "contract": "tenancy",
+    "purpose": "Tenant biometric retention and its legal limit",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1864,6 +1871,35 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "BiometricValidationAtGateView"
  },
+ "listDataRetentionSettings": {
+  "method": "GET",
+  "path": "/data-retention-settings",
+  "contract": "tenancy",
+  "summary": "How long the tenant keeps each class of data",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "dataClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listFaceChangeEnrollment": {
   "method": "GET",
   "path": "/face-change-enrollment",
@@ -2170,6 +2206,155 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "attemptedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "BiometricAccessCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Biometric Access Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "profileId": {
+    "type": "string"
+   },
+   "profileName": {
+    "type": "string",
+    "description": "e.g. Annual Pass Face"
+   },
+   "biometricType": {
+    "type": "string",
+    "enum": [
+     "facePass",
+     "faceTag"
+    ]
+   },
+   "credentialType": {
+    "type": "string",
+    "description": "e.g. Annual Pass, Membership, Day Ticket"
+   },
+   "venueScope": {
+    "type": "string",
+    "description": "Venue or 'all parks'"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ]
+   }
+  }
+ },
+ "BiometricAccessCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "activeFacePassProfiles": {
+    "type": "integer",
+    "description": "Active Face Pass Profiles"
+   },
+   "activeFaceTags": {
+    "type": "integer",
+    "description": "Active Face Tags"
+   },
+   "enrollmentsToday": {
+    "type": "integer",
+    "description": "Enrollments Today"
+   },
+   "successfulFaceVerifications": {
+    "type": "integer",
+    "description": "Successful Face Verifications"
+   },
+   "failedVerifications": {
+    "type": "integer",
+    "description": "Failed Verifications"
+   },
+   "manualReviews": {
+    "type": "integer",
+    "description": "Manual Reviews"
+   },
+   "reEnrollmentRequests": {
+    "type": "integer",
+    "description": "Re-enrollment Requests"
+   },
+   "blockedFaceChanges": {
+    "type": "integer",
+    "description": "Blocked Face Changes"
+   },
+   "profilesPendingDeletion": {
+    "type": "integer",
+    "description": "Profiles Pending Deletion"
+   },
+   "cameraReaderHealth": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "degraded",
+     "down"
+    ],
+    "description": "Camera/Reader Health"
+   },
+   "biometricSecurityAlerts": {
+    "type": "integer",
+    "description": "Biometric Security Alerts"
+   },
+   "ai": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI findings (abnormal failure rates, suspicious re-enrolments, camera quality). Read-only; AI does not decide access."
+   }
+  }
+ },
+ "BiometricConsentGuardianManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Biometric Consent & Guardian Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "consentRecordId": {
+    "type": "string",
+    "description": "Consent record ID"
+   },
+   "policyVersion": {
+    "type": "string",
+    "description": "Policy/version"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "guardianReference": {
+    "type": "string",
+    "description": "Guardian reference where applicable"
+   },
+   "operatorId": {
+    "type": "string",
+    "description": "Operator where applicable"
+   },
+   "withdrawalDeletionStatus": {
+    "type": "string",
+    "enum": [
+     "active",
+     "withdrawn",
+     "biometricDeleted"
+    ],
+    "description": "withdrawal/deletion status"
+   },
+   "guestId": {
+    "type": "string"
    }
   }
  },
@@ -2578,6 +2763,73 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "faceRequirement"
   ]
  },
+ "FaceChangeReEnrollmentIdentityProtectionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Face Change, Re-enrollment & Identity Protection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "existingProfileReference": {
+    "type": "string",
+    "description": "Existing profile reference"
+   },
+   "newCaptureReference": {
+    "type": "string",
+    "description": "New capture reference"
+   },
+   "matchResult": {
+    "type": "string",
+    "enum": [
+     "withinPolicy",
+     "significantDifference"
+    ],
+    "description": "match result"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "credential"
+   },
+   "guestId": {
+    "type": "string",
+    "description": "guest"
+   },
+   "reasonForReEnrollment": {
+    "type": "string",
+    "enum": [
+     "appearanceChange",
+     "poorOriginalCapture",
+     "technicalIssue",
+     "guestRequest",
+     "recovery",
+     "other"
+    ],
+    "description": "reason for re-enrollment"
+   },
+   "previousChanges": {
+    "type": "integer",
+    "description": "previous changes"
+   },
+   "operatorId": {
+    "type": "string",
+    "description": "operator"
+   },
+   "attemptId": {
+    "type": "string"
+   },
+   "attemptedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "updated",
+     "blocked",
+     "pendingReview"
+    ]
+   }
+  }
+ },
  "FaceMatchingVerificationThresholdsInput": {
   "type": "object",
   "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
@@ -2927,6 +3179,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "minimum": 1,
     "description": "Used only when deletionTrigger is operationalRetentionThreshold, and then required. **No default and no maximum here on purpose**: the longest lawful period is the client counsel's value (make-or-break (a), see the operation)"
    },
+   "consentCapture": {
+    "type": "string",
+    "enum": [
+     "onScreenAcknowledgement",
+     "signedForm"
+    ],
+    "default": "onScreenAcknowledgement",
+    "description": "How consent is taken when a Face Tag is captured (3.2.44; added 29 September, build pass). `onScreenAcknowledgement` is a tap on the counter or gate screen after the notice: explicit, recorded, and no form to sign, which is what the matrix asks. `signedForm` for a venue that wants one. A notice-only capture is not offered (make-or-break on `enrolFaceTag`, CF-35)."
+   },
    "status": {
     "type": "string",
     "enum": [
@@ -2987,6 +3248,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "retentionThresholdHours": {
     "type": "integer",
     "description": "Used when deletionTrigger is operationalRetentionThreshold. No default (make-or-break (a), see `setFaceTagTemporaryEnrollment`)"
+   },
+   "consentCapture": {
+    "type": "string",
+    "enum": [
+     "onScreenAcknowledgement",
+     "signedForm"
+    ],
+    "description": "How consent is taken at capture; onScreenAcknowledgement (no form to sign) unless set"
    }
   }
  },
@@ -3006,6 +3275,182 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "TenantDataRetentionClass": {
+  "type": "string",
+  "description": "**The data classes a tenant sets a retention period for** (decided 29 September, Chinmay: all data retention is tenant configuration, one setting per class). Defaults are ADR-0047's and the AI system design's (section 8, decision 5); a legal limit is the only thing the platform enforces.\n| Class | Default | Counted from | Legal limit (refused) | |---|---|---|---| | `guestProfile` | 5 years | last activity | none | | `paymentRecord` | 10 years | created | at least 10 years (4.3.4) | | `financialRecord` | 7 years | created | at least 7 years (6.1.78) | | `auditRecord` | 2 years (authorisation and device audit) | created | none | | `approvalRecord` | 7 years (approvals board 6.7) | decided | none | | `complianceInspection` | 7 years | created | none | | `faceTagBiometric` | 7 days | ticket expiry | make-or-break | | `facePassBiometric` | follows `guestProfile` | last activity | make-or-break | | `aiPrompts` | 90 days (prompts and responses) | created | none | | `aiConversations` | 90 days | last activity | none | | `aiDecisionRecords` | follows `auditRecord` (decision records and the approvals of AI actions) | decided | none | | `aiMetadataIndex` | always follows `aiDecisionRecords` (summaries, entities, embeddings) | created | none |\n**ADR-0047's floors and ceilings that are not law are defaults now, not refusals** (the audit floor of one year, the proposed seven-year guest-profile ceiling, the Face Tag thirty-day ceiling). Platform-owned copies — the burst environment copy, a decommissioned cell — are not tenant data classes and are not here.\n",
+  "enum": [
+   "guestProfile",
+   "paymentRecord",
+   "financialRecord",
+   "auditRecord",
+   "approvalRecord",
+   "complianceInspection",
+   "faceTagBiometric",
+   "facePassBiometric",
+   "aiPrompts",
+   "aiConversations",
+   "aiDecisionRecords",
+   "aiMetadataIndex"
+  ]
+ },
+ "TenantDataRetentionSetting": {
+  "type": "object",
+  "x-ticvai-persistence": "tenancy.data_retention_setting",
+  "description": "**One tenant's retention period for one data class** (decided 29 September, Chinmay). One row per tenant and class, written by `setDataRetentionSetting`; a class with no row takes the platform default. The limit and default fields are the platform's catalogue, computed for the response and not stored on the row.\n",
+  "required": [
+   "dataClass"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "dataClass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TenantDataRetentionClass"
+     }
+    ],
+    "x-ticvai-unique": "tenant",
+    "description": "One row per class per tenant. On a write it comes from the path; a body value is ignored."
+   },
+   "retainAmount": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "The tenant's period. Null with no `followsDataClass` means the platform default applies. Zero means the data is not kept past the transaction that produced it.\n"
+   },
+   "retainUnit": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ],
+    "description": "Required with `retainAmount`."
+   },
+   "followsDataClass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TenantDataRetentionClass"
+     }
+    ],
+    "nullable": true,
+    "description": "Keep this class for as long as another class is kept. Set by default for `aiDecisionRecords` (follows `auditRecord`), `facePassBiometric` (follows `guestProfile`) and `aiMetadataIndex` (follows `aiDecisionRecords`, and cannot be changed).\n"
+   },
+   "onExpiry": {
+    "type": "string",
+    "enum": [
+     "archive",
+     "anonymise",
+     "delete"
+    ],
+    "default": "archive",
+    "description": "ADR-0047's stages. `archive` moves the data to the archive instance, from where it is erased on the class's own schedule; derived stores (the AI index, search) purge at archive, not later.\n"
+   },
+   "anchor": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "createdAt",
+     "lastActivity",
+     "decidedAt",
+     "ticketExpiry"
+    ],
+    "description": "What the period is counted from. Fixed per class by the platform."
+   },
+   "effectiveAmount": {
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The period actually applied, after follows and defaults are resolved."
+   },
+   "effectiveUnit": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ]
+   },
+   "isDefault": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "True when the tenant has not set this class and the platform default applies."
+   },
+   "defaultAmount": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false
+   },
+   "defaultUnit": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ]
+   },
+   "legalMinimumAmount": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "A floor the law sets. A shorter period is refused (`422`)."
+   },
+   "legalMaximumAmount": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "A maximum the law sets. A longer period is refused (`422`). Null for every class until the biometric make-or-break is answered."
+   },
+   "legalLimitUnit": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ]
+   },
+   "legalBasis": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The law or requirement the limit comes from, e.g. `4.3.4`."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The tenant. Retention is set at tenant scope only."
    }
   }
  }

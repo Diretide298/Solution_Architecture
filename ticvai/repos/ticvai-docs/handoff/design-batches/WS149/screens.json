@@ -1,0 +1,1817 @@
+[
+ {
+  "id": "ADM-579",
+  "name": "Terminal & Card-Present Command Center\\t48",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "3",
+   "number": "1",
+   "page": 47
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/terminal-card-present-command-center-t48-adm-579",
+   "component": "apps/ticvai-web/src/routes/commercial/TerminalCardPresentCommandCenterT48.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-580",
+    "ADM-581",
+    "ADM-582",
+    "ADM-583",
+    "ADM-584",
+    "ADM-585",
+    "ADM-586",
+    "ADM-587",
+    "ADM-588"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to Platform Dashboard",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "ADM-580",
+     "trigger": "Payment Terminal & Device Inventory\\t49",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-581",
+     "trigger": "Terminal Provisioning & Device Configuration\\t51",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-582",
+     "trigger": "POS, Kiosk & Terminal Assignment Manager\\t52",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-583",
+     "trigger": "EMV & Card-Present Processing Configuration\\t53",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-584",
+     "trigger": "Payment Server & Terminal Connectivity Manager\\t54",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-585",
+     "trigger": "Card-Present Transaction Monitor & Operations\\t55",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-586",
+     "trigger": "Degraded, Offline & Store-and-Forward Manager\\t56",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-587",
+     "trigger": "Terminal Health, Maintenance & Incident Center\\t57",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-588",
+     "trigger": "Terminal Simulator, Certification & AI Operations Advisor\\t59",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide real-time operational visibility over all card-present payment infrastructure.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search terminal card-present \\t48",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §Analyze by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Venue",
+        "Location",
+        "Terminal",
+        "POS",
+        "Acquirer",
+        "Payment method",
+        "Card scheme",
+        "Device model"
+       ],
+       "notes": "The pack filters this screen by venue, location, terminal, pos, acquirer, payment method and 2 more — which are present is a decision the pack already made.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §Analyze by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Terminals",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Online Terminals",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Offline Terminals",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Degraded Terminals",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active POS Assignments",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Card-Present Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Authorization Rate",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Card-Present Value",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average Processing Time",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Terminal Alerts",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Offline/Pending Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 47 §KPI Cards"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The terminal card-present \\t48 list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the terminal card-present \\t48 untouched.",
+   "emptyFirstRun": "No terminal card-present \\t48 yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the terminal card-present \\t48 are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPaymentTerminals",
+    "contract": "payments",
+    "purpose": "Terminals across venues",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-579",
+   "workshopBoard": "wireframes/WS89 Payment Payment Orchestration Board 3.dc.html#adm-579"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 47. 0 of 8 labels bound to a contract property; 20 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-580",
+  "name": "Payment Terminal & Device Inventory\\t49",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "3",
+   "number": "2",
+   "page": 48
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/payment-terminal-device-inventory-t49-adm-580",
+   "component": "apps/ticvai-web/src/routes/commercial/PaymentTerminalDeviceInventoryT49.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-579"
+   ],
+   "exitTo": [
+    "ADM-579"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-579",
+     "trigger": "Back to Terminal & Card-Present Command Center\\t48",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Maintain the centralized inventory of all payment terminals connected to TICVAI.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Fixed POS terminal, SoftPOS where supported, Device owner, Last service, Replacement date. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 48 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 48"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 48"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Fixed POS terminal",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "SoftPOS where supported",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Device owner",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Last service",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Replacement date",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 48 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The payment terminal device list.",
+   "error": "Could not load. Names which read failed and leaves the payment terminal device untouched.",
+   "emptyFirstRun": "No payment terminal device yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the payment terminal device are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPaymentTerminals",
+    "contract": "payments",
+    "purpose": "The inventory",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listDevices",
+    "contract": "tenancy",
+    "purpose": "The device register behind it",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listPaymentTerminalCertifications",
+    "contract": "payments",
+    "purpose": "Terminal model certifications",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordPaymentTerminalCertification",
+    "contract": "payments",
+    "purpose": "Record a terminal model certification",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-580",
+   "workshopBoard": "wireframes/WS89 Payment Payment Orchestration Board 3.dc.html#adm-580"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 48. 0 of 0 labels bound to a contract property; 5 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "modelCode",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-581",
+  "name": "Terminal Provisioning & Device Configuration\\t51",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "3",
+   "number": "3",
+   "page": 50
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/terminal-provisioning-device-configuration-t51-adm-581",
+   "component": "apps/ticvai-web/src/routes/commercial/TerminalProvisioningDeviceConfigurationT51.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-579"
+   ],
+   "exitTo": [
+    "ADM-579"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-579",
+     "trigger": "Back to Terminal & Card-Present Command Center\\t48",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
+  "purpose": "Configure and activate a physical terminal for TICVAI use.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Device reference, Receipt configuration, Connection profile. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 50 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Legal Entity",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Location",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "POS",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Provider",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Acquirer",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Merchant Account",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Terminal Profile",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Select"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Device reference",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Receipt configuration",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Connection profile",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 50 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The terminal provisioning device configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the terminal provisioning device untouched.",
+   "emptyFirstRun": "No terminal provisioning device configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "enrolDevice",
+    "contract": "tenancy",
+    "purpose": "Provision the device",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setPaymentTerminalConfiguration",
+    "contract": "payments",
+    "purpose": "Its payment configuration",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPaymentTerminals"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-581",
+   "workshopBoard": "wireframes/WS89 Payment Payment Orchestration Board 3.dc.html#adm-581"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 50. 0 of 0 labels bound to a contract property; 12 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "session"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-582",
+  "name": "POS, Kiosk & Terminal Assignment Manager\\t52",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "3",
+   "number": "4",
+   "page": 51
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/pos-kiosk-terminal-assignment-manager-t52-adm-582",
+   "component": "apps/ticvai-web/src/routes/commercial/PosKioskTerminalAssignmentManagerT52.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-579"
+   ],
+   "exitTo": [
+    "ADM-579"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-579",
+     "trigger": "Back to Terminal & Card-Present Command Center\\t48",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control which terminal is connected or assigned to each TICVAI selling device.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**POS, Kiosk & Terminal Assignment Manager\\t52 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 51"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 51"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setDeviceAssignment",
+       "label": "Save device assignment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setDeviceAssignment"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The pos kiosk terminal list.",
+   "error": "Could not load. Names which read failed and leaves the pos kiosk terminal untouched.",
+   "emptyFirstRun": "No pos kiosk terminal yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the pos kiosk terminal are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setDeviceAssignment",
+    "contract": "tenancy",
+    "purpose": "Assign it to a workstation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-582",
+   "workshopBoard": "wireframes/WS89 Payment Payment Orchestration Board 3.dc.html#adm-582"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 51. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "session"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-583",
+  "name": "EMV & Card-Present Processing Configuration\\t53",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "3",
+   "number": "5",
+   "page": 52
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/emv-card-present-processing-configuration-t53-adm-583",
+   "component": "apps/ticvai-web/src/routes/commercial/EmvCardPresentProcessingConfigurationT53.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-579"
+   ],
+   "exitTo": [
+    "ADM-579"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-579",
+     "trigger": "Back to Terminal & Card-Present Command Center\\t48",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure card-present transaction capabilities without exposing sensitive cardholder data.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Sale",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Authorization",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Capture",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Void",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refund",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reversal",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Preauthorization where supported",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Completion where supported",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 52 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The emv card-present processing configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the emv card-present processing untouched.",
+   "emptyFirstRun": "No emv card-present processing configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setPaymentTerminalConfiguration",
+    "contract": "payments",
+    "purpose": "EMV and card-present settings",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPaymentTerminals"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-583",
+   "workshopBoard": "wireframes/WS89 Payment Payment Orchestration Board 3.dc.html#adm-583"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 52. 0 of 0 labels bound to a contract property; 8 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-584",
+  "name": "Payment Server & Terminal Connectivity Manager\\t54",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "3",
+   "number": "6",
+   "page": 53
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/payment-server-terminal-connectivity-manager-t54-adm-584",
+   "component": "apps/ticvai-web/src/routes/commercial/PaymentServerTerminalConnectivityManagerT54.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-579"
+   ],
+   "exitTo": [
+    "ADM-579"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-579",
+     "trigger": "Back to Terminal & Card-Present Command Center\\t48",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Monitor and configure the communication path between TICVAI POS, payment terminal, payment server and payment provider.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 53 §Show"
+   },
+   {
+    "operation": null,
+    "why": "**Payment Server & Terminal Connectivity Manager\\t54 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every payment server terminal",
+       "columns": [
+        "POS ↔ Terminal",
+        "Terminal ↔ Payment Server",
+        "Payment Server ↔ Provider",
+        "Provider ↔ Acquirer"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 53 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected payment server terminal",
+       "bindsTo": null,
+       "columns": [
+        "POS ↔ Terminal",
+        "Terminal ↔ Payment Server",
+        "Payment Server ↔ Provider",
+        "Provider ↔ Acquirer"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Architecture Example”, “Terminal Integration Layer”, “Payment Terminal”, “Payment Server / Provider”, “Depending on integration”, “Health Indicators”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 53 §Show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Connectivity test, Terminal ping/health test where supported, Provider reachability, Merchant validation, Configuration validation. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 53 §Authorized users can run"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The payment server terminal list.",
+   "error": "Could not load. Names which read failed and leaves the payment server terminal untouched.",
+   "emptyFirstRun": "No payment server terminal yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the payment server terminal are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getDeviceTelemetry",
+    "contract": "tenancy",
+    "purpose": "Connectivity over time",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "POS ↔ Terminal",
+    "Terminal ↔ Payment Server",
+    "Payment Server ↔ Provider",
+    "Provider ↔ Acquirer"
+   ],
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "session"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-584",
+   "workshopBoard": "wireframes/WS89 Payment Payment Orchestration Board 3.dc.html#adm-584"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 53. 0 of 4 labels bound to a contract property; 9 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-585",
+  "name": "Card-Present Transaction Monitor & Operations\\t55",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "3",
+   "number": "7",
+   "page": 54
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/card-present-transaction-monitor-operations-t55-adm-585",
+   "component": "apps/ticvai-web/src/routes/commercial/CardPresentTransactionMonitorOperationsT55.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-579"
+   ],
+   "exitTo": [
+    "ADM-579"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-579",
+     "trigger": "Back to Terminal & Card-Present Command Center\\t48",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide operations teams with real-time visibility into card-present payment attempts.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 54 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search card-present transaction operations\\t55",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 54 §Search/filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "TICVAI Payment ID",
+        "Order",
+        "POS",
+        "Terminal",
+        "Venue",
+        "Provider",
+        "Acquirer",
+        "Date/time",
+        "Amount",
+        "Currency",
+        "Status",
+        "Operator"
+       ],
+       "notes": "The pack filters this screen by ticvai payment id, order, pos, terminal, venue, provider and 6 more — which are present is a decision the pack already made.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 54 §Search/filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every card-present transaction operations\\t55",
+       "columns": [
+        "Payment ID",
+        "Order ID",
+        "Terminal",
+        "POS",
+        "Amount",
+        "Currency",
+        "Provider",
+        "Merchant account",
+        "Card scheme",
+        "Entry method",
+        "Authorization result",
+        "Processing duration",
+        "Status"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 54 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected card-present transaction operations\\t55",
+       "bindsTo": null,
+       "columns": [
+        "Payment ID",
+        "Order ID",
+        "Terminal",
+        "POS",
+        "Amount",
+        "Currency",
+        "Provider",
+        "Merchant account",
+        "Card scheme",
+        "Entry method",
+        "Authorization result",
+        "Processing duration",
+        "Status"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Important”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 54 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The card-present transaction operations\\t55 list.",
+   "error": "Could not load. Names which read failed and leaves the card-present transaction operations\\t55 untouched.",
+   "emptyFirstRun": "No card-present transaction operations\\t55 yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the card-present transaction operations\\t55 are still there. The pack's own statuses are Initiated — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPaymentTerminals",
+    "contract": "payments",
+    "purpose": "Live card-present operations",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Payment ID",
+    "Order ID",
+    "Terminal",
+    "POS",
+    "Amount",
+    "Currency"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-585",
+   "workshopBoard": "wireframes/WS89 Payment Payment Orchestration Board 3.dc.html#adm-585"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 54. 0 of 25 labels bound to a contract property; 36 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-586",
+  "name": "Degraded, Offline & Store-and-Forward Manager\\t56",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "3",
+   "number": "8",
+   "page": 55
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/degraded-offline-store-and-forward-manager-t56-adm-586",
+   "component": "apps/ticvai-web/src/routes/commercial/DegradedOfflineStoreAndForwardManagerT56.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-579"
+   ],
+   "exitTo": [
+    "ADM-579"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-579",
+     "trigger": "Back to Terminal & Card-Present Command Center\\t48",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Manage card-present operations when normal connectivity is unavailable. This directly addresses the degraded-mode requirement in the payment matrix.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 55 §Show"
+   },
+   {
+    "operation": null,
+    "why": "**Degraded, Offline & Store-and-Forward Manager\\t56 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every degraded offline store-and-forward",
+       "columns": [
+        "Terminal",
+        "Transaction",
+        "Amount",
+        "Timestamp",
+        "Offline reason",
+        "Retry status",
+        "Synchronization state"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 55 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected degraded offline store-and-forward",
+       "bindsTo": null,
+       "columns": [
+        "Terminal",
+        "Transaction",
+        "Amount",
+        "Timestamp",
+        "Offline reason",
+        "Retry status",
+        "Synchronization state"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Important Principle”, “Synchronization”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 55 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The degraded offline store-and-forward list.",
+   "error": "Could not load. Names which read failed and leaves the degraded offline store-and-forward untouched.",
+   "emptyFirstRun": "No degraded offline store-and-forward yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the degraded offline store-and-forward are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listStoredForwardTransactions",
+    "contract": "payments",
+    "purpose": "What is held offline",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setPaymentTerminalConfiguration",
+    "contract": "payments",
+    "purpose": "Store-and-forward limits",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPaymentTerminals"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Terminal",
+    "Transaction",
+    "Amount",
+    "Timestamp",
+    "Offline reason",
+    "Retry status"
+   ],
+   "params": [
+    {
+     "name": "terminalId",
+     "from": "session"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-586",
+   "workshopBoard": "wireframes/WS89 Payment Payment Orchestration Board 3.dc.html#adm-586"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 55. 0 of 7 labels bound to a contract property; 15 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-587",
+  "name": "Terminal Health, Maintenance & Incident Center\\t57",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "3",
+   "number": "9",
+   "page": 56
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/terminal-health-maintenance-incident-center-t57-adm-587",
+   "component": "apps/ticvai-web/src/routes/commercial/TerminalHealthMaintenanceIncidentCenterT57.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-579"
+   ],
+   "exitTo": [
+    "ADM-579"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-579",
+     "trigger": "Back to Terminal & Card-Present Command Center\\t48",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide centralized lifecycle monitoring and operational maintenance of terminal hardware.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Device replacement, Certification update. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 56 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 56"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 56"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Device replacement",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 56 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Certification update",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 56 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The terminal health maintenance list.",
+   "error": "Could not load. Names which read failed and leaves the terminal health maintenance untouched.",
+   "emptyFirstRun": "No terminal health maintenance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the terminal health maintenance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getDeviceTelemetry",
+    "contract": "tenancy",
+    "purpose": "Terminal health",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Raise a repair",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listDeviceFirmware",
+    "contract": "tenancy",
+    "purpose": "Terminal firmware versions across the fleet",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getDeviceFirmware",
+    "contract": "tenancy",
+    "purpose": "Open a release",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createDeviceFirmware",
+    "contract": "tenancy",
+    "purpose": "Register a terminal firmware release",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-587",
+   "workshopBoard": "wireframes/WS89 Payment Payment Orchestration Board 3.dc.html#adm-587"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 56. 0 of 0 labels bound to a contract property; 2 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "session"
+    },
+    {
+     "name": "firmwareId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-588",
+  "name": "Terminal Simulator, Certification & AI Operations Advisor\\t59",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "3",
+   "number": "10",
+   "page": 58
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/terminal-simulator-certification-ai-operations-advisor-t-adm-588",
+   "component": "apps/ticvai-web/src/routes/commercial/TerminalSimulatorCertificationAiOperationsAdviso.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-579"
+   ],
+   "exitTo": [
+    "ADM-579"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-579",
+     "trigger": "Back to Terminal & Card-Present Command Center\\t48",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Select; Terminal Receipt Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Provide a controlled environment to validate terminal configuration and payment flows before production activation.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 8 actions on this screen and the screen declares 0 operations.** Unserved: Successful payment, Card decline, Lost connection, Reversal, Duplicate request, Temporary assignment, Venue, Assignment history. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 58 §Support simulation/test flows for"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "POS",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Terminal",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Provider",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Merchant account",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transaction amount",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transaction type",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Connectivity state",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Merchant receipt",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Terminal Receipt Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer receipt",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Terminal Receipt Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Printed",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Terminal Receipt Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Digital",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Terminal Receipt Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Combined TICVAI receipt",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Terminal Receipt Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Terminal-only receipt",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Terminal Receipt Configuration"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Successful payment",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Support simulation/test flows for"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Card decline",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Support simulation/test flows for"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Lost connection",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Support simulation/test flows for"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reversal",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Support simulation/test flows for"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Duplicate request",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Support simulation/test flows for"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Temporary assignment",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Assignment history",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 58 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The terminal simulator certification configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the terminal simulator certification untouched.",
+   "emptyFirstRun": "No terminal simulator certification configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "testPaymentProviderConnection",
+    "contract": "payments",
+    "purpose": "Certify the terminal path",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPaymentProviderConnections"
+    ]
+   },
+   {
+    "operationId": "listPaymentTerminalCertifications",
+    "contract": "payments",
+    "purpose": "Terminal model certifications",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordPaymentTerminalCertification",
+    "contract": "payments",
+    "purpose": "Record a terminal model certification",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-588",
+   "workshopBoard": "wireframes/WS89 Payment Payment Orchestration Board 3.dc.html#adm-588"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 58. 0 of 0 labels bound to a contract property; 24 of 232 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "connectionId",
+     "from": "navigation"
+    },
+    {
+     "name": "modelCode",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

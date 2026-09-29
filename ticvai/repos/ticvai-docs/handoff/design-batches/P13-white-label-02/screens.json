@@ -496,7 +496,10 @@
     "CMS-001",
     "CMS-002",
     "CMS-003",
-    "CMS-015"
+    "CMS-015",
+    "CMS-103",
+    "CMS-104",
+    "CMS-102"
    ],
    "inferred": true,
    "fromFlows": true,
@@ -520,6 +523,24 @@
      "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-014 holds version, so an edge into it carries them"
     },
     {
+     "to": "CMS-103",
+     "trigger": "Fix a booking flow",
+     "provenance": "authored 29 September, W12 (an invalid flow blocks the publish)",
+     "carries": [
+      "bookingFlowId"
+     ]
+    },
+    {
+     "to": "CMS-104",
+     "trigger": "Build the mobile app",
+     "provenance": "authored 29 September, M24-08 (build-time changes reach guests with a store release)"
+    },
+    {
+     "to": "CMS-102",
+     "trigger": "Back to the Site Builder",
+     "provenance": "authored 29 September, W12 (step 7)"
+    },
+    {
      "to": "CMS-015",
      "trigger": "Rolls back when something is wrong",
      "provenance": "flow F22 step 5→6",
@@ -533,7 +554,7 @@
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Move a change from draft to live, with someone accountable.",
+  "purpose": "Move a change from draft to live, with someone accountable (Site Builder step 7).",
   "layout": {
    "template": "detail",
    "regions": [
@@ -565,7 +586,7 @@
       {
        "kind": "publishGate",
        "impliedBy": "publishTenantConfig",
-       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate. **Booking flows publish here with the rest of the site (decided 29 September, W12)**: the gate lists each venue flow that changed, and an invalid one (`bookingFlowInvalid`) or a bookable kind with no flow (`bookingFlowMissing`) blocks the publish with a link to CMS-103.\n",
        "provenance": "carried from the previous definition"
       }
      ]
@@ -620,6 +641,12 @@
     "contract": "white-label",
     "purpose": "App status and recent changes",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listBookingFlows",
+    "contract": "white-label",
+    "purpose": "The venue's flows and whether each is valid, for the gate (W12)",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
@@ -648,6 +675,14 @@
     "provenance": "contract white-label.yaml POST /tenant-config/publish"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -912,7 +947,8 @@
     "CMS-013",
     "CMS-017",
     "CMS-018",
-    "CMS-101"
+    "CMS-101",
+    "CMS-103"
    ],
    "inferred": false,
    "entryFrom": [
@@ -949,6 +985,14 @@
      "provenance": "derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds none of them, so the edge carries nothing and CMS-018 opens cold"
     },
     {
+     "to": "CMS-103",
+     "trigger": "Booking flows",
+     "provenance": "authored 29 September, W12 (flow-level settings and step order moved to CMS-103)",
+     "carries": [
+      "bookingFlowId"
+     ]
+    },
+    {
      "to": "CMS-101",
      "trigger": "Help me choose",
      "provenance": "authored 29 September, rev 3 REV3-11 — Help me choose sits on the booking page these settings shape, so it is set up from here"
@@ -959,7 +1003,7 @@
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantConfig` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "The values the whole site inherits from, and the booking-flow settings each venue may override (decided 29 September, rev 3 CFG-11).",
+  "purpose": "The values the whole site inherits from, and the venue-wide booking settings each venue may override (decided 29 September, rev 3 CFG-11); the settings of one flow are on CMS-103 (W12).",
   "layout": {
    "template": "detail",
    "regions": [
@@ -1001,7 +1045,6 @@
         "BookingFlowConfig.cartLayout",
         "BookingFlowConfig.cardLayout",
         "BookingFlowConfig.cardSize",
-        "BookingFlowConfig.extrasStep",
         "BookingFlowConfig.seatPicker",
         "BookingFlowConfig.mapView",
         "BookingFlowConfig.density",
@@ -1011,28 +1054,24 @@
         "BookingFlowConfig.singleEventPage",
         "BookingFlowConfig.quantitiesOnAddOns",
         "BookingFlowConfig.cartSideInRtl",
-        "BookingFlowConfig.categoryDisplay",
         "BookingFlowConfig.eventBannerDates",
         "BookingFlowConfig.timesPerPage",
         "BookingFlowConfig.dayPartFilter",
         "BookingFlowConfig.dayPartBoundaries",
-        "BookingFlowConfig.performanceReveal",
-        "BookingFlowConfig.signInAt",
-        "BookingFlowConfig.seatEventDateMode",
         "BookingFlowConfig.seatViewPosition",
         "BookingFlowConfig.seatTimeBar",
         "BookingFlowConfig.ticketCategories",
         "BookingFlowConfig.ticketTags",
         "BookingFlowConfig.cardInfo",
-        "BookingFlowConfig.quickTour",
         "BookingFlowConfig.conciergeMascot",
         "BookingFlowConfig.showInfoOnly",
         "BookingFlowConfig.locationSwitcher",
-        "BookingFlowConfig.consentQuestionIds",
+        "BookingFlowConfig.guestContactFields",
+        "BookingFlowConfig.dateStripDays",
         "BookingFlowConfig.venueOverrides"
        ],
        "operation": "getBookingFlowConfig",
-       "notes": "**The rev 3 booking rules, each with its default** (decided 29 September, rev 3). `timesPerPage` 8, 12, 24 or all (24) and `dayPartFilter` (on), with `dayPartBoundaries` afternoon from 12:00 and evening from 17:00 in the venue time zone (REV3-1); `performanceReveal` date, then time, then tickets, or all at once (REV3-2); `signInAt` after add-ons or at payment (REV3-3); `seatEventDateMode` an inline step or a pop-up on the seat map (REV3-4); `seatViewPosition` bottom, right, left or top, web only (REV3-5); `seatTimeBar` (on, REV3-6); `cartLayout` gains `floatingIcon` and `cartSideInRtl` keeps the basket right or mirrors it (REV3-10); `showInfoOnly` (on, REV3-14); `ticketCategories` category then subcategory, or a flat list (REV3-16); `locationSwitcher` (REV3-18); `quickTour` (off, REV3-20); `ticketTags` (on, 23SEP-3); `cardInfo` (on, 23SEP-6); `categoryDisplay` grid or row strip (23SEP-18); `eventBannerDates` (off, 23SEP-19); `conciergeMascot` (on, CFG-5). `cardLayout`, `cardSize` and `density` are fixed lists now: stacked rows, split rows, cards across, poster cards; compact, standard, large, extra large; compact, standard, roomy (DG-6). **There is no swim-consent toggle and no F&B-modifier toggle**: a consent question is attached to the flow or the product (REV3-26), and modifiers show when an item has groups attached (REV3-9).",
+       "notes": "**Venue-wide booking settings only (decided 29 September, W12).** The settings that belong to one flow (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, the flow's consent questions) moved to each flow on CMS-103, and `categoryDisplay` is gone (W7, superseding 23SEP-18: `cardLayout` carries rows or grid). Here: `timesPerPage` and the day-part chips (REV3-1); `seatViewPosition` (REV3-5); `seatTimeBar` (REV3-6); `cartLayout` and `cartSideInRtl` (REV3-10); `showInfoOnly` (REV3-14); `ticketCategories` (REV3-16); `locationSwitcher` (REV3-18); `ticketTags` (23SEP-3); `cardInfo` (23SEP-6); `eventBannerDates` (23SEP-19); `conciergeMascot` (CFG-5); the card and density enums (DG-6); **`guestContactFields`**, what the guest-checkout pop-up asks: email only, + name or + mobile (W1); **`dateStripDays`**, the days on the date strip before the calendar icon, default 7 (M17-08).",
        "provenance": "contract white-label.yaml GET /tenant-config/booking-flow"
       },
       {
@@ -1053,14 +1092,6 @@
        "operation": "getBookingFlowConfig",
        "notes": "**One row per venue that overrides anything** (decided 29 September, rev 3 CFG-11). The editor sets only the fields that differ; a field left empty inherits the tenant value, and clearing one removes it from the override. A venue that is not one of the tenant's active venues, or a second row for the same venue, is refused `400` and the row is marked. An override kept for a closed venue is shown greyed: it has no effect.",
        "provenance": "contract white-label.yaml GET /tenant-config/booking-flow"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Consent questions this booking flow asks",
-       "bindsTo": "BookingFlowConfig.consentQuestionIds",
-       "operation": "listConsentQuestions",
-       "notes": "**The questions every booking in this flow asks, whatever the product** (decided 29 September, rev 3 REV3-26), e.g. a water park's \"Are you able to swim?\". Options are the active questions from `listConsentQuestions`, written on CMS-018; a product's own questions are attached on BO-008. The guest is asked the union, each question once. Overridable per venue like every other setting here.",
-       "provenance": "contract marketing-crm.yaml GET /consent-questions"
       }
      ]
     },
@@ -1105,16 +1136,24 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "listConsentQuestions",
-    "contract": "marketing-crm",
-    "purpose": "The venue's consent questions, to attach to the booking flow (rev 3 REV3-26)",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "listOrgUnits",
     "contract": "tenancy",
     "purpose": "The tenant's venues, for the per-venue override picker (rev 3 CFG-11)",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAnalyticsProviders",
+    "contract": "white-label",
+    "purpose": "Connected analytics platforms",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setAnalyticsProvider",
+    "contract": "white-label",
+    "purpose": "Connect or change an analytics platform",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1128,7 +1167,7 @@
     "id": "formSetBookingFlowConfig",
     "component": "modal",
     "trigger": "Save booking flow config",
-    "body": "**Collects what `setBookingFlowConfig` sends before it is called.** Nothing in the body is required. Optional: `preset`, `stepIndicator`, `cartLayout`, `cardLayout`, `cardSize`, `extrasStep`, `seatPicker`, `mapView`, `density`, `embedMode`, `heroBanner`, `searchInBanner`, `singleEventPage`, `quantitiesOnAddOns`, the rev 3 booking rules on the panel above, `consentQuestionIds` and `venueOverrides` (decided 29 September, rev 3 CFG-11). **The body is the tenant settings plus every venue override**: saving a venue's override sends the whole configuration with that venue's row changed. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBookingFlowConfig` sends before it is called.** Nothing in the body is required. Optional: `preset`, `stepIndicator`, `cartLayout`, `cardLayout`, `cardSize`, `seatPicker`, `mapView`, `density`, `embedMode`, `heroBanner`, `searchInBanner`, `singleEventPage`, `quantitiesOnAddOns`, the venue-wide rev 3 booking rules on the panel above, `guestContactFields` (W1), `dateStripDays` (M17-08) and `venueOverrides` (decided 29 September, rev 3 CFG-11). **The body is the tenant settings plus every venue override**: saving a venue's override sends the whole configuration with that venue's row changed. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "BookingFlowConfig",
     "confirm": {
      "label": "Save booking flow config",
@@ -1142,7 +1181,6 @@
       "cartLayout",
       "cardLayout",
       "cardSize",
-      "extrasStep",
       "seatPicker",
       "mapView",
       "density",
@@ -1152,24 +1190,20 @@
       "singleEventPage",
       "quantitiesOnAddOns",
       "cartSideInRtl",
-      "categoryDisplay",
       "eventBannerDates",
       "timesPerPage",
       "dayPartFilter",
       "dayPartBoundaries",
-      "performanceReveal",
-      "signInAt",
-      "seatEventDateMode",
       "seatViewPosition",
       "seatTimeBar",
       "ticketCategories",
       "ticketTags",
       "cardInfo",
-      "quickTour",
       "conciergeMascot",
       "showInfoOnly",
       "locationSwitcher",
-      "consentQuestionIds",
+      "guestContactFields",
+      "dateStripDays",
       "venueOverrides"
      ]
     },
@@ -2050,10 +2084,12 @@
   },
   "navigation": {
    "entryFrom": [
-    "CMS-016"
+    "CMS-016",
+    "CMS-102"
    ],
    "exitTo": [
-    "CMS-016"
+    "CMS-016",
+    "CMS-102"
    ],
    "inferred": false,
    "notes": "**Reached from CMS-016 Site Settings**, beside the booking-flow settings, because Help me choose sits on the booking page those settings shape (decided 29 September, rev 3 REV3-11).",
@@ -2063,6 +2099,12 @@
      "trigger": "Back to Site Settings",
      "provenance": "authored 29 September, rev 3 REV3-11",
      "back": true
+    },
+    {
+     "to": "CMS-102",
+     "trigger": "Back to the Site Builder",
+     "provenance": "authored 29 September, W12 (step 4)",
+     "back": true
     }
    ]
   },
@@ -2070,7 +2112,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listGuidedChoices` reads the venue's set-ups and the editor acts on one of them — list, select, act",
-  "purpose": "Set up a venue's Help me choose, review what the assistant suggests from the venue's products, preview it and publish it.",
+  "purpose": "Set up a venue's Help me choose so its answers filter the catalogue, review the question set the assistant proposes from the venue's products, preview the filtered list and publish it (Site Builder step 4).",
   "layout": {
    "template": "split",
    "regions": [
@@ -2136,6 +2178,8 @@
         "GuidedChoice.name",
         "GuidedChoice.mode",
         "GuidedChoice.showBanner",
+        "GuidedChoice.behaviour",
+        "GuidedChoice.showEverything",
         "GuidedChoice.questions",
         "GuidedChoice.status",
         "GuidedChoice.source",
@@ -2144,13 +2188,13 @@
         "GuidedChoice.publishedBy"
        ],
        "operation": "listGuidedChoices",
-       "notes": "**The editor.** `mode`: a button on the booking page, a pop-up on the guest's first arrival as well, or off (configured but not shown). `showBanner`: the dark banner under the products. One or two questions, two to four answers each: title, one-liner (140 characters), icon, badge (24 characters), target (a product, category, event or booking module, picked from `listProducts`, `listProductCategories` and `listEvents`) and the result card (title, body, image; absent fields fall back to the target's own). Every text in every tenant language.",
+       "notes": "**The editor.** `mode`: a button on the booking page, a pop-up on the guest's first arrival as well, or off (configured but not shown). `showBanner`: the dark banner under the products. One or two questions, two to four answers each: title, one-liner (140 characters), icon, badge (24 characters), target (a product, category, event or booking module, picked from `listProducts`, `listProductCategories` and `listEvents`) and the result card (title, body, image; absent fields fall back to the target's own). Every text in every tenant language.\n**Help me choose filters (decided 29 September, W4).** `behaviour` filter (default) or recommend; up to four questions, each of a kind: choice, yes/no, age, level or certification. **The filter builder** sets what each answer keeps: products, categories, segment tags, an age range, swimmers only or never, a certificate held or not; a target may also be a booking flow (`listBookingFlows`). An answer may pre-fill a consent question, which the guest still confirms. The \"Show everything\" link is on by default.",
        "provenance": "contract white-label.yaml GET /venues/{venueId}/guided-choices"
       },
       {
        "kind": "livePreview",
        "label": "Preview",
-       "notes": "**Renders the draft as a guest would meet it**: the button or pop-up, the banner, each question and the result card, in each language and in both directions. Drawn from the record in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up until Publish.",
+       "notes": "**Renders the draft as a guest would meet it**: the button or pop-up, the banner, each question and the result card, in each language and in both directions. Drawn from the record in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up until Publish. **Preview the filtered list**: for each combination of answers, the products left (read with `listProducts` and the answer's filter), so an answer that leaves nothing bookable shows before it is published (W4).",
        "provenance": "authored 29 September, rev 3 REV3-11"
       },
       {
@@ -2279,6 +2323,26 @@
     "contract": "catalogue",
     "purpose": "Events an answer can open",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listBookingFlows",
+    "contract": "white-label",
+    "purpose": "The venue's flows an answer can open (target kind bookingFlow, W12)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "suggestGuidedChoice",
+    "contract": "ai",
+    "purpose": "Ask the assistant for a question set from product attributes (age and height rules, level tags, certifications); it lands here as a draft through white-label proposeGuidedChoice (W4)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getGuidedChoiceSuggestion",
+    "contract": "ai",
+    "purpose": "The reasons behind a Help me choose suggestion",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2289,6 +2353,10 @@
     },
     {
      "name": "guidedChoiceId",
+     "from": "navigation"
+    },
+    {
+     "name": "suggestionId",
      "from": "navigation"
     }
    ],

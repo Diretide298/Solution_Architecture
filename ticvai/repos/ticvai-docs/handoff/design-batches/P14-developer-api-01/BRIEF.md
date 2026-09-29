@@ -1,6 +1,6 @@
 # P14-developer-api-01 — P14 · Developer & API
 
-**8 screens · 21 operations · 11 schemas · 3 permissions**
+**8 screens · 28 operations · 18 schemas · 3 permissions**
 
 Platform P14 Developer · ships as **ticvai-control** ·
 partner audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 3 permissions apply here:
   `DEVELOPER_ADMIN, DEVELOPER_MANAGE, DEVELOPER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,11 +60,11 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `DEV-001` | API Reference | listDetail | 1 | 0 | — |
-| `DEV-002` | Register & Organisation | configEditor | 2 | 0 | — |
-| `DEV-003` | Clients & Credentials | listDetail | 4 | 1 | — |
-| `DEV-004` | Sandbox | listDetail | 3 | 1 | — |
-| `DEV-005` | Webhooks | listDetail | 4 | 0 | — |
-| `DEV-006` | Usage & Limits | statusTracker | 1 | 0 | — |
-| `DEV-007` | Marketplace Listing | listDetail | 2 | 0 | — |
-| `DEV-008` | Programme Administration | configEditor | 4 | 0 | — |
+| `DEV-001` | API Reference | listDetail | 2 | 0 | — |
+| `DEV-002` | Register & Organisation | configEditor | 2 | 1 | — |
+| `DEV-003` | Clients & Credentials | listDetail | 6 | 4 | — |
+| `DEV-004` | Sandbox | listDetail | 5 | 3 | — |
+| `DEV-005` | Webhooks | listDetail | 5 | 2 | — |
+| `DEV-006` | Usage & Limits | statusTracker | 2 | 0 | — |
+| `DEV-007` | Marketplace Listing | listDetail | 2 | 1 | — |
+| `DEV-008` | Programme Administration | configEditor | 7 | 5 | — |

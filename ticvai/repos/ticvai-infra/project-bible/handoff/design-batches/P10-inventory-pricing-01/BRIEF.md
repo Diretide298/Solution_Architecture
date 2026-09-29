@@ -1,6 +1,6 @@
 # P10-inventory-pricing-01 — P10 · Inventory & Pricing
 
-**3 screens · 37 operations · 30 schemas · 13 permissions**
+**3 screens · 25 operations · 38 schemas · 11 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 13 permissions apply here:
-  `CAPACITY_CONFIGURE, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `CAPACITY_CONFIGURE, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID, PRICE_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **11 of these operations work offline**: applyManualDiscount, createOrder, getOrder, getProduct, holdOrder, listOrderRefunds, listOrders, listProductVariants
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,8 +60,8 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-005` | Inventory & Allocation View | listDetail | 19 | 1 | — |
-| `PTR-006` | Product Catalog (B2B Pricing) | listDetail | 17 | 0 | — |
+| `PTR-005` | Inventory & Allocation View | listDetail | 16 | 9 | — |
+| `PTR-006` | Product Catalog (B2B Pricing) | listDetail | 8 | 0 | — |
 | `PTR-007` | Availability Search | statusTracker | 1 | 0 | — |
 
 ## Thin screens in this batch

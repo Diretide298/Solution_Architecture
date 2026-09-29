@@ -130,7 +130,7 @@
   "method": "GET",
   "path": "/reports/financial",
   "contract": "finance",
-  "summary": "P&L, balance sheet or cash flow",
+  "summary": "Financial statements, revenue and tax summaries",
   "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -209,6 +209,11 @@
     "required": null
    },
    {
+    "name": "membershipId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -251,10 +256,15 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "Conversation"
+  "responds": "Page"
  },
  "listReports": {
   "method": "GET",
@@ -307,7 +317,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Case"
  },
  "runReport": {
   "method": "POST",
@@ -364,7 +374,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "AgentAvailability"
  },
  "updateCase": {
   "method": "PATCH",

@@ -1,1 +1,206 @@
-{}
+{
+ "createLegalEntity": {
+  "method": "POST",
+  "path": "/legal-entities",
+  "contract": "finance",
+  "summary": "Create a legal entity",
+  "permission": "ACCOUNT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LegalEntity",
+  "responds": "LegalEntity"
+ },
+ "getSubscription": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/subscription",
+  "contract": "subscription",
+  "summary": "Read the current subscription",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Subscription"
+ },
+ "listTenants": {
+  "method": "GET",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "List tenants",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "planId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "openPlatformStaffGrant": {
+  "method": "POST",
+  "path": "/platform-staff-grants",
+  "contract": "identity",
+  "summary": "A platform operator opens a time-boxed grant into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PlatformStaffGrant"
+ },
+ "previewSubscriptionChange": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/subscription/preview",
+  "contract": "subscription",
+  "summary": "Preview the effect of a plan change",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetSubscriptionRequest",
+  "responds": "SubscriptionPreview"
+ },
+ "setAgreementContractTerm": {
+  "method": "PUT",
+  "path": "/agreement-contract-term",
+  "contract": "subscription",
+  "summary": "Agreement & Contract Terms Builder",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AgreementContractTermsBuilderInput",
+  "responds": "AgreementContractTermsBuilderView"
+ },
+ "setPaymentProvider": {
+  "method": "PUT",
+  "path": "/payment-providers",
+  "contract": "orders",
+  "summary": "Configure a gateway and its routing",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetPaymentProviderRequest",
+  "responds": "PaymentProvider"
+ },
+ "setSubscription": {
+  "method": "PUT",
+  "path": "/tenants/{tenantId}/subscription",
+  "contract": "subscription",
+  "summary": "Assign or change a subscription",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetSubscriptionRequest",
+  "responds": "Subscription"
+ },
+ "setTrialConfiguration": {
+  "method": "PUT",
+  "path": "/trial-configurations",
+  "contract": "subscription",
+  "summary": "What a trial includes, how long it lasts and how it converts",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TrialConfiguration",
+  "responds": "TrialConfiguration"
+ },
+ "simulateCommercialPackage": {
+  "method": "POST",
+  "path": "/package-simulations",
+  "contract": "subscription",
+  "summary": "What this package would cost, and what it would provision",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PackageSimulationRequest",
+  "responds": "PackageSimulation"
+ }
+}

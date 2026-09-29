@@ -5,22 +5,6 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Cart & Transaction Threshold Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "nt": {
-    "type": "string",
-    "description": "nt"
-   },
-   "aed2505": {
-    "type": "number",
-    "description": "AED 250 5%"
-   },
-   "aed50010": {
-    "type": "number",
-    "description": "AED 500 10%"
-   },
-   "aed": {
-    "type": "string",
-    "description": "AED (the pack shows 15%, 1,000)"
-   },
    "taxCountsTowardThreshold": {
     "type": "integer",
     "description": "Tax counts toward threshold"
@@ -153,29 +137,9 @@
     "type": "string",
     "description": "Per-account usage"
    },
-   "maximumDiscount15": {
-    "type": "number",
-    "description": "Maximum discount: 15%"
-   },
-   "maximumDiscount25": {
-    "type": "number",
-    "description": "Maximum discount: 25%"
-   },
-   "maximumDiscount40": {
-    "type": "number",
-    "description": "Maximum discount: 40%"
-   },
-   "above40": {
-    "type": "number",
-    "description": "Above 40%"
-   },
    "requireApproval": {
     "type": "boolean",
     "description": "Require approval"
-   },
-   "requiredByTheMatrix": {
-    "type": "string",
-    "description": "required by the matrix"
    }
   }
  },
@@ -185,42 +149,6 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Payment Method, Bank & Partner Discount Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "creditCard": {
-    "type": "string",
-    "description": "Credit card"
-   },
-   "debitCard": {
-    "type": "string",
-    "description": "Debit card"
-   },
-   "visa": {
-    "type": "string",
-    "description": "Visa"
-   },
-   "mastercard": {
-    "type": "string",
-    "description": "Mastercard"
-   },
-   "mada": {
-    "type": "string",
-    "description": "Mada"
-   },
-   "applePay": {
-    "type": "string",
-    "description": "Apple Pay"
-   },
-   "wallet": {
-    "type": "string",
-    "description": "Wallet"
-   },
-   "giftCard": {
-    "type": "string",
-    "description": "Gift card"
-   },
-   "bankSpecificCard": {
-    "type": "string",
-    "description": "Bank-specific card"
-   },
    "selectedPaymentGateway": {
     "type": "string",
     "description": "Selected payment gateway"
@@ -270,29 +198,35 @@
     "type": "string",
     "description": "Banks"
    },
-   "hotels": {
-    "type": "string",
-    "description": "Hotels"
+   "paymentConditions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "creditCard",
+      "debitCard",
+      "visa",
+      "mastercard",
+      "mada",
+      "applePay",
+      "wallet",
+      "giftCard",
+      "bankSpecificCard"
+     ]
+    },
+    "description": "Payment methods that qualify."
    },
-   "airlines": {
+   "partnerType": {
     "type": "string",
-    "description": "Airlines"
-   },
-   "tourismPartners": {
-    "type": "string",
-    "description": "Tourism partners"
-   },
-   "corporatePartners": {
-    "type": "string",
-    "description": "Corporate partners"
-   },
-   "governmentPartners": {
-    "type": "string",
-    "description": "Government partners"
-   },
-   "membershipPrograms": {
-    "type": "string",
-    "description": "Membership programs"
+    "enum": [
+     "hotels",
+     "airlines",
+     "tourismPartners",
+     "corporatePartners",
+     "governmentPartners",
+     "membershipPrograms"
+    ],
+    "description": "Partner behind the offer."
    }
   }
  },
@@ -338,58 +272,25 @@
     "type": "string",
     "description": "Maximum uses"
    },
-   "standardPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Standard price"
-   },
-   "currentSellingPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current selling price"
-   },
-   "dynamicPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Dynamic price"
-   },
-   "membershipPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Membership price"
-   },
-   "b2bPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "B2B price"
-   },
-   "packagePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Package price"
-   },
-   "negativePrices": {
+   "priceBasis": {
     "type": "string",
-    "description": "Negative prices"
-   },
-   "priceBelowConfiguredFloor": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price below configured floor"
-   },
-   "discountAboveAuthorizedCeiling": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount above authorized ceiling"
-   },
-   "marginBelowMinimumThreshold": {
-    "type": "integer",
-    "description": "Margin below minimum threshold"
+    "enum": [
+     "currentSellingPrice",
+     "dynamicPrice",
+     "membershipPrice",
+     "b2bPrice",
+     "packagePrice"
+    ],
+    "description": "The price the discount applies against."
    }
   }
  },
  "PromotionRuleBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.upsell_rule at 5%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; saved as a `promotions.promotion_rule` row (PromotionRule, ruleType benefit) (DM5, 29 September: data model for the agreed operations)",
   "description": "**What Promotion Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "logic": {
-    "type": "string",
-    "description": "logic"
-   },
    "ruleName": {
     "type": "string",
     "description": "Rule name"
@@ -478,10 +379,6 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Promotion Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "logic": {
-    "type": "string",
-    "description": "logic"
-   },
    "ruleName": {
     "type": "string",
     "description": "Rule name"
@@ -564,6 +461,102 @@
    }
   }
  },
+ "PromotionStackingRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; the configurable part of a `promotions.stacking_rule` row (StackingRule composes it) (DM5, 29 September: data model for the agreed operations)",
+  "description": "**What Promotion Stacking Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "scope": {
+    "type": "string",
+    "enum": [
+     "entireTransaction",
+     "product",
+     "productCategory",
+     "individualTicket",
+     "bundleComponent",
+     "customer",
+     "channel"
+    ],
+    "description": "What the rule applies to."
+   },
+   "stackingModel": {
+    "type": "string",
+    "enum": [
+     "fullyStackable",
+     "nonStackable",
+     "conditional",
+     "categoryStacking",
+     "maximumN"
+    ],
+    "description": "Stacking model"
+   },
+   "maximumPromotions": {
+    "type": "integer",
+    "description": "For maximumN: most promotions per transaction"
+   },
+   "promotionTypeA": {
+    "type": "string",
+    "description": "First promotion type in the rule"
+   },
+   "promotionTypeB": {
+    "type": "string",
+    "description": "Second promotion type in the rule"
+   },
+   "canStack": {
+    "type": "boolean",
+    "description": "Whether A can stack with B"
+   }
+  }
+ },
+ "PromotionStackingRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Stacking Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "scope": {
+    "type": "string",
+    "enum": [
+     "entireTransaction",
+     "product",
+     "productCategory",
+     "individualTicket",
+     "bundleComponent",
+     "customer",
+     "channel"
+    ],
+    "description": "What the rule applies to."
+   },
+   "stackingModel": {
+    "type": "string",
+    "enum": [
+     "fullyStackable",
+     "nonStackable",
+     "conditional",
+     "categoryStacking",
+     "maximumN"
+    ],
+    "description": "Stacking model"
+   },
+   "maximumPromotions": {
+    "type": "integer",
+    "description": "For maximumN: most promotions per transaction"
+   },
+   "promotionTypeA": {
+    "type": "string",
+    "description": "First promotion type in the rule"
+   },
+   "promotionTypeB": {
+    "type": "string",
+    "description": "Second promotion type in the rule"
+   },
+   "canStack": {
+    "type": "boolean",
+    "description": "Whether A can stack with B"
+   }
+  }
+ },
  "RuleTestSimulationAiRecommendationWorkspaceInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -614,103 +607,6 @@
    "promoCode": {
     "type": "string",
     "description": "Promo code"
-   },
-   "familySegment": {
-    "type": "string",
-    "description": "Family segment ✓"
-   },
-   "b2c": {
-    "type": "string",
-    "description": "B2C ✓"
-   },
-   "validDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid date ✓"
-   },
-   "marketingAdministrator": {
-    "type": "string",
-    "description": "Marketing Administrator"
-   },
-   "campaignManager": {
-    "type": "string",
-    "description": "Campaign Manager"
-   },
-   "commercialManager": {
-    "type": "string",
-    "description": "Commercial Manager"
-   },
-   "revenueManager": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Manager"
-   },
-   "finance": {
-    "type": "string",
-    "description": "Finance"
-   },
-   "b2bManager": {
-    "type": "string",
-    "description": "B2B Manager"
-   },
-   "venueManager": {
-    "type": "string",
-    "description": "Venue Manager"
-   },
-   "systemAdministrator": {
-    "type": "string",
-    "description": "System Administrator"
-   },
-   "approver": {
-    "type": "string",
-    "description": "Approver"
-   },
-   "auditor": {
-    "type": "string",
-    "description": "Auditor"
-   },
-   "changeDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Change discount"
-   },
-   "changeThresholds": {
-    "type": "string",
-    "description": "Change thresholds"
-   },
-   "changeSegments": {
-    "type": "string",
-    "description": "Change segments"
-   },
-   "changeDates": {
-    "type": "string",
-    "description": "Change dates"
-   },
-   "currentPriceAndPricingFloors": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current price and pricing floors"
-   },
-   "guestCustomerSegments": {
-    "type": "string",
-    "description": "Guest/customer segments"
-   },
-   "membershipAndTierEligibility": {
-    "type": "string",
-    "description": "Membership and tier eligibility"
-   },
-   "companySegmentsAndPartnerPricing": {
-    "type": "string",
-    "description": "Company segments and partner pricing"
-   },
-   "paymentMethodAndBankEligibility": {
-    "type": "string",
-    "description": "Payment-method and bank eligibility"
-   },
-   "productsEligibleForPromotionalRules": {
-    "type": "string",
-    "description": "Products eligible for promotional rules"
-   },
-   "revenueMarginAndDiscountExposure": {
-    "type": "number",
-    "description": "Revenue, margin and discount exposure"
    }
   }
  },
@@ -765,110 +661,35 @@
     "type": "string",
     "description": "Promo code"
    },
+   "appliedRules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Rules that qualified and applied to the sample transaction"
+   },
+   "rejectedRules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Rules evaluated and not applied, each with its reason"
+   },
    "discount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount (the pack shows 15% / AED 90)"
+    "description": "Discount granted to the sample transaction"
    },
-   "familySegment": {
-    "type": "string",
-    "description": "Family segment ✓"
-   },
-   "b2c": {
-    "type": "string",
-    "description": "B2C ✓"
-   },
-   "validDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid date ✓"
-   },
-   "rule421Qualified": {
-    "type": "string",
-    "description": "Rule 421 qualified"
-   },
-   "marketingAdministrator": {
-    "type": "string",
-    "description": "Marketing Administrator"
-   },
-   "campaignManager": {
-    "type": "string",
-    "description": "Campaign Manager"
-   },
-   "commercialManager": {
-    "type": "string",
-    "description": "Commercial Manager"
-   },
-   "revenueManager": {
+   "finalAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Manager"
+    "description": "Final amount after promotions"
    },
-   "finance": {
-    "type": "string",
-    "description": "Finance"
-   },
-   "b2bManager": {
-    "type": "string",
-    "description": "B2B Manager"
-   },
-   "venueManager": {
-    "type": "string",
-    "description": "Venue Manager"
-   },
-   "systemAdministrator": {
-    "type": "string",
-    "description": "System Administrator"
-   },
-   "approver": {
-    "type": "string",
-    "description": "Approver"
-   },
-   "auditor": {
-    "type": "string",
-    "description": "Auditor"
-   },
-   "changeDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Change discount"
-   },
-   "changeThresholds": {
-    "type": "string",
-    "description": "Change thresholds"
-   },
-   "changeSegments": {
-    "type": "string",
-    "description": "Change segments"
-   },
-   "changeDates": {
-    "type": "string",
-    "description": "Change dates"
-   },
-   "currentPriceAndPricingFloors": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current price and pricing floors"
-   },
-   "guestCustomerSegments": {
-    "type": "string",
-    "description": "Guest/customer segments"
-   },
-   "membershipAndTierEligibility": {
-    "type": "string",
-    "description": "Membership and tier eligibility"
-   },
-   "companySegmentsAndPartnerPricing": {
-    "type": "string",
-    "description": "Company segments and partner pricing"
-   },
-   "paymentMethodAndBankEligibility": {
-    "type": "string",
-    "description": "Payment-method and bank eligibility"
-   },
-   "productsEligibleForPromotionalRules": {
-    "type": "string",
-    "description": "Products eligible for promotional rules"
-   },
-   "revenueMarginAndDiscountExposure": {
+   "marginImpact": {
     "type": "number",
-    "description": "Revenue, margin and discount exposure"
+    "description": "Margin impact of the tested rules, percent"
+   },
+   "aiRecommendation": {
+    "type": "string",
+    "description": "AI recommendation (decision support only; never applied without authorisation)"
    }
   }
  },
@@ -878,26 +699,6 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Special Price & Guest Offer Configurator displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "twoParksPass": {
-    "type": "string",
-    "description": "Two-parks pass"
-   },
-   "multiParksPass": {
-    "type": "string",
-    "description": "Multi-parks pass"
-   },
-   "ladiesNight": {
-    "type": "string",
-    "description": "Ladies night"
-   },
-   "annualPass": {
-    "type": "string",
-    "description": "Annual pass"
-   },
-   "familyPass": {
-    "type": "string",
-    "description": "Family pass"
-   },
    "offerName": {
     "type": "string",
     "description": "Offer name"
@@ -986,34 +787,6 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Time-Based & Seasonal Discount Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "summer": {
-    "type": "string",
-    "description": "Summer"
-   },
-   "ramadan": {
-    "type": "string",
-    "description": "Ramadan"
-   },
-   "eid": {
-    "type": "string",
-    "description": "Eid"
-   },
-   "schoolHolidays": {
-    "type": "string",
-    "description": "School holidays"
-   },
-   "nationalDay": {
-    "type": "string",
-    "description": "National Day"
-   },
-   "peakOffPeak": {
-    "type": "string",
-    "description": "Peak/off-peak"
-   },
-   "customSeasons": {
-    "type": "string",
-    "description": "Custom seasons"
-   },
    "purchaseDate": {
     "type": "string",
     "format": "date-time",
@@ -1053,6 +826,19 @@
     "type": "string",
     "format": "date-time",
     "description": "Event period"
+   },
+   "seasonType": {
+    "type": "string",
+    "enum": [
+     "summer",
+     "ramadan",
+     "eid",
+     "schoolHolidays",
+     "nationalDay",
+     "peakOffPeak",
+     "customSeasons"
+    ],
+    "description": "Season the rule applies in."
    }
   }
  },
@@ -1062,10 +848,6 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Volume, Bulk & Tier Discount Configurator displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "tyNt": {
-    "type": "string",
-    "description": "ty nt"
-   },
    "minimumQuantity": {
     "type": "integer",
     "description": "Minimum quantity"
@@ -1097,10 +879,6 @@
    "eligibleChannel": {
     "type": "string",
     "description": "Eligible channel"
-   },
-   "schools": {
-    "type": "string",
-    "description": "Schools"
    }
   }
  }

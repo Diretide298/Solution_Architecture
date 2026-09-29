@@ -829,6 +829,61 @@
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 8 §Operational Configuration"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Cleaning",
+       "bindsTo": "Resource.cleaningPolicy.mode",
+       "operation": "updateResource",
+       "notes": "**How the room is cleaned between uses** (decided 29 September, W10). *After every booking* blocks a fixed buffer after each booking (e.g. 15 minutes); *N times a day* lets the system place N cleanings in the day's gaps. None means only setup and teardown.",
+       "provenance": "contract resources.yaml Resource.cleaningPolicy"
+      },
+      {
+       "kind": "numberField",
+       "label": "Minutes per cleaning",
+       "bindsTo": "Resource.cleaningPolicy.bufferMinutes",
+       "operation": "updateResource",
+       "provenance": "contract resources.yaml ResourceCleaningPolicy.bufferMinutes"
+      },
+      {
+       "kind": "numberField",
+       "label": "Cleanings per day",
+       "bindsTo": "Resource.cleaningPolicy.cleaningsPerDay",
+       "operation": "updateResource",
+       "notes": "Shown for *N times a day* only.",
+       "provenance": "contract resources.yaml ResourceCleaningPolicy.cleaningsPerDay"
+      },
+      {
+       "kind": "textField",
+       "label": "Cleaning window from",
+       "bindsTo": "Resource.cleaningPolicy.windowStart",
+       "operation": "updateResource",
+       "provenance": "contract resources.yaml ResourceCleaningPolicy.windowStart"
+      },
+      {
+       "kind": "textField",
+       "label": "Cleaning window to",
+       "bindsTo": "Resource.cleaningPolicy.windowEnd",
+       "operation": "updateResource",
+       "provenance": "contract resources.yaml ResourceCleaningPolicy.windowEnd"
+      },
+      {
+       "kind": "timeline",
+       "label": "Day preview",
+       "bindsTo": "ResourceAvailability",
+       "columns": [
+        "ResourceAvailability.freeWindows",
+        "ResourceAvailability.blockedWindows"
+       ],
+       "operation": "getResourceAvailability",
+       "notes": "**A day preview before saving** (W10): bookings, holds and the cleanings the policy places, as `cleaning` blocked windows, so an operator sees what the policy takes out of availability.",
+       "provenance": "contract resources.yaml GET /resources/{resourceId}/availability"
+      }
+     ]
     }
    ]
   },
@@ -841,11 +896,25 @@
   },
   "apis": [
    {
+    "operationId": "getResourceAvailability",
+    "contract": "resources",
+    "purpose": "Day preview of availability with cleanings placed (W10)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, W10 (P29)"
+   },
+   {
     "operationId": "getResource",
     "contract": "resources",
     "purpose": "The resource being edited",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getResourceQualifications",
+    "contract": "resources",
+    "purpose": "What the resource is certified to do, and until when",
+    "trigger": "onLoad",
+    "provenance": "readiness close-out, 29 September 2026"
    },
    {
     "operationId": "createResource",

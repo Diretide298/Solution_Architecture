@@ -911,6 +911,41 @@
     "contract": "marketing-crm",
     "purpose": "Cookie, Tracking & Digital Technology Registry",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setTrackingTechnology",
+    "contract": "marketing-crm",
+    "purpose": "Add, classify, approve or retire a technology",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordCookieScan",
+    "contract": "marketing-crm",
+    "purpose": "Upload or take in a scan result",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listCookieScans",
+    "contract": "marketing-crm",
+    "purpose": "Scan runs and what each found",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listCookieScanPolicies",
+    "contract": "marketing-crm",
+    "purpose": "Scan schedules per channel",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setCookieScanPolicy",
+    "contract": "marketing-crm",
+    "purpose": "Set a scan schedule and alert recipients",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1085,6 +1120,13 @@
     "contract": "marketing-crm",
     "purpose": "Cookie Banner & Preference Center Designer",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setCookieBannerDesign",
+    "contract": "marketing-crm",
+    "purpose": "Save a banner design as a new draft version",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

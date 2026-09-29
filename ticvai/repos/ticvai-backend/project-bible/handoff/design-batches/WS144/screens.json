@@ -1412,6 +1412,12 @@
        "derived": true,
        "impliedBy": "listLoyaltyProgrammes",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getDashboard",
+       "notes": "One record, read-only."
       }
      ]
     }
@@ -1431,6 +1437,20 @@
     "purpose": "Gamification analytics",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Participation, loyalty/membership impact, retention",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Gamification analytics dashboard",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1439,6 +1459,14 @@
    "workshopBoard": "wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-833"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 51. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "dashboardId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

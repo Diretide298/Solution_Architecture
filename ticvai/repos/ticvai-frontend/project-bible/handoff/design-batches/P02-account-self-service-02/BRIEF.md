@@ -1,6 +1,6 @@
 # P02-account-self-service-02 — P02 · Account & Self-Service (2 of 2)
 
-**4 screens · 16 operations · 6 schemas · 6 permissions**
+**4 screens · 26 operations · 23 schemas · 7 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -47,10 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `GUEST_MANAGE, GUEST_VIEW, LOYALTY_REDEEM, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, LOYALTY_REDEEM, ORDER_CREATE, ORDER_VIEW, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: getWaiverStatus
+- **2 of these operations work offline**: getGuestSession, getWaiverStatus
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -62,11 +62,11 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-067` | Refunds & Resale | statusTracker | 3 | 0 | — |
-| `GST-069` | Face Pass | statusTracker | 3 | 1 | — |
-| `GST-071` | Payment Methods | listDetail | 5 | 0 | — |
-| `GST-073` | Security & Sign-in | configEditor | 5 | 0 | — |
+| `GST-067` | Refunds & Resale | statusTracker | 3 | 2 | — |
+| `GST-069` | Face Pass | statusTracker | 4 | 2 | — |
+| `GST-071` | Payment Methods | listDetail | 5 | 3 | — |
+| `GST-073` | Security & Sign-in | configEditor | 14 | 4 | — |
 
 ## Thin screens in this batch
 
-**GST-067, GST-069 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-067 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

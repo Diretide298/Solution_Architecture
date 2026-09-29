@@ -26,10 +26,7 @@
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-002 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     },
     {
      "to": "SUP-004",
@@ -38,7 +35,7 @@
       "caseId",
       "conversationId"
      ],
-     "provenance": "derived — SUP-004 declares entryState.params caseId, conversationId, so an edge into it must carry them"
+     "provenance": "derived — SUP-004 declares entryState.params caseId, conversationId and SUP-002 holds caseId, conversationId, so an edge into it carries them"
     }
    ]
   },
@@ -50,13 +47,6 @@
   "pattern": "listDetail",
   "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
   "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
-  "gaps": [
-   {
-    "operation": "listConversations",
-    "why": "**1 declared operation reach no component on this screen**: listConversations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -65,8 +55,36 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listCases",
+       "notes": "Sends `?status=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Assigned to principal id",
+       "operation": "listCases",
+       "notes": "Sends `?assignedToPrincipalId=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "toggle",
+       "label": "Breached sla",
+       "operation": "listCases",
+       "notes": "Sends `?breachedSla=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Priority",
+       "operation": "listCases",
+       "notes": "Sends `?priority=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every agent",
+       "label": "Every case",
        "bindsTo": "Case",
        "columns": [
         "Case.id",
@@ -84,6 +102,27 @@
        ],
        "operation": "listCases",
        "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every conversation",
+       "bindsTo": "Conversation",
+       "columns": [
+        "Conversation.id",
+        "Conversation.telephony",
+        "Conversation.assistSessionId",
+        "Conversation.channel",
+        "Conversation.state",
+        "Conversation.subjectId",
+        "Conversation.venueId",
+        "Conversation.assignedPrincipalId",
+        "Conversation.queueId",
+        "Conversation.queuePosition",
+        "Conversation.estimatedWaitSeconds",
+        "Conversation.handoverReason"
+       ],
+       "operation": "listConversations",
+       "provenance": "contract marketing-crm.yaml GET /conversations"
       }
      ]
     },
@@ -93,7 +132,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected agent",
+       "label": "The selected case",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.kind",
+        "Case.channel",
+        "Case.recordedAt",
+        "Case.syncedAt",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority",
+        "Case.assignedToPrincipalId",
+        "Case.venueId",
+        "Case.relatedOrderId",
+        "Case.slaDueAt"
+       ],
+       "operation": "listCases",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The case",
        "bindsTo": "CaseDetail",
        "columns": [
         "CaseDetail.id",
@@ -101,17 +165,17 @@
         "CaseDetail.subjectId",
         "CaseDetail.guestName",
         "CaseDetail.subject",
+        "CaseDetail.kind",
+        "CaseDetail.channel",
+        "CaseDetail.recordedAt",
+        "CaseDetail.syncedAt",
         "CaseDetail.categoryId",
         "CaseDetail.status",
         "CaseDetail.priority",
         "CaseDetail.assignedToPrincipalId",
         "CaseDetail.venueId",
         "CaseDetail.relatedOrderId",
-        "CaseDetail.slaDueAt",
-        "CaseDetail.isSlaBreached",
-        "CaseDetail.slaPausedSeconds",
-        "CaseDetail.escalationCount",
-        "CaseDetail.resolvedAt"
+        "CaseDetail.slaDueAt"
        ],
        "operation": "getCase",
        "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
@@ -124,37 +188,37 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add case message",
        "operation": "addCaseMessage",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create case",
        "operation": "createCase",
        "provenance": "contract marketing-crm.yaml POST /cases"
       },
       {
        "kind": "secondaryButton",
-       "label": "Escalate",
+       "label": "Escalate case",
        "operation": "escalateCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reopen",
+       "label": "Reopen case",
        "operation": "reopenCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save case",
        "operation": "updateCase",
        "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save agent availability",
        "operation": "setAgentAvailability",
        "provenance": "contract marketing-crm.yaml PUT /agent-availability"
       }
@@ -165,9 +229,9 @@
   "states": {
    "loading": "The agent list.",
    "error": "Could not load. Names which read failed and leaves the agent untouched.",
-   "emptyFirstRun": "No agent yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the agent are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No agent yet. Offers Add case message (`addCaseMessage`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the agent are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -207,7 +271,7 @@
     "operationId": "getCase",
     "contract": "marketing-crm",
     "purpose": "Read a case with its thread",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "reopenCase",
@@ -252,20 +316,150 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `caseId`.",
    "preloaded": [
-    "CaseDetail.id",
-    "CaseDetail.caseNumber",
-    "CaseDetail.subjectId",
-    "CaseDetail.guestName",
-    "CaseDetail.subject"
+    "Case.id",
+    "Case.caseNumber",
+    "Case.subjectId",
+    "Case.guestName",
+    "Case.subject"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P12 Venue Support.dc.html#sup-002",
+   "derivedFrom": "wireframes/reference/Dashboards Board.dc.html",
    "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCaseMessage",
+    "component": "modal",
+    "trigger": "Add case message",
+    "body": "**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`, `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add case message",
+     "operation": "addCaseMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "body",
+      "isInternal",
+      "recordedAt",
+      "channel",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
+   },
+   {
+    "id": "formCreateCase",
+    "component": "modal",
+    "trigger": "Create case",
+    "body": "**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCaseRequest",
+    "confirm": {
+     "label": "Create case",
+     "operation": "createCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subject",
+      "description",
+      "channel",
+      "recordedAt",
+      "subjectId",
+      "categoryId",
+      "priority",
+      "kind",
+      "venueId",
+      "relatedOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases"
+   },
+   {
+    "id": "formEscalateCase",
+    "component": "modal",
+    "trigger": "Escalate case",
+    "body": "**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`, `newPriority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Escalate case",
+     "operation": "escalateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "assignToPrincipalId",
+      "newPriority"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
+   },
+   {
+    "id": "formReopenCase",
+    "component": "modal",
+    "trigger": "Reopen case",
+    "body": "**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reopen case",
+     "operation": "reopenCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
+   },
+   {
+    "id": "formUpdateCase",
+    "component": "modal",
+    "trigger": "Save case",
+    "body": "**Collects what `updateCase` sends before it is called.** Nothing in the body is required. Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save case",
+     "operation": "updateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "priority",
+      "assignedToPrincipalId",
+      "categoryId",
+      "resolutionNote"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
+   },
+   {
+    "id": "formSetAgentAvailability",
+    "component": "modal",
+    "trigger": "Save agent availability",
+    "body": "**Collects what `setAgentAvailability` sends before it is called.** Required: `state`. Optional: `maxConcurrent`, `queueIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save agent availability",
+     "operation": "setAgentAvailability"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "state",
+      "maxConcurrent",
+      "queueIds"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PUT /agent-availability"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -316,10 +510,7 @@
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-008 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     },
     {
      "to": "SUP-002",
@@ -327,7 +518,7 @@
      "carries": [
       "caseId"
      ],
-     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+     "provenance": "derived — SUP-002 declares entryState.params caseId and SUP-008 holds caseId, so an edge into it carries them"
     }
    ]
   },
@@ -336,13 +527,6 @@
   "pattern": "listDetail",
   "patternReason": "`listReports` reads the population and `getFinancialReport` reads one of them — list, select, act",
   "purpose": "Produce agent performance & sla view for this venue.",
-  "gaps": [
-   {
-    "operation": "getReport",
-    "why": "**2 declared operations reach no component on this screen**: getReport, listConversations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -351,8 +535,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Category",
+       "operation": "listReports",
+       "notes": "Sends `?category=` to `listReports`.",
+       "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listReports",
+       "notes": "Sends `?search=` to `listReports`.",
+       "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every agent performance sla",
+       "label": "Every report definition",
        "bindsTo": "ReportDefinition",
        "columns": [
         "ReportDefinition.name",
@@ -370,6 +568,27 @@
        ],
        "operation": "listReports",
        "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every conversation",
+       "bindsTo": "Conversation",
+       "columns": [
+        "Conversation.id",
+        "Conversation.telephony",
+        "Conversation.assistSessionId",
+        "Conversation.channel",
+        "Conversation.state",
+        "Conversation.subjectId",
+        "Conversation.venueId",
+        "Conversation.assignedPrincipalId",
+        "Conversation.queueId",
+        "Conversation.queuePosition",
+        "Conversation.estimatedWaitSeconds",
+        "Conversation.handoverReason"
+       ],
+       "operation": "listConversations",
+       "provenance": "contract marketing-crm.yaml GET /conversations"
       }
      ]
     },
@@ -379,7 +598,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected agent performance sla",
+       "label": "The selected report definition",
+       "bindsTo": "ReportDefinition",
+       "columns": [
+        "ReportDefinition.name",
+        "ReportDefinition.description",
+        "ReportDefinition.category",
+        "ReportDefinition.dataSource",
+        "ReportDefinition.columns",
+        "ReportDefinition.filters",
+        "ReportDefinition.groupBy",
+        "ReportDefinition.parameters",
+        "ReportDefinition.requiredPermission",
+        "ReportDefinition.maxDateRangeDays",
+        "ReportDefinition.id",
+        "ReportDefinition.isSystem",
+        "ReportDefinition.isRetired",
+        "ReportDefinition.estimatedCost",
+        "ReportDefinition.createdByPrincipalId",
+        "ReportDefinition.lastRunAt"
+       ],
+       "operation": "getReport",
+       "provenance": "contract reporting.yaml GET /reports/{reportId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The financial report",
        "bindsTo": "FinancialReport",
        "columns": [
         "FinancialReport.report",
@@ -401,37 +645,37 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Ask",
+       "label": "Ask reporting question",
        "operation": "askReportingQuestion",
        "provenance": "contract reporting.yaml POST /reports/ask"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create report",
        "operation": "createReport",
        "provenance": "contract reporting.yaml POST /reports"
       },
       {
        "kind": "destructiveButton",
-       "label": "Delete",
+       "label": "Delete report",
        "operation": "deleteReport",
        "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save",
+       "label": "Save natural language query",
        "operation": "saveNaturalLanguageQuery",
        "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save report",
        "operation": "updateReport",
        "provenance": "contract reporting.yaml PUT /reports/{reportId}"
       }
@@ -443,24 +687,137 @@
    {
     "id": "confirmDeleteReport",
     "component": "confirmDialog",
-    "trigger": "Delete",
+    "trigger": "Delete report",
     "body": "**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than the verb. A agent performance sla this affects should be identified in the dialog, not just counted.",
     "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formAskReportingQuestion",
+    "component": "modal",
+    "trigger": "Ask reporting question",
+    "body": "**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional: `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ask reporting question",
+     "operation": "askReportingQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "question",
+      "conversationId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask"
+   },
+   {
+    "id": "formCreateReport",
+    "component": "modal",
+    "trigger": "Create report",
+    "body": "**Collects what `createReport` sends before it is called.** Required: `name`, `category`, `dataSource`, `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReportRequest",
+    "confirm": {
+     "label": "Create report",
+     "operation": "createReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category",
+      "dataSource",
+      "columns",
+      "requiredPermission",
+      "description",
+      "filters",
+      "groupBy",
+      "parameters",
+      "maxDateRangeDays"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports"
+   },
+   {
+    "id": "formSaveNaturalLanguageQuery",
+    "component": "modal",
+    "trigger": "Save natural language query",
+    "body": "**Collects what `saveNaturalLanguageQuery` sends before it is called.** Required: `name`. Optional: `category`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save natural language query",
+     "operation": "saveNaturalLanguageQuery"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
+   },
+   {
+    "id": "formUpdateReport",
+    "component": "modal",
+    "trigger": "Save report",
+    "body": "**Collects what `updateReport` sends before it is called.** Required: `name`, `category`, `dataSource`, `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReportRequest",
+    "confirm": {
+     "label": "Save report",
+     "operation": "updateReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category",
+      "dataSource",
+      "columns",
+      "requiredPermission",
+      "description",
+      "filters",
+      "groupBy",
+      "parameters",
+      "maxDateRangeDays"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /reports/{reportId}"
    }
   ],
   "states": {
    "loading": "The agent performance sla list.",
    "error": "Could not load. Names which read failed and leaves the agent performance sla untouched.",
-   "emptyFirstRun": "No agent performance sla yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the agent performance sla are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No agent performance sla yet. Offers Create report (`createReport`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on category, search and the agent performance sla are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "runReport",
     "contract": "reporting",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "askReportingQuestion",
@@ -499,7 +856,7 @@
     "operationId": "getReport",
     "contract": "reporting",
     "purpose": "Read a report definition",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listReports",
@@ -545,11 +902,11 @@
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
    "preloaded": [
-    "FinancialReport.report",
-    "FinancialReport.fiscalPeriodId",
-    "FinancialReport.legalEntityId",
-    "FinancialReport.currency",
-    "FinancialReport.currencyScale"
+    "ReportDefinition.name",
+    "ReportDefinition.description",
+    "ReportDefinition.category",
+    "ReportDefinition.dataSource",
+    "ReportDefinition.columns"
    ]
   },
   "wireframe": {

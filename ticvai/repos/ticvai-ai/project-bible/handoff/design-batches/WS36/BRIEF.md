@@ -1,6 +1,6 @@
 # WS36 — Pricing   Revenue Management board 3
 
-**10 screens · 10 operations · 14 schemas · 2 permissions**
+**10 screens · 21 operations · 31 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `LEDGER_POST, LEDGER_VIEW, PRICE_CONFIGURE, PRODUCT_CONFIGURE, PRODUCT_VIEW, TAX_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-068` | Tax, Fee & Calculation Command Center | listDetail | 1 | 0 | — |
-| `ADM-069` | Tax Profile & Jurisdiction Configuration | configEditor | 1 | 0 | — |
+| `ADM-068` | Tax, Fee & Calculation Command Center | listDetail | 3 | 0 | — |
+| `ADM-069` | Tax Profile & Jurisdiction Configuration | configEditor | 5 | 0 | — |
 | `ADM-070` | Tax Rule & Treatment Builder | listDetail | 1 | 0 | — |
-| `ADM-071` | Fee & Surcharge Library | configEditor | 1 | 0 | — |
-| `ADM-072` | Fee Applicability & Charging Rule Builder | configEditor | 1 | 1 | — |
+| `ADM-071` | Fee & Surcharge Library | configEditor | 2 | 1 | — |
+| `ADM-072` | Fee Applicability & Charging Rule Builder | configEditor | 1 | 0 | — |
 | `ADM-073` | Fee Waiver, Tax Exemption & Exception Rules | configEditor | 1 | 0 | — |
-| `ADM-074` | Price Calculation Sequence & Formula Engine | configEditor | 1 | 0 | — |
-| `ADM-075` | Currency Precision, Rounding & Monetary Rules | listDetail | 1 | 0 | — |
+| `ADM-074` | Price Calculation Sequence & Formula Engine | configEditor | 2 | 1 | — |
+| `ADM-075` | Currency Precision, Rounding & Monetary Rules | listDetail | 2 | 1 | — |
 | `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | configEditor | 1 | 0 | — |
-| `ADM-077` | Calculation Validation, Reconciliation & Service Interface | listDetail | 1 | 0 | — |
+| `ADM-077` | Calculation Validation, Reconciliation & Service Interface | listDetail | 4 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-075, ADM-077 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-077 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

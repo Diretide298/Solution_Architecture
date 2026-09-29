@@ -14,22 +14,22 @@
   },
   "navigation": {
    "entryFrom": [
-    "GST-001"
+    "GST-001",
+    "GST-004"
    ],
    "inferred": true,
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003"
+    "GST-003",
+    "GST-008",
+    "GST-049"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-007 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
      "to": "GST-003",
@@ -37,25 +37,39 @@
      "carries": [
       "eventId"
      ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-003 declares entryState.params eventId and GST-007 holds eventId, so an edge into it carries them"
+    },
+    {
+     "to": "GST-008",
+     "trigger": "Picks a time; the tickets for it appear",
+     "carries": [
+      "performanceId"
+     ],
+     "provenance": "decided 29 September, rev 3 REV3-2: date → time → ticket"
+    },
+    {
+     "to": "GST-049",
+     "trigger": "Picks a time on a seated event (inline step)",
+     "carries": [
+      "performanceId"
+     ],
+     "provenance": "decided 29 September, rev 3 REV3-4 (`seatEventDateMode` `inlineStep`) and REV3-7"
+    },
+    {
+     "to": "GST-008",
+     "trigger": "Picks a date and time after choosing the workshop (product-first flow)",
+     "carries": [
+      "performanceId"
+     ],
+     "provenance": "decided 29 September 2026 (P29), W8"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "Inventory cites `GET /performances, POST /inventory-holds` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** **Date → time → ticket (REV3-2):** the time sits right after the date and stays hidden until a date is picked; tickets (GST-008) come after the time; Continue stays off until both are chosen (`performanceReveal`, default `dateTimeTicket`). **Times (REV3-1)** paged with part-of-day chips. **Seated events (REV3-4, REV3-7):** this step before the seat map, or a pop-up on it (`seatEventDateMode`); skipped when the event has one on-sale performance; may render with GST-049 as one step. **Language (REV3-17), experience and level (REV3-19), Booking at (REV3-18), Quick tour (REV3-20).** **Consent questions (REV3-26)** pop up once after the session or date; the *Swim consent pop-up (on/off)* toggle is dropped. Per-guest eligibility is `checkBookingEligibility`, unchanged (DG-3). Guest copy may say *Session* (CFG-10); code keeps `Performance`. Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September (MOB-29SEP).** **M17-08:** seven-day date strip plus a calendar icon. **W8:** a product-first flow (workshop, experience) comes here after the product is chosen on GST-008; the date-first default no longer overrides it, because the order is the flow's. **W5:** surf and session levels appear only after a time slot is chosen. **W11:** guided tours stay date → language → time slot, confirmed unchanged.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listPerformances` reads the population and `getAvailability` reads one of them — list, select, act",
-  "purpose": "See select date & time for this venue.",
-  "gaps": [
-   {
-    "operation": "getAvailability",
-    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "purpose": "Pick a date, then a time that has room; the tickets for it come next.",
   "layout": {
    "template": "split",
    "regions": [
@@ -64,8 +78,71 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "banner",
+       "label": "Booking at",
+       "notes": "The venue of this booking with **Change location** (audit R267 choice); a switch clears the selection unless products share a `familyKey`; times and prices refresh. Only when `BookingFlowConfig.locationSwitcher` is on.",
+       "provenance": "decided 29 September, rev 3 REV3-18"
+      },
+      {
+       "kind": "selectField",
+       "label": "Part of the day",
+       "notes": "Morning, Afternoon, Evening chips with counts, split at `dayPartBoundaries` (12:00, 17:00 by default) in the venue time zone; when `dayPartFilter` is on.",
+       "operation": "listPerformances",
+       "provenance": "decided 29 September, rev 3 REV3-1"
+      },
+      {
+       "kind": "cardList",
+       "label": "Times",
+       "bindsTo": "Performance",
+       "notes": "Compact tiles, `timesPerPage` at a time (8, 12, 24, all; default 24) with Earlier and Later; sold-out times greyed. Hidden until a date is picked (`performanceReveal` `dateTimeTicket`).",
+       "operation": "listPerformances",
+       "provenance": "decided 29 September, rev 3 REV3-1, REV3-2"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tour language",
+       "notes": "Sends `?language=`; shows `Performance.language`, and `format` for cinema.",
+       "operation": "listPerformances",
+       "provenance": "decided 29 September, rev 3 REV3-17"
+      },
+      {
+       "kind": "selectField",
+       "label": "Choose your experience",
+       "bindsTo": "ProductCategory",
+       "notes": "Options with their `ProductCategory.description`.",
+       "operation": "listProductCategories",
+       "provenance": "decided 29 September, rev 3 REV3-19"
+      },
+      {
+       "kind": "selectField",
+       "label": "Select level",
+       "notes": "`listProducts?segmentTag=level/<code>`; Reset clears both filters. A four-day calendar lays out the times with places left and price per person.",
+       "operation": "listProducts",
+       "provenance": "decided 29 September, rev 3 REV3-19"
+      },
+      {
+       "kind": "iconButton",
+       "label": "Quick tour",
+       "notes": "Replays the four coach marks when `BookingFlowConfig.quickTour` is on.",
+       "provenance": "decided 29 September, rev 3 REV3-20"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listPerformances",
+       "notes": "Sends `?from=` to `listPerformances`.",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listPerformances",
+       "notes": "Sends `?to=` to `listPerformances`.",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every select date time",
+       "label": "Every performance",
        "bindsTo": "Performance",
        "columns": [
         "Performance.id",
@@ -80,6 +157,44 @@
        ],
        "operation": "listPerformances",
        "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Availability",
+       "operation": "getAvailability",
+       "notes": "From `getAvailability`, now a `PerformanceAvailabilityPage` (a Page of `PerformanceAvailability`, each with `startsAt`): `channelCapacityId`, `performanceId`, `startsAt`, `capacity`, `sold`, `leased`, `remaining`, `byChannel`. The time grid calls it once with `eventId`, `from` and `to` for every performance in the window (decided 29 September, rev 3 REV3-1), not once per tile.",
+       "provenance": "contract catalogue.yaml GET /availability",
+       "bindsTo": "PerformanceAvailability"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Booking steps",
+       "bindsTo": "BookingFlow",
+       "columns": [
+        "BookingFlow.steps"
+       ],
+       "operation": "getPublishedBookingFlow",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Next 7 days",
+       "operation": "listPerformances",
+       "notes": "**A date strip of the next `BookingFlowSettings.dateStripDays` days** (default 7, 3-31) with a calendar icon that opens the full month for later dates (M17-08).",
+       "provenance": "decided 29 September 2026 (P29), M17-08"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Check booking eligibility",
+       "operation": "checkBookingEligibility",
+       "provenance": "contract catalogue.yaml POST /eligibility-checks"
       }
      ]
     }
@@ -88,12 +203,18 @@
   "states": {
    "loading": "The select date time list.",
    "error": "Could not load. Names which read failed and leaves the select date time untouched.",
-   "emptyFirstRun": "No select date time yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the select date time are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No select date time yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on from, to and the select date time are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
+   {
+    "operationId": "checkBookingEligibility",
+    "contract": "catalogue",
+    "purpose": "Check the party's ages and heights",
+    "trigger": "onAction"
+   },
    {
     "operationId": "listPerformances",
     "contract": "catalogue",
@@ -105,6 +226,46 @@
     "contract": "catalogue",
     "purpose": "Live remaining capacity",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductCategories",
+    "contract": "catalogue",
+    "purpose": "The experience filter with descriptions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "Products of a category or level",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add the chosen time to the cart (the lease is taken server-side)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "The cart's `consentQuestions` after the time is added",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "recordConsentAnswers",
+    "contract": "marketing-crm",
+    "purpose": "Record the answers to the booking's consent questions",
+    "trigger": "onAction",
+    "invalidates": [
+     "getCart"
+    ]
+   },
+   {
+    "operationId": "getPublishedBookingFlow",
+    "contract": "white-label",
+    "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), W12"
    }
   ],
   "entryState": {
@@ -112,6 +273,14 @@
     {
      "name": "eventId",
      "from": "deepLink"
+    },
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `eventId`.",
@@ -119,10 +288,69 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-007"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-007",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "partial",
+    "view": "Buy tickets → a dated product → Booking (date and time step)",
+    "differences": "Booking in the app runs the website booking engine; per-flow step order."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCheckBookingEligibility",
+    "component": "modal",
+    "trigger": "Check booking eligibility",
+    "body": "**Collects what `checkBookingEligibility` sends before it is called.** Required: `productIds`, `party`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "EligibilityCheckRequest",
+    "confirm": {
+     "label": "Check booking eligibility",
+     "operation": "checkBookingEligibility"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "productIds",
+      "party"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "consentQuestions",
+    "component": "modal",
+    "trigger": "Once, after the session or date is picked, when the cart has consent questions",
+    "body": "**The venue's consent questions for this booking** (e.g. *Are you able to swim?*), one or several, in the order `Cart.consentQuestions` gives (the flow's `consentQuestionIds` and every cart product's, each once); per person or once per booking as each question says. Next records them with `recordConsentAnswers` (question version, answer, who, when). A blocking answer marks the lines it blocks. No tenant on/off toggle (decided 29 September, rev 3 REV3-26).",
+    "bindsTo": "ConsentQuestion",
+    "confirm": {
+     "label": "Next",
+     "operation": "recordConsentAnswers"
+    },
+    "dismiss": {
+     "label": "Back",
+     "discards": [
+      "answers"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "quickTour",
+    "component": "modal",
+    "trigger": "First booking visit on this device, or Quick tour",
+    "body": "**Four coach marks** over date, time, tickets and basket, with Back, Next and End tour; the first-visit flag is kept on the device only (decided 29 September, rev 3 REV3-20).",
+    "dismiss": {
+     "label": "End tour",
+     "discards": []
+    },
+    "provenance": "client-verified"
+   }
+  ],
+  "purposeNote": "Rewritten 29 September for the date → time → ticket order (decided 29 September, rev 3 REV3-2).",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -169,107 +397,264 @@
   },
   "navigation": {
    "entryFrom": [
-    "GST-001"
+    "GST-001",
+    "GST-004",
+    "GST-007"
    ],
-   "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-007",
+    "GST-041",
+    "GST-042",
+    "GST-072"
    ],
    "transitions": [
     {
-     "to": "GST-001",
-     "trigger": "Home – Default",
+     "to": "GST-041",
+     "trigger": "Continue to the basket",
+     "operation": "addCartLine",
      "carries": [
-      "subjectId"
+      "cartId"
      ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "precondition": "a date and time (dated products) and at least one ticket chosen",
+     "provenance": "decided 29 September, rev 3 REV3-2 and GAP-D3"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
+     "to": "GST-042",
+     "trigger": "Continue — sign in or use a guest code (when sign-in is asked after add-ons)",
+     "carries": [
+      "cartId"
+     ],
+     "precondition": "the guest is not signed in",
+     "provenance": "decided 29 September, rev 3 REV3-3: `signInAt` `afterAddOns`; add-ons are on this step on the app"
+    },
+    {
+     "to": "GST-007",
+     "trigger": "Change date or time",
+     "back": true,
+     "provenance": "decided 29 September, rev 3 REV3-2",
      "carries": [
       "eventId"
+     ]
+    },
+    {
+     "to": "GST-072",
+     "trigger": "Booking for a group or a party",
+     "provenance": "decided 29 September, rev 3 GAP-D3; DG-4",
+     "carries": [
+      "productId",
+      "token"
+     ]
+    },
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "provenance": "derived — GST-001 opens cold"
+    },
+    {
+     "to": "GST-007",
+     "trigger": "Workshop chosen, then date and time (product-first flow)",
+     "carries": [
+      "productId"
      ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "decided 29 September 2026 (P29), W8"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "Inventory cites `local` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "**Rev 3 (decided 29 September).** **Ticket selection moved onto this screen** (GAP-D3): the name promised choosing tickets and add-ons and the definition was a ticket transfer, which stays on GST-014 / GST-045 (one implementation with two ids). Tickets come after the date and time (REV3-2); categories (REV3-16); info-only products show their label and open details (REV3-14); ticket-type descriptions (23SEP-6) and tags (23SEP-3); Help me choose as a region and a sheet (REV3-11); Booking at (REV3-18). On mobile the basket stays a bottom bar with the running total (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** **W4:** Help me choose filters the products (`guidedAnswerIds`) with *Show everything*; `behaviour` `recommend` stays an option. **W8:** in a product-first flow (workshop, experience) this step comes first and the date and time follow (GST-007). **W5:** surf levels (beginner, intermediate …) appear only after the time slot.",
   "density": "comfortable",
-  "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
-  "purpose": "Find tickets & add-ons for this venue.",
-  "gaps": [
-   {
-    "operation": "transferOrderTickets",
-    "why": "**`transferOrderTickets` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract orders.yaml POST /orders/{orderId}/transfer"
-   }
-  ],
+  "pattern": "listDetail",
+  "patternReason": "`listProductVariants` reads the ticket types of the product and a stepper sets each quantity — list, select, act (rewritten decided 29 September, rev 3 GAP-D3: the ticket-selection functions the name promises moved onto this screen)",
+  "purpose": "Choose which tickets and how many, and any add-ons, for the date and time picked.",
   "layout": {
-   "template": "form",
+   "template": "split",
    "regions": [
     {
-     "name": "actionBar",
-     "slot": "publish",
+     "name": "contentBody",
+     "slot": "collection",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "kind": "banner",
+       "label": "Booking at",
+       "notes": "The venue of this booking with **Change location**; only when `locationSwitcher` is on.",
+       "provenance": "decided 29 September, rev 3 REV3-18"
+      },
+      {
+       "kind": "cardList",
+       "label": "Ticket categories",
+       "bindsTo": "ProductCategory",
+       "notes": "Category tiles then tickets, or a flat list, per `ticketCategories`.",
+       "operation": "listProductCategories",
+       "provenance": "decided 29 September, rev 3 REV3-16"
+      },
+      {
+       "kind": "cardList",
+       "label": "Ticket types",
+       "bindsTo": "ProductVariant",
+       "columns": [
+        "ProductVariant.id",
+        "ProductVariant.name",
+        "ProductVariant.description",
+        "ProductVariant.axisValues",
+        "ProductVariant.isActive"
+       ],
+       "notes": "Each row with a stepper and a live price; `ProductVariant.description` behind the (i) when `cardInfo` is on (23SEP-6); display tags when `ticketTags` is on (23SEP-3). Hidden until a time is picked in the dated flow (`performanceReveal`).",
+       "operation": "listProductVariants",
+       "provenance": "decided 29 September, rev 3 GAP-D3, REV3-2, 23SEP-6"
+      },
+      {
+       "kind": "cardList",
+       "label": "Add-ons",
+       "bindsTo": "Product",
+       "notes": "All add-ons on this one step, as the prototype does.",
+       "operation": "listProducts",
+       "provenance": "decided 29 September, rev 3 GAP-D3"
+      },
+      {
+       "kind": "banner",
+       "label": "Help me choose",
+       "bindsTo": "GuidedChoice",
+       "notes": "The venue's published Help me choose (404 = none): a button, a pop-up once on first arrival, and/or a dark banner under the products (*Choose from the experiences above or let us help you decide*). **29 September (W4): the answers filter the list** — sent as `guidedAnswerIds` to `listProducts`, so only suitable products stay; *Show everything* clears it. Never a consent step: a swimmer answer pre-fills the REV3-26 swim consent, which the guest still confirms.",
+       "operation": "getPublishedGuidedChoice",
+       "provenance": "decided 29 September, rev 3 REV3-11; prototype r3hmc"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Booking steps",
+       "bindsTo": "BookingFlow",
+       "columns": [
+        "BookingFlow.steps"
+       ],
+       "operation": "getPublishedBookingFlow",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Show everything",
+       "operation": "listProducts",
+       "notes": "Clears the Help me choose filter (W4).",
+       "provenance": "decided 29 September 2026 (P29), W4"
       }
      ]
     },
     {
-     "name": "contentBody",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "transferOrderTickets"
+       "kind": "primaryButton",
+       "label": "Continue",
+       "operation": "addCartLine",
+       "provenance": "decided 29 September, rev 3 GAP-D3"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The saved tickets add-ons.",
-   "error": "Could not load. Names which read failed and leaves the tickets add-ons untouched.",
-   "emptyFirstRun": "No tickets add-ons configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "The ticket types of the product, with prices.",
+   "error": "Could not load. Names which read failed; nothing is added.",
+   "emptyFirstRun": "**This product has no ticket types on sale.** Says so and offers the product page.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing.",
+   "emptyNoResults": "No ticket in the category picked. Names the category and offers the others."
   },
   "apis": [
    {
-    "operationId": "transferOrderTickets",
+    "operationId": "listProductVariants",
+    "contract": "catalogue",
+    "purpose": "The ticket types and prices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductCategories",
+    "contract": "catalogue",
+    "purpose": "Ticket categories",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "The add-ons, and the tickets of a category",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPublishedGuidedChoice",
+    "contract": "white-label",
+    "purpose": "The venue's published Help me choose (404 = none)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
+    "purpose": "Add the tickets and add-ons",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getPublishedBookingFlow",
+    "contract": "white-label",
+    "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), W12"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "orderId",
-     "from": "deepLink"
+     "name": "productId",
+     "from": "GST-004"
+    },
+    {
+     "name": "performanceId",
+     "from": "GST-007",
+     "optional": true
+    },
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
+   "coldEntry": "**A link to a product no longer on sale** says so and offers the listing; a performance that has passed offers the next one."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-008"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-008",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "partial",
+    "view": "Buy tickets → a product → Booking (tickets step)",
+    "differences": "Booking in the app runs the website booking engine."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "purposeNote": "Rewritten 29 September (decided 29 September, rev 3 GAP-D3). The screen had been defined as ticket transfer (`transferOrderTickets` only), a duplicate of GST-014 / GST-045; transfer stays there.",
+  "overlays": [
+   {
+    "id": "helpMeChoose",
+    "component": "modal",
+    "trigger": "Help me choose (button, banner, or once on first arrival when the mode is popupOnArrival)",
+    "body": "**One or two questions, three answers each** (title, one-liner, icon, optional badge); the last answer opens its target (a product, a category, an event or a module) through a result card. **Start over** returns to the first question. Answers stay on the device (decided 29 September, rev 3 REV3-11). The prototype draws it as a full-height sheet (r3quiz) opened from the banner, so it is an overlay of this step rather than a screen of its own.",
+    "bindsTo": "GuidedChoice",
+    "confirm": {
+     "label": "Show me"
+    },
+    "dismiss": {
+     "label": "Close",
+     "discards": [
+      "answers"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -321,32 +706,17 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-048 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "Inventory cites `GET /recommendations` — no matching operation. Written before the contracts existed."
-  ],
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getUpsellSuggestions` reads one record and nothing reads a population — the screen is about that one thing",
@@ -360,7 +730,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected upsell cross-sell",
+       "label": "The upsell suggestion",
        "bindsTo": "UpsellSuggestion",
        "columns": [
         "UpsellSuggestion.variantId",
@@ -384,7 +754,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       }
@@ -393,11 +763,10 @@
    ]
   },
   "states": {
-   "loading": "The upsell cross-sell list.",
+   "loading": "The upsell cross-sell, read by `getUpsellSuggestions`.",
    "error": "Could not load. Names which read failed and leaves the upsell cross-sell untouched.",
-   "emptyFirstRun": "No upsell cross-sell yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the upsell cross-sell are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No upsell cross-sell yet. Offers Add cart line (`addCartLine`).",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getUpsellSuggestions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -408,10 +777,18 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "getUpsellSuggestions",
-    "contract": "promotions",
-    "purpose": "Suggestions for a cart",
-    "trigger": "onAction"
+    "operationId": "decideRecommendations",
+    "contract": "ai",
+    "purpose": "Fill a recommendation slot",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordRecommendationEvents",
+    "contract": "ai",
+    "purpose": "Report what happened to recommended items",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -425,10 +802,42 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-048"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-048",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Upsell / cross-sell"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -475,34 +884,25 @@
   },
   "navigation": {
    "entryFrom": [
-    "GST-001"
+    "GST-001",
+    "GST-007",
+    "GST-004",
+    "GST-077"
    ],
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-049 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**Rev 3 (decided 29 September).** Date and time inline or as a pop-up (REV3-4); view box always below on mobile (REV3-5, 23SEP-14); time bar (REV3-6); at most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking (default 10, bounds 1-50; `422 seat-limit-exceeded` reads *Up to {maxSeats} seats per booking*) and the basket lists each seat (REV3-7); may render with GST-007 as one step (REV3-7); fixture strip and a direct path from GST-004 (23SEP-16). A cabana map is GST-074, not this screen (REV3-15). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**29 September (W2).** Sections first, zoom into a section for seats, pinch out or *Whole map* back to the full map; held seats are kept.",
   "density": "comfortable",
   "boardFrames": [
    "Seat Board 4.dc.html#seat-4a"
@@ -519,7 +919,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected interactive seat selection",
+       "label": "The seat availability",
        "bindsTo": "SeatAvailability",
        "columns": [
         "SeatAvailability.performanceId",
@@ -530,6 +930,34 @@
        ],
        "operation": "getSeatAvailability",
        "provenance": "contract seating.yaml GET /performances/{performanceId}/seat-availability"
+      },
+      {
+       "kind": "seatMap",
+       "label": "Choose seats",
+       "notes": "**A seat selection screen with no seat map.** `noGeometry` is the state that matters: a map imported from a manifest alone can be sold from a list and not rendered, and the screen has to say which it is rather than showing an empty frame. **Sections first** (W2): the whole map in section colours with prices; tapping a section zooms into it in place and shows its seats; **pinch out** (or *← Whole map*) returns to the whole map to compare sections, keeping the seats already held.",
+       "provenance": "minute 2026-08-03 §Ticket Flow Variations by Product Type"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time bar",
+       "notes": "The chosen performance, the other times to switch to, and **Change date**; switching releases the held seats (`relinquishSeatHold`, the guest's own hold) and holds new ones. Only when `seatTimeBar` is on (default on).",
+       "operation": "listPerformances",
+       "provenance": "decided 29 September, rev 3 REV3-6"
+      },
+      {
+       "kind": "cardList",
+       "label": "Fixture strip",
+       "notes": "The fixture as a strip at the top of the seat step.",
+       "operation": "listPerformances",
+       "provenance": "decided 29 September, rev 3 23SEP-16"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "View from this section",
+       "bindsTo": "SeatAvailability.sections",
+       "notes": "The section photo (`viewAssetId`) or a view rendered from the geometry; **always below the map on mobile**.",
+       "operation": "getSeatAvailability",
+       "provenance": "decided 29 September, rev 3 23SEP-14, REV3-5"
       }
      ]
     },
@@ -539,60 +967,25 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create seat hold",
        "operation": "createSeatHold",
        "provenance": "contract seating.yaml POST /seat-holds"
       },
       {
        "kind": "secondaryButton",
-       "label": "Recommend",
+       "label": "Recommend seats",
        "operation": "recommendSeats",
        "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getSeatAvailability",
-       "notes": "One record, read-only.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createSeatHold",
-       "label": "Create seat hold",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createSeatHold",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "seatMap",
-       "label": "Choose seats",
-       "notes": "**A seat selection screen with no seat map.** `noGeometry` is the state that matters: a map imported from a manifest alone can be sold from a list and not rendered, and the screen has to say which it is rather than showing an empty frame.",
-       "provenance": "minute 2026-08-03 §Ticket Flow Variations by Product Type"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The interactive seat selection list.",
+   "loading": "The interactive seat selection, read by `getSeatAvailability`.",
    "error": "Could not load. Names which read failed and leaves the interactive seat selection untouched.",
-   "emptyFirstRun": "No interactive seat selection yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the interactive seat selection are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No interactive seat selection yet. Offers Create seat hold (`createSeatHold`).",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -613,6 +1006,18 @@
     "contract": "seating",
     "purpose": "Recommend seats for a party",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listPerformances",
+    "contract": "catalogue",
+    "purpose": "The event's other times (time bar, date and time pop-up)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "relinquishSeatHold",
+    "contract": "seating",
+    "purpose": "Release the seats held for the old performance when the guest switches time on the time bar (decided 29 September, rev 3 REV3-6); a guest releases only their own hold",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -620,17 +1025,100 @@
     {
      "name": "performanceId",
      "from": "deepLink"
+    },
+    {
+     "name": "eventId",
+     "from": "GST-007"
+    },
+    {
+     "name": "holdId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A link to a performance that has happened.** Offers the next performance of the same event."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-049",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "partial",
+    "view": "Buy tickets → a stadium or theatre event → seat map (← Whole map)",
+    "differences": "The app runs the website seat engine (2D and 3D)."
+   },
+   "derivedFrom": "wireframes/reference/Seat Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateSeatHold",
+    "component": "modal",
+    "trigger": "Create seat hold",
+    "body": "**Collects what `createSeatHold` sends before it is called.** Required: `id`, `performanceId`, `seatIds`, `ttlSeconds`. Optional: `subjectId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateSeatHoldRequest",
+    "confirm": {
+     "label": "Create seat hold",
+     "operation": "createSeatHold"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "performanceId",
+      "seatIds",
+      "ttlSeconds",
+      "subjectId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRecommendSeats",
+    "component": "modal",
+    "trigger": "Recommend seats",
+    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize`, `strategy`. Optional: `categoryIds`, `maxPrice`, `accessibleCount`, `maxOptions`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SeatRecommendationRequest",
+    "confirm": {
+     "label": "Recommend seats",
+     "operation": "recommendSeats"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partySize",
+      "strategy",
+      "categoryIds",
+      "maxPrice",
+      "accessibleCount",
+      "maxOptions"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "dateTimeOnSeatMap",
+    "component": "modal",
+    "trigger": "The seat map opens for an event with several performances and `seatEventDateMode` is `popupOnSeatMap`",
+    "body": "**Pick the date and time over the seat map**; choosing one loads that performance's seats (decided 29 September, rev 3 REV3-4).",
+    "bindsTo": "Performance",
+    "confirm": {
+     "label": "Show seats",
+     "to": "GST-049",
+     "carries": [
+      "performanceId"
+     ]
+    },
+    "dismiss": {
+     "label": "Close",
+     "discards": []
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -684,7 +1172,6 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-016"
    ],
    "transitions": [
@@ -696,36 +1183,15 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-050 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.8: *\"resource bookings (e.g., cabana rental) decrement a capacity-based inventory on booking\"*. **Distinct from GST-058**: this is one resource with a price and a booking action; GST-058 is availability across areas. Confirmed against storyboard boards 7.10 and 8.8 on 18 August.",
-  "openQuestions": [
-   "Inventory cites `POST /resource-bookings` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "Minuted 10 Aug §4.8: *\"resource bookings (e.g., cabana rental) decrement a capacity-based inventory on booking\"*. **Distinct from GST-058**: this is one resource with a price and a booking action; GST-058 is availability across areas. Confirmed against storyboard boards 7.10 and 8.8 on 18 August.\n\n**Rev 3 (decided 29 September).** **A cabana placed on an ingested venue map is picked on the map and bought** (REV3-15 and GAP-C2, superseding audit R073 (c) for those resources): that is GST-074. This screen stays for a resource sold as capacity where the venue has no map, so the unit is assigned rather than chosen.\n\n**29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana: pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map back end as F&B and locations.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getAvailability` reads one of them — list, select, act",
   "purpose": "Book a cabana or other capacity-based resource.",
-  "gaps": [
-   {
-    "operation": "getAvailability",
-    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -734,8 +1200,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every resource booking cabana",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -753,6 +1240,14 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Availability",
+       "operation": "getAvailability",
+       "notes": "From `getAvailability`, now a `PerformanceAvailabilityPage` (a Page of `PerformanceAvailability`, each with `startsAt`): `channelCapacityId`, `performanceId`, `startsAt`, `capacity`, `sold`, `leased`, `remaining`, `byChannel`. The time grid calls it once with `eventId`, `from` and `to` for every performance in the window (decided 29 September, rev 3 REV3-1), not once per tile.",
+       "provenance": "contract catalogue.yaml GET /availability",
+       "bindsTo": "PerformanceAvailability"
       }
      ]
     },
@@ -762,7 +1257,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       }
@@ -773,9 +1268,9 @@
   "states": {
    "loading": "The resource booking cabana list.",
    "error": "Could not load. Names which read failed and leaves the resource booking cabana untouched.",
-   "emptyFirstRun": "No resource booking cabana yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the resource booking cabana are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No resource booking cabana yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the resource booking cabana are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -813,10 +1308,43 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-050"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-050",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Account → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map",
+    "differences": "Rev 3 books from a map, with a hold countdown and sold-out cabanas; the YAML is a list with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff (R073c), which contradicts both this screen and the prototype."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -863,34 +1391,33 @@
   },
   "navigation": {
    "entryFrom": [
-    "GST-001"
+    "GST-001",
+    "GST-004"
    ],
    "inferred": true,
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003"
+    "GST-041"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-056 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
+     "to": "GST-041",
+     "trigger": "Add the meal combo (admission included) to the basket",
+     "operation": "addCartLine",
      "carries": [
-      "eventId"
+      "cartId"
      ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "decided 29 September 2026 (P29), MOB-4"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**29 September (MOB-4).** A **meal combo with admission** is a bundle with an admission component and a meal component: *Buy meal combo* on Item Detail (GST-004) opens it here, and checkout is about three steps.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listCatalogueBundles` reads the population and `getBundle` reads one of them — list, select, act",
@@ -904,7 +1431,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every bundle package",
+       "label": "Every bundle",
        "bindsTo": "BundleSummary",
        "columns": [
         "BundleSummary.venueId",
@@ -928,7 +1455,25 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected bundle package",
+       "label": "The selected bundle",
+       "bindsTo": "BundleSummary",
+       "columns": [
+        "BundleSummary.venueId",
+        "BundleSummary.publishedAt",
+        "BundleSummary.publishedBy",
+        "BundleSummary.contentHash",
+        "BundleSummary.signatureKeyId",
+        "BundleSummary.staleAfter",
+        "BundleSummary.sizeBytes",
+        "BundleSummary.note",
+        "BundleSummary.appliedByWorkstations"
+       ],
+       "operation": "listCatalogueBundles",
+       "provenance": "contract catalogue.yaml GET /catalogue/bundles"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The bundle",
        "bindsTo": "Bundle",
        "columns": [
         "Bundle.code",
@@ -959,7 +1504,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       }
@@ -970,9 +1515,9 @@
   "states": {
    "loading": "The bundle package list.",
    "error": "Could not load. Names which read failed and leaves the bundle package untouched.",
-   "emptyFirstRun": "No bundle package yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the bundle package are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No bundle package yet. Offers Add cart line (`addCartLine`).",
+   "emptyNoResults": "Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -1011,19 +1556,51 @@
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `bundleId`.",
    "preloaded": [
-    "Bundle.code",
-    "Bundle.name",
-    "Bundle.description",
-    "Bundle.venueId",
-    "Bundle.kind"
+    "BundleSummary.venueId",
+    "BundleSummary.publishedAt",
+    "BundleSummary.publishedBy",
+    "BundleSummary.contentHash",
+    "BundleSummary.signatureKeyId"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-056"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-056",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Bundle package"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1076,8 +1653,8 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
-    "GST-050"
+    "GST-050",
+    "GST-074"
    ],
    "transitions": [
     {
@@ -1088,36 +1665,23 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-058 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
+     "to": "GST-074",
+     "trigger": "Choose on the map (a venue with its spots on a map)",
      "carries": [
-      "eventId"
+      "productId"
      ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "decided 29 September, rev 3 REV3-15"
     }
    ]
   },
-  "notes": "**Deliberately separate from GST-050**, and checked on 18 August. Board 8 panel 8 is availability across areas with counts remaining; board 7 panel 10 is one cabana with a price and a Book Now. **A list and a detail, not a duplicate** — merging them would put a booking action on a browsing screen.",
-  "openQuestions": [
-   "Inventory cites `GET /resources/availability` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "**Deliberately separate from GST-050**, and checked on 18 August. Board 8 panel 8 is availability across areas with counts remaining; board 7 panel 10 is one cabana with a price and a Book Now. **A list and a detail, not a duplicate** — merging them would put a booking action on a browsing screen.\n\n**Rev 3 (decided 29 September).** Where the venue's spots are on an ingested map, availability is shown on the map (GST-074, REV3-15); this list stays for capacity-sold resources.\n\n**29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana: pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map back end as F&B and locations.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getAvailability` reads one of them — list, select, act",
   "purpose": "See which cabanas are free, by area and date, before choosing one.",
-  "gaps": [
-   {
-    "operation": "getAvailability",
-    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1126,8 +1690,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every resource availability (cabana)",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -1145,6 +1730,14 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Availability",
+       "operation": "getAvailability",
+       "notes": "From `getAvailability`, now a `PerformanceAvailabilityPage` (a Page of `PerformanceAvailability`, each with `startsAt`): `channelCapacityId`, `performanceId`, `startsAt`, `capacity`, `sold`, `leased`, `remaining`, `byChannel`. The time grid calls it once with `eventId`, `from` and `to` for every performance in the window (decided 29 September, rev 3 REV3-1), not once per tile.",
+       "provenance": "contract catalogue.yaml GET /availability",
+       "bindsTo": "PerformanceAvailability"
       }
      ]
     }
@@ -1153,9 +1746,9 @@
   "states": {
    "loading": "The resource availability (cabana) list.",
    "error": "Could not load. Names which read failed and leaves the resource availability (cabana) untouched.",
-   "emptyFirstRun": "No resource availability (cabana) yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the resource availability (cabana) are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No resource availability (cabana) yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the resource availability (cabana) are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -1177,8 +1770,16 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-058"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-058",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map",
+    "differences": "The Rev 3 cabana map puts availability and booking on one screen."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1241,7 +1842,7 @@
      "carries": [
       "subjectId"
      ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-072 holds subjectId, so an edge into it carries them"
     }
    ]
   },
@@ -1251,13 +1852,6 @@
   "pattern": "statusTracker",
   "patternReason": "`getGroupBooking` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "**A guest buying eight tickets could not give seven of them away.** `shareEntitlement`, `getGroupBooking` and `respondToInvitation` had no surface, so a group booking was one person holding eight barc",
-  "gaps": [
-   {
-    "operation": "getMyChallenges",
-    "why": "**1 declared operation reach no component on this screen**: getMyChallenges. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -1267,7 +1861,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected share group booking",
+       "label": "The group booking",
        "bindsTo": "GroupBooking",
        "columns": [
         "GroupBooking.id",
@@ -1283,6 +1877,69 @@
        ],
        "operation": "getGroupBooking",
        "provenance": "contract orders.yaml GET /group-bookings/{groupBookingId}"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every group package definition",
+       "bindsTo": "GroupPackageDefinition",
+       "columns": [
+        "GroupPackageDefinition.id",
+        "GroupPackageDefinition.productId",
+        "GroupPackageDefinition.kind",
+        "GroupPackageDefinition.maxParticipants",
+        "GroupPackageDefinition.durationMinutes",
+        "GroupPackageDefinition.hostCount",
+        "GroupPackageDefinition.pricingBasis",
+        "GroupPackageDefinition.freeLeaderRatio",
+        "GroupPackageDefinition.paymentMode",
+        "GroupPackageDefinition.includes",
+        "GroupPackageDefinition.scopePath"
+       ],
+       "operation": "listGroupPackages",
+       "provenance": "contract catalogue.yaml GET /group-packages"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The challenge",
+       "bindsTo": "Challenge",
+       "columns": [
+        "Challenge.id",
+        "Challenge.name",
+        "Challenge.kind",
+        "Challenge.scope",
+        "Challenge.goal",
+        "Challenge.eventId",
+        "Challenge.rewardKind",
+        "Challenge.rewardValue",
+        "Challenge.rewardAmount",
+        "Challenge.badgeAssetId",
+        "Challenge.startsAt",
+        "Challenge.endsAt",
+        "Challenge.status",
+        "Challenge.scopePath"
+       ],
+       "operation": "getMyChallenges",
+       "provenance": "contract marketing-crm.yaml GET /guests/me/challenges"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The group package definition",
+       "bindsTo": "GroupPackageDefinition",
+       "columns": [
+        "GroupPackageDefinition.id",
+        "GroupPackageDefinition.productId",
+        "GroupPackageDefinition.kind",
+        "GroupPackageDefinition.maxParticipants",
+        "GroupPackageDefinition.durationMinutes",
+        "GroupPackageDefinition.hostCount",
+        "GroupPackageDefinition.pricingBasis",
+        "GroupPackageDefinition.freeLeaderRatio",
+        "GroupPackageDefinition.paymentMode",
+        "GroupPackageDefinition.includes",
+        "GroupPackageDefinition.scopePath"
+       ],
+       "operation": "getGroupPackageDefinition",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/group-package"
       }
      ]
     },
@@ -1292,21 +1949,27 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Share",
+       "label": "Share entitlement",
        "operation": "shareEntitlement",
        "provenance": "contract orders.yaml POST /entitlements/{entitlementId}/share"
       },
       {
        "kind": "secondaryButton",
-       "label": "Respond",
+       "label": "Respond to invitation",
        "operation": "respondToInvitation",
        "provenance": "contract marketing-crm.yaml POST /invitations/{token}/respond"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create referral",
        "operation": "createReferral",
        "provenance": "contract marketing-crm.yaml POST /referrals"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request group booking",
+       "operation": "requestGroupBooking",
+       "provenance": "contract orders.yaml POST /group-booking-requests"
       }
      ]
     }
@@ -1317,10 +1980,28 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Nothing shared.** A guest holding eight tickets sees the option here rather than discovering it at the gate.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listGroupPackages` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Tickets already shared stay visible. Sharing, invitations and referrals need the connection — a transfer nobody received is a ticket nobody holds."
   },
   "apis": [
+   {
+    "operationId": "listGroupPackages",
+    "contract": "catalogue",
+    "purpose": "School-trip formats and party packages",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGroupPackageDefinition",
+    "contract": "catalogue",
+    "purpose": "What a package includes",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "requestGroupBooking",
+    "contract": "orders",
+    "purpose": "Ask for a school trip or a birthday party",
+    "trigger": "onAction"
+   },
    {
     "operationId": "shareEntitlement",
     "contract": "orders",
@@ -1369,16 +2050,644 @@
     {
      "name": "token",
      "from": "deepLink"
+    },
+    {
+     "name": "productId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-072"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-072",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Share & group booking"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRequestGroupBooking",
+    "component": "modal",
+    "trigger": "Request group booking",
+    "body": "**Collects what `requestGroupBooking` sends before it is called.** Required: `kind`, `packageProductId`, `preferredDate`, `expectedSize`. Optional: `organisationName`, `yearGroup`, `accessAndDietaryNeeds`, `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "GroupBookingRequest",
+    "confirm": {
+     "label": "Request group booking",
+     "operation": "requestGroupBooking"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "packageProductId",
+      "preferredDate",
+      "expectedSize",
+      "organisationName",
+      "yearGroup",
+      "accessAndDietaryNeeds",
+      "celebrantName",
+      "celebrantTurningAge",
+      "allergiesAndRequests"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formShareEntitlement",
+    "component": "modal",
+    "trigger": "Share entitlement",
+    "body": "**Collects what `shareEntitlement` sends before it is called.** Required: `toSubjectId`. Optional: `validUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Share entitlement",
+     "operation": "shareEntitlement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "toSubjectId",
+      "validUntil"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRespondToInvitation",
+    "component": "modal",
+    "trigger": "Respond to invitation",
+    "body": "**Collects what `respondToInvitation` sends before it is called.** Required: `response`. Optional: `plusOnes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Respond to invitation",
+     "operation": "respondToInvitation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "response",
+      "plusOnes"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formCreateReferral",
+    "component": "modal",
+    "trigger": "Create referral",
+    "body": "**Collects what `createReferral` sends before it is called.** Required: `id`, `referrerSubjectId`, `code`, `status`. Optional: `refereeSubjectId`, `qualifyingAction`, `referrerRewardId`, `refereeRewardId`, `expiresAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Referral",
+    "confirm": {
+     "label": "Create referral",
+     "operation": "createReferral"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "referrerSubjectId",
+      "code",
+      "status",
+      "refereeSubjectId",
+      "qualifyingAction",
+      "referrerRewardId",
+      "refereeRewardId",
+      "expiresAt",
+      "scopePath"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-074",
+  "name": "Map Booking — Cabanas & Spots",
+  "module": "Booking & Selection",
+  "requiresModule": "resources",
+  "wave": 3,
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/map-booking",
+   "component": "apps/guest-app/src/routes/general/MapBookingCanvas.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-004",
+    "GST-058"
+   ],
+   "exitTo": [
+    "GST-004",
+    "GST-041",
+    "GST-016"
+   ],
+   "transitions": [
+    {
+     "to": "GST-041",
+     "trigger": "Go to checkout",
+     "operation": "addCartLine",
+     "carries": [
+      "cartId"
+     ],
+     "precondition": "a spot is held and added",
+     "provenance": "decided 29 September, rev 3 REV3-15"
+    },
+    {
+     "to": "GST-016",
+     "trigger": "See it in my reservations",
+     "provenance": "decided 29 September, rev 3 REV3-15; flow F52 step 2→3"
+    },
+    {
+     "to": "GST-004",
+     "trigger": "Back to the product",
+     "back": true,
+     "provenance": "decided 29 September, rev 3 REV3-15",
+     "carries": [
+      "productId"
+     ]
+    }
+   ]
+  },
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-15 and GAP-C2). **Cabana maps work like the stadium seat map:** the venue's map is ingested with its cabanas, loungers and other bookable spots (number, zone, capacity, price band), and the guest picks a specific one on the map and buys it. This supersedes audit R073 (c) (*cabanas stay staff-booked*) for resources placed on an ingested map. **Tables on the map are non-dining spots sold like cabanas** (decided 29 September by the user); a restaurant table stays the F&B reservation flow (WEB-036 / GST-070). The map comes from `getVenueMap` (its `resources`: label, kind, zone, capacity, price band, boundary) and the status of every spot for the chosen day from one `getMapResourceAvailability` call, joined on `resourceId`; held, booked and unavailable spots are greyed. Tapping a free spot calls `createResourceHold` and starts the *Remaining time* counter from the hold's `expiresAt` (8 minutes, extendable to 30 in all, audit R169); Add to basket sends `addCartLine` with the spot's price-band `variantId` and the `resourceHoldId`, e.g. *Cabana B09 · Large cabana · Beach, AED 1,855*. Picking another spot releases the first hold (`relinquishResourceHold`).\n\n**29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana: pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map back end as F&B and locations.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`getMapResourceAvailability` reads the population of spots and a tap holds one of them — list (as a map), select, act",
+  "purpose": "Pick a specific cabana, lounger or other spot on the venue map and hold it while you book.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "datePicker",
+       "label": "Date",
+       "notes": "Sends `from`/`to` (the venue's opening for the day, or a slot) to `getMapResourceAvailability`.",
+       "operation": "getMapResourceAvailability",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      },
+      {
+       "kind": "numberField",
+       "label": "Who is coming",
+       "notes": "`partySize`; a spot smaller than the party is refused `422 party-exceeds-capacity`.",
+       "operation": "createResourceHold",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      },
+      {
+       "kind": "selectField",
+       "label": "Area",
+       "bindsTo": "PlacedResource.zone",
+       "notes": "Beach, Tower, Riverside, Splash zone… from the placed resources' zones.",
+       "operation": "getVenueMap",
+       "provenance": "decided 29 September, rev 3 REV3-15; prototype cabana map"
+      },
+      {
+       "kind": "seatMap",
+       "label": "Venue map",
+       "bindsTo": "VenueMapDetail.resources",
+       "notes": "The ingested map with every placed spot drawn at its boundary and numbered (R01-R10, T01-T08, S01-S06, B01-B10 on Coastal Aqua). Free spots are tappable; held, booked and unavailable ones greyed.",
+       "operation": "getVenueMap",
+       "provenance": "decided 29 September, rev 3 REV3-15, GAP-C2"
+      },
+      {
+       "kind": "cardList",
+       "label": "Spots",
+       "bindsTo": "MapResourceAvailability.resources",
+       "notes": "The same spots as a list for the chosen area: number, capacity, price band and price, status. The accessible alternative to the map.",
+       "operation": "getMapResourceAvailability",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      },
+      {
+       "kind": "selectField",
+       "label": "Map",
+       "bindsTo": "BookableVenueMaps.maps",
+       "operation": "listBookableVenueMaps",
+       "notes": "**Which map to book on.** `listBookableVenueMaps(venueId, productId)` returns the venue's published maps that carry bookable spots; with one map the screen opens it directly and this choice is not shown. The chosen map's `mapId` is what `getVenueMap` (at its `publishedVersion`) and `getMapResourceAvailability` read (decided 29 September, rev 3 REV3-15).",
+       "provenance": "contract venue-map.yaml GET /bookable-venue-maps"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Remaining time",
+       "bindsTo": "ResourceHold.expiresAt",
+       "notes": "Counts down from the hold's `expiresAt`, always visible. At zero the spot is released and the guest is told.",
+       "operation": "getResourceHold",
+       "provenance": "decided 29 September, rev 3 REV3-15; audit R169"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The spot you picked",
+       "bindsTo": "PlacedResource",
+       "columns": [
+        "PlacedResource.label",
+        "PlacedResource.kind",
+        "PlacedResource.zone",
+        "PlacedResource.capacity",
+        "PlacedResource.priceBandCode"
+       ],
+       "operation": "getVenueMap",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add to basket",
+       "notes": "Sends `variantId` (the spot's price band) and `resourceHoldId`.",
+       "operation": "addCartLine",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Keep it longer",
+       "operation": "extendResourceHold",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Pick another",
+       "notes": "Releases the hold at once so the spot is free for others.",
+       "operation": "relinquishResourceHold",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue map and the status of every spot for the day, read together.",
+   "error": "Could not load the map or the spots. Names which read failed; nothing is held.",
+   "emptyFirstRun": "**No bookable spots are placed on this map yet.** Says so and offers the venue's other ways to book, rather than an empty map.",
+   "emptyNoResults": "Every spot in this area is taken for the day. Names the area and offers another area or day.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** The map and the spots already loaded stay on screen with their age, never shown as free now. Holding a spot and adding it to the basket need the connection — a cabana held offline is a cabana two people think they have."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueMap",
+    "contract": "venue-map",
+    "purpose": "The map with its placed spots (label, kind, zone, capacity, price band)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getMapResourceAvailability",
+    "contract": "resources",
+    "purpose": "Every spot's status for the day in one call",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createResourceHold",
+    "contract": "resources",
+    "purpose": "Hold the tapped spot for the window",
+    "trigger": "onAction",
+    "invalidates": [
+     "getMapResourceAvailability"
+    ]
+   },
+   {
+    "operationId": "getResourceHold",
+    "contract": "resources",
+    "purpose": "The hold's countdown",
+    "trigger": "onInterval"
+   },
+   {
+    "operationId": "extendResourceHold",
+    "contract": "resources",
+    "purpose": "Keep the hold longer while paying",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "relinquishResourceHold",
+    "contract": "resources",
+    "purpose": "Release the hold",
+    "trigger": "onAction",
+    "invalidates": [
+     "getMapResourceAvailability"
+    ]
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add the held spot to the basket (`variantId`, `resourceHoldId`)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listBookableVenueMaps",
+    "contract": "venue-map",
+    "purpose": "Find the venue's published map with bookable spots (with productId when the product page opened it); getVenueMap then reads that map's published version (decided 29 September, rev 3 REV3-15)",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "mapId",
+     "from": "GST-004",
+     "optional": true
+    },
+    {
+     "name": "productId",
+     "from": "GST-004",
+     "optional": true
+    },
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "holdId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "**A link to a map that is no longer published, or a day that has passed,** says which and offers today on the current map. Nothing is held on arrival."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-074",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Rev 3 feedback → Cabana map (r3cabmap)"
+   }
+  },
+  "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
+  "overlays": [
+   {
+    "id": "confirmReleaseHold",
+    "component": "confirmDialog",
+    "trigger": "Pick another (or tapping a second spot)",
+    "body": "**Release the spot you are holding?** It goes back on the map at once and someone else may take it.",
+    "confirm": {
+     "label": "Release it",
+     "operation": "relinquishResourceHold"
+    },
+    "dismiss": {
+     "label": "Keep it",
+     "carries": [
+      "holdId"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-075",
+  "name": "Book a Space by the Hour",
+  "module": "Booking & Selection",
+  "requiresModule": "resources",
+  "wave": 3,
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/space-by-the-hour",
+   "component": "apps/guest-app/src/routes/general/SpaceByTheHourWizard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-004"
+   ],
+   "exitTo": [
+    "GST-004",
+    "GST-041"
+   ],
+   "transitions": [
+    {
+     "to": "GST-041",
+     "trigger": "Add to basket",
+     "operation": "addCartLine",
+     "carries": [
+      "cartId"
+     ],
+     "precondition": "date, start time, length and room type chosen",
+     "provenance": "decided 29 September, rev 3 REV3-13"
+    },
+    {
+     "to": "GST-004",
+     "trigger": "Back to the product",
+     "back": true,
+     "provenance": "decided 29 September, rev 3 REV3-13",
+     "carries": [
+      "productId"
+     ]
+    }
+   ]
+  },
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). A staged booking: date → start time → length (1 hour, 2 hours, half day, full day) → room type (focus pod, majlis, boardroom, auditorium) → attendees → add-ons (coffee break, working lunch, AV technician). **A room type is a product with `requiresTimeWindow`; a length is one of its variants** (the `length` axis, each value with `durationMinutes`), priced on its own, so the price is the variant's — the room rate for that length. The guest never names a room: `addCartLine` carries `bookedWindow` {startsAt, endsAt}, `endsAt` being the start plus the length, and `allocateResources` picks the room at checkout (26 August minute). Add-ons are lines with `parentLineId`. `422 windowLengthMismatch`, `windowRequired` and `windowNotAllowed` are programming errors; `409 windowUnavailable` says the time filled and offers the next free start.\n\n**29 September (W9).** Availability is checked against date, start time and length together (`listProductStartTimes` with `variantId` = length); changing any of the three re-checks every room, and a busy room shows *free from*. Starts every 15 minutes where the venue sets `stepMinutes` 15.",
+  "density": "comfortable",
+  "pattern": "multiStepForm",
+  "patternReason": "A staged booking — date, start time, length, room type, attendees, add-ons — ending in one `addCartLine`",
+  "purpose": "Book a meeting room or other space for a start time and a length; the price is the room rate for that length.",
+  "layout": {
+   "template": "wizard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "datePicker",
+       "label": "Select a date",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      },
+      {
+       "kind": "selectField",
+       "label": "Start time",
+       "bindsTo": "ProductStartTime",
+       "notes": "The start times at which a room of the chosen type is free for the chosen length (`listProductStartTimes` with `productId`, `variantId` = the length, `date`; hourly, 08:00-20:00 in the prototype), each with how many rooms of the type are left. The chosen start and start + length go to `addCartLine` as `bookedWindow`.",
+       "operation": "listProductStartTimes",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      },
+      {
+       "kind": "selectField",
+       "label": "How long",
+       "bindsTo": "ProductVariant",
+       "notes": "1 hour, 2 hours, half day (4 h), full day (8 h): the room type's `length` variants, each priced on its own (the prototype shows *Save 10%* and *Save 15%*).",
+       "operation": "listProductVariants",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      },
+      {
+       "kind": "cardList",
+       "label": "Choose a room",
+       "bindsTo": "Product",
+       "notes": "Room types (focus pod, majlis room, boardroom, auditorium) with capacity, description, badge and the price for the chosen length.",
+       "operation": "listProducts",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      },
+      {
+       "kind": "numberField",
+       "label": "Attendees",
+       "notes": "For the visitor list at reception; a room type smaller than the party is not offered.",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      },
+      {
+       "kind": "cardList",
+       "label": "Add to the booking",
+       "bindsTo": "Product",
+       "notes": "Coffee break, working lunch, AV technician: add-on lines with `parentLineId`.",
+       "operation": "listProducts",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "submit",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add to basket",
+       "notes": "`variantId` (the length), `bookedWindow` {startsAt, endsAt}, then the add-on lines.",
+       "operation": "addCartLine",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The room types and their lengths for this venue.",
+   "error": "Could not load. Names which read failed; nothing is booked.",
+   "emptyFirstRun": "**This venue sells no space by the hour yet.** Says so rather than an empty list.",
+   "emptyNoResults": "No room of the type is free at that time for that length. Offers the next free start time.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Rooms and times already loaded stay on screen with their age. Picking a start time and adding the booking need the connection — a room held offline is a room two people think they have."
+  },
+  "apis": [
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "Room types sold by the hour (`requiresTimeWindow`) and their add-ons",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductVariants",
+    "contract": "catalogue",
+    "purpose": "The lengths of a room type, each with its price",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductStartTimes",
+    "contract": "resources",
+    "purpose": "Start times free for the room type and length on the date",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add the room type for the booked window, then the add-ons",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "productId",
+     "from": "GST-004",
+     "optional": true
+    },
+    {
+     "name": "cartId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves the venue the app is in and lists its room types; nothing is booked on arrival."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-075",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room)"
+   }
+  },
+  "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
   "_platform": {
    "code": "P02",
    "audience": "guest",

@@ -1,6 +1,6 @@
 # WS51 — Promotions   Bundles Management board 7
 
-**10 screens · 10 operations · 11 schemas · 2 permissions**
+**10 screens · 11 operations · 13 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ORDER_CREATE, PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,7 +61,7 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `ADM-198` | Targeting & Eligibility Command Center | commandCentre | 1 | 0 | — |
-| `ADM-199` | Eligibility Rule Builder | listDetail | 1 | 0 | — |
+| `ADM-199` | Eligibility Rule Builder | listDetail | 2 | 0 | — |
 | `ADM-200` | CRM & Customer Segment Manager | listDetail | 1 | 0 | — |
 | `ADM-201` | Membership, Loyalty & Guest Eligibility | listDetail | 1 | 0 | — |
 | `ADM-202` | Behavioral & Transaction Targeting | configEditor | 1 | 0 | — |
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-198 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-199",
@@ -311,13 +307,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every targeting eligibility",
        "columns": [
-        "TargetingEligibilityCommandCenterView.healthy",
-        "TargetingEligibilityCommandCenterView.warning",
-        "TargetingEligibilityCommandCenterView.conflict",
-        "TargetingEligibilityCommandCenterView.noAudience",
-        "TargetingEligibilityCommandCenterView.oversizedAudience",
-        "TargetingEligibilityCommandCenterView.expired",
-        "TargetingEligibilityCommandCenterView.missingData"
+        "TargetingEligibilityCommandCenterView.ruleHealth"
        ],
        "bindsTo": "TargetingEligibilityCommandCenterView",
        "operation": "listTargetingEligibility",
@@ -334,13 +324,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected targeting eligibility",
        "bindsTo": "TargetingEligibilityCommandCenterView",
        "columns": [
-        "TargetingEligibilityCommandCenterView.healthy",
-        "TargetingEligibilityCommandCenterView.warning",
-        "TargetingEligibilityCommandCenterView.conflict",
-        "TargetingEligibilityCommandCenterView.noAudience",
-        "TargetingEligibilityCommandCenterView.oversizedAudience",
-        "TargetingEligibilityCommandCenterView.expired",
-        "TargetingEligibilityCommandCenterView.missingData"
+        "TargetingEligibilityCommandCenterView.ruleHealth"
        ],
        "notes": null,
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 94 §Each rule shows"
@@ -367,7 +351,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-198"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-198",
+   "workshopBoard": "wireframes/WS112 Promotions   Bundles Management Board 7.dc.html#adm-198"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 94. 19 of 33 labels bound to a contract property; 33 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -437,6 +422,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Multiple condition sets. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 95 §Support"
+   },
+   {
+    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack Promotions___Bundles_Management_Reference.pdf, page 95"
    },
@@ -455,8 +445,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setEligibilityRule"
+       "label": "Multiple condition sets",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 95 §Support"
       }
      ]
     },
@@ -486,18 +476,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setEligibilityRule",
     "contract": "promotions",
     "purpose": "Eligibility Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setEligibilityRule"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setResaleEligibilityRule",
+    "contract": "orders",
+    "purpose": "Resale Eligibility Rule Configuration",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-199"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-199",
+   "workshopBoard": "wireframes/WS112 Promotions   Bundles Management Board 7.dc.html#adm-199"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 95. 0 of 0 labels bound to a contract property; 0 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 95. 0 of 0 labels bound to a contract property; 1 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -648,7 +642,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-200"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-200",
+   "workshopBoard": "wireframes/WS112 Promotions   Bundles Management Board 7.dc.html#adm-200"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 96. 8 of 8 labels bound to a contract property; 8 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -770,7 +765,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-201"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-201",
+   "workshopBoard": "wireframes/WS112 Promotions   Bundles Management Board 7.dc.html#adm-201"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 97. 0 of 0 labels bound to a contract property; 0 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -895,7 +891,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-202"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-202",
+   "workshopBoard": "wireframes/WS112 Promotions   Bundles Management Board 7.dc.html#adm-202"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 98. 0 of 0 labels bound to a contract property; 6 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -965,7 +962,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Current booking. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Product currently viewed, Current booking. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Promotions___Bundles_Management_Reference.pdf, page 99 §Support"
    },
    {
@@ -988,6 +985,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Product currently viewed",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 99 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Current booking",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 99 §Support"
       }
@@ -995,14 +997,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     },
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listContextLocationChannel",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -1023,19 +1018,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "ContextLocationChannelTimeTargetingView.b2cWebsite",
-    "ContextLocationChannelTimeTargetingView.mobileApp",
-    "ContextLocationChannelTimeTargetingView.pos",
-    "ContextLocationChannelTimeTargetingView.mobilePos",
-    "ContextLocationChannelTimeTargetingView.kiosk"
+    "ContextLocationChannelTimeTargetingView.channels"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-203"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-203",
+   "workshopBoard": "wireframes/WS112 Promotions   Bundles Management Board 7.dc.html#adm-203"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 99. 0 of 0 labels bound to a contract property; 1 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 99. 0 of 0 labels bound to a contract property; 2 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1155,7 +1147,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-204"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-204",
+   "workshopBoard": "wireframes/WS112 Promotions   Bundles Management Board 7.dc.html#adm-204"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 100. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1303,7 +1296,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-205"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-205",
+   "workshopBoard": "wireframes/WS112 Promotions   Bundles Management Board 7.dc.html#adm-205"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 101. 7 of 7 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1373,7 +1367,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Existing member, Specific CRM segment, Partner restriction. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Existing member, Specific CRM segment, Partner restriction, Product ownership. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Promotions___Bundles_Management_Reference.pdf, page 102 §Support"
    }
   ],
@@ -1434,6 +1428,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Partner restriction",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 102 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Product ownership",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 102 §Support"
       }
      ]
     }
@@ -1456,9 +1455,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-206"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-206",
+   "workshopBoard": "wireframes/WS112 Promotions   Bundles Management Board 7.dc.html#adm-206"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 102. 0 of 0 labels bound to a contract property; 9 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 102. 0 of 0 labels bound to a contract property; 10 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1512,10 +1512,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from ADM-198, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Board 7 shall be complete when: 1. Authorized users can create eligibility rules without development. 2. Rules support AND/OR/NOT and nested conditions. 3. Rules can explicitly include and exclude audiences. 4. CRM segments can be consumed without recreating CRM segmentation unnecessarily. 5. Membership status and tier can determine eligibility. 6. Loyalty tier and permitted loyalty attributes can determine eligibility. 7. Guest categories can determine eligibility. 8. Historical purchases can determine eligibility. 9. Visit history can determine eligibility. 10.Previous promotion redemption c",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Use TICVAI's AI layer to identify customer audiences and promotion opportunities that business users may not have manually defined. Board 8 shall provide TICVAI with the centralized Promotion Decision Engine responsible for determining what happens when multiple promotions, discounts, coupons, bundles, loyalty benefits, membership benefits, payment offers, BOGO mechanics, partner offers, or special prices qualify for the same transaction. This is one of the most important boards in the Promotions module because the previous boards may all produce valid offers simultaneously. For example, a guest could qualify for: Annual Pass Holder — 15% discount SUMMER20 coupon — 20% discount Emirates NBD card — 10% discount Buy 4 Pay 3 — promotional mechanic Loyalty Gold — 5% benefit Can they combine? In what order? Which promotion wins? What is the maximum permitted benefit? The matrix explicitly requires configurable promotion hierarchy, stacking and conflict resolution, including scenarios where promotions are combined, mutually exclusive, or prioritized, with clear explanation of which promotion was applied and why. Board 8 shall contain 10 backend screens.",
-  "purposeNote": "Board 7 shall be complete when: 1. Authorized users can create eligibility rules without development. 2. Rules support AND/OR/NOT and nested conditions. 3. Rules can explicitly include and exclude audiences. 4. CRM segments can be consumed without recreating CRM segmentation unnecessarily. 5. Membership status and tier can determine eligibility. 6. Loyalty tier and permitted loyalty attributes can determine eligibility. Pag e 106 | 158TICVAI • 106 7. Guest categories can determine eligibility. 8. Historical purchases can determine eligibility. 9. Visit history can determine eligibility. 10.Pre",
   "gaps": [
    {
     "operation": null,
@@ -1573,17 +1573,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "AiAudienceDiscoveryTargetingOptimizationView.purchasedAquariumAdmission",
-    "AiAudienceDiscoveryTargetingOptimizationView.audience48260",
-    "AiAudienceDiscoveryTargetingOptimizationView.suggestedOffer15AquariumDiscount",
-    "AiAudienceDiscoveryTargetingOptimizationView.predictedConversion128",
-    "AiAudienceDiscoveryTargetingOptimizationView.estimatedIncrementalRevenueAed740k"
+    "AiAudienceDiscoveryTargetingOptimizationView.predictedConversion",
+    "AiAudienceDiscoveryTargetingOptimizationView.estimatedIncrementalRevenue"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-207"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-207",
+   "workshopBoard": "wireframes/WS112 Promotions   Bundles Management Board 7.dc.html#adm-207"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 103. 0 of 0 labels bound to a contract property; 1 of 163 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1628,7 +1626,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AiAudienceDiscoveryTargetingOptimizationView"
  },
@@ -1641,7 +1645,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AudiencePreviewReachEligibilitySimulatorView"
  },
@@ -1654,7 +1664,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BehavioralTransactionTargetingView"
  },
@@ -1680,7 +1696,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CrmCustomerSegmentManagerView"
  },
@@ -1693,7 +1715,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MembershipLoyaltyGuestEligibilityView"
  },
@@ -1719,7 +1747,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "TargetingConflictFrequencyExclusionControlsView"
  },
@@ -1733,6 +1767,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "guestType",
     "in": "query",
@@ -1772,6 +1811,36 @@ Method, path, parameters, request and response for every operation these screens
     "name": "geographic",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "b2b",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "payment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "contextual",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "aiGenerated",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -1786,9 +1855,39 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "EligibilityRuleBuilderInput",
   "responds": "EligibilityRuleBuilderView"
+ },
+ "setResaleEligibilityRule": {
+  "method": "PUT",
+  "path": "/resale-eligibility-rule",
+  "contract": "orders",
+  "summary": "Resale Eligibility Rule Configuration",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResaleEligibilityRuleConfigurationInput",
+  "responds": "ResaleEligibilityRuleConfigurationView"
  }
 }
 ```
@@ -1805,26 +1904,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What AI Audience Discovery & Targeting Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "purchasedAquariumAdmission": {
-    "type": "string",
-    "description": "purchased Aquarium admission"
-   },
-   "audience48260": {
-    "type": "string",
-    "description": "Audience: 48,260"
-   },
-   "suggestedOffer15AquariumDiscount": {
-    "type": "number",
-    "description": "Suggested offer: 15% Aquarium discount"
-   },
-   "predictedConversion128": {
-    "type": "number",
-    "description": "Predicted conversion: 12.8%"
-   },
-   "estimatedIncrementalRevenueAed740k": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Estimated incremental revenue: AED 740K"
-   },
    "narrowAudience": {
     "type": "string",
     "description": "Narrow audience"
@@ -1857,113 +1936,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Reduce frequency"
    },
-   "whyThisAudience": {
-    "type": "string",
-    "description": "Why this audience?"
-   },
-   "useOnlyPermittedCustomerAttributes": {
-    "type": "string",
-    "description": "Use only permitted customer attributes"
-   },
-   "respectCustomerConsentPreferencesWhereApplicable": {
-    "type": "string",
-    "description": "Respect customer consent/preferences where applicable"
-   },
-   "respectConfiguredMarketingSuppression": {
-    "type": "string",
-    "description": "Respect configured marketing suppression"
-   },
-   "auditSegmentUse": {
-    "type": "string",
-    "description": "Audit segment use"
-   },
-   "auditEligibilityRuleChanges": {
-    "type": "string",
-    "description": "Audit eligibility-rule changes"
-   },
-   "audienceSize126500": {
-    "type": "string",
-    "description": "Audience size: 126,500"
-   },
-   "individualCustomerIdentities": {
-    "type": "string",
-    "description": "Individual customer identities"
-   },
    "membershipTierEligibility": {
     "type": "string",
     "description": "Membership/tier eligibility"
-   },
-   "productRelationships": {
-    "type": "string",
-    "description": "Product relationships"
-   },
-   "commercialBenefits": {
-    "type": "string",
-    "description": "Commercial benefits"
-   },
-   "couponEngineBoard3": {
-    "type": "string",
-    "description": "Coupon Engine — Board 3"
-   },
-   "codeBasedEligibility": {
-    "type": "string",
-    "description": "Code-based eligibility"
-   },
-   "bundleEngineBoards56": {
-    "type": "string",
-    "description": "Bundle Engine — Boards 5–6"
-   },
-   "bundleTargeting": {
-    "type": "string",
-    "description": "Bundle targeting"
-   },
-   "partnerAccountEligibility": {
-    "type": "string",
-    "description": "Partner/account eligibility"
-   },
-   "contextAndChannel": {
-    "type": "string",
-    "description": "Context and channel"
-   },
-   "paymentMethodEligibility": {
-    "type": "string",
-    "description": "Payment-method eligibility"
-   },
-   "campaignAudienceActivation": {
-    "type": "string",
-    "description": "Campaign audience activation"
-   },
-   "performanceAndPredictiveTargeting": {
-    "type": "string",
-    "description": "Performance and predictive targeting"
-   },
-   "doesThisCustomerQualify": {
-    "type": "string",
-    "description": "Does this customer qualify?"
-   },
-   "whatCommercialBenefitApplies": {
-    "type": "string",
-    "description": "What commercial benefit applies?"
-   },
-   "matrixCoverageBoard7": {
-    "type": "string",
-    "description": "Matrix Coverage — Board 7"
-   },
-   "customerGuestEligibilityAndTargetedDiscounts": {
-    "type": "string",
-    "description": "Customer/guest eligibility and targeted discounts"
    },
    "membershipAndLoyaltyEligibility": {
     "type": "string",
     "description": "Membership and loyalty eligibility"
    },
-   "customerAccountSpecificPromotionConditions": {
+   "audienceName": {
     "type": "string",
-    "description": "Customer/account-specific promotion conditions"
+    "description": "Discovered audience"
    },
-   "channelLocationPartnerRestrictions": {
+   "audienceSize": {
+    "type": "integer",
+    "description": "Audience size"
+   },
+   "suggestedOffer": {
     "type": "string",
-    "description": "Channel/location/partner restrictions"
+    "description": "Suggested offer"
+   },
+   "predictedConversion": {
+    "type": "number",
+    "description": "Predicted conversion, percent"
+   },
+   "estimatedIncrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Estimated incremental revenue"
+   },
+   "rationale": {
+    "type": "string",
+    "description": "Why this audience (explainable factors)"
    }
   }
  },
@@ -1973,10 +1976,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Audience Preview, Reach & Eligibility Simulator displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "mobileAppEnabled": {
-    "type": "boolean",
-    "description": "Mobile App enabled (the pack shows 126,500)"
-   },
    "estimatedAudience": {
     "type": "string",
     "description": "Estimated audience"
@@ -2005,13 +2004,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Estimated revenue"
    },
-   "profileAEligible": {
-    "type": "string",
-    "description": "Profile A → Eligible"
-   },
-   "profileBNotEligible": {
-    "type": "string",
-    "description": "Profile B → Not Eligible"
+   "sampleProfileResult": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Sample profiles tested and whether each is eligible"
    }
   }
  },
@@ -2090,19 +2088,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Product mix"
    },
-   "last7Days": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last 7 days"
-   },
    "lifetime": {
     "type": "string",
     "description": "Lifetime"
    },
-   "customPeriod": {
+   "lookbackPeriod": {
     "type": "string",
-    "format": "date-time",
-    "description": "Custom period"
+    "enum": [
+     "last7Days",
+     "last30Days",
+     "last90Days",
+     "lastYear",
+     "customPeriod"
+    ],
+    "description": "Look-back period for behavioural conditions"
    }
   }
  },
@@ -2112,50 +2111,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Context, Location, Channel & Time Targeting displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "b2cWebsite": {
-    "type": "string",
-    "description": "B2C Website"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "mobilePos": {
-    "type": "string",
-    "description": "Mobile POS"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "b2b": {
-    "type": "string",
-    "description": "B2B"
-   },
-   "callCenter": {
-    "type": "string",
-    "description": "Call Center"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "ota": {
-    "type": "string",
-    "description": "OTA"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
    "businessEntity": {
     "type": "string",
     "description": "Business entity"
@@ -2232,9 +2187,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Visit state"
    },
-   "inVenueStateWhereAvailable": {
+   "inVenueState": {
     "type": "string",
     "description": "In-venue state where available"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2cWebsite",
+      "mobileApp",
+      "pos",
+      "mobilePos",
+      "kiosk",
+      "b2b",
+      "callCenter",
+      "api",
+      "ota",
+      "reseller",
+      "partner"
+     ]
+    },
+    "description": "Channels that qualify."
    }
   }
  },
@@ -2244,45 +2219,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What CRM & Customer Segment Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "ticvaiCrm": {
-    "type": "string",
-    "description": "TICVAI CRM"
-   },
-   "importedSegment": {
-    "type": "string",
-    "description": "Imported segment"
-   },
-   "externalCrm": {
-    "type": "string",
-    "description": "External CRM"
-   },
-   "externalCdp": {
-    "type": "string",
-    "description": "External CDP"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "loyalty": {
-    "type": "string",
-    "description": "Loyalty"
-   },
-   "b2bAccounts": {
-    "type": "string",
-    "description": "B2B accounts"
-   },
-   "marketingAutomation": {
-    "type": "string",
-    "description": "Marketing automation"
-   },
    "segmentName": {
     "type": "string",
     "description": "Segment name"
-   },
-   "source": {
-    "type": "string",
-    "description": "Source"
    },
    "estimatedAudience": {
     "type": "string",
@@ -2308,13 +2247,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "status": {
     "type": "integer",
     "description": "Status"
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "ticvaiCrm",
+     "importedSegment",
+     "externalCrm",
+     "externalCdp",
+     "membership",
+     "loyalty",
+     "b2bAccounts",
+     "marketingAutomation"
+    ],
+    "description": "Where the segment comes from."
    }
   }
  },
  "EligibilityRuleBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; saved as a `promotions.promotion_rule` row (PromotionRule, ruleType eligibility, its criteria as the condition group and ruleEffect as effect) (DM5, 29 September: data model for the agreed operations)",
   "description": "**What Eligibility Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "guestType": {
@@ -2390,17 +2343,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Nested groups"
    },
-   "include": {
-    "type": "string",
-    "description": "Include"
-   },
-   "exclude": {
-    "type": "string",
-    "description": "Exclude"
-   },
    "multipleConditionSets": {
     "type": "string",
     "description": "Multiple condition sets"
+   },
+   "ruleEffect": {
+    "type": "string",
+    "enum": [
+     "include",
+     "exclude"
+    ],
+    "description": "Whether matching guests are included or excluded."
    }
   }
  },
@@ -2483,17 +2436,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Nested groups"
    },
-   "include": {
-    "type": "string",
-    "description": "Include"
-   },
-   "exclude": {
-    "type": "string",
-    "description": "Exclude"
-   },
    "multipleConditionSets": {
     "type": "string",
     "description": "Multiple condition sets"
+   },
+   "ruleEffect": {
+    "type": "string",
+    "enum": [
+     "include",
+     "exclude"
+    ],
+    "description": "Whether matching guests are included or excluded."
    }
   }
  },
@@ -2557,57 +2510,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Tier progression"
    },
-   "adult": {
-    "type": "string",
-    "description": "Adult"
+   "guestCategories": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "adult",
+      "child",
+      "senior",
+      "family",
+      "student",
+      "resident",
+      "tourist",
+      "group",
+      "vip"
+     ]
+    },
+    "description": "Guest categories that qualify."
    },
-   "child": {
-    "type": "string",
-    "description": "Child"
-   },
-   "senior": {
-    "type": "string",
-    "description": "Senior"
-   },
-   "family": {
-    "type": "string",
-    "description": "Family"
-   },
-   "student": {
-    "type": "string",
-    "description": "Student"
-   },
-   "resident": {
-    "type": "string",
-    "description": "Resident"
-   },
-   "tourist": {
-    "type": "string",
-    "description": "Tourist"
-   },
-   "group": {
-    "type": "string",
-    "description": "Group"
-   },
-   "vip": {
-    "type": "string",
-    "description": "VIP"
-   },
-   "fit": {
-    "type": "string",
-    "description": "fit"
-   },
-   "bronze5": {
-    "type": "number",
-    "description": "Bronze 5%"
-   },
-   "silver10": {
-    "type": "number",
-    "description": "Silver 10%"
-   },
-   "gold15": {
-    "type": "number",
-    "description": "Gold 15%"
+   "tierBenefits": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Benefit per loyalty tier, for example Bronze 5%, Silver 10%, Gold 15%"
    }
   }
  },
@@ -2708,6 +2634,242 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "approvedPaymentPartner": {
     "type": "integer",
     "description": "Approved payment partner"
+   }
+  }
+ },
+ "ResaleEligibilityRuleConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; lands in `orders.resale_eligibility_rule` (DM5, 29 September)",
+  "description": "**What Resale Eligibility Rule Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket type"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "membershipType": {
+    "type": "string",
+    "description": "Membership type"
+   },
+   "salesChannel": {
+    "type": "string",
+    "description": "Sales channel"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "priceCategory": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price category"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "ticketStatus": {
+    "type": "string",
+    "description": "Ticket status"
+   },
+   "paymentStatus": {
+    "type": "string",
+    "description": "Payment status"
+   },
+   "ticketOwnershipStatus": {
+    "type": "string",
+    "description": "Ticket ownership status"
+   },
+   "specificResaleStartEndDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Specific resale start/end date"
+   },
+   "blackoutPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Blackout period"
+   },
+   "maximumResaleAttempts": {
+    "type": "integer",
+    "description": "Maximum resale attempts"
+   },
+   "maximumListingsPerCustomer": {
+    "type": "string",
+    "description": "Maximum listings per customer"
+   },
+   "minimumOwnershipPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Minimum ownership period"
+   },
+   "identityVerificationRequirement": {
+    "type": "string",
+    "description": "Identity verification requirement"
+   },
+   "originalPurchaserOnly": {
+    "type": "string",
+    "description": "Original purchaser only"
+   },
+   "membershipRestriction": {
+    "type": "string",
+    "description": "Membership restriction"
+   },
+   "resaleImmediatelyAfterPurchase": {
+    "type": "boolean",
+    "description": "Allow resale immediately after purchase"
+   },
+   "requiredConditions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fullyPaid",
+      "notScanned",
+      "notExpired",
+      "eventNotStarted",
+      "notRefunded",
+      "notComplimentary",
+      "notStaff",
+      "notInternal",
+      "notBlocked",
+      "notUnderDispute"
+     ]
+    },
+    "description": "Conditions a ticket must meet to be listed."
+   }
+  }
+ },
+ "ResaleEligibilityRuleConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Resale Eligibility Rule Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket type"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "membershipType": {
+    "type": "string",
+    "description": "Membership type"
+   },
+   "salesChannel": {
+    "type": "string",
+    "description": "Sales channel"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "priceCategory": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price category"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "ticketStatus": {
+    "type": "string",
+    "description": "Ticket status"
+   },
+   "paymentStatus": {
+    "type": "string",
+    "description": "Payment status"
+   },
+   "ticketOwnershipStatus": {
+    "type": "string",
+    "description": "Ticket ownership status"
+   },
+   "specificResaleStartEndDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Specific resale start/end date"
+   },
+   "blackoutPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Blackout period"
+   },
+   "maximumResaleAttempts": {
+    "type": "integer",
+    "description": "Maximum resale attempts"
+   },
+   "maximumListingsPerCustomer": {
+    "type": "string",
+    "description": "Maximum listings per customer"
+   },
+   "minimumOwnershipPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Minimum ownership period"
+   },
+   "identityVerificationRequirement": {
+    "type": "string",
+    "description": "Identity verification requirement"
+   },
+   "originalPurchaserOnly": {
+    "type": "string",
+    "description": "Original purchaser only"
+   },
+   "membershipRestriction": {
+    "type": "string",
+    "description": "Membership restriction"
+   },
+   "resaleImmediatelyAfterPurchase": {
+    "type": "boolean",
+    "description": "Allow resale immediately after purchase"
+   },
+   "requiredConditions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fullyPaid",
+      "notScanned",
+      "notExpired",
+      "eventNotStarted",
+      "notRefunded",
+      "notComplimentary",
+      "notStaff",
+      "notInternal",
+      "notBlocked",
+      "notUnderDispute"
+     ]
+    },
+    "description": "Conditions a ticket must meet to be listed."
    }
   }
  },
@@ -2846,33 +3008,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "AI-Recommended Segments"
    },
-   "healthy": {
+   "ruleHealth": {
     "type": "string",
-    "description": "Healthy"
-   },
-   "warning": {
-    "type": "string",
-    "description": "Warning"
-   },
-   "conflict": {
-    "type": "string",
-    "description": "Conflict"
-   },
-   "noAudience": {
-    "type": "string",
-    "description": "No Audience"
-   },
-   "oversizedAudience": {
-    "type": "string",
-    "description": "Oversized Audience"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "missingData": {
-    "type": "string",
-    "description": "Missing Data"
+    "enum": [
+     "healthy",
+     "warning",
+     "conflict",
+     "noAudience",
+     "oversizedAudience",
+     "expired",
+     "missingData"
+    ],
+    "description": "Health of the targeting rule."
    }
   }
  }

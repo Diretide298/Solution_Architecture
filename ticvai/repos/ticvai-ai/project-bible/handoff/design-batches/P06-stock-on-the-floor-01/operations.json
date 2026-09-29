@@ -23,7 +23,7 @@
   "path": "/goods-receipts",
   "contract": "inventory",
   "summary": "Receive goods against a purchase order",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_RECEIVE",
   "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
@@ -42,7 +42,7 @@
   "path": "/requisitions",
   "contract": "inventory",
   "summary": "Raise a requisition",
-  "permission": "ORDER_CREATE",
+  "permission": "PROCUREMENT_REQUEST",
   "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
@@ -96,7 +96,7 @@
  },
  "enterCountLine": {
   "method": "POST",
-  "path": "/stock-counts/{countId}/lines",
+  "path": "/fnb-stock-counts/{countId}/lines",
   "contract": "fnb",
   "summary": "What was actually on the shelf",
   "permission": "PRODUCT_CONFIGURE",
@@ -126,6 +126,25 @@
   "requestBody": null,
   "responds": "CountVariance"
  },
+ "getDashboard": {
+  "method": "GET",
+  "path": "/dashboards/{dashboardId}",
+  "contract": "reporting",
+  "summary": "Read a dashboard with tile data",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "refresh",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DashboardData"
+ },
  "getHaccpStatus": {
   "method": "GET",
   "path": "/food-safety/status",
@@ -138,6 +157,55 @@
   "parameters": [],
   "requestBody": null,
   "responds": null
+ },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
  },
  "getStockPositions": {
   "method": "GET",
@@ -189,7 +257,7 @@
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": null
+  "responds": "StockTransfer"
  },
  "listAlerts": {
   "method": "GET",
@@ -205,6 +273,26 @@
     "name": "status",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "itemId",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -215,7 +303,7 @@
   "path": "/requisitions",
   "contract": "inventory",
   "summary": "List requisitions",
-  "permission": "PRODUCT_VIEW",
+  "permission": "PROCUREMENT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -276,7 +364,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "SerialisedItem"
+  "responds": "Page"
  },
  "listStockLocations": {
   "method": "GET",
@@ -300,7 +388,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "StockLocation"
+  "responds": "Page"
  },
  "listStockMovements": {
   "method": "GET",
@@ -358,7 +446,7 @@
   "summary": "The temperature a delivery arrived at, and what was decided",
   "permission": "INCIDENT_REPORT",
   "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -377,7 +465,7 @@
   "summary": "Record a temperature check, in range or not",
   "permission": "INCIDENT_REPORT",
   "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -411,6 +499,11 @@
    },
    {
     "name": "includeSiblingOutlets",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outletId",
     "in": "query",
     "required": null
    }
@@ -461,7 +554,7 @@
   "path": "/goods-receipts/{receiptId}/reject",
   "contract": "inventory",
   "summary": "Reject received goods",
-  "permission": "PRODUCT_CONFIGURE",
+  "permission": "PROCUREMENT_RECEIVE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -477,7 +570,7 @@
  },
  "requestRecount": {
   "method": "POST",
-  "path": "/stock-counts/{countId}/recount",
+  "path": "/fnb-stock-counts/{countId}/recount",
   "contract": "fnb",
   "summary": "Send a line back to be counted again",
   "permission": "PRODUCT_CONFIGURE",
@@ -492,7 +585,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "RecountResult"
  },
  "reserveMerchandise": {
   "method": "POST",
@@ -542,6 +635,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

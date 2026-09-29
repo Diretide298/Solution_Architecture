@@ -1,6 +1,6 @@
 # P08-people-access-rights-01 — P08 · People & Access Rights (1 of 2)
 
-**10 screens · 34 operations · 25 schemas · 10 permissions**
+**10 screens · 39 operations · 32 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `ANNOUNCEMENT_PUBLISH, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, ATTENDANCE_RECORD, ROLE_MANAGE, USER_MANAGE, WORKFORCE_MANAGE, WORKFORCE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `ANNOUNCEMENT_PUBLISH, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, ATTENDANCE_RECORD, PERMISSION_VIEW, ROLE_MANAGE, USER_MANAGE, WORKFORCE_MANAGE, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,13 +60,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-053` | Staff Directory | listDetail | 9 | 3 | — |
-| `BO-054` | Role Assignment | listDetail | 3 | 1 | — |
+| `BO-053` | Staff Directory | listDetail | 10 | 3 | — |
+| `BO-054` | Role Assignment | listDetail | 7 | 1 | — |
 | `BO-055` | Rota & Scheduling | listDetail | 4 | 3 | — |
 | `BO-056` | Time & Attendance | listDetail | 3 | 2 | — |
 | `BO-057` | Training & Certification | listDetail | 1 | 0 | — |
 | `BO-066` | Notification Settings | listDetail | 4 | 1 | — |
-| `BO-084` | Approval Inbox | approvalInbox | 3 | 2 | — |
+| `BO-084` | Approval Inbox | approvalInbox | 4 | 2 | — |
 | `BO-085` | Approval Request | approvalInbox | 5 | 4 | — |
 | `BO-086` | Approval Matrix | listDetail | 2 | 1 | — |
 | `BO-087` | Approval Delegations | listDetail | 3 | 2 | — |
@@ -276,6 +276,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "listJobTitles",
      "listWorkAssignments"
     ]
+   },
+   {
+    "operationId": "suggestRoleAssignment",
+    "contract": "identity",
+    "purpose": "Roles to grant a new or moved member of staff (by principal, or by job title and posting before the principal exists)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -496,6 +503,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listRoles"
     ]
+   },
+   {
+    "operationId": "listPermissionFindings",
+    "contract": "identity",
+    "purpose": "Unused and missing permissions for the role being assigned",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "suggestRoleAssignment",
+    "contract": "identity",
+    "purpose": "Suggested roles for the selected person from peers with the same job title and posting",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccessReviewCampaigns",
+    "contract": "identity",
+    "purpose": "Open access reviews",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccessReviewItems",
+    "contract": "identity",
+    "purpose": "My pending review items (assignedToMe)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -505,6 +540,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "Role.name",
     "Role.description",
     "Role.permissions"
+   ],
+   "params": [
+    {
+     "name": "campaignId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -1709,6 +1750,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listApprovalRequests"
     ]
+   },
+   {
+    "operationId": "getApprovalRequestScore",
+    "contract": "ai",
+    "purpose": "Risk band, priority and suggested escalation for the request, as context only (no approve/reject suggestion)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1716,6 +1764,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "requestId",
      "from": "deepLink"
+    },
+    {
+     "name": "approvalRequestId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `requestId`.",
@@ -1822,9 +1874,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-084",
      "trigger": "Approval Inbox",
      "carries": [
+      "approvalRequestId",
       "requestId"
      ],
-     "provenance": "derived — BO-084 declares entryState.params requestId and BO-085 holds requestId, so an edge into it carries them"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-085 holds approvalRequestId, requestId, so an edge into it carries them"
     },
     {
      "to": "BO-087",
@@ -2162,7 +2215,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params requestId and BO-086 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-086 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",
@@ -2365,7 +2418,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params requestId and BO-087 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-087 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",
@@ -2759,6 +2812,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "AnnouncementReach"
  },
+ "getApprovalRequestScore": {
+  "method": "GET",
+  "path": "/approval-requests/{approvalRequestId}/score",
+  "contract": "ai",
+  "summary": "The latest context score of an approval request",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiApprovalRequestScore"
+ },
  "getPrincipal": {
   "method": "GET",
   "path": "/principals/{principalId}",
@@ -2771,6 +2837,74 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [],
   "requestBody": null,
   "responds": "Principal"
+ },
+ "listAccessReviewCampaigns": {
+  "method": "GET",
+  "path": "/access-review-campaigns",
+  "contract": "identity",
+  "summary": "Access review campaigns, open first",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAccessReviewItems": {
+  "method": "GET",
+  "path": "/access-review-campaigns/{campaignId}/items",
+  "contract": "identity",
+  "summary": "The grants a campaign asks somebody to certify or revoke",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "findingKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listAnnouncements": {
   "method": "GET",
@@ -2864,6 +2998,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "sort",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -2918,6 +3057,65 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [],
   "requestBody": null,
   "responds": "WorkforceJobTitle"
+ },
+ "listPermissionFindings": {
+  "method": "GET",
+  "path": "/permission-findings",
+  "contract": "identity",
+  "summary": "Excessive, missing and conflicting permissions, per principal or role",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "roleId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "lookbackDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "deniedThreshold",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "draftPolicyId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPrincipals": {
   "method": "GET",
@@ -3190,7 +3388,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Save a tick-set under a name",
   "permission": "ROLE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -3239,6 +3437,60 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "WorkforceWorkAssignment",
   "responds": "WorkforceWorkAssignment"
+ },
+ "suggestRoleAssignment": {
+  "method": "GET",
+  "path": "/role-suggestions",
+  "contract": "identity",
+  "summary": "Which roles a person should probably hold, from peers with the same job and posting",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "jobTitleId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "minPeerShare",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "minPeers",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "lookbackDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "updatePrincipal": {
   "method": "PATCH",
@@ -3306,6 +3558,118 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiApprovalRequestScore": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.approval_request_score",
+  "description": "**Context for an approval reviewer** (11.1.73..75): risk, priority and a suggested escalation for one pending request, the latest per request. **There is no approve or reject field, by design** (minutes of 8 September: AI in approvals never recommends or influences approve or reject).",
+  "required": [
+   "approvalRequestId",
+   "riskScore",
+   "riskBand",
+   "priorityScore",
+   "escalationSuggestion"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "approvals.request"
+   },
+   "trigger": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "resubmitted",
+     "slaTick",
+     "escalated"
+    ]
+   },
+   "riskScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "riskBand": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Design 5.6: a risk score and band, never a probability."
+   },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "description": "For ordering work in an inbox; higher first."
+   },
+   "escalationSuggestion": {
+    "type": "object",
+    "required": [
+     "action"
+    ],
+    "properties": {
+     "action": {
+      "type": "string",
+      "enum": [
+       "escalate",
+       "addBackupApprover",
+       "none"
+      ]
+     },
+     "reason": {
+      "type": "string",
+      "nullable": true
+     }
+    },
+    "description": "A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy."
+   },
+   "signals": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "description": "e.g. `amountAboveRequesterNorm`, `requesterEntityRisk`, `outOfHours`, `irreversibleAction`, `slaDueSoon`, `stepBreachRate`, `approverUnavailable`."
+      },
+      "contribution": {
+       "type": "number"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scoredAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "Announcement": {
   "type": "object",
   "x-ticvai-persistence": "workforce.announcement",
@@ -3355,6 +3719,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "requiresAcknowledgement": {
     "type": "boolean"
+   },
+   "deliveryChannels": {
+    "type": "array",
+    "description": "How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). `emergency` is sent by both whatever is set here.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "inApp",
+      "push"
+     ]
+    },
+    "default": [
+     "inApp",
+     "push"
+    ]
    },
    "expiresAt": {
     "type": "string",
@@ -3787,6 +4166,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "aiAssessment": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
+    "properties": {
+     "riskScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "riskBand": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "critical"
+      ]
+     },
+     "priorityScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "escalationSuggestion": {
+      "type": "object",
+      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
+      "properties": {
+       "action": {
+        "type": "string",
+        "enum": [
+         "escalate",
+         "addBackupApprover",
+         "none"
+        ]
+       },
+       "reason": {
+        "type": "string",
+        "nullable": true
+       }
+      }
+     },
+     "signals": {
+      "type": "array",
+      "maxItems": 10,
+      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "code": {
+         "type": "string"
+        },
+        "contribution": {
+         "type": "number"
+        },
+        "detail": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     },
+     "scoreId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
+     },
+     "decisionRecordId": {
+      "type": "string",
+      "description": "The ai decision record, for the audit of what the AI said and why."
+     },
+     "assessedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    }
   }
  },
@@ -3878,7 +4335,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "riskScoreAbove": {
     "type": "number",
     "nullable": true,
-    "description": "11.1.12. **Nothing supplies this yet** — risk scoring is parked with the model-dependent AI. The field exists so adding the engine later is configuration rather than a schema change.\n"
+    "description": "11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"
    },
    "condition": {
     "type": "string",
@@ -3941,6 +4398,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "11.1.53. An unanswered request eventually stops waiting."
+   },
+   "externalProviderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"
    }
   }
  },
@@ -4184,6 +4647,416 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "string",
      "format": "uuid"
     }
+   }
+  }
+ },
+ "IdentityAccessReviewCampaign": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.access_review_campaign",
+  "description": "**A periodic access review** (7.1.35, 7.1.56; decided 29 September, build pass, group G2): which grants, reviewed by whom, by when. Its items are `identity.access_review_item`. Lifecycle in `states/access-review-campaign.yaml`.",
+  "required": [
+   "name",
+   "scopePath",
+   "reviewerMode",
+   "dueAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005), and what is reviewed: every grant at or below it. Inside the caller's own scope. Operations write it at `venue` scope."
+   },
+   "roleIds": {
+    "type": "array",
+    "nullable": true,
+    "description": "Only grants of these roles; null reviews every grant in scope.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "reviewerMode": {
+    "type": "string",
+    "enum": [
+     "lineManager",
+     "named"
+    ],
+    "description": "`lineManager`: each item goes to the holder's manager from their primary work assignment, falling back to the named reviewers where none is found. `named`: the named reviewers share the items."
+   },
+   "reviewerPrincipalIds": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "dueAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recurrence": {
+    "type": "string",
+    "enum": [
+     "none",
+     "quarterly",
+     "semiAnnual",
+     "annual"
+    ],
+    "default": "none"
+   },
+   "prefillFromFindings": {
+    "type": "boolean",
+    "default": true
+   },
+   "lookbackDays": {
+    "type": "integer",
+    "minimum": 7,
+    "maximum": 365,
+    "default": 90
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "completed",
+     "expired"
+    ],
+    "readOnly": true
+   },
+   "itemCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "decidedCount": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "Kept by `decideAccessReviewItem` in the same write, so the campaign list needs no count query."
+   },
+   "revokedCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "IdentityAccessReviewItem": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.access_review_item",
+  "description": "One grant under review in a campaign, with the finding that pre-filled it and the reviewer's decision (decided 29 September, build pass, group G2). Lifecycle in `states/access-review-item.yaml`.",
+  "required": [
+   "campaignId",
+   "delegatedAccessId",
+   "principalId",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "identity.access_review_campaign"
+   },
+   "delegatedAccessId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "identity.delegated_access",
+    "description": "The grant under review."
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "identity.principal"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.role"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The grant's scope. **The partition key** (ADR-0005)."
+   },
+   "reviewerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "findingKind": {
+    "type": "string",
+    "enum": [
+     "none",
+     "excessive",
+     "conflicting"
+    ],
+    "default": "none"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recommendation": {
+    "type": "string",
+    "enum": [
+     "certify",
+     "revoke",
+     "review"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "certified",
+     "revoked",
+     "notReviewed"
+    ],
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   }
+  }
+ },
+ "IdentityPermissionFinding": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from grants (roles, delegations, policies) against identity.access_decision and identity.segregation_rule",
+  "description": "One excessive, missing or conflicting permission (7.1.47; decided 29 September, build pass).",
+  "required": [
+   "kind",
+   "principalId",
+   "permission"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "excessive",
+     "missing",
+     "conflicting"
+    ]
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The role that grants it, for excessive and conflicting; the role whose peers hold it, for missing."
+   },
+   "permission": {
+    "type": "string"
+   },
+   "conflictingPermission": {
+    "type": "string",
+    "nullable": true,
+    "description": "The other half of the pair, for conflicting."
+   },
+   "segregationRuleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "grantedBy": {
+    "type": "string",
+    "enum": [
+     "role",
+     "delegation",
+     "policy"
+    ],
+    "nullable": true
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The last permit that used it; null when never used in the window."
+   },
+   "deniedCount": {
+    "type": "integer",
+    "nullable": true,
+    "description": "For missing, the denials in the window."
+   },
+   "peersHoldingPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "For missing, the share of the role's holders at the same scope who hold the permission."
+   },
+   "recommendation": {
+    "type": "string",
+    "enum": [
+     "revoke",
+     "grant",
+     "review"
+    ]
+   },
+   "asDraft": {
+    "type": "boolean",
+    "default": false,
+    "description": "True when the finding exists only because of the `draftPolicyId` evaluated."
+   }
+  }
+ },
+ "IdentityRoleSuggestion": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from workforce.work_assignment peers, identity.delegated_access and identity.access_decision",
+  "description": "One role suggested for a person because peers with the same job title and posting hold it (7.1.35, 7.1.56; decided 29 September, build pass, group G2).",
+  "required": [
+   "roleId",
+   "scopePath",
+   "peersHoldingPercent",
+   "recommendation"
+  ],
+  "properties": {
+   "roleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "roleCode": {
+    "type": "string"
+   },
+   "roleName": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "Where the peers hold it, and so where it would be granted."
+   },
+   "peerCount": {
+    "type": "integer",
+    "description": "Principals with the same job title at the same posting."
+   },
+   "peersHolding": {
+    "type": "integer"
+   },
+   "peersHoldingPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "peersUsingPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Of the peers holding it, the share with a permit using one of its permissions in `lookbackDays`."
+   },
+   "alreadyHeld": {
+    "type": "boolean"
+   },
+   "recommendation": {
+    "type": "string",
+    "enum": [
+     "grant",
+     "review",
+     "held"
+    ],
+    "description": "`grant` where most peers hold and use it; `review` where they hold it and do not use it; `held` where the person has it already."
+   },
+   "evidence": {
+    "type": "object",
+    "description": "What the suggestion rests on, so the person granting can check it.",
+    "properties": {
+     "jobTitleId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "postingScopePath": {
+      "type": "string"
+     },
+     "samplePeerPrincipalIds": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "requiresApproval": {
+      "type": "boolean",
+      "description": "Whether granting this role raises an approval (a role carrying permission or price authority, ApprovalKind level 2)."
+     }
+    }
+   }
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
    }
   }
  },
@@ -4467,6 +5340,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cancelled",
    "completed",
    "noShow"
+  ]
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
   ]
  },
  "WorkforceJobTitle": {

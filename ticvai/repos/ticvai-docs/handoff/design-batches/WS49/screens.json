@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-178 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-179",
@@ -259,7 +256,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-178"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-178",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-178"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 63. 14 of 27 labels bound to a contract property; 37 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -387,6 +385,53 @@
        "kind": "selectField",
        "label": "Sales status",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "textField",
+       "label": "Owner principal id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?q=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every commercial campaign",
+       "bindsTo": "CommercialCampaign",
+       "columns": [
+        "CommercialCampaign.id",
+        "CommercialCampaign.venueId",
+        "CommercialCampaign.code",
+        "CommercialCampaign.name",
+        "CommercialCampaign.description",
+        "CommercialCampaign.ownerPrincipalId",
+        "CommercialCampaign.legalEntityId",
+        "CommercialCampaign.validFrom",
+        "CommercialCampaign.validTo",
+        "CommercialCampaign.budgets"
+       ],
+       "operation": "listCommercialCampaigns",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
       }
      ]
     },
@@ -414,16 +459,20 @@
     "operationId": "setBundleDefinition",
     "contract": "promotions",
     "purpose": "Bundle Definition & Setup",
-    "trigger": "onAction",
-    "invalidates": [
-     "setBundleDefinition"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listCommercialCampaigns",
+    "contract": "promotions",
+    "purpose": "List commercial campaigns",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-179"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-179",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-179"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 65. 0 of 0 labels bound to a contract property; 11 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -548,16 +597,14 @@
     "operationId": "setBundleComponent",
     "contract": "promotions",
     "purpose": "Bundle Component Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setBundleComponent"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-180"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-180",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-180"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 5 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -681,7 +728,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-181"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-181",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-181"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 67. 0 of 0 labels bound to a contract property; 3 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -826,7 +874,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-182"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-182",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-182"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 68. 0 of 0 labels bound to a contract property; 10 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -905,12 +954,7 @@
        "label": "Every bundle availability capacity",
        "columns": [
         "BundleAvailabilityCapacityValidationView.available",
-        "BundleAvailabilityCapacityValidationView.lowAvailability",
-        "BundleAvailabilityCapacityValidationView.soldOut",
-        "BundleAvailabilityCapacityValidationView.suspended",
-        "BundleAvailabilityCapacityValidationView.unpublished",
-        "BundleAvailabilityCapacityValidationView.invalidDate",
-        "BundleAvailabilityCapacityValidationView.capacityUnavailable"
+        "BundleAvailabilityCapacityValidationView.componentStatus"
        ],
        "bindsTo": "BundleAvailabilityCapacityValidationView",
        "operation": "listBundleAvailabilityCapacity",
@@ -928,12 +972,7 @@
        "bindsTo": "BundleAvailabilityCapacityValidationView",
        "columns": [
         "BundleAvailabilityCapacityValidationView.available",
-        "BundleAvailabilityCapacityValidationView.lowAvailability",
-        "BundleAvailabilityCapacityValidationView.soldOut",
-        "BundleAvailabilityCapacityValidationView.suspended",
-        "BundleAvailabilityCapacityValidationView.unpublished",
-        "BundleAvailabilityCapacityValidationView.invalidDate",
-        "BundleAvailabilityCapacityValidationView.capacityUnavailable"
+        "BundleAvailabilityCapacityValidationView.componentStatus"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Bundle selected”, “Check mandatory components”, “Check inventory”, “Check capacity”, “Check schedule/timeslot”, “Check validity”.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 69 §For each component display"
@@ -960,17 +999,14 @@
   "entryState": {
    "preloaded": [
     "BundleAvailabilityCapacityValidationView.available",
-    "BundleAvailabilityCapacityValidationView.lowAvailability",
-    "BundleAvailabilityCapacityValidationView.soldOut",
-    "BundleAvailabilityCapacityValidationView.suspended",
-    "BundleAvailabilityCapacityValidationView.unpublished",
-    "BundleAvailabilityCapacityValidationView.invalidDate"
+    "BundleAvailabilityCapacityValidationView.componentStatus"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-183"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-183",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-183"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 69. 7 of 7 labels bound to a contract property; 7 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1082,17 +1118,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "BundleValiditySchedulingRedemptionRulesView.valid1June31August",
-    "BundleValiditySchedulingRedemptionRulesView.allComponentsTogether",
-    "BundleValiditySchedulingRedemptionRulesView.independentRedemption",
-    "BundleValiditySchedulingRedemptionRulesView.sequentialRedemption",
-    "BundleValiditySchedulingRedemptionRulesView.firstUseActivation"
+    "BundleValiditySchedulingRedemptionRulesView.redemptionModel"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-184"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-184",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-184"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 70. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1159,13 +1192,6 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Allow TICVAI bundles to include products or services owned by external operators. The matrix requires combinations with external products/services and bundles across different destinations, including systems that may use different databases.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Partner & External Product Bundle Manager declares no operation that writes anything** — its only declared call is `listPartnerExternalProduct`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1177,16 +1203,32 @@
        "kind": "dataTable",
        "label": "Every partner external product",
        "columns": [
-        "PartnerExternalProductBundleManagerView.connected",
-        "PartnerExternalProductBundleManagerView.available",
-        "PartnerExternalProductBundleManagerView.degraded",
-        "PartnerExternalProductBundleManagerView.apiError",
-        "PartnerExternalProductBundleManagerView.productUnavailable",
-        "PartnerExternalProductBundleManagerView.mappingError"
+        "PartnerExternalProductBundleManagerView.connectionStatus"
        ],
        "bindsTo": "PartnerExternalProductBundleManagerView",
        "operation": "listPartnerExternalProduct",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 71 §Show"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every partner bundle product",
+       "bindsTo": "PartnerBundleProduct",
+       "columns": [
+        "PartnerBundleProduct.id",
+        "PartnerBundleProduct.bundleComponentId",
+        "PartnerBundleProduct.partnerId",
+        "PartnerBundleProduct.externalProductId",
+        "PartnerBundleProduct.productName",
+        "PartnerBundleProduct.apiSource",
+        "PartnerBundleProduct.availabilitySource",
+        "PartnerBundleProduct.externalPrice",
+        "PartnerBundleProduct.sellingPrice",
+        "PartnerBundleProduct.commission",
+        "PartnerBundleProduct.settlementRule",
+        "PartnerBundleProduct.cancellationRule"
+       ],
+       "operation": "listBundlePartnerProductMappings",
+       "provenance": "contract promotions.yaml GET /bundles/{bundleId}/partner-products"
       }
      ]
     },
@@ -1199,15 +1241,24 @@
        "label": "The selected partner external product",
        "bindsTo": "PartnerExternalProductBundleManagerView",
        "columns": [
-        "PartnerExternalProductBundleManagerView.connected",
-        "PartnerExternalProductBundleManagerView.available",
-        "PartnerExternalProductBundleManagerView.degraded",
-        "PartnerExternalProductBundleManagerView.apiError",
-        "PartnerExternalProductBundleManagerView.productUnavailable",
-        "PartnerExternalProductBundleManagerView.mappingError"
+        "PartnerExternalProductBundleManagerView.connectionStatus"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Dubai Weekend Package”.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 71 §Show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save bundle partner product mappings",
+       "operation": "setBundlePartnerProductMappings",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "Replaces the bundle's `promotions.partner_bundle_product` rows with the set sent: a row sent with an `id` is updated, one without is created, and a stored row not sent is removed.",
+       "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/partner-products"
       }
      ]
     }
@@ -1226,24 +1277,61 @@
     "contract": "promotions",
     "purpose": "Partner & External Product Bundle Manager",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listBundlePartnerProductMappings",
+    "contract": "promotions",
+    "purpose": "List a bundle's partner product mappings",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBundlePartnerProductMappings",
+    "contract": "promotions",
+    "purpose": "Set a bundle's partner product mappings",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerExternalProduct",
+     "listBundlePartnerProductMappings"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "PartnerExternalProductBundleManagerView.connected",
-    "PartnerExternalProductBundleManagerView.available",
-    "PartnerExternalProductBundleManagerView.degraded",
-    "PartnerExternalProductBundleManagerView.apiError",
-    "PartnerExternalProductBundleManagerView.productUnavailable",
-    "PartnerExternalProductBundleManagerView.mappingError"
+    "PartnerExternalProductBundleManagerView.connectionStatus"
+   ],
+   "params": [
+    {
+     "name": "bundleId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-185"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-185",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-185"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 71. 6 of 6 labels bound to a contract property; 17 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetBundlePartnerProductMappings",
+    "component": "modal",
+    "trigger": "Save bundle partner product mappings",
+    "body": "**Collects what `setBundlePartnerProductMappings` sends before it is called.** Required: `mappings`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save bundle partner product mappings",
+     "operation": "setBundlePartnerProductMappings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "mappings"
+     ]
+    },
+    "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/partner-products"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1376,7 +1464,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-186"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-186",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-186"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 72. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1438,7 +1527,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Campaign Manager. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Campaign Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager, Venue Manager. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
    },
    {
@@ -1462,6 +1551,31 @@
       {
        "kind": "primaryButton",
        "label": "Campaign Manager",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Commercial Manager",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Revenue Manager",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Finance",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "B2B Manager",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue Manager",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
       },
       {
@@ -1490,18 +1604,16 @@
     "operationId": "simulateBundlePreviewRecommendation",
     "contract": "promotions",
     "purpose": "Bundle Preview, Simulation & AI Recommendation",
-    "trigger": "onAction",
-    "invalidates": [
-     "simulateBundlePreviewRecommendation"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-187"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-187",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-187"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 12 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 17 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

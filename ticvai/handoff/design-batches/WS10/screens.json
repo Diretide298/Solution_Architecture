@@ -234,6 +234,13 @@
     "invalidates": [
      "listDynamicAccessPolicy"
     ]
+   },
+   {
+    "operationId": "listDynamicPolicyEffectiveness",
+    "contract": "access",
+    "purpose": "Open a policy's effectiveness from the command center",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1574,6 +1581,13 @@
     "contract": "access",
     "purpose": "Roll back policy",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listDynamicPolicyEffectiveness",
+    "contract": "access",
+    "purpose": "Per-policy triggers, denials, overrides and trend over a period",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {

@@ -1,6 +1,6 @@
 # WS41 — Privacy  Consent   Preference Management board 1
 
-**10 screens · 12 operations · 17 schemas · 3 permissions**
+**10 screens · 18 operations · 25 schemas · 3 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -64,8 +64,8 @@ convincingly. It is never a caption.
 | `CMS-022` | Data Processing Purpose & Lawful Basis Registry | listDetail | 1 | 0 | — |
 | `CMS-023` | Consent Purpose & Consent Type Builder | configEditor | 1 | 0 | — |
 | `CMS-024` | Communication Preference & Marketing Permission Configuration | configEditor | 1 | 0 | — |
-| `CMS-025` | Cookie, Tracking & Digital Technology Registry | listDetail | 1 | 0 | — |
-| `CMS-026` | Cookie Banner & Preference Center Designer | configEditor | 1 | 0 | — |
+| `CMS-025` | Cookie, Tracking & Digital Technology Registry | listDetail | 6 | 0 | — |
+| `CMS-026` | Cookie Banner & Preference Center Designer | configEditor | 2 | 0 | — |
 | `CMS-027` | Consent Capture Point & Customer Journey Configuration | configEditor | 1 | 0 | — |
 | `CMS-028` | Privacy Notice, Policy & Terms Version Management | listDetail | 2 | 1 | — |
 | `CMS-029` | Minor, Guardian & Age-Based Privacy Configuration | configEditor | 1 | 0 | — |

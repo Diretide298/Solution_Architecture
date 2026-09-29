@@ -1,6 +1,6 @@
 # WS43 — Product Lifecycle   Catalogue Governance board 1
 
-**10 screens · 10 operations · 20 schemas · 2 permissions**
+**10 screens · 12 operations · 28 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -68,8 +67,8 @@ convincingly. It is never a caption.
 | `ADM-122` | Product Import / Export & Environment Transfer | listDetail | 1 | 0 | — |
 | `ADM-123` | Product Context, Ownership & Assignment | listDetail | 1 | 0 | — |
 | `ADM-124` | Channel Publication & Availability | listDetail | 1 | 0 | — |
-| `ADM-125` | Publication & Activation Scheduler | listDetail | 1 | 0 | — |
-| `ADM-126` | Product Duplication & Template Library | configEditor | 1 | 0 | — |
+| `ADM-125` | Publication & Activation Scheduler | listDetail | 2 | 0 | — |
+| `ADM-126` | Product Duplication & Template Library | configEditor | 2 | 1 | — |
 | `ADM-127` | AI Catalogue Builder & Configuration Review | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch

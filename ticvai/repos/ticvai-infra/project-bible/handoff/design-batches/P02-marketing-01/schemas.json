@@ -19,7 +19,7 @@
   ]
  },
  "ConsentPurposeConfig": {
-  "x-ticvai-persistence": "marketing.consent_purpose",
+  "x-ticvai-persistence": "marketing.consent_purpose + marketing.consent_purpose_channel",
   "type": "object",
   "required": [
    "purpose",
@@ -66,8 +66,11 @@
    "pos",
    "callCentre",
    "import",
-   "agentRecorded"
-  ]
+   "agentRecorded",
+   "cookieBanner",
+   "checkout"
+  ],
+  "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
  },
  "ConsentState": {
   "x-ticvai-persistence": "none — projection over consent_record",
@@ -124,18 +127,29 @@
  "MarketingSubscription": {
   "type": "object",
   "x-ticvai-persistence": "marketing.subscription",
+  "x-ticvai-retired-columns": [
+   "guest_id",
+   "subscribed"
+  ],
   "description": "**Drafted 4 September.** What a guest asked to receive. **Deliberately separate from `marketing.consent`** - consent is what the law allows, a subscription is what the person wants, and a system that stores one and reports the other is the reason unsubscribe links stop working.",
   "required": [
-   "id"
+   "id",
+   "subjectId",
+   "channel",
+   "listName",
+   "isSubscribed"
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
-   "guestId": {
+   "subjectId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The guest — from the guest session, or from `unsubscribeToken` when there is no session."
    },
    "channel": {
     "type": "string",
@@ -148,7 +162,7 @@
    "listName": {
     "type": "string"
    },
-   "subscribed": {
+   "isSubscribed": {
     "type": "boolean"
    },
    "source": {
@@ -156,10 +170,12 @@
     "description": "Where the opt-in happened, because a regulator asks."
    },
    "unsubscribeToken": {
+    "writeOnly": true,
     "type": "string",
-    "description": "**Unsubscribe must work without a login.**"
+    "description": "**Unsubscribe must work without a login.** The link in a message carries the token and `setMarketingSubscription` accepts it in place of a session. **Write-only: never returned**, so a `MARKETING_VIEW` holder reading subscriptions cannot act as the guest."
    },
    "updatedAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    }
@@ -175,6 +191,25 @@
    "inApp",
    "post"
   ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
  },
  "RecordConsentRequest": {
   "x-ticvai-persistence": "none — request only",

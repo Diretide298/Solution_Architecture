@@ -1,6 +1,6 @@
 # P10-support-01 — P10 · Support
 
-**1 screens · 7 operations · 8 schemas · 2 permissions**
+**1 screens · 7 operations · 9 schemas · 2 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `CASE_MANAGE, CASE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: addCaseMessage, createCase
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,4 +60,4 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-021` | Support & Contact | listDetail | 7 | 0 | — |
+| `PTR-021` | Support & Contact | listDetail | 7 | 5 | — |

@@ -1,6 +1,6 @@
 # P08-orders-money-01 — P08 · Orders & Money (1 of 3)
 
-**10 screens · 69 operations · 78 schemas · 29 permissions**
+**10 screens · 80 operations · 113 schemas · 32 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 29 permissions apply here:
-  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, CASH_LIFT, CASH_NO_SALE, GUEST_VIEW, LEDGER_POST, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 32 permissions apply here:
+  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, CASH_LIFT, CASH_NO_SALE, GUEST_VIEW, LEDGER_POST, LEDGER_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,11 +60,11 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-008` | Product Detail & Variants | listDetail | 11 | 3 | — |
-| `BO-022` | Order Detail | listDetail | 14 | 9 | — |
-| `BO-023` | Refunds & Exchanges | listDetail | 15 | 9 | — |
+| `BO-008` | Product Detail & Variants | listDetail | 12 | 3 | — |
+| `BO-022` | Order Detail | listDetail | 19 | 9 | — |
+| `BO-023` | Refunds & Exchanges | listDetail | 18 | 9 | — |
 | `BO-024` | Payment Exceptions | configEditor | 6 | 4 | — |
-| `BO-025` | Chargebacks & Disputes | listDetail | 5 | 2 | — |
+| `BO-025` | Chargebacks & Disputes | listDetail | 10 | 2 | — |
 | `BO-026` | Group Bookings | listDetail | 17 | 11 | — |
 | `BO-027` | Reissue & Media Replacement | statusTracker | 6 | 2 | — |
 | `BO-028` | Refund Approval Queue | configEditor | 1 | 0 | — |
@@ -202,7 +202,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "Product.media",
         "Product.consentQuestionIds",
         "Product.requiresTimeWindow",
-        "Product.segmentTags"
+        "Product.segmentTags",
+        "Product.salesContact",
+        "Product.bookingFlowId"
        ],
        "operation": "getProduct",
        "notes": "**What the guest sees of the product** (decided 29 September, rev 3). `guestListing`: bookable (the default), info only, or hidden; an info-only product keeps its details and photo, shows `notBookableLabel` (default \"Info only / Not bookable online\") and opens details instead of Add to basket, and `addCartLine` refuses it `409` (REV3-14). `displayTags`: up to six, each a kind (clock, height, free, calendar, id) and a label; with none, the guest app derives them from duration, validity and the height rule (23SEP-3). `media`: images and videos from the asset library, one of them primary, which is the photo on the ticket card and what Read more opens on (23SEP-4). `consentQuestionIds`: the consent questions this product asks, in order, from CMS-018 (REV3-26). `requiresTimeWindow`: a space sold by the hour, such as a meeting-room type; its lengths are a `length` attribute whose values carry `durationMinutes` (REV3-13).",
@@ -250,6 +252,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Booking flow",
+       "bindsTo": "Product.bookingFlowId",
+       "operation": "listBookingFlows",
+       "notes": "**Which booking flow sells this product** (decided 29 September, W8 and W12): a flow from CMS-103, e.g. *workshop: product first, then date and time*. Empty means the category's flow, then the venue's flow for the product kind; the screen shows which one applies. Saved with `updateProduct`.",
+       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)"
+      },
+      {
+       "kind": "textField",
+       "label": "Sales phone",
+       "bindsTo": "Product.salesContact.phone",
+       "operation": "updateProduct",
+       "notes": "**Contact sales to book** (decided 29 September, W3). Shown beside `guestListing`; used only when the product is info only, as *Call sales* on WEB-004 and GST-004. Empty phone and email means the venue's contact.",
+       "provenance": "contract catalogue.yaml Product.salesContact"
+      },
+      {
+       "kind": "textField",
+       "label": "Sales email",
+       "bindsTo": "Product.salesContact.email",
+       "operation": "updateProduct",
+       "provenance": "contract catalogue.yaml Product.salesContact"
+      },
+      {
+       "kind": "textField",
+       "label": "Note under the contact",
+       "bindsTo": "Product.salesContact.note",
+       "operation": "updateProduct",
+       "notes": "At most 200 characters per language, e.g. *Group courses are booked by phone*.",
+       "provenance": "contract catalogue.yaml Product.salesContact"
+      }
+     ]
     }
    ]
   },
@@ -261,6 +300,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listBookingFlows",
+    "contract": "white-label",
+    "purpose": "The booking flows a product can be sold through (W12)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, W12 (P29)"
+   },
    {
     "operationId": "getProduct",
     "contract": "catalogue",
@@ -411,7 +457,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formUpdateProduct",
     "component": "modal",
     "trigger": "Save product",
-    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, and what the guest sees (decided 29 September, rev 3): `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (at most six, 23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26) and `requiresTimeWindow` (REV3-13). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, and what the guest sees (decided 29 September, rev 3): `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (at most six, 23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26) and `requiresTimeWindow` (REV3-13); `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "UpdateProductRequest",
     "confirm": {
      "label": "Save product",
@@ -429,7 +475,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "displayTags",
       "media",
       "consentQuestionIds",
-      "requiresTimeWindow"
+      "requiresTimeWindow",
+      "salesContact",
+      "bookingFlowId"
      ]
     },
     "provenance": "contract catalogue.yaml PATCH /products/{productId}"
@@ -1051,6 +1099,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listOrders"
     ]
+   },
+   {
+    "operationId": "listTaxInvoices",
+    "contract": "finance",
+    "purpose": "List tax invoices",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "issueTaxInvoice",
+    "contract": "finance",
+    "purpose": "Issue a tax invoice",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getTaxInvoice",
+    "contract": "finance",
+    "purpose": "Show a tax invoice",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "issueCreditMemo",
+    "contract": "finance",
+    "purpose": "Issue a credit memo",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getTaxDocumentRendition",
+    "contract": "finance",
+    "purpose": "Download the invoice / credit memo PDF",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1058,6 +1141,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "orderId",
      "from": "deepLink"
+    },
+    {
+     "name": "documentId",
+     "from": "navigation"
+    },
+    {
+     "name": "invoiceId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
@@ -1674,6 +1765,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "The policy this refund is judged against",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "issueCreditMemo",
+    "contract": "finance",
+    "purpose": "Issue a credit memo",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listCreditMemos",
+    "contract": "finance",
+    "purpose": "List credit memos",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getTaxDocumentRendition",
+    "contract": "finance",
+    "purpose": "Download the invoice / credit memo PDF",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1685,6 +1797,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "documentId",
+     "from": "navigation"
+    },
+    {
+     "name": "invoiceId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error. **The venue comes from the session** — a back-office user works one venue at a time and the refund policy is a venue setting, so the policy read needs it. Added 24 August with `getRefundPolicy`.",
@@ -2227,6 +2347,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "finance",
     "purpose": "List settlement batches",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordChargeback",
+    "contract": "orders",
+    "purpose": "Record a chargeback read from an acquirer portal",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "assignChargeback",
+    "contract": "orders",
+    "purpose": "Assign a chargeback to an investigator",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordChargebackOutcome",
+    "contract": "orders",
+    "purpose": "Record the bank decision on a chargeback",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getChargebackAnalytics",
+    "contract": "orders",
+    "purpose": "Chargeback analytics panel",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getChargebackAnalytics",
+    "contract": "orders",
+    "purpose": "Chargeback rate by reason, product and customer",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2234,6 +2389,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "settlementId",
      "from": "deepLink"
+    },
+    {
+     "name": "chargebackId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `settlementId`.",
@@ -4561,6 +4720,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "ProductChangeImpact"
  },
+ "assignChargeback": {
+  "method": "POST",
+  "path": "/chargebacks/{chargebackId}/assign",
+  "contract": "orders",
+  "summary": "Give a chargeback to an investigator, with a note",
+  "permission": "ORDER_REFUND_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Chargeback"
+ },
  "capturePayment": {
   "method": "POST",
   "path": "/payments/{paymentId}/capture",
@@ -4808,6 +4986,55 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "ExchangeOrderRequest",
   "responds": "OrderExchangeResult"
  },
+ "getChargebackAnalytics": {
+  "method": "GET",
+  "path": "/chargebacks/analytics",
+  "contract": "orders",
+  "summary": "Chargeback rate, win and loss, by reason, provider, outcome and period",
+  "permission": "ORDER_REFUND_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "periodFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "minChargebacks",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "providerId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrdChargebackAnalytics"
+ },
  "getCurrentShift": {
   "method": "GET",
   "path": "/shifts/current",
@@ -4908,7 +5135,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
  },
@@ -4990,6 +5223,38 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Shift"
  },
+ "getTaxDocumentRendition": {
+  "method": "GET",
+  "path": "/tax-documents/{documentId}/rendition",
+  "contract": "finance",
+  "summary": "The PDF of a tax invoice or credit memo, in a language",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FinTaxDocumentRendition"
+ },
+ "getTaxInvoice": {
+  "method": "GET",
+  "path": "/tax-invoices/{invoiceId}",
+  "contract": "finance",
+  "summary": "One tax invoice, with its lines, VAT per rate and credit memos",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FinTaxInvoice"
+ },
  "holdOrder": {
   "method": "POST",
   "path": "/orders/{orderId}/hold",
@@ -5046,6 +5311,73 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Payment"
+ },
+ "issueCreditMemo": {
+  "method": "POST",
+  "path": "/tax-invoices/{invoiceId}/credit-memos",
+  "contract": "finance",
+  "summary": "Credit all or part of a tax invoice",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FinIssueCreditMemoRequest",
+  "responds": "FinCreditMemo"
+ },
+ "issueTaxInvoice": {
+  "method": "POST",
+  "path": "/tax-invoices",
+  "contract": "finance",
+  "summary": "Issue a tax invoice for one or more paid orders",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FinIssueTaxInvoiceRequest",
+  "responds": "FinTaxInvoice"
+ },
+ "listBookingFlows": {
+  "method": "GET",
+  "path": "/venues/{venueId}/booking-flows",
+  "contract": "white-label",
+  "summary": "A venue's booking flows, in the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "flowTypeKey",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listCashMovements": {
   "method": "GET",
@@ -5123,6 +5455,55 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "CredentialReplacementReissueRevocationRecoveryView"
+ },
+ "listCreditMemos": {
+  "method": "GET",
+  "path": "/credit-memos",
+  "contract": "finance",
+  "summary": "Credit memos issued, newest first",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "taxInvoiceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "refundId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listOrderRefunds": {
   "method": "GET",
@@ -5380,6 +5761,60 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listTaxInvoices": {
+  "method": "GET",
+  "path": "/tax-invoices",
+  "contract": "finance",
+  "summary": "Tax invoices issued, newest first",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "invoiceType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listTicketReissueFulfillment": {
   "method": "GET",
   "path": "/ticket-reissue-fulfillment",
@@ -5436,6 +5871,44 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "OpenShiftRequest",
   "responds": "Shift"
+ },
+ "recordChargeback": {
+  "method": "POST",
+  "path": "/chargebacks/intake",
+  "contract": "orders",
+  "summary": "Take in a chargeback notified by a provider",
+  "permission": "ORDER_REFUND_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Chargeback"
+ },
+ "recordChargebackOutcome": {
+  "method": "POST",
+  "path": "/chargebacks/{chargebackId}/outcome",
+  "contract": "orders",
+  "summary": "Record the bank's decision and adjust the ledger",
+  "permission": "ORDER_REFUND_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Chargeback"
  },
  "recordNoSale": {
   "method": "POST",
@@ -5776,6 +6249,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "UpdateGroupBookingRequest",
@@ -5791,6 +6269,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -5959,6 +6442,275 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "BookingFlow": {
+  "x-ticvai-persistence": "whitelabel.booking_flow",
+  "type": "object",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "required": [
+   "flowTypeKey",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `createBookingFlowDefinition`."
+   },
+   "flowTypeKey": {
+    "$ref": "#/components/schemas/BookingFlowTypeKey"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
+   },
+   "isDefaultForType": {
+    "type": "boolean",
+    "default": false,
+    "description": "At most one per venue and type; setting it takes it from the previous default."
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
+   },
+   "steps": {
+    "type": "array",
+    "maxItems": 30,
+    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlowStep"
+    }
+   },
+   "settings": {
+    "$ref": "#/components/schemas/BookingFlowLevelSettings"
+   },
+   "isValid": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "BookingFlowLevelSettings": {
+  "x-ticvai-persistence": "none — jsonb column on whitelabel.booking_flow",
+  "type": "object",
+  "description": "**The settings that belong to one flow, not to the venue (decided 29 September, W12).** Moved here from `BookingFlowSettings`, which keeps the venue-wide ones. Each keeps its rev 3 meaning and default. A field left out takes its default.\n",
+  "properties": {
+   "performanceReveal": {
+    "type": "string",
+    "enum": [
+     "dateTimeTicket",
+     "allAtOnce"
+    ],
+    "default": "dateTimeTicket",
+    "description": "**Performance reveal (rev 3 REV3-2).** `dateTimeTicket` shows the times only once a date is picked and the tickets only once a time is picked; `allAtOnce` shows them together. Product-first (W8) is the step order of `experienceWorkshop`, not a value here.\n"
+   },
+   "signInAt": {
+    "type": "string",
+    "enum": [
+     "afterAddOns",
+     "atPayment"
+    ],
+    "default": "afterAddOns",
+    "description": "**Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3).** `afterAddOns` asks as the guest leaves the extras step; `atPayment` asks at payment. The basket is kept either way.\n"
+   },
+   "seatEventDateMode": {
+    "type": "string",
+    "enum": [
+     "inlineStep",
+     "popupOnSeatMap"
+    ],
+    "default": "inlineStep",
+    "description": "**Date and time on a seated event (rev 3 REV3-4).** `inlineStep` asks for them before the seat map; `popupOnSeatMap` opens the seat map with a date and time pop-up. Read only by the seated flow types.\n"
+   },
+   "extrasStep": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "always",
+     "never"
+    ],
+    "default": "auto",
+    "description": "`auto` shows the extras step only when the cart's products have add-ons; `never` is the same as turning the optional `extras` step off."
+   },
+   "quickTour": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Quick tour (rev 3 REV3-20).** A first visit gets a coach-mark tour of this flow's steps, replayable from a Quick tour button. Seen-state kept on the device only.\n"
+   },
+   "consentQuestionIds": {
+    "type": "array",
+    "maxItems": 10,
+    "uniqueItems": true,
+    "default": [],
+    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400. A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "BookingFlowStep": {
+  "x-ticvai-persistence": "whitelabel.booking_flow_step",
+  "type": "object",
+  "description": "One step of a venue's flow, in the venue's order (decided 29 September, W12).",
+  "required": [
+   "stepKey",
+   "enabled",
+   "sortOrder"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "stepKey": {
+    "$ref": "#/components/schemas/BookingFlowStepKey"
+   },
+   "enabled": {
+    "type": "boolean",
+    "description": "A `required` step cannot be off; the flow saves and `isValid` turns false."
+   },
+   "sortOrder": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "requirement": {
+    "type": "string",
+    "enum": [
+     "required",
+     "optional",
+     "conditional"
+    ],
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the flow type, so the CMS can mark the step without a second read."
+   },
+   "settings": {
+    "type": "object",
+    "additionalProperties": true,
+    "default": {},
+    "description": "The step's own settings, by the names the type's `stepSettings` gives for this step (e.g. `languages` on `language`, `minHours` on `duration`). A name the type does not give is refused with 400."
+   }
+  }
+ },
+ "BookingFlowTypeKey": {
+  "type": "string",
+  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize` are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
+  "enum": [
+   "datedDayPass",
+   "timedEntry",
+   "openDated",
+   "seatedFixedPerformance",
+   "seatedDateTimeSeatMap",
+   "experienceWorkshop",
+   "surfSession",
+   "meetingRoomHourly",
+   "cabanaMap",
+   "cabanaBySize",
+   "guidedTourByLanguage",
+   "transport",
+   "tableReservation",
+   "membership",
+   "giftCard",
+   "multiLocation"
+  ]
+ },
+ "CashCountLine": {
+  "x-ticvai-persistence": "orders.cash_count_line",
+  "type": "object",
+  "description": "**One denomination, counted once, against one shift.** Raised in review on 24 August: the table was a stub.\n**The denomination is referenced rather than described** — `platform.denomination` already holds the note and coin definitions per currency, and a count line that repeats the face value is a count line that can disagree with the till it was counted on.\n**`countedQuantity` is a quantity and `expectedQuantity` is derived**, not stored: the expectation is the opening float plus every movement, and a stored expectation that drifts from the movements is a variance nobody can explain.\n",
+  "required": [
+   "shiftId",
+   "denominationId",
+   "countedQuantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "shiftId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "A ULID, as `Shift.id` and `orders.pos_shift.id` are."
+   },
+   "depositBoxId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "countKind": {
+    "type": "string",
+    "enum": [
+     "openingFloat",
+     "close",
+     "movement"
+    ],
+    "description": "Which count this line belongs to — the opening float (`openShift`), the close (`closeShift`) or a lift or add (`createCashMovement`). **Until 26 September the three were indistinguishable on one shift** (pull audit R099). Set by the server from the operation that wrote the line.\n"
+   },
+   "cashMovementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The movement this line counts, where `countKind` is `movement`. How `listCashMovements` rebuilds each movement's `denominations`.\n"
+   },
+   "denominationId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "References `platform.denomination` — face value, kind and sort order live there."
+   },
+   "countedQuantity": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "**How many of this note or coin were in the drawer.**"
+   },
+   "countedValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "**Quantity times face value, stored.** Derivable, and stored anyway: a denomination revalued or deactivated later would silently rewrite a historical count.\n"
+   },
+   "countedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "countedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recountOf": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A recount points at what it replaces rather than overwriting it.** `requestRecount` exists because a variance is a question before it is a fact.\n"
+   }
+  }
+ },
  "CashMovement": {
   "x-ticvai-persistence": "orders.cash_movement",
   "allOf": [
@@ -6036,6 +6788,156 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "callCentre"
   ]
  },
+ "Chargeback": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.chargeback + orders.chargeback_evidence + orders.chargeback_investigation_log",
+  "description": "BL-118, CF-144. **A chargeback is not a refund**, and treating it as one is how a venue loses them by default.\nA refund is a decision the venue makes. **A chargeback is a decision a bank makes, on a clock the venue does not control** — evidence is due in days, a deadline missed is a case lost regardless of merit, and there is a fee either way.\nThe money is already gone when this record is created. **Representment is an argument, not a reversal.**\n",
+  "required": [
+   "id",
+   "paymentId",
+   "amount",
+   "reason",
+   "status",
+   "evidenceDueBy"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "paymentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "providerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "providerCaseReference": {
+    "type": "string"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "feeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "fraudulent",
+     "productNotReceived",
+     "productUnacceptable",
+     "duplicate",
+     "subscriptionCancelled",
+     "creditNotProcessed",
+     "unrecognised",
+     "other"
+    ],
+    "description": "**The scheme's reason code, mapped.** Which evidence wins depends entirely on it — a *product not received* case is answered by a scan record and a *fraudulent* case is not.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "received",
+     "underReview",
+     "evidenceSubmitted",
+     "won",
+     "lost",
+     "accepted",
+     "expired"
+    ]
+   },
+   "evidenceDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**The field the whole record exists for.** A deadline missed is a case lost on merit nobody read, and it is the one date that must reach a person rather than a report.\n"
+   },
+   "evidenceSubmittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "evidence": {
+    "type": "array",
+    "description": "**What the platform can prove**, assembled rather than typed: the order, the scan that admitted them, the delivery, the terms accepted, the IP and device. A venue answering a chargeback by hand is a venue answering it late.\nHeld as rows of `orders.chargeback_evidence`, one per item (29 September, build: a list of objects needs its own table to be stored at all).\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "order",
+        "scanRecord",
+        "deliveryProof",
+        "termsAccepted",
+        "communication",
+        "deviceFingerprint",
+        "other"
+       ]
+      },
+      "reference": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "outcomeAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "schemeReasonCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "The card scheme's own reason code as notified, beside the mapped `reason` (5.7.92)."
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the provider notified the case; the date its debit posts to (`recordChargeback`)."
+   },
+   "assigneePrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who is investigating (`assignChargeback`)."
+   },
+   "investigationLog": {
+    "type": "array",
+    "description": "Notes from `assignChargeback` and `recordChargebackOutcome`, oldest first, with who wrote each and when. Append-only. Held as rows of `orders.chargeback_investigation_log` (29 September, build).",
+    "items": {
+     "type": "object",
+     "properties": {
+      "note": {
+       "type": "string"
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "debitJournalEntryId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The `chargebackDebit` (and `chargebackFee`) entry posted at intake."
+   },
+   "outcomeJournalEntryId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The `chargebackReversal` entry posted when the case is won, or the additional fee when lost."
+   }
+  }
+ },
  "CloseShiftRequest": {
   "type": "object",
   "required": [
@@ -6084,6 +6986,105 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time"
    }
   }
+ },
+ "ConsentQuestion": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.consent_question + marketing.consent_question_version",
+  "description": "**A venue-defined consent question asked at booking** (decided 29 September, rev 3 REV3-26). Each version's text is kept in `consent_question_version`, so an answer always points at the exact words the guest saw. Attached to products by the catalogue and to booking flows by the white-label flow configuration; one or several per flow, as the venue chooses.\n",
+  "required": [
+   "id",
+   "kind",
+   "text",
+   "version",
+   "scope",
+   "required",
+   "blockingAnswer",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "readOnly": true
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ConsentQuestionKind"
+   },
+   "text": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "The question as the guest reads it, per locale."
+   },
+   "helpText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true,
+    "description": "Raised by one each time the question changes (`updateConsentQuestion`)."
+   },
+   "scope": {
+    "type": "string",
+    "enum": [
+     "perPerson",
+     "perBooking"
+    ],
+    "default": "perPerson",
+    "description": "Asked for each declared person, or once for the whole booking."
+   },
+   "required": {
+    "type": "boolean",
+    "default": true,
+    "description": "Checkout waits until it is answered (`orders.checkoutCart` 422 `consentRequired`)."
+   },
+   "blockingAnswer": {
+    "type": "string",
+    "enum": [
+     "yes",
+     "no",
+     "none"
+    ],
+    "default": "none",
+    "description": "The answer that stops the booking, for the person or the booking it covers. `none` records the answer and blocks nothing."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "retired"
+    ],
+    "default": "active"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "ConsentQuestionKind": {
+  "type": "string",
+  "description": "What the question is about (decided 29 September, rev 3 REV3-26). `swim` feeds the derived `confidentSwimmer` on the order line; the others are recorded and checked as the venue set them.",
+  "enum": [
+   "swim",
+   "scuba",
+   "risk",
+   "custom"
+  ]
  },
  "CountedDenominationLine": {
   "type": "object",
@@ -6270,6 +7271,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "variantId": {
     "type": "string",
     "format": "uuid"
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Carried from the cart line at checkout; stored on `orders.order_line` and sent in `order.completed` lines.\n"
    },
    "performanceId": {
     "type": "string",
@@ -6459,6 +7466,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "nullable": true,
     "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
+   },
+   "returnUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
    },
    "deviceId": {
     "type": "string",
@@ -6657,7 +7682,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "DataSource": {
   "type": "string",
-  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n",
+  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n\n**`forecastPoints` added 29 September** (8.2.55, build pass, group G2): the points of published AI forecast versions; see `x-ticvai-forecast-points`.\n\n**Three accreditation sources added 29 September** (12.1.50, build pass): `accreditationApplications`, `accreditationHolders` and `accreditationCredentials`, over `accreditation.application`, `accreditation.holder` and `accreditation.credential`. They are what the accreditation KPIs and any accreditation report or export (`exportReportResult`, csv or xlsx) are built over. **All three name a person**, and `REPORT_EXPORT_PII` gates them as it gates `guests`.\n",
   "enum": [
    "orders",
    "orderLines",
@@ -6692,8 +7717,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "forms",
    "challenges",
    "wallets",
-   "resaleListings"
-  ]
+   "resaleListings",
+   "accreditationApplications",
+   "accreditationHolders",
+   "accreditationCredentials",
+   "forecastPoints"
+  ],
+  "x-ticvai-forecast-points": "**`forecastPoints` added 29 September (build pass, group G2; 8.2.55)**: one row per forecast point (`ai.forecast_point`) of a **published** forecast version (`ai.forecast_version` status `published`), with the definition it belongs to (`ai.forecast_definition`: subject, grain, unit), the period, the dimension key and the p10, p50 and p90 values. Draft, awaiting-approval and superseded versions are not reachable, and scenario points (`scenarioId` set) only with the scenario named as a filter: **a forecast leaves the platform as the one somebody published**. It is how a forecast is exported (`runReport` then `exportReportResult`, csv or xlsx), scheduled or put on a dashboard. Names no person, so `REPORT_EXPORT` is enough. Read from the reporting replica of the AI log database (design 2.4), never from the model service.\n"
  },
  "DenominationCount": {
   "type": "array",
@@ -7003,6 +8033,655 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "enum"
   ]
  },
+ "FinCreditMemo": {
+  "x-ticvai-persistence": "ledger.credit_memo + ledger.credit_memo_line",
+  "type": "object",
+  "description": "5.7.94. **A tax credit note against one tax invoice**, with its own series. Never edited.",
+  "required": [
+   "id",
+   "creditMemoNumber",
+   "taxInvoiceId",
+   "kind",
+   "reason",
+   "legalEntityId",
+   "issuedAt",
+   "currency",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "creditMemoNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Server-assigned from the legal entity's credit memo series, in sequence without gaps."
+   },
+   "taxInvoiceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "taxInvoiceNumber": {
+    "type": "string",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "full",
+     "partial"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "refund",
+     "cancellation",
+     "priceAdjustment",
+     "returnOfGoods",
+     "billingError",
+     "other"
+    ]
+   },
+   "refundId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "cancelledOrderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "buyerSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmountInLegalCurrency": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "renditionAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "eInvoiceStatus": {
+    "$ref": "#/components/schemas/FinEInvoiceTransmissionStatus"
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FinCreditMemoLine"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   }
+  }
+ },
+ "FinCreditMemoLine": {
+  "type": "object",
+  "required": [
+   "invoiceLineNumber",
+   "netAmount",
+   "taxAmount",
+   "grossAmount"
+  ],
+  "properties": {
+   "invoiceLineNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "quantity": {
+    "type": "number",
+    "nullable": true
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxRate": {
+    "type": "number"
+   },
+   "taxCategory": {
+    "$ref": "#/components/schemas/FinTaxCategory"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "FinEInvoiceTransmissionStatus": {
+  "type": "string",
+  "description": "6.1.1. `notRequired` where the legal entity's provider is `disabled` or absent.",
+  "enum": [
+   "notRequired",
+   "queued",
+   "sent",
+   "accepted",
+   "rejected",
+   "failed"
+  ]
+ },
+ "FinIssueCreditMemoRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "kind",
+   "reason"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "full",
+     "partial"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "refund",
+     "cancellation",
+     "priceAdjustment",
+     "returnOfGoods",
+     "billingError",
+     "other"
+    ]
+   },
+   "refundId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "cancelledOrderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "description": "Required for `partial`. Each names an invoice line and the quantity or amount credited.",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineNumber"
+     ],
+     "properties": {
+      "lineNumber": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "quantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "netAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   }
+  }
+ },
+ "FinIssueTaxInvoiceRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "invoiceType",
+   "orderIds"
+  ],
+  "properties": {
+   "invoiceType": {
+    "$ref": "#/components/schemas/FinTaxInvoiceType"
+   },
+   "orderIds": {
+    "type": "array",
+    "minItems": 1,
+    "description": "One order for `simplified` and `full`; one or more for `consolidated`. Every order must be paid, of one buyer, one legal entity and one currency.",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "recipient": {
+    "$ref": "#/components/schemas/FinTaxInvoiceRecipient"
+   },
+   "languages": {
+    "type": "array",
+    "description": "Overrides the template's languages for this document, within those the template offers.",
+    "items": {
+     "type": "string",
+     "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+    }
+   },
+   "supersedesInvoiceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A simplified invoice this full invoice replaces for the same supply. Refused unless the law allows it (make-or-break on issueTaxInvoice)."
+   },
+   "deliverToEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "Sends the PDF on issue as well as returning it."
+   }
+  }
+ },
+ "FinTaxCategory": {
+  "type": "string",
+  "description": "How a line is treated for VAT. Taken from the tax code the line was posted with.",
+  "enum": [
+   "standardRated",
+   "zeroRated",
+   "exempt",
+   "outOfScope",
+   "reverseCharge"
+  ]
+ },
+ "FinTaxDocumentRendition": {
+  "x-ticvai-persistence": "none — a signed link to the stored PDF",
+  "type": "object",
+  "required": [
+   "documentId",
+   "documentKind",
+   "url",
+   "expiresAt"
+  ],
+  "properties": {
+   "documentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "documentKind": {
+    "type": "string",
+    "enum": [
+     "taxInvoice",
+     "creditMemo"
+    ]
+   },
+   "documentNumber": {
+    "type": "string"
+   },
+   "language": {
+    "type": "string",
+    "nullable": true
+   },
+   "contentType": {
+    "type": "string",
+    "default": "application/pdf"
+   },
+   "url": {
+    "type": "string",
+    "format": "uri"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "FinTaxInvoice": {
+  "x-ticvai-persistence": "ledger.tax_invoice + ledger.tax_invoice_line",
+  "type": "object",
+  "description": "5.7.93, 5.10.3. **A guest tax invoice, as issued, never edited.** Corrections are credit memos. The supplier block is a snapshot of the legal entity at issue, so a later change of address does not change a document already given to a guest.",
+  "required": [
+   "id",
+   "invoiceNumber",
+   "invoiceType",
+   "status",
+   "legalEntityId",
+   "issuedAt",
+   "supplyDate",
+   "currency",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "invoiceNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Server-assigned from the legal entity's series for the document kind, in sequence and without gaps, e.g. `INV-2026-000123`. Never reused."
+   },
+   "invoiceType": {
+    "$ref": "#/components/schemas/FinTaxInvoiceType"
+   },
+   "status": {
+    "$ref": "#/components/schemas/FinTaxInvoiceStatus"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "supplierName": {
+    "type": "string"
+   },
+   "supplierAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "supplierTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest the orders belong to; the key a guest's own reads filter on."
+   },
+   "buyerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerCountryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "buyerTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "customerAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "supplyDate": {
+    "type": "string",
+    "format": "date",
+    "description": "The date of supply where it differs from the issue date (the latest order's payment date on a consolidated invoice). A day in the region's time zone."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmountInLegalCurrency": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs, at the rate the orders were stored at."
+   },
+   "creditedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "supersedesInvoiceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "renditionAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The PDF rendered at issue; read through getTaxDocumentRendition."
+   },
+   "eInvoiceStatus": {
+    "$ref": "#/components/schemas/FinEInvoiceTransmissionStatus"
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Null where the platform issued it."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FinTaxInvoiceLine"
+    }
+   },
+   "taxSummary": {
+    "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "VAT per rate and category, summed from the lines for the response.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "taxCategory": {
+       "$ref": "#/components/schemas/FinTaxCategory"
+      },
+      "taxRate": {
+       "type": "number"
+      },
+      "taxableAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "taxAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written at the scope of the venue the orders were sold at, or the region for a consolidated invoice across venues."
+   }
+  }
+ },
+ "FinTaxInvoiceLine": {
+  "type": "object",
+  "description": "One line as it was sold and taxed. Amounts are in the invoice currency.",
+  "required": [
+   "lineNumber",
+   "description",
+   "quantity",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "taxCategory"
+  ],
+  "properties": {
+   "lineNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderLineId": {
+    "type": "string",
+    "nullable": true
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "quantity": {
+    "type": "number"
+   },
+   "unitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "taxRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "taxCategory": {
+    "$ref": "#/components/schemas/FinTaxCategory"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "creditedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "FinTaxInvoiceRecipient": {
+  "x-ticvai-persistence": "none — copied onto the invoice as buyer columns",
+  "type": "object",
+  "description": "Who the invoice is addressed to. Required for `full` and `consolidated`.",
+  "required": [
+   "name"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 300
+   },
+   "address": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "countryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "taxRegistrationNumber": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "The recipient's TRN where they are VAT-registered."
+   },
+   "customerAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The B2B credit account (payments `B2bCreditAccount`) where a company is invoiced."
+   }
+  }
+ },
+ "FinTaxInvoiceStatus": {
+  "type": "string",
+  "description": "`issued` until a credit memo is issued against it; `superseded` where a full invoice replaced a simplified one for the same supply (only if the law allows it; see issueTaxInvoice).",
+  "enum": [
+   "issued",
+   "partiallyCredited",
+   "fullyCredited",
+   "superseded"
+  ]
+ },
+ "FinTaxInvoiceType": {
+  "type": "string",
+  "description": "5.7.93. `simplified` for one order with no recipient details, `full` for one order with them, `consolidated` for several paid orders of one buyer on one invoice.",
+  "enum": [
+   "simplified",
+   "full",
+   "consolidated"
+  ]
+ },
  "FinancialReport": {
   "x-ticvai-persistence": "none — computed from replica",
   "type": "object",
@@ -7121,6 +8800,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "type": "string"
     }
+   },
+   "compiledSql": {
+    "type": "string",
+    "nullable": true,
+    "description": "The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"
    }
   }
  },
@@ -7629,6 +9313,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "MediaKind": {
+  "type": "string",
+  "enum": [
+   "image",
+   "video",
+   "audio",
+   "document",
+   "vector",
+   "font",
+   "archive"
+  ]
+ },
  "MediaReplaceResult": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -7652,6 +9348,97 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean"
    }
   }
+ },
+ "MediaRights": {
+  "x-ticvai-persistence": "none — embedded in asset",
+  "type": "object",
+  "description": "Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n",
+  "properties": {
+   "licenceKind": {
+    "type": "string",
+    "enum": [
+     "owned",
+     "royaltyFree",
+     "rightsManaged",
+     "creativeCommons",
+     "editorialOnly",
+     "unknown"
+    ]
+   },
+   "licensor": {
+    "type": "string",
+    "nullable": true
+   },
+   "licenceReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "permittedUses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "web",
+      "print",
+      "socialMedia",
+      "inVenue",
+      "advertising",
+      "internal"
+     ]
+    }
+   },
+   "attributionRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "attributionText": {
+    "type": "string",
+    "nullable": true
+   },
+   "permittedTerritories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"
+   },
+   "permittedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"
+   },
+   "modelReleaseHeld": {
+    "type": "boolean",
+    "default": false
+   },
+   "renewalOwner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "MediaStatus": {
+  "type": "string",
+  "enum": [
+   "processing",
+   "ready",
+   "quarantined",
+   "failed",
+   "archived"
+  ]
  },
  "MediaUsage": {
   "x-ticvai-persistence": "assets.media_usage",
@@ -7736,6 +9523,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "NaturalLanguageAnswer": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -7744,7 +9560,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "question",
    "interpretation",
    "result",
-   "confidence"
+   "reliability"
   ],
   "properties": {
    "conversationId": {
@@ -7755,19 +9571,59 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "interpretation": {
     "type": "string",
-    "description": "What the question was understood to mean, in plain language."
+    "description": "What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."
+   },
+   "semanticSpec": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingSemanticQuerySpec"
+     }
+    ],
+    "nullable": true,
+    "description": "What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"
    },
    "generatedQuery": {
-    "$ref": "#/components/schemas/GeneratedQuery",
-    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`.\n"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/GeneratedQuery"
+     }
+    ],
+    "nullable": true,
+    "description": "The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"
    },
    "result": {
-    "$ref": "#/components/schemas/ReportResult"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportResult"
+     }
+    ],
+    "nullable": true,
+    "description": "Null when the question is outside the semantic model."
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."
+   },
+   "reliability": {
+    "$ref": "#/components/schemas/ReportingAnswerReliability"
+   },
+   "unavailableReason": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingUnavailableReason"
+     }
+    ],
+    "nullable": true,
+    "description": "Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."
    },
    "confidence": {
     "type": "number",
     "minimum": 0,
-    "maximum": 1
+    "maximum": 1,
+    "deprecated": true,
+    "description": "Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."
    },
    "suggestedFollowUps": {
     "type": "array",
@@ -7855,6 +9711,113 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "description": "When the device recorded it. `openShift` is online-only (F32), so this differs from server receipt time only by transit; it is kept because the shift's other device writes are ordered against it.\n"
+   }
+  }
+ },
+ "OrdChargebackAnalytics": {
+  "x-ticvai-persistence": "none — computed from orders.chargeback and orders.payment on the reporting replica",
+  "type": "object",
+  "description": "4.2.21. Chargeback measures for a period, in total and per group.",
+  "required": [
+   "periodFrom",
+   "periodTo",
+   "groupBy",
+   "totals",
+   "groups"
+  ],
+  "properties": {
+   "periodFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "periodTo": {
+    "type": "string",
+    "format": "date"
+   },
+   "groupBy": {
+    "type": "string"
+   },
+   "totals": {
+    "$ref": "#/components/schemas/OrdChargebackMeasures"
+   },
+   "groups": {
+    "type": "array",
+    "items": {
+     "allOf": [
+      {
+       "$ref": "#/components/schemas/OrdChargebackMeasures"
+      },
+      {
+       "type": "object",
+       "required": [
+        "key"
+       ],
+       "properties": {
+        "key": {
+         "type": "string",
+         "description": "The reason, provider id, outcome, venue id, month (`YYYY-MM`), product id, product category id, or guest `subjectId` (`anonymous` for purchases with no guest) of the group."
+        },
+        "label": {
+         "type": "string",
+         "nullable": true,
+         "description": "The display name of the group's key. Null for `customer` unless the caller holds `GUEST_VIEW_PII`."
+        }
+       }
+      }
+     ]
+    }
+   }
+  }
+ },
+ "OrdChargebackMeasures": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "properties": {
+   "chargebackCount": {
+    "type": "integer"
+   },
+   "chargebackAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "cardPaymentCount": {
+    "type": "integer"
+   },
+   "chargebackRateByCount": {
+    "type": "number",
+    "description": "Chargebacks received per card payment captured in the period, as a fraction."
+   },
+   "chargebackRateByValue": {
+    "type": "number"
+   },
+   "decidedCount": {
+    "type": "integer"
+   },
+   "wonCount": {
+    "type": "integer"
+   },
+   "lostCount": {
+    "type": "integer"
+   },
+   "acceptedCount": {
+    "type": "integer"
+   },
+   "expiredCount": {
+    "type": "integer",
+    "description": "Lost to a missed evidence deadline."
+   },
+   "winRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "Won over decided (won, lost, expired); null with none decided."
+   },
+   "recoveredAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "feeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "openCount": {
+    "type": "integer"
    }
   }
  },
@@ -8093,7 +10056,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   }
  },
  "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility",
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-retired-columns": [
+   "promotion_id",
+   "name",
+   "reason"
+  ],
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateOrderLine"
@@ -8153,6 +10121,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "default": 0,
       "readOnly": true,
       "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
+     },
+     "venueId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "discounts": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.",
+      "items": {
+       "$ref": "#/components/schemas/OrderLineDiscount"
+      }
      }
     }
    }
@@ -8364,6 +10346,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
  },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -8468,7 +10510,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",
@@ -8633,6 +10713,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 REV3-14). Each value at most 60 characters. Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.\n"
    },
+   "salesContact": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductSalesContact"
+     }
+    ],
+    "nullable": true,
+    "description": "**Who a guest contacts to book a view-only product** (decided 29 September, W3), e.g. a training course listed with full details and no Book button. Shown as *Call sales* and *Email sales* on an `infoOnly` product. Null means the venue's own contact (white-label `getTenantAppStatus.contact`). Ignored unless `guestListing` is `infoOnly`.\n"
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+   },
    "displayTags": {
     "type": "array",
     "maxItems": 6,
@@ -8657,7 +10752,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "string",
      "format": "uuid"
     },
-    "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlowConfig.consentQuestionIds`, per venue through `venueOverrides`); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
+    "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
    },
    "requiresTimeWindow": {
     "type": "boolean",
@@ -8862,6 +10957,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ProductSalesContact": {
+  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
+  "type": "object",
+  "description": "Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n",
+  "minProperties": 1,
+  "properties": {
+   "phone": {
+    "type": "string",
+    "maxLength": 32,
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "maxLength": 254,
+    "nullable": true
+   },
+   "note": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."
+   }
+  }
+ },
  "ProductVariant": {
   "x-ticvai-persistence": "catalogue.variant",
   "type": "object",
@@ -8962,6 +11085,122 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "Set where this version was created by a restore. **A restore is a new version, not a rewind** — a price that was wrong for three days stays visible, because a finance query run next quarter has to reproduce what was charged.\n"
+   }
+  }
+ },
+ "Refund": {
+  "x-ticvai-persistence": "orders.refund",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "amount",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "batchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own."
+   },
+   "fxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
+   },
+   "taxReversalEntryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A refund reverses the tax entry it created, and this is where that is stated rather than implied.** `reverseJournalEntry` and `calculateTax` both exist, so both halves were present and the obligation was assumed — **an implied obligation is one a developer can miss without failing anything.**\nNull only where the original sale carried no tax.\n"
+   },
+   "settleTo": {
+    "type": "string",
+    "enum": [
+     "originalTender",
+     "advanceBalance",
+     "wireTransfer",
+     "storeCredit"
+    ],
+    "default": "originalTender",
+    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
+   },
+   "fxVariance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedPercentage": {
+    "type": "number",
+    "description": "From the venue's time bands, or an approver override."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingApproval",
+     "pendingGateway",
+     "completed",
+     "declined",
+     "failed"
+    ]
+   },
+   "reason": {
+    "type": "string"
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "secondaryPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ledgerEntryId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Written before the gateway is called."
+   },
+   "gatewayReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -9306,6 +11545,105 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
    }
   }
+ },
+ "ReportingAnswerReliability": {
+  "type": "string",
+  "description": "**How far an analytics answer can be relied on** (decided 29 September, AI system design 5.6): a category, never a bare percentage. `grounded`: every figure comes from a result of the compiled spec. `partial`: part of the question was answered and the rest was not modelled. `conflictingSources`: the result and a cited source disagree. `insufficientEvidence`: the question could not be answered, including \"not available yet\" outside the semantic model. The same four values as `ai.yaml`'s assistant answers.\n",
+  "enum": [
+   "grounded",
+   "partial",
+   "conflictingSources",
+   "insufficientEvidence"
+  ]
+ },
+ "ReportingSemanticQuerySpec": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "**A question in the semantic model's own vocabulary** (decided 29 September, AI system design 2.2 E and 5.7). What the model returns for a live-number question instead of SQL, and what `runSemanticQuery` takes. Every code is a `SemanticModel` field code or a KPI code; Reporting validates the spec against the published model and compiles it deterministically, so the same spec compiles to the same SQL for the same model version.\n",
+  "required": [
+   "metric",
+   "period"
+  ],
+  "properties": {
+   "metric": {
+    "type": "string",
+    "description": "A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The governed definition the dashboards use, so the number matches them."
+   },
+   "dimensions": {
+    "type": "array",
+    "maxItems": 5,
+    "description": "Field codes to group by. Each must be reachable from the metric's dataset through a relationship the semantic model declares.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "operator"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "description": "A `SemanticModel` field code."
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "equals",
+        "notEquals",
+        "greaterThan",
+        "lessThan",
+        "between",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+       ]
+      },
+      "values": {
+       "type": "array",
+       "description": "**Open on purpose; typed by the field.** One value for the comparison operators, exactly two (from, to) for `between`, any number for `in` and `notIn`, none for `isNull` and `isNotNull`.\n",
+       "items": {}
+      }
+     }
+    }
+   },
+   "period": {
+    "type": "string",
+    "description": "ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the form `explainMetricChange` takes."
+   },
+   "comparison": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `getKpiValues` `compareTo`. With one, each row carries the metric for the comparison beside the current value.",
+    "enum": [
+     "previousPeriod",
+     "samePeriodLastYear",
+     "target",
+     "benchmark"
+    ]
+   },
+   "semanticModelVersion": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "The `SemanticModel.version` the spec was validated and compiled against. Set by Reporting."
+   }
+  }
+ },
+ "ReportingUnavailableReason": {
+  "type": "string",
+  "description": "Which part of a question is outside the semantic model, so the answer is \"not available yet\" (design 5.7). A metric or field the caller may not see is reported as not modelled, so the reason does not reveal that it exists.",
+  "enum": [
+   "metricNotModelled",
+   "dimensionNotModelled",
+   "filterNotModelled",
+   "comparisonNotAvailable",
+   "periodOutsideHistory"
+  ]
  },
  "RunReportRequest": {
   "x-ticvai-persistence": "none — request only",
@@ -9827,6 +12165,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "autoClosed"
   ]
  },
+ "SupervisorStepUp": {
+  "type": "object",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "required": [
+   "principalId",
+   "credential"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The supervisor signing. Recorded against the act."
+   },
+   "credential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
+   }
+  }
+ },
  "TenderKind": {
   "type": "string",
   "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
@@ -10035,6 +12394,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "nullable": true
    },
+   "salesContact": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductSalesContact"
+     }
+    ],
+    "nullable": true,
+    "description": "See `Product.salesContact` (W3, 29 September)."
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "See `Product.bookingFlowId` (W8, W12, 29 September)."
+   },
    "displayTags": {
     "type": "array",
     "maxItems": 6,
@@ -10062,6 +12436,69 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean"
    }
   }
+ },
+ "VariantDimension": {
+  "x-ticvai-persistence": "catalogue.variant_dimension",
+  "type": "object",
+  "description": "**A length is an axis like any other** (decided 29 September, rev 3 REV3-13). A meeting room type sold by the hour has an axis `length` with values `1h`, `2h`, `halfDay`, `fullDay`, each carrying `durationMinutes` (proposed 60, 120, 240 and 480, client to correct), and each generated variant is priced on its own, so a half day need not cost four single hours.\n",
+  "required": [
+   "code",
+   "name",
+   "values"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "values": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "label"
+     ],
+     "properties": {
+      "code": {
+       "type": "string",
+       "maxLength": 64
+      },
+      "label": {
+       "type": "string",
+       "maxLength": 200
+      },
+      "priceDelta": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "durationMinutes": {
+       "type": "integer",
+       "minimum": 15,
+       "maximum": 1440,
+       "nullable": true,
+       "description": "How long a variant carrying this value books its space for, on a `length` axis of a product with `requiresTimeWindow` (decided 29 September, rev 3 REV3-13). Null on any other axis. One axis per product at most may carry it; a second is a `400`."
+      }
+     }
+    }
+   }
+  }
+ },
+ "VoidReason": {
+  "type": "string",
+  "description": "**The void reason list** (decided 28 September, audit R125 (4)): the one list `voidOrder` takes, and the list `fnb.amendFnbOrder` and `fnb.cancelFnbOrder` point to. `other` requires a note (audit R222), and the notes are reviewed quarterly to add real reasons. Proposed, client to correct.\n",
+  "enum": [
+   "guestChangedMind",
+   "enteredInError",
+   "itemUnavailable",
+   "qualityIssue",
+   "duplicate",
+   "other"
+  ]
  },
  "WithdrawalReason": {
   "type": "string",

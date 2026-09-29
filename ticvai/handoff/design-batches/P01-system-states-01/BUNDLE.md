@@ -1,6 +1,6 @@
 # P01-system-states-01 — P01 · System States
 
-**1 screens · 1 operations · 2 schemas · 0 permissions**
+**1 screens · 1 operations · 5 schemas · 0 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -97,7 +97,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "WEB-001"
    ]
   },
-  "notes": "Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's failure, not ours. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's failure, not ours. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Bound 28 September** — sold out and closed come from `getTenantAppStatus.availability` (`open`, `soldOut`, `closed`) and `availabilityMessage` (decided 28 September, audit R073 (f)). The forced upgrade (`minimumAppVersion`) is the app's alone, since a website is always the current version.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
@@ -111,7 +111,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected error sold out",
+       "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
        "columns": [
         "TenantAppStatus.isPublished",
@@ -125,9 +125,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "TenantAppStatus.isInMaintenance",
         "TenantAppStatus.maintenanceMessage",
         "TenantAppStatus.expectedBackAt",
+        "TenantAppStatus.availability",
+        "TenantAppStatus.availabilityMessage",
         "TenantAppStatus.recentChanges"
        ],
        "operation": "getTenantAppStatus",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      },
+      {
+       "kind": "banner",
+       "label": "Sold out or closed today",
+       "bindsTo": "TenantAppStatus.availabilityMessage",
+       "operation": "getTenantAppStatus",
+       "notes": "**From `getTenantAppStatus.availability`** (`open`, `soldOut`, `closed`) and its `availabilityMessage`, set live from CMS-001 through `setMaintenanceMode` (decided 28 September, audit R073 (f)). `soldOut` and `closed` read differently: sold out means come another day, closed means the venue is not open. Nothing shows while it is `open`.",
        "provenance": "contract white-label.yaml GET /tenant-config/status"
       }
      ]
@@ -138,9 +148,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "—",
    "error": "**This screen is the error state.** It distinguishes sold out, closed, and platform unavailable — three different things a guest must not confuse, because only one means come back later",
    "emptyFirstRun": "—",
-   "emptyNoResults": "The filter narrowed it and the error sold out are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down."
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down.",
+   "soldOut": "**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)).",
+   "closed": "**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f))."
   },
   "apis": [
    {
@@ -151,9 +162,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-029"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-029",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Footer 'Service status', or Discover → 'Service status'",
+    "differences": "Prototype has 'Maintenance' where YAML has 'closed'; sold-out offers 'Join the waitlist' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus only) cannot call."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -218,6 +237,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AppAvailability": {
+  "type": "string",
+  "description": "**The sold-out or closed signal (decided 28 September, audit R073).** `open` is the normal state. `soldOut` shows WEB-029's sold-out state across the app while browsing still works; `closed` shows the closed state (a weather closure, a private event). Neither refuses a request on its own: it is what the guest is told, and a sale is still refused by availability where it applies. Set with `setMaintenanceMode`.\n",
+  "enum": [
+   "open",
+   "soldOut",
+   "closed"
+  ],
+  "default": "open"
+ },
  "LocalisedText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
@@ -225,9 +254,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "type": "string"
   }
  },
+ "MinimumAppVersion": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "nullable": true,
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "properties": {
+   "ios": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "android": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   }
+  }
+ },
  "TenantAppStatus": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
+  "description": "Computed on read. The published fields come from the current `ConfigVersion`, the maintenance fields from the tenant's `tenant_config` row (`setMaintenanceMode`), and the draft fields from the working draft. **Fields marked staff only are left out of a response to a caller without a staff session** (`getTenantAppStatus`).\n",
   "required": [
    "tenantId",
    "isPublished",
@@ -239,7 +287,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid"
    },
    "isPublished": {
-    "type": "boolean"
+    "type": "boolean",
+    "x-ticvai-derived": "onRead",
+    "description": "True once any version has been published."
    },
    "publishedVersion": {
     "type": "string",
@@ -251,19 +301,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    },
    "draftVersion": {
-    "type": "string"
+    "type": "string",
+    "description": "Staff only."
    },
    "hasUnpublishedChanges": {
-    "type": "boolean"
+    "type": "boolean",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. The working draft differs from the current version's `snapshot`."
    },
    "activeModuleCount": {
-    "type": "integer"
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. `ModuleEnablement` rows with `isEnabled` true."
    },
    "licensedModuleCount": {
-    "type": "integer"
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. `ModuleEnablement` rows with `isLicensed` true."
    },
    "activePageCount": {
-    "type": "integer"
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. Content pages that are `published` and enabled."
    },
    "isInMaintenance": {
     "type": "boolean"
@@ -276,8 +335,101 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "nullable": true
    },
+   "minimumAppVersion": {
+    "$ref": "#/components/schemas/MinimumAppVersion"
+   },
+   "contact": {
+    "$ref": "#/components/schemas/VenueContact"
+   },
+   "availability": {
+    "$ref": "#/components/schemas/AppAvailability"
+   },
+   "availabilityMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "What the sold-out or closed screen says (WEB-029). Null shows the default wording."
+   },
+   "venues": {
+    "type": "array",
+    "maxItems": 200,
+    "x-ticvai-derived": "onRead",
+    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "venueId",
+      "name"
+     ],
+     "properties": {
+      "venueId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "**The venue's scope node** (`tenancy.OrgUnit.id`, level venue): what every guest screen that declares `venueId` `from: session` reads once the guest picks it."
+      },
+      "name": {
+       "type": "string",
+       "maxLength": 200,
+       "description": "The venue's name (`tenancy.OrgUnit.name`)."
+      },
+      "city": {
+       "type": "string",
+       "maxLength": 120,
+       "nullable": true,
+       "description": "Shown under the name so two venues with similar names can be told apart."
+      },
+      "openingHoursToday": {
+       "type": "object",
+       "nullable": true,
+       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.",
+       "properties": {
+        "opens": {
+         "type": "string",
+         "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "closes": {
+         "type": "string",
+         "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        }
+       }
+      }
+     }
+    }
+   },
+   "whatsNew": {
+    "type": "array",
+    "maxItems": 10,
+    "x-ticvai-derived": "onRead",
+    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "version",
+      "publishedAt",
+      "notes"
+     ],
+     "properties": {
+      "version": {
+       "type": "string",
+       "description": "The release version."
+      },
+      "publishedAt": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When the release reached the tenant's cell."
+      },
+      "notes": {
+       "$ref": "#/components/schemas/LocalisedText"
+      }
+     }
+    }
+   },
    "recentChanges": {
     "type": "array",
+    "description": "Staff only. Names the principal behind each change, so it never reaches a public response.",
     "items": {
      "type": "object",
      "properties": {
@@ -297,6 +449,44 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "VenueContact": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "nullable": true,
+  "description": "How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because nothing here is personal.\n",
+  "properties": {
+   "phone": {
+    "type": "string",
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "whatsapp": {
+    "type": "string",
+    "nullable": true
+   },
+   "address": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "openingHours": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "Prose, as the guest reads it. The bookable hours are the catalogue's."
    }
   }
  }

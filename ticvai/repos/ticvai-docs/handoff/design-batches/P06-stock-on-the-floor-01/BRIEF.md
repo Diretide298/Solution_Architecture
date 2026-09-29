@@ -1,6 +1,6 @@
 # P06-stock-on-the-floor-01 — P06 · Stock on the Floor
 
-**10 screens · 27 operations · 26 schemas · 9 permissions**
+**10 screens · 29 operations · 38 schemas · 12 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 9 permissions apply here:
-  `INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, LEDGER_POST, ORDER_CREATE, ORDER_MODIFY, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 12 permissions apply here:
+  `INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, LEDGER_POST, ORDER_CREATE, ORDER_MODIFY, PROCUREMENT_RECEIVE, PROCUREMENT_REQUEST, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **15 of these operations work offline**: createGoodsReceipt, createRequisition, enterCountLine, getCountVariance, getHaccpStatus, getStockPositions, getStockTransfer, listRequisitions
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -61,13 +61,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `EMP-061` | Retail Inventory Command Center | listDetail | 2 | 0 | — |
-| `EMP-062` | Store Stock & SKU Availability | statusTracker | 4 | 0 | — |
-| `EMP-063` | Requisition & Smart Store Replenishment | listDetail | 2 | 0 | — |
-| `EMP-064` | Store-to-Store & Warehouse Transfers | listDetail | 2 | 0 | — |
-| `EMP-065` | Receiving & Store Put-Away | statusTracker | 4 | 1 | — |
-| `EMP-066` | Stock Count & Cycle Count Management | statusTracker | 6 | 0 | — |
-| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | configEditor | 4 | 0 | — |
-| `EMP-068` | Reservation, Allocation & Omnichannel Inventory | statusTracker | 2 | 0 | — |
+| `EMP-061` | Retail Inventory Command Center | listDetail | 6 | 0 | — |
+| `EMP-062` | Store Stock & SKU Availability | statusTracker | 4 | 2 | — |
+| `EMP-063` | Requisition & Smart Store Replenishment | listDetail | 2 | 1 | — |
+| `EMP-064` | Store-to-Store & Warehouse Transfers | listDetail | 2 | 1 | — |
+| `EMP-065` | Receiving & Store Put-Away | statusTracker | 4 | 3 | — |
+| `EMP-066` | Stock Count & Cycle Count Management | statusTracker | 6 | 5 | — |
+| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | configEditor | 4 | 3 | — |
+| `EMP-068` | Reservation, Allocation & Omnichannel Inventory | statusTracker | 2 | 1 | — |
 | `EMP-069` | Barcode, RFID, Serialized Stock & Traceability | listDetail | 2 | 0 | — |
-| `EMP-070` | Inventory Exceptions, AI Replenishment & Action Center | listDetail | 3 | 0 | — |
+| `EMP-070` | Inventory Exceptions, AI Replenishment & Action Center | listDetail | 3 | 2 | — |

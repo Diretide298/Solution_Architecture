@@ -1,6 +1,6 @@
 # P02-cart-checkout-01 — P02 · Cart & Checkout
 
-**3 screens · 17 operations · 19 schemas · 4 permissions**
+**3 screens · 21 operations · 32 schemas · 4 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -50,7 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 4 permissions apply here:
   `ORDER_CREATE, ORDER_REPRINT, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **5 of these operations work offline**: createOrder, createPayment, getOrder, listProductVariants, reprintOrder
+- **7 of these operations work offline**: createOrder, createPayment, getOrder, getPerformance, getPublishedBookingFlow, listProductVariants, reprintOrder
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -62,10 +62,10 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-009` | Review & Payment | statusTracker | 9 | 0 | — |
-| `GST-010` | Booking Confirmation | statusTracker | 3 | 0 | — |
-| `GST-041` | Checkout Entry | statusTracker | 8 | 0 | — |
+| `GST-009` | Review & Payment | statusTracker | 10 | 6 | — |
+| `GST-010` | Booking Confirmation | statusTracker | 3 | 2 | — |
+| `GST-041` | Checkout Entry | statusTracker | 12 | 4 | — |
 
 ## Thin screens in this batch
 
-**GST-010, GST-041 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-010 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

@@ -1,4 +1,115 @@
 {
+ "createApprovalEvidencePackage": {
+  "method": "POST",
+  "path": "/approval-evidence-packages",
+  "contract": "approvals",
+  "summary": "Assemble what an auditor asked for",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getApprovalAnalytics": {
+  "method": "GET",
+  "path": "/approval-analytics",
+  "contract": "approvals",
+  "summary": "Volumes, times, rejections and bottlenecks",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalAnalytics"
+ },
+ "getApprovalRecord": {
+  "method": "GET",
+  "path": "/approval-requests/{requestId}/record",
+  "contract": "approvals",
+  "summary": "The immutable decision record, and whether it is intact",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApprovalRecord"
+ },
+ "getGuestVerificationPolicy": {
+  "method": "GET",
+  "path": "/guest-verification-policy",
+  "contract": "identity",
+  "summary": "The tenant's guest identity-verification workflow",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "IdentityGuestVerificationPolicy"
+ },
+ "listApprovalControlPolicies": {
+  "method": "GET",
+  "path": "/approval-control-policies",
+  "contract": "approvals",
+  "summary": "Segregation of duties, four-eyes and dual control",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApprovalControlPolicy"
+ },
+ "listDataRetentionSettings": {
+  "method": "GET",
+  "path": "/data-retention-settings",
+  "contract": "tenancy",
+  "summary": "How long the tenant keeps each class of data",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "dataClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listMfaMethods": {
   "method": "GET",
   "path": "/auth/mfa/methods",
@@ -31,6 +142,120 @@
   "requestBody": null,
   "responds": "StepUpPolicy"
  },
+ "setApprovalControlPolicy": {
+  "method": "PUT",
+  "path": "/approval-control-policies",
+  "contract": "approvals",
+  "summary": "Require a second, independent pair of eyes",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalControlPolicy",
+  "responds": "ApprovalControlPolicy"
+ },
+ "setApprovalRetentionPolicy": {
+  "method": "PUT",
+  "path": "/approval-retention",
+  "contract": "approvals",
+  "summary": "How long decision records are kept, and what survives",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalRetentionPolicy",
+  "responds": "ApprovalRetentionPolicy"
+ },
+ "setDataRetentionSetting": {
+  "method": "PUT",
+  "path": "/data-retention-settings/{dataClass}",
+  "contract": "tenancy",
+  "summary": "Set how long the tenant keeps one class of data",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TenantDataRetentionSetting",
+  "responds": "TenantDataRetentionSetting"
+ },
+ "setGuestVerificationPolicy": {
+  "method": "PUT",
+  "path": "/guest-verification-policy",
+  "contract": "identity",
+  "summary": "Set which verifications a guest must pass, and when",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IdentityGuestVerificationPolicy",
+  "responds": "IdentityGuestVerificationPolicy"
+ },
+ "setPasswordPolicy": {
+  "method": "PUT",
+  "path": "/password-policy",
+  "contract": "identity",
+  "summary": "Length, breach check, lockout and step-up",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PasswordPolicy",
+  "responds": "PasswordPolicy"
+ },
+ "setSegregationRules": {
+  "method": "PUT",
+  "path": "/segregation-rules",
+  "contract": "identity",
+  "summary": "Which permissions may not be held together",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SegregationRule"
+ },
  "setStepUpPolicy": {
   "method": "PUT",
   "path": "/step-up-policies",
@@ -40,8 +265,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "StepUpPolicy",
   "responds": "StepUpPolicy"
+ },
+ "signApprovalDecision": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/signature",
+  "contract": "approvals",
+  "summary": "Sign a decision, so it can be proved later",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalSignature"
  }
 }

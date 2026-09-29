@@ -1,6 +1,6 @@
 # WS49 — Promotions   Bundles Management board 5
 
-**10 screens · 10 operations · 14 schemas · 2 permissions**
+**10 screens · 13 operations · 18 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,19 +61,19 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `ADM-178` | Bundle & Combo Command Center | commandCentre | 1 | 0 | — |
-| `ADM-179` | Bundle Definition & Setup | configEditor | 1 | 0 | — |
+| `ADM-179` | Bundle Definition & Setup | configEditor | 2 | 0 | — |
 | `ADM-180` | Bundle Component Builder | configEditor | 1 | 0 | — |
 | `ADM-181` | Guest Choice & Build-Your-Own Bundle Designer | configEditor | 1 | 0 | — |
 | `ADM-182` | Bundle Pricing & Commercial Model | configEditor | 1 | 0 | — |
 | `ADM-183` | Bundle Availability, Capacity & Validation | listDetail | 1 | 0 | — |
 | `ADM-184` | Bundle Validity, Scheduling & Redemption Rules | listDetail | 1 | 0 | — |
-| `ADM-185` | Partner & External Product Bundle Manager | listDetail | 1 | 0 | — |
+| `ADM-185` | Partner & External Product Bundle Manager | listDetail | 3 | 1 | — |
 | `ADM-186` | Revenue Allocation, Cost & Settlement Rules | configEditor | 1 | 0 | — |
 | `ADM-187` | Bundle Preview, Simulation & AI Recommendation | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-183, ADM-184, ADM-185, ADM-187 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-183, ADM-184 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-178 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-179",
@@ -344,7 +340,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-178"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-178",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-178"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 63. 14 of 27 labels bound to a contract property; 37 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -472,6 +469,53 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "Sales status",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "textField",
+       "label": "Owner principal id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?q=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every commercial campaign",
+       "bindsTo": "CommercialCampaign",
+       "columns": [
+        "CommercialCampaign.id",
+        "CommercialCampaign.venueId",
+        "CommercialCampaign.code",
+        "CommercialCampaign.name",
+        "CommercialCampaign.description",
+        "CommercialCampaign.ownerPrincipalId",
+        "CommercialCampaign.legalEntityId",
+        "CommercialCampaign.validFrom",
+        "CommercialCampaign.validTo",
+        "CommercialCampaign.budgets"
+       ],
+       "operation": "listCommercialCampaigns",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
       }
      ]
     },
@@ -499,16 +543,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setBundleDefinition",
     "contract": "promotions",
     "purpose": "Bundle Definition & Setup",
-    "trigger": "onAction",
-    "invalidates": [
-     "setBundleDefinition"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listCommercialCampaigns",
+    "contract": "promotions",
+    "purpose": "List commercial campaigns",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-179"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-179",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-179"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 65. 0 of 0 labels bound to a contract property; 11 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -633,16 +681,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setBundleComponent",
     "contract": "promotions",
     "purpose": "Bundle Component Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setBundleComponent"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-180"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-180",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-180"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 5 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -766,7 +812,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-181"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-181",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-181"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 67. 0 of 0 labels bound to a contract property; 3 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -911,7 +958,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-182"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-182",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-182"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 68. 0 of 0 labels bound to a contract property; 10 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -990,12 +1038,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Every bundle availability capacity",
        "columns": [
         "BundleAvailabilityCapacityValidationView.available",
-        "BundleAvailabilityCapacityValidationView.lowAvailability",
-        "BundleAvailabilityCapacityValidationView.soldOut",
-        "BundleAvailabilityCapacityValidationView.suspended",
-        "BundleAvailabilityCapacityValidationView.unpublished",
-        "BundleAvailabilityCapacityValidationView.invalidDate",
-        "BundleAvailabilityCapacityValidationView.capacityUnavailable"
+        "BundleAvailabilityCapacityValidationView.componentStatus"
        ],
        "bindsTo": "BundleAvailabilityCapacityValidationView",
        "operation": "listBundleAvailabilityCapacity",
@@ -1013,12 +1056,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "BundleAvailabilityCapacityValidationView",
        "columns": [
         "BundleAvailabilityCapacityValidationView.available",
-        "BundleAvailabilityCapacityValidationView.lowAvailability",
-        "BundleAvailabilityCapacityValidationView.soldOut",
-        "BundleAvailabilityCapacityValidationView.suspended",
-        "BundleAvailabilityCapacityValidationView.unpublished",
-        "BundleAvailabilityCapacityValidationView.invalidDate",
-        "BundleAvailabilityCapacityValidationView.capacityUnavailable"
+        "BundleAvailabilityCapacityValidationView.componentStatus"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Bundle selected”, “Check mandatory components”, “Check inventory”, “Check capacity”, “Check schedule/timeslot”, “Check validity”.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 69 §For each component display"
@@ -1045,17 +1083,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "entryState": {
    "preloaded": [
     "BundleAvailabilityCapacityValidationView.available",
-    "BundleAvailabilityCapacityValidationView.lowAvailability",
-    "BundleAvailabilityCapacityValidationView.soldOut",
-    "BundleAvailabilityCapacityValidationView.suspended",
-    "BundleAvailabilityCapacityValidationView.unpublished",
-    "BundleAvailabilityCapacityValidationView.invalidDate"
+    "BundleAvailabilityCapacityValidationView.componentStatus"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-183"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-183",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-183"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 69. 7 of 7 labels bound to a contract property; 7 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1167,17 +1202,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "BundleValiditySchedulingRedemptionRulesView.valid1June31August",
-    "BundleValiditySchedulingRedemptionRulesView.allComponentsTogether",
-    "BundleValiditySchedulingRedemptionRulesView.independentRedemption",
-    "BundleValiditySchedulingRedemptionRulesView.sequentialRedemption",
-    "BundleValiditySchedulingRedemptionRulesView.firstUseActivation"
+    "BundleValiditySchedulingRedemptionRulesView.redemptionModel"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-184"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-184",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-184"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 70. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1244,13 +1276,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Allow TICVAI bundles to include products or services owned by external operators. The matrix requires combinations with external products/services and bundles across different destinations, including systems that may use different databases.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Partner & External Product Bundle Manager declares no operation that writes anything** — its only declared call is `listPartnerExternalProduct`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1262,16 +1287,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every partner external product",
        "columns": [
-        "PartnerExternalProductBundleManagerView.connected",
-        "PartnerExternalProductBundleManagerView.available",
-        "PartnerExternalProductBundleManagerView.degraded",
-        "PartnerExternalProductBundleManagerView.apiError",
-        "PartnerExternalProductBundleManagerView.productUnavailable",
-        "PartnerExternalProductBundleManagerView.mappingError"
+        "PartnerExternalProductBundleManagerView.connectionStatus"
        ],
        "bindsTo": "PartnerExternalProductBundleManagerView",
        "operation": "listPartnerExternalProduct",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 71 §Show"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every partner bundle product",
+       "bindsTo": "PartnerBundleProduct",
+       "columns": [
+        "PartnerBundleProduct.id",
+        "PartnerBundleProduct.bundleComponentId",
+        "PartnerBundleProduct.partnerId",
+        "PartnerBundleProduct.externalProductId",
+        "PartnerBundleProduct.productName",
+        "PartnerBundleProduct.apiSource",
+        "PartnerBundleProduct.availabilitySource",
+        "PartnerBundleProduct.externalPrice",
+        "PartnerBundleProduct.sellingPrice",
+        "PartnerBundleProduct.commission",
+        "PartnerBundleProduct.settlementRule",
+        "PartnerBundleProduct.cancellationRule"
+       ],
+       "operation": "listBundlePartnerProductMappings",
+       "provenance": "contract promotions.yaml GET /bundles/{bundleId}/partner-products"
       }
      ]
     },
@@ -1284,15 +1325,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected partner external product",
        "bindsTo": "PartnerExternalProductBundleManagerView",
        "columns": [
-        "PartnerExternalProductBundleManagerView.connected",
-        "PartnerExternalProductBundleManagerView.available",
-        "PartnerExternalProductBundleManagerView.degraded",
-        "PartnerExternalProductBundleManagerView.apiError",
-        "PartnerExternalProductBundleManagerView.productUnavailable",
-        "PartnerExternalProductBundleManagerView.mappingError"
+        "PartnerExternalProductBundleManagerView.connectionStatus"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Dubai Weekend Package”.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 71 §Show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save bundle partner product mappings",
+       "operation": "setBundlePartnerProductMappings",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "Replaces the bundle's `promotions.partner_bundle_product` rows with the set sent: a row sent with an `id` is updated, one without is created, and a stored row not sent is removed.",
+       "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/partner-products"
       }
      ]
     }
@@ -1311,24 +1361,61 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "promotions",
     "purpose": "Partner & External Product Bundle Manager",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listBundlePartnerProductMappings",
+    "contract": "promotions",
+    "purpose": "List a bundle's partner product mappings",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBundlePartnerProductMappings",
+    "contract": "promotions",
+    "purpose": "Set a bundle's partner product mappings",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerExternalProduct",
+     "listBundlePartnerProductMappings"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "PartnerExternalProductBundleManagerView.connected",
-    "PartnerExternalProductBundleManagerView.available",
-    "PartnerExternalProductBundleManagerView.degraded",
-    "PartnerExternalProductBundleManagerView.apiError",
-    "PartnerExternalProductBundleManagerView.productUnavailable",
-    "PartnerExternalProductBundleManagerView.mappingError"
+    "PartnerExternalProductBundleManagerView.connectionStatus"
+   ],
+   "params": [
+    {
+     "name": "bundleId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-185"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-185",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-185"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 71. 6 of 6 labels bound to a contract property; 17 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetBundlePartnerProductMappings",
+    "component": "modal",
+    "trigger": "Save bundle partner product mappings",
+    "body": "**Collects what `setBundlePartnerProductMappings` sends before it is called.** Required: `mappings`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save bundle partner product mappings",
+     "operation": "setBundlePartnerProductMappings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "mappings"
+     ]
+    },
+    "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/partner-products"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1461,7 +1548,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-186"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-186",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-186"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 72. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1523,7 +1611,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Campaign Manager. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Campaign Manager, Commercial Manager, Revenue Manager, Finance, B2B Manager, Venue Manager. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
    },
    {
@@ -1547,6 +1635,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "primaryButton",
        "label": "Campaign Manager",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Commercial Manager",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Revenue Manager",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Finance",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "B2B Manager",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue Manager",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
       },
       {
@@ -1575,18 +1688,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "simulateBundlePreviewRecommendation",
     "contract": "promotions",
     "purpose": "Bundle Preview, Simulation & AI Recommendation",
-    "trigger": "onAction",
-    "invalidates": [
-     "simulateBundlePreviewRecommendation"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-187"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-187",
+   "workshopBoard": "wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-187"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 12 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 17 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1644,6 +1755,11 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "ticketBundle",
     "in": "query",
     "required": false
@@ -1682,10 +1798,64 @@ Method, path, parameters, request and response for every operation these screens
     "name": "ticketParking",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "ticketFnb",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipPackage",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerBundle",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "hotelPackage",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dynamicBundle",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "buildYourOwnBundle",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
   "responds": "BundleComboCommandCenterView"
+ },
+ "listBundlePartnerProductMappings": {
+  "method": "GET",
+  "path": "/bundles/{bundleId}/partner-products",
+  "contract": "promotions",
+  "summary": "List a bundle's partner product mappings",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listBundlePricingCommercial": {
   "method": "GET",
@@ -1712,6 +1882,50 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [],
   "requestBody": null,
   "responds": "BundleValiditySchedulingRedemptionRulesView"
+ },
+ "listCommercialCampaigns": {
+  "method": "GET",
+  "path": "/commercial-campaigns",
+  "contract": "promotions",
+  "summary": "List commercial campaigns",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "q",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPartnerExternalProduct": {
   "method": "GET",
@@ -1748,7 +1962,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BundleComponentBuilderInput",
   "responds": "BundleComponentBuilderView"
  },
@@ -1761,9 +1981,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BundleDefinitionSetupInput",
   "responds": "BundleDefinitionSetupView"
+ },
+ "setBundlePartnerProductMappings": {
+  "method": "PUT",
+  "path": "/bundles/{bundleId}/partner-products",
+  "contract": "promotions",
+  "summary": "Set a bundle's partner product mappings",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "setGuestChoiceBuild": {
   "method": "PUT",
@@ -1774,7 +2019,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GuestChoiceBuildYourOwnBundleDesignerInput",
   "responds": "GuestChoiceBuildYourOwnBundleDesignerView"
  },
@@ -1787,7 +2038,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BundlePreviewSimulationAiRecommendationInput",
   "responds": "BundlePreviewSimulationAiRecommendationView"
  }
@@ -1806,38 +2063,47 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Bundle Availability, Capacity & Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
+   "componentStatus": {
+    "type": "string",
+    "enum": [
+     "available",
+     "lowAvailability",
+     "soldOut",
+     "suspended",
+     "unpublished",
+     "invalidDate",
+     "capacityUnavailable"
+    ],
+    "description": "Availability of the component."
+   },
+   "bundleId": {
+    "type": "string",
+    "description": "Bundle ID"
+   },
+   "componentId": {
+    "type": "string",
+    "description": "Component ID"
+   },
+   "componentName": {
+    "type": "string",
+    "description": "Component"
+   },
    "available": {
-    "type": "string",
-    "description": "Available"
-   },
-   "lowAvailability": {
-    "type": "string",
-    "description": "Low availability"
-   },
-   "soldOut": {
-    "type": "string",
-    "description": "Sold out"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "unpublished": {
-    "type": "string",
-    "description": "Unpublished"
-   },
-   "invalidDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Invalid date"
-   },
-   "capacityUnavailable": {
     "type": "integer",
-    "description": "Capacity unavailable"
+    "description": "Quantity available"
    },
-   "independentCapacity": {
-    "type": "integer",
-    "description": "independent capacity"
+   "failureBehavior": {
+    "type": "string",
+    "enum": [
+     "preventSale",
+     "hideBundle",
+     "offerSubstitute",
+     "allowAlternateDate",
+     "allowAlternateTimeslot",
+     "removeOptionalComponent",
+     "recommendAnotherBundle"
+    ],
+    "description": "Configured behaviour when a component is unavailable"
    }
   }
  },
@@ -1952,86 +2218,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Bundle Component Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "admissionTicket": {
-    "type": "string",
-    "description": "Admission ticket"
-   },
-   "attraction": {
-    "type": "string",
-    "description": "Attraction"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
-   },
-   "experience": {
-    "type": "string",
-    "description": "Experience"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "annualPass": {
-    "type": "string",
-    "description": "Annual pass"
-   },
-   "fBProduct": {
-    "type": "string",
-    "description": "F&B product"
-   },
-   "fBMealPackage": {
-    "type": "string",
-    "description": "F&B meal package"
-   },
-   "retailProduct": {
-    "type": "string",
-    "description": "Retail product"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
-   "locker": {
-    "type": "string",
-    "description": "Locker"
-   },
-   "photo": {
-    "type": "string",
-    "description": "Photo"
-   },
-   "rental": {
-    "type": "string",
-    "description": "Rental"
-   },
-   "voucher": {
-    "type": "string",
-    "description": "Voucher"
-   },
-   "giftCard": {
-    "type": "string",
-    "description": "Gift card"
-   },
-   "service": {
-    "type": "string",
-    "description": "Service"
-   },
-   "externalProduct": {
-    "type": "string",
-    "description": "External product"
-   },
-   "ntYEntTreatment": {
-    "type": "string",
-    "description": "nt y ent Treatment"
-   },
-   "photo1OptionalAed30": {
-    "type": "string",
-    "description": "Photo 1 Optional +AED 30"
-   },
    "typesType": {
     "type": "string",
     "enum": [
@@ -2062,6 +2248,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "quantityBasedOnTicketCount": {
     "type": "integer",
     "description": "Quantity based on ticket count"
+   },
+   "componentType": {
+    "type": "string",
+    "enum": [
+     "admissionTicket",
+     "attraction",
+     "event",
+     "timeslot",
+     "experience",
+     "membership",
+     "annualPass",
+     "fBProduct",
+     "fBMealPackage",
+     "retailProduct",
+     "parking",
+     "locker",
+     "photo",
+     "rental",
+     "voucher",
+     "giftCard",
+     "service",
+     "externalProduct"
+    ],
+    "description": "What the component is."
    }
   }
  },
@@ -2071,86 +2281,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Bundle Component Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "admissionTicket": {
-    "type": "string",
-    "description": "Admission ticket"
-   },
-   "attraction": {
-    "type": "string",
-    "description": "Attraction"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
-   },
-   "experience": {
-    "type": "string",
-    "description": "Experience"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "annualPass": {
-    "type": "string",
-    "description": "Annual pass"
-   },
-   "fBProduct": {
-    "type": "string",
-    "description": "F&B product"
-   },
-   "fBMealPackage": {
-    "type": "string",
-    "description": "F&B meal package"
-   },
-   "retailProduct": {
-    "type": "string",
-    "description": "Retail product"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
-   "locker": {
-    "type": "string",
-    "description": "Locker"
-   },
-   "photo": {
-    "type": "string",
-    "description": "Photo"
-   },
-   "rental": {
-    "type": "string",
-    "description": "Rental"
-   },
-   "voucher": {
-    "type": "string",
-    "description": "Voucher"
-   },
-   "giftCard": {
-    "type": "string",
-    "description": "Gift card"
-   },
-   "service": {
-    "type": "string",
-    "description": "Service"
-   },
-   "externalProduct": {
-    "type": "string",
-    "description": "External product"
-   },
-   "ntYEntTreatment": {
-    "type": "string",
-    "description": "nt y ent Treatment"
-   },
-   "photo1OptionalAed30": {
-    "type": "string",
-    "description": "Photo 1 Optional +AED 30"
-   },
    "typesType": {
     "type": "string",
     "enum": [
@@ -2181,6 +2311,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "quantityBasedOnTicketCount": {
     "type": "integer",
     "description": "Quantity based on ticket count"
+   },
+   "componentType": {
+    "type": "string",
+    "enum": [
+     "admissionTicket",
+     "attraction",
+     "event",
+     "timeslot",
+     "experience",
+     "membership",
+     "annualPass",
+     "fBProduct",
+     "fBMealPackage",
+     "retailProduct",
+     "parking",
+     "locker",
+     "photo",
+     "rental",
+     "voucher",
+     "giftCard",
+     "service",
+     "externalProduct"
+    ],
+    "description": "What the component is."
    }
   }
  },
@@ -2234,26 +2388,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Sales status"
    },
-   "allComponentsPredefined": {
-    "type": "string",
-    "description": "All components predefined"
-   },
-   "requiredComponentsPlusOptionalChoices": {
-    "type": "string",
-    "description": "Required components plus optional choices"
-   },
-   "customerSelectsFromPermittedCategories": {
-    "type": "string",
-    "description": "Customer selects from permitted categories"
-   },
-   "chooseAny3Attractions": {
-    "type": "string",
-    "description": "Choose any 3 attractions"
-   },
-   "containsInternalAndExternalProducts": {
-    "type": "string",
-    "description": "Contains internal and external products"
-   },
    "appearsAsStandaloneProduct": {
     "type": "string",
     "description": "Appears as standalone product"
@@ -2265,6 +2399,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "requiresAnotherProduct": {
     "type": "string",
     "description": "Requires another product"
+   },
+   "bundleType": {
+    "type": "string",
+    "enum": [
+     "fixed",
+     "configurable",
+     "buildYourOwn",
+     "dynamic",
+     "partner"
+    ],
+    "description": "Bundle type"
    }
   }
  },
@@ -2318,26 +2463,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Sales status"
    },
-   "allComponentsPredefined": {
-    "type": "string",
-    "description": "All components predefined"
-   },
-   "requiredComponentsPlusOptionalChoices": {
-    "type": "string",
-    "description": "Required components plus optional choices"
-   },
-   "customerSelectsFromPermittedCategories": {
-    "type": "string",
-    "description": "Customer selects from permitted categories"
-   },
-   "chooseAny3Attractions": {
-    "type": "string",
-    "description": "Choose any 3 attractions"
-   },
-   "containsInternalAndExternalProducts": {
-    "type": "string",
-    "description": "Contains internal and external products"
-   },
    "appearsAsStandaloneProduct": {
     "type": "string",
     "description": "Appears as standalone product"
@@ -2349,6 +2474,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "requiresAnotherProduct": {
     "type": "string",
     "description": "Requires another product"
+   },
+   "bundleType": {
+    "type": "string",
+    "enum": [
+     "fixed",
+     "configurable",
+     "buildYourOwn",
+     "dynamic",
+     "partner"
+    ],
+    "description": "Bundle type: all components predefined; required plus optional choices; guest selects from permitted categories; changes with availability or rules; contains internal and external products"
    }
   }
  },
@@ -2358,147 +2494,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.bundle_component at 3%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Bundle Preview, Simulation & AI Recommendation submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "guest": {
+   "bundleId": {
     "type": "string",
-    "description": "Guest"
+    "description": "Bundle ID"
    },
-   "segment": {
+   "previewChannel": {
     "type": "string",
-    "description": "Segment"
+    "enum": [
+     "b2c",
+     "mobileApp",
+     "pos",
+     "kiosk",
+     "b2b",
+     "partnerChannel"
+    ],
+    "description": "Channel whose guest journey is previewed"
    },
-   "products": {
-    "type": "string",
-    "description": "Products"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "loyalty": {
-    "type": "string",
-    "description": "Loyalty"
-   },
-   "paymentType": {
-    "type": "string",
-    "description": "Payment type"
-   },
-   "promoCode": {
-    "type": "string",
-    "description": "Promo code"
-   },
-   "familySegment": {
-    "type": "string",
-    "description": "Family segment ✓"
-   },
-   "b2c": {
-    "type": "string",
-    "description": "B2C ✓"
-   },
-   "validDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid date ✓"
-   },
-   "marketingAdministrator": {
-    "type": "string",
-    "description": "Marketing Administrator"
-   },
-   "campaignManager": {
-    "type": "string",
-    "description": "Campaign Manager"
-   },
-   "commercialManager": {
-    "type": "string",
-    "description": "Commercial Manager"
-   },
-   "revenueManager": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Manager"
-   },
-   "finance": {
-    "type": "string",
-    "description": "Finance"
-   },
-   "b2bManager": {
-    "type": "string",
-    "description": "B2B Manager"
-   },
-   "venueManager": {
-    "type": "string",
-    "description": "Venue Manager"
-   },
-   "systemAdministrator": {
-    "type": "string",
-    "description": "System Administrator"
-   },
-   "approver": {
-    "type": "string",
-    "description": "Approver"
-   },
-   "auditor": {
-    "type": "string",
-    "description": "Auditor"
-   },
-   "changeDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Change discount"
-   },
-   "changeThresholds": {
-    "type": "string",
-    "description": "Change thresholds"
-   },
-   "changeSegments": {
-    "type": "string",
-    "description": "Change segments"
-   },
-   "changeDates": {
-    "type": "string",
-    "description": "Change dates"
-   },
-   "currentPriceAndPricingFloors": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current price and pricing floors"
-   },
-   "guestCustomerSegments": {
-    "type": "string",
-    "description": "Guest/customer segments"
-   },
-   "membershipAndTierEligibility": {
-    "type": "string",
-    "description": "Membership and tier eligibility"
-   },
-   "companySegmentsAndPartnerPricing": {
-    "type": "string",
-    "description": "Company segments and partner pricing"
-   },
-   "paymentMethodAndBankEligibility": {
-    "type": "string",
-    "description": "Payment-method and bank eligibility"
-   },
-   "productsEligibleForPromotionalRules": {
-    "type": "string",
-    "description": "Products eligible for promotional rules"
-   },
-   "revenueMarginAndDiscountExposure": {
-    "type": "number",
-    "description": "Revenue, margin and discount exposure"
+   "components": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Components to simulate"
    }
   }
  },
@@ -2508,155 +2525,74 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Bundle Preview, Simulation & AI Recommendation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "guest": {
+   "bundleId": {
     "type": "string",
-    "description": "Guest"
+    "description": "Bundle ID"
    },
-   "segment": {
+   "previewChannel": {
     "type": "string",
-    "description": "Segment"
+    "enum": [
+     "b2c",
+     "mobileApp",
+     "pos",
+     "kiosk",
+     "b2b",
+     "partnerChannel"
+    ],
+    "description": "Channel whose guest journey is previewed"
    },
-   "products": {
-    "type": "string",
-    "description": "Products"
+   "components": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Components in the simulated bundle"
    },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "date": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "loyalty": {
-    "type": "string",
-    "description": "Loyalty"
-   },
-   "paymentType": {
-    "type": "string",
-    "description": "Payment type"
-   },
-   "promoCode": {
-    "type": "string",
-    "description": "Promo code"
-   },
-   "discount": {
+   "individualValue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount (the pack shows 15% / AED 90)"
+    "description": "Individual value of the components"
    },
-   "familySegment": {
-    "type": "string",
-    "description": "Family segment ✓"
-   },
-   "b2c": {
-    "type": "string",
-    "description": "B2C ✓"
-   },
-   "validDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Valid date ✓"
-   },
-   "rule421Qualified": {
-    "type": "string",
-    "description": "Rule 421 qualified"
-   },
-   "marketingAdministrator": {
-    "type": "string",
-    "description": "Marketing Administrator"
-   },
-   "campaignManager": {
-    "type": "string",
-    "description": "Campaign Manager"
-   },
-   "commercialManager": {
-    "type": "string",
-    "description": "Commercial Manager"
-   },
-   "revenueManager": {
+   "bundlePrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Manager"
+    "description": "Bundle price"
    },
-   "finance": {
-    "type": "string",
-    "description": "Finance"
-   },
-   "b2bManager": {
-    "type": "string",
-    "description": "B2B Manager"
-   },
-   "venueManager": {
-    "type": "string",
-    "description": "Venue Manager"
-   },
-   "systemAdministrator": {
-    "type": "string",
-    "description": "System Administrator"
-   },
-   "approver": {
-    "type": "string",
-    "description": "Approver"
-   },
-   "auditor": {
-    "type": "string",
-    "description": "Auditor"
-   },
-   "changeDiscount": {
+   "guestSaving": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Change discount"
+    "description": "Guest saving"
    },
-   "changeThresholds": {
-    "type": "string",
-    "description": "Change thresholds"
-   },
-   "changeSegments": {
-    "type": "string",
-    "description": "Change segments"
-   },
-   "changeDates": {
-    "type": "string",
-    "description": "Change dates"
-   },
-   "currentPriceAndPricingFloors": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current price and pricing floors"
-   },
-   "guestCustomerSegments": {
-    "type": "string",
-    "description": "Guest/customer segments"
-   },
-   "membershipAndTierEligibility": {
-    "type": "string",
-    "description": "Membership and tier eligibility"
-   },
-   "companySegmentsAndPartnerPricing": {
-    "type": "string",
-    "description": "Company segments and partner pricing"
-   },
-   "paymentMethodAndBankEligibility": {
-    "type": "string",
-    "description": "Payment-method and bank eligibility"
-   },
-   "productsEligibleForPromotionalRules": {
-    "type": "string",
-    "description": "Products eligible for promotional rules"
-   },
-   "revenueMarginAndDiscountExposure": {
+   "guestSavingPercent": {
     "type": "number",
-    "description": "Revenue, margin and discount exposure"
+    "description": "Guest saving, percent"
+   },
+   "estimatedMargin": {
+    "type": "number",
+    "description": "Estimated margin, percent"
+   },
+   "failedValidations": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "componentAvailability",
+      "capacity",
+      "pricing",
+      "validity",
+      "revenueAllocation",
+      "channelAssignment",
+      "tax",
+      "partnerConnection",
+      "marginFloor"
+     ]
+    },
+    "description": "Validations that block publication; empty means READY TO PUBLISH"
+   },
+   "readyToPublish": {
+    "type": "boolean",
+    "description": "Ready to publish"
+   },
+   "aiRecommendation": {
+    "type": "string",
+    "description": "AI bundle recommendation (a draft; never published without configured approval)"
    }
   }
  },
@@ -2666,18 +2602,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Bundle Pricing & Commercial Model displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "bundleDiscount15": {
-    "type": "number",
-    "description": "Bundle discount 15%"
-   },
-   "eachComponentRetainsConfiguredPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Each component retains configured price"
-   },
-   "calculatedThroughTicvaiSPricingEngine": {
-    "type": "string",
-    "description": "Calculated through TICVAI's pricing engine"
-   },
    "basePrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Base price"
@@ -2718,9 +2642,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Channel-specific price"
    },
-   "aed30": {
+   "pricingModel": {
     "type": "string",
-    "description": "+AED 30"
+    "enum": [
+     "fixedBundlePrice",
+     "sumMinusDiscount",
+     "componentPricing",
+     "startingFrom",
+     "tieredBundlePrice",
+     "dynamicBundlePrice"
+    ],
+    "description": "How the bundle is priced; a dynamic bundle price is calculated by the pricing engine"
+   },
+   "upgradeCharge": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Surcharge when the guest picks a premium option"
    }
   }
  },
@@ -2730,35 +2666,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Bundle Validity, Scheduling & Redemption Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "valid1June31August": {
-    "type": "string",
-    "description": "Valid 1 June–31 August"
-   },
-   "allComponentsTogether": {
-    "type": "string",
-    "description": "All components together"
-   },
-   "independentRedemption": {
-    "type": "string",
-    "description": "Independent redemption"
-   },
-   "sequentialRedemption": {
-    "type": "string",
-    "description": "Sequential redemption"
-   },
-   "firstUseActivation": {
-    "type": "string",
-    "description": "First-use activation"
-   },
-   "scheduledRedemption": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Scheduled redemption"
-   },
-   "timeslotReservationRequired": {
-    "type": "boolean",
-    "description": "Timeslot reservation required"
-   },
    "ownValidity": {
     "type": "string",
     "description": "Own validity"
@@ -2782,6 +2689,169 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "ownAccessRule": {
     "type": "string",
     "description": "Own access rule"
+   },
+   "redemptionModel": {
+    "type": "string",
+    "enum": [
+     "allComponentsTogether",
+     "independentRedemption",
+     "sequentialRedemption",
+     "firstUseActivation",
+     "scheduledRedemption",
+     "timeslotReservationRequired"
+    ],
+    "description": "How the bundle's components are redeemed."
+   }
+  }
+ },
+ "CampaignBudget": {
+  "x-ticvai-persistence": "promotions.campaign_budget",
+  "type": "object",
+  "description": "One budget line of a commercial campaign (setCampaignBudgetFinancial): what kind of spend it caps, who funds it, what it covers, and what happens as it is consumed. **Consumed, committed and reserved are not stored**: consumed is the discount given on orders (`orders.discount`, `promotions.promotion.discount_given`), committed and reserved are priced carts not yet paid, all worked out on read so they cannot drift from the orders they summarise. (DM5, 29 September: data model for the agreed operations)",
+  "required": [
+   "budgetType",
+   "amount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "budgetType": {
+    "type": "string",
+    "enum": [
+     "total",
+     "discount",
+     "reward",
+     "freeProduct"
+    ],
+    "description": "The spend this line caps (total campaign, discount, reward or free-product budget)."
+   },
+   "fundingSource": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "venue",
+     "department",
+     "marketing",
+     "partner"
+    ],
+    "description": "Who pays for it; `partner` is a co-funded (e.g. bank or partner-funded) line."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scope": {
+    "type": "string",
+    "enum": [
+     "entireCampaign",
+     "promotion",
+     "product",
+     "channel",
+     "partner",
+     "customerSegment"
+    ],
+    "default": "entireCampaign",
+    "description": "What the line covers."
+   },
+   "scopeRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The promotion, product, partner or segment id, or the SalesChannel value, that `scope` names. Null for `entireCampaign`."
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The budget owner."
+   },
+   "costCentre": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true
+   },
+   "department": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "thresholdPolicy": {
+    "$ref": "#/components/schemas/BudgetThresholdPolicy"
+   }
+  }
+ },
+ "CommercialCampaign": {
+  "x-ticvai-persistence": "promotions.campaign + promotions.campaign_budget",
+  "type": "object",
+  "description": "A commercial campaign: the grouping of promotions, coupon campaigns and bundles that share an owner, a business entity, dates and a budget. **Not `marketing.campaign`**, which is the CRM send campaign in another service. The header is saved with its budget lines by setCampaignBudgetFinancial (the budget screen is where the pack captures campaign, owner, business entity and effective dates), and on its own by createCommercialCampaign and updateCommercialCampaign; listCommercialCampaigns lists it (decided 29 September, writers pass); promotions, coupon campaigns and bundles point at it by `campaignId`. No status of its own: a campaign is live while its promotions are, and a threshold action that stops it pauses them. (DM5, 29 September: data model for the agreed operations)",
+  "required": [
+   "id",
+   "venueId",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The campaign (and budget) owner."
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The business entity that funds and books the campaign."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "budgets": {
+    "type": "array",
+    "description": "The rows of `promotions.campaign_budget`, one per budget line.",
+    "items": {
+     "$ref": "#/components/schemas/CampaignBudget"
+    }
    }
   }
  },
@@ -2791,50 +2861,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Guest Choice & Build-Your-Own Bundle Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each group* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
-   "waterPark": {
-    "type": "string",
-    "description": "Water Park"
-   },
-   "aquarium": {
-    "type": "string",
-    "description": "Aquarium"
-   },
-   "observationDeck": {
-    "type": "string",
-    "description": "Observation Deck"
-   },
-   "museum": {
-    "type": "string",
-    "description": "Museum"
-   },
-   "adventurePark": {
-    "type": "string",
-    "description": "Adventure Park"
-   },
-   "mealA": {
-    "type": "string",
-    "description": "Meal A"
-   },
-   "mealB": {
-    "type": "string",
-    "description": "Meal B"
-   },
-   "mealC": {
-    "type": "string",
-    "description": "Meal C"
-   },
-   "photo": {
-    "type": "string",
-    "description": "Photo"
-   },
-   "locker": {
-    "type": "string",
-    "description": "Locker"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
    "groupName": {
     "type": "string",
     "description": "Group name"
@@ -2876,50 +2902,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Guest Choice & Build-Your-Own Bundle Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "waterPark": {
-    "type": "string",
-    "description": "Water Park"
-   },
-   "aquarium": {
-    "type": "string",
-    "description": "Aquarium"
-   },
-   "observationDeck": {
-    "type": "string",
-    "description": "Observation Deck"
-   },
-   "museum": {
-    "type": "string",
-    "description": "Museum"
-   },
-   "adventurePark": {
-    "type": "string",
-    "description": "Adventure Park"
-   },
-   "mealA": {
-    "type": "string",
-    "description": "Meal A"
-   },
-   "mealB": {
-    "type": "string",
-    "description": "Meal B"
-   },
-   "mealC": {
-    "type": "string",
-    "description": "Meal C"
-   },
-   "photo": {
-    "type": "string",
-    "description": "Photo"
-   },
-   "locker": {
-    "type": "string",
-    "description": "Locker"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
    "groupName": {
     "type": "string",
     "description": "Group name"
@@ -2951,6 +2933,119 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "selectionOrder": {
     "type": "string",
     "description": "Selection order"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PartnerBundleProduct": {
+  "x-ticvai-persistence": "promotions.partner_bundle_product",
+  "type": "object",
+  "description": "A partner's or external product sold as a bundle component: the partner's product id and source, its price to us and ours to the guest, the commission, and the settlement, cancellation and redemption terms (Partner & External Product Bundle Manager). Tied to the `promotions.bundle_component` that stands for it. `connectionStatus` is the last health reading of the partner integration, written by the sync job. (DM5, 29 September: data model for the agreed operations)\n**Written by setBundlePartnerProductMappings; read by listBundlePartnerProductMappings and listPartnerExternalProduct** (decided 29 September, writers pass). `connectionStatus` and `lastCheckedAt` are the partner sync job's alone: it polls each mapped partner product and writes them, and no operation takes them from a request.",
+  "required": [
+   "id",
+   "bundleComponentId",
+   "partnerId",
+   "externalProductId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "bundleComponentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "externalProductId": {
+    "type": "string",
+    "maxLength": 128
+   },
+   "productName": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "apiSource": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The partner integration the product comes through."
+   },
+   "availabilitySource": {
+    "type": "string",
+    "enum": [
+     "partnerApi",
+     "allocation",
+     "onRequest"
+    ],
+    "default": "partnerApi",
+    "description": "Where availability is checked."
+   },
+   "externalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "sellingPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "settlementRule": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "cancellationRule": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "redemptionMethod": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "connectionStatus": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Written by the partner sync job only; `available` until its first reading.",
+    "enum": [
+     "connected",
+     "available",
+     "degraded",
+     "apiError",
+     "productUnavailable",
+     "mappingError"
+    ]
+   },
+   "lastCheckedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the partner sync job last read the partner."
    }
   }
  },
@@ -3004,49 +3099,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Redemption method"
    },
-   "connected": {
+   "connectionStatus": {
     "type": "string",
-    "description": "Connected"
-   },
-   "available": {
-    "type": "string",
-    "description": "Available"
-   },
-   "degraded": {
-    "type": "string",
-    "description": "Degraded"
-   },
-   "apiError": {
-    "type": "string",
-    "description": "API Error"
-   },
-   "productUnavailable": {
-    "type": "string",
-    "description": "Product unavailable"
-   },
-   "mappingError": {
-    "type": "string",
-    "description": "Mapping error"
-   },
-   "ticvaiWaterPark": {
-    "type": "string",
-    "description": "TICVAI Water Park"
-   },
-   "externalHotelNight": {
-    "type": "string",
-    "description": "External Hotel Night"
-   },
-   "externalDesertSafari": {
-    "type": "string",
-    "description": "External Desert Safari"
-   },
-   "ticvaiMealVoucher": {
-    "type": "string",
-    "description": "TICVAI Meal Voucher"
-   },
-   "soldAsOneCommercialPackage": {
-    "type": "string",
-    "description": "sold as one commercial package"
+    "enum": [
+     "connected",
+     "available",
+     "degraded",
+     "apiError",
+     "productUnavailable",
+     "mappingError"
+    ],
+    "description": "Partner connection status."
    }
   }
  },
@@ -3056,38 +3119,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Revenue Allocation, Cost & Settlement Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "on": {
-    "type": "string",
-    "description": "on"
-   },
-   "fixedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed amount"
-   },
-   "percentage": {
-    "type": "number",
-    "description": "Percentage"
-   },
-   "proportionalListPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Proportional list price"
-   },
-   "weightedAllocation": {
-    "type": "string",
-    "description": "Weighted allocation"
-   },
-   "costPlus": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cost-plus"
-   },
-   "contractualPartnerAllocation": {
-    "type": "string",
-    "description": "Contractual partner allocation"
-   },
-   "redemptionBasedAllocation": {
-    "type": "string",
-    "description": "Redemption-based allocation"
-   },
    "revenueAccount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Revenue account"
@@ -3120,21 +3151,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Settlement cycle"
    },
-   "fullRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Full refund"
-   },
-   "partialRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Partial refund"
-   },
-   "componentRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Component refund"
-   },
-   "unredeemedComponentRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Unredeemed component refund"
+   "allocationMethod": {
+    "type": "string",
+    "enum": [
+     "fixedAmount",
+     "percentage",
+     "proportionalListPrice",
+     "weightedAllocation",
+     "costPlus",
+     "contractualPartnerAllocation",
+     "redemptionBasedAllocation"
+    ],
+    "description": "How bundle revenue is allocated to components."
    }
   }
  }

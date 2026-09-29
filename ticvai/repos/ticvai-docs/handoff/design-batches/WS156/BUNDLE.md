@@ -1,6 +1,6 @@
 # WS156 — Resource Management Configuration board 2
 
-**9 screens · 12 operations · 7 schemas · 4 permissions**
+**9 screens · 14 operations · 10 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-864` | Resource Calendar Command Center | listDetail | 3 | 0 | — |
 | `BO-865` | Calendar Filters, Search & Smart Discovery | listDetail | 2 | 0 | — |
-| `BO-866` | Resource Availability Schedule Configuration | configEditor | 2 | 0 | — |
+| `BO-866` | Resource Availability Schedule Configuration | configEditor | 4 | 0 | — |
 | `BO-867` | Resource Time-Slot Configuration | configEditor | 2 | 0 | — |
 | `BO-868` | Advance Reservation Management | configEditor | 3 | 0 | — |
 | `BO-869` | Recurring Reservation Configuration | configEditor | 2 | 0 | — |
@@ -202,6 +202,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "contentBody",
      "components": [
+      {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "getResourceCalendar",
+       "notes": "Every resource's bookings and blocks on one calendar. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
       {
        "kind": "primaryButton",
        "derived": true,
@@ -594,6 +601,61 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 22 §Availability may be configured using"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Cleaning",
+       "bindsTo": "Resource.cleaningPolicy.mode",
+       "operation": "updateResource",
+       "notes": "**How the room is cleaned between uses** (decided 29 September, W10). *After every booking* blocks a fixed buffer after each booking (e.g. 15 minutes); *N times a day* lets the system place N cleanings in the day's gaps. None means only setup and teardown.",
+       "provenance": "contract resources.yaml Resource.cleaningPolicy"
+      },
+      {
+       "kind": "numberField",
+       "label": "Minutes per cleaning",
+       "bindsTo": "Resource.cleaningPolicy.bufferMinutes",
+       "operation": "updateResource",
+       "provenance": "contract resources.yaml ResourceCleaningPolicy.bufferMinutes"
+      },
+      {
+       "kind": "numberField",
+       "label": "Cleanings per day",
+       "bindsTo": "Resource.cleaningPolicy.cleaningsPerDay",
+       "operation": "updateResource",
+       "notes": "Shown for *N times a day* only.",
+       "provenance": "contract resources.yaml ResourceCleaningPolicy.cleaningsPerDay"
+      },
+      {
+       "kind": "textField",
+       "label": "Cleaning window from",
+       "bindsTo": "Resource.cleaningPolicy.windowStart",
+       "operation": "updateResource",
+       "provenance": "contract resources.yaml ResourceCleaningPolicy.windowStart"
+      },
+      {
+       "kind": "textField",
+       "label": "Cleaning window to",
+       "bindsTo": "Resource.cleaningPolicy.windowEnd",
+       "operation": "updateResource",
+       "provenance": "contract resources.yaml ResourceCleaningPolicy.windowEnd"
+      },
+      {
+       "kind": "timeline",
+       "label": "Day preview",
+       "bindsTo": "ResourceAvailability",
+       "columns": [
+        "ResourceAvailability.freeWindows",
+        "ResourceAvailability.blockedWindows"
+       ],
+       "operation": "getResourceAvailability",
+       "notes": "**A day preview before saving** (W10): bookings, holds and the cleanings the policy places, as `cleaning` blocked windows, so an operator sees what the policy takes out of availability.",
+       "provenance": "contract resources.yaml GET /resources/{resourceId}/availability"
+      }
+     ]
     }
    ]
   },
@@ -605,6 +667,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
+   {
+    "operationId": "getResourceAvailability",
+    "contract": "resources",
+    "purpose": "Day preview of availability with cleanings placed (W10)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, W10 (P29)"
+   },
+   {
+    "operationId": "updateResource",
+    "contract": "resources",
+    "purpose": "Save the cleaning policy (W10)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, W10 (P29)",
+    "invalidates": [
+     "getResourceAvailability"
+    ]
+   },
    {
     "operationId": "getResourceSchedule",
     "contract": "resources",
@@ -1799,6 +1878,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1870,6 +1954,30 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "ResourceBlock",
   "responds": "ResourceBlock"
+ },
+ "getResourceAvailability": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/availability",
+  "contract": "resources",
+  "summary": "When it is free, with conflicts already resolved",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceAvailability"
  },
  "getResourceCalendar": {
   "method": "GET",
@@ -2019,6 +2127,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "ResourceSchedule",
@@ -2058,6 +2171,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Resource"
  },
+ "updateResource": {
+  "method": "PUT",
+  "path": "/resources/{resourceId}",
+  "contract": "resources",
+  "summary": "Change a resource",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Resource",
+  "responds": "Resource"
+ },
  "updateResourceBooking": {
   "method": "PATCH",
   "path": "/resource-bookings/{bookingId}",
@@ -2068,6 +2200,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2142,7 +2279,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "teardownMinutes": {
     "type": "integer",
-    "default": 0
+    "default": 0,
+    "description": "After the booking. **Kept as it is** (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added after the teardown, so a room with no teardown and a 15-minute clean is free 15 minutes after each booking ends.\n"
+   },
+   "cleaningPolicy": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ResourceCleaningPolicy"
+     }
+    ],
+    "nullable": true,
+    "description": "How the resource is cleaned between uses (decided 29 September, W10). Null means no cleaning is scheduled beyond `teardownMinutes`."
    },
    "requiresQualification": {
     "type": "array",
@@ -2167,6 +2314,63 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "isActive": {
     "type": "boolean",
     "default": true
+   }
+  }
+ },
+ "ResourceAvailability": {
+  "type": "object",
+  "description": "**Free windows, with setup and teardown already subtracted.** A client computing this from bookings will forget the turnaround.\n",
+  "properties": {
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "freeWindows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "from": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "to": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "blockedWindows": {
+    "type": "array",
+    "description": "**With a reason, because they are not the same.** Booked and under repair need different responses from an operator looking for something free — wait, or look elsewhere.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "from": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "to": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "booked",
+        "held",
+        "setup",
+        "teardown",
+        "maintenance",
+        "blackout",
+        "closed",
+        "cleaning"
+       ],
+       "description": "`held` is a live `ResourceHold` (rev 3 REV3-15): taken now, free again if it expires. `cleaning` is a cleaning the resource's `cleaningPolicy` places (W10, 29 September).\n"
+      }
+     }
+    }
    }
   }
  },
@@ -2389,6 +2593,49 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ResourceCleaningPolicy": {
+  "x-ticvai-persistence": "none — columns on resources.resource",
+  "type": "object",
+  "description": "**When the resource is cleaned, and what that takes out of availability** (decided 29 September, W10; the meeting-room case from the 29 September website review).\n- `afterEveryBooking` (option A): `bufferMinutes` blocked after every booking, after its teardown. - `timesPerDay` (option B): `cleaningsPerDay` cleanings of `bufferMinutes` each, between `windowStart` and `windowEnd`, **placed by the system**. The targets are spread evenly across the window; each is put in the free gap nearest its target that is long enough, and never on a booking, a hold or a block. **A confirmed booking is never moved for a cleaning.** Placement is computed on read from the day's bookings, so it moves when bookings change, and a start time is offered only if every cleaning of that day can still be placed after it is booked.\n`createResource` and `updateResource` refuse a policy with `timesPerDay` and no `cleaningsPerDay`, or a window that ends before it starts, with `422`.\n",
+  "required": [
+   "mode",
+   "bufferMinutes"
+  ],
+  "properties": {
+   "mode": {
+    "type": "string",
+    "enum": [
+     "afterEveryBooking",
+     "timesPerDay"
+    ]
+   },
+   "bufferMinutes": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 240,
+    "description": "Minutes one cleaning takes. The prototype uses 15 (proposed default, client to correct)."
+   },
+   "cleaningsPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 24,
+    "nullable": true,
+    "description": "Required for `timesPerDay`; ignored for `afterEveryBooking`."
+   },
+   "windowStart": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Venue-local time the cleaning window opens. Null means the resource's opening time."
+   },
+   "windowEnd": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Venue-local time the cleaning window closes. Null means the resource's closing time."
+   }
+  }
+ },
  "ResourceKind": {
   "type": "string",
   "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n",
@@ -2411,6 +2658,64 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "x-ticvai-refuses": {
    "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
+  }
+ },
+ "ResourceRequirement": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.resource_requirement",
+  "description": "**A type and a quantity, never a named resource.** This is what makes the 26 August rule enforceable — the product states what it needs and the platform decides which one.\nFor resources placed on a published venue map the rule is superseded (decided 29 September, rev 3 REV3-15): the guest names the resource through a `ResourceHold`, and no requirement is needed.\n",
+  "required": [
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceTypeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A fixed component, and the exception rather than the rule.** Meeting Room A really is Meeting Room A; the technician is not.\n"
+   },
+   "quantity": {
+    "type": "integer",
+    "default": 1
+   },
+   "mandatory": {
+    "type": "boolean",
+    "default": true
+   },
+   "requiredQualifications": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "requiredAttributes": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "substituteResourceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
   }
  },
  "ResourceSchedule": {

@@ -1,6 +1,6 @@
 # P08-orders-money-02 — P08 · Orders & Money (2 of 3)
 
-**10 screens · 60 operations · 63 schemas · 29 permissions**
+**10 screens · 63 operations · 80 schemas · 29 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -69,4 +69,4 @@ convincingly. It is never a caption.
 | `BO-059` | Sales Reports | listDetail | 9 | 6 | — |
 | `BO-061` | Scheduled Reports | listDetail | 5 | 3 | — |
 | `BO-062` | Venue Profile | listDetail | 4 | 1 | — |
-| `BO-065` | Venue Configuration | listDetail | 6 | 2 | — |
+| `BO-065` | Venue Configuration | listDetail | 9 | 2 | — |

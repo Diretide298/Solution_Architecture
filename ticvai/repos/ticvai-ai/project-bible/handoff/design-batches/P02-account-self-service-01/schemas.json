@@ -1,4 +1,108 @@
 {
+ "AccessDeviceBinding": {
+  "type": "object",
+  "x-ticvai-persistence": "access.device_binding",
+  "description": "One guest device bound to a credential, with its registration, last activation and security status; the binding policy in force is a deviceBinding row of access.credential_policy (declared 29 September, data-model close-out DM1). Written by bindCredentialDevice (the guest app) and releaseCredentialDevice; securityStatus is set by the sharing detection job (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "entitlementId",
+   "deviceId",
+   "registeredAt",
+   "securityStatus",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest (pii.subject)"
+   },
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "credentialBindingId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "deviceId": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "deviceReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "appInstallationId": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "os": {
+    "type": "string",
+    "maxLength": 50,
+    "nullable": true
+   },
+   "registeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastActivatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastKnownVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "securityStatus": {
+    "type": "string",
+    "enum": [
+     "normal",
+     "suspicious",
+     "blocked"
+    ],
+    "default": "normal"
+   },
+   "deactivatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Set when the binding is removed (deactivation, or a transfer of the credential)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "ClaimDeviceConsentRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "consentKey"
+  ],
+  "properties": {
+   "consentKey": {
+    "type": "string",
+    "maxLength": 64
+   }
+  }
+ },
  "ConsentDecision": {
   "type": "string",
   "enum": [
@@ -27,8 +131,11 @@
    "pos",
    "callCentre",
    "import",
-   "agentRecorded"
-  ]
+   "agentRecorded",
+   "cookieBanner",
+   "checkout"
+  ],
+  "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
  },
  "ConsentState": {
   "x-ticvai-persistence": "none — projection over consent_record",
@@ -82,6 +189,529 @@
    }
   }
  },
+ "CookieBannerPreferenceCenterDesignerView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.cookie_banner_design",
+  "description": "One version of a cookie banner and preference-centre design (pack 17.1.6).",
+  "required": [
+   "channel",
+   "position",
+   "languages",
+   "rejectIsOneClick",
+   "categories"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null for the corporate design every brand inherits."
+   },
+   "inheritsFromId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "b2cWebsite",
+     "customerPortal",
+     "mobileApp",
+     "embeddedCheckout",
+     "whiteLabelSite",
+     "partnerMicrosite"
+    ]
+   },
+   "logoAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "position": {
+    "type": "string",
+    "enum": [
+     "top",
+     "bottom",
+     "popup",
+     "modal"
+    ]
+   },
+   "themeId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The white-label theme it takes colours and fonts from."
+   },
+   "buttons": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "action"
+     ],
+     "properties": {
+      "action": {
+       "type": "string",
+       "enum": [
+        "acceptAll",
+        "rejectNonEssential",
+        "managePreferences",
+        "savePreferences",
+        "doNotSellOrShare"
+       ]
+      },
+      "label": {
+       "$ref": "#/components/schemas/LocalisedText"
+      }
+     }
+    }
+   },
+   "rejectIsOneClick": {
+    "type": "boolean",
+    "default": true,
+    "description": "Must be true."
+   },
+   "links": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "label",
+      "policyKind"
+     ],
+     "properties": {
+      "label": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "policyKind": {
+       "type": "string",
+       "enum": [
+        "privacy",
+        "cookie",
+        "termsAndConditions"
+       ]
+      }
+     }
+    }
+   },
+   "categories": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "defaultOn"
+     ],
+     "properties": {
+      "category": {
+       "type": "string",
+       "enum": [
+        "strictlyNecessary",
+        "functional",
+        "analytics",
+        "personalisation",
+        "marketing"
+       ]
+      },
+      "description": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "defaultOn": {
+       "type": "boolean",
+       "description": "True only for `strictlyNecessary`, which is always active."
+      }
+     }
+    }
+   },
+   "languages": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "string",
+     "maxLength": 10
+    },
+    "description": "Every language the storefront serves; Arabic renders right to left."
+   },
+   "regulatoryRegimes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "gdpr",
+      "ePrivacy",
+      "ccpaCpra",
+      "lgpd",
+      "uaePdpl",
+      "saudiPdpl"
+     ]
+    },
+    "description": "2.6.60 (29 September, build). **The laws this design is published to satisfy**, so compliance is stated rather than assumed. The strictest posture (opt-in, one-click reject, every non-essential category off) already meets GDPR/ePrivacy, LGPD and both PDPLs; `ccpaCpra` adds the \"Do not sell or share\" button (`doNotSellOrShare`) and honours a Global Privacy Control signal as that opt-out."
+   },
+   "recordIpAddress": {
+    "type": "boolean",
+    "default": false,
+    "description": "2.6.55, \"if legally permitted\" (29 September, build). On, `recordDeviceConsent` writes the IP address and user agent to `pii.consent_identifier`; off, they are not kept anywhere. Off by default."
+   },
+   "noticeVersion": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Moves with the cookie policy (white-label `setPolicy`, kind `cookie`)."
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "superseded"
+    ],
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "CookieCategory": {
+  "type": "string",
+  "enum": [
+   "strictlyNecessary",
+   "functional",
+   "analytics",
+   "personalisation",
+   "marketing"
+  ],
+  "description": "2.6.53. The five categories the banner design (`CookieBannerPreferenceCenterDesignerView.categories`) offers; the matrix's \"preference\" category is `personalisation` (British spelling, as `ConsentPurpose`)."
+ },
+ "CookieConsentChannel": {
+  "type": "string",
+  "enum": [
+   "b2cWebsite",
+   "customerPortal",
+   "mobileApp",
+   "embeddedCheckout",
+   "whiteLabelSite",
+   "partnerMicrosite"
+  ],
+  "description": "The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6)."
+ },
+ "CookieConsentRuntime": {
+  "type": "object",
+  "x-ticvai-persistence": "none — assembled at read time from marketing.cookie_banner_design, marketing.tracking_technology and marketing.device_consent",
+  "description": "What `getCookieConsentRuntime` gives the storefront tag loader and the app SDK gate (2.6.52, 2.6.58).",
+  "required": [
+   "banner",
+   "noticeVersion",
+   "requiresDecision",
+   "allowedTechnologies",
+   "consentModeSignals"
+  ],
+  "properties": {
+   "banner": {
+    "$ref": "#/components/schemas/CookieBannerPreferenceCenterDesignerView"
+   },
+   "noticeVersion": {
+    "type": "string"
+   },
+   "requiresDecision": {
+    "type": "boolean",
+    "description": "True with no decision, an expired one, or one given against a superseded notice."
+   },
+   "decision": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/DeviceConsent"
+     }
+    ],
+    "nullable": true,
+    "description": "The latest decision for the presented key; null without a key."
+   },
+   "allowedTechnologies": {
+    "type": "array",
+    "description": "Per category, the approved technologies it unlocks. Anything not listed never loads.",
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "technologies"
+     ],
+     "properties": {
+      "category": {
+       "$ref": "#/components/schemas/CookieCategory"
+      },
+      "granted": {
+       "type": "boolean",
+       "description": "Whether the presented decision grants it; always true for `strictlyNecessary`."
+      },
+      "technologies": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "name",
+         "provider"
+        ],
+        "properties": {
+         "name": {
+          "type": "string"
+         },
+         "provider": {
+          "type": "string"
+         },
+         "technologyType": {
+          "type": "string"
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "consentModeSignals": {
+    "type": "object",
+    "description": "**The decision in Google consent-mode terms** (2.6.65), so Analytics and Tag Manager are told, not left to guess. `denied` wherever no decision grants the category.",
+    "properties": {
+     "adStorage": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "adUserData": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "adPersonalization": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "analyticsStorage": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "functionalityStorage": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "personalizationStorage": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "securityStorage": {
+      "type": "string",
+      "enum": [
+       "granted"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "CredentialDeviceBindingInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; written as access.device_binding (declared 29 September, writers pass)",
+  "required": [
+   "deviceId"
+  ],
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "maxLength": 128,
+    "description": "The app's stable device identifier"
+   },
+   "deviceReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "appInstallationId": {
+    "type": "string",
+    "maxLength": 128,
+    "nullable": true
+   },
+   "os": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true
+   },
+   "otp": {
+    "type": "string",
+    "maxLength": 12,
+    "nullable": true,
+    "description": "Verified one-time code, where the policy is otpVerificationRequired and this is a device change"
+   }
+  }
+ },
+ "DeviceConsent": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.device_consent + marketing.device_consent_category",
+  "description": "**One cookie decision by a visitor nobody has identified yet** (BL-073 §4b, decided 29 September). Append-only: a change of mind is a new row. Keyed for the visitor by `consentKey`, which the platform mints; the categories are child rows. The IP address and user agent, where recorded at all, are in `pii.consent_identifier` (`ConsentCaptureIdentifier`), never here.",
+  "required": [
+   "consentKey",
+   "channel",
+   "action",
+   "categories",
+   "noticeVersion",
+   "decidedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "consentKey": {
+    "type": "string",
+    "maxLength": 64,
+    "readOnly": true,
+    "description": "**Opaque, minted by us, not a device fingerprint.** It answers 2.6.55's \"user identifier/session ID\" and is the join key `claimDeviceConsent` needs. Shared by all the tenant's domains (2.6.62), never across tenants."
+   },
+   "channel": {
+    "$ref": "#/components/schemas/CookieConsentChannel"
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "bannerDesignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The published `CookieBannerPreferenceCenterDesignerView` version the visitor was shown."
+   },
+   "action": {
+    "$ref": "#/components/schemas/DeviceConsentAction"
+   },
+   "categories": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Every category of the design, with the decision this row gives it.",
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "decision"
+     ],
+     "properties": {
+      "category": {
+       "$ref": "#/components/schemas/CookieCategory"
+      },
+      "decision": {
+       "type": "string",
+       "enum": [
+        "granted",
+        "declined"
+       ]
+      }
+     }
+    }
+   },
+   "noticeVersion": {
+    "type": "string",
+    "description": "The cookie notice version decided against (white-label `setPolicy`, kind `cookie`)."
+   },
+   "language": {
+    "type": "string",
+    "maxLength": 10,
+    "nullable": true
+   },
+   "globalPrivacyControl": {
+    "type": "boolean",
+    "default": false,
+    "description": "The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing."
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "country": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The edge's geolocation of the request, for the geographic statistics (2.6.63). The address is not kept here."
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A device consent expires and a subject consent does not.** Set from the tenant's device-consent term; after it the banner asks again."
+   },
+   "claimedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Set once, by `claimDeviceConsent`. Never cleared."
+   },
+   "claimedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant."
+   }
+  }
+ },
+ "DeviceConsentAction": {
+  "type": "string",
+  "enum": [
+   "acceptAll",
+   "rejectNonEssential",
+   "savePreferences",
+   "withdraw",
+   "doNotSellOrShare"
+  ],
+  "description": "What the visitor pressed. `doNotSellOrShare` is the CCPA/CPRA opt-out link, shown where the design's `regulatoryRegimes` include `ccpaCpra`."
+ },
  "Entitlement": {
   "type": "object",
   "x-ticvai-persistence": "access.entitlement",
@@ -100,7 +730,7 @@
    "id": {
     "type": "string",
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n"
+    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
    },
    "templateId": {
     "type": "string",
@@ -113,7 +743,8 @@
    },
    "orderId": {
     "type": "string",
-    "format": "uuid"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The order's id, a ULID as in `/orders/{orderId}` (`orders.sales_order.id`)."
    },
    "orderLineId": {
     "type": "string",
@@ -151,12 +782,14 @@
    "validTo": {
     "type": "string",
     "format": "date-time",
-    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n"
+    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n**What the pre-expiry notice is measured from** (29 September, build pass, group G2; 5.5.30). A daily run in access publishes `entitlement.expiringSoon` once per entitlement and `validTo` when an entitlement in `issued` or `partiallyConsumed` comes within its template's `expiryNoticeDays` (`catalogue.EntitlementTemplate`), and not for one bought inside that window. Marketing turns it into the reminder (a `MessageTrigger` on the event, or a triggered campaign on `entitlementExpiring`); access only says the date is near. A freeze or renewal that moves `validTo` raises the next notice once.\n"
    },
    "entriesUsed": {
     "type": "integer",
     "default": 0,
-    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n"
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n**Maintained on write**, in the same transaction as the admitting `access.scan_event` row: by `validateAccess`, `validateGroupAccess` (by the count admitted) and `syncScans` for each replayed admission the server accepts. A replayed scan the server downgrades to `denied` does not count.\n"
    },
    "entriesAllowed": {
     "type": "integer",
@@ -165,16 +798,39 @@
    "lastEntryAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "`recordedAt` of the latest admission counted in `entriesUsed`, written by the same writes. A scan replayed late with an earlier `recordedAt` does not move it back.\n"
    },
    "frozenDays": {
     "type": "integer",
     "default": 0,
-    "description": "Days added by a freeze. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Days added by a freeze. **Maintained on write** by the freeze operation (`freezeEntitlement`), in the same write that extends `validTo` by those days. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
    },
    "suspendedReason": {
     "type": "string",
     "nullable": true
+   },
+   "freezeReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "travelling",
+     "injury",
+     "personal",
+     "seasonal",
+     "other"
+    ],
+    "description": "The `reason` of the latest `freezeEntitlement` (audit R222). Null when never frozen."
+   },
+   "freezeNote": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 500,
+    "description": "The `note` the latest `freezeEntitlement` took, required there when `reason` is `other` (decided 28 September, audit R222). Kept so the quarterly review of `other` notes has something to read."
    },
    "isNameBound": {
     "type": "boolean",
@@ -207,7 +863,7 @@
    },
    "supersedesEntitlementId": {
     "type": "string",
-    "format": "uuid",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true,
     "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
    },
@@ -216,8 +872,600 @@
     "format": "uuid",
     "nullable": true,
     "description": "Where the template carries stored value. **A `retail.Wallet` bound to the entitlement, not a balance on it** (CF-126).\n"
+   },
+   "facePassEnrolmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The active `facePass` enrolment on this entitlement (`FacePassEnrolment.id`), or null when none is. **Computed on read from `pii.subject_biometric` and not stored here** — the PII split keeps the biometric on its own side, and this carries only its id. It is how a screen holding a pass finds the enrolment `getFacePassEnrolment` and `revokeFacePass` take.\n"
    }
   }
+ },
+ "FinCreditMemo": {
+  "x-ticvai-persistence": "ledger.credit_memo + ledger.credit_memo_line",
+  "type": "object",
+  "description": "5.7.94. **A tax credit note against one tax invoice**, with its own series. Never edited.",
+  "required": [
+   "id",
+   "creditMemoNumber",
+   "taxInvoiceId",
+   "kind",
+   "reason",
+   "legalEntityId",
+   "issuedAt",
+   "currency",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "creditMemoNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Server-assigned from the legal entity's credit memo series, in sequence without gaps."
+   },
+   "taxInvoiceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "taxInvoiceNumber": {
+    "type": "string",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "full",
+     "partial"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "refund",
+     "cancellation",
+     "priceAdjustment",
+     "returnOfGoods",
+     "billingError",
+     "other"
+    ]
+   },
+   "refundId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "cancelledOrderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "buyerSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmountInLegalCurrency": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "renditionAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "eInvoiceStatus": {
+    "$ref": "#/components/schemas/FinEInvoiceTransmissionStatus"
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FinCreditMemoLine"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   }
+  }
+ },
+ "FinCreditMemoLine": {
+  "type": "object",
+  "required": [
+   "invoiceLineNumber",
+   "netAmount",
+   "taxAmount",
+   "grossAmount"
+  ],
+  "properties": {
+   "invoiceLineNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "quantity": {
+    "type": "number",
+    "nullable": true
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxRate": {
+    "type": "number"
+   },
+   "taxCategory": {
+    "$ref": "#/components/schemas/FinTaxCategory"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "FinEInvoiceTransmissionStatus": {
+  "type": "string",
+  "description": "6.1.1. `notRequired` where the legal entity's provider is `disabled` or absent.",
+  "enum": [
+   "notRequired",
+   "queued",
+   "sent",
+   "accepted",
+   "rejected",
+   "failed"
+  ]
+ },
+ "FinIssueTaxInvoiceRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "invoiceType",
+   "orderIds"
+  ],
+  "properties": {
+   "invoiceType": {
+    "$ref": "#/components/schemas/FinTaxInvoiceType"
+   },
+   "orderIds": {
+    "type": "array",
+    "minItems": 1,
+    "description": "One order for `simplified` and `full`; one or more for `consolidated`. Every order must be paid, of one buyer, one legal entity and one currency.",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "recipient": {
+    "$ref": "#/components/schemas/FinTaxInvoiceRecipient"
+   },
+   "languages": {
+    "type": "array",
+    "description": "Overrides the template's languages for this document, within those the template offers.",
+    "items": {
+     "type": "string",
+     "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+    }
+   },
+   "supersedesInvoiceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A simplified invoice this full invoice replaces for the same supply. Refused unless the law allows it (make-or-break on issueTaxInvoice)."
+   },
+   "deliverToEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "Sends the PDF on issue as well as returning it."
+   }
+  }
+ },
+ "FinTaxCategory": {
+  "type": "string",
+  "description": "How a line is treated for VAT. Taken from the tax code the line was posted with.",
+  "enum": [
+   "standardRated",
+   "zeroRated",
+   "exempt",
+   "outOfScope",
+   "reverseCharge"
+  ]
+ },
+ "FinTaxDocumentRendition": {
+  "x-ticvai-persistence": "none — a signed link to the stored PDF",
+  "type": "object",
+  "required": [
+   "documentId",
+   "documentKind",
+   "url",
+   "expiresAt"
+  ],
+  "properties": {
+   "documentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "documentKind": {
+    "type": "string",
+    "enum": [
+     "taxInvoice",
+     "creditMemo"
+    ]
+   },
+   "documentNumber": {
+    "type": "string"
+   },
+   "language": {
+    "type": "string",
+    "nullable": true
+   },
+   "contentType": {
+    "type": "string",
+    "default": "application/pdf"
+   },
+   "url": {
+    "type": "string",
+    "format": "uri"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "FinTaxInvoice": {
+  "x-ticvai-persistence": "ledger.tax_invoice + ledger.tax_invoice_line",
+  "type": "object",
+  "description": "5.7.93, 5.10.3. **A guest tax invoice, as issued, never edited.** Corrections are credit memos. The supplier block is a snapshot of the legal entity at issue, so a later change of address does not change a document already given to a guest.",
+  "required": [
+   "id",
+   "invoiceNumber",
+   "invoiceType",
+   "status",
+   "legalEntityId",
+   "issuedAt",
+   "supplyDate",
+   "currency",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "invoiceNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Server-assigned from the legal entity's series for the document kind, in sequence and without gaps, e.g. `INV-2026-000123`. Never reused."
+   },
+   "invoiceType": {
+    "$ref": "#/components/schemas/FinTaxInvoiceType"
+   },
+   "status": {
+    "$ref": "#/components/schemas/FinTaxInvoiceStatus"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "supplierName": {
+    "type": "string"
+   },
+   "supplierAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "supplierTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest the orders belong to; the key a guest's own reads filter on."
+   },
+   "buyerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerCountryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "buyerTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "customerAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "supplyDate": {
+    "type": "string",
+    "format": "date",
+    "description": "The date of supply where it differs from the issue date (the latest order's payment date on a consolidated invoice). A day in the region's time zone."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmountInLegalCurrency": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs, at the rate the orders were stored at."
+   },
+   "creditedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "supersedesInvoiceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "renditionAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The PDF rendered at issue; read through getTaxDocumentRendition."
+   },
+   "eInvoiceStatus": {
+    "$ref": "#/components/schemas/FinEInvoiceTransmissionStatus"
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Null where the platform issued it."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FinTaxInvoiceLine"
+    }
+   },
+   "taxSummary": {
+    "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "VAT per rate and category, summed from the lines for the response.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "taxCategory": {
+       "$ref": "#/components/schemas/FinTaxCategory"
+      },
+      "taxRate": {
+       "type": "number"
+      },
+      "taxableAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "taxAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written at the scope of the venue the orders were sold at, or the region for a consolidated invoice across venues."
+   }
+  }
+ },
+ "FinTaxInvoiceLine": {
+  "type": "object",
+  "description": "One line as it was sold and taxed. Amounts are in the invoice currency.",
+  "required": [
+   "lineNumber",
+   "description",
+   "quantity",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "taxCategory"
+  ],
+  "properties": {
+   "lineNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderLineId": {
+    "type": "string",
+    "nullable": true
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "quantity": {
+    "type": "number"
+   },
+   "unitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "taxRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "taxCategory": {
+    "$ref": "#/components/schemas/FinTaxCategory"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "creditedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "FinTaxInvoiceRecipient": {
+  "x-ticvai-persistence": "none — copied onto the invoice as buyer columns",
+  "type": "object",
+  "description": "Who the invoice is addressed to. Required for `full` and `consolidated`.",
+  "required": [
+   "name"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 300
+   },
+   "address": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "countryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "taxRegistrationNumber": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "The recipient's TRN where they are VAT-registered."
+   },
+   "customerAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The B2B credit account (payments `B2bCreditAccount`) where a company is invoiced."
+   }
+  }
+ },
+ "FinTaxInvoiceStatus": {
+  "type": "string",
+  "description": "`issued` until a credit memo is issued against it; `superseded` where a full invoice replaced a simplified one for the same supply (only if the law allows it; see issueTaxInvoice).",
+  "enum": [
+   "issued",
+   "partiallyCredited",
+   "fullyCredited",
+   "superseded"
+  ]
+ },
+ "FinTaxInvoiceType": {
+  "type": "string",
+  "description": "5.7.93. `simplified` for one order with no recipient details, `full` for one order with them, `consolidated` for several paid orders of one buyer on one invoice.",
+  "enum": [
+   "simplified",
+   "full",
+   "consolidated"
+  ]
  },
  "GuestDocument": {
   "type": "object",
@@ -227,10 +1475,12 @@
    "id",
    "subjectId",
    "kind",
-   "storageRef"
+   "storageRef",
+   "retainUntil"
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -252,7 +1502,8 @@
     ]
    },
    "storageRef": {
-    "type": "string"
+    "type": "string",
+    "description": "**The stored object's key in the guest-document store**, which is deliberately not `assets` (BL-133). No operation in this contract issues one yet: `assets` `createUpload` is staff-only and writes the media library, so the upload step for this store is still to be designed.\n"
    },
    "contentType": {
     "type": "string"
@@ -264,16 +1515,74 @@
    "retainUntil": {
     "type": "string",
     "format": "date",
-    "description": "**Required, not optional.** A guest document with no deletion date is a guest document kept forever, and the retention question is the one CF-64 is open on.\n"
+    "description": "**Required, not optional.** A guest document with no deletion date is a guest document kept forever, and the retention question is the one CF-64 is open on.\n**Kept until its purpose ends, then for the period client counsel sets (decided 28 September, audit R149).** The caller sets `retainUntil` to the end of the purpose (the visit, the waiver's validity, the visa's expiry) plus that period. **The period per `kind` is an open value**: until counsel names it, it is zero, so the document is deleted when the purpose ends.\n"
    },
    "uploadedAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    },
    "uploadedByPrincipalId": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid",
     "nullable": true
+   }
+  }
+ },
+ "GuestPreferences": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_preference",
+  "description": "**What the guest likes, kept apart from what they permit** (consent) and from who they are (the profile). One row per subject. `dietary` and `accessibility` are here rather than as tags because BL-134 gives them their own consent purpose and retention.\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "seatingPreference": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 200
+   },
+   "drinkPreferences": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "dietary": {
+    "type": "array",
+    "description": "Also written by `updateMyProfile`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "accessibility": {
+    "type": "array",
+    "description": "Also written by `updateMyProfile`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "preferredChannel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "x-ticvai-persisted": false,
+    "description": "**Stored on the profile** (`GuestProfile.preferredChannel`) — carried here because the preference screen edits it beside the rest.\n"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -359,6 +1668,19 @@
    },
    "isActive": {
     "type": "boolean"
+   },
+   "mergedIntoSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"
+   },
+   "mergedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -385,7 +1707,7 @@
    },
    "isVerified": {
     "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
+    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse and fill a cart but not transact: the gate is the checkout page (ADR-0045), where `checkoutCart` refuses it until the guest verifies or proves the contact by code. UAE Pass returns a verified identity, so it starts true. Rule on `verifyGuestEmail`, decided 17 September 2026.\n"
    },
    "identityProviders": {
     "type": "array",
@@ -406,6 +1728,18 @@
     "nullable": true,
     "description": "Present where the guest is linked across cells (ADR-0010)."
    },
+   "requiresMfa": {
+    "type": "boolean",
+    "default": false,
+    "description": "True only where the sign-in venue enabled guest two-step verification (`VenueSettings.identity.guestTwoStep`, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per venue). The session is then not usable until `verifyMfaChallenge` succeeds on a `signIn` challenge. Always false for a UAE Pass sign-in, which is already a verified two-factor identity (proposed, client to correct).\n"
+   },
+   "mfaMethods": {
+    "type": "array",
+    "description": "The guest's active methods, so the client can offer the right one. Empty when `requiresMfa` is false.",
+    "items": {
+     "$ref": "#/components/schemas/MfaMethod"
+    }
+   },
    "homeCellName": {
     "type": "string",
     "nullable": true
@@ -417,77 +1751,9 @@
    "expiresAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
+    "description": "**30 days, sliding** (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. **One session per device**: a guest may be signed in on a phone and a laptop at once, and a new sign-in on the same `deviceId` ends that device's previous session.\n"
    }
   }
- },
- "LoginRequest": {
-  "type": "object",
-  "required": [
-   "username",
-   "credential",
-   "workstationId"
-  ],
-  "properties": {
-   "username": {
-    "type": "string",
-    "maxLength": 256
-   },
-   "credential": {
-    "type": "string",
-    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
-    "maxLength": 512
-   },
-   "method": {
-    "type": "string",
-    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
-    "enum": [
-     "password",
-     "pin",
-     "card",
-     "rfid",
-     "sso"
-    ],
-    "default": "password"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
-   },
-   "deviceFingerprint": {
-    "type": "string",
-    "maxLength": 256
-   }
-  }
- },
- "LoginResponse": {
-  "x-ticvai-persistence": "none — computed",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   {
-    "type": "object",
-    "required": [
-     "requiresRoleSelection"
-    ],
-    "properties": {
-     "requiresRoleSelection": {
-      "type": "boolean"
-     },
-     "availableRoles": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/RoleSummary"
-      }
-     },
-     "session": {
-      "$ref": "#/components/schemas/Session"
-     }
-    }
-   }
-  ]
  },
  "MessageChannel": {
   "type": "string",
@@ -498,59 +1764,6 @@
    "push",
    "inApp",
    "post"
-  ]
- },
- "MfaEnrolment": {
-  "x-ticvai-persistence": "none — transient",
-  "type": "object",
-  "required": [
-   "methodId",
-   "kind"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
-   },
-   "methodId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MfaKind"
-   },
-   "secret": {
-    "type": "string",
-    "nullable": true,
-    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
-   },
-   "qrCodeUri": {
-    "type": "string",
-    "nullable": true
-   },
-   "recoveryCodes": {
-    "type": "array",
-    "description": "Returned once on successful verification. Not retrievable afterwards.",
-    "items": {
-     "type": "string"
-    }
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "MfaKind": {
-  "type": "string",
-  "enum": [
-   "totp",
-   "smsOtp",
-   "emailOtp",
-   "biometric",
-   "hardwareToken"
   ]
  },
  "MfaMethod": {
@@ -616,10 +1829,14 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client ULID from `CreateOrderRequest.id`."
    },
    "orderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
    },
    "channel": {
     "allOf": [
@@ -664,6 +1881,33 @@
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "droppedPromotions": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "budgetCapReached"
+       ]
+      }
+     }
+    }
+   },
    "totalPriceVariance": {
     "allOf": [
      {
@@ -694,12 +1938,27 @@
    },
    "shiftId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "subjectId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "holdLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -731,7 +1990,12 @@
   ]
  },
  "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-retired-columns": [
+   "promotion_id",
+   "name",
+   "reason"
+  ],
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateOrderLine"
@@ -772,8 +2036,10 @@
      },
      "entitlementIds": {
       "type": "array",
+      "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       }
      },
      "crossRegionRightIds": {
@@ -782,6 +2048,27 @@
        "type": "string"
       },
       "description": "Redemption rights propagated to other cells for this line."
+     },
+     "reprintCount": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "readOnly": true,
+      "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
+     },
+     "venueId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "discounts": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.",
+      "items": {
+       "$ref": "#/components/schemas/OrderLineDiscount"
+      }
      }
     }
    }
@@ -801,6 +2088,66 @@
    "failed"
   ],
   "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
  },
  "Page": {
   "type": "object",
@@ -834,10 +2181,12 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -856,7 +2205,11 @@
     "description": "The amount in `tenderCurrency`, at that currency's own scale."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
    },
@@ -900,7 +2253,45 @@
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",
@@ -914,6 +2305,47 @@
    "syncedAt": {
     "type": "string",
     "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "PublishedTrackingTechnology": {
+  "type": "object",
+  "x-ticvai-persistence": "none — the approved rows of marketing.tracking_technology, guest-facing fields only",
+  "description": "One approved technology as the preference centre shows it (2.6.54).",
+  "required": [
+   "name",
+   "provider",
+   "category",
+   "isThirdParty"
+  ],
+  "properties": {
+   "name": {
+    "type": "string"
+   },
+   "provider": {
+    "type": "string"
+   },
+   "category": {
+    "$ref": "#/components/schemas/CookieCategory"
+   },
+   "technologyType": {
+    "type": "string"
+   },
+   "purpose": {
+    "type": "string",
+    "nullable": true
+   },
+   "durationDays": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Null for session storage."
+   },
+   "isThirdParty": {
+    "type": "boolean"
+   },
+   "privacyInformation": {
+    "type": "string",
     "nullable": true
    }
   }
@@ -954,6 +2386,83 @@
    }
   }
  },
+ "RecordDeviceConsentRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "description": "What the banner or preference centre sends to `recordDeviceConsent`.",
+  "required": [
+   "channel",
+   "action",
+   "noticeVersion",
+   "decidedAt"
+  ],
+  "properties": {
+   "consentKey": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "The key the browser or app already holds; omitted on a first decision, and one is minted."
+   },
+   "channel": {
+    "$ref": "#/components/schemas/CookieConsentChannel"
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "bannerDesignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "action": {
+    "$ref": "#/components/schemas/DeviceConsentAction"
+   },
+   "categories": {
+    "type": "array",
+    "description": "Required for `savePreferences`; ignored for the other actions, which decide every category themselves.",
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "decision"
+     ],
+     "properties": {
+      "category": {
+       "$ref": "#/components/schemas/CookieCategory"
+      },
+      "decision": {
+       "type": "string",
+       "enum": [
+        "granted",
+        "declined"
+       ]
+      }
+     }
+    }
+   },
+   "noticeVersion": {
+    "type": "string"
+   },
+   "language": {
+    "type": "string",
+    "maxLength": 10,
+    "nullable": true
+   },
+   "globalPrivacyControl": {
+    "type": "boolean",
+    "default": false
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "RegisterGuestRequest": {
   "type": "object",
   "required": [
@@ -982,6 +2491,7 @@
     "type": "string",
     "minLength": 8,
     "maxLength": 256,
+    "writeOnly": true,
     "description": "Optional. OTP-only accounts are supported and are the default."
    },
    "preferredLanguage": {
@@ -1005,30 +2515,6 @@
       }
      }
     }
-   }
-  }
- },
- "RoleSummary": {
-  "x-ticvai-persistence": "none — projection over role",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "isPrimary": {
-    "type": "boolean"
    }
   }
  },
@@ -1098,46 +2584,6 @@
    }
   }
  },
- "SsoProtocol": {
-  "type": "string",
-  "enum": [
-   "oidc",
-   "saml2"
-  ]
- },
- "SsoProvider": {
-  "x-ticvai-persistence": "identity.sso_provider",
-  "type": "object",
-  "required": [
-   "id",
-   "displayName",
-   "protocol"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "protocol": {
-    "$ref": "#/components/schemas/SsoProtocol"
-   },
-   "iconAssetRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "isEnforced": {
-    "type": "boolean",
-    "description": "True disables password login for principals covered by this provider."
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
-   }
-  }
- },
  "TokenPair": {
   "x-ticvai-persistence": "none — transient",
   "type": "object",
@@ -1160,6 +2606,61 @@
    }
   }
  },
+ "VisitReminder": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.visit_reminder",
+  "description": "**One reminder per booking, set by the guest.** Not a marketing message: it is sent only for a booking the guest holds, and only on channels they still consent to.\n**One per booking per guest** (decided 28 September, audit R123 (8)): unique on `orderId` and `subjectId`. Two guests sharing a booking each keep their own reminder, and `setVisitReminder` replaces the caller's own rather than adding a second.\n",
+  "required": [
+   "enabled"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The guest who set it. A booking shared with others reminds only the guest who asked."
+   },
+   "enabled": {
+    "type": "boolean"
+   },
+   "leadTimeMinutes": {
+    "type": "integer",
+    "minimum": 15,
+    "maximum": 10080,
+    "default": 1440,
+    "description": "How long before each session starts. A day by default; a week at most."
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "push",
+      "email",
+      "sms"
+     ]
+    },
+    "default": [
+     "push"
+    ]
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   }
+  }
+ },
  "WalletPass": {
   "type": "object",
   "x-ticvai-persistence": "orders.wallet_pass",
@@ -1178,7 +2679,7 @@
    },
    "entitlementId": {
     "type": "string",
-    "format": "uuid"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "platform": {
     "type": "string",
@@ -1193,6 +2694,7 @@
    "authenticationToken": {
     "type": "string",
     "format": "password",
+    "writeOnly": true,
     "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
    },
    "status": {
@@ -1265,7 +2767,9 @@
        "nullable": true
       },
       "price": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "x-ticvai-column": "list_price",
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "The variant's current list price when the wishlist is read. Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column); the wire keeps `price`."
       },
       "imageAssetRef": {
        "type": "string",
@@ -1289,6 +2793,92 @@
       }
      }
     }
+   }
+  }
+ },
+ "WorkstationContext": {
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "venueId",
+   "regionId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Inherited from the workstation, never selected by the operator."
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "driver"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "receiptPrinter",
+        "ticketPrinter",
+        "cashDrawer",
+        "barcodeScanner",
+        "rfidReader",
+        "paymentTerminal",
+        "customerDisplay"
+       ]
+      },
+      "driver": {
+       "type": "string"
+      },
+      "identifier": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4
+   },
+   "timezone": {
+    "type": "string"
+   },
+   "cellName": {
+    "type": "string",
+    "description": "The cell serving this workstation's region. One cell per tenant per region (ADR-0014). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+   },
+   "deploymentProfile": {
+    "type": "string",
+    "enum": [
+     "terminalLocal",
+     "venueEdge",
+     "thin"
+    ],
+    "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
    }
   }
  }

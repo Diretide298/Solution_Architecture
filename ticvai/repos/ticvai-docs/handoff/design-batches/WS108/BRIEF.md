@@ -1,6 +1,6 @@
 # WS108 — ACCREDITATION board 1
 
-**10 screens · 7 operations · 6 schemas · 4 permissions**
+**10 screens · 12 operations · 6 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,15 +61,15 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-615` | Accreditation Command Center | listDetail | 2 | 0 | — |
-| `BO-616` | Accreditation Application Directory | listDetail | 1 | 0 | — |
-| `BO-617` | New Accreditation Application | listDetail | 1 | 0 | — |
-| `BO-618` | Accreditation Form Builder | configEditor | 1 | 0 | — |
+| `BO-616` | Accreditation Application Directory | listDetail | 2 | 0 | — |
+| `BO-617` | New Accreditation Application | listDetail | 3 | 0 | — |
+| `BO-618` | Accreditation Form Builder | configEditor | 2 | 0 | — |
 | `BO-619` | Accreditation Category Management | listDetail | 1 | 0 | — |
-| `BO-620` | Accreditation Program Setup | listDetail | 1 | 0 | — |
+| `BO-620` | Accreditation Program Setup | listDetail | 4 | 0 | — |
 | `BO-621` | Applicant Type Configuration | listDetail | 1 | 0 | — |
 | `BO-622` | Application Requirements Matrix | listDetail | 1 | 0 | — |
 | `BO-623` | Accreditation Intake Monitor | listDetail | 1 | 0 | — |
-| `BO-624` | Registration Rules & Publication | listDetail | 1 | 0 | — |
+| `BO-624` | Registration Rules & Publication | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 

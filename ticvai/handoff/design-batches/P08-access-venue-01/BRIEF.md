@@ -1,6 +1,6 @@
 # P08-access-venue-01 — P08 · Access & Venue (1 of 3)
 
-**10 screens · 64 operations · 70 schemas · 21 permissions**
+**10 screens · 65 operations · 82 schemas · 22 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 21 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, ASSET_MANAGE, ASSET_VIEW, EVENT_CONFIGURE, MAINTENANCE_APPROVE, MAINTENANCE_EXECUTE, MARKETING_MANAGE, MARKETING_SEND, MARKETING_VIEW, ORDER_REFUND_APPROVE, ORDER_REFUND_BULK, PARKING_CONFIGURE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 22 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AI_USE, ASSET_MANAGE, ASSET_VIEW, EVENT_CONFIGURE, MAINTENANCE_APPROVE, MAINTENANCE_EXECUTE, MARKETING_MANAGE, MARKETING_SEND, MARKETING_VIEW, ORDER_REFUND_APPROVE, ORDER_REFUND_BULK`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -64,7 +64,7 @@ convincingly. It is never a caption.
 | `BO-002` | Queue Configuration | listDetail | 14 | 8 | — |
 | `BO-003` | Queue Integration Setup | listDetail | 4 | 1 | — |
 | `BO-004` | Manual Wait Time Entry | approvalInbox | 11 | 7 | — |
-| `BO-005` | Queue Monitor | listDetail | 20 | 11 | — |
+| `BO-005` | Queue Monitor | listDetail | 21 | 11 | — |
 | `BO-006` | Parking Configuration | listDetail | 4 | 2 | — |
 | `BO-030` | Work Order Verification | listDetail | 9 | 6 | — |
 | `BO-031` | Asset Register | listDetail | 7 | 3 | — |

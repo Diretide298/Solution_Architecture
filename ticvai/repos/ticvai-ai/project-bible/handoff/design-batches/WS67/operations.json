@@ -1,1 +1,198 @@
-{}
+{
+ "createDashboard": {
+  "method": "POST",
+  "path": "/dashboards",
+  "contract": "reporting",
+  "summary": "Create a dashboard",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateDashboardRequest",
+  "responds": "Dashboard"
+ },
+ "createKpi": {
+  "method": "POST",
+  "path": "/kpis",
+  "contract": "reporting",
+  "summary": "Define a KPI once, for everywhere",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "KpiDefinition",
+  "responds": "KpiDefinition"
+ },
+ "deleteDashboard": {
+  "method": "DELETE",
+  "path": "/dashboards/{dashboardId}",
+  "contract": "reporting",
+  "summary": "Archive a dashboard",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getDashboard": {
+  "method": "GET",
+  "path": "/dashboards/{dashboardId}",
+  "contract": "reporting",
+  "summary": "Read a dashboard with tile data",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "refresh",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DashboardData"
+ },
+ "getSemanticModel": {
+  "method": "GET",
+  "path": "/semantic-model",
+  "contract": "reporting",
+  "summary": "The business data catalogue reports are built from",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SemanticModel"
+ },
+ "listAnalyticsPipelines": {
+  "method": "GET",
+  "path": "/analytics-pipelines",
+  "contract": "reporting",
+  "summary": "Data sources, refresh state and freshness",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AnalyticsPipeline"
+ },
+ "listDashboards": {
+  "method": "GET",
+  "path": "/dashboards",
+  "contract": "reporting",
+  "summary": "List dashboards",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "includeArchived",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "Dashboard"
+ },
+ "listKpis": {
+  "method": "GET",
+  "path": "/kpis",
+  "contract": "reporting",
+  "summary": "The enterprise KPI library",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "KpiDefinition"
+ },
+ "recordDashboardView": {
+  "method": "POST",
+  "path": "/dashboards/{dashboardId}/views",
+  "contract": "reporting",
+  "summary": "Record that a dashboard was opened",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setKpiTargets": {
+  "method": "PUT",
+  "path": "/kpis/{kpiId}/targets",
+  "contract": "reporting",
+  "summary": "Targets, thresholds and what red means",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiTarget"
+ },
+ "updateDashboard": {
+  "method": "PUT",
+  "path": "/dashboards/{dashboardId}",
+  "contract": "reporting",
+  "summary": "Update a dashboard",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateDashboardRequest",
+  "responds": "Dashboard"
+ }
+}

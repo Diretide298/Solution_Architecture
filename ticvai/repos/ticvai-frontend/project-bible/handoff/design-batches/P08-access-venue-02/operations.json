@@ -207,6 +207,21 @@
     "name": "withinDays",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -235,6 +250,16 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "workstation",
   "parameters": [
+   {
+    "name": "sinceVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "validFrom",
     "in": "query",
@@ -479,6 +504,19 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listCatalogueBundles": {
+  "method": "GET",
+  "path": "/catalogue/bundles",
+  "contract": "catalogue",
+  "summary": "List published catalogue bundles",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BundleSummary"
+ },
  "listGames": {
   "method": "GET",
   "path": "/games",
@@ -552,6 +590,60 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -881,6 +973,65 @@
   ],
   "requestBody": "ReportIncidentRequest",
   "responds": "Incident"
+ },
+ "searchMedia": {
+  "method": "GET",
+  "path": "/media",
+  "contract": "assets",
+  "summary": "Search the asset library",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "collectionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "unusedOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "rightsExpiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "setAssetStatus": {
   "method": "PUT",

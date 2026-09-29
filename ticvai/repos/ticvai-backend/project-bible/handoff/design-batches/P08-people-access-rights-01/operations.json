@@ -183,6 +183,19 @@
   "requestBody": null,
   "responds": "AnnouncementReach"
  },
+ "getApprovalRequestScore": {
+  "method": "GET",
+  "path": "/approval-requests/{approvalRequestId}/score",
+  "contract": "ai",
+  "summary": "The latest context score of an approval request",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiApprovalRequestScore"
+ },
  "getPrincipal": {
   "method": "GET",
   "path": "/principals/{principalId}",
@@ -195,6 +208,74 @@
   "parameters": [],
   "requestBody": null,
   "responds": "Principal"
+ },
+ "listAccessReviewCampaigns": {
+  "method": "GET",
+  "path": "/access-review-campaigns",
+  "contract": "identity",
+  "summary": "Access review campaigns, open first",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAccessReviewItems": {
+  "method": "GET",
+  "path": "/access-review-campaigns/{campaignId}/items",
+  "contract": "identity",
+  "summary": "The grants a campaign asks somebody to certify or revoke",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "findingKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listAnnouncements": {
   "method": "GET",
@@ -288,6 +369,11 @@
     "required": null
    },
    {
+    "name": "sort",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -342,6 +428,65 @@
   "parameters": [],
   "requestBody": null,
   "responds": "WorkforceJobTitle"
+ },
+ "listPermissionFindings": {
+  "method": "GET",
+  "path": "/permission-findings",
+  "contract": "identity",
+  "summary": "Excessive, missing and conflicting permissions, per principal or role",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "roleId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "lookbackDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "deniedThreshold",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "draftPolicyId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPrincipals": {
   "method": "GET",
@@ -614,7 +759,7 @@
   "summary": "Save a tick-set under a name",
   "permission": "ROLE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -663,6 +808,60 @@
   ],
   "requestBody": "WorkforceWorkAssignment",
   "responds": "WorkforceWorkAssignment"
+ },
+ "suggestRoleAssignment": {
+  "method": "GET",
+  "path": "/role-suggestions",
+  "contract": "identity",
+  "summary": "Which roles a person should probably hold, from peers with the same job and posting",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "jobTitleId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "minPeerShare",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "minPeers",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "lookbackDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "updatePrincipal": {
   "method": "PATCH",

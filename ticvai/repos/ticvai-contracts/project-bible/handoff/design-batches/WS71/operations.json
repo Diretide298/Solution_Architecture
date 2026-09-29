@@ -1,1 +1,356 @@
-{}
+{
+ "createKpi": {
+  "method": "POST",
+  "path": "/kpis",
+  "contract": "reporting",
+  "summary": "Define a KPI once, for everywhere",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "KpiDefinition",
+  "responds": "KpiDefinition"
+ },
+ "getAnalyticsBenchmark": {
+  "method": "GET",
+  "path": "/analytics-benchmarks",
+  "contract": "reporting",
+  "summary": "One site against another, on a like-for-like basis",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "kpiId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "scopePaths",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "normaliseBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "BenchmarkRow"
+ },
+ "getAnalyticsUsage": {
+  "method": "GET",
+  "path": "/analytics-usage",
+  "contract": "reporting",
+  "summary": "Which dashboards and reports are actually used, and what they cost",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AnalyticsUsageRow"
+ },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
+ },
+ "getSemanticModel": {
+  "method": "GET",
+  "path": "/semantic-model",
+  "contract": "reporting",
+  "summary": "The business data catalogue reports are built from",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SemanticModel"
+ },
+ "listAnalyticsPipelines": {
+  "method": "GET",
+  "path": "/analytics-pipelines",
+  "contract": "reporting",
+  "summary": "Data sources, refresh state and freshness",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AnalyticsPipeline"
+ },
+ "listDashboards": {
+  "method": "GET",
+  "path": "/dashboards",
+  "contract": "reporting",
+  "summary": "List dashboards",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "includeArchived",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "Dashboard"
+ },
+ "listKpis": {
+  "method": "GET",
+  "path": "/kpis",
+  "contract": "reporting",
+  "summary": "The enterprise KPI library",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "KpiDefinition"
+ },
+ "listSecurityDetectionGovernance": {
+  "method": "GET",
+  "path": "/security-detection-governance",
+  "contract": "access",
+  "summary": "Security Analytics, AI Detection & Governance",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "park",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "reseller",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "credentialType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "media",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "device",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "gate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "timeDay",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "SecurityAnalyticsAiDetectionGovernanceView"
+ },
+ "listSiteNormalisationBases": {
+  "method": "GET",
+  "path": "/site-normalisation-bases",
+  "contract": "reporting",
+  "summary": "The denominators each site is benchmarked by",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "periodFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "periodTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setKpiTargets": {
+  "method": "PUT",
+  "path": "/kpis/{kpiId}/targets",
+  "contract": "reporting",
+  "summary": "Targets, thresholds and what red means",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiTarget"
+ },
+ "setSemanticModel": {
+  "method": "PUT",
+  "path": "/semantic-model",
+  "contract": "reporting",
+  "summary": "Publish the catalogue",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SemanticModel",
+  "responds": "SemanticModel"
+ },
+ "setSiteNormalisationBasis": {
+  "method": "PUT",
+  "path": "/site-normalisation-bases",
+  "contract": "reporting",
+  "summary": "Set the denominators a site is benchmarked by",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SiteNormalisationBasis"
+ }
+}

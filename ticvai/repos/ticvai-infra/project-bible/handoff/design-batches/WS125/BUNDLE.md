@@ -1,6 +1,6 @@
 # WS125 — Event Management Configuration Backend Structure v1.0 board 1
 
-**3 screens · 4 operations · 2 schemas · 2 permissions**
+**3 screens · 4 operations · 3 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -562,6 +562,50 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "Event": {
+  "x-ticvai-persistence": "catalogue.event",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "parentEventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For grouped events."
+   },
+   "performanceCount": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "How many performances the event has. Counted by the server; never sent by a client."
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
  "EventType": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.event_type",

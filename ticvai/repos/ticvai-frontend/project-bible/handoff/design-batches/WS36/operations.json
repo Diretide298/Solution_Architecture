@@ -1,4 +1,38 @@
 {
+ "getVatReturn": {
+  "method": "GET",
+  "path": "/tax/vat-returns",
+  "contract": "finance",
+  "summary": "A legal entity's VAT return for a tax period, in the FTA's boxes",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "format",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FinVatReturn"
+ },
  "listCalculationValidationReconciliation": {
   "method": "GET",
   "path": "/calculation-validation-reconciliation",
@@ -8,9 +42,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "resultKind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "area",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "passed",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CalculationValidationReconciliationServiceInterfaceView"
+  "responds": "Page"
  },
  "listCurrencyPrecisionRounding": {
   "method": "GET",
@@ -25,6 +90,69 @@
   "requestBody": null,
   "responds": "CurrencyPrecisionRoundingMonetaryRulesView"
  },
+ "listEInvoiceTransmissions": {
+  "method": "GET",
+  "path": "/e-invoicing/transmissions",
+  "contract": "finance",
+  "summary": "What was sent to the e-invoicing provider, and what came back",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "documentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listEInvoicingProviders": {
+  "method": "GET",
+  "path": "/e-invoicing/providers",
+  "contract": "finance",
+  "summary": "The e-invoicing service provider connection per legal entity",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listFeeSurcharge": {
   "method": "GET",
   "path": "/fee-surcharge",
@@ -34,9 +162,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "feeType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "FeeSurchargeLibraryView"
+  "responds": "Page"
  },
  "listFeeWaiverTax": {
   "method": "GET",
@@ -47,9 +201,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "exceptionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eligibilityBasis",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "FeeWaiverTaxExemptionExceptionRulesView"
+  "responds": "Page"
  },
  "listPriceCalculationSequence": {
   "method": "GET",
@@ -60,9 +240,30 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "calculationProfileId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "asOf",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PriceCalculationSequenceFormulaEngineView"
+  "responds": "Page"
  },
  "listTaxFeeCalculation": {
   "method": "GET",
@@ -75,43 +276,164 @@
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "tax",
+    "name": "type",
     "in": "query",
     "required": false
    },
    {
-    "name": "fee",
+    "name": "country",
     "in": "query",
     "required": false
    },
    {
-    "name": "surcharge",
+    "name": "legalEntity",
     "in": "query",
     "required": false
    },
    {
-    "name": "waiver",
+    "name": "status",
     "in": "query",
     "required": false
    },
    {
-    "name": "exemption",
+    "name": "search",
     "in": "query",
     "required": false
    },
    {
-    "name": "calculationProfile",
-    "in": "query",
-    "required": false
+    "name": null,
+    "in": null,
+    "required": null
    },
    {
-    "name": "roundingProfile",
-    "in": "query",
-    "required": false
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "TaxFeeCalculationCommandCenterView"
+  "responds": "Page"
+ },
+ "listTaxInvoiceTemplates": {
+  "method": "GET",
+  "path": "/tax-invoice-templates",
+  "contract": "finance",
+  "summary": "Invoice and credit memo templates and number series, per legal entity",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTaxInvoices": {
+  "method": "GET",
+  "path": "/tax-invoices",
+  "contract": "finance",
+  "summary": "Tax invoices issued, newest first",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "invoiceType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setCurrencyRoundingRule": {
+  "method": "PUT",
+  "path": "/rounding-profiles",
+  "contract": "catalogue",
+  "summary": "Set precision and rounding for a currency",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RoundingProfile",
+  "responds": "RoundingProfile"
+ },
+ "setEInvoicingProvider": {
+  "method": "PUT",
+  "path": "/e-invoicing/providers",
+  "contract": "finance",
+  "summary": "Connect a legal entity to its accredited e-invoicing service provider",
+  "permission": "TAX_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FinEInvoicingProvider",
+  "responds": "FinEInvoicingProvider"
  },
  "setFeeApplicabilityCharging": {
   "method": "PUT",
@@ -122,9 +444,72 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "FeeApplicabilityChargingRuleBuilderInput",
   "responds": "FeeApplicabilityChargingRuleBuilderView"
+ },
+ "setFeeDefinition": {
+  "method": "PUT",
+  "path": "/fees",
+  "contract": "catalogue",
+  "summary": "Create or update a fee or surcharge",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PricingFee",
+  "responds": "PricingFee"
+ },
+ "setPriceCalculationPolicy": {
+  "method": "PUT",
+  "path": "/calculation-profiles",
+  "contract": "catalogue",
+  "summary": "Save a price calculation sequence, whole",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CalculationProfile",
+  "responds": "CalculationProfile"
+ },
+ "setTaxInvoiceTemplate": {
+  "method": "PUT",
+  "path": "/tax-invoice-templates",
+  "contract": "finance",
+  "summary": "Set a legal entity's template and number series for one document kind",
+  "permission": "TAX_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FinTaxInvoiceTemplate",
+  "responds": "FinTaxInvoiceTemplate"
  },
  "setTaxProfileJurisdiction": {
   "method": "PUT",
@@ -135,7 +520,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "TaxProfileJurisdictionConfigurationInput",
   "responds": "TaxProfileJurisdictionConfigurationView"
  },
@@ -148,7 +539,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "TaxRuleTreatmentBuilderInput",
   "responds": "TaxRuleTreatmentBuilderView"
  },
@@ -161,8 +558,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PriceBreakdownCalculationSimulationExplainabilityInput",
   "responds": "PriceBreakdownCalculationSimulationExplainabilityView"
+ },
+ "transmitEInvoices": {
+  "method": "POST",
+  "path": "/e-invoicing/transmissions",
+  "contract": "finance",
+  "summary": "Send issued tax documents to the e-invoicing provider",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }

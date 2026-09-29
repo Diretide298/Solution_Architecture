@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-168` | Advanced Offer Command Center | commandCentre | 1 | 0 | — |
+| `ADM-168` | Advanced Offer Command Center | commandCentre | 2 | 0 | — |
 | `ADM-169` | Buy X Get Y / BOGO Rule Builder | configEditor | 1 | 0 | — |
 | `ADM-170` | Multi-Buy & Quantity Offer Configurator | configEditor | 1 | 0 | — |
 | `ADM-171` | Cheapest / Lowest-Value Item Promotion | configEditor | 1 | 0 | — |
@@ -74,4 +73,4 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**ADM-170, ADM-174, ADM-175, ADM-177 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-170, ADM-174, ADM-175 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

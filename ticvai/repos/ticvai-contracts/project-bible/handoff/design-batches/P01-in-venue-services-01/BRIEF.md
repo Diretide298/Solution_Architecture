@@ -1,6 +1,6 @@
 # P01-in-venue-services-01 — P01 · In-venue Services
 
-**6 screens · 23 operations · 37 schemas · 5 permissions**
+**6 screens · 28 operations · 62 schemas · 6 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, ORDER_MODIFY, PRODUCT_VIEW, QUEUE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `ORDER_CREATE, ORDER_MODIFY, PARKING_CONFIGURE, PRODUCT_VIEW, QUEUE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
@@ -61,9 +61,9 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-036` | F&B – Browse & Order | listDetail | 10 | 0 | — |
-| `WEB-037` | Menu Item Detail | listDetail | 2 | 0 | — |
-| `WEB-038` | F&B – Order Tracking | statusTracker | 3 | 0 | — |
+| `WEB-036` | F&B – Browse & Order | listDetail | 14 | 5 | — |
+| `WEB-037` | Menu Item Detail | listDetail | 2 | 1 | — |
+| `WEB-038` | F&B – Order Tracking | statusTracker | 3 | 1 | — |
 | `WEB-039` | Venue Map & Wait Times | listDetail | 4 | 0 | — |
-| `WEB-040` | Virtual Queue | statusTracker | 6 | 0 | — |
-| `WEB-041` | Parking – Reserve & Pay | listDetail | 3 | 0 | — |
+| `WEB-040` | Virtual Queue | statusTracker | 6 | 2 | — |
+| `WEB-041` | Parking – Reserve & Pay | listDetail | 5 | 2 | — |

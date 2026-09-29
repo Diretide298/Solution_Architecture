@@ -23,6 +23,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "ticketBundle",
     "in": "query",
     "required": false
@@ -61,10 +66,64 @@
     "name": "ticketParking",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "ticketFnb",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipPackage",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerBundle",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "hotelPackage",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dynamicBundle",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "buildYourOwnBundle",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
   "responds": "BundleComboCommandCenterView"
+ },
+ "listBundlePartnerProductMappings": {
+  "method": "GET",
+  "path": "/bundles/{bundleId}/partner-products",
+  "contract": "promotions",
+  "summary": "List a bundle's partner product mappings",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listBundlePricingCommercial": {
   "method": "GET",
@@ -91,6 +150,50 @@
   "parameters": [],
   "requestBody": null,
   "responds": "BundleValiditySchedulingRedemptionRulesView"
+ },
+ "listCommercialCampaigns": {
+  "method": "GET",
+  "path": "/commercial-campaigns",
+  "contract": "promotions",
+  "summary": "List commercial campaigns",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "q",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPartnerExternalProduct": {
   "method": "GET",
@@ -127,7 +230,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BundleComponentBuilderInput",
   "responds": "BundleComponentBuilderView"
  },
@@ -140,9 +249,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BundleDefinitionSetupInput",
   "responds": "BundleDefinitionSetupView"
+ },
+ "setBundlePartnerProductMappings": {
+  "method": "PUT",
+  "path": "/bundles/{bundleId}/partner-products",
+  "contract": "promotions",
+  "summary": "Set a bundle's partner product mappings",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "setGuestChoiceBuild": {
   "method": "PUT",
@@ -153,7 +287,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GuestChoiceBuildYourOwnBundleDesignerInput",
   "responds": "GuestChoiceBuildYourOwnBundleDesignerView"
  },
@@ -166,7 +306,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BundlePreviewSimulationAiRecommendationInput",
   "responds": "BundlePreviewSimulationAiRecommendationView"
  }

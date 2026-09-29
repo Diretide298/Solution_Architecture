@@ -149,7 +149,22 @@
    "emptyNoResults": "The filter narrowed it and the governance compliance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listApprovalControlPolicies",
+    "contract": "approvals",
+    "purpose": "Controls in force",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getApprovalAnalytics",
+    "contract": "approvals",
+    "purpose": "Governance posture",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Governance Compliance %",
@@ -162,7 +177,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-339"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-339",
+   "workshopBoard": "wireframes/WS35 Approval Workflows and Governance Board 6.dc.html#adm-339"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 50. 0 of 0 labels bound to a contract property; 8 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -207,6 +223,22 @@
    "component": "apps/ticvai-web/src/routes/platform/SegregationOfDutiesPolicyManager.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-339"
+   ],
+   "exitTo": [
+    "ADM-339"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-339",
+     "trigger": "Back to Governance & Compliance Command Center",
+     "provenance": "structural — pack board 6 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Price Configuration User) and no display directory — it is settings, not a population",
@@ -229,6 +261,20 @@
        "kind": "selectField",
        "label": "=R",
        "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 51 §Price Configuration User"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setSegregationRules",
+       "label": "Save segregation rules",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setSegregationRules"
       }
      ]
     }
@@ -240,28 +286,21 @@
    "emptyFirstRun": "No segregation duties policy configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setSegregationRules",
+    "contract": "identity",
+    "purpose": "Which roles may not be held together",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-340"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-340",
+   "workshopBoard": "wireframes/WS35 Approval Workflows and Governance Board 6.dc.html#adm-340"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 51. 0 of 0 labels bound to a contract property; 1 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-339"
-   ],
-   "exitTo": [
-    "ADM-339"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-339",
-     "trigger": "Back to Governance & Compliance Command Center",
-     "provenance": "structural — pack board 6 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -303,6 +342,22 @@
    "route": "/platform/four-eyes-dual-control-policy-adm-341",
    "component": "apps/ticvai-web/src/routes/platform/FourEyesDualControlPolicy.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-339"
+   ],
+   "exitTo": [
+    "ADM-339"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-339",
+     "trigger": "Back to Governance & Compliance Command Center",
+     "provenance": "structural — pack board 6 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "configEditor",
@@ -360,28 +415,31 @@
    "emptyFirstRun": "No four-eyes dual- policy configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setApprovalControlPolicy",
+    "contract": "approvals",
+    "purpose": "Four-eyes and dual control",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listApprovalControlPolicies"
+    ]
+   },
+   {
+    "operationId": "listApprovalControlPolicies",
+    "contract": "approvals",
+    "purpose": "What is already required",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-341"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-341",
+   "workshopBoard": "wireframes/WS35 Approval Workflows and Governance Board 6.dc.html#adm-341"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 7 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-339"
-   ],
-   "exitTo": [
-    "ADM-339"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-339",
-     "trigger": "Back to Governance & Compliance Command Center",
-     "provenance": "structural — pack board 6 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -424,29 +482,65 @@
    "component": "apps/ticvai-web/src/routes/platform/AuthenticationMfaPolicyManager.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-339"
+   ],
+   "exitTo": [
+    "ADM-339"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-339",
+     "trigger": "Back to Governance & Compliance Command Center",
+     "provenance": "structural — pack board 6 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define the authentication strength required before an approver can execute sensitive approval decisions. The source requires authentication before approval actions and supports MFA for sensitive approvals.",
-  "gaps": [],
+  "gaps": [
+   {
+    "operation": "setPasswordPolicy",
+    "why": "**`setPasswordPolicy` replaces the whole policy and nothing reads it.** identity has no `getPasswordPolicy`, so this screen cannot show the tenant's current `mfaRequiredForPermissions` (or the rest of the policy it must send back unchanged). Handed to the contracts group (audit R135).",
+    "source": "contract identity.yaml PUT /password-policy"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 53"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 53"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setStepUpPolicy"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "components": [
       {
        "kind": "dataTable",
        "derived": true,
-       "impliedBy": "listMfaMethods",
+       "impliedBy": "listStepUpPolicies",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setStepUpPolicy",
-       "label": "Save step up policy",
-       "notes": "The act the screen exists for."
       },
       {
        "kind": "secondaryButton",
@@ -454,6 +548,24 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setStepUpPolicy"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Permissions that require MFA",
+       "bindsTo": "PasswordPolicy",
+       "columns": [
+        "PasswordPolicy.mfaRequiredForPermissions"
+       ],
+       "operation": "setPasswordPolicy",
+       "notes": "**MFA is required by permission (decided 28 September, audit R135).** A principal holding any permission listed here must present a second factor at sign-in and keep an active method. The floor — `ROLE_MANAGE`, `LEDGER_APPROVE` and every `PLATFORM_*` permission — is shown locked: the tenant may add permissions and never drop a floor entry (`setPasswordPolicy` refuses such a body with 400).",
+       "provenance": "contract identity.yaml PUT /password-policy"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save MFA requirement",
+       "operation": "setPasswordPolicy",
+       "notes": "**Staff factors only.** Guest two-step verification is not set here: it is a per-venue option in Venue Management (`VenueSettings.identity.guestTwoStep`, BO-065), off unless the venue enables it (decided 29 September, rev 3 GAP-B1, superseding the second part of audit R167).",
+       "provenance": "contract identity.yaml PUT /password-policy"
       }
      ]
     }
@@ -483,33 +595,38 @@
     ]
    },
    {
+    "operationId": "setPasswordPolicy",
+    "contract": "identity",
+    "purpose": "Which permissions require MFA (`mfaRequiredForPermissions`) — add above the floor, never drop (decided 28 September, audit R135)",
+    "trigger": "onAction"
+   },
+   {
     "operationId": "listMfaMethods",
     "contract": "identity",
     "purpose": "Which methods approvers have enrolled, because a policy demanding a factor nobody holds locks the action",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGuestVerificationPolicy",
+    "contract": "identity",
+    "purpose": "The tenant's guest identity-verification workflow",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setGuestVerificationPolicy",
+    "contract": "identity",
+    "purpose": "Set which verifications guests must pass, and when",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-342"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-342",
+   "workshopBoard": "wireframes/WS35 Approval Workflows and Governance Board 6.dc.html#adm-342"
   },
-  "apisNote": "**Wired on 10 September 2026.** This screen came from the workshop pack `Approval_Workflows_and_Governance` board 6 and declared no operation at all - its own `gaps` entry read *the name promises authoring and the contract offers none*. It now reads and raises `StepUpPolicy`.\n\n**`listMfaMethods` is here for a reason that is easy to miss.** A policy demanding `mfa` on an action whose approvers have enrolled no method does not secure the action, it stops it - and the person who finds out is an approver with a decision in front of them.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-339"
-   ],
-   "exitTo": [
-    "ADM-339"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-339",
-     "trigger": "Back to Governance & Compliance Command Center",
-     "provenance": "structural — pack board 6 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -551,6 +668,22 @@
    "route": "/platform/sensitive-action-confirmation-adm-343",
    "component": "apps/ticvai-web/src/routes/platform/SensitiveActionConfirmation.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-339"
+   ],
+   "exitTo": [
+    "ADM-339"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-339",
+     "trigger": "Back to Governance & Compliance Command Center",
+     "provenance": "structural — pack board 6 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "configEditor",
@@ -603,28 +736,31 @@
    "emptyFirstRun": "No sensitive action confirmation configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setStepUpPolicy",
+    "contract": "approvals",
+    "purpose": "Which actions need re-authentication",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listStepUpPolicies"
+    ]
+   },
+   {
+    "operationId": "listStepUpPolicies",
+    "contract": "approvals",
+    "purpose": "Policies in force",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-343"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-343",
+   "workshopBoard": "wireframes/WS35 Approval Workflows and Governance Board 6.dc.html#adm-343"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 6 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-339"
-   ],
-   "exitTo": [
-    "ADM-339"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-339",
-     "trigger": "Back to Governance & Compliance Command Center",
-     "provenance": "structural — pack board 6 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -666,6 +802,22 @@
    "route": "/platform/digital-signature-management-adm-344",
    "component": "apps/ticvai-web/src/routes/platform/DigitalSignatureManagement.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-339"
+   ],
+   "exitTo": [
+    "ADM-339"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-339",
+     "trigger": "Back to Governance & Compliance Command Center",
+     "provenance": "structural — pack board 6 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "configEditor",
@@ -723,25 +875,29 @@
    "emptyFirstRun": "No digital signature configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "signApprovalDecision",
+    "contract": "approvals",
+    "purpose": "Signature methods in use",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getApprovalRecord"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-344"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-344",
+   "workshopBoard": "wireframes/WS35 Approval Workflows and Governance Board 6.dc.html#adm-344"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 8 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-339"
-   ],
-   "exitTo": [
-    "ADM-339"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "ADM-339",
-     "trigger": "Back to Governance & Compliance Command Center",
-     "provenance": "structural — pack board 6 wiring, 9 September 2026",
-     "back": true
+     "name": "requestId",
+     "from": "navigation"
     }
    ]
   },
@@ -786,6 +942,22 @@
    "route": "/platform/immutable-approval-record-tamper-detection-adm-345",
    "component": "apps/ticvai-web/src/routes/platform/ImmutableApprovalRecordTamperDetection.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-339"
+   ],
+   "exitTo": [
+    "ADM-339"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-339",
+     "trigger": "Back to Governance & Compliance Command Center",
+     "provenance": "structural — pack board 6 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "listDetail",
@@ -858,7 +1030,15 @@
    "emptyNoResults": "The filter narrowed it and the immutable approval record are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getApprovalRecord",
+    "contract": "approvals",
+    "purpose": "Chained records, verified on read",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Record Integrity: VERIFIED ✓",
@@ -867,29 +1047,20 @@
     "User/service",
     "Date/time",
     "attempted action"
+   ],
+   "params": [
+    {
+     "name": "requestId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-345"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-345",
+   "workshopBoard": "wireframes/WS35 Approval Workflows and Governance Board 6.dc.html#adm-345"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 55. 0 of 9 labels bound to a contract property; 9 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-339"
-   ],
-   "exitTo": [
-    "ADM-339"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-339",
-     "trigger": "Back to Governance & Compliance Command Center",
-     "provenance": "structural — pack board 6 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -931,6 +1102,22 @@
    "route": "/platform/approval-record-retention-policy-adm-346",
    "component": "apps/ticvai-web/src/routes/platform/ApprovalRecordRetentionPolicy.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-339"
+   ],
+   "exitTo": [
+    "ADM-339"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-339",
+     "trigger": "Back to Governance & Compliance Command Center",
+     "provenance": "structural — pack board 6 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "configEditor",
@@ -993,25 +1180,43 @@
    "emptyFirstRun": "No approval record retention configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setApprovalRetentionPolicy",
+    "contract": "approvals",
+    "purpose": "How long records are kept",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getApprovalRecord"
+    ]
+   },
+   {
+    "operationId": "listDataRetentionSettings",
+    "contract": "tenancy",
+    "purpose": "Retention period per data class",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setDataRetentionSetting",
+    "contract": "tenancy",
+    "purpose": "Set a class's period (approvalRecord, aiDecisionRecords)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-346"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-346",
+   "workshopBoard": "wireframes/WS35 Approval Workflows and Governance Board 6.dc.html#adm-346"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 56. 0 of 0 labels bound to a contract property; 8 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-339"
-   ],
-   "exitTo": [
-    "ADM-339"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "ADM-339",
-     "trigger": "Back to Governance & Compliance Command Center",
-     "provenance": "structural — pack board 6 wiring, 9 September 2026",
-     "back": true
+     "name": "dataClass",
+     "from": "navigation"
     }
    ]
   },
@@ -1056,6 +1261,22 @@
    "route": "/platform/regulatory-audit-evidence-center-adm-347",
    "component": "apps/ticvai-web/src/routes/platform/RegulatoryAuditEvidenceCenter.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-339"
+   ],
+   "exitTo": [
+    "ADM-339"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-339",
+     "trigger": "Back to Governance & Compliance Command Center",
+     "provenance": "structural — pack board 6 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "listDetail",
@@ -1111,28 +1332,21 @@
    "emptyNoResults": "The filter narrowed it and the regulatory audit evidence are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createApprovalEvidencePackage",
+    "contract": "approvals",
+    "purpose": "Assemble what an auditor asked for",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-347"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-347",
+   "workshopBoard": "wireframes/WS35 Approval Workflows and Governance Board 6.dc.html#adm-347"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 57. 0 of 12 labels bound to a contract property; 12 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-339"
-   ],
-   "exitTo": [
-    "ADM-339"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-339",
-     "trigger": "Back to Governance & Compliance Command Center",
-     "provenance": "structural — pack board 6 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1175,6 +1389,22 @@
    "component": "apps/ticvai-web/src/routes/platform/GovernanceRiskAiComplianceAdvisor.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-339"
+   ],
+   "exitTo": [
+    "ADM-339"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-339",
+     "trigger": "Back to Governance & Compliance Command Center",
+     "provenance": "structural — pack board 6 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1207,28 +1437,21 @@
    "emptyNoResults": "The filter narrowed it and the governance risk compliance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getApprovalAnalytics",
+    "contract": "approvals",
+    "purpose": "Risk and compliance posture",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-348"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-348",
+   "workshopBoard": "wireframes/WS35 Approval Workflows and Governance Board 6.dc.html#adm-348"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 58. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-339"
-   ],
-   "exitTo": [
-    "ADM-339"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-339",
-     "trigger": "Back to Governance & Compliance Command Center",
-     "provenance": "structural — pack board 6 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

@@ -18,11 +18,49 @@
   "requestBody": null,
   "responds": "Wishlist"
  },
- "completeSsoAuthorization": {
+ "bindCredentialDevice": {
   "method": "POST",
-  "path": "/auth/sso/{providerId}/callback",
+  "path": "/my/credentials/{credentialId}/device-bindings",
+  "contract": "access",
+  "summary": "Bind my credential to this device",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CredentialDeviceBindingInput",
+  "responds": "AccessDeviceBinding"
+ },
+ "claimDeviceConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents/claim-device",
+  "contract": "marketing-crm",
+  "summary": "Attach a browser's cookie decision to the guest who turned out to own it",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ClaimDeviceConsentRequest",
+  "responds": "ConsentState"
+ },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
   "contract": "identity",
-  "summary": "Exchange an SSO code for a session",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -35,7 +73,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "LoginResponse"
+  "responds": null
  },
  "deleteGuestAccount": {
   "method": "DELETE",
@@ -56,25 +94,6 @@
   "requestBody": null,
   "responds": null
  },
- "enrolMfaMethod": {
-  "method": "POST",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrol an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaEnrolment"
- },
  "exportSubjectData": {
   "method": "POST",
   "path": "/guests/{subjectId}/data-export",
@@ -93,6 +112,69 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "getCookieConsentRuntime": {
+  "method": "GET",
+  "path": "/storefront/cookie-consent",
+  "contract": "marketing-crm",
+  "summary": "What the page must show and what it may load",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "X-Consent-Key",
+    "in": "header",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "CookieConsentRuntime"
+ },
+ "getDeviceConsentHistory": {
+  "method": "GET",
+  "path": "/consent/device/history",
+  "contract": "marketing-crm",
+  "summary": "A visitor's own cookie decisions, oldest first",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "X-Consent-Key",
+    "in": "header",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "getEntitlement": {
   "method": "GET",
@@ -174,9 +256,73 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
+ },
+ "getOrderCalendarEvent": {
+  "method": "GET",
+  "path": "/orders/{orderId}/calendar-event",
+  "contract": "orders",
+  "summary": "The visit as a calendar entry",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getTaxDocumentRendition": {
+  "method": "GET",
+  "path": "/tax-documents/{documentId}/rendition",
+  "contract": "finance",
+  "summary": "The PDF of a tax invoice or credit memo, in a language",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FinTaxDocumentRendition"
+ },
+ "getTaxInvoice": {
+  "method": "GET",
+  "path": "/tax-invoices/{invoiceId}",
+  "contract": "finance",
+  "summary": "One tax invoice, with its lines, VAT per rate and credit memos",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FinTaxInvoice"
+ },
+ "getVisitReminder": {
+  "method": "GET",
+  "path": "/orders/{orderId}/reminder",
+  "contract": "orders",
+  "summary": "The guest's reminder for this booking",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VisitReminder"
  },
  "getWishlist": {
   "method": "GET",
@@ -202,6 +348,11 @@
   "scopeLevel": "tenant",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "allDevices",
     "in": "query",
     "required": null
@@ -209,6 +360,25 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "guestPasswordLogin": {
+  "method": "POST",
+  "path": "/auth/guest/password",
+  "contract": "identity",
+  "summary": "Sign in with an email or mobile and a password",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
  },
  "guestSocialLogin": {
   "method": "POST",
@@ -248,6 +418,25 @@
   "requestBody": null,
   "responds": "GuestSession"
  },
+ "issueTaxInvoice": {
+  "method": "POST",
+  "path": "/tax-invoices",
+  "contract": "finance",
+  "summary": "Issue a tax invoice for one or more paid orders",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FinIssueTaxInvoiceRequest",
+  "responds": "FinTaxInvoice"
+ },
  "issueWalletPass": {
   "method": "POST",
   "path": "/wallet-passes",
@@ -286,6 +475,55 @@
   "requestBody": null,
   "responds": null
  },
+ "listCreditMemos": {
+  "method": "GET",
+  "path": "/credit-memos",
+  "contract": "finance",
+  "summary": "Credit memos issued, newest first",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "taxInvoiceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "refundId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listEntitlements": {
   "method": "GET",
   "path": "/my/entitlements/all",
@@ -296,6 +534,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "includeExpired",
     "in": "query",
@@ -313,20 +556,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Entitlement"
- },
- "listMfaMethods": {
-  "method": "GET",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrolled MFA methods",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "MfaMethod"
+  "responds": "Page"
  },
  "listMyEntitlements": {
   "method": "GET",
@@ -338,6 +568,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "state",
     "in": "query",
@@ -360,7 +595,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Entitlement"
+  "responds": "Page"
  },
  "listMyOrders": {
   "method": "GET",
@@ -372,6 +607,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "since",
     "in": "query",
@@ -389,7 +629,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -445,37 +685,93 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listSsoProviders": {
+ "listPublishedTrackingTechnologies": {
   "method": "GET",
-  "path": "/auth/sso/providers",
-  "contract": "identity",
-  "summary": "Identity providers configured for this tenant",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "SsoProvider"
- },
- "login": {
-  "method": "POST",
-  "path": "/auth/login",
-  "contract": "identity",
-  "summary": "Authenticate and open a session",
+  "path": "/storefront/cookie-consent/technologies",
+  "contract": "marketing-crm",
+  "summary": "The approved cookie registry, as the preference centre shows it",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
+    "name": "channel",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
    }
   ],
-  "requestBody": "LoginRequest",
-  "responds": "LoginResponse"
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTaxInvoices": {
+  "method": "GET",
+  "path": "/tax-invoices",
+  "contract": "finance",
+  "summary": "Tax invoices issued, newest first",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "invoiceType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "recordConsent": {
   "method": "POST",
@@ -495,6 +791,25 @@
   ],
   "requestBody": "RecordConsentRequest",
   "responds": "ConsentState"
+ },
+ "recordDeviceConsent": {
+  "method": "POST",
+  "path": "/consent/device",
+  "contract": "marketing-crm",
+  "summary": "Record a visitor's cookie decision, before anyone is known",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordDeviceConsentRequest",
+  "responds": "DeviceConsent"
  },
  "refreshToken": {
   "method": "POST",
@@ -553,25 +868,6 @@
   "requestBody": null,
   "responds": null
  },
- "removeMfaMethod": {
-  "method": "DELETE",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Remove an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "requestGuestOtp": {
   "method": "POST",
   "path": "/auth/guest/otp",
@@ -591,24 +887,29 @@
   "requestBody": null,
   "responds": null
  },
- "startSsoAuthorization": {
-  "method": "GET",
-  "path": "/auth/sso/{providerId}/authorize",
-  "contract": "identity",
-  "summary": "Begin an SSO flow",
-  "permission": null,
+ "setVisitReminder": {
+  "method": "PUT",
+  "path": "/orders/{orderId}/reminder",
+  "contract": "orders",
+  "summary": "Turn a visit reminder on or off",
+  "permission": "ORDER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "redirectUri",
-    "in": "query",
-    "required": true
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
-  "requestBody": null,
-  "responds": null
+  "requestBody": "VisitReminder",
+  "responds": "VisitReminder"
  },
  "transferOrderTickets": {
   "method": "POST",
@@ -645,8 +946,8 @@
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": null
+  "requestBody": "GuestPreferences",
+  "responds": "GuestPreferences"
  },
  "updateMyProfile": {
   "method": "PATCH",
@@ -709,7 +1010,7 @@
   "method": "POST",
   "path": "/auth/mfa/challenge/{challengeId}/verify",
   "contract": "identity",
-  "summary": "Complete a step-up challenge",
+  "summary": "Complete a sign-in or step-up challenge",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -723,24 +1024,5 @@
   ],
   "requestBody": null,
   "responds": null
- },
- "verifyMfaEnrolment": {
-  "method": "POST",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Complete enrolment",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaMethod"
  }
 }

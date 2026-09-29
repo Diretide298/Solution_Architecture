@@ -1415,6 +1415,13 @@
     "contract": "access",
     "purpose": "Save retention rule",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listDataRetentionSettings",
+    "contract": "tenancy",
+    "purpose": "Tenant biometric retention and its legal limit",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

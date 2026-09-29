@@ -1512,6 +1512,158 @@
    "templateId"
   ]
  },
+ "MediaDesignStudioCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Design Studio Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "templateId": {
+    "type": "string",
+    "description": "Template ID"
+   },
+   "templateName": {
+    "type": "string",
+    "description": "Template Name"
+   },
+   "mediaType": {
+    "type": "string",
+    "enum": [
+     "qrTicket",
+     "dynamicQrTicket",
+     "barcodeTicket",
+     "mobileTicket",
+     "pdf",
+     "a4A5",
+     "thermal",
+     "pos",
+     "customPrint",
+     "appleWallet",
+     "googleWallet",
+     "rfidCard",
+     "rfidWristband",
+     "nfcCard",
+     "nfcWristband",
+     "membershipCard",
+     "customWearable"
+    ],
+    "description": "Media the template is for"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "productEventAssociation": {
+    "type": "string",
+    "description": "Product / Event association"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective To"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "scheduled",
+     "published",
+     "archived"
+    ],
+    "description": "Template status"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "lastModified": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Modified"
+   }
+  }
+ },
+ "MediaDesignStudioCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "totalMediaTemplates": {
+    "type": "integer",
+    "description": "Total Media Templates"
+   },
+   "published": {
+    "type": "integer",
+    "description": "Published"
+   },
+   "draft": {
+    "type": "integer",
+    "description": "Draft"
+   },
+   "pendingApproval": {
+    "type": "integer",
+    "description": "Pending Approval"
+   },
+   "scheduled": {
+    "type": "integer",
+    "description": "Scheduled"
+   },
+   "archived": {
+    "type": "integer",
+    "description": "Archived"
+   },
+   "qrDigitalTemplates": {
+    "type": "integer",
+    "description": "QR / Digital Templates"
+   },
+   "pdfPrintTemplates": {
+    "type": "integer",
+    "description": "PDF / Print Templates"
+   },
+   "appleWalletTemplates": {
+    "type": "integer",
+    "description": "Apple Wallet Templates"
+   },
+   "googleWalletTemplates": {
+    "type": "integer",
+    "description": "Google Wallet Templates"
+   },
+   "rfidNfcTemplates": {
+    "type": "integer",
+    "description": "RFID / NFC Templates"
+   },
+   "cardWristbandTemplates": {
+    "type": "integer",
+    "description": "Card / Wristband Templates"
+   },
+   "templatesRequiringReview": {
+    "type": "integer",
+    "description": "Templates Requiring Review"
+   },
+   "templatesWithValidationErrors": {
+    "type": "integer",
+    "description": "Templates with Validation Errors"
+   }
+  }
+ },
  "MultiMediaPreviewTestingApprovalPublicationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,

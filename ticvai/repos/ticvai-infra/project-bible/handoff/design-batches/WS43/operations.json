@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BulkProductCreationCatalogueImportInput",
   "responds": "BulkProductCreationCatalogueImportView"
  },
@@ -22,6 +28,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -40,9 +51,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "templateKind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ProductDuplicationTemplateLibraryView"
+  "responds": "Page"
  },
  "listProductImportExport": {
   "method": "GET",
@@ -53,9 +95,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "direction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "environment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ProductImportExportEnvironmentTransferView"
+  "responds": "Page"
  },
  "listProductLifecycle": {
   "method": "GET",
@@ -66,9 +139,134 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "productType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "lifecycleState",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "department",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveOn",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "createdFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "createdTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "modifiedSince",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ProductLifecycleCommandCenterView"
+  "responds": "Page"
+ },
+ "listScheduledLifecycleActions": {
+  "method": "GET",
+  "path": "/activation-scheduler",
+  "contract": "catalogue",
+  "summary": "Scheduled lifecycle actions, for the scheduler calendar",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "actionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "publishActivationScheduler": {
   "method": "PUT",
@@ -79,7 +277,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PublicationActivationSchedulerInput",
   "responds": "PublicationActivationSchedulerView"
  },
@@ -92,7 +296,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ChannelPublicationAvailabilityInput",
   "responds": "ChannelPublicationAvailabilityView"
  },
@@ -105,9 +315,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AiCatalogueBuilderConfigurationReviewInput",
   "responds": "AiCatalogueBuilderConfigurationReviewView"
+ },
+ "setConfigurationTemplate": {
+  "method": "PUT",
+  "path": "/configuration-templates",
+  "contract": "catalogue",
+  "summary": "Create or update a product or price-list template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConfigurationTemplate",
+  "responds": "ConfigurationTemplate"
  },
  "setLifecycleStatuWorkflow": {
   "method": "PUT",
@@ -118,7 +353,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "LifecycleStatusWorkflowConfigurationInput",
   "responds": "LifecycleStatusWorkflowConfigurationView"
  },
@@ -131,7 +372,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ProductContextOwnershipAssignmentInput",
   "responds": "ProductContextOwnershipAssignmentView"
  }

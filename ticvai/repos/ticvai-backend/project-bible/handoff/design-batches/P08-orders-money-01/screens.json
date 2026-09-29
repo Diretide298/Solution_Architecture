@@ -122,7 +122,9 @@
         "Product.media",
         "Product.consentQuestionIds",
         "Product.requiresTimeWindow",
-        "Product.segmentTags"
+        "Product.segmentTags",
+        "Product.salesContact",
+        "Product.bookingFlowId"
        ],
        "operation": "getProduct",
        "notes": "**What the guest sees of the product** (decided 29 September, rev 3). `guestListing`: bookable (the default), info only, or hidden; an info-only product keeps its details and photo, shows `notBookableLabel` (default \"Info only / Not bookable online\") and opens details instead of Add to basket, and `addCartLine` refuses it `409` (REV3-14). `displayTags`: up to six, each a kind (clock, height, free, calendar, id) and a label; with none, the guest app derives them from duration, validity and the height rule (23SEP-3). `media`: images and videos from the asset library, one of them primary, which is the photo on the ticket card and what Read more opens on (23SEP-4). `consentQuestionIds`: the consent questions this product asks, in order, from CMS-018 (REV3-26). `requiresTimeWindow`: a space sold by the hour, such as a meeting-room type; its lengths are a `length` attribute whose values carry `durationMinutes` (REV3-13).",
@@ -170,6 +172,43 @@
        "provenance": "contract catalogue.yaml PATCH /products/{productId}/variants/{variantId}"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Booking flow",
+       "bindsTo": "Product.bookingFlowId",
+       "operation": "listBookingFlows",
+       "notes": "**Which booking flow sells this product** (decided 29 September, W8 and W12): a flow from CMS-103, e.g. *workshop: product first, then date and time*. Empty means the category's flow, then the venue's flow for the product kind; the screen shows which one applies. Saved with `updateProduct`.",
+       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)"
+      },
+      {
+       "kind": "textField",
+       "label": "Sales phone",
+       "bindsTo": "Product.salesContact.phone",
+       "operation": "updateProduct",
+       "notes": "**Contact sales to book** (decided 29 September, W3). Shown beside `guestListing`; used only when the product is info only, as *Call sales* on WEB-004 and GST-004. Empty phone and email means the venue's contact.",
+       "provenance": "contract catalogue.yaml Product.salesContact"
+      },
+      {
+       "kind": "textField",
+       "label": "Sales email",
+       "bindsTo": "Product.salesContact.email",
+       "operation": "updateProduct",
+       "provenance": "contract catalogue.yaml Product.salesContact"
+      },
+      {
+       "kind": "textField",
+       "label": "Note under the contact",
+       "bindsTo": "Product.salesContact.note",
+       "operation": "updateProduct",
+       "notes": "At most 200 characters per language, e.g. *Group courses are booked by phone*.",
+       "provenance": "contract catalogue.yaml Product.salesContact"
+      }
+     ]
     }
    ]
   },
@@ -181,6 +220,13 @@
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listBookingFlows",
+    "contract": "white-label",
+    "purpose": "The booking flows a product can be sold through (W12)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, W12 (P29)"
+   },
    {
     "operationId": "getProduct",
     "contract": "catalogue",
@@ -331,7 +377,7 @@
     "id": "formUpdateProduct",
     "component": "modal",
     "trigger": "Save product",
-    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, and what the guest sees (decided 29 September, rev 3): `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (at most six, 23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26) and `requiresTimeWindow` (REV3-13). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, and what the guest sees (decided 29 September, rev 3): `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (at most six, 23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26) and `requiresTimeWindow` (REV3-13); `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "UpdateProductRequest",
     "confirm": {
      "label": "Save product",
@@ -349,7 +395,9 @@
       "displayTags",
       "media",
       "consentQuestionIds",
-      "requiresTimeWindow"
+      "requiresTimeWindow",
+      "salesContact",
+      "bookingFlowId"
      ]
     },
     "provenance": "contract catalogue.yaml PATCH /products/{productId}"
@@ -971,6 +1019,41 @@
     "invalidates": [
      "listOrders"
     ]
+   },
+   {
+    "operationId": "listTaxInvoices",
+    "contract": "finance",
+    "purpose": "List tax invoices",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "issueTaxInvoice",
+    "contract": "finance",
+    "purpose": "Issue a tax invoice",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getTaxInvoice",
+    "contract": "finance",
+    "purpose": "Show a tax invoice",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "issueCreditMemo",
+    "contract": "finance",
+    "purpose": "Issue a credit memo",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getTaxDocumentRendition",
+    "contract": "finance",
+    "purpose": "Download the invoice / credit memo PDF",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -978,6 +1061,14 @@
     {
      "name": "orderId",
      "from": "deepLink"
+    },
+    {
+     "name": "documentId",
+     "from": "navigation"
+    },
+    {
+     "name": "invoiceId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
@@ -1594,6 +1685,27 @@
     "contract": "orders",
     "purpose": "The policy this refund is judged against",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "issueCreditMemo",
+    "contract": "finance",
+    "purpose": "Issue a credit memo",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listCreditMemos",
+    "contract": "finance",
+    "purpose": "List credit memos",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getTaxDocumentRendition",
+    "contract": "finance",
+    "purpose": "Download the invoice / credit memo PDF",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1605,6 +1717,14 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "documentId",
+     "from": "navigation"
+    },
+    {
+     "name": "invoiceId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error. **The venue comes from the session** — a back-office user works one venue at a time and the refund policy is a venue setting, so the policy read needs it. Added 24 August with `getRefundPolicy`.",
@@ -2147,6 +2267,41 @@
     "contract": "finance",
     "purpose": "List settlement batches",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordChargeback",
+    "contract": "orders",
+    "purpose": "Record a chargeback read from an acquirer portal",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "assignChargeback",
+    "contract": "orders",
+    "purpose": "Assign a chargeback to an investigator",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordChargebackOutcome",
+    "contract": "orders",
+    "purpose": "Record the bank decision on a chargeback",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getChargebackAnalytics",
+    "contract": "orders",
+    "purpose": "Chargeback analytics panel",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getChargebackAnalytics",
+    "contract": "orders",
+    "purpose": "Chargeback rate by reason, product and customer",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2154,6 +2309,10 @@
     {
      "name": "settlementId",
      "from": "deepLink"
+    },
+    {
+     "name": "chargebackId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `settlementId`.",

@@ -1,0 +1,287 @@
+[
+ {
+  "id": "ANL-071",
+  "name": "AI Maturity & Learning",
+  "module": "Analytics",
+  "requiresModule": "ai",
+  "wave": 3,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/ai-maturity",
+   "component": "apps/venue-management-web/src/routes/analytics/AiMaturity.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-010"
+   ],
+   "exitTo": [
+    "ANL-010"
+   ],
+   "inferred": false,
+   "transitions": [
+    {
+     "to": "ANL-010",
+     "trigger": "Suggestions & Advice",
+     "back": true,
+     "provenance": "29 September pass (P29 group A)"
+    }
+   ]
+  },
+  "notes": "**Added 29 September (AI functions review, the product owner's \"build it right, it gets more accurate with time\").** No customer is told an AI feature \"comes later\": every answer starts from a baseline and learns. This is where the venue sees how far each answer has come, gives the figures the baseline stands on, and imports its own history from the systems it used before TICVAI. Importing 12 months or more moves the answers it covers straight to Established.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listAiCapabilityMaturity` reads a population (one row per question the AI answers) and the detail is the row",
+  "purpose": "See where each AI answer stands, what it is based on and what it needs next; set the venue AI profile; import the venue's own history.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every AI answer, by stage",
+       "bindsTo": "AiCapabilityMaturity",
+       "columns": [
+        "AiCapabilityMaturity.capabilityKey",
+        "AiCapabilityMaturity.suggestionKind",
+        "AiCapabilityMaturity.forecastDefinitionKey",
+        "AiCapabilityMaturity.stage",
+        "AiCapabilityMaturity.maturity",
+        "AiCapabilityMaturity.since"
+       ],
+       "operation": "listAiCapabilityMaturity",
+       "notes": "Stage badge, the \"Based on\" line, the share of own data and what the next stage needs.",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Stage",
+       "operation": "listAiCapabilityMaturity",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Venue AI profile",
+       "bindsTo": "AiVenueSettings",
+       "columns": [
+        "AiVenueSettings.venueType",
+        "AiVenueSettings.capacity",
+        "AiVenueSettings.openingHours",
+        "AiVenueSettings.typicalWeekdayAttendance",
+        "AiVenueSettings.typicalWeekendAttendance",
+        "AiVenueSettings.peakMonths",
+        "AiVenueSettings.averageSpend",
+        "AiVenueSettings.fnbAttachRate",
+        "AiVenueSettings.staffProductivity"
+       ],
+       "operation": "getAiVenueSettings",
+       "notes": "**The venue can correct its profile at any time** — the honest answer to a baseline that is wrong for an unusual venue in the first weeks.",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "History imports",
+       "bindsTo": "AiHistoryImport",
+       "columns": [
+        "AiHistoryImport.dataKind",
+        "AiHistoryImport.status",
+        "AiHistoryImport.periodFrom",
+        "AiHistoryImport.periodTo",
+        "AiHistoryImport.monthsCovered",
+        "AiHistoryImport.rowsLoaded",
+        "AiHistoryImport.rowsRejected"
+       ],
+       "operation": "listVenueHistoryImports",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Import findings",
+       "bindsTo": "AiHistoryImport.findings",
+       "operation": "getVenueHistoryImport",
+       "notes": "Each rejected row and why, so the venue can fix the export and import again.",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save venue AI profile",
+       "operation": "setAiVenueSettings",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Import history",
+       "operation": "importVenueHistory",
+       "notes": "**Loaded into the AI data only, never the ledger**: an imported sale teaches the forecast and is never counted as revenue. The form says so.",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The stage of each answer; the venue profile resolves separately.",
+   "error": "Could not load. **Every AI answer still works** — this page reports on them and changes none.",
+   "emptyFirstRun": "**Nothing answered yet.** Every question starts at Starting from the venue AI profile and the starting pattern for the venue type. The action fills in the profile, or imports history.",
+   "emptyNoResults": "No answer is at this stage. Names the filter and offers to clear it.",
+   "emptyNoAccess": "You do not have AI permission at this venue. Names `AI_USE`, and `AI_CONFIGURE` for the profile and imports."
+  },
+  "apis": [
+   {
+    "operationId": "listAiCapabilityMaturity",
+    "contract": "ai",
+    "purpose": "Where each answer stands",
+    "trigger": "onLoad",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "getAiVenueSettings",
+    "contract": "ai",
+    "purpose": "The venue AI profile",
+    "trigger": "onLoad",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "setAiVenueSettings",
+    "contract": "ai",
+    "purpose": "Correct the venue AI profile",
+    "trigger": "onAction",
+    "invalidates": [
+     "getAiVenueSettings",
+     "listAiCapabilityMaturity"
+    ],
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "listVenueHistoryImports",
+    "contract": "ai",
+    "purpose": "Past imports and their result",
+    "trigger": "onLoad",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "getVenueHistoryImport",
+    "contract": "ai",
+    "purpose": "One import's findings",
+    "trigger": "onAction",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "importVenueHistory",
+    "contract": "ai",
+    "purpose": "Import the venue's own history",
+    "trigger": "onAction",
+    "invalidates": [
+     "listVenueHistoryImports"
+    ],
+    "provenance": "29 September pass (P29 group A)"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "importId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ],
+   "coldEntry": "A link from an import-finished notification opens the import named by `importId`; without it the page opens on the maturity list."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-071"
+  },
+  "overlays": [
+   {
+    "id": "formSetAiVenueSettings",
+    "component": "modal",
+    "trigger": "Save venue AI profile",
+    "body": "**Collects what `setAiVenueSettings` sends before it is called.** Required: `venueId`, `venueType`. Any figure left empty takes the starting pattern's default for the venue type.",
+    "bindsTo": "AiVenueSettings",
+    "confirm": {
+     "label": "Save venue AI profile",
+     "operation": "setAiVenueSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueType",
+      "isOutdoor",
+      "capacity",
+      "openingHours",
+      "typicalWeekdayAttendance",
+      "typicalWeekendAttendance",
+      "peakMonths",
+      "averageSpend",
+      "fnbAttachRate",
+      "staffProductivity"
+     ]
+    },
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "id": "formImportVenueHistory",
+    "component": "modal",
+    "trigger": "Import history",
+    "body": "**Collects what `importVenueHistory` sends before it is called.** Required: `dataKind`, `assetId` (the uploaded export), `columnMapping`. Optional: `sourceSystem`, `dryRun` (check without loading). A second import of the same kind and period replaces the first.",
+    "confirm": {
+     "label": "Import history",
+     "operation": "importVenueHistory"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "dataKind",
+      "assetId",
+      "columnMapping",
+      "sourceSystem",
+      "dryRun"
+     ]
+    },
+    "provenance": "29 September pass (P29 group A)"
+   }
+  ],
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

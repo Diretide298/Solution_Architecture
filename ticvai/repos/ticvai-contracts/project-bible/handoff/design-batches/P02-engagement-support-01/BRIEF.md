@@ -1,6 +1,6 @@
 # P02-engagement-support-01 — P02 · Engagement & Support (1 of 2)
 
-**10 screens · 21 operations · 45 schemas · 4 permissions**
+**10 screens · 30 operations · 77 schemas · 4 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -50,7 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 4 permissions apply here:
   `AI_USE, CASE_MANAGE, PRODUCT_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **6 of these operations work offline**: getWaitTimes, listCatalogueBundles, listContentPages, listFaqs, listProducts, raiseMyCase
+- **9 of these operations work offline**: getTenantAppStatus, getVisitPlan, getWaitTimes, listCatalogueBundles, listContentPages, listFaqs, listMyNotifications, listProducts
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -62,17 +62,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-030` | In-Venue Notifications | configEditor | 1 | 0 | — |
-| `GST-031` | AI Concierge – Home | statusTracker | 5 | 0 | — |
-| `GST-032` | AI Concierge – Chat | statusTracker | 8 | 0 | — |
+| `GST-030` | In-Venue Notifications | configEditor | 3 | 0 | — |
+| `GST-031` | AI Concierge – Home | statusTracker | 5 | 4 | — |
+| `GST-032` | AI Concierge – Chat | statusTracker | 9 | 6 | — |
 | `GST-033` | AI Concierge – Contextual Help | configEditor | 1 | 0 | — |
-| `GST-035` | Feedback & Ratings | configEditor | 2 | 0 | — |
-| `GST-040` | Help & Support | commandCentre | 5 | 0 | — |
-| `GST-051` | Plan Your Adventure – Start | listDetail | 2 | 0 | — |
+| `GST-035` | Feedback & Ratings | configEditor | 2 | 1 | — |
+| `GST-040` | Help & Support | commandCentre | 6 | 2 | — |
+| `GST-051` | Plan | multiStepForm | 3 | 0 | — |
 | `GST-052` | Suggested Itineraries | listDetail | 3 | 0 | — |
-| `GST-053` | Build Your Own Itinerary | listDetail | 4 | 0 | — |
-| `GST-054` | AI Optimized Itinerary | listDetail | 4 | 0 | — |
+| `GST-053` | Your Plan | listDetail | 7 | 0 | — |
+| `GST-054` | AI Planner | listDetail | 6 | 0 | yes |
 
 ## Thin screens in this batch
 
-**GST-030, GST-033, GST-051, GST-052, GST-053 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-033, GST-052 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

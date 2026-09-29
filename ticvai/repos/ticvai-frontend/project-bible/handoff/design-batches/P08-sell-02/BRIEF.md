@@ -1,6 +1,6 @@
 # P08-sell-02 — P08 · Sell (2 of 4)
 
-**10 screens · 41 operations · 38 schemas · 14 permissions**
+**10 screens · 42 operations · 56 schemas · 15 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 14 permissions apply here:
-  `ACCESS_VALIDATE, CAPACITY_CONFIGURE, EVENT_CONFIGURE, ORDER_CREATE, ORDER_VIEW, PERFORMANCE_CONFIGURE, PRODUCT_CONFIGURE, PRODUCT_VIEW, REGION_CONFIGURE, SCOPE_VIEW, TENANT_CONFIGURE, TENANT_VIEW`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 15 permissions apply here:
+  `ACCESS_VALIDATE, AI_USE, CAPACITY_CONFIGURE, EVENT_CONFIGURE, ORDER_CREATE, ORDER_VIEW, PERFORMANCE_CONFIGURE, PRODUCT_CONFIGURE, PRODUCT_VIEW, REGION_CONFIGURE, SCOPE_VIEW, TENANT_CONFIGURE`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -64,7 +64,7 @@ convincingly. It is never a caption.
 | `BO-019` | Closures & Blackouts | listDetail | 12 | 7 | — |
 | `BO-037` | Offline Package Status | listDetail | 9 | 4 | — |
 | `BO-063` | Opening Hours & Calendar | listDetail | 13 | 7 | — |
-| `BO-102` | Sell | listDetail | 3 | 0 | — |
+| `BO-102` | Sell | listDetail | 4 | 0 | — |
 | `BO-109` | Menu Builder & POS Layout Designer | listDetail | 3 | 2 | — |
 | `BO-110` | Recipe & BOM Management | listDetail | 2 | 1 | — |
 | `BO-111` | Ingredient Substitution, Allergen & Nutrition | configEditor | 5 | 2 | — |

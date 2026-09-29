@@ -1,0 +1,346 @@
+{
+ "addCartLine": {
+  "method": "POST",
+  "path": "/carts/{cartId}/lines",
+  "contract": "orders",
+  "summary": "Add something",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AddCartLineRequest",
+  "responds": "Cart"
+ },
+ "deleteFavouriteRoute": {
+  "method": "DELETE",
+  "path": "/transport/favourite-routes/{favouriteId}",
+  "contract": "transport",
+  "summary": "Remove a saved route",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getNextTransportDeparture": {
+  "method": "GET",
+  "path": "/transport/departures/next",
+  "contract": "transport",
+  "summary": "Next Available Trip",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "fromStationId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "toStationId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "after",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "passengers",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DepartureOffer"
+ },
+ "getTransportFareTable": {
+  "method": "GET",
+  "path": "/transport/routes/{routeId}/fare-table",
+  "contract": "transport",
+  "summary": "A route's fares and passenger types",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FareTable"
+ },
+ "getTransportRoute": {
+  "method": "GET",
+  "path": "/transport/routes/{routeId}",
+  "contract": "transport",
+  "summary": "A route with its stops",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TransportRoute"
+ },
+ "getTransportRouteMap": {
+  "method": "GET",
+  "path": "/transport/routes/{routeId}/map",
+  "contract": "transport",
+  "summary": "The route drawn for a map, with the journey highlighted",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "fromStationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "toStationId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RouteMap"
+ },
+ "listMyFavouriteRoutes": {
+  "method": "GET",
+  "path": "/transport/favourite-routes",
+  "contract": "transport",
+  "summary": "The caller's saved routes",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTransportPassOffers": {
+  "method": "GET",
+  "path": "/transport/pass-offers",
+  "contract": "transport",
+  "summary": "Multi-trip passes for a pair of stations, priced, with the saving",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "fromStationId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "toStationId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTransportRoutes": {
+  "method": "GET",
+  "path": "/transport/routes",
+  "contract": "transport",
+  "summary": "Routes, optionally those serving a pair of stations",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "fromStationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "toStationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTransportStations": {
+  "method": "GET",
+  "path": "/transport/stations",
+  "contract": "transport",
+  "summary": "Stations of a venue's transport network",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "quoteTransportFare": {
+  "method": "POST",
+  "path": "/transport/fare-quotes",
+  "contract": "transport",
+  "summary": "Price a one-way trip or a pass for a party",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "FareQuoteRequest",
+  "responds": "FareQuote"
+ },
+ "saveFavouriteRoute": {
+  "method": "POST",
+  "path": "/transport/favourite-routes",
+  "contract": "transport",
+  "summary": "Save route",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FavouriteRoute"
+ },
+ "searchTransportDepartures": {
+  "method": "GET",
+  "path": "/transport/departures",
+  "contract": "transport",
+  "summary": "Search Trips — departures between two stations on a date",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "fromStationId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "toStationId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "passengers",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ }
+}

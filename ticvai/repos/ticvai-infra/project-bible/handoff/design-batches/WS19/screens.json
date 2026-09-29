@@ -17,84 +17,6 @@
    "component": "apps/ticvai-web/src/routes/platform/ApprovalIntegrationCommandCenter.tsx",
    "status": "notStarted"
   },
-  "density": "compact",
-  "pattern": "commandCentre",
-  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
-  "purpose": "Provide administrators and technical teams with a centralized overview of all systems connected to the Approval Engine.",
-  "layout": {
-   "template": "dashboard",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "headline",
-     "components": [
-      {
-       "kind": "metricTile",
-       "label": "Connected TICVAI Modules",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "External Integrations",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "API Requests Today",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Workflow Events",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Active Webhooks",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Failed Requests",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Integration Errors",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Average Response Time",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The approval integration list; the counts above it resolve separately.",
-   "error": "Could not load. Names which read failed and leaves the approval integration untouched.",
-   "emptyFirstRun": "No approval integration yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the approval integration are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "entryState": {
-   "preloaded": [
-    "Connected TICVAI Modules",
-    "External Integrations",
-    "API Requests Today",
-    "Workflow Events",
-    "Active Webhooks",
-    "Failed Requests"
-   ]
-  },
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-349"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 60. 0 of 0 labels bound to a contract property; 8 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
     "ADM-002"
@@ -165,6 +87,107 @@
     }
    ]
   },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide administrators and technical teams with a centralized overview of all systems connected to the Approval Engine.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Connected TICVAI Modules",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "External Integrations",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "API Requests Today",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Workflow Events",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Webhooks",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Requests",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Integration Errors",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average Response Time",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 60 §KPI Cards"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval integration list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the approval integration untouched.",
+   "emptyFirstRun": "No approval integration yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval integration are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCrossModuleOrchestration",
+    "contract": "approvals",
+    "purpose": "Which modules raise approvals",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listApprovalExternalProviders",
+    "contract": "approvals",
+    "purpose": "External providers and their health",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listApprovalExternalDispatches",
+    "contract": "approvals",
+    "purpose": "Levels waiting on or failed in external systems",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Connected TICVAI Modules",
+    "External Integrations",
+    "API Requests Today",
+    "Workflow Events",
+    "Active Webhooks",
+    "Failed Requests"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-349",
+   "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-349"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 60. 0 of 0 labels bound to a contract property; 8 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -207,6 +230,22 @@
    "component": "apps/ticvai-web/src/routes/platform/ModuleIntegrationRegistry.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-349"
+   ],
+   "exitTo": [
+    "ADM-349"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-349",
+     "trigger": "Back to Approval Integration Command Center",
+     "provenance": "structural — pack board 7 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -228,7 +267,14 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCrossModuleOrchestration",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
     }
    ]
   },
@@ -239,28 +285,21 @@
    "emptyNoResults": "The filter narrowed it and the module integration registry are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listCrossModuleOrchestration",
+    "contract": "approvals",
+    "purpose": "The integration registry",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-350"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-350",
+   "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-350"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 61. 0 of 0 labels bound to a contract property; 0 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-349"
-   ],
-   "exitTo": [
-    "ADM-349"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-349",
-     "trigger": "Back to Approval Integration Command Center",
-     "provenance": "structural — pack board 7 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -302,6 +341,22 @@
    "route": "/platform/approval-api-management-adm-351",
    "component": "apps/ticvai-web/src/routes/platform/ApprovalApiManagement.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-349"
+   ],
+   "exitTo": [
+    "ADM-349"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-349",
+     "trigger": "Back to Approval Integration Command Center",
+     "provenance": "structural — pack board 7 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "configEditor",
@@ -369,28 +424,21 @@
    "emptyFirstRun": "No approval api configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "What the API exposes",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-351"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-351",
+   "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-351"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 62. 0 of 0 labels bound to a contract property; 9 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-349"
-   ],
-   "exitTo": [
-    "ADM-349"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-349",
-     "trigger": "Back to Approval Integration Command Center",
-     "provenance": "structural — pack board 7 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -433,6 +481,22 @@
    "component": "apps/ticvai-web/src/routes/platform/WorkflowEventFramework.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-349"
+   ],
+   "exitTo": [
+    "ADM-349"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-349",
+     "trigger": "Back to Approval Integration Command Center",
+     "provenance": "structural — pack board 7 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -454,7 +518,22 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setTriggerActionCross",
+       "label": "Save trigger action cross",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setTriggerActionCross"
+      }
+     ]
     }
    ]
   },
@@ -465,28 +544,31 @@
    "emptyNoResults": "The filter narrowed it and the workflow event framework are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setTriggerActionCross",
+    "contract": "approvals",
+    "purpose": "Workflow events",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listCrossModuleOrchestration"
+    ]
+   },
+   {
+    "operationId": "listWebhookEventTypes",
+    "contract": "public-api",
+    "purpose": "Workflow events published through the event framework (publisher=approvals)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-352"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-352",
+   "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-352"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 63. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-349"
-   ],
-   "exitTo": [
-    "ADM-349"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-349",
-     "trigger": "Back to Approval Integration Command Center",
-     "provenance": "structural — pack board 7 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -528,6 +610,22 @@
    "route": "/platform/webhook-configuration-subscription-manager-adm-353",
    "component": "apps/ticvai-web/src/routes/platform/WebhookConfigurationSubscriptionManager.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-349"
+   ],
+   "exitTo": [
+    "ADM-349"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-349",
+     "trigger": "Back to Approval Integration Command Center",
+     "provenance": "structural — pack board 7 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "configEditor",
@@ -582,28 +680,35 @@
    "emptyFirstRun": "No webhook subscription configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createWebhookSubscription",
+    "contract": "public-api",
+    "purpose": "Webhook subscriptions",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listWebhookEventTypes",
+    "contract": "public-api",
+    "purpose": "Events a subscription can take",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listWebhookSubscriptions",
+    "contract": "public-api",
+    "purpose": "Existing subscriptions",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-353"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-353",
+   "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-353"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 64. 0 of 0 labels bound to a contract property; 6 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-349"
-   ],
-   "exitTo": [
-    "ADM-349"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-349",
-     "trigger": "Back to Approval Integration Command Center",
-     "provenance": "structural — pack board 7 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -645,6 +750,22 @@
    "route": "/platform/external-workflow-system-integration-adm-354",
    "component": "apps/ticvai-web/src/routes/platform/ExternalWorkflowSystemIntegration.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-349"
+   ],
+   "exitTo": [
+    "ADM-349"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-349",
+     "trigger": "Back to Approval Integration Command Center",
+     "provenance": "structural — pack board 7 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "configEditor",
@@ -707,28 +828,35 @@
    "emptyFirstRun": "No external workflow system configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listApiClients",
+    "contract": "public-api",
+    "purpose": "External workflow systems",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listApprovalExternalProviders",
+    "contract": "approvals",
+    "purpose": "Registered external workflow systems",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setApprovalExternalProvider",
+    "contract": "approvals",
+    "purpose": "Register or change a provider",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-354"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-354",
+   "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-354"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 65. 0 of 0 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-349"
-   ],
-   "exitTo": [
-    "ADM-349"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-349",
-     "trigger": "Back to Approval Integration Command Center",
-     "provenance": "structural — pack board 7 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -771,6 +899,22 @@
    "component": "apps/ticvai-web/src/routes/platform/DataWorkflowMappingStudio.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-349"
+   ],
+   "exitTo": [
+    "ADM-349"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-349",
+     "trigger": "Back to Approval Integration Command Center",
+     "provenance": "structural — pack board 7 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -797,7 +941,22 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setTriggerActionCross",
+       "label": "Save trigger action cross",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setTriggerActionCross"
+      }
+     ]
     }
    ]
   },
@@ -808,28 +967,24 @@
    "emptyNoResults": "The filter narrowed it and the data workflow mapping are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setTriggerActionCross",
+    "contract": "approvals",
+    "purpose": "Map external data onto a request",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listCrossModuleOrchestration"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-355"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-355",
+   "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-355"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-349"
-   ],
-   "exitTo": [
-    "ADM-349"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-349",
-     "trigger": "Back to Approval Integration Command Center",
-     "provenance": "structural — pack board 7 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -872,6 +1027,22 @@
    "component": "apps/ticvai-web/src/routes/platform/IntegrationSecurityAccessControl.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-349"
+   ],
+   "exitTo": [
+    "ADM-349"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-349",
+     "trigger": "Back to Approval Integration Command Center",
+     "provenance": "structural — pack board 7 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -905,7 +1076,14 @@
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAccessPolicies",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
     }
    ]
   },
@@ -916,28 +1094,21 @@
    "emptyNoResults": "The filter narrowed it and the integration security access are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listAccessPolicies",
+    "contract": "identity",
+    "purpose": "Integration access control",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-356"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-356",
+   "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-356"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 67. 0 of 0 labels bound to a contract property; 5 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-349"
-   ],
-   "exitTo": [
-    "ADM-349"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-349",
-     "trigger": "Back to Approval Integration Command Center",
-     "provenance": "structural — pack board 7 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -980,6 +1151,22 @@
    "component": "apps/ticvai-web/src/routes/platform/IntegrationMonitoringErrorRetryCenter.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-349"
+   ],
+   "exitTo": [
+    "ADM-349"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-349",
+     "trigger": "Back to Approval Integration Command Center",
+     "provenance": "structural — pack board 7 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1001,7 +1188,14 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWorkflowExceptionFailure",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
     }
    ]
   },
@@ -1012,28 +1206,28 @@
    "emptyNoResults": "The filter narrowed it and the integration monitoring error are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listWorkflowExceptionFailure",
+    "contract": "approvals",
+    "purpose": "Errors and retries",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listApprovalExternalDispatches",
+    "contract": "approvals",
+    "purpose": "External dispatch errors and retries",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-357"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-357",
+   "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-357"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 68. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-349"
-   ],
-   "exitTo": [
-    "ADM-349"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-349",
-     "trigger": "Back to Approval Integration Command Center",
-     "provenance": "structural — pack board 7 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1076,6 +1270,22 @@
    "component": "apps/ticvai-web/src/routes/platform/IntegrationAnalyticsAiHealthAdvisor.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-349"
+   ],
+   "exitTo": [
+    "ADM-349"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-349",
+     "trigger": "Back to Approval Integration Command Center",
+     "provenance": "structural — pack board 7 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -1097,7 +1307,14 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWorkflowProcessPerformance",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
     }
    ]
   },
@@ -1108,28 +1325,21 @@
    "emptyNoResults": "The filter narrowed it and the integration analytics health are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listWorkflowProcessPerformance",
+    "contract": "approvals",
+    "purpose": "Integration health",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-358"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-358",
+   "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-358"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 69. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-349"
-   ],
-   "exitTo": [
-    "ADM-349"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-349",
-     "trigger": "Back to Approval Integration Command Center",
-     "provenance": "structural — pack board 7 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

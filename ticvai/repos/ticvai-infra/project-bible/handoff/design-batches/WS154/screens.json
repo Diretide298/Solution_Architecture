@@ -1,0 +1,1848 @@
+[
+ {
+  "id": "ADM-629",
+  "name": "Payment Risk & Fraud Command Center\\t166",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "8",
+   "number": "1",
+   "page": 165
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/payment-risk-fraud-command-center-t166-adm-629",
+   "component": "apps/ticvai-web/src/routes/commercial/PaymentRiskFraudCommandCenterT166.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-630",
+    "ADM-631",
+    "ADM-632",
+    "ADM-633",
+    "ADM-634",
+    "ADM-635",
+    "ADM-636",
+    "ADM-637",
+    "ADM-638"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to Platform Dashboard",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "ADM-630",
+     "trigger": "Payment Risk Rule & Decision Engine\\t167",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-631",
+     "trigger": "Velocity, Behavioral & Transaction Risk Controls\\t168",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-632",
+     "trigger": "Risk Lists, Signals & Payment Control Center\\t169",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-633",
+     "trigger": "Fraud Alert, Investigation & Case Management\\t170",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-634",
+     "trigger": "Chargeback & Dispute Command Center\\t172",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-635",
+     "trigger": "Chargeback Evidence & Representment Workspace\\t173",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-636",
+     "trigger": "Payment Performance & Conversion Analytics\\t174",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-637",
+     "trigger": "AI Fraud, Anomaly & Payment Intelligence Center\\t175",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-638",
+     "trigger": "Payment Executive Intelligence, Risk Simulator & AI Advisor\\t176",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show; Analyze) — counts over a population, then the population",
+  "purpose": "Provide real-time operational visibility over fraud, suspicious transactions, payment risk and chargebacks across the TICVAI ecosystem.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 165 §Show"
+   }
+  ],
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Payment Attempts",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Approved Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Declined Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Risk-Blocked Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Risk-Review Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Suspected Fraud Value",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Confirmed Fraud Value",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Chargebacks",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Chargeback Value",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Chargeback Rate",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Open Disputes",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "High-Risk Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §KPI Cards"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every payment risk fraud",
+       "columns": [
+        "Low Risk",
+        "Medium Risk",
+        "High Risk",
+        "Critical Risk",
+        "Fraud attempts",
+        "Blocked fraud",
+        "Confirmed fraud",
+        "Chargebacks",
+        "False positives"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected payment risk fraud",
+       "bindsTo": null,
+       "columns": [
+        "Low Risk",
+        "Medium Risk",
+        "High Risk",
+        "Critical Risk",
+        "Fraud attempts",
+        "Blocked fraud",
+        "Confirmed fraud",
+        "Chargebacks",
+        "False positives"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Breakdown”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The payment risk fraud list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the payment risk fraud untouched.",
+   "emptyFirstRun": "No payment risk fraud yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the payment risk fraud are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getPaymentPerformance",
+    "contract": "payments",
+    "purpose": "Risk and fraud at a glance",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-629",
+   "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-629"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 165. 0 of 9 labels bound to a contract property; 21 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-630",
+  "name": "Payment Risk Rule & Decision Engine\\t167",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "8",
+   "number": "2",
+   "page": 166
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/payment-risk-rule-decision-engine-t167-adm-630",
+   "component": "apps/ticvai-web/src/routes/commercial/PaymentRiskRuleDecisionEngineT167.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-629"
+   ],
+   "exitTo": [
+    "ADM-629"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-629",
+     "trigger": "Back to Payment Risk & Fraud Command Center\\t166",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow administrators to configure deterministic payment risk rules and actions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Allow, Monitor, Require additional verification, Route to manual review, Block, Trigger alert. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 166 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 166"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 166"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Allow",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 166 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Monitor",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 166 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Require additional verification",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 166 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Route to manual review",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 166 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Block",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 166 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Trigger alert",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 166 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The payment risk rule list.",
+   "error": "Could not load. Names which read failed and leaves the payment risk rule untouched.",
+   "emptyFirstRun": "No payment risk rule yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the payment risk rule are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setPaymentRiskRules",
+    "contract": "payments",
+    "purpose": "Rules and decisions",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listFraudRules",
+    "contract": "orders",
+    "purpose": "Show refund-abuse and charge fraud rules",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setFraudRules",
+    "contract": "orders",
+    "purpose": "Edit refund-abuse and charge fraud rules",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-630",
+   "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-630"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 166. 0 of 0 labels bound to a contract property; 6 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-631",
+  "name": "Velocity, Behavioral & Transaction Risk Controls\\t168",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "8",
+   "number": "3",
+   "page": 167
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/velocity-behavioral-transaction-risk-controls-t168-adm-631",
+   "component": "apps/ticvai-web/src/routes/commercial/VelocityBehavioralTransactionRiskControlsT168.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-629"
+   ],
+   "exitTo": [
+    "ADM-629"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-629",
+     "trigger": "Back to Payment Risk & Fraud Command Center\\t166",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage high-frequency and abnormal payment activity.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Customer, Device, Payment instrument reference/token, Venue, POS. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 167 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 167"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 167"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Customer",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 167 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Device",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 167 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Payment instrument reference/token",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 167 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 167 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "POS",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 167 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The velocity behavioral transaction list.",
+   "error": "Could not load. Names which read failed and leaves the velocity behavioral transaction untouched.",
+   "emptyFirstRun": "No velocity behavioral transaction yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the velocity behavioral transaction are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setPaymentRiskRules",
+    "contract": "payments",
+    "purpose": "Velocity and behaviour",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-631",
+   "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-631"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 167. 0 of 0 labels bound to a contract property; 5 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-632",
+  "name": "Risk Lists, Signals & Payment Control Center\\t169",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "8",
+   "number": "4",
+   "page": 168
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/risk-lists-signals-payment-control-center-t169-adm-632",
+   "component": "apps/ticvai-web/src/routes/commercial/RiskListsSignalsPaymentControlCenterT169.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-629"
+   ],
+   "exitTo": [
+    "ADM-629"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-629",
+     "trigger": "Back to Payment Risk & Fraud Command Center\\t166",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide centralized management of approved payment risk lists and signals.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Trusted device, Blocked instrument reference, High-risk device, Review list. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 168 §Support controlled lists such as"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 168"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 168"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Trusted device",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 168 §Support controlled lists such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Blocked instrument reference",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 168 §Support controlled lists such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "High-risk device",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 168 §Support controlled lists such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Review list",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 168 §Support controlled lists such as"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The risk lists signals list.",
+   "error": "Could not load. Names which read failed and leaves the risk lists signals untouched.",
+   "emptyFirstRun": "No risk lists signals yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the risk lists signals are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setPaymentRiskRules",
+    "contract": "payments",
+    "purpose": "Lists and signals",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-632",
+   "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-632"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 168. 0 of 0 labels bound to a contract property; 4 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-633",
+  "name": "Fraud Alert, Investigation & Case Management\\t170",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "8",
+   "number": "5",
+   "page": 169
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/fraud-alert-investigation-case-management-t170-adm-633",
+   "component": "apps/ticvai-web/src/routes/commercial/FraudAlertInvestigationCaseManagementT170.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-629"
+   ],
+   "exitTo": [
+    "ADM-629"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-629",
+     "trigger": "Back to Payment Risk & Fraud Command Center\\t166",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
+  "purpose": "Convert suspicious activity into controlled investigation cases.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 169 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every fraud alert investigation",
+       "columns": [
+        "Case ID",
+        "Risk level",
+        "Customer",
+        "Transaction",
+        "Order",
+        "Payment method",
+        "Provider",
+        "Amount",
+        "Currency",
+        "Device",
+        "Channel",
+        "Risk score",
+        "Rules triggered",
+        "AI signals",
+        "Related transactions",
+        "Previous transactions",
+        "Failed payments",
+        "Refunds",
+        "Chargebacks",
+        "Devices",
+        "Payment instruments",
+        "Customer accounts"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 169 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected fraud alert investigation",
+       "bindsTo": null,
+       "columns": [
+        "Case ID",
+        "Risk level",
+        "Customer",
+        "Transaction",
+        "Order",
+        "Payment method",
+        "Provider",
+        "Amount",
+        "Currency",
+        "Device",
+        "Channel",
+        "Risk score",
+        "Rules triggered",
+        "AI signals",
+        "Related transactions",
+        "Previous transactions",
+        "Failed payments",
+        "Refunds",
+        "Chargebacks",
+        "Devices",
+        "Payment instruments",
+        "Customer accounts"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Detected”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 169 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Add note, Link transactions, Link customers/accounts, Request additional review, Mark confirmed fraud, Mark legitimate, Add risk-list entry, Escalate, Close case. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 169 §Authorized users may"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The fraud alert investigation list.",
+   "error": "Could not load. Names which read failed and leaves the fraud alert investigation untouched.",
+   "emptyFirstRun": "No fraud alert investigation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the fraud alert investigation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listChargebacks",
+    "contract": "orders",
+    "purpose": "Cases to investigate",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getEntityRisk",
+    "contract": "ai",
+    "purpose": "Current risk of an entity",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listRiskAlerts",
+    "contract": "ai",
+    "purpose": "Risk alerts",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideRiskAlert",
+    "contract": "ai",
+    "purpose": "Dismiss, monitor, mark false positive, or escalate",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createRiskCase",
+    "contract": "ai",
+    "purpose": "Open an investigation",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getRiskCase",
+    "contract": "ai",
+    "purpose": "A case with its evidence and actions",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "addRiskCaseEvidence",
+    "contract": "ai",
+    "purpose": "Add evidence to a case",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "expandRiskNetwork",
+    "contract": "ai",
+    "purpose": "Expand the relationship graph around an entity",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "proposeRiskAction",
+    "contract": "ai",
+    "purpose": "Propose a restrictive action from a case",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "closeRiskCase",
+    "contract": "ai",
+    "purpose": "Close a case with an outcome",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "assignChargeback",
+    "contract": "orders",
+    "purpose": "Assign a chargeback to an investigator",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getChargebackAnalytics",
+    "contract": "orders",
+    "purpose": "Customers with repeated chargebacks (groupBy=customer, minChargebacks)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Case ID",
+    "Risk level",
+    "Customer",
+    "Transaction",
+    "Order",
+    "Payment method"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation"
+    },
+    {
+     "name": "caseId",
+     "from": "navigation"
+    },
+    {
+     "name": "chargebackId",
+     "from": "navigation"
+    },
+    {
+     "name": "entityRef",
+     "from": "navigation"
+    },
+    {
+     "name": "entityType",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-633",
+   "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-633"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 169. 0 of 22 labels bound to a contract property; 31 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-634",
+  "name": "Chargeback & Dispute Command Center\\t172",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "8",
+   "number": "6",
+   "page": 171
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/chargeback-dispute-command-center-t172-adm-634",
+   "component": "apps/ticvai-web/src/routes/commercial/ChargebackDisputeCommandCenterT172.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-629"
+   ],
+   "exitTo": [
+    "ADM-629"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-629",
+     "trigger": "Back to Payment Risk & Fraud Command Center\\t166",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Display) — counts over a population, then the population",
+  "purpose": "Provide centralized operational management for provider/acquirer chargebacks and payment disputes.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 171 §Display"
+   }
+  ],
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "New Chargebacks",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Open Chargebacks",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Chargeback Value",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Chargeback Rate",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Response Due",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Won",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Lost",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Accepted",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Represented",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Recovery Value",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every chargeback dispute \\t172",
+       "columns": [
+        "Chargeback ID",
+        "Original Payment",
+        "Order",
+        "Customer",
+        "Provider",
+        "Acquirer",
+        "Merchant account",
+        "Amount",
+        "Currency",
+        "Reason code",
+        "Received date",
+        "Response deadline",
+        "Status"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected chargeback dispute \\t172",
+       "bindsTo": null,
+       "columns": [
+        "Chargeback ID",
+        "Original Payment",
+        "Order",
+        "Customer",
+        "Provider",
+        "Acquirer",
+        "Merchant account",
+        "Amount",
+        "Currency",
+        "Reason code",
+        "Received date",
+        "Response deadline",
+        "Status"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Important”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The chargeback dispute \\t172 list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the chargeback dispute \\t172 untouched.",
+   "emptyFirstRun": "No chargeback dispute \\t172 yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the chargeback dispute \\t172 are still there. The pack's own statuses are Received — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listChargebacks",
+    "contract": "orders",
+    "purpose": "Chargebacks and disputes",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "respondToChargeback",
+    "contract": "orders",
+    "purpose": "Respond",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "recordChargeback",
+    "contract": "orders",
+    "purpose": "Record a chargeback read from an acquirer portal",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "assignChargeback",
+    "contract": "orders",
+    "purpose": "Assign a chargeback to an investigator",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordChargebackOutcome",
+    "contract": "orders",
+    "purpose": "Record the bank decision on a chargeback",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getChargebackAnalytics",
+    "contract": "orders",
+    "purpose": "Chargeback analytics panel",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getChargebackAnalytics",
+    "contract": "orders",
+    "purpose": "Chargeback analytics, groupBy product/customer",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-634",
+   "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-634"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 171. 0 of 13 labels bound to a contract property; 33 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "chargebackId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-635",
+  "name": "Chargeback Evidence & Representment Workspace\\t173",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "8",
+   "number": "7",
+   "page": 172
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/chargeback-evidence-representment-workspace-t173-adm-635",
+   "component": "apps/ticvai-web/src/routes/commercial/ChargebackEvidenceRepresentmentWorkspaceT173.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-629"
+   ],
+   "exitTo": [
+    "ADM-629"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-629",
+     "trigger": "Back to Payment Risk & Fraud Command Center\\t166",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Help Payment Operations collect, review and submit the evidence needed to respond to disputes. This is particularly important for TICVAI because ticketing transactions generate strong operational evidence.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 172"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 172"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "submitChargebackEvidence",
+       "label": "Submit chargeback evidence",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "submitChargebackEvidence"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The chargeback evidence representment list.",
+   "error": "Could not load. Names which read failed and leaves the chargeback evidence representment untouched.",
+   "emptyFirstRun": "No chargeback evidence representment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the chargeback evidence representment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "submitChargebackEvidence",
+    "contract": "payments",
+    "purpose": "Assemble a representment",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listChargebacks"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-635",
+   "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-635"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 172. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "chargebackId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-636",
+  "name": "Payment Performance & Conversion Analytics\\t174",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "8",
+   "number": "8",
+   "page": 173
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/payment-performance-conversion-analytics-t174-adm-636",
+   "component": "apps/ticvai-web/src/routes/commercial/PaymentPerformanceConversionAnalyticsT174.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-629"
+   ],
+   "exitTo": [
+    "ADM-629"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-629",
+     "trigger": "Back to Payment Risk & Fraud Command Center\\t166",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Captured) and no display directory — it is settings, not a population",
+  "purpose": "Provide comprehensive analytics across the complete Payment & Payment Orchestration module. This screen is not only fraud analytics. It provides payment-business performance intelligence.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search payment performance conversion",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 173 §Analyze By"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Provider",
+        "Acquirer",
+        "Payment method",
+        "Card scheme",
+        "Digital wallet",
+        "Venue",
+        "Channel",
+        "Merchant account",
+        "Currency",
+        "Country/market",
+        "Device/terminal type"
+       ],
+       "notes": "The pack filters this screen by provider, acquirer, payment method, card scheme, digital wallet, venue and 5 more — which are present is a decision the pack already made.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 173 §Analyze By"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "78%",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 173 §Captured"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The payment performance conversion configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the payment performance conversion untouched.",
+   "emptyFirstRun": "No payment performance conversion configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoResults": "The filter narrowed it and the payment performance conversion are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getPaymentPerformance",
+    "contract": "payments",
+    "purpose": "Conversion and where sales are lost",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-636",
+   "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-636"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 173. 0 of 11 labels bound to a contract property; 24 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-637",
+  "name": "AI Fraud, Anomaly & Payment Intelligence Center\\t175",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "8",
+   "number": "9",
+   "page": 174
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/ai-fraud-anomaly-payment-intelligence-center-t175-adm-637",
+   "component": "apps/ticvai-web/src/routes/commercial/AiFraudAnomalyPaymentIntelligenceCenterT175.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-629"
+   ],
+   "exitTo": [
+    "ADM-629"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-629",
+     "trigger": "Back to Payment Risk & Fraud Command Center\\t166",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide governed AI/ML capabilities for fraud detection and payment anomaly identification.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 174"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 174"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getEntityRisk",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "configureRiskStrategy",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listRiskAlerts",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "configureRiskStrategy"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The fraud anomaly payment list.",
+   "error": "Could not load. Names which read failed and leaves the fraud anomaly payment untouched.",
+   "emptyFirstRun": "No fraud anomaly payment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the fraud anomaly payment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getPaymentPerformance",
+    "contract": "payments",
+    "purpose": "Anomalies in payment behaviour",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getEntityRisk",
+    "contract": "ai",
+    "purpose": "Current risk of an entity",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "configureRiskStrategy",
+    "contract": "ai",
+    "purpose": "Set the risk strategy",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listRiskAlerts",
+    "contract": "ai",
+    "purpose": "Risk alerts",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getChargebackAnalytics",
+    "contract": "orders",
+    "purpose": "Chargeback analytics panel",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getChargebackAnalytics",
+    "contract": "orders",
+    "purpose": "Chargeback trend beside payment risk",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-637",
+   "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-637"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 174. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "entityRef",
+     "from": "navigation"
+    },
+    {
+     "name": "entityType",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-638",
+  "name": "Payment Executive Intelligence, Risk Simulator & AI Advisor\\t176",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "8",
+   "number": "10",
+   "page": 175
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/payment-executive-intelligence-risk-simulator-ai-advisor-adm-638",
+   "component": "apps/ticvai-web/src/routes/commercial/PaymentExecutiveIntelligenceRiskSimulatorAiAdvis.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-629"
+   ],
+   "exitTo": [
+    "ADM-629"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-629",
+     "trigger": "Back to Payment Risk & Fraud Command Center\\t166",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§Show; Monitor) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide executive-level intelligence and a safe simulation environment for payment, fraud and risk strategies.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Payment Value",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Payment Success Rate",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Authorization Rate",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Payment Cost",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Refund Rate",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fraud Rate",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Chargeback Rate",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Settlement Accuracy",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Provider Performance",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Payment Conversion",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "↓",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Monitor"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The payment executive intelligence list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the payment executive intelligence untouched.",
+   "emptyFirstRun": "No payment executive intelligence yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the payment executive intelligence are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "simulatePaymentConfiguration",
+    "contract": "payments",
+    "purpose": "Executive simulation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "backtestRiskStrategy",
+    "contract": "ai",
+    "purpose": "Backtest a draft strategy",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-638",
+   "workshopBoard": "wireframes/WS94 Payment Payment Orchestration Board 8.dc.html#adm-638"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 175. 0 of 0 labels bound to a contract property; 11 of 117 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -1,6 +1,6 @@
 # P08-people-access-rights-01 — P08 · People & Access Rights (1 of 2)
 
-**10 screens · 34 operations · 25 schemas · 10 permissions**
+**10 screens · 39 operations · 32 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `ANNOUNCEMENT_PUBLISH, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, ATTENDANCE_RECORD, ROLE_MANAGE, USER_MANAGE, WORKFORCE_MANAGE, WORKFORCE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `ANNOUNCEMENT_PUBLISH, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, ATTENDANCE_RECORD, PERMISSION_VIEW, ROLE_MANAGE, USER_MANAGE, WORKFORCE_MANAGE, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,13 +60,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-053` | Staff Directory | listDetail | 9 | 3 | — |
-| `BO-054` | Role Assignment | listDetail | 3 | 1 | — |
+| `BO-053` | Staff Directory | listDetail | 10 | 3 | — |
+| `BO-054` | Role Assignment | listDetail | 7 | 1 | — |
 | `BO-055` | Rota & Scheduling | listDetail | 4 | 3 | — |
 | `BO-056` | Time & Attendance | listDetail | 3 | 2 | — |
 | `BO-057` | Training & Certification | listDetail | 1 | 0 | — |
 | `BO-066` | Notification Settings | listDetail | 4 | 1 | — |
-| `BO-084` | Approval Inbox | approvalInbox | 3 | 2 | — |
+| `BO-084` | Approval Inbox | approvalInbox | 4 | 2 | — |
 | `BO-085` | Approval Request | approvalInbox | 5 | 4 | — |
 | `BO-086` | Approval Matrix | listDetail | 2 | 1 | — |
 | `BO-087` | Approval Delegations | listDetail | 3 | 2 | — |

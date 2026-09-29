@@ -31,11 +31,17 @@
     "CMS-061",
     "CMS-071",
     "CMS-081",
-    "CMS-091"
+    "CMS-091",
+    "CMS-102"
    ],
    "inferred": true,
    "isEntryPoint": true,
    "transitions": [
+    {
+     "to": "CMS-102",
+     "trigger": "Site Builder",
+     "provenance": "authored 29 September, W12 and M24-05 (the step-based builder starts from the workspace)"
+    },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
@@ -69,7 +75,7 @@
     {
      "to": "CMS-008",
      "trigger": "Content Blocks",
-     "provenance": "derived — CMS-008 declares entryState.params bannerId, promoBlockId and CMS-001 holds none of them, so the edge carries nothing and CMS-008 opens cold"
+     "provenance": "derived — CMS-008 declares entryState.params actionId, bannerId, promoBlockId and CMS-001 holds none of them, so the edge carries nothing and CMS-008 opens cold"
     },
     {
      "to": "CMS-009",
@@ -141,7 +147,8 @@
   ],
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Land a tenant somewhere that shows what is live and what is not.",
+  "purpose": "Land a tenant somewhere that shows what is live and what is not, and hold step 1 of the Site Builder (venue and modules).",
+  "purposeNote": "**Step 1 of CMS-102 Site Builder (decided 29 September, W12).** The modules and feature toggles here, including `guestCheckout` (which fields its pop-up asks is `guestContactFields` on CMS-016, W1) and the new `visitPlanner` module, which shows or hides the mobile Plan tab and WEB-050 (MOB-1). A Site Builder card leads new tenants into the seven steps.",
   "states": {
    "loading": "The tenant, read by `getTenantAppStatus`.",
    "error": "Could not load. Names which read failed and leaves the tenant untouched.",
@@ -929,7 +936,7 @@
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getBrandIdentity` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Hold the marks every surface needs, at the sizes it needs them.",
+  "purpose": "Hold the marks every surface needs, at the sizes it needs them, and the mobile app's intro video (Site Builder steps 5 and 6).",
   "states": {
    "loading": "The logo assets, read by `getBrandIdentity`.",
    "error": "Could not load. Names which read failed and leaves the logo assets untouched.",
@@ -988,9 +995,12 @@
         "BrandIdentity.splashDurationSeconds",
         "BrandIdentity.splashBackgroundColour",
         "BrandIdentity.showLoadingIndicator",
-        "BrandIdentity.splashChangeScope"
+        "BrandIdentity.splashChangeScope",
+        "BrandIdentity.introVideoAssetRef",
+        "BrandIdentity.introVideoMode"
        ],
        "operation": "getBrandIdentity",
+       "notes": "**Intro video (decided 29 September, MOB-5).** Picked from the media library (CMS-010); plays off, on first launch or on every launch, always with Skip introduction. Streamed, so it needs no app build, unlike the splash and icons.",
        "provenance": "contract white-label.yaml GET /tenant-config/brand"
       },
       {
@@ -1051,7 +1061,7 @@
     "id": "formSetBrandIdentity",
     "component": "modal",
     "trigger": "Save brand identity",
-    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `splashChangeScope`, `introVideoAssetRef` and `introVideoMode` (off, first launch or every launch; MOB-5). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "BrandIdentity",
     "confirm": {
      "label": "Save brand identity",
@@ -1068,7 +1078,9 @@
       "splashDurationSeconds",
       "splashBackgroundColour",
       "showLoadingIndicator",
-      "splashChangeScope"
+      "splashChangeScope",
+      "introVideoAssetRef",
+      "introVideoMode"
      ]
     },
     "provenance": "contract white-label.yaml PUT /tenant-config/brand"
@@ -1173,9 +1185,11 @@
         "Theme.darkMode",
         "Theme.cornerRadius",
         "Theme.surfaceStyle",
-        "Theme.buttonStyle"
+        "Theme.buttonStyle",
+        "Theme.componentColours"
        ],
        "operation": "getTheme",
+       "notes": "**Per-element colours (decided 17 September, M17-11).** Pickers for the main call to action, the pay button, add to cart, the Buy tickets button, links and badges, each with a live contrast warning; left empty they follow the theme. The guest flow itself stays standard.",
        "provenance": "contract white-label.yaml GET /tenant-config/theme"
       }
      ]
@@ -1236,7 +1250,7 @@
     "id": "formSetTheme",
     "component": "modal",
     "trigger": "Save theme",
-    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle` (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided 29 September, rev 3 CFG-3). **A colour pair that fails contrast is refused** (`400 ContrastProblem`, decided 28 September, audit R139 (a)): the modal stays open with the failing pairs marked. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle` (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided 29 September, rev 3 CFG-3) and `componentColours` (M17-11). **A colour pair that fails contrast is refused** (`400 ContrastProblem`, decided 28 September, audit R139 (a)): the modal stays open with the failing pairs marked. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "Theme",
     "confirm": {
      "label": "Save theme",
@@ -1253,7 +1267,8 @@
       "darkMode",
       "cornerRadius",
       "surfaceStyle",
-      "buttonStyle"
+      "buttonStyle",
+      "componentColours"
      ]
     },
     "provenance": "contract white-label.yaml PUT /tenant-config/theme"
@@ -1658,6 +1673,7 @@
         "HomepageLayout.sections"
        ],
        "operation": "getHomepageLayout",
+       "notes": "**Also the mobile Home editor (decided 29 September, MOB-3; Site Builder steps 5 and 6).** The `venueOverview` section (description, opening hours, type tiles), the hero's style (carousel, video, poster or split) and 1 or 2 highlights for attractions, dining, what's on and shop (`maxItems`). The header and footer are set here too (`setHeader`, `setFooter`).",
        "provenance": "contract white-label.yaml GET /tenant-config/homepage"
       },
       {
@@ -1805,6 +1821,20 @@
      "getHomepageLayout",
      "getModuleEnablement"
     ]
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Record which AI draft or proposal was used, or why it was refused",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1817,6 +1847,10 @@
    "params": [
     {
      "name": "pageId",
+     "from": "navigation"
+    },
+    {
+     "name": "actionId",
      "from": "navigation"
     }
    ]
@@ -1990,7 +2024,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPromoBlocks` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Define what a block can and cannot contain.",
+  "purpose": "Define what a block can and cannot contain, and set the banners (Site Builder step 5).",
   "layout": {
    "template": "split",
    "regions": [
@@ -2179,6 +2213,20 @@
      "listPromoBlocks",
      "listBanners"
     ]
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Record which AI draft or proposal was used, or why it was refused",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2196,6 +2244,10 @@
     },
     {
      "name": "promoBlockId",
+     "from": "navigation"
+    },
+    {
+     "name": "actionId",
      "from": "navigation"
     }
    ]
@@ -2389,7 +2441,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMenus` reads the population and `getMenu` reads one of them — list, select, act",
-  "purpose": "Decide what appears in the header and the footer.",
+  "purpose": "Decide what appears in the header, the footer and the mobile tab bar, with the Buy tickets button (Site Builder steps 5 and 6).",
   "layout": {
    "template": "split",
    "regions": [
@@ -2452,9 +2504,34 @@
      ]
     },
     {
+     "name": "navigationEditor",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Navigation and mobile tabs",
+       "bindsTo": "NavigationConfig",
+       "columns": [
+        "NavigationConfig.kind",
+        "NavigationConfig.items",
+        "NavigationConfig.buyButton"
+       ],
+       "operation": "getNavigation",
+       "notes": "**The mobile tab editor (decided 29 September, MOB-1 and MOB-2).** Which tabs, their order, labels and icons; each tab is an `appSection` link. The default is Home, Explore, Plan and Tickets; Map is optional; Plan needs the `visitPlanner` module. The Buy tickets button: raised in the centre (default), floating, flat or hidden, and its label. At most five tabs are visible.",
+       "provenance": "contract white-label.yaml GET /tenant-config/navigation"
+      }
+     ]
+    },
+    {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save navigation and tabs",
+       "operation": "setNavigation",
+       "provenance": "contract white-label.yaml PUT /tenant-config/navigation"
+      },
       {
        "kind": "primaryButton",
        "label": "Create menu",
@@ -2485,6 +2562,12 @@
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getNavigation",
+    "contract": "white-label",
+    "purpose": "The navigation and the mobile tab set (MOB-1)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "listMenus",
     "contract": "fnb",
@@ -2527,8 +2610,11 @@
    {
     "operationId": "setNavigation",
     "contract": "white-label",
-    "purpose": "Set main and overflow navigation",
+    "purpose": "Save the navigation, the mobile tabs and the Buy tickets button (MOB-1, MOB-2)",
     "trigger": "onAction",
+    "invalidates": [
+     "getNavigation"
+    ],
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
@@ -2555,6 +2641,26 @@
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
+   {
+    "id": "formSetNavigation",
+    "component": "modal",
+    "trigger": "Save navigation and tabs",
+    "body": "**Collects what `setNavigation` sends.** Required: `kind`, `items` (label, icon, target, visible, order; a mobile tab targets an `appSection`). Optional: `buyButton` (`style`, `label`). Refused `400` when a tab targets a disabled module or more than five are visible. Dismissing sends nothing.",
+    "bindsTo": "NavigationConfig",
+    "confirm": {
+     "label": "Save navigation",
+     "operation": "setNavigation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "items",
+      "buyButton"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/navigation"
+   },
    {
     "id": "formCreateMenu",
     "component": "modal",
@@ -3197,6 +3303,13 @@
     "invalidates": [
      "searchMedia"
     ]
+   },
+   {
+    "operationId": "semanticSearch",
+    "contract": "ai",
+    "purpose": "Natural-language search of the media library (kind media)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {

@@ -265,6 +265,20 @@
     "purpose": "Create one",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "proposeTranslations",
+    "contract": "ai",
+    "purpose": "Draft other languages of a message template (any channel) for review",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -389,6 +403,13 @@
     "purpose": "Build a newsletter",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -508,6 +529,13 @@
     "purpose": "Content blocks and product feed",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -776,6 +804,13 @@
     "purpose": "Notification rules",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1256,6 +1291,27 @@
     "purpose": "Content, translation and branding",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Record which AI draft or proposal was used, or why it was refused",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "proposeTranslations",
+    "contract": "ai",
+    "purpose": "Draft other languages of a message template (any channel) for review",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1264,6 +1320,14 @@
    "workshopBoard": "wireframes/WS75 Marketing CRM Configuration Reference v1.0 Board 6.dc.html#bo-793"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "actionId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

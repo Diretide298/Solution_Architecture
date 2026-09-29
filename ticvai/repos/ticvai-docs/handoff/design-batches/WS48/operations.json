@@ -10,6 +10,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "buyXGetX",
     "in": "query",
     "required": false
@@ -46,6 +51,26 @@
    },
    {
     "name": "fixedBundlePrice",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "giftWithPurchase",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "addedValue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "crossCategoryReward",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "upgradeOffer",
     "in": "query",
     "required": false
    }
@@ -101,7 +126,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "mode",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "OfferSimulationBasketTraceAiOptimizationView"
  },
@@ -127,7 +158,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BuyXGetYBogoRuleBuilderInput",
   "responds": "BuyXGetYBogoRuleBuilderView"
  },
@@ -140,7 +177,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CrossCategoryPromotionBuilderInput",
   "responds": "CrossCategoryPromotionBuilderView"
  },
@@ -153,7 +196,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "FixedPriceNForXOfferBuilderInput",
   "responds": "FixedPriceNForXOfferBuilderView"
  },
@@ -166,7 +215,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GiftFreeProductAddedValueOfferBuilderInput",
   "responds": "GiftFreeProductAddedValueOfferBuilderView"
  }

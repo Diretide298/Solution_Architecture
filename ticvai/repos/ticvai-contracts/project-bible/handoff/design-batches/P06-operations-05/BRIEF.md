@@ -1,6 +1,6 @@
 # P06-operations-05 — P06 · Operations (5 of 5)
 
-**6 screens · 15 operations · 16 schemas · 9 permissions**
+**6 screens · 15 operations · 26 schemas · 9 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -61,12 +61,12 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `EMP-048` | Opening checklist | listDetail | 4 | 0 | — |
-| `EMP-047` | Emergency mode | listDetail | 4 | 0 | — |
-| `EMP-050` | Post-incident restore | listDetail | 4 | 0 | — |
+| `EMP-048` | Opening checklist | listDetail | 4 | 2 | — |
+| `EMP-047` | Emergency mode | listDetail | 4 | 1 | — |
+| `EMP-050` | Post-incident restore | listDetail | 4 | 2 | — |
 | `EMP-045` | Arabic / RTL | listDetail | 0 | 0 | — |
 | `EMP-046` | Sign out | configEditor | 1 | 0 | — |
-| `EMP-049` | Hand over the journal | listDetail | 2 | 0 | — |
+| `EMP-049` | Hand over the journal | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 

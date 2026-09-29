@@ -1,6 +1,6 @@
 # P02-discovery-01 — P02 · Discovery
 
-**1 screens · 1 operations · 0 schemas · 0 permissions**
+**1 screens · 1 operations · 4 schemas · 0 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -62,8 +62,4 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-063` | Search | listDetail | 1 | 0 | — |
-
-## Thin screens in this batch
-
-**GST-063 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `GST-063` | Explore – Search Results | listDetail | 1 | 0 | — |

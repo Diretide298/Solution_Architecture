@@ -14,46 +14,64 @@
   },
   "navigation": {
    "entryFrom": [
-    "WEB-004"
+    "WEB-004",
+    "WEB-006",
+    "WEB-002"
    ],
    "exitTo": [
     "WEB-001",
     "WEB-006",
     "WEB-007",
     "WEB-008",
-    "WEB-010"
+    "WEB-010",
+    "WEB-016"
    ],
    "transitions": [
     {
      "to": "WEB-006",
-     "trigger": "Picks a date and session",
-     "provenance": "flow F01 step 3→4"
+     "trigger": "Change date or time (the dated flow picks them first)",
+     "provenance": "decided 29 September, rev 3 REV3-2: date → time → ticket; WEB-006 now comes before this screen (flow F01 step 3→4)",
+     "carries": [
+      "eventId"
+     ]
     },
     {
      "to": "WEB-007",
      "trigger": "Interactive Seat Selection",
      "carries": [
-      "performanceId"
+      "eventId"
      ],
-     "provenance": "derived — WEB-007 declares entryState.params performanceId, so an edge into it must carry them"
+     "provenance": "derived — WEB-007 declares entryState.params eventId, holdId, performanceId and WEB-005 holds eventId, so an edge into it carries them"
     },
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "carries": [
-      "cartId"
-     ],
-     "provenance": "derived — WEB-008 declares entryState.params cartId, so an edge into it must carry them"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them, so the edge carries nothing and WEB-008 opens cold"
     },
     {
      "to": "WEB-010",
      "trigger": "Shopping Cart",
      "carries": [
-      "cartId",
       "code",
       "lineId"
      ],
-     "provenance": "derived — WEB-010 declares entryState.params cartId, code, lineId, so an edge into it must carry them"
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-005 holds code, lineId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-016",
+     "trigger": "Continue, when sign-in is asked after add-ons and this booking has no add-ons step",
+     "carries": [
+      "cartId"
+     ],
+     "provenance": "decided 29 September, rev 3 REV3-3: `BookingFlowConfig.signInAt` `afterAddOns`; the basket is kept"
+    },
+    {
+     "to": "WEB-006",
+     "trigger": "Workshop chosen, then date and time (product-first flow)",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "decided 29 September 2026 (P29), W8"
     }
    ]
   },
@@ -69,8 +87,51 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "banner",
+       "label": "Booking at",
+       "notes": "The venue this booking is for, with **Change location**. Reuses the venue choice of WEB-001 (audit R267). On a switch the selection is cleared, except lines whose product shares a `familyKey` with a product at the new venue, which move to it; times and prices refresh. Shown only when `BookingFlowConfig.locationSwitcher` is on.",
+       "provenance": "decided 29 September, rev 3 REV3-18"
+      },
+      {
+       "kind": "cardList",
+       "label": "Ticket categories",
+       "bindsTo": "ProductCategory",
+       "notes": "`ticketCategories` `categoryThenSubcategory` (default): category tiles, then that category's tickets (`listProducts?categoryId=`); `flatList`: every ticket at once.",
+       "operation": "listProductCategories",
+       "provenance": "decided 29 September, rev 3 REV3-16"
+      },
+      {
+       "kind": "selectField",
+       "label": "Choose your experience",
+       "bindsTo": "ProductCategory",
+       "notes": "Each option carries its one-line `ProductCategory.description`. Narrows `listProducts?categoryId=`.",
+       "operation": "listProductCategories",
+       "provenance": "decided 29 September, rev 3 REV3-19"
+      },
+      {
+       "kind": "selectField",
+       "label": "Select level",
+       "notes": "Beginner to expert, from the products' `segmentTags` `level/<code>` (`listProducts?segmentTag=`). **Reset** clears both filters.",
+       "operation": "listProducts",
+       "provenance": "decided 29 September, rev 3 REV3-19"
+      },
+      {
+       "kind": "banner",
+       "label": "Help me choose",
+       "bindsTo": "GuidedChoice",
+       "notes": "The venue's published Help me choose, if any (404 = none, and nothing shows). `mode` `button`: a button on this step; `popupOnArrival`: the pop-up also opens once on the first arrival (a seen flag on the device only); `showBanner`: a dark banner under the products (*Choose from the experiences above or let us help you decide*). Opens the Help me choose pop-up. **29 September (W4): the answers filter the list** (`guidedAnswerIds` on `listProducts`); *Show everything* clears it. Not a consent step: a swimmer answer pre-fills the REV3-26 swim consent, which the guest still confirms.",
+       "operation": "getPublishedGuidedChoice",
+       "provenance": "decided 29 September, rev 3 REV3-11"
+      },
+      {
+       "kind": "iconButton",
+       "label": "Quick tour",
+       "notes": "Replays the four-step coach-mark tour. Shown only when `BookingFlowConfig.quickTour` is on (default off).",
+       "provenance": "decided 29 September, rev 3 REV3-20"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every ticket type selection",
+       "label": "Every product variant",
        "bindsTo": "ProductVariant",
        "columns": [
         "ProductVariant.id",
@@ -81,6 +142,36 @@
        ],
        "operation": "listProductVariants",
        "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
+      },
+      {
+       "kind": "cardList",
+       "bindsTo": "ProductVariant[]",
+       "notes": "Each row is a variant with a stepper. Price updates live. Each row shows `ProductVariant.description` (who it is for, what it includes) behind the (i) when `BookingFlowConfig.cardInfo` is on (23SEP-6), its display tags when `ticketTags` is on (23SEP-3) and its own photo (23SEP-4). In the dated flow the rows stay hidden until a time is picked (`performanceReveal` `dateTimeTicket`, REV3-2)",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "bindsTo": "PromotionEvaluation.rejected",
+       "notes": "Shows near-miss offers — \"add one more for the family rate\". Uses the rejected list, which exists precisely so this can be said",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Booking steps",
+       "bindsTo": "BookingFlow",
+       "columns": [
+        "BookingFlow.steps"
+       ],
+       "operation": "getPublishedBookingFlow",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Show everything",
+       "operation": "listProducts",
+       "notes": "Clears the Help me choose filter (W4).",
+       "provenance": "decided 29 September 2026 (P29), W4"
       }
      ]
     },
@@ -90,7 +181,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected ticket type selection",
+       "label": "The selected product variant",
        "bindsTo": "ProductVariant",
        "columns": [
         "ProductVariant.id",
@@ -110,34 +201,10 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Evaluate",
+       "label": "Evaluate promotions",
        "operation": "evaluatePromotions",
        "provenance": "contract promotions.yaml POST /promotions/evaluate"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "bindsTo": "ProductVariant[]",
-       "notes": "Each row is a variant with a stepper. Price updates live",
-       "provenance": "carried from the previous definition"
       },
-      {
-       "kind": "banner",
-       "bindsTo": "PromotionEvaluation.rejected",
-       "notes": "Shows near-miss offers — \"add one more for the family rate\". Uses the rejected list, which exists precisely so this can be said",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "carried",
-     "components": [
       {
        "kind": "primaryButton",
        "label": "Continue",
@@ -150,9 +217,9 @@
   "states": {
    "loading": "The ticket type selection list.",
    "error": "Could not load. Names which read failed and leaves the ticket type selection untouched.",
-   "emptyFirstRun": "No ticket type selection yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the ticket type selection are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No ticket type selection yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -170,6 +237,31 @@
     "contract": "catalogue",
     "purpose": "List generated variants",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductCategories",
+    "contract": "catalogue",
+    "purpose": "Category tiles and the experience filter, with descriptions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "The tickets of a category or level (`categoryId`, `segmentTag`)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPublishedGuidedChoice",
+    "contract": "white-label",
+    "purpose": "The venue's published Help me choose (404 = none)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPublishedBookingFlow",
+    "contract": "white-label",
+    "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), W12"
    }
   ],
   "entryState": {
@@ -177,6 +269,10 @@
     {
      "name": "productId",
      "from": "WEB-004"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
@@ -189,11 +285,74 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-005"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-005",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Header 'Book' (or any card's Book) → step 1 'Tickets' of the booking stepper; e.g. Tidewater Museum → 'Category → subcategory tickets'",
+    "differences": "Ticket choice is on the same step as date and time and comes last: 'Date → time → ticket' (Config 'Performance reveal', Rev 3 item 2), whereas YAML goes WEB-005 → WEB-006. Prototype adds category → subcategory browsing, info-only (not bookable) products, 'Help me choose' questions, location switcher ('Booking at' bar), quick tour. Promo codes are entered in the cart, not on this step (YAML keeps evaluatePromotions here)."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formEvaluatePromotions",
+    "component": "modal",
+    "trigger": "Evaluate promotions",
+    "body": "**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "EvaluatePromotionsRequest",
+    "confirm": {
+     "label": "Evaluate promotions",
+     "operation": "evaluatePromotions"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "channel",
+      "lines",
+      "subjectId",
+      "membershipTierId",
+      "couponCodes",
+      "evaluateAt"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "helpMeChoose",
+    "component": "modal",
+    "trigger": "Help me choose (the button, the banner, or once on first arrival when the mode is popupOnArrival)",
+    "body": "**One or two questions, three answers each** (title, one-liner, icon, optional badge), from the published `GuidedChoice`. The answer to the last question opens its target through a result card: a product (this step with that product), a product category (its tiles), an event (WEB-006) or a module. **Start over** returns to the first question. Nothing is sent to the server; the guest's answers stay on the device (decided 29 September, rev 3 REV3-11).",
+    "bindsTo": "GuidedChoice",
+    "confirm": {
+     "label": "Show me"
+    },
+    "dismiss": {
+     "label": "Close",
+     "discards": [
+      "answers"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "quickTour",
+    "component": "modal",
+    "trigger": "First booking visit on this device, or Quick tour",
+    "body": "**Four coach marks** over date, time, tickets and basket, with Back, Next and End tour. Shown once per device (the flag is kept on the device only) and replayable from Quick tour; only when `BookingFlowConfig.quickTour` is on (decided 29 September, rev 3 REV3-20).",
+    "dismiss": {
+     "label": "End tour",
+     "discards": []
+    },
+    "provenance": "client-verified"
+   }
+  ],
+  "notes": "**Rev 3 (decided 29 September).** **Order (REV3-2):** in the dated flow the guest picks the date, then the time (WEB-006), then tickets here: tickets stay hidden until a time is picked and Continue stays off until both are chosen, per `BookingFlowConfig.performanceReveal` (`dateTimeTicket` default, `allAtOnce` shows all). The two steps may render as one staged page. This screen may also render as a side panel on WEB-002 and WEB-004 (23SEP-5). **Sign-in (REV3-3):** with `signInAt` `afterAddOns` (default) the sign-in or guest code is asked when the guest leaves Add-ons (WEB-008), or on Continue here when the booking has no add-ons step; `atPayment` asks at WEB-012. The basket is kept either way. **Filters:** categories (REV3-16), experience and level (REV3-19). **Info-only** products show their label and open details (REV3-14). **Help me choose** (REV3-11) is a region and a pop-up of this step, not a screen of its own: the prototype draws it as a dialog over the booking step with a banner under the products. **Quick tour** (REV3-20). **Cart (REV3-10):** `cartLayout` may be `floatingIcon`, a round basket button with the count that opens the cart; the cart stays on the right in Arabic unless `cartSideInRtl` is `mirror`. Card layout, size and density are enums (DG-6). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** W4: Help me choose filters. W8: in a product-first flow (workshop) this step comes first and the date follows. W5: surf levels appear only after a time slot.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -227,7 +386,7 @@
  },
  {
   "id": "WEB-006",
-  "name": "Date & Session Selection",
+  "name": "Date & Performance Selection",
   "module": "Booking & Selection",
   "requiresModule": "ticketing",
   "wave": 1,
@@ -240,7 +399,8 @@
   },
   "navigation": {
    "entryFrom": [
-    "WEB-005"
+    "WEB-005",
+    "WEB-004"
    ],
    "exitTo": [
     "WEB-001",
@@ -251,47 +411,44 @@
    ],
    "transitions": [
     {
-     "to": "WEB-007",
-     "trigger": "Selects seats on the map",
-     "provenance": "flow F02 step 1→2",
-     "operation": "getAvailability"
+     "to": "WEB-005",
+     "trigger": "Picks a time; the tickets for it appear",
+     "provenance": "decided 29 September, rev 3 REV3-2: date → time → ticket (flow F01 step 3→4)",
+     "carries": [
+      "performanceId"
+     ]
+    },
+    {
+     "to": "WEB-008",
+     "trigger": "Add-ons & Upsell",
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them, so the edge carries nothing and WEB-008 opens cold"
     },
     {
      "to": "WEB-010",
      "trigger": "Reviews the cart and may enter a promotion code",
      "provenance": "flow F01 step 4→5",
-     "operation": "getAvailability"
-    },
-    {
-     "to": "WEB-005",
-     "trigger": "Ticket Type Selection",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — WEB-005 declares entryState.params productId, so an edge into it must carry them"
-    },
-    {
-     "to": "WEB-008",
-     "trigger": "Add-ons & Upsell",
+     "operation": "getAvailability",
      "carries": [
       "cartId"
-     ],
-     "provenance": "derived — WEB-008 declares entryState.params cartId, so an edge into it must carry them"
+     ]
+    },
+    {
+     "to": "WEB-007",
+     "trigger": "Selects seats on the map",
+     "provenance": "flow F02 step 1→2",
+     "operation": "getAvailability",
+     "carries": [
+      "eventId",
+      "performanceId"
+     ]
     }
    ]
   },
-  "notes": "Availability is read live and never cached beyond a few seconds. A guest selecting a session that filled while they were reading is a worse outcome than a slightly slower screen. **Wired 24 August from review**: acquireInventoryHold. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.",
+  "notes": "Availability is read live and never cached beyond a few seconds. A guest selecting a session that filled while they were reading is a worse outcome than a slightly slower screen. **Wired 24 August from review**: acquireInventoryHold. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.\n\n**Rev 3 (decided 29 September).** **Date → time → ticket (REV3-2):** this step now comes before the ticket choice (WEB-005); the time sits right after the date and stays hidden until a date is picked, and tickets stay hidden until a time is picked (`BookingFlowConfig.performanceReveal`, default `dateTimeTicket`; `allAtOnce` shows everything). **Times (REV3-1):** compact tiles paged `timesPerPage` at a time, with Morning / Afternoon / Evening chips and counts (`dayPartFilter`, boundaries per venue, default before 12:00, 12:00-17:00, from 17:00, venue time zone). **Seated events (REV3-4, REV3-7):** `seatEventDateMode` `inlineStep` keeps this step before the seat map; `popupOnSeatMap` asks the date and time in a pop-up over WEB-007 instead. **This step is skipped when the event has exactly one on-sale performance.** For a seated event this step and WEB-007 may render as one page (date, time, show — plus language and format for cinema — and the seat map). **Language (REV3-17)**, **experience and level with a four-day calendar (REV3-19)**, **Booking at (REV3-18)**, **Quick tour (REV3-20)**. **Consent questions (REV3-26)** pop up once after the session or date is picked; the prototype's *Swim consent pop-up (on/off)* toggle is dropped because questions are attached per product or flow. Per-guest age and height eligibility, guardian signature and *Remove this guest* are `checkBookingEligibility`, unchanged (DG-3). **Guest-facing copy may say *Session*** (CFG-10, a glossary exception like *Booking* under audit R145); code and contracts keep `Performance`. Floating basket icon and cart side (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** M17-08: the date strip shows the next seven days, with a calendar for later dates. W5: surf products (beginner, intermediate …) only after a time slot. W8: the date-first default no longer overrides product-first flows: order comes from the flow. W11: tours stay date → language → time slot, unchanged.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getAvailability` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Pick a date and time that has capacity.",
-  "gaps": [
-   {
-    "operation": "getAvailability",
-    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -301,9 +458,20 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Acquire",
-       "operation": "acquireInventoryHold",
+       "label": "Acquire inventory hold",
+       "operation": "addCartLine",
        "provenance": "contract catalogue.yaml POST /inventory-holds"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Check booking eligibility",
+       "operation": "checkBookingEligibility",
+       "provenance": "contract catalogue.yaml POST /eligibility-checks"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Continue",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -312,40 +480,105 @@
      "slot": "carried",
      "components": [
       {
+       "kind": "banner",
+       "label": "Booking at",
+       "notes": "The venue this booking is for, with **Change location** (audit R267 venue choice). On a switch the selection clears unless products share a `familyKey`; times and prices refresh. Only when `BookingFlowConfig.locationSwitcher` is on.",
+       "provenance": "decided 29 September, rev 3 REV3-18"
+      },
+      {
+       "kind": "selectField",
+       "label": "Part of the day",
+       "notes": "Morning, Afternoon and Evening chips, each with its count of times, split in the venue time zone at `BookingFlowConfig.dayPartBoundaries` (`afternoonStartsAt` default 12:00, `eveningStartsAt` default 17:00). Shown when `dayPartFilter` is on (default on).",
+       "operation": "listPerformances",
+       "provenance": "decided 29 September, rev 3 REV3-1"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tour language",
+       "notes": "EN, AR, FR, DE, ZH, RU; sends `?language=` so only performances in that language are listed. Each time shows `Performance.language`, and for cinema also `Performance.format` (2D, 3D, subtitled).",
+       "operation": "listPerformances",
+       "provenance": "decided 29 September, rev 3 REV3-17"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Next 7 days",
+       "notes": "**Date strip of the next `BookingFlowSettings.dateStripDays` days** (default 7, 3-31) with a calendar icon for the full month (M17-08). Surf-style layout: four days side by side, each time with places left and the price per person; the experience and level filters of WEB-005 apply. A layout of the same data, no package change.",
+       "operation": "listPerformances",
+       "provenance": "decided 29 September, rev 3 REV3-19"
+      },
+      {
+       "kind": "iconButton",
+       "label": "Quick tour",
+       "notes": "Replays the coach-mark tour when `BookingFlowConfig.quickTour` is on.",
+       "provenance": "decided 29 September, rev 3 REV3-20"
+      },
+      {
        "kind": "datePicker",
        "notes": "Sold-out dates disabled with a reason on hover, not hidden",
        "provenance": "carried from the previous definition"
       },
       {
        "kind": "cardList",
-       "bindsTo": "Availability.performances",
-       "notes": "Session times with remaining counts. Availability is per channel — a session showing sold out here may still have counter allocation, which is correct behaviour and not a defect",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "carried",
-     "components": [
+       "bindsTo": "PerformanceAvailabilityPage.items",
+       "notes": "Session times with remaining counts. Availability is per channel — a session showing sold out here may still have counter allocation, which is correct behaviour and not a defect. **More than 8 times show as compact tiles**, `BookingFlowConfig.timesPerPage` at a time (8, 12, 24 or all; default 24) with Earlier and Later; sold-out times greyed, not hidden. Times stay hidden until a date is picked (`performanceReveal`).",
+       "provenance": "carried from the previous definition; decided 29 September, rev 3 REV3-1, REV3-2"
+      },
       {
-       "kind": "primaryButton",
-       "label": "Continue",
-       "provenance": "carried from the previous definition"
+       "kind": "dataTable",
+       "label": "Availability",
+       "operation": "getAvailability",
+       "notes": "From `getAvailability`, now a `PerformanceAvailabilityPage` (a Page of `PerformanceAvailability`, each with `startsAt`): `channelCapacityId`, `performanceId`, `startsAt`, `capacity`, `sold`, `leased`, `remaining`, `byChannel`. The time grid calls it once with `eventId`, `from` and `to` for every performance in the window (decided 29 September, rev 3 REV3-1), not once per tile.",
+       "provenance": "contract catalogue.yaml GET /availability",
+       "bindsTo": "PerformanceAvailability"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The performance",
+       "bindsTo": "Performance",
+       "columns": [
+        "Performance.id",
+        "Performance.eventId",
+        "Performance.startsAt",
+        "Performance.endsAt",
+        "Performance.approvalRequestId",
+        "Performance.requiresApprovalToCancel",
+        "Performance.status",
+        "Performance.admissionRulesId",
+        "Performance.seatMapId"
+       ],
+       "operation": "getPerformance",
+       "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Booking steps",
+       "bindsTo": "BookingFlow",
+       "columns": [
+        "BookingFlow.steps"
+       ],
+       "operation": "getPublishedBookingFlow",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The date session selection list.",
+   "loading": "The date session selection, read by `getPerformance`.",
    "error": "Could not load. Names which read failed and leaves the date session selection untouched.",
-   "emptyFirstRun": "No date session selection yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the date session selection are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "emptyFirstRun": "No date session selection yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing.",
+   "emptyNoResults": "No time matches the part of the day or the language picked, and the other times are still there. Names the filter and offers to clear it."
   },
   "apis": [
+   {
+    "operationId": "checkBookingEligibility",
+    "contract": "catalogue",
+    "purpose": "Check the party's ages and heights",
+    "trigger": "onAction"
+   },
    {
     "operationId": "getAvailability",
     "contract": "catalogue",
@@ -353,8 +586,8 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "acquireInventoryHold",
-    "contract": "catalogue",
+    "operationId": "addCartLine",
+    "contract": "orders",
     "purpose": "Acquire an inventory lease",
     "trigger": "onAction"
    },
@@ -362,13 +595,49 @@
     "operationId": "getPerformance",
     "contract": "catalogue",
     "purpose": "The performance being booked",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listPerformances",
+    "contract": "catalogue",
+    "purpose": "The times of the event for the picked date or range, filtered by `language`",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "The cart's `consentQuestions` after the time is added",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "recordConsentAnswers",
+    "contract": "marketing-crm",
+    "purpose": "Record the answers to the booking's consent questions",
+    "trigger": "onAction",
+    "invalidates": [
+     "getCart"
+    ]
+   },
+   {
+    "operationId": "getPublishedBookingFlow",
+    "contract": "white-label",
+    "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), W12"
    }
   ],
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-006"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-006",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Book → step 1; e.g. Summit Peaks → 'Timed access — 10-minute slots', Coastal Aqua → 'Surf sessions with filters'",
+    "differences": "Merged into the ticket step (date first, time revealed after the date, tickets after the time). Prototype adds morning/afternoon/evening filters, times-per-page paging, sold-out greying, per-guest age/height eligibility dialog with 'Remove this guest', and the water-park 'Are you able to swim?' pop-up. YAML's separate hold call (addCartLine / inventory hold) is implicit."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "entryState": {
@@ -376,9 +645,82 @@
     {
      "name": "performanceId",
      "from": "navigation"
+    },
+    {
+     "name": "cartId",
+     "from": "navigation"
+    },
+    {
+     "name": "eventId",
+     "from": "WEB-004"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formCheckBookingEligibility",
+    "component": "modal",
+    "trigger": "Check booking eligibility",
+    "body": "**Collects what `checkBookingEligibility` sends before it is called.** Required: `productIds`, `party`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "EligibilityCheckRequest",
+    "confirm": {
+     "label": "Check booking eligibility",
+     "operation": "checkBookingEligibility"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "productIds",
+      "party"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formAcquireInventoryHold",
+    "component": "modal",
+    "trigger": "Add to cart",
+    "body": "**Collects what `addCartLine` sends before it is called; the cart takes the hold server-side.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add to cart",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "channelCapacityId",
+      "requestedUnits",
+      "ttlSeconds",
+      "channel"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "consentQuestions",
+    "component": "modal",
+    "trigger": "Once, after the session or date is picked, when the cart has consent questions",
+    "body": "**The venue's consent questions for this booking**, e.g. *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*: one or several, in the order `Cart.consentQuestions` gives (the booking flow's `BookingFlowConfig.consentQuestionIds` and every cart product's `consentQuestionIds`, each question once). A question asked **per person** is asked for each member of the party; one asked **per booking** once. Themed as the prototype's pop-up (Yes / No, Next). Next sends the answers to `recordConsentAnswers`, which stores each as a consent record (question version, answer, who answered, when). **A blocking answer** (e.g. *No* to the swim question) marks the lines it blocks and says so; the guest removes them or answers again. There is no tenant on/off toggle: a question is attached to a product or a flow by the venue (decided 29 September, rev 3 REV3-26).",
+    "bindsTo": "ConsentQuestion",
+    "confirm": {
+     "label": "Next",
+     "operation": "recordConsentAnswers"
+    },
+    "dismiss": {
+     "label": "Back",
+     "discards": [
+      "answers"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -425,7 +767,9 @@
   },
   "navigation": {
    "entryFrom": [
-    "WEB-006"
+    "WEB-006",
+    "WEB-004",
+    "WEB-049"
    ],
    "exitTo": [
     "WEB-001",
@@ -436,37 +780,36 @@
    ],
    "transitions": [
     {
-     "to": "WEB-010",
-     "trigger": "Reviews the cart",
-     "provenance": "flow F02 step 2→3"
-    },
-    {
      "to": "WEB-005",
      "trigger": "Ticket Type Selection",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — WEB-005 declares entryState.params productId, so an edge into it must carry them"
+     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-007 holds none of them, so the edge carries nothing and WEB-005 opens cold"
     },
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "carries": [
-      "cartId"
-     ],
-     "provenance": "derived — WEB-008 declares entryState.params cartId, so an edge into it must carry them"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them, so the edge carries nothing and WEB-008 opens cold"
     },
     {
      "to": "WEB-006",
-     "trigger": "Date & Session Selection",
+     "trigger": "Date & Performance Selection",
      "carries": [
+      "eventId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params performanceId, so an edge into it must carry them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-007 holds eventId, performanceId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-010",
+     "trigger": "Reviews the cart",
+     "provenance": "flow F02 step 2→3",
+     "carries": [
+      "holdId",
+      "performanceId"
+     ]
     }
    ]
   },
-  "notes": "A map with no geometry falls back to category and best-available selection. Availability returns renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.** **Renamed 31 August** from *Seat Map Selection*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added recommendSeats. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "notes": "A map with no geometry falls back to category and best-available selection. Availability returns renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.** **Renamed 31 August** from *Seat Map Selection*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added recommendSeats. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Date and time on seated events: an inline step before this map, or a pop-up over it, per `BookingFlowConfig.seatEventDateMode` (REV3-4); a single-performance event opens straight here. Time bar with performance switcher (REV3-6, `seatTimeBar`). View-from-your-seat box placed per `seatViewPosition` (REV3-5) and fed by a section photo or the geometry (23SEP-14). Fixture strip and a direct WEB-004 → WEB-007 path (23SEP-16). With WEB-006 this may render as one step (REV3-7). Seat picker defaults to the bowl (`seatPicker` default `bowl`, CFG-6). **The cabana map is no longer this screen:** a cabana, lounger or other spot placed on a venue map is booked on WEB-047 (REV3-15, GAP-C2). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September (W2).** Sections first, zoom into a section, scroll or pinch out (or *Whole map*) back to the full map; held seats are kept.",
   "density": "compact",
   "boardFrames": [
    "Seat Board 3.dc.html#seat-3b"
@@ -483,7 +826,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected interactive seat selection",
+       "label": "The seat availability",
        "bindsTo": "SeatAvailability",
        "columns": [
         "SeatAvailability.performanceId",
@@ -494,6 +837,50 @@
        ],
        "operation": "getSeatAvailability",
        "provenance": "contract seating.yaml GET /performances/{performanceId}/seat-availability"
+      },
+      {
+       "kind": "banner",
+       "notes": "Hold countdown, always visible. A selection that expires silently while a guest enters card details is the worst outcome in this flow",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "seatMap",
+       "label": "Choose seats",
+       "notes": "**A seat selection screen with no seat map.** `noGeometry` is the state that matters: a map imported from a manifest alone can be sold from a list and not rendered, and the screen has to say which it is rather than showing an empty frame. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking** on the guest channel (default 10, bounds 1-50): a `422 seat-limit-exceeded` from `createSeatHold` reads *Up to {maxSeats} seats per booking*, and the basket lists each seat (decided 29 September, rev 3 REV3-7). Section zoom happens on the same map (23SEP-16). **Sections first** (W2): tap a section to zoom in and see its seats; scroll or pinch out, or *← Whole map*, to return and compare sections, keeping held seats.",
+       "provenance": "minute 2026-08-03 §Ticket Flow Variations by Product Type"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time bar",
+       "notes": "Above the map: the chosen performance, the other times of the event to switch to, and **Change date**. Switching releases the seats held for the old performance (`relinquishSeatHold`, the guest's own hold; another's answers 404) and holds new ones for the new one (`createSeatHold`). Shown only when `BookingFlowConfig.seatTimeBar` is on (default on).",
+       "operation": "listPerformances",
+       "provenance": "decided 29 September, rev 3 REV3-6"
+      },
+      {
+       "kind": "cardList",
+       "label": "Fixture strip",
+       "notes": "The fixture (teams, date, kick-off) as a strip at the top of the seat step, so a single-performance fixture opens straight on the map.",
+       "operation": "listPerformances",
+       "provenance": "decided 29 September, rev 3 23SEP-16"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "View from this section",
+       "bindsTo": "SeatAvailability.sections",
+       "notes": "When a section is picked: its photo (`sections[].viewAssetId`) if the venue uploaded one, otherwise a view rendered from the imported geometry (section boundary, stage position, seat positions) — closer sections show a larger stage and fewer rows ahead. Placed per `BookingFlowConfig.seatViewPosition` (bottom default, right, left, top) on wide screens; always below the map on narrow screens.",
+       "operation": "getSeatAvailability",
+       "provenance": "decided 29 September, rev 3 23SEP-14, REV3-5"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Booking steps",
+       "bindsTo": "BookingFlow",
+       "columns": [
+        "BookingFlow.steps"
+       ],
+       "operation": "getPublishedBookingFlow",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (seats) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
       }
      ]
     },
@@ -503,39 +890,16 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create seat hold",
        "operation": "createSeatHold",
        "provenance": "contract seating.yaml POST /seat-holds"
       },
       {
        "kind": "secondaryButton",
-       "label": "Recommend",
+       "label": "Recommend seats",
        "operation": "recommendSeats",
        "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "banner",
-       "notes": "Hold countdown, always visible. A selection that expires silently while a guest enters card details is the worst outcome in this flow",
-       "provenance": "carried from the previous definition"
       },
-      {
-       "kind": "seatMap",
-       "label": "Choose seats",
-       "notes": "**A seat selection screen with no seat map.** `noGeometry` is the state that matters: a map imported from a manifest alone can be sold from a list and not rendered, and the screen has to say which it is rather than showing an empty frame.",
-       "provenance": "minute 2026-08-03 §Ticket Flow Variations by Product Type"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "carried",
-     "components": [
       {
        "kind": "primaryButton",
        "label": "Continue to checkout",
@@ -546,12 +910,12 @@
    ]
   },
   "states": {
-   "loading": "The interactive seat selection list.",
+   "loading": "The interactive seat selection, read by `getSeatAvailability`.",
    "error": "Could not load. Names which read failed and leaves the interactive seat selection untouched.",
-   "emptyFirstRun": "No interactive seat selection yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the interactive seat selection are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "emptyFirstRun": "No interactive seat selection yet. Offers Create seat hold (`createSeatHold`).",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing.",
+   "emptyNoResults": "The event has no other time to switch to on the time bar; the chosen performance stays."
   },
   "apis": [
    {
@@ -571,6 +935,25 @@
     "contract": "seating",
     "purpose": "Recommend seats for a party",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listPerformances",
+    "contract": "catalogue",
+    "purpose": "The event's other times, for the time bar and the date and time pop-up",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "relinquishSeatHold",
+    "contract": "seating",
+    "purpose": "Release the seats held for the old performance when the guest switches time on the time bar (decided 29 September, rev 3 REV3-6); a guest releases only their own hold",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getPublishedBookingFlow",
+    "contract": "white-label",
+    "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), W12"
    }
   ],
   "entryState": {
@@ -578,17 +961,103 @@
     {
      "name": "performanceId",
      "from": "deepLink"
+    },
+    {
+     "name": "eventId",
+     "from": "WEB-006"
+    },
+    {
+     "name": "holdId",
+     "from": "navigation"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A link to a performance that has happened.** Offers the next performance of the same event."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
+   "status": "review",
+   "provenance": "client-verified",
    "board": "wireframes/P01 Guest Web.dc.html#web-007",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "exact",
+    "view": "Union Arena → 'Flow 1 · Fixed date → zone → seat map' or 'Flow 2 · Choose date & time → seat map'; Grand Playhouse → Flow 1 / Flow 2"
+   },
+   "derivedFrom": "wireframes/reference/Seat Board 3.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateSeatHold",
+    "component": "modal",
+    "trigger": "Create seat hold",
+    "body": "**Collects what `createSeatHold` sends before it is called.** Required: `id`, `performanceId`, `seatIds`, `ttlSeconds`. Optional: `subjectId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateSeatHoldRequest",
+    "confirm": {
+     "label": "Create seat hold",
+     "operation": "createSeatHold"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "performanceId",
+      "seatIds",
+      "ttlSeconds",
+      "subjectId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRecommendSeats",
+    "component": "modal",
+    "trigger": "Recommend seats",
+    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize`, `strategy`. Optional: `categoryIds`, `maxPrice`, `accessibleCount`, `maxOptions`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SeatRecommendationRequest",
+    "confirm": {
+     "label": "Recommend seats",
+     "operation": "recommendSeats"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partySize",
+      "strategy",
+      "categoryIds",
+      "maxPrice",
+      "accessibleCount",
+      "maxOptions"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "dateTimeOnSeatMap",
+    "component": "modal",
+    "trigger": "The seat map opens for an event with several performances and `seatEventDateMode` is `popupOnSeatMap`",
+    "body": "**Pick the date and time over the seat map** instead of a separate step: the dates, then that day's times; choosing one loads that performance's seat availability. Closing it keeps the performance already shown (decided 29 September, rev 3 REV3-4).",
+    "bindsTo": "Performance",
+    "confirm": {
+     "label": "Show seats",
+     "to": "WEB-007",
+     "carries": [
+      "performanceId"
+     ]
+    },
+    "dismiss": {
+     "label": "Close",
+     "discards": []
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -635,43 +1104,60 @@
   },
   "navigation": {
    "entryFrom": [
-    "WEB-001"
+    "WEB-001",
+    "WEB-047"
    ],
    "inferred": true,
    "exitTo": [
     "WEB-001",
     "WEB-005",
     "WEB-006",
-    "WEB-007"
+    "WEB-007",
+    "WEB-010",
+    "WEB-016"
    ],
    "transitions": [
     {
      "to": "WEB-005",
      "trigger": "Ticket Type Selection",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — WEB-005 declares entryState.params productId, so an edge into it must carry them"
+     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-008 holds none of them, so the edge carries nothing and WEB-005 opens cold"
     },
     {
      "to": "WEB-007",
      "trigger": "Interactive Seat Selection",
-     "carries": [
-      "performanceId"
-     ],
-     "provenance": "derived — WEB-007 declares entryState.params performanceId, so an edge into it must carry them"
+     "provenance": "derived — WEB-007 declares entryState.params eventId, holdId, performanceId and WEB-008 holds none of them, so the edge carries nothing and WEB-007 opens cold"
     },
     {
      "to": "WEB-006",
-     "trigger": "Date & Session Selection",
+     "trigger": "Date & Performance Selection",
      "carries": [
+      "cartId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params performanceId, so an edge into it must carry them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-010",
+     "trigger": "Shopping Cart",
+     "carries": [
+      "cartId",
+      "code",
+      "performanceId"
+     ],
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-008 holds cartId, code, performanceId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-016",
+     "trigger": "Continue — sign in or use a guest code (when sign-in is asked after add-ons)",
+     "carries": [
+      "cartId"
+     ],
+     "precondition": "the guest is not signed in",
+     "provenance": "decided 29 September, rev 3 REV3-3: `BookingFlowConfig.signInAt` `afterAddOns` (default) places the gate at this exit; the basket is kept"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. Add-ons. **`listCatalogueBundles` removed** — Sanket noted the screen shows individual add-ons rather than bundles, and it does. **Rewired on the 20 August review.**",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. Add-ons. **`listCatalogueBundles` removed** — Sanket noted the screen shows individual add-ons rather than bundles, and it does. **Rewired on the 20 August review.**\n\n**Rev 3 (decided 29 September).** **Sign-in gate (REV3-3):** with `BookingFlowConfig.signInAt` `afterAddOns` (default), leaving this step asks the guest to sign in, or for a guest code when guest checkout is on (WEB-016); the basket is kept. With `atPayment` the gate is at WEB-012. Floating basket icon and cart side (REV3-10). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getUpsellSuggestions` reads one record and nothing reads a population — the screen is about that one thing",
@@ -685,7 +1171,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected add-ons upsell",
+       "label": "The upsell suggestion",
        "bindsTo": "UpsellSuggestion",
        "columns": [
         "UpsellSuggestion.variantId",
@@ -700,6 +1186,60 @@
        ],
        "operation": "getUpsellSuggestions",
        "provenance": "contract promotions.yaml POST /upsell-suggestions"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The bundle",
+       "bindsTo": "Bundle",
+       "columns": [
+        "Bundle.code",
+        "Bundle.name",
+        "Bundle.description",
+        "Bundle.venueId",
+        "Bundle.kind",
+        "Bundle.price",
+        "Bundle.components",
+        "Bundle.choiceGroups",
+        "Bundle.allocation",
+        "Bundle.validFrom",
+        "Bundle.validTo",
+        "Bundle.id",
+        "Bundle.savingsAmount",
+        "Bundle.savingsPercentage",
+        "Bundle.hasBeenSold",
+        "Bundle.isActive"
+       ],
+       "operation": "getBundle",
+       "provenance": "contract promotions.yaml GET /bundles/{bundleId}"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every bundle",
+       "bindsTo": "BundleSummary",
+       "columns": [
+        "BundleSummary.venueId",
+        "BundleSummary.publishedAt",
+        "BundleSummary.publishedBy",
+        "BundleSummary.contentHash",
+        "BundleSummary.signatureKeyId",
+        "BundleSummary.staleAfter",
+        "BundleSummary.sizeBytes",
+        "BundleSummary.note",
+        "BundleSummary.appliedByWorkstations"
+       ],
+       "operation": "listCatalogueBundles",
+       "provenance": "contract catalogue.yaml GET /catalogue/bundles"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Booking steps",
+       "bindsTo": "BookingFlow",
+       "columns": [
+        "BookingFlow.steps"
+       ],
+       "operation": "getPublishedBookingFlow",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (extras) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
       }
      ]
     },
@@ -709,41 +1249,20 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "addCartLine",
-       "label": "Add cart line",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "addCartLine",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The add-ons upsell list.",
+   "loading": "The add-ons upsell, read by `getUpsellSuggestions`.",
    "error": "Could not load. Names which read failed and leaves the add-ons upsell untouched.",
-   "emptyFirstRun": "No add-ons upsell yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the add-ons upsell are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No add-ons upsell yet. Offers Add cart line (`addCartLine`).",
+   "emptyNoResults": "Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -754,22 +1273,37 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "getUpsellSuggestions",
-    "contract": "promotions",
-    "purpose": "Suggestions for a cart",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "getBundle",
     "contract": "promotions",
     "purpose": "A bundle offered as an upsell",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listCatalogueBundles",
     "contract": "catalogue",
     "purpose": "Which bundles apply here",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideRecommendations",
+    "contract": "ai",
+    "purpose": "Fill a recommendation slot",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordRecommendationEvents",
+    "contract": "ai",
+    "purpose": "Report what happened to recommended items",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getPublishedBookingFlow",
+    "contract": "white-label",
+    "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), W12"
    }
   ],
   "entryState": {
@@ -781,16 +1315,53 @@
     {
      "name": "bundleId",
      "from": "navigation"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-008"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-008",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Book → 'Extras' step (e.g. Summit Peaks → Dated day pass → Continue)",
+    "differences": "Sign-in is asked when leaving Add-ons (Config 'Ask to sign in: After add-ons', Rev 3 item 3), so WEB-008 → WEB-016 is a transition YAML does not have. Add-ons also appear on the payment step (combo) and confirmation (upsells). 28 Sep flow review: all add-ons live here only."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -850,30 +1421,24 @@
     {
      "to": "WEB-005",
      "trigger": "Ticket Type Selection",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — WEB-005 declares entryState.params productId, so an edge into it must carry them"
+     "provenance": "derived — WEB-005 declares entryState.params productId and WEB-009 holds none of them, so the edge carries nothing and WEB-005 opens cold"
     },
     {
      "to": "WEB-007",
      "trigger": "Interactive Seat Selection",
-     "carries": [
-      "performanceId"
-     ],
-     "provenance": "derived — WEB-007 declares entryState.params performanceId, so an edge into it must carry them"
+     "provenance": "derived — WEB-007 declares entryState.params eventId, holdId, performanceId and WEB-009 holds none of them, so the edge carries nothing and WEB-007 opens cold"
     },
     {
      "to": "WEB-006",
-     "trigger": "Date & Session Selection",
+     "trigger": "Date & Performance Selection",
      "carries": [
       "performanceId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params performanceId, so an edge into it must carry them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, eventId, performanceId and WEB-009 holds performanceId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "Withdrawn products stay in the list marked unavailable. A guest who saved something and finds it silently gone assumes the feature is broken. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Wishlist. **Device operations removed** — Sanket flagged that no device management appears on this screen, and he was right. **Rewired on the 20 August review.**",
+  "notes": "Withdrawn products stay in the list marked unavailable. A guest who saved something and finds it silently gone assumes the feature is broken. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Wishlist. **Device operations removed** — Sanket flagged that no device management appears on this screen, and he was right. **Rewired on the 20 August review.**\n\n**Rev 3 (decided 29 September, rev 3 GAP-D3).** Built as one implementation with WEB-024 (the account's devices, wishlist and consent); both ids are kept.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getWishlist` reads one record and nothing reads a population — the screen is about that one thing",
@@ -887,7 +1452,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected wishlist",
+       "label": "The wishlist",
        "bindsTo": "Wishlist",
        "columns": [
         "Wishlist.subjectId",
@@ -895,53 +1460,6 @@
        ],
        "operation": "getWishlist",
        "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Add",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "addToWishlist",
-       "label": "Add to wishlist",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "removeFromWishlist",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "label": "Remove from wishlist",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "addToWishlist",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "confirmDialog",
@@ -951,6 +1469,24 @@
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add to wishlist",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove from wishlist",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      }
+     ]
     }
    ]
   },
@@ -958,17 +1494,35 @@
    {
     "id": "confirmRemoveFromWishlist",
     "component": "confirmDialog",
-    "trigger": "Remove",
+    "trigger": "Remove from wishlist",
     "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A wishlist this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formAddToWishlist",
+    "component": "modal",
+    "trigger": "Add to wishlist",
+    "body": "**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add to wishlist",
+     "operation": "addToWishlist"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "performanceId",
+      "note"
+     ]
+    },
+    "provenance": "client-verified"
    }
   ],
   "states": {
    "loading": "Saved items load",
    "error": "Could not load",
    "emptyFirstRun": "Nothing saved — explains what the list is for",
-   "emptyNoResults": "The filter narrowed it and the wishlist are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -1005,11 +1559,546 @@
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `itemId`."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-009"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-009",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Discover → 'Wishlist' link (discoverLinks)",
+    "differences": "No 'withdrawn product stays marked unavailable' state (YAML note). Prototype adds 'Restore removed' and live queue times."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-047",
+  "name": "Map Booking — Cabanas & Spots",
+  "module": "Booking & Selection",
+  "requiresModule": "resources",
+  "wave": 3,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/booking-and-selection/map-booking",
+   "component": "apps/guest-web/src/routes/booking-and-selection/MapBookingCanvas.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-004"
+   ],
+   "exitTo": [
+    "WEB-004",
+    "WEB-008",
+    "WEB-010"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-010",
+     "trigger": "Go to checkout",
+     "operation": "addCartLine",
+     "carries": [
+      "cartId"
+     ],
+     "precondition": "a spot is held and added",
+     "provenance": "decided 29 September, rev 3 REV3-15"
+    },
+    {
+     "to": "WEB-008",
+     "trigger": "Continue to add-ons (rentals, towels)",
+     "carries": [
+      "cartId"
+     ],
+     "provenance": "decided 29 September, rev 3 REV3-15; prototype cabana flow add-ons step"
+    },
+    {
+     "to": "WEB-004",
+     "trigger": "Back to the product",
+     "back": true,
+     "provenance": "decided 29 September, rev 3 REV3-15",
+     "carries": [
+      "productId"
+     ]
+    }
+   ]
+  },
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-15 and GAP-C2). **Cabana maps work like the stadium seat map:** the venue's map is ingested with its cabanas, loungers and other bookable spots (number, zone, capacity, price band), and the guest picks a specific one on the map and buys it. This supersedes audit R073 (c) (*cabanas stay staff-booked*) for resources placed on an ingested map. **Tables on the map are non-dining spots sold like cabanas** (decided 29 September by the user); a restaurant table stays the F&B reservation flow (WEB-036 / GST-070). The map comes from `getVenueMap` (its `resources`: label, kind, zone, capacity, price band, boundary) and the status of every spot for the chosen day from one `getMapResourceAvailability` call, joined on `resourceId`; held, booked and unavailable spots are greyed. Tapping a free spot calls `createResourceHold` and starts the *Remaining time* counter from the hold's `expiresAt` (8 minutes, extendable to 30 in all, audit R169); Add to basket sends `addCartLine` with the spot's price-band `variantId` and the `resourceHoldId`, e.g. *Cabana B09 · Large cabana · Beach, AED 1,855*. Picking another spot releases the first hold (`relinquishResourceHold`).\n\n**29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana: pick on map* (WEB-047) or *Cabana: by size* (capacity) as its booking flow (CMS-103), and the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit. Same venue-map back end as F&B and locations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`getMapResourceAvailability` reads the population of spots and a tap holds one of them — list (as a map), select, act",
+  "purpose": "Pick a specific cabana, lounger or other spot on the venue map and hold it while you book.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "datePicker",
+       "label": "Date",
+       "notes": "Sends `from`/`to` (the venue's opening for the day, or a slot) to `getMapResourceAvailability`.",
+       "operation": "getMapResourceAvailability",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      },
+      {
+       "kind": "numberField",
+       "label": "Who is coming",
+       "notes": "`partySize`; a spot smaller than the party is refused `422 party-exceeds-capacity`.",
+       "operation": "createResourceHold",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      },
+      {
+       "kind": "selectField",
+       "label": "Area",
+       "bindsTo": "PlacedResource.zone",
+       "notes": "Beach, Tower, Riverside, Splash zone… from the placed resources' zones.",
+       "operation": "getVenueMap",
+       "provenance": "decided 29 September, rev 3 REV3-15; prototype cabana map"
+      },
+      {
+       "kind": "seatMap",
+       "label": "Venue map",
+       "bindsTo": "VenueMapDetail.resources",
+       "notes": "The ingested map with every placed spot drawn at its boundary and numbered (R01-R10, T01-T08, S01-S06, B01-B10 on Coastal Aqua). Free spots are tappable; held, booked and unavailable ones greyed.",
+       "operation": "getVenueMap",
+       "provenance": "decided 29 September, rev 3 REV3-15, GAP-C2"
+      },
+      {
+       "kind": "cardList",
+       "label": "Spots",
+       "bindsTo": "MapResourceAvailability.resources",
+       "notes": "The same spots as a list for the chosen area: number, capacity, price band and price, status. The accessible alternative to the map.",
+       "operation": "getMapResourceAvailability",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      },
+      {
+       "kind": "selectField",
+       "label": "Map",
+       "bindsTo": "BookableVenueMaps.maps",
+       "operation": "listBookableVenueMaps",
+       "notes": "**Which map to book on.** `listBookableVenueMaps(venueId, productId)` returns the venue's published maps that carry bookable spots; with one map the screen opens it directly and this choice is not shown. The chosen map's `mapId` is what `getVenueMap` (at its `publishedVersion`) and `getMapResourceAvailability` read (decided 29 September, rev 3 REV3-15).",
+       "provenance": "contract venue-map.yaml GET /bookable-venue-maps"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Remaining time",
+       "bindsTo": "ResourceHold.expiresAt",
+       "notes": "Counts down from the hold's `expiresAt`, always visible. At zero the spot is released and the guest is told.",
+       "operation": "getResourceHold",
+       "provenance": "decided 29 September, rev 3 REV3-15; audit R169"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The spot you picked",
+       "bindsTo": "PlacedResource",
+       "columns": [
+        "PlacedResource.label",
+        "PlacedResource.kind",
+        "PlacedResource.zone",
+        "PlacedResource.capacity",
+        "PlacedResource.priceBandCode"
+       ],
+       "operation": "getVenueMap",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add to basket",
+       "notes": "Sends `variantId` (the spot's price band) and `resourceHoldId`.",
+       "operation": "addCartLine",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Keep it longer",
+       "operation": "extendResourceHold",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Pick another",
+       "notes": "Releases the hold at once so the spot is free for others.",
+       "operation": "relinquishResourceHold",
+       "provenance": "decided 29 September, rev 3 REV3-15"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue map and the status of every spot for the day, read together.",
+   "error": "Could not load the map or the spots. Names which read failed; nothing is held.",
+   "emptyFirstRun": "**No bookable spots are placed on this map yet.** Says so and offers the venue's other ways to book, rather than an empty map.",
+   "emptyNoResults": "Every spot in this area is taken for the day. Names the area and offers another area or day.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** The map and the spots already loaded stay on screen with their age, never shown as free now. Holding a spot and adding it to the basket need the connection — a cabana held offline is a cabana two people think they have."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueMap",
+    "contract": "venue-map",
+    "purpose": "The map with its placed spots (label, kind, zone, capacity, price band)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getMapResourceAvailability",
+    "contract": "resources",
+    "purpose": "Every spot's status for the day in one call",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createResourceHold",
+    "contract": "resources",
+    "purpose": "Hold the tapped spot for the window",
+    "trigger": "onAction",
+    "invalidates": [
+     "getMapResourceAvailability"
+    ]
+   },
+   {
+    "operationId": "getResourceHold",
+    "contract": "resources",
+    "purpose": "The hold's countdown",
+    "trigger": "onInterval"
+   },
+   {
+    "operationId": "extendResourceHold",
+    "contract": "resources",
+    "purpose": "Keep the hold longer while paying",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "relinquishResourceHold",
+    "contract": "resources",
+    "purpose": "Release the hold",
+    "trigger": "onAction",
+    "invalidates": [
+     "getMapResourceAvailability"
+    ]
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add the held spot to the basket (`variantId`, `resourceHoldId`)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listBookableVenueMaps",
+    "contract": "venue-map",
+    "purpose": "Find the venue's published map with bookable spots (with productId when the product page opened it); getVenueMap then reads that map's published version (decided 29 September, rev 3 REV3-15)",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "mapId",
+     "from": "WEB-004",
+     "optional": true
+    },
+    {
+     "name": "productId",
+     "from": "WEB-004",
+     "optional": true
+    },
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "holdId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "**A link to a map that is no longer published, or a day that has passed,** says which and offers today on the current map. Nothing is held on arrival."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-047",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Coastal Aqua → 'Cabana & locker rentals' → cabana map ('Remaining time' counter)"
+   }
+  },
+  "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
+  "overlays": [
+   {
+    "id": "confirmReleaseHold",
+    "component": "confirmDialog",
+    "trigger": "Pick another (or tapping a second spot)",
+    "body": "**Release the spot you are holding?** It goes back on the map at once and someone else may take it.",
+    "confirm": {
+     "label": "Release it",
+     "operation": "relinquishResourceHold"
+    },
+    "dismiss": {
+     "label": "Keep it",
+     "carries": [
+      "holdId"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-048",
+  "name": "Book a Space by the Hour",
+  "module": "Booking & Selection",
+  "requiresModule": "resources",
+  "wave": 3,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/booking-and-selection/space-by-the-hour",
+   "component": "apps/guest-web/src/routes/booking-and-selection/SpaceByTheHourWizard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-004"
+   ],
+   "exitTo": [
+    "WEB-004",
+    "WEB-010"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-010",
+     "trigger": "Add to basket, then review the cart",
+     "operation": "addCartLine",
+     "carries": [
+      "cartId"
+     ],
+     "precondition": "date, start time, length and room type chosen",
+     "provenance": "decided 29 September, rev 3 REV3-13"
+    },
+    {
+     "to": "WEB-004",
+     "trigger": "Back to the product",
+     "back": true,
+     "provenance": "decided 29 September, rev 3 REV3-13",
+     "carries": [
+      "productId"
+     ]
+    }
+   ]
+  },
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). A staged booking: date → start time → length (1 hour, 2 hours, half day, full day) → room type (focus pod, majlis, boardroom, auditorium) → attendees → add-ons (coffee break, working lunch, AV technician). **A room type is a product with `requiresTimeWindow`; a length is one of its variants** (the `length` axis, each value with `durationMinutes`), priced on its own, so the price is the variant's — the room rate for that length. The guest never names a room: `addCartLine` carries `bookedWindow` {startsAt, endsAt}, `endsAt` being the start plus the length, and `allocateResources` picks the room at checkout (26 August minute). Add-ons are lines with `parentLineId`. `422 windowLengthMismatch`, `windowRequired` and `windowNotAllowed` are programming errors; `409 windowUnavailable` says the time filled and offers the next free start.\n\n**29 September (W9).** Availability is checked against date, start time and length together (`listProductStartTimes` with `variantId` = length); changing any of the three re-checks every room, and a busy room shows *free from*. Starts every 15 minutes where the venue sets `stepMinutes` 15.",
+  "density": "compact",
+  "pattern": "multiStepForm",
+  "patternReason": "A staged booking — date, start time, length, room type, attendees, add-ons — ending in one `addCartLine`; the prototype draws it as one step revealing each choice in turn",
+  "purpose": "Book a meeting room or other space for a start time and a length; the price is the room rate for that length.",
+  "layout": {
+   "template": "wizard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "datePicker",
+       "label": "Select a date",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      },
+      {
+       "kind": "selectField",
+       "label": "Start time",
+       "bindsTo": "ProductStartTime",
+       "notes": "The start times at which a room of the chosen type is free for the chosen length (`listProductStartTimes` with `productId`, `variantId` = the length, `date`; hourly, 08:00-20:00 in the prototype), each with how many rooms of the type are left. The chosen start and start + length go to `addCartLine` as `bookedWindow`.",
+       "operation": "listProductStartTimes",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      },
+      {
+       "kind": "selectField",
+       "label": "How long",
+       "bindsTo": "ProductVariant",
+       "notes": "1 hour, 2 hours, half day (4 h), full day (8 h): the room type's `length` variants, each priced on its own (the prototype shows *Save 10%* and *Save 15%*).",
+       "operation": "listProductVariants",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      },
+      {
+       "kind": "cardList",
+       "label": "Choose a room",
+       "bindsTo": "Product",
+       "notes": "Room types (focus pod, majlis room, boardroom, auditorium) with capacity, description, badge and the price for the chosen length.",
+       "operation": "listProducts",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      },
+      {
+       "kind": "numberField",
+       "label": "Attendees",
+       "notes": "For the visitor list at reception; a room type smaller than the party is not offered.",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      },
+      {
+       "kind": "cardList",
+       "label": "Add to the booking",
+       "bindsTo": "Product",
+       "notes": "Coffee break, working lunch, AV technician: add-on lines with `parentLineId`.",
+       "operation": "listProducts",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "submit",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add to basket",
+       "notes": "`variantId` (the length), `bookedWindow` {startsAt, endsAt}, then the add-on lines.",
+       "operation": "addCartLine",
+       "provenance": "decided 29 September, rev 3 REV3-13"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The room types and their lengths for this venue.",
+   "error": "Could not load. Names which read failed; nothing is booked.",
+   "emptyFirstRun": "**This venue sells no space by the hour yet.** Says so rather than an empty list.",
+   "emptyNoResults": "No room of the type is free at that time for that length. Offers the next free start time.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Rooms and times already loaded stay on screen with their age. Picking a start time and adding the booking need the connection — a room held offline is a room two people think they have."
+  },
+  "apis": [
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "Room types sold by the hour (`requiresTimeWindow`) and their add-ons",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductVariants",
+    "contract": "catalogue",
+    "purpose": "The lengths of a room type, each with its price",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductStartTimes",
+    "contract": "resources",
+    "purpose": "Start times free for the room type and length on the date",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add the room type for the booked window, then the add-ons",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "productId",
+     "from": "WEB-004",
+     "optional": true
+    },
+    {
+     "name": "cartId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves the venue from the site and lists its room types; nothing is booked on arrival."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-048",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "House of Pages → 'Meeting room by the hour'"
+   }
+  },
+  "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
   "_platform": {
    "code": "P01",
    "audience": "guest",

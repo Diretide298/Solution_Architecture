@@ -1,6 +1,6 @@
 # P01-promotions-01 — P01 · Promotions
 
-**1 screens · 3 operations · 6 schemas · 1 permissions**
+**1 screens · 2 operations · 8 schemas · 1 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -61,4 +61,4 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-032` | Offers & Promotions | listDetail | 3 | 0 | — |
+| `WEB-032` | Offers & Promotions | listDetail | 2 | 0 | — |

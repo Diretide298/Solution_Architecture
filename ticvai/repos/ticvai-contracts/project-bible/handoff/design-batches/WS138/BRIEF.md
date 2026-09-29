@@ -1,6 +1,6 @@
 # WS138 — Marketing CRM Configuration Reference v1.0 board 4
 
-**10 screens · 12 operations · 22 schemas · 5 permissions**
+**10 screens · 16 operations · 33 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `APPROVAL_REQUEST, MARKETING_MANAGE, MARKETING_VIEW, PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `AI_USE, APPROVAL_REQUEST, MARKETING_MANAGE, MARKETING_VIEW, PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-764` | Campaign Command Center | listDetail | 1 | 0 | — |
+| `BO-764` | Campaign Command Center | listDetail | 2 | 0 | — |
 | `BO-765` | Campaign Library & Calendar | listDetail | 1 | 0 | — |
-| `BO-766` | Campaign Builder | listDetail | 2 | 0 | — |
+| `BO-766` | Campaign Builder | listDetail | 3 | 0 | — |
 | `BO-767` | Audience & Offer Selection | listDetail | 2 | 0 | — |
 | `BO-768` | Multichannel Composer | listDetail | 2 | 0 | — |
 | `BO-769` | Schedule & Trigger Rules | listDetail | 2 | 0 | — |
 | `BO-770` | Campaign Approval Workflow | listDetail | 1 | 0 | — |
 | `BO-771` | Budget, Goals & Forecast | listDetail | 2 | 0 | — |
-| `BO-772` | A/B & AI Optimization | listDetail | 1 | 0 | — |
+| `BO-772` | A/B & AI Optimization | listDetail | 6 | 0 | — |
 | `BO-773` | Attribution & Audit | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-764, BO-765, BO-766, BO-767, BO-768, BO-769, BO-770, BO-771, BO-772, BO-773 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-764, BO-765, BO-766, BO-767, BO-768, BO-769, BO-770, BO-771, BO-773 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

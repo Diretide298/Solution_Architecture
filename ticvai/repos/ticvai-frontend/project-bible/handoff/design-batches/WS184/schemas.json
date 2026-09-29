@@ -1,0 +1,808 @@
+{
+ "AiCustomerRecommendationProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "none — assembled from features, ai.rec_decline and ai.rec_event",
+  "description": "What the engine knows about one customer for recommendations (ADM-680): segment, affinities, declines, consent flags and recent decisions. Sensitive data never becomes a feature (AIR-185).",
+  "required": [
+   "subjectId"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "segment": {
+    "type": "string",
+    "nullable": true
+   },
+   "personalisationAllowed": {
+    "type": "boolean"
+   },
+   "affinities": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "categoryRef": {
+       "type": "string"
+      },
+      "strength": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "declines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiRecommendationDecline"
+    }
+   },
+   "recentDecisions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiRecommendationDecision"
+    }
+   },
+   "featureFreshAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "AiRecommendationDecision": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.rec_decision",
+  "description": "**One compact recommendation decision** (design 2.2 A, 3.1 Recommendation): funnel counts, exclusion reasons (AIR-032), versions, scores and the final set. Written after the response, never before it. **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
+  "required": [
+   "placement",
+   "mode",
+   "items"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "placement": {
+    "type": "string",
+    "enum": [
+     "productPage",
+     "cart",
+     "checkout",
+     "postPurchase",
+     "preVisit",
+     "inVenue",
+     "posBasket",
+     "kioskBasket",
+     "fnbMenu",
+     "retailBasket",
+     "seatUpgrade",
+     "membership",
+     "email",
+     "homepage",
+     "loyalty"
+    ]
+   },
+   "channel": {
+    "type": "string"
+   },
+   "cartId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sessionRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "personalised",
+     "contextual",
+     "rulesOnly",
+     "fallback"
+    ],
+    "description": "Personalised only where context is sufficient and consent allows (AIR-114, AIR-187)."
+   },
+   "strategyRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "strategyVersion": {
+    "type": "integer",
+    "nullable": true
+   },
+   "modelVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "featureSetVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "funnel": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Candidate counts at each stage: generated, eligible, ranked, returned."
+   },
+   "exclusions": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Removed candidates by reason: unsaleable, capacity, inventory, owned, inCart, conflict, declined, frequencyCap, guardrail."
+   },
+   "items": {
+    "$ref": "#/components/schemas/AiRecommendationItemList"
+   },
+   "experimentArm": {
+    "type": "string",
+    "nullable": true
+   },
+   "latencyMs": {
+    "type": "integer"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Decision TTL: 30 s where capacity-sensitive, 30 min otherwise (AIR-208)."
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiRecommendationDecline": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.rec_decline",
+  "description": "**The cross-channel decline store** (AIR-065). Keyed on customer or session, so a declined offer is not repeated at the kiosk after the app. **Only an explicit decline counts; \"ignored\" is not a decline** (decided 29 September, decision 7).",
+  "required": [
+   "declinedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sessionRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The declined product. Null where a non-product item was declined (`itemRef`)."
+   },
+   "itemRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "For a declined `offer`, `reward` or `challenge` item (29 September, build): its `promotionId`, `couponRef`, `rewardId` or `challengeId`, prefixed with the kind (`offer:`, `reward:`, `challenge:`), resolved from the event's `trackingId`."
+   },
+   "placement": {
+    "type": "string",
+    "enum": [
+     "productPage",
+     "cart",
+     "checkout",
+     "postPurchase",
+     "preVisit",
+     "inVenue",
+     "posBasket",
+     "kioskBasket",
+     "fnbMenu",
+     "retailBasket",
+     "seatUpgrade",
+     "membership",
+     "email",
+     "homepage",
+     "loyalty"
+    ]
+   },
+   "channel": {
+    "type": "string",
+    "nullable": true
+   },
+   "declinedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiRecommendationExplanation": {
+  "type": "object",
+  "x-ticvai-persistence": "none — built from ai.rec_decision and its decision record",
+  "description": "Why these items (AIR-193..202), at three depths each gated by permission (AIC-195): business, governance, technical.",
+  "required": [
+   "decisionId",
+   "depth"
+  ],
+  "properties": {
+   "decisionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "depth": {
+    "type": "string",
+    "enum": [
+     "business",
+     "governance",
+     "technical"
+    ]
+   },
+   "funnel": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "exclusions": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "items": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "trackingId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "productId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "reasons": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "scoreBreakdown": {
+       "type": "object",
+       "additionalProperties": true,
+       "nullable": true
+      }
+     }
+    }
+   },
+   "versions": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Strategy, model and feature-set versions. `technical` depth only."
+   }
+  }
+ },
+ "ConsentState": {
+  "x-ticvai-persistence": "none — projection over consent_record",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "purposes"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "purposes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "purpose",
+      "decision",
+      "requiresRenewal"
+     ],
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "decision": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "channels": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/MessageChannel"
+       }
+      },
+      "noticeVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "requiresRenewal": {
+       "type": "boolean",
+       "description": "True where the notice has been superseded since consent was given."
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "GuestProfile": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
+   },
+   "displayName": {
+    "type": "string",
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "nullable": true
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredChannel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells. Marketing acts locally."
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "engagementScore": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
+   },
+   "engagementTier": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "new",
+     "active",
+     "occasional",
+     "lapsing",
+     "lapsed",
+     "dormant"
+    ],
+    "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
+   },
+   "lifetimeValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "visitCount": {
+    "type": "integer"
+   },
+   "lastVisitAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "mergedIntoSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"
+   },
+   "mergedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "GuestProfileDetail": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/GuestProfile"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+     },
+     "consents": {
+      "$ref": "#/components/schemas/ConsentState"
+     },
+     "loyalty": {
+      "$ref": "#/components/schemas/LoyaltyPosition"
+     },
+     "openCaseCount": {
+      "type": "integer"
+     },
+     "recentOrderIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "membershipIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "notes": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
+ "LoyaltyPosition": {
+  "x-ticvai-persistence": "marketing.loyalty_position",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "programmeId",
+   "pointsBalance",
+   "tierCode"
+  ],
+  "properties": {
+   "leaderboardNickname": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 24,
+    "description": "BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "pointsBalance": {
+    "type": "integer"
+   },
+   "lifetimePoints": {
+    "type": "integer"
+   },
+   "tierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"
+   },
+   "tierCode": {
+    "type": "string"
+   },
+   "tierName": {
+    "type": "string"
+   },
+   "pointsToNextTier": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryPoints": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RecommendationPerformance": {
+  "type": "object",
+  "description": "Board 6.5. **Attributed and incremental reported apart** — the first flatters.",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "impressions": {
+    "type": "integer"
+   },
+   "clicks": {
+    "type": "integer"
+   },
+   "accepted": {
+    "type": "integer"
+   },
+   "acceptanceRate": {
+    "type": "number"
+   },
+   "attributedRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "incrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "holdoutAcceptanceRate": {
+    "type": "number",
+    "nullable": true
+   },
+   "lift": {
+    "type": "number",
+    "nullable": true
+   }
+  }
+ },
+ "RecommendationStrategy": {
+  "type": "object",
+  "x-ticvai-persistence": "promotions.recommendation_strategy",
+  "description": "Upsell board 1. **Objective, placement, ranking and guardrail in one record**, because any one of them alone produces a recommender that is either aimless or dangerous.\n",
+  "required": [
+   "code",
+   "name",
+   "objective"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "objective": {
+    "type": "string",
+    "enum": [
+     "attachRevenue",
+     "averageOrderValue",
+     "upgradeRate",
+     "visitFrequency",
+     "inventoryBalance",
+     "guestSatisfaction"
+    ]
+   },
+   "kinds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "upsell",
+      "upgrade",
+      "crossSell",
+      "bundle",
+      "nextBestOffer",
+      "reactivation"
+     ]
+    }
+   },
+   "itemKinds": {
+    "type": "array",
+    "description": "What the strategy may put in a slot (29 September, build pass, group G2, from group G1's handoff; 8.6.30 to 8.6.36, 5.4.21, 22.6.18): `product` (the default and the behaviour before), `offer` (a live promotion marked `recommendable`), `reward` (a marketing-crm loyalty reward the guest can redeem) and `challenge` (a challenge they can join). Mirrors `ai.decideRecommendations` item kinds.",
+    "default": [
+     "product"
+    ],
+    "items": {
+     "type": "string",
+     "enum": [
+      "product",
+      "offer",
+      "reward",
+      "challenge"
+     ]
+    }
+   },
+   "placements": {
+    "type": "array",
+    "description": "`homepage` (8.6.10) and `loyalty` (5.4.21, 22.6.18) added 29 September (build pass, group G2), matching the placements `ai.decideRecommendations` fills.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "productPage",
+      "cart",
+      "checkout",
+      "postPurchase",
+      "preVisitEmail",
+      "inVenueApp",
+      "kiosk",
+      "pos",
+      "signage",
+      "callCentre",
+      "homepage",
+      "loyalty"
+     ]
+    }
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "maxRecommendations": {
+    "type": "integer",
+    "default": 3,
+    "description": "**A guardrail before it is a layout choice.** Nine upsells at checkout is not a denser page, it is an abandoned basket.\n"
+   },
+   "minConfidence": {
+    "type": "number",
+    "nullable": true
+   },
+   "rankingWeights": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "number"
+    },
+    "description": "Propensity, margin, inventory pressure, affinity, recency."
+   },
+   "requireAvailability": {
+    "type": "boolean",
+    "default": true
+   },
+   "excludeInBasket": {
+    "type": "boolean",
+    "default": true
+   },
+   "guardrails": {
+    "type": "object",
+    "properties": {
+     "maxDiscountPercent": {
+      "type": "number",
+      "nullable": true
+     },
+     "minMarginPercent": {
+      "type": "number",
+      "nullable": true
+     },
+     "neverRecommendCategoryIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "requireHumanApproval": {
+      "type": "boolean",
+      "default": false
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "paused",
+     "retired"
+    ]
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RecommendationSuppression": {
+  "type": "object",
+  "x-ticvai-persistence": "promotions.recommendation_suppression",
+  "description": "Boards 1.7 and 5.7. **Fatigue is why a good recommender stops working.**",
+  "properties": {
+   "scopePath": {
+    "type": "string"
+   },
+   "maxImpressionsPerProductPerDay": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maxImpressionsPerGuestPerSession": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cooldownAfterDismissDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cooldownAfterAcceptDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "hardExclusions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "segmentId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "categoryId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "productId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "reason": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ }
+}

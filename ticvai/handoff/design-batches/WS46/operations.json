@@ -21,7 +21,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CustomerMembershipSegmentDiscountRulesView"
  },
@@ -112,9 +118,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PromotionRuleBuilderInput",
   "responds": "PromotionRuleBuilderView"
+ },
+ "setPromotionStackingRule": {
+  "method": "PUT",
+  "path": "/promotion-stacking-rule",
+  "contract": "promotions",
+  "summary": "Promotion Stacking Rule Builder",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PromotionStackingRuleBuilderInput",
+  "responds": "PromotionStackingRuleBuilderView"
  },
  "setRuleTestRecommendation": {
   "method": "PUT",
@@ -125,7 +156,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RuleTestSimulationAiRecommendationWorkspaceInput",
   "responds": "RuleTestSimulationAiRecommendationWorkspaceView"
  }

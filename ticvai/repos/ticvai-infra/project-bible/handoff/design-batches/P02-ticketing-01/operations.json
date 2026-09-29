@@ -71,6 +71,11 @@
     "required": null
    },
    {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -82,7 +87,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "FxRate"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -160,6 +165,21 @@
    },
    {
     "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
     "in": "query",
     "required": null
    },

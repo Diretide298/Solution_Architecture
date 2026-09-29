@@ -1,6 +1,6 @@
 # P10-overview-01 — P10 · Overview
 
-**1 screens · 16 operations · 18 schemas · 10 permissions**
+**1 screens · 16 operations · 22 schemas · 10 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 10 permissions apply here:
   `CREDIT_MANAGE, CREDIT_OVERRIDE, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID`. A control nobody can use must say so,
   not sit enabled and fail.
-- **8 of these operations work offline**: applyManualDiscount, createOrder, getOrder, holdOrder, listOrderRefunds, listOrders, reprintOrder, voidOrder
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,4 +60,4 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-002` | Partner Dashboard | listDetail | 16 | 2 | — |
+| `PTR-002` | Partner Dashboard | listDetail | 16 | 10 | — |

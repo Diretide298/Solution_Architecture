@@ -1,6 +1,6 @@
 # P02-marketing-01 — P02 · Marketing
 
-**1 screens · 4 operations · 8 schemas · 2 permissions**
+**1 screens · 4 operations · 9 schemas · 2 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -62,4 +62,4 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-065` | Newsletter & Preferences | listDetail | 4 | 0 | — |
+| `GST-065` | Newsletter & Preferences | listDetail | 4 | 2 | — |

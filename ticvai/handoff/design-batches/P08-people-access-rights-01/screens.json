@@ -192,6 +192,13 @@
      "listJobTitles",
      "listWorkAssignments"
     ]
+   },
+   {
+    "operationId": "suggestRoleAssignment",
+    "contract": "identity",
+    "purpose": "Roles to grant a new or moved member of staff (by principal, or by job title and posting before the principal exists)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -412,6 +419,34 @@
     "invalidates": [
      "listRoles"
     ]
+   },
+   {
+    "operationId": "listPermissionFindings",
+    "contract": "identity",
+    "purpose": "Unused and missing permissions for the role being assigned",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "suggestRoleAssignment",
+    "contract": "identity",
+    "purpose": "Suggested roles for the selected person from peers with the same job title and posting",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccessReviewCampaigns",
+    "contract": "identity",
+    "purpose": "Open access reviews",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccessReviewItems",
+    "contract": "identity",
+    "purpose": "My pending review items (assignedToMe)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -421,6 +456,12 @@
     "Role.name",
     "Role.description",
     "Role.permissions"
+   ],
+   "params": [
+    {
+     "name": "campaignId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -1625,6 +1666,13 @@
     "invalidates": [
      "listApprovalRequests"
     ]
+   },
+   {
+    "operationId": "getApprovalRequestScore",
+    "contract": "ai",
+    "purpose": "Risk band, priority and suggested escalation for the request, as context only (no approve/reject suggestion)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1632,6 +1680,10 @@
     {
      "name": "requestId",
      "from": "deepLink"
+    },
+    {
+     "name": "approvalRequestId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `requestId`.",
@@ -1738,9 +1790,10 @@
      "to": "BO-084",
      "trigger": "Approval Inbox",
      "carries": [
+      "approvalRequestId",
       "requestId"
      ],
-     "provenance": "derived — BO-084 declares entryState.params requestId and BO-085 holds requestId, so an edge into it carries them"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-085 holds approvalRequestId, requestId, so an edge into it carries them"
     },
     {
      "to": "BO-087",
@@ -2078,7 +2131,7 @@
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params requestId and BO-086 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-086 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",
@@ -2281,7 +2334,7 @@
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params requestId and BO-087 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-087 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",

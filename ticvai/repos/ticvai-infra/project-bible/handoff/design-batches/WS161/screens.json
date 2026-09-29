@@ -1155,7 +1155,29 @@
    "emptyNoResults": "The filter narrowed it and the event resource forecasting are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createForecastScenario",
+    "contract": "ai",
+    "purpose": "Run a what-if",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listOperationalRequirements",
+    "contract": "ai",
+    "purpose": "Requirements derived from the forecast",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Configured",

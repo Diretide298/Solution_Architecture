@@ -39,16 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-089",
-     "trigger": "Works in Dynamic Pricing Strategy Builder",
-     "provenance": "flow F147 step 1→2",
-     "operation": "listDynamicPricingStrategy"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-088 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-090",
@@ -75,12 +66,6 @@
      "operation": "listDynamicPricingStrategy"
     },
     {
-     "to": "ADM-094",
-     "trigger": "Works in Dynamic Price Bands, Ladders & Adjustment Matrix",
-     "provenance": "flow F147 step 11→12",
-     "operation": "listDynamicPricingStrategy"
-    },
-    {
      "to": "ADM-095",
      "trigger": "Works in Dynamic Pricing Guardrails & Commercial Protection",
      "provenance": "flow F147 step 13→14",
@@ -97,18 +82,36 @@
      "trigger": "Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
      "provenance": "flow F147 step 17→18",
      "operation": "listDynamicPricingStrategy"
+    },
+    {
+     "to": "ADM-089",
+     "trigger": "Works in Dynamic Pricing Strategy Builder",
+     "provenance": "flow F147 step 1→2",
+     "operation": "listDynamicPricingStrategy",
+     "carries": [
+      "strategyId"
+     ]
+    },
+    {
+     "to": "ADM-094",
+     "trigger": "Works in Dynamic Price Bands, Ladders & Adjustment Matrix",
+     "provenance": "flow F147 step 11→12",
+     "operation": "listDynamicPricingStrategy",
+     "carries": [
+      "strategyId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can view and manage the complete dynamic-pricing strategy portfolio from one centralized workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each strategy should show) — counts over a population, then the population",
   "purpose": "Provide the central backend workspace for creating, monitoring, and managing all dynamic- pricing strategies. This should be the primary operational screen for Revenue Managers.",
-  "purposeNote": "Authorized users can view and manage the complete dynamic-pricing strategy portfolio from one centralized workspace.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 10 actions on this screen and the screen declares 1 operation.** Unserved: Booking Velocity, Channel, Create Strategy, Duplicate, Open, Test, Compare, Pause …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 13 actions on this screen and the screen declares 1 operation.** Unserved: Demand Based, Inventory Based, Booking Velocity, Timeslot, Channel, Create Strategy, Duplicate, Open …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Support"
    }
   ],
@@ -123,73 +126,73 @@
        "kind": "metricTile",
        "label": "Active Strategies",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.activeStrategies"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.activeStrategies"
       },
       {
        "kind": "metricTile",
        "label": "Draft Strategies",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.draftStrategies"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.draftStrategies"
       },
       {
        "kind": "metricTile",
        "label": "Products Under Dynamic Pricing",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.productsUnderDynamicPricing"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.productsUnderDynamicPricing"
       },
       {
        "kind": "metricTile",
        "label": "Events Under Dynamic Pricing",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.eventsUnderDynamicPricing"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.eventsUnderDynamicPricing"
       },
       {
        "kind": "metricTile",
        "label": "Performances Under Dynamic Pricing",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.performancesUnderDynamicPricing"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.performancesUnderDynamicPricing"
       },
       {
        "kind": "metricTile",
        "label": "Rules Active",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.rulesActive"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.rulesActive"
       },
       {
        "kind": "metricTile",
        "label": "Current Price Adjustments",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.currentPriceAdjustments"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.currentPriceAdjustments"
       },
       {
        "kind": "metricTile",
        "label": "Prices at Maximum Guardrail",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.pricesAtMaximumGuardrail"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.pricesAtMaximumGuardrail"
       },
       {
        "kind": "metricTile",
        "label": "Prices at Minimum Guardrail",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.pricesAtMinimumGuardrail"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.pricesAtMinimumGuardrail"
       },
       {
        "kind": "metricTile",
        "label": "Rule Conflicts",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.ruleConflicts"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.ruleConflicts"
       },
       {
        "kind": "metricTile",
        "label": "Frozen Strategies",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.frozenStrategies"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.frozenStrategies"
       },
       {
        "kind": "metricTile",
        "label": "Upcoming Activations",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Display",
-       "bindsTo": "DynamicPricingStrategyCommandCenterView.upcomingActivations"
+       "bindsTo": "DynamicPricingStrategyCommandCenterSummary.upcomingActivations"
       }
      ]
     },
@@ -255,7 +258,22 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Demand Based",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Inventory Based",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Booking Velocity",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Timeslot",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Support"
       },
       {
@@ -280,18 +298,11 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Test",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Compare",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Pause",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Quick Actions"
+       "label": "Transition dynamic pricing strategy",
+       "operation": "transitionDynamicPricingStrategy",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The strategy's status moves, as calls** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
       }
      ]
     }
@@ -310,14 +321,53 @@
     "contract": "catalogue",
     "purpose": "Dynamic Pricing Strategy Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "transitionDynamicPricingStrategy",
+    "contract": "catalogue",
+    "purpose": "Activate, pause, resume or retire a dynamic pricing strategy",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDynamicPricingStrategy"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-088"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-088",
+   "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-088"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 75. 25 of 25 labels bound to a contract property; 35 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 75. 25 of 25 labels bound to a contract property; 38 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formTransitionDynamicPricingStrategy",
+    "component": "modal",
+    "trigger": "Transition dynamic pricing strategy",
+    "body": "**Collects what `transitionDynamicPricingStrategy` sends before it is called.** Required: `action`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transition dynamic pricing strategy",
+     "operation": "transitionDynamicPricingStrategy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "strategyId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -374,15 +424,18 @@
      "to": "ADM-088",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F147 step 2→3",
-     "operation": "setDynamicPricingStrategy"
+     "operation": "setDynamicPricingStrategy",
+     "carries": [
+      "strategyId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can create reusable dynamic-pricing strategies linked to governed commercial base prices and clearly defined product/event scopes.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure whether a strategy) and no display directory — it is settings, not a population",
   "purpose": "Create the master dynamic-pricing strategy and define what commercial objects it controls.",
-  "purposeNote": "Administrators can create reusable dynamic-pricing strategies linked to governed commercial base prices and clearly defined product/event scopes.",
   "layout": {
    "template": "form",
    "regions": [
@@ -510,6 +563,14 @@
        "kind": "primaryButton",
        "label": "Save changes",
        "provenance": "contract operation setDynamicPricingStrategy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transition dynamic pricing strategy",
+       "operation": "transitionDynamicPricingStrategy",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The strategy's status moves, as calls** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
       }
      ]
     }
@@ -526,18 +587,51 @@
     "operationId": "setDynamicPricingStrategy",
     "contract": "catalogue",
     "purpose": "Dynamic Pricing Strategy Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDynamicPricingStrategy"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "transitionDynamicPricingStrategy",
+    "contract": "catalogue",
+    "purpose": "Activate, pause, resume or retire a dynamic pricing strategy",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-089"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-089",
+   "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-089"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 76. 0 of 0 labels bound to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formTransitionDynamicPricingStrategy",
+    "component": "modal",
+    "trigger": "Transition dynamic pricing strategy",
+    "body": "**Collects what `transitionDynamicPricingStrategy` sends before it is called.** Required: `action`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transition dynamic pricing strategy",
+     "operation": "transitionDynamicPricingStrategy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /dynamic-pricing-strategies/{strategyId}/lifecycle"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "strategyId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -594,7 +688,10 @@
      "to": "ADM-088",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F147 step 4→5",
-     "operation": "setDemandOccupancyAvailability"
+     "operation": "setDemandOccupancyAvailability",
+     "carries": [
+      "strategyId"
+     ]
     }
    ]
   },
@@ -654,16 +751,14 @@
     "operationId": "setDemandOccupancyAvailability",
     "contract": "catalogue",
     "purpose": "Demand, Occupancy & Availability Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setDemandOccupancyAvailability"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-090"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-090",
+   "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-090"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 78. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -722,19 +817,22 @@
      "to": "ADM-088",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F147 step 6→7",
-     "operation": "setBookingVelocityTime"
+     "operation": "setBookingVelocityTime",
+     "carries": [
+      "strategyId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Dynamic pricing can respond to both booking pace and remaining selling time rather than relying solely on current occupancy.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control price movement based on how quickly inventory is selling and how much time remains before the event or visit date. This is critical because occupancy alone is insufficient for effective revenue management.",
-  "purposeNote": "Dynamic pricing can respond to both booking pace and remaining selling time rather than relying solely on current occupancy.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Sales per Hour, Sales per Day, Sales per Week, Current Booking Pace, Expected Booking Pace, Historical Booking Curve. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Sales per Hour, Sales per Day, Sales per Week, Current Booking Pace, Expected Booking Pace, Historical Booking Curve, Remaining Inventory. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 80 §Support"
    },
    {
@@ -784,6 +882,11 @@
        "kind": "secondaryButton",
        "label": "Historical Booking Curve",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 80 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Remaining Inventory",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 80 §Support"
       }
      ]
     },
@@ -805,18 +908,16 @@
     "operationId": "setBookingVelocityTime",
     "contract": "catalogue",
     "purpose": "Booking Velocity & Time-to-Event Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setBookingVelocityTime"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-091"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-091",
+   "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-091"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 80. 0 of 0 labels bound to a contract property; 6 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 80. 0 of 0 labels bound to a contract property; 7 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -873,15 +974,18 @@
      "to": "ADM-088",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F147 step 8→9",
-     "operation": "listSeasonalCalendarDay"
+     "operation": "listSeasonalCalendarDay",
+     "carries": [
+      "strategyId"
+     ]
     }
    ]
   },
   "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Configure dynamic pricing behavior according to temporal commercial patterns.",
   "purposeNote": "performances, and timeslots without creating conflicting temporal rules.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision Rendered on the calendar template (M17-03, 29 September).",
+  "purpose": "Configure dynamic pricing behavior according to temporal commercial patterns.",
   "gaps": [
    {
     "operation": null,
@@ -895,7 +999,7 @@
    }
   ],
   "layout": {
-   "template": "split",
+   "template": "calendar",
    "regions": [
     {
      "name": "contentBody",
@@ -905,6 +1009,45 @@
        "derived": true,
        "impliedBy": "listSeasonalCalendarDay",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save demand signal configuration",
+       "operation": "setDemandSignalConfiguration",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The person's half of `catalogue.demand_signal`** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "View: day, week or month",
+       "notes": "**Every calendar has day, week and month views, and the day view is broken into hours from the venue's day start hour** (17 September minutes, M17-03). Built on the shared calendar view (`calendarView`, to be added to the component library); until then a timeline per view.",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Category",
+       "notes": "**Filtered by category, so a team sees only what is theirs** (M17-03).",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "listSeasonalCalendarDay",
+       "notes": "Entries of the view in force, placed by date and hour.",
+       "provenance": "29 September pass (P29 group A)"
       }
      ]
     }
@@ -923,6 +1066,15 @@
     "contract": "catalogue",
     "purpose": "Seasonal, Calendar, Day & Timeslot Dynamic Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDemandSignalConfiguration",
+    "contract": "catalogue",
+    "purpose": "Enter a calendar signal or configure how a demand signal is used",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSeasonalCalendarDay"
+    ]
    }
   ],
   "entryState": {
@@ -931,15 +1083,60 @@
     "SeasonalCalendarDayTimeslotDynamicRulesView.month",
     "SeasonalCalendarDayTimeslotDynamicRulesView.week",
     "SeasonalCalendarDayTimeslotDynamicRulesView.dateRange",
-    "SeasonalCalendarDayTimeslotDynamicRulesView.publicHoliday"
+    "SeasonalCalendarDayTimeslotDynamicRulesView.dimension"
+   ],
+   "params": [
+    {
+     "name": "signalId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-092"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-092",
+   "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-092"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 81. 0 of 0 labels bound to a contract property; 0 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDemandSignalConfiguration",
+    "component": "modal",
+    "trigger": "Save demand signal configuration",
+    "body": "**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DemandSignal",
+    "confirm": {
+     "label": "Save demand signal configuration",
+     "operation": "setDemandSignalConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "signalKind",
+      "source",
+      "signalType",
+      "name",
+      "venueId",
+      "productId",
+      "geography",
+      "marketCode",
+      "periodStart",
+      "periodEnd",
+      "currentValue",
+      "unit",
+      "reading",
+      "configuration",
+      "weight",
+      "reliability"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -996,16 +1193,24 @@
      "to": "ADM-088",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F147 step 10→11",
-     "operation": "listChannelCustomerSegment"
+     "operation": "listChannelCustomerSegment",
+     "carries": [
+      "strategyId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Dynamic pricing can vary appropriately by channel, customer segment, and location without violating protected commercial agreements.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow dynamic-pricing behavior to differ according to commercial context.",
-  "purposeNote": "Dynamic pricing can vary appropriately by channel, customer segment, and location without violating protected commercial agreements.",
   "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: POS, Call Center, API. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 83 §Support"
+   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -1021,15 +1226,29 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listChannelCustomerSegment",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "kind": "primaryButton",
+       "label": "POS",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 83 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Call Center",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 83 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "API",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 83 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1050,19 +1269,16 @@
   ],
   "entryState": {
    "preloaded": [
-    "ChannelCustomerSegmentLocationDynamicRulesView.b2c",
-    "ChannelCustomerSegmentLocationDynamicRulesView.mobileApp",
-    "ChannelCustomerSegmentLocationDynamicRulesView.pos",
-    "ChannelCustomerSegmentLocationDynamicRulesView.kiosk",
-    "ChannelCustomerSegmentLocationDynamicRulesView.callCenter"
+    "ChannelCustomerSegmentLocationDynamicRulesView.channel"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-093"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-093",
+   "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-093"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 83. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 83. 0 of 0 labels bound to a contract property; 3 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1119,22 +1335,18 @@
      "to": "ADM-088",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F147 step 12→13",
-     "operation": "listDynamicPriceBand"
+     "operation": "listDynamicPriceBand",
+     "carries": [
+      "strategyId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Dynamic prices move through controlled commercial price bands or adjustment ranges rather than generating arbitrary uncontrolled selling prices.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define the controlled monetary steps through which prices can move. This is preferable to allowing unrestricted price generation for many products.",
-  "purposeNote": "Dynamic prices move through controlled commercial price bands or adjustment ranges rather than generating arbitrary uncontrolled selling prices.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Fixed Price Bands. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 84 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1182,6 +1394,19 @@
        "kind": "primaryButton",
        "label": "Fixed Price Bands",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 84 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Continuous Range where permitted",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 84 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save price ladder matrix",
+       "operation": "setPriceLadderMatrix",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The bands a strategy's price moves between, and how fast** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /dynamic-pricing-strategies/{strategyId}/price-ladder"
       }
      ]
     }
@@ -1199,14 +1424,70 @@
     "contract": "catalogue",
     "purpose": "Dynamic Price Bands, Ladders & Adjustment Matrix",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPriceLadderMatrix",
+    "contract": "catalogue",
+    "purpose": "Set a strategy's price ladder",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDynamicPriceBand"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-094"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-094",
+   "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-094"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 84. 0 of 0 labels bound to a contract property; 7 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 84. 0 of 0 labels bound to a contract property; 8 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPriceLadderMatrix",
+    "component": "modal",
+    "trigger": "Save price ladder matrix",
+    "body": "**Collects what `setPriceLadderMatrix` sends before it is called.** Required: `id`, `scopePath`, `dynamicPricingStrategyId`, `adjustmentModel`. Optional: `basePriceSource`, `bands`, `baseBandCode`, `stepAmount`, `minimumPrice`, `basePrice`, `maximumPrice`, `allowUpward`, `allowDownward`, `maxIncreasePercentPerAdjustment`, `maxDecreasePercentPerAdjustment`, `maximumBandsPerMovement` and 4 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PriceLadder",
+    "confirm": {
+     "label": "Save price ladder matrix",
+     "operation": "setPriceLadderMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "dynamicPricingStrategyId",
+      "adjustmentModel",
+      "basePriceSource",
+      "bands",
+      "baseBandCode",
+      "stepAmount",
+      "minimumPrice",
+      "basePrice",
+      "maximumPrice",
+      "allowUpward",
+      "allowDownward",
+      "maxIncreasePercentPerAdjustment",
+      "maxDecreasePercentPerAdjustment",
+      "maximumBandsPerMovement",
+      "minimumMinutesBetweenMovements",
+      "cooldownMinutes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /dynamic-pricing-strategies/{strategyId}/price-ladder"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "strategyId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1268,10 +1549,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "No dynamic pricing strategy can generate a selling price outside approved financial, contractual, operational, or regulatory boundaries.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Establish the non-negotiable boundaries for every dynamic-pricing strategy.",
-  "purposeNote": "No dynamic pricing strategy can generate a selling price outside approved financial, contractual, operational, or regulatory boundaries.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1350,6 +1631,14 @@
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Freeze Product, Freeze Event, Freeze Performance, Freeze Strategy, Freeze Venue, Return to Base Price. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 86 §Authorized users can"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save dynamic pricing guardrail policy",
+       "operation": "setDynamicPricingGuardrailPolicy",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**Guardrails and automation policy, one row per scope** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /dynamic-pricing-controls"
       }
      ]
     }
@@ -1367,14 +1656,61 @@
     "contract": "catalogue",
     "purpose": "Dynamic Pricing Guardrails & Commercial Protection",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDynamicPricingGuardrailPolicy",
+    "contract": "catalogue",
+    "purpose": "Set the guardrails and automation level of dynamic pricing at one scope",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDynamicPricingGuardrail"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-095"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-095",
+   "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-095"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 86. 0 of 0 labels bound to a contract property; 18 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDynamicPricingGuardrailPolicy",
+    "component": "modal",
+    "trigger": "Save dynamic pricing guardrail policy",
+    "body": "**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DynamicPricingControl",
+    "confirm": {
+     "label": "Save dynamic pricing guardrail policy",
+     "operation": "setDynamicPricingGuardrailPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "scopeLevel",
+      "automationLevel",
+      "scopeId",
+      "absoluteMinimumPrice",
+      "absoluteMaximumPrice",
+      "minimumMarginPercent",
+      "maximumUpliftPercent",
+      "maximumReductionPercent",
+      "maximumSingleChangePercent",
+      "maximumDailyChangePercent",
+      "maximumWeeklyChangePercent",
+      "minimumChangeIntervalMinutes",
+      "maximumChangesPerDay",
+      "minimumInventory",
+      "maximumOccupancyTriggerPercent",
+      "protectedRateTypes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /dynamic-pricing-controls"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1436,10 +1772,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "authorized boundaries into the central governance process.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure independently by; Configure; Capture) and no display directory — it is settings, not a population",
   "purpose": "Define how much authority the pricing engine has to act on a calculated dynamic price. This is different from Board 4's approval workflow. Board 5 determines whether the engine may act automatically. Board 4 handles governance when formal approval is required.",
-  "purposeNote": "authorized boundaries into the central governance process.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1523,6 +1859,20 @@
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 87 §Capture"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save dynamic pricing guardrail policy",
+       "operation": "setDynamicPricingGuardrailPolicy",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**Guardrails and automation policy, one row per scope** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /dynamic-pricing-controls"
+      }
+     ]
     }
    ]
   },
@@ -1538,14 +1888,61 @@
     "contract": "catalogue",
     "purpose": "Dynamic Pricing Automation Policy & Control",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDynamicPricingGuardrailPolicy",
+    "contract": "catalogue",
+    "purpose": "Set the guardrails and automation level of dynamic pricing at one scope",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDynamicPricingAutomation"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-096"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-096",
+   "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-096"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 87. 0 of 0 labels bound to a contract property; 15 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDynamicPricingGuardrailPolicy",
+    "component": "modal",
+    "trigger": "Save dynamic pricing guardrail policy",
+    "body": "**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DynamicPricingControl",
+    "confirm": {
+     "label": "Save dynamic pricing guardrail policy",
+     "operation": "setDynamicPricingGuardrailPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "scopeLevel",
+      "automationLevel",
+      "scopeId",
+      "absoluteMinimumPrice",
+      "absoluteMaximumPrice",
+      "minimumMarginPercent",
+      "maximumUpliftPercent",
+      "maximumReductionPercent",
+      "maximumSingleChangePercent",
+      "maximumDailyChangePercent",
+      "maximumWeeklyChangePercent",
+      "minimumChangeIntervalMinutes",
+      "maximumChangesPerDay",
+      "minimumInventory",
+      "maximumOccupancyTriggerPercent",
+      "protectedRateTypes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /dynamic-pricing-controls"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1596,23 +1993,78 @@
     "ADM-088"
    ],
    "inferred": false,
-   "notes": "**Reached from ADM-088, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from ADM-088, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-088",
+     "trigger": "Dynamic Pricing Strategy Command Center",
+     "provenance": "derived — ADM-088 declares entryState.params strategyId and ADM-097 holds none of them, so the edge carries nothing and ADM-088 opens cold"
+    }
+   ]
   },
   "density": "compact",
+  "purposeNote": "For any configured commercial scenario, TICVAI can deterministically calculate, test, and explain the final dynamic price before the strategy is activated. Board 5 — Final Screen Register # Backend Screen Primary Responsibility 10.5. Dynamic Pricing Strategy Command Center Strategy portfolio 1 10.5. Strategy master",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Identify; Show) and no metric row",
   "purpose": "Determine the final dynamic price when multiple strategies and rules are simultaneously applicable. This is the final and most important control screen of Board 5.",
-  "purposeNote": "For any configured commercial scenario, TICVAI can deterministically calculate, test, and explain the final dynamic price before the strategy is activated. Board 5 — Final Screen Register # Backend Screen Primary Responsibility 10.5. Dynamic Pricing Strategy Command Center Strategy portfolio 1 10.5. Strategy master",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Most Specific Rule Wins, Stop Processing. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 89 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Contradictory rules",
+       "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.contradictoryRules",
+       "operation": "listRulePriorityConflict",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Same priority",
+       "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.samePriority",
+       "operation": "listRulePriorityConflict",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Impossible condition",
+       "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.impossibleCondition",
+       "operation": "listRulePriorityConflict",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Overlapping strategy",
+       "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.overlappingStrategy",
+       "operation": "listRulePriorityConflict",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Circular dependency",
+       "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.circularDependency",
+       "operation": "listRulePriorityConflict",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Missing fallback",
+       "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.missingFallback",
+       "operation": "listRulePriorityConflict",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Guardrail conflict",
+       "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsSummary.guardrailConflict",
+       "operation": "listRulePriorityConflict",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -1621,14 +2073,7 @@
        "kind": "dataTable",
        "label": "Every rule priority conflict",
        "columns": [
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.contradictoryRules",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.samePriority",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.impossibleCondition",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.overlappingStrategy",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.circularDependency",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.missingFallback",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.guardrailConflict",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.whyAed300"
+        "RulePriorityConflictResolutionDynamicPricingTestConsView.calculationPath"
        ],
        "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsView",
        "operation": "listRulePriorityConflict",
@@ -1645,14 +2090,7 @@
        "label": "The selected rule priority conflict",
        "bindsTo": "RulePriorityConflictResolutionDynamicPricingTestConsView",
        "columns": [
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.contradictoryRules",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.samePriority",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.impossibleCondition",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.overlappingStrategy",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.circularDependency",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.missingFallback",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.guardrailConflict",
-        "RulePriorityConflictResolutionDynamicPricingTestConsView.whyAed300"
+        "RulePriorityConflictResolutionDynamicPricingTestConsView.calculationPath"
        ],
        "notes": "The pack groups this record's detail under its own headings: “For one Saturday evening ticket”, “Priority Matrix”, “Commercial Protection”, “Contract/Member Protection”, “Event-Specific Strategy”, “Inventory/Occupancy”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 89 §Identify"
@@ -1666,12 +2104,26 @@
       {
        "kind": "primaryButton",
        "label": "Most Specific Rule Wins",
+       "operation": "setRulePriorityConflict",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 89 §Support"
       },
       {
        "kind": "destructiveButton",
        "label": "Stop Processing",
+       "operation": "setRulePriorityConflict",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 89 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Run Test",
+       "operation": "setRulePriorityConflict",
+       "provenance": "contract catalogue.yaml PUT /rule-priority-conflict (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save Case",
+       "operation": "setRulePriorityConflict",
+       "provenance": "contract catalogue.yaml PUT /rule-priority-conflict (decided 29 September, readiness close-out)"
       }
      ]
     }
@@ -1699,22 +2151,29 @@
     "contract": "catalogue",
     "purpose": "Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setRulePriorityConflict",
+    "contract": "catalogue",
+    "purpose": "Reorder, validate, test or save the pricing rule priority",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
-    "RulePriorityConflictResolutionDynamicPricingTestConsView.contradictoryRules",
-    "RulePriorityConflictResolutionDynamicPricingTestConsView.samePriority",
-    "RulePriorityConflictResolutionDynamicPricingTestConsView.impossibleCondition",
-    "RulePriorityConflictResolutionDynamicPricingTestConsView.overlappingStrategy",
-    "RulePriorityConflictResolutionDynamicPricingTestConsView.circularDependency",
-    "RulePriorityConflictResolutionDynamicPricingTestConsView.missingFallback"
+    "RulePriorityConflictResolutionDynamicPricingTestConsSummary.contradictoryRules",
+    "RulePriorityConflictResolutionDynamicPricingTestConsSummary.samePriority",
+    "RulePriorityConflictResolutionDynamicPricingTestConsSummary.impossibleCondition",
+    "RulePriorityConflictResolutionDynamicPricingTestConsSummary.overlappingStrategy",
+    "RulePriorityConflictResolutionDynamicPricingTestConsSummary.circularDependency",
+    "RulePriorityConflictResolutionDynamicPricingTestConsSummary.missingFallback"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-097"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-097",
+   "workshopBoard": "wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-097"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 89. 8 of 8 labels bound to a contract property; 10 of 143 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

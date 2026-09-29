@@ -1,6 +1,6 @@
 # WS59 — Ticket Media   Credential Management board 1
 
-**10 screens · 16 operations · 14 schemas · 3 permissions**
+**10 screens · 16 operations · 18 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -2755,6 +2755,92 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CredentialIdentityTokenReferenceMappingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Identity, Token & Reference Mapping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "credentialBindingId": {
+    "type": "string",
+    "description": "Credential Binding ID"
+   },
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket ID"
+   },
+   "mediaType": {
+    "type": "string",
+    "description": "Media Type"
+   },
+   "credentialReference": {
+    "type": "string",
+    "description": "Credential Reference"
+   },
+   "tokenIdentifier": {
+    "type": "string",
+    "description": "Token or identifier, masked in administrative views"
+   },
+   "providerReference": {
+    "type": "string",
+    "description": "Provider Reference"
+   },
+   "issuedDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Issued Date"
+   },
+   "activationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Activation Date"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "active",
+     "suspended",
+     "revoked",
+     "expired"
+    ],
+    "description": "Credential binding status"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "securityProfile": {
+    "type": "string",
+    "description": "Security profile"
+   },
+   "protectionMethods": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "tokenization",
+      "hashing",
+      "encryption",
+      "signedPayloads",
+      "keyReferences",
+      "masking"
+     ]
+    },
+    "description": "How the credential value is protected"
+   }
+  },
+  "required": [
+   "credentialBindingId",
+   "virtualTicketId",
+   "mediaType"
+  ]
+ },
  "EntitlementCrossMediaSynchronizationRulesView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -3380,6 +3466,198 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "VirtualTicketArchitectureTestingGovernanceAuditView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Virtual Ticket Architecture Testing, Governance & Audit displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "changeType": {
+    "type": "string",
+    "enum": [
+     "configurationChange",
+     "mediaBinding",
+     "rebinding",
+     "activation",
+     "suspension",
+     "revocation",
+     "replacement",
+     "resolverChange",
+     "ruleChange",
+     "approval"
+    ],
+    "description": "What kind of change was recorded"
+   },
+   "actor": {
+    "type": "string",
+    "description": "Actor"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "before": {
+    "type": "string",
+    "description": "State before the change"
+   },
+   "after": {
+    "type": "string",
+    "description": "State after the change"
+   }
+  }
+ },
+ "VirtualTicketCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Virtual Ticket Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket ID"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "eventPerformance": {
+    "type": "string",
+    "description": "Event / Performance"
+   },
+   "ticketHolder": {
+    "type": "string",
+    "description": "Ticket Holder"
+   },
+   "orderReference": {
+    "type": "string",
+    "description": "Order Reference"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "seatResourceWhereApplicable": {
+    "type": "string",
+    "description": "Seat / Resource where applicable"
+   },
+   "ticketStatus": {
+    "type": "string",
+    "enum": [
+     "created",
+     "pendingFulfillment",
+     "active",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "suspended",
+     "cancelled",
+     "voided",
+     "reissuedSuperseded",
+     "refunded",
+     "transferred",
+     "blocked"
+    ],
+    "description": "Virtual Ticket status (lifecycle 15.1.3)"
+   },
+   "usageStatus": {
+    "type": "string",
+    "enum": [
+     "unused",
+     "partiallyUsed",
+     "used"
+    ],
+    "description": "How much of the entitlement is consumed"
+   },
+   "numberOfLinkedMedia": {
+    "type": "integer",
+    "description": "Number of Linked Media"
+   },
+   "primaryMedia": {
+    "type": "string",
+    "description": "Primary Media"
+   },
+   "lastCredentialActivity": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Credential Activity"
+   },
+   "lastModified": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Modified"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Valid from"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Valid to"
+   }
+  }
+ },
+ "VirtualTicketCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "totalVirtualTickets": {
+    "type": "integer",
+    "description": "Total Virtual Tickets"
+   },
+   "active": {
+    "type": "integer",
+    "description": "Active"
+   },
+   "pendingActivation": {
+    "type": "integer",
+    "description": "Pending Activation"
+   },
+   "suspended": {
+    "type": "integer",
+    "description": "Suspended"
+   },
+   "usedConsumed": {
+    "type": "integer",
+    "description": "Used / Consumed"
+   },
+   "partiallyConsumed": {
+    "type": "integer",
+    "description": "Partially Consumed"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "cancelled": {
+    "type": "integer",
+    "description": "Cancelled"
+   },
+   "revoked": {
+    "type": "integer",
+    "description": "Revoked"
+   },
+   "virtualTicketsWithMultipleMedia": {
+    "type": "integer",
+    "description": "Virtual Tickets with Multiple Media"
+   },
+   "virtualTicketsWithNoActiveMedia": {
+    "type": "integer",
+    "description": "Virtual Tickets with No Active Media"
+   },
+   "mediaBindingExceptions": {
+    "type": "integer",
+    "description": "Media Binding Exceptions"
+   },
+   "credentialSynchronizationIssues": {
+    "type": "integer",
+    "description": "Credential Synchronization Issues"
    }
   }
  },

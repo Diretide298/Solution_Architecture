@@ -150,6 +150,13 @@
     "contract": "marketing-crm",
     "purpose": "List campaigns",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMarketingRecommendations",
+    "contract": "ai",
+    "purpose": "AI recommendations on this campaign or journey, with expected impact and evidence",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -237,6 +244,13 @@
     {
      "name": "contentBody",
      "components": [
+      {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "listCampaignCalendarTimeline",
+       "notes": "Campaigns placed across their run dates. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
       {
        "kind": "dataTable",
        "derived": true,
@@ -400,6 +414,13 @@
     "invalidates": [
      "listCampaigns"
     ]
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1169,6 +1190,25 @@
        "derived": true,
        "impliedBy": "getCampaignPerformance",
        "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "proposeMarketingContent",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMarketingRecommendations",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "proposeMarketingContent"
       }
      ]
     }
@@ -1188,6 +1228,41 @@
     "purpose": "Budget, goals and pacing",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listMarketingRecommendations",
+    "contract": "ai",
+    "purpose": "AI recommendations on this campaign or journey, with expected impact and evidence",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideAiInsight",
+    "contract": "ai",
+    "purpose": "Accept, reject or mark a campaign or journey recommendation actioned",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Send-time suggestion (kind sendTime): best hour and channel per recipient",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "updateCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Set up A/B variants and the test, and pick a winner by hand (winnerRule manual)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1200,6 +1275,10 @@
    "params": [
     {
      "name": "campaignId",
+     "from": "navigation"
+    },
+    {
+     "name": "insightId",
      "from": "navigation"
     }
    ]

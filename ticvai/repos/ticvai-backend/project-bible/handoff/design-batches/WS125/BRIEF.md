@@ -1,6 +1,6 @@
 # WS125 — Event Management Configuration Backend Structure v1.0 board 1
 
-**3 screens · 4 operations · 2 schemas · 2 permissions**
+**3 screens · 4 operations · 3 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

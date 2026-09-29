@@ -1,6 +1,6 @@
 # P10-credit-settlement-01 — P10 · Credit & Settlement
 
-**2 screens · 7 operations · 4 schemas · 5 permissions**
+**2 screens · 7 operations · 6 schemas · 5 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 5 permissions apply here:
   `CREDIT_MANAGE, CREDIT_OVERRIDE, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: addTip, createPayment
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,5 +60,9 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-012` | Checkout / Credit Purchase | configEditor | 4 | 0 | — |
-| `PTR-013` | Credit Limit & Balance | statusTracker | 3 | 1 | — |
+| `PTR-012` | Checkout / Credit Purchase | configEditor | 4 | 2 | — |
+| `PTR-013` | Credit Limit & Balance | statusTracker | 3 | 2 | — |
+
+## Thin screens in this batch
+
+**PTR-013 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

@@ -89,10 +89,34 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "CreatePerformancesRequest",
   "responds": null
+ },
+ "decideRecommendations": {
+  "method": "POST",
+  "path": "/recommendations/decide",
+  "contract": "ai",
+  "summary": "Fill a recommendation slot",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRecommendationResult"
  },
  "forceReleaseInventoryHold": {
   "method": "POST",
@@ -161,6 +185,16 @@
   "scopeLevel": "workstation",
   "parameters": [
    {
+    "name": "sinceVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "validFrom",
     "in": "query",
     "required": true
@@ -225,25 +259,6 @@
   ],
   "requestBody": null,
   "responds": "SeatAvailability"
- },
- "getUpsellSuggestions": {
-  "method": "POST",
-  "path": "/upsell-suggestions",
-  "contract": "promotions",
-  "summary": "Suggestions for a cart",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
  },
  "getVenueSettings": {
   "method": "GET",
@@ -385,6 +400,11 @@
    },
    {
     "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
     "in": "query",
     "required": null
    },
@@ -600,6 +620,25 @@
   "requestBody": "SeatRecommendationRequest",
   "responds": null
  },
+ "recordRecommendationEvents": {
+  "method": "POST",
+  "path": "/recommendations/events",
+  "contract": "ai",
+  "summary": "Report what happened to recommended items",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "relinquishInventoryHold": {
   "method": "DELETE",
   "path": "/inventory-holds/{inventoryHoldId}",
@@ -664,9 +703,14 @@
   "summary": "Define approved substitutions",
   "permission": "PRODUCT_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "recipeId",
     "in": "path",
@@ -691,6 +735,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -752,6 +801,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "Recipe",
@@ -767,6 +821,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -824,6 +883,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

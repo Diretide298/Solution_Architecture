@@ -139,6 +139,30 @@
   "requestBody": null,
   "responds": "ResourceAuditEntry"
  },
+ "getResourceAvailability": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/availability",
+  "contract": "resources",
+  "summary": "When it is free, with conflicts already resolved",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceAvailability"
+ },
  "getResourceDependencies": {
   "method": "GET",
   "path": "/resources/{resourceId}/dependencies",
@@ -164,6 +188,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "ResourceHierarchy"
+ },
+ "getResourceQualifications": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/qualifications",
+  "contract": "resources",
+  "summary": "What an instructor or staff resource is certified to do, and until when — as saved",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Qualification"
  },
  "getResourceUtilisation": {
   "method": "GET",

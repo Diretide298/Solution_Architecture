@@ -1,0 +1,1099 @@
+{
+ "CreateWorkOrderRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "title",
+   "venueId",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "title": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 5000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderKind"
+     }
+    ],
+    "default": "corrective"
+   },
+   "priority": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "description": "**Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the fault.\n"
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13)."
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dueAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "description": "Photo-first. Expected at creation, not added later from memory.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "takeAssetOutOfService": {
+    "type": "boolean",
+    "default": false,
+    "description": "Raise and immediately suspend the asset. For a fault found on a live ride, the two are one action.\n"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "DeviceAssignment": {
+  "type": "object",
+  "x-ticvai-persistence": "tenancy.device_assignment",
+  "description": "16.2.9 to 16.2.11. **Ownership, custody and location are three facts, not one.**",
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `setDeviceAssignment`."
+   },
+   "ownerOrgUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who the device belongs to — the cost centre that replaces it when it breaks."
+   },
+   "custodianPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Who is holding it right now.** The fact a loss investigation needs."
+   },
+   "assignedWorkstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "locationScopePath": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastSeenLocation": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Reported by the heartbeat; distinct from where it is supposed to be."
+   },
+   "assetTag": {
+    "type": "string",
+    "nullable": true
+   },
+   "acquiredAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "A calendar date in the region's time zone."
+   },
+   "warrantyExpiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "A calendar date in the region's time zone."
+   },
+   "assignedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   }
+  }
+ },
+ "DeviceCapability": {
+  "type": "string",
+  "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n",
+  "enum": [
+   "genderClassification"
+  ]
+ },
+ "DeviceEnrolment": {
+  "x-ticvai-persistence": "platform.device",
+  "type": "object",
+  "description": "BL-160. **The body `enrolDevice` accepts, named so that it writes.**\nIt was an anonymous inline object, and `derive-lineage` reads writes from the schema an operation accepts — so the one operation that moves a device through its whole lifecycle recorded no writes at all, and `platform.device` looked like a table only `registerDevice` touched.\n**Provisioning is inside enrolment rather than beside it**, which is why `configurationProfileId` is here: a device that is enrolled but unprovisioned is a device that will fail at the gate on its first morning.\n",
+  "required": [
+   "state"
+  ],
+  "properties": {
+   "state": {
+    "type": "string",
+    "enum": [
+     "enrolled",
+     "provisioned",
+     "active",
+     "deactivated",
+     "retired"
+    ],
+    "description": "**The target state, not the current one.** `registered` is absent because `registerDevice` is what produces it and nothing transitions back to it.\n"
+   },
+   "configurationProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Recorded on the `tenancy.device_audit` row, not on the device.** Required in practice for `deactivated` and `retired`, where an investigation six months later needs to know why a gate stopped working.\n"
+   }
+  }
+ },
+ "DeviceFirmware": {
+  "type": "object",
+  "x-ticvai-persistence": "tenancy.device_firmware",
+  "description": "16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.** Written by `createDeviceFirmware` and moved through its life by `setDeviceFirmwareStatus` (29 September, build pass); `startDeviceFirmwareRollout` deploys only a `released` one.\n",
+  "required": [
+   "deviceKind",
+   "version"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "deviceKind": {
+    "type": "string"
+   },
+   "version": {
+    "type": "string"
+   },
+   "vendor": {
+    "type": "string",
+    "nullable": true,
+    "description": "Who built the image, as the device's driver names its maker."
+   },
+   "checksumAlgorithm": {
+    "type": "string",
+    "enum": [
+     "sha256",
+     "sha512"
+    ],
+    "default": "sha256"
+   },
+   "releaseNotes": {
+    "type": "string",
+    "nullable": true
+   },
+   "artefactAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "checksum": {
+    "type": "string",
+    "nullable": true
+   },
+   "minimumPreviousVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Some updates cannot be applied from any starting point.** Naming the floor is how a two-step upgrade stays possible instead of bricking the devices that skipped one.\n"
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Set when `setDeviceFirmwareStatus` first makes the release `released`."
+   },
+   "installedCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "default": "draft",
+    "enum": [
+     "draft",
+     "released",
+     "deprecated",
+     "withdrawn"
+    ]
+   },
+   "statusReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `reason` given when the release was deprecated or withdrawn."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The tenant the release belongs to. Releases are tenant-wide; rollouts narrow them."
+   }
+  }
+ },
+ "DeviceKind": {
+  "type": "string",
+  "enum": [
+   "receiptPrinter",
+   "ticketPrinter",
+   "labelPrinter",
+   "cashDrawer",
+   "barcodeScanner",
+   "rfidReader",
+   "nfcReader",
+   "cardReader",
+   "idReader",
+   "biometricReader",
+   "accessReader",
+   "paymentTerminal",
+   "customerDisplay",
+   "signageDisplay",
+   "kitchenDisplay",
+   "turnstileController",
+   "wristbandEncoder",
+   "signaturePad",
+   "scale",
+   "camera",
+   "mobileHandset"
+  ],
+  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n"
+ },
+ "DeviceTelemetryPoint": {
+  "type": "object",
+  "x-ticvai-persistence": "tenancy.device_telemetry",
+  "description": "16.4.21 and 16.4.22. **A series, because degradation is not visible in a point-in-time reading.**\n",
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "batteryPercent": {
+    "type": "integer",
+    "nullable": true
+   },
+   "batteryHealthPercent": {
+    "type": "integer",
+    "nullable": true
+   },
+   "charging": {
+    "type": "boolean",
+    "nullable": true
+   },
+   "signalStrength": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cpuPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "memoryPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "storageFreeMb": {
+    "type": "integer",
+    "nullable": true
+   },
+   "consumables": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Paper, ribbon, wristband stock — whatever the device kind reports."
+   },
+   "uptimeSeconds": {
+    "type": "integer",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PayTerminalCertification": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.terminal_certification + payments.terminal_certification_level3",
+  "description": "4.3.1. Also the `recordPaymentTerminalCertification` body. **One per terminal model**; a terminal names its model in `PaymentTerminal.terminalModelCode`.",
+  "required": [
+   "modelCode",
+   "manufacturer"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "modelCode": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "manufacturer": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "emvLevel1ApprovalReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "emvLevel1ExpiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "emvLevel2KernelVersions": {
+    "type": "array",
+    "description": "Contact and contactless kernels with their EMVCo approval, e.g. `EMV Contact 4.3 / ref`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "emvLevel2ExpiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "level3Certifications": {
+    "type": "array",
+    "description": "Per acquirer and card scheme; a terminal is activated only against an acquirer listed here and not expired.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "acquirerConnectionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "cardScheme": {
+       "type": "string"
+      },
+      "reference": {
+       "type": "string"
+      },
+      "certifiedAt": {
+       "type": "string",
+       "format": "date"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "pciPtsApprovalNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "pciPtsExpiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "documentAssetIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `tenant` scope."
+   }
+  }
+ },
+ "PaymentTerminal": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.terminal",
+  "description": "Board 3. **The payment layer on a `tenancy` device**, not a second device register.",
+  "required": [
+   "deviceId"
+  ],
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `tenancy.RegisteredDevice`. **Enrolment, credentials, firmware and tamper state live there.**"
+   },
+   "merchantAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acquirerConnectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "terminalIdentifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "emvConfigurationVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "terminalModelCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "4.3.1. The model whose EMV and PCI certification applies (`listPaymentTerminalCertifications`)."
+   },
+   "entryModes": {
+    "type": "array",
+    "description": "4.3.2. The card entry modes this terminal accepts. **`magstripe` (swipe) is off unless listed**, since a swiped card carries no chip cryptogram; it stays available as a fallback where the acquirer allows it.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "chip",
+      "contactless",
+      "magstripe",
+      "manualEntry",
+      "mobileWallet"
+     ]
+    }
+   },
+   "dccEnabled": {
+    "type": "boolean",
+    "default": false,
+    "description": "4.3.2. Offer Dynamic Currency Conversion on a foreign card at this terminal. The rate is the provider's and is recorded on the payment (`fxRateSource` `cardScheme`); the ledger still holds the base currency."
+   },
+   "dccProviderConnectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "contactlessLimit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "pinBypassAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "storeAndForward": {
+    "type": "object",
+    "description": "**A risk decision, not a technical one.**",
+    "properties": {
+     "enabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "floorLimit": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "maximumHeldTotal": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "maximumAgeMinutes": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "unconfigured",
+     "active",
+     "offline",
+     "suspended"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ProviderTestResult": {
+  "type": "object",
+  "description": "Board 3.10. **A provider configured and never tested fails on the first real transaction.**\n",
+  "properties": {
+   "connectionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "testedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "checks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "credentials",
+        "authorise",
+        "capture",
+        "refund",
+        "void",
+        "tokenise",
+        "webhook"
+       ]
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "latencyMs": {
+       "type": "integer",
+       "nullable": true
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "overall": {
+    "type": "string",
+    "enum": [
+     "pass",
+     "partial",
+     "fail"
+    ]
+   }
+  }
+ },
+ "RegisteredDevice": {
+  "x-ticvai-persistence": "platform.device",
+  "type": "object",
+  "description": "**The device register of record** (decided 29 September, build pass). Identity, enrolment, credential, firmware and push registration for every device in the estate live on this row. `access.access_device` places access-control devices in the gate topology and repeats serial, versions, health and lifecycle; the two are not merged yet, and where they disagree this row wins.\n",
+  "required": [
+   "id",
+   "kind",
+   "driver"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "$ref": "#/components/schemas/DeviceKind"
+   },
+   "driver": {
+    "type": "string",
+    "description": "Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. Adding a vendor is a driver plus configuration, not a core change (ADR-0015).\n"
+   },
+   "identifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September); `registerDevice` refuses either mistake with `422`.\n"
+   },
+   "model": {
+    "type": "string",
+    "nullable": true
+   },
+   "pushToken": {
+    "type": "string",
+    "format": "password",
+    "nullable": true,
+    "writeOnly": true,
+    "description": "BL-163. **Guest devices register for push and staff devices did not** — `registerGuestDevice` exists with a token, platform and failure count, and a scanner that cannot be told anything is a scanner somebody has to walk to.\nWrite-only, and marked `writeOnly`: accepted by `registerDevice` and never returned by `listDevices` or `getDevice`. **A push token is a credential**, and the rule that no surface holds a provider key applies here too.\n"
+   },
+   "pushPlatform": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "ios",
+     "android",
+     "web",
+     "windows"
+    ]
+   },
+   "pushFailureCount": {
+    "type": "integer",
+    "default": 0,
+    "readOnly": true,
+    "description": "**Consecutive failures.** A token that has failed repeatedly is a device that was wiped or reassigned, and continuing to push to it is how a notification queue fills with nothing.\n"
+   },
+   "offlineScope": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "none",
+     "readOnly",
+     "sellAndScan",
+     "fullVenue"
+    ],
+    "description": "BL-163. **What this device may do with no connection**, which was unstated for the staff app while `venue-pos` and `venue-scanner` had it settled.\n**`fullVenue` on a personal handset is a decision, not a default** — a device that can do everything offline is a device that carries the whole venue's data in somebody's pocket.\n"
+   },
+   "firmwareVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "As the device last reported it on its heartbeat."
+   },
+   "isRequired": {
+    "type": "boolean",
+    "description": "True blocks shift open when the device is unreachable."
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "online",
+     "offline",
+     "error",
+     "consumableLow",
+     "needsAttention",
+     "unknown"
+    ],
+    "description": "What the device last said on its heartbeat; `unknown` until it has."
+   },
+   "batteryPercent": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "Board 1 of the client's POS design set, 20 August. **A wristband encoder at 8% is a gate that stops working in an hour**, and nothing in the package carried it.\n**Null where the device has no battery**, which is most of them — a receipt printer reporting 100% forever is worse than one reporting nothing.\n"
+   },
+   "lastCheckedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Distinct from `lastHeartbeatAt`.** A heartbeat is the workstation saying the device is attached; a check is the device answering. **A printer with no paper heartbeats perfectly**, which is why the client's board shows both columns.\n"
+   },
+   "health": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "warning",
+     "degraded",
+     "offline",
+     "unknown"
+    ],
+    "default": "unknown",
+    "readOnly": true,
+    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n"
+   },
+   "lastHeartbeatAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "capabilities": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "$ref": "#/components/schemas/DeviceCapability"
+    },
+    "description": "BL-179. **What this driver reports it can do, beyond reading media.** ADR-0015 is standards-first — the device does what the device does — and until now a venue could switch on a feature that depended on hardware without anything being able to say whether the hardware was there.\n**A capability absent is a capability unavailable**, not a capability assumed. A venue setting that requires one is refused where no device in scope reports it, rather than silently doing nothing at the gate.\n"
+   },
+   "enrolmentState": {
+    "type": "string",
+    "enum": [
+     "registered",
+     "enrolled",
+     "provisioned",
+     "active",
+     "deactivated",
+     "retired"
+    ],
+    "default": "registered",
+    "readOnly": true,
+    "description": "BL-160. **Where the device is in its life, which is not the same question as whether it is answering.** `enrolDevice` has taken the whole matrix — registered, enrolled, provisioned, active, deactivated, retired — since 16.1.2, and until now there was no column for it to land in, so the operation read this table and wrote nothing.\n**Distinct from `status` and from `health`.** `status` is what the device last said and `health` is what we computed from it; a decommissioned turnstile still sitting on the network is `online` and `retired` at once, and neither column contradicts the other. **A device that is `retired` is refused at the gate whatever its status says.**\nThe transition itself — who moved it, from what, and why — is a `tenancy.device_audit` record. It is not repeated here, because the latest transition stored in two places is one place to go stale.\n"
+   },
+   "retiredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set when `enrolmentState` reaches `retired`, and null otherwise.** Derivable from `tenancy.device_audit`, and kept as a column for the same reason `maintenance.asset.retired_on` is one: a retirement date you reconstruct from an audit log is a date nobody filters a fleet by.\n"
+   },
+   "configurationProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\n"
+   }
+  }
+ },
+ "StoredForwardTransaction": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.stored_forward",
+  "description": "Board 3.8. **Money taken that the platform does not yet know about.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "takenAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "maskedPan": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "held",
+     "forwarding",
+     "accepted",
+     "rejected",
+     "expired"
+    ]
+   },
+   "attempts": {
+    "type": "integer",
+    "default": 0
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "WorkOrder": {
+  "x-ticvai-persistence": "maintenance.work_order",
+  "x-ticvai-retired-columns": [
+   "is_overdue"
+  ],
+  "type": "object",
+  "required": [
+   "id",
+   "workOrderNumber",
+   "title",
+   "venueId",
+   "status",
+   "priority",
+   "kind",
+   "createdAt"
+  ],
+  "properties": {
+   "downtimeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n**Maintained on write**: set when the asset returns to service, as the minutes from the `maintenance.asset_status_change` row that took it out carrying this work order's id to the asset's next change back to `inService`. Null while the asset is still out, and for a work order that never took it out.\n"
+   },
+   "rootCause": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "wearAndTear",
+     "operatorError",
+     "guestDamage",
+     "manufacturingDefect",
+     "environmental",
+     "softwareFault",
+     "powerFailure",
+     "deferredMaintenance",
+     "unknown"
+    ],
+    "description": "**Structured, because free text cannot be counted.** *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault caused by work that was postponed is an argument for a budget.\n"
+   },
+   "rootCauseNote": {
+    "type": "string",
+    "nullable": true
+   },
+   "escalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "escalationLevel": {
+    "type": "integer",
+    "default": 0,
+    "description": "**Escalation is a clock, not a decision.** A work order on a ride nobody has accepted after twenty minutes escalates itself, because the alternative is somebody noticing.\n"
+   },
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "workOrderNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
+   },
+   "title": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assetName": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record reads as it was raised.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/WorkOrderStatus"
+   },
+   "priority": {
+    "$ref": "#/components/schemas/WorkOrderPriority"
+   },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."
+   },
+   "prioritySource": {
+    "type": "string",
+    "enum": [
+     "scored",
+     "assetOverride",
+     "manual"
+    ],
+    "readOnly": true,
+    "description": "Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs (M17-13)."
+   },
+   "kind": {
+    "$ref": "#/components/schemas/WorkOrderKind"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "As raised in `CreateWorkOrderRequest.categoryId`, amendable by `updateWorkOrder`. The category is what `completeWorkOrder` reads to decide whether completion photographs are required.\n"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Where the fault is, as raised. Needed where there is no asset — a broken tile, a leak in a corridor.\n"
+   },
+   "elapsedMinutes": {
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Labour minutes accumulated up to the last pause or stop. **Maintained on write** by `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`; while `isTimerRunning` is true the interval since the last start is not yet included.\n"
+   },
+   "isTimerRunning": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Maintained on write by `startWorkOrder`, `resumeWorkOrder`, `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`.\n"
+   },
+   "dueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isOverdue": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "`dueAt` is in the past and the status is still `open`, `assigned`, `inProgress`, `paused` or `awaitingParts`. **Computed on read and not stored** — it depends on the clock. `listWorkOrders?overdueOnly` applies the same test to `due_at`.\n"
+   },
+   "requiresVerification": {
+    "type": "boolean"
+   },
+   "sourcePlanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceInspectionId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "sourceIncidentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WorkOrderFaultAssessment": {
+  "x-ticvai-persistence": "none — columns on maintenance.work_order",
+  "type": "object",
+  "description": "What the person raising a fault says about it, which the priority score reads (M17-01).",
+  "properties": {
+   "safetyRisk": {
+    "type": "boolean",
+    "default": false
+   },
+   "guestImpact": {
+    "type": "string",
+    "enum": [
+     "none",
+     "degraded",
+     "closed"
+    ],
+    "default": "none"
+   }
+  }
+ },
+ "WorkOrderKind": {
+  "type": "string",
+  "enum": [
+   "corrective",
+   "planned",
+   "inspectionFollowUp",
+   "incidentCorrective",
+   "improvement"
+  ]
+ },
+ "WorkOrderPriority": {
+  "type": "string",
+  "enum": [
+   "low",
+   "normal",
+   "high",
+   "urgent",
+   "emergency"
+  ]
+ },
+ "WorkOrderStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "assigned",
+   "inProgress",
+   "paused",
+   "awaitingParts",
+   "completed",
+   "verified",
+   "closed",
+   "cancelled"
+  ]
+ }
+}

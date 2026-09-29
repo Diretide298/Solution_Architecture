@@ -1,6 +1,6 @@
 # WS140 — Marketing CRM Configuration Reference v1.0 board 6
 
-**10 screens · 13 operations · 12 schemas · 4 permissions**
+**10 screens · 16 operations · 16 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `GUEST_MANAGE, MARKETING_MANAGE, MARKETING_SEND, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `AI_USE, GUEST_MANAGE, MARKETING_MANAGE, MARKETING_SEND, MARKETING_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,15 +61,15 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-784` | Communications Center | listDetail | 1 | 0 | — |
-| `BO-785` | Template Library | listDetail | 2 | 0 | — |
-| `BO-786` | Newsletter Builder | listDetail | 1 | 0 | — |
-| `BO-787` | Content Blocks & Product Feed | listDetail | 1 | 0 | — |
+| `BO-785` | Template Library | listDetail | 4 | 0 | — |
+| `BO-786` | Newsletter Builder | listDetail | 2 | 0 | — |
+| `BO-787` | Content Blocks & Product Feed | listDetail | 2 | 0 | — |
 | `BO-788` | Subscriptions & Preferences | listDetail | 3 | 0 | — |
-| `BO-789` | Transactional Notification Rules | listDetail | 2 | 0 | — |
+| `BO-789` | Transactional Notification Rules | listDetail | 3 | 0 | — |
 | `BO-790` | Scheduling, Priority & Approval | listDetail | 1 | 0 | — |
 | `BO-791` | Delivery, Retry & Failover | listDetail | 2 | 0 | — |
 | `BO-792` | Deliverability & Analytics | listDetail | 1 | 0 | — |
-| `BO-793` | AI Content, Translation & Audit | listDetail | 1 | 0 | — |
+| `BO-793` | AI Content, Translation & Audit | listDetail | 4 | 0 | — |
 
 ## Thin screens in this batch
 

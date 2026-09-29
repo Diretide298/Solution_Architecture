@@ -1,6 +1,6 @@
 # P08-sell-03 — P08 · Sell (3 of 4)
 
-**10 screens · 28 operations · 31 schemas · 10 permissions**
+**10 screens · 28 operations · 48 schemas · 10 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,11 +61,11 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-114` | Variants, Attributes, Barcode & RFID Management | listDetail | 2 | 0 | — |
-| `BO-115` | Category, Brand & Merchandise Hierarchy | listDetail | 5 | 3 | — |
+| `BO-115` | Category, Brand & Merchandise Hierarchy | listDetail | 6 | 3 | — |
 | `BO-116` | Merchandising & Product Presentation | commandCentre | 7 | 4 | — |
 | `BO-117` | Product Import, Governance & AI Configuration Assistant | listDetail | 6 | 4 | — |
 | `BO-118` | Campaign & Audience Management | commandCentre | 6 | 3 | — |
-| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | statusTracker | 4 | 0 | — |
+| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | statusTracker | 3 | 0 | — |
 | `BO-120` | Omnichannel Commerce & Journey Configuration | listDetail | 2 | 1 | — |
 | `BO-121` | Personalized Offers & Guest Engagement | listDetail | 2 | 1 | — |
 | `BO-122` | POS Experience Dashboard | listDetail | 1 | 0 | — |

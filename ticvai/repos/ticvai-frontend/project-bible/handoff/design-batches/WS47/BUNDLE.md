@@ -1,6 +1,6 @@
 # WS47 — Promotions   Bundles Management board 3
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 10 operations · 15 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-158 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-159",
@@ -351,7 +347,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "listCouponCodes",
     "contract": "promotions",
     "purpose": "List generated codes",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -361,20 +357,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "from": "navigation"
     }
    ],
-   "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable.",
-   "preloaded": [
-    "Active Code Campaigns",
-    "Active Coupons",
-    "Unique Codes Issued",
-    "Codes Redeemed",
-    "Redemption Rate",
-    "Unused Codes"
-   ]
+   "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-158"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-158",
+   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-158"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 36. 0 of 8 labels bound to a contract property; 24 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -432,10 +421,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-159 holds none of them, so the edge carries nothing and ADM-158 opens cold"
     }
    ]
   },
@@ -521,16 +507,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setCouponPromoCode",
     "contract": "promotions",
     "purpose": "Coupon & Promo Code Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setCouponPromoCode"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-159"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-159",
+   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-159"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 9 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -588,10 +572,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-160 holds none of them, so the edge carries nothing and ADM-158 opens cold"
     }
    ]
   },
@@ -684,7 +665,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-160"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-160",
+   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-160"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 38. 0 of 0 labels bound to a contract property; 10 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -742,10 +724,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-161 holds none of them, so the edge carries nothing and ADM-158 opens cold"
     }
    ]
   },
@@ -803,17 +782,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "CodeEligibilityRestrictionManagerView.ticket",
-    "CodeEligibilityRestrictionManagerView.ticketType",
-    "CodeEligibilityRestrictionManagerView.product",
-    "CodeEligibilityRestrictionManagerView.productCategory",
-    "CodeEligibilityRestrictionManagerView.attraction"
+    "CodeEligibilityRestrictionManagerView.productScopes"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-161"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-161",
+   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-161"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -871,10 +847,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-162 holds none of them, so the edge carries nothing and ADM-158 opens cold"
     }
    ]
   },
@@ -893,10 +866,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every usage capacity frequency",
        "columns": [
-        "UsageCapacityFrequencyControlView.issued50000",
-        "UsageCapacityFrequencyControlView.redeemed31450",
-        "UsageCapacityFrequencyControlView.reservedPending420",
-        "UsageCapacityFrequencyControlView.remaining18130"
+        "UsageCapacityFrequencyControlView.issued",
+        "UsageCapacityFrequencyControlView.redeemed",
+        "UsageCapacityFrequencyControlView.reservedPending",
+        "UsageCapacityFrequencyControlView.remaining"
        ],
        "bindsTo": "UsageCapacityFrequencyControlView",
        "operation": "listUsageCapacityFrequency",
@@ -913,10 +886,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected usage capacity frequency",
        "bindsTo": "UsageCapacityFrequencyControlView",
        "columns": [
-        "UsageCapacityFrequencyControlView.issued50000",
-        "UsageCapacityFrequencyControlView.redeemed31450",
-        "UsageCapacityFrequencyControlView.reservedPending420",
-        "UsageCapacityFrequencyControlView.remaining18130"
+        "UsageCapacityFrequencyControlView.issued",
+        "UsageCapacityFrequencyControlView.redeemed",
+        "UsageCapacityFrequencyControlView.reservedPending",
+        "UsageCapacityFrequencyControlView.remaining"
        ],
        "notes": null,
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 41 §Show"
@@ -942,16 +915,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "UsageCapacityFrequencyControlView.issued50000",
-    "UsageCapacityFrequencyControlView.redeemed31450",
-    "UsageCapacityFrequencyControlView.reservedPending420",
-    "UsageCapacityFrequencyControlView.remaining18130"
+    "UsageCapacityFrequencyControlView.issued",
+    "UsageCapacityFrequencyControlView.redeemed",
+    "UsageCapacityFrequencyControlView.reservedPending",
+    "UsageCapacityFrequencyControlView.remaining"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-162"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-162",
+   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-162"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 41. 4 of 4 labels bound to a contract property; 4 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1009,10 +983,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-163 holds none of them, so the edge carries nothing and ADM-158 opens cold"
     }
    ]
   },
@@ -1065,8 +1036,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "ValidityDateTimeControlView.valid18002200",
-    "ValidityDateTimeControlView.mondayThursdayOnly",
     "ValidityDateTimeControlView.blackoutDates",
     "ValidityDateTimeControlView.holidays",
     "ValidityDateTimeControlView.selectedTimeslots"
@@ -1075,7 +1044,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-163"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-163",
+   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-163"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1133,10 +1103,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-164 holds none of them, so the edge carries nothing and ADM-158 opens cold"
     }
    ]
   },
@@ -1159,7 +1126,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "CodeDistributionAssignmentManagerView.assigned",
         "CodeDistributionAssignmentManagerView.sent",
         "CodeDistributionAssignmentManagerView.delivered",
-        "CodeDistributionAssignmentManagerView.viewedWhereAvailable",
+        "CodeDistributionAssignmentManagerView.viewed",
         "CodeDistributionAssignmentManagerView.redeemed",
         "CodeDistributionAssignmentManagerView.expired",
         "CodeDistributionAssignmentManagerView.cancelled"
@@ -1183,7 +1150,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "CodeDistributionAssignmentManagerView.assigned",
         "CodeDistributionAssignmentManagerView.sent",
         "CodeDistributionAssignmentManagerView.delivered",
-        "CodeDistributionAssignmentManagerView.viewedWhereAvailable",
+        "CodeDistributionAssignmentManagerView.viewed",
         "CodeDistributionAssignmentManagerView.redeemed",
         "CodeDistributionAssignmentManagerView.expired",
         "CodeDistributionAssignmentManagerView.cancelled"
@@ -1218,10 +1185,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setCodeDistributionManager",
     "contract": "promotions",
     "purpose": "Code Distribution & Assignment Manager",
-    "trigger": "onAction",
-    "invalidates": [
-     "setCodeDistributionManager"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1230,14 +1194,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "CodeDistributionAssignmentManagerView.assigned",
     "CodeDistributionAssignmentManagerView.sent",
     "CodeDistributionAssignmentManagerView.delivered",
-    "CodeDistributionAssignmentManagerView.viewedWhereAvailable",
+    "CodeDistributionAssignmentManagerView.viewed",
     "CodeDistributionAssignmentManagerView.redeemed"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-164"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-164",
+   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-164"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 42. 8 of 8 labels bound to a contract property; 8 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1295,10 +1260,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-165 holds none of them, so the edge carries nothing and ADM-158 opens cold"
     }
    ]
   },
@@ -1318,11 +1280,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Every redemption code lookup",
        "columns": [
         "RedemptionMonitorCodeLookupView.code",
-        "RedemptionMonitorCodeLookupView.campaign",
         "Redemption date/time",
-        "RedemptionMonitorCodeLookupView.transaction",
-        "RedemptionMonitorCodeLookupView.booking",
-        "RedemptionMonitorCodeLookupView.customerAccountReference",
         "RedemptionMonitorCodeLookupView.product",
         "RedemptionMonitorCodeLookupView.originalValue",
         "RedemptionMonitorCodeLookupView.discount",
@@ -1349,11 +1307,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "RedemptionMonitorCodeLookupView",
        "columns": [
         "RedemptionMonitorCodeLookupView.code",
-        "RedemptionMonitorCodeLookupView.campaign",
         "Redemption date/time",
-        "RedemptionMonitorCodeLookupView.transaction",
-        "RedemptionMonitorCodeLookupView.booking",
-        "RedemptionMonitorCodeLookupView.customerAccountReference",
         "RedemptionMonitorCodeLookupView.product",
         "RedemptionMonitorCodeLookupView.originalValue",
         "RedemptionMonitorCodeLookupView.discount",
@@ -1401,17 +1355,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "entryState": {
    "preloaded": [
     "RedemptionMonitorCodeLookupView.code",
-    "RedemptionMonitorCodeLookupView.campaign",
-    "Redemption date/time",
-    "RedemptionMonitorCodeLookupView.transaction",
-    "RedemptionMonitorCodeLookupView.booking",
-    "RedemptionMonitorCodeLookupView.customerAccountReference"
+    "Redemption date/time"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-165"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-165",
+   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-165"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 43. 14 of 15 labels bound to a contract property; 23 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1469,10 +1420,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-166 holds none of them, so the edge carries nothing and ADM-158 opens cold"
     }
    ]
   },
@@ -1491,15 +1439,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every code security fraud",
        "columns": [
-        "CodeSecurityFraudExceptionCenterView.excessiveRedemptionVelocity",
-        "CodeSecurityFraudExceptionCenterView.repeatedFailedAttempts",
-        "CodeSecurityFraudExceptionCenterView.multipleCustomersUsingCustomerSpecificCode",
-        "CodeSecurityFraudExceptionCenterView.unusualGeographicUsage",
-        "CodeSecurityFraudExceptionCenterView.highVolumeRedemptionFromOneDevice",
-        "CodeSecurityFraudExceptionCenterView.suspiciousPosOperatorActivity",
-        "CodeSecurityFraudExceptionCenterView.codeEnumerationAttempts",
-        "CodeSecurityFraudExceptionCenterView.partnerCodeLeakage",
-        "CodeSecurityFraudExceptionCenterView.redemptionAboveExpectedCampaignPattern"
+        "CodeSecurityFraudExceptionCenterView.signalType"
        ],
        "bindsTo": "CodeSecurityFraudExceptionCenterView",
        "operation": "listCodeSecurityFraud",
@@ -1516,15 +1456,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected code security fraud",
        "bindsTo": "CodeSecurityFraudExceptionCenterView",
        "columns": [
-        "CodeSecurityFraudExceptionCenterView.excessiveRedemptionVelocity",
-        "CodeSecurityFraudExceptionCenterView.repeatedFailedAttempts",
-        "CodeSecurityFraudExceptionCenterView.multipleCustomersUsingCustomerSpecificCode",
-        "CodeSecurityFraudExceptionCenterView.unusualGeographicUsage",
-        "CodeSecurityFraudExceptionCenterView.highVolumeRedemptionFromOneDevice",
-        "CodeSecurityFraudExceptionCenterView.suspiciousPosOperatorActivity",
-        "CodeSecurityFraudExceptionCenterView.codeEnumerationAttempts",
-        "CodeSecurityFraudExceptionCenterView.partnerCodeLeakage",
-        "CodeSecurityFraudExceptionCenterView.redemptionAboveExpectedCampaignPattern"
+        "CodeSecurityFraudExceptionCenterView.signalType"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Risk Levels”.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 44 §Monitor"
@@ -1562,18 +1494,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "CodeSecurityFraudExceptionCenterView.excessiveRedemptionVelocity",
-    "CodeSecurityFraudExceptionCenterView.repeatedFailedAttempts",
-    "CodeSecurityFraudExceptionCenterView.multipleCustomersUsingCustomerSpecificCode",
-    "CodeSecurityFraudExceptionCenterView.unusualGeographicUsage",
-    "CodeSecurityFraudExceptionCenterView.highVolumeRedemptionFromOneDevice",
-    "CodeSecurityFraudExceptionCenterView.suspiciousPosOperatorActivity"
+    "CodeSecurityFraudExceptionCenterView.signalType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-166"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-166",
+   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-166"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 44. 9 of 9 labels bound to a contract property; 16 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1631,15 +1559,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-158",
      "trigger": "Coupon & Promo Code Command Center",
-     "carries": [
-      "campaignId"
-     ],
-     "provenance": "derived — ADM-158 declares entryState.params campaignId, so an edge into it must carry them"
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-167 holds none of them, so the edge carries nothing and ADM-158 opens cold"
     }
    ]
   },
   "density": "compact",
-  "purposeNote": "Board 3 shall be considered complete when: 1. Users can create common and unique promotional codes. 2. Coupons and promotional vouchers can be configured. 3. Large unique-code batches can be generated. 4. Codes can support single, multiple, capped, or unlimited redemption. Pag e 48 | 158TICVAI • 48 5. Usage can be limited per booking, customer, account, channel, venue, or campaign. 6. Date/time/relative validity rules are supported. 7. Product and ticket eligibility can be configured. 8. Customer and segment eligibility can be configured. 9. Channel, partner, and location restrictions can be c",
+  "purposeNote": "Board 3 shall be considered complete when: 1. Users can create common and unique promotional codes. 2. Coupons and promotional vouchers can be configured. 3. Large unique-code batches can be generated. 4. Codes can support single, multiple, capped, or unlimited redemption. 5. Usage can be limited per booking, customer, account, channel, venue, or campaign. 6. Date/time/relative validity rules are supported. 7. Product and ticket eligibility can be configured. 8. Customer and segment eligibility can be configured. 9. Channel, partner, and location restrictions can be configured. 10.Codes can tr",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Performance KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide complete performance analytics and governance for coupon and promo-code campaigns. Board 4 shall provide TICVAI with an enterprise-grade Advanced Promotion Mechanics Engine for promotions involving relationships between products, quantities, basket composition, rewards, and qualifying purchases. While Board 2 defines standard discounts and thresholds and Board 3 manages promo codes/coupons, Board 4 answers: “When the customer buys X, what exactly should TICVAI give them, discount, replace, upgrade, or add to the transaction?” The matrix requires mechanics such as Buy X Get X, Buy X Get Y, Buy N Get X, percentage/amount discounts on another product, cheapest-item-free, fixed-price combinations, cross-category F&B/Retail rewards, added-value gifts, and automatic cart-level promotion application. Board 4 shall contain 10 backend screens.",
@@ -1783,7 +1708,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-167"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-167",
+   "workshopBoard": "wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-167"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 45. 12 of 22 labels bound to a contract property; 22 of 144 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1841,7 +1767,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CodeSecurityFraudExceptionCenterView"
  },
@@ -1857,6 +1789,11 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [
    {
     "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "batchId",
     "in": "query",
     "required": null
    },
@@ -1884,6 +1821,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "campaign",
     "in": "query",
@@ -1937,7 +1879,58 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "promoCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "couponId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "batchId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "transaction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "booking",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "campaign",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerAccountReference",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "RedemptionMonitorCodeLookupView"
  },
@@ -1963,7 +1956,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "UsageCapacityFrequencyControlView"
  },
@@ -1989,7 +1988,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CodeDistributionAssignmentManagerInput",
   "responds": "CodeDistributionAssignmentManagerView"
  },
@@ -2002,7 +2007,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CouponPromoCodeBuilderInput",
   "responds": "CouponPromoCodeBuilderView"
  }
@@ -2039,73 +2050,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "description": "Vocabulary listed under Distribution Channels."
    },
-   "individualCustomer": {
+   "assigneeType": {
     "type": "string",
-    "description": "Individual customer"
+    "enum": [
+     "individualCustomer",
+     "customerSegment",
+     "membershipAccount",
+     "b2bCompany",
+     "reseller",
+     "travelAgency",
+     "school",
+     "hotel",
+     "bank",
+     "corporatePartner",
+     "marketingCampaign"
+    ],
+    "description": "Who the codes are assigned to."
    },
-   "customerSegment": {
+   "batchId": {
     "type": "string",
-    "description": "Customer segment"
+    "description": "Batch ID"
    },
-   "membershipAccount": {
+   "assigneeReference": {
     "type": "string",
-    "description": "Membership account"
+    "description": "Customer, segment, account or partner the codes go to"
    },
-   "b2bCompany": {
-    "type": "string",
-    "description": "B2B company"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "travelAgency": {
-    "type": "string",
-    "description": "Travel agency"
-   },
-   "school": {
-    "type": "string",
-    "description": "School"
-   },
-   "hotel": {
-    "type": "string",
-    "description": "Hotel"
-   },
-   "bank": {
-    "type": "string",
-    "description": "Bank"
-   },
-   "corporatePartner": {
-    "type": "string",
-    "description": "Corporate partner"
-   },
-   "marketingCampaign": {
-    "type": "string",
-    "description": "Marketing campaign"
-   },
-   "partnerBankAbc": {
-    "type": "string",
-    "description": "Partner: Bank ABC"
-   },
-   "batchBankabc2027001": {
-    "type": "string",
-    "description": "Batch: BANKABC-2027-001"
-   },
-   "codes25000": {
-    "type": "string",
-    "description": "Codes: 25,000"
-   },
-   "assigned25000": {
-    "type": "string",
-    "description": "Assigned: 25,000"
-   },
-   "redeemed8720": {
-    "type": "string",
-    "description": "Redeemed: 8,720"
-   },
-   "remaining16280": {
-    "type": "string",
-    "description": "Remaining: 16,280"
+   "quantity": {
+    "type": "integer",
+    "description": "Codes to assign"
    }
   }
  },
@@ -2133,50 +2105,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "description": "Vocabulary listed under Distribution Channels."
    },
-   "individualCustomer": {
-    "type": "string",
-    "description": "Individual customer"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer segment"
-   },
-   "membershipAccount": {
-    "type": "string",
-    "description": "Membership account"
-   },
-   "b2bCompany": {
-    "type": "string",
-    "description": "B2B company"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "travelAgency": {
-    "type": "string",
-    "description": "Travel agency"
-   },
-   "school": {
-    "type": "string",
-    "description": "School"
-   },
-   "hotel": {
-    "type": "string",
-    "description": "Hotel"
-   },
-   "bank": {
-    "type": "string",
-    "description": "Bank"
-   },
-   "corporatePartner": {
-    "type": "string",
-    "description": "Corporate partner"
-   },
-   "marketingCampaign": {
-    "type": "string",
-    "description": "Marketing campaign"
-   },
    "generated": {
     "type": "string",
     "description": "Generated"
@@ -2193,10 +2121,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Delivered"
    },
-   "viewedWhereAvailable": {
-    "type": "string",
-    "description": "Viewed where available"
-   },
    "redeemed": {
     "type": "string",
     "description": "Redeemed"
@@ -2209,29 +2133,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Cancelled"
    },
-   "partnerBankAbc": {
+   "viewed": {
     "type": "string",
-    "description": "Partner: Bank ABC"
+    "description": "Viewed where available"
    },
-   "batchBankabc2027001": {
+   "assigneeType": {
     "type": "string",
-    "description": "Batch: BANKABC-2027-001"
+    "enum": [
+     "individualCustomer",
+     "customerSegment",
+     "membershipAccount",
+     "b2bCompany",
+     "reseller",
+     "travelAgency",
+     "school",
+     "hotel",
+     "bank",
+     "corporatePartner",
+     "marketingCampaign"
+    ],
+    "description": "Who the codes are assigned to."
    },
-   "codes25000": {
+   "batchId": {
     "type": "string",
-    "description": "Codes: 25,000"
+    "description": "Batch ID"
    },
-   "assigned25000": {
+   "partner": {
     "type": "string",
-    "description": "Assigned: 25,000"
-   },
-   "redeemed8720": {
-    "type": "string",
-    "description": "Redeemed: 8,720"
-   },
-   "remaining16280": {
-    "type": "string",
-    "description": "Remaining: 16,280"
+    "description": "Partner, for a partner batch"
    }
   }
  },
@@ -2241,109 +2170,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Code Eligibility & Restriction Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "ticket": {
-    "type": "string",
-    "description": "Ticket"
-   },
-   "ticketType": {
-    "type": "string",
-    "description": "Ticket type"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product category"
-   },
-   "attraction": {
-    "type": "string",
-    "description": "Attraction"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "bundle": {
-    "type": "string",
-    "description": "Bundle"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "fB": {
-    "type": "string",
-    "description": "F&B"
-   },
-   "retail": {
-    "type": "string",
-    "description": "Retail"
-   },
-   "addOn": {
-    "type": "string",
-    "description": "Add-on"
-   },
-   "guestType": {
-    "type": "string",
-    "description": "Guest type"
-   },
-   "crmSegment": {
-    "type": "string",
-    "description": "CRM segment"
-   },
-   "loyaltyTier": {
-    "type": "string",
-    "description": "Loyalty tier"
-   },
-   "b2bAccount": {
-    "type": "string",
-    "description": "B2B account"
-   },
    "partner": {
     "type": "string",
     "description": "Partner"
-   },
-   "corporateGroup": {
-    "type": "string",
-    "description": "Corporate group"
-   },
-   "b2c": {
-    "type": "string",
-    "description": "B2C"
-   },
-   "b2b": {
-    "type": "string",
-    "description": "B2B"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "mobilePos": {
-    "type": "string",
-    "description": "Mobile POS"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "callCenter": {
-    "type": "string",
-    "description": "Call Center"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
    },
    "businessEntity": {
     "type": "string",
@@ -2361,9 +2190,57 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Operating area"
    },
-   "conditions": {
-    "type": "string",
-    "description": "conditions"
+   "productScopes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticket",
+      "ticketType",
+      "product",
+      "productCategory",
+      "attraction",
+      "event",
+      "bundle",
+      "membership",
+      "fB",
+      "retail",
+      "addOn"
+     ]
+    },
+    "description": "Products the code is restricted to."
+   },
+   "customerScopes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "guestType",
+      "crmSegment",
+      "loyaltyTier",
+      "b2bAccount",
+      "corporateGroup",
+      "b2b"
+     ]
+    },
+    "description": "Customers the code is restricted to."
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2c",
+      "pos",
+      "mobilePos",
+      "kiosk",
+      "mobileApp",
+      "callCenter",
+      "reseller",
+      "api"
+     ]
+    },
+    "description": "Channels the code is valid on."
    }
   }
  },
@@ -2373,42 +2250,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Code Security, Fraud & Exception Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "excessiveRedemptionVelocity": {
-    "type": "string",
-    "description": "Excessive redemption velocity"
-   },
-   "repeatedFailedAttempts": {
-    "type": "integer",
-    "description": "Repeated failed attempts"
-   },
-   "multipleCustomersUsingCustomerSpecificCode": {
-    "type": "string",
-    "description": "Multiple customers using customer-specific code"
-   },
-   "unusualGeographicUsage": {
-    "type": "string",
-    "description": "Unusual geographic usage"
-   },
-   "highVolumeRedemptionFromOneDevice": {
-    "type": "integer",
-    "description": "High-volume redemption from one device"
-   },
-   "suspiciousPosOperatorActivity": {
-    "type": "string",
-    "description": "Suspicious POS/operator activity"
-   },
-   "codeEnumerationAttempts": {
-    "type": "integer",
-    "description": "Code enumeration attempts"
-   },
-   "partnerCodeLeakage": {
-    "type": "string",
-    "description": "Partner code leakage"
-   },
-   "redemptionAboveExpectedCampaignPattern": {
-    "type": "string",
-    "description": "Redemption above expected campaign pattern"
-   },
    "levelsType": {
     "type": "string",
     "enum": [
@@ -2419,9 +2260,111 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "description": "Vocabulary listed under Risk Levels."
    },
-   "reinstateCode": {
+   "signalType": {
     "type": "string",
-    "description": "Reinstate code"
+    "enum": [
+     "excessiveRedemptionVelocity",
+     "repeatedFailedAttempts",
+     "multipleCustomersUsingCustomerSpecificCode",
+     "unusualGeographicUsage",
+     "highVolumeRedemptionFromOneDevice",
+     "suspiciousPosOperatorActivity",
+     "codeEnumerationAttempts",
+     "partnerCodeLeakage",
+     "redemptionAboveExpectedCampaignPattern"
+    ],
+    "description": "The fraud signal monitored."
+   },
+   "codeId": {
+    "type": "string",
+    "description": "Code or batch ID"
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When detected"
+   },
+   "details": {
+    "type": "string",
+    "description": "What was observed"
+   }
+  }
+ },
+ "CouponCode": {
+  "x-ticvai-persistence": "promotions.coupon_code",
+  "type": "object",
+  "required": [
+   "code",
+   "campaignId",
+   "status"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "batchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `generateCouponCodes` batch that issued this code. Null where no batch did."
+   },
+   "status": {
+    "$ref": "#/components/schemas/CouponStatus"
+   },
+   "assignedSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "redemptionCount": {
+    "type": "integer"
+   },
+   "maxRedemptions": {
+    "type": "integer"
+   },
+   "discount": {
+    "$ref": "#/components/schemas/Discount"
+   },
+   "invalidReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`.\n",
+    "enum": [
+     "expired",
+     "alreadyRedeemed",
+     "voided",
+     "notYetValid",
+     "wrongVenue",
+     "conditionsNotMet",
+     "notAssignedToGuest"
+    ]
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "redeemedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "redeemedOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  },
@@ -2431,85 +2374,77 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Coupon & Promo Code Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "commonPromoCode": {
+   "codeType": {
     "type": "string",
-    "description": "Common promo code"
+    "enum": [
+     "commonPromoCode",
+     "uniquePromoCode",
+     "coupon",
+     "promotionalVoucher",
+     "freeTicketCode",
+     "discountVoucher",
+     "partnerCode",
+     "employeeCode",
+     "influencerAffiliateCode",
+     "compensationServiceRecoveryCode",
+     "bulkCampaignCode"
+    ],
+    "description": "Kind of code."
    },
-   "uniquePromoCode": {
+   "benefitType": {
     "type": "string",
-    "description": "Unique promo code"
+    "enum": [
+     "percentageDiscount",
+     "fixedValueDiscount",
+     "fixedPromotionalPrice",
+     "freeProduct",
+     "freeTicket",
+     "freeAddOn",
+     "upgrade",
+     "bundleBenefit",
+     "addedValue"
+    ],
+    "description": "What the code grants; the discount itself is calculated by the promotion rule engine rather than duplicated here."
    },
-   "coupon": {
-    "type": "string",
-    "description": "Coupon"
-   },
-   "promotionalVoucher": {
-    "type": "string",
-    "description": "Promotional voucher"
-   },
-   "freeTicketCode": {
-    "type": "string",
-    "description": "Free-ticket code"
-   },
-   "discountVoucher": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount voucher"
-   },
-   "partnerCode": {
-    "type": "string",
-    "description": "Partner code"
-   },
-   "employeeCode": {
-    "type": "string",
-    "description": "Employee code"
-   },
-   "influencerAffiliateCode": {
-    "type": "string",
-    "description": "Influencer/affiliate code"
-   },
-   "compensationServiceRecoveryCode": {
-    "type": "string",
-    "description": "Compensation/service-recovery code"
-   },
-   "bulkCampaignCode": {
-    "type": "string",
-    "description": "Bulk campaign code"
-   },
-   "percentageDiscount": {
+   "benefitValue": {
     "type": "number",
-    "description": "Percentage discount"
+    "description": "Benefit value: the percentage, or the amount in the promotion's currency"
    },
-   "fixedValueDiscount": {
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "code": {
+    "type": "string",
+    "description": "Code text for a common code, or the batch pattern for unique codes"
+   },
+   "maximumDiscount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed-value discount"
+    "description": "Maximum discount"
    },
-   "fixedPromotionalPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed promotional price"
+   "eligibleProducts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Eligible products"
    },
-   "freeProduct": {
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Channels the code works on"
+   },
+   "validFrom": {
     "type": "string",
-    "description": "Free product"
+    "format": "date-time",
+    "description": "Valid from"
    },
-   "freeTicket": {
+   "validTo": {
     "type": "string",
-    "description": "Free ticket"
-   },
-   "freeAddOn": {
-    "type": "string",
-    "description": "Free add-on"
-   },
-   "bundleBenefit": {
-    "type": "string",
-    "description": "Bundle benefit"
-   },
-   "addedValue": {
-    "type": "string",
-    "description": "Added value"
-   },
-   "thanDuplicateDiscountLogic": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "than duplicate discount logic"
+    "format": "date-time",
+    "description": "Valid to"
    }
   }
  },
@@ -2519,85 +2454,169 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Coupon & Promo Code Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "commonPromoCode": {
+   "codeType": {
     "type": "string",
-    "description": "Common promo code"
+    "enum": [
+     "commonPromoCode",
+     "uniquePromoCode",
+     "coupon",
+     "promotionalVoucher",
+     "freeTicketCode",
+     "discountVoucher",
+     "partnerCode",
+     "employeeCode",
+     "influencerAffiliateCode",
+     "compensationServiceRecoveryCode",
+     "bulkCampaignCode"
+    ],
+    "description": "Kind of code."
    },
-   "uniquePromoCode": {
+   "benefitType": {
     "type": "string",
-    "description": "Unique promo code"
+    "enum": [
+     "percentageDiscount",
+     "fixedValueDiscount",
+     "fixedPromotionalPrice",
+     "freeProduct",
+     "freeTicket",
+     "freeAddOn",
+     "upgrade",
+     "bundleBenefit",
+     "addedValue"
+    ],
+    "description": "What the code grants; the discount itself is calculated by the promotion rule engine rather than duplicated here."
    },
-   "coupon": {
-    "type": "string",
-    "description": "Coupon"
-   },
-   "promotionalVoucher": {
-    "type": "string",
-    "description": "Promotional voucher"
-   },
-   "freeTicketCode": {
-    "type": "string",
-    "description": "Free-ticket code"
-   },
-   "discountVoucher": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount voucher"
-   },
-   "partnerCode": {
-    "type": "string",
-    "description": "Partner code"
-   },
-   "employeeCode": {
-    "type": "string",
-    "description": "Employee code"
-   },
-   "influencerAffiliateCode": {
-    "type": "string",
-    "description": "Influencer/affiliate code"
-   },
-   "compensationServiceRecoveryCode": {
-    "type": "string",
-    "description": "Compensation/service-recovery code"
-   },
-   "bulkCampaignCode": {
-    "type": "string",
-    "description": "Bulk campaign code"
-   },
-   "percentageDiscount": {
+   "benefitValue": {
     "type": "number",
-    "description": "Percentage discount"
+    "description": "Benefit value: the percentage, or the amount in the promotion's currency"
    },
-   "fixedValueDiscount": {
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "code": {
+    "type": "string",
+    "description": "Code text for a common code, or the batch pattern for unique codes"
+   },
+   "maximumDiscount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed-value discount"
+    "description": "Maximum discount"
    },
-   "fixedPromotionalPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed promotional price"
+   "eligibleProducts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Eligible products"
    },
-   "freeProduct": {
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Channels the code works on"
+   },
+   "validFrom": {
     "type": "string",
-    "description": "Free product"
+    "format": "date-time",
+    "description": "Valid from"
    },
-   "freeTicket": {
+   "validTo": {
     "type": "string",
-    "description": "Free ticket"
+    "format": "date-time",
+    "description": "Valid to"
+   }
+  }
+ },
+ "CouponStatus": {
+  "type": "string",
+  "enum": [
+   "issued",
+   "assigned",
+   "redeemed",
+   "expired",
+   "voided"
+  ]
+ },
+ "Discount": {
+  "x-ticvai-persistence": "none — embedded in promotion",
+  "type": "object",
+  "required": [
+   "kind"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/DiscountKind"
    },
-   "freeAddOn": {
-    "type": "string",
-    "description": "Free add-on"
+   "percentage": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
    },
-   "bundleBenefit": {
-    "type": "string",
-    "description": "Bundle benefit"
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "addedValue": {
-    "type": "string",
-    "description": "Added value"
+   "fixedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "thanDuplicateDiscountLogic": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "than duplicate discount logic"
+   "buyQuantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "getQuantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "getDiscountPercentage": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "description": "100 makes the free items actually free; lower values give a partial discount."
+   },
+   "tiers": {
+    "type": "array",
+    "description": "For `tieredPercentage` — more units, larger discount.",
+    "items": {
+     "type": "object",
+     "required": [
+      "minQuantity",
+      "percentage"
+     ],
+     "properties": {
+      "minQuantity": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "percentage": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      }
+     }
+    }
+   },
+   "maxDiscountAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Cap on a percentage discount. Prevents an unbounded discount on a large basket."
+   },
+   "rewardVariantIds": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "maxApplicationsPerBasket": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
    }
   }
  },
@@ -2674,47 +2693,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Expired unused codes"
    },
-   "created": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Created"
-   },
-   "modified": {
-    "type": "string",
-    "description": "Modified"
-   },
-   "generated": {
-    "type": "string",
-    "description": "Generated"
-   },
-   "assigned": {
-    "type": "string",
-    "description": "Assigned"
-   },
-   "distributed": {
-    "type": "string",
-    "description": "Distributed"
-   },
-   "redeemed": {
-    "type": "string",
-    "description": "Redeemed"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "reactivated": {
-    "type": "string",
-    "description": "Reactivated"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "Cancelled"
-   },
    "user": {
     "type": "string",
     "description": "User"
@@ -2740,29 +2718,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Approval reference"
    },
-   "identifiesBenefit": {
+   "auditEvent": {
     "type": "string",
-    "description": "↓ identifies benefit"
-   },
-   "determinesQualificationAndCalculation": {
-    "type": "string",
-    "description": "↓ determines qualification and calculation"
-   },
-   "ticketingCatalogueEligibleTicketsProducts": {
-    "type": "string",
-    "description": "Ticketing Catalogue — eligible tickets/products"
-   },
-   "bundlesBundleRelatedCouponBenefits": {
-    "type": "string",
-    "description": "Bundles — bundle-related coupon benefits"
-   },
-   "paymentPaymentMethodDependentPromotions": {
-    "type": "string",
-    "description": "Payment — payment-method-dependent promotions"
-   },
-   "matrixCoverageBoard3": {
-    "type": "string",
-    "description": "Matrix Coverage — Board 3"
+    "enum": [
+     "created",
+     "modified",
+     "assigned",
+     "suspended",
+     "reactivated",
+     "cancelled"
+    ],
+    "description": "Code audit event."
    }
   }
  },
@@ -2775,34 +2741,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "promoCode": {
     "type": "string",
     "description": "Promo code"
-   },
-   "couponId": {
-    "type": "string",
-    "description": "Coupon ID"
-   },
-   "batchId": {
-    "type": "string",
-    "description": "Batch ID"
-   },
-   "transaction": {
-    "type": "string",
-    "description": "Transaction"
-   },
-   "booking": {
-    "type": "string",
-    "description": "Booking"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
    },
    "code": {
     "type": "string",
@@ -2817,10 +2755,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "description": "Redemption time"
-   },
-   "customerAccountReference": {
-    "type": "string",
-    "description": "Customer/account reference"
    },
    "product": {
     "type": "string",
@@ -2856,55 +2790,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "validationResult": {
     "type": "string",
-    "description": "Validation result"
-   },
-   "valid": {
-    "type": "string",
-    "description": "Valid"
-   },
-   "redeemed": {
-    "type": "string",
-    "description": "Redeemed"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "notStarted": {
-    "type": "string",
-    "description": "Not Started"
-   },
-   "usageLimitReached": {
-    "type": "integer",
-    "description": "Usage Limit Reached"
-   },
-   "invalidProduct": {
-    "type": "string",
-    "description": "Invalid Product"
-   },
-   "invalidChannel": {
-    "type": "string",
-    "description": "Invalid Channel"
-   },
-   "invalidCustomer": {
-    "type": "string",
-    "description": "Invalid Customer"
-   },
-   "invalidLocation": {
-    "type": "string",
-    "description": "Invalid Location"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "Cancelled"
-   },
-   "requiresRedemptionReporting": {
-    "type": "string",
-    "description": "requires redemption reporting"
+    "enum": [
+     "valid",
+     "redeemed",
+     "expired",
+     "notStarted",
+     "usageLimitReached",
+     "invalidProduct",
+     "invalidChannel",
+     "invalidLocation",
+     "invalidCustomer",
+     "suspended",
+     "cancelled"
+    ],
+    "description": "Validation result of the redemption attempt"
    }
   }
  },
@@ -2991,14 +2890,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "remainingQuantity": {
     "type": "integer",
     "description": "Remaining quantity"
-   },
-   "it": {
-    "type": "string",
-    "description": "it"
-   },
-   "permissionsExplicitlyAllowIt": {
-    "type": "string",
-    "description": "permissions explicitly allow it"
    }
   }
  },
@@ -3008,18 +2899,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Usage, Capacity & Frequency Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "singleUse": {
-    "type": "string",
-    "description": "Single use"
-   },
-   "multipleUse": {
-    "type": "string",
-    "description": "Multiple use"
-   },
-   "unlimitedUse": {
-    "type": "string",
-    "description": "Unlimited use"
-   },
    "maximumTotalRedemptions": {
     "type": "string",
     "description": "Maximum total redemptions"
@@ -3048,29 +2927,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Maximum per venue"
    },
-   "issued50000": {
+   "usageType": {
     "type": "string",
-    "description": "Issued: 50,000"
+    "enum": [
+     "singleUse",
+     "multipleUse",
+     "unlimitedUse"
+    ],
+    "description": "How often one code may be used."
    },
-   "redeemed31450": {
-    "type": "string",
-    "description": "Redeemed: 31,450"
+   "issued": {
+    "type": "integer",
+    "description": "Codes issued"
    },
-   "reservedPending420": {
-    "type": "string",
-    "description": "Reserved/Pending: 420"
+   "redeemed": {
+    "type": "integer",
+    "description": "Codes redeemed"
    },
-   "remaining18130": {
-    "type": "string",
-    "description": "Remaining: 18,130"
+   "reservedPending": {
+    "type": "integer",
+    "description": "Codes reserved or pending"
    },
-   "at": {
-    "type": "string",
-    "description": "At"
-   },
-   "thresholdsShallBeConfigurable": {
-    "type": "string",
-    "description": "Thresholds shall be configurable"
+   "remaining": {
+    "type": "integer",
+    "description": "Codes remaining"
    }
   }
  },
@@ -3080,14 +2960,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Validity, Date & Time Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "valid18002200": {
-    "type": "string",
-    "description": "Valid 18:00–22:00"
-   },
-   "mondayThursdayOnly": {
-    "type": "string",
-    "description": "Monday–Thursday only"
-   },
    "blackoutDates": {
     "type": "string",
     "description": "Blackout dates"
@@ -3112,10 +2984,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "description": "Expiration grace period"
-   },
-   "theAdministratorSBrowserTimezone": {
-    "type": "string",
-    "description": "the administrator's browser timezone"
    }
   }
  }

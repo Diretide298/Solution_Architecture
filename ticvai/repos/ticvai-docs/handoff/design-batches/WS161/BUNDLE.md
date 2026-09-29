@@ -1,6 +1,6 @@
 # WS161 — Resource Management Configuration board 7
 
-**10 screens · 11 operations · 16 schemas · 6 permissions**
+**10 screens · 14 operations · 24 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `APPROVAL_REQUEST, EVENT_CONFIGURE, RESOURCE_BOOK, RESOURCE_CONFIGURE, RESOURCE_VIEW, WORKFORCE_MANAGE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `AI_USE, APPROVAL_REQUEST, EVENT_CONFIGURE, RESOURCE_BOOK, RESOURCE_CONFIGURE, RESOURCE_VIEW, WORKFORCE_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -66,7 +66,7 @@ convincingly. It is never a caption.
 | `BO-916` | Equipment & Asset Allocation | listDetail | 1 | 0 | — |
 | `BO-917` | Event Staff & Personnel Allocation | listDetail | 1 | 0 | — |
 | `BO-918` | Event Resource Template Library | configEditor | 2 | 0 | — |
-| `BO-919` | AI Event Resource Forecasting | listDetail | 0 | 0 | — |
+| `BO-919` | AI Event Resource Forecasting | listDetail | 3 | 0 | — |
 | `BO-920` | Event Resource Cost Estimator | listDetail | 2 | 0 | — |
 | `BO-921` | Multi-Event Allocation & Conflict Optimizer | listDetail | 1 | 0 | — |
 | `BO-922` | Event Resource Approval & Readiness Gate | listDetail | 2 | 0 | — |
@@ -1239,7 +1239,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the event resource forecasting are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createForecastScenario",
+    "contract": "ai",
+    "purpose": "Run a what-if",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listOperationalRequirements",
+    "contract": "ai",
+    "purpose": "Requirements derived from the forecast",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Configured",
@@ -1858,6 +1880,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1900,6 +1927,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "CreateApprovalRequest",
   "responds": "ApprovalRequest"
+ },
+ "createForecastScenario": {
+  "method": "POST",
+  "path": "/forecast-scenarios",
+  "contract": "ai",
+  "summary": "Run a what-if",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiForecastScenario",
+  "responds": null
  },
  "createResourcePackage": {
   "method": "POST",
@@ -1971,6 +2017,60 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "EventResourcePlan"
  },
+ "getForecast": {
+  "method": "GET",
+  "path": "/forecasts",
+  "contract": "ai",
+  "summary": "Forecast values",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "definitionKey",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "versionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "dimensionKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scenarioId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "getResourceCalendar": {
   "method": "GET",
   "path": "/resource-calendar",
@@ -2009,6 +2109,55 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "ResourceCalendarRow"
+ },
+ "listOperationalRequirements": {
+  "method": "GET",
+  "path": "/operational-requirements",
+  "contract": "ai",
+  "summary": "Requirements derived from the forecast",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "versionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listResourcePackages": {
   "method": "GET",
@@ -2064,6 +2213,468 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiForecastPoint": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.forecast_point",
+  "description": "One forecast value with its interval: 10th, 50th and 90th percentile (design 5.6: a range, never a bare percentage). Partitioned by target month. **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
+  "required": [
+   "versionId",
+   "targetStart",
+   "p50"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "versionId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.forecast_version"
+   },
+   "scenarioId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.forecast_scenario",
+    "description": "Set where the point belongs to a what-if scenario rather than the version itself."
+   },
+   "targetStart": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "targetEnd": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dimensionKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "Canonical key of the breakdown, e.g. `product=…;channel=web`."
+   },
+   "p10": {
+    "type": "number",
+    "nullable": true
+   },
+   "p50": {
+    "type": "number"
+   },
+   "p90": {
+    "type": "number",
+    "nullable": true
+   },
+   "unit": {
+    "type": "string"
+   },
+   "drivers": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Component decomposition or SHAP contributions, largest first (ADM-506)."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiForecastScenario": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.forecast_scenario",
+  "description": "**A what-if against a published version** (ADM-507, ADM-517, BO-931). Changes nothing in production; its points are written with `scenarioId`.",
+  "required": [
+   "baseVersionId",
+   "changes"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "name": {
+    "type": "string"
+   },
+   "baseVersionId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.forecast_version"
+   },
+   "changes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "lever"
+     ],
+     "properties": {
+      "lever": {
+       "type": "string",
+       "enum": [
+        "price",
+        "capacity",
+        "openingHours",
+        "weather",
+        "event",
+        "marketing",
+        "staffing",
+        "closure"
+       ]
+      },
+      "target": {
+       "type": "string",
+       "nullable": true
+      },
+      "value": {
+       "type": "object",
+       "additionalProperties": true,
+       "nullable": true
+      }
+     }
+    },
+    "minItems": 1
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "computing",
+     "ready",
+     "failed"
+    ],
+    "readOnly": true
+   },
+   "result": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Deltas against the base version by subject and period."
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiForecastVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.forecast_version",
+  "description": "**An immutable forecast version** (AIP-032): producer, model version, data cut-off, horizon and status. Nothing is overwritten; yesterday's actuals are scored against every earlier version.",
+  "required": [
+   "definitionId",
+   "versionNumber",
+   "status",
+   "basis"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "definitionId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.forecast_definition"
+   },
+   "versionNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "running",
+     "draft",
+     "awaitingApproval",
+     "published",
+     "superseded",
+     "rejected",
+     "failed"
+    ],
+    "readOnly": true
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "maturity": {
+    "$ref": "#/components/schemas/AiMaturity"
+   },
+   "producerRef": {
+    "type": "string"
+   },
+   "modelVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "dataCutoffAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The analytical replica watermark the snapshot was taken at."
+   },
+   "horizonStart": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "horizonEnd": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "qualityChecks": {
+    "type": "object",
+    "additionalProperties": true,
+    "readOnly": true,
+    "description": "Each gate and whether it passed."
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "Null where the definition auto-published."
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiMaturity": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "required": [
+   "stage",
+   "basedOn"
+  ],
+  "properties": {
+   "stage": {
+    "type": "string",
+    "enum": [
+     "starting",
+     "learning",
+     "established",
+     "learned"
+    ],
+    "description": "`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."
+   },
+   "basedOn": {
+    "type": "string",
+    "description": "The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "source"
+     ],
+     "properties": {
+      "source": {
+       "type": "string",
+       "enum": [
+        "venueSettings",
+        "startingPattern",
+        "calendar",
+        "weather",
+        "bookingsOnHand",
+        "ownHistory",
+        "importedHistory",
+        "configuration",
+        "trainedModel"
+       ]
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true,
+       "description": "e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."
+      },
+      "observations": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "ownDataShare": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."
+   },
+   "limitedHistory": {
+    "type": "boolean"
+   },
+   "nextStage": {
+    "type": "object",
+    "nullable": true,
+    "description": "What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.",
+    "properties": {
+     "stage": {
+      "type": "string",
+      "enum": [
+       "learning",
+       "established",
+       "learned"
+      ]
+     },
+     "needs": {
+      "type": "string"
+     },
+     "expectedBy": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     }
+    }
+   }
+  }
+ },
+ "AiOperationalRequirement": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.operational_requirement",
+  "description": "**A requirement derived from a forecast version** (design 2.2 C step 6, AIP-067): staff, POS, gates, F&B, stock or resources, computed with the tenant's productivity standards. **Autonomy L2 (prepare)**: it is sent to the owning module as a recommendation bound to that version, and a person applies it there.",
+  "required": [
+   "versionId",
+   "kind",
+   "periodStart",
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "versionId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.forecast_version"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "staff",
+     "pos",
+     "kiosk",
+     "gates",
+     "fnb",
+     "retail",
+     "stock",
+     "resource",
+     "equipment",
+     "facility"
+    ]
+   },
+   "targetContract": {
+    "type": "string",
+    "description": "The owning module that applies it: `workforce`, `fnb`, `inventory`, `resources`, `access`."
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "A role, outlet, gate, item or resource type."
+   },
+   "periodStart": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "periodEnd": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "quantity": {
+    "type": "number"
+   },
+   "quantityP90": {
+    "type": "number",
+    "nullable": true,
+    "description": "The requirement at the forecast's 90th percentile, for planning to the busy case."
+   },
+   "unit": {
+    "type": "string"
+   },
+   "productivityStandard": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "The standard used, e.g. covers per staff hour, scans per gate per hour."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "accepted",
+     "modified",
+     "rejected",
+     "handedOver",
+     "expired"
+    ],
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "decisionNote": {
+    "type": "string",
+    "nullable": true
+   },
+   "handoverRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The owning module's record once handed over."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "ApprovalDecision": {
   "type": "object",
   "x-ticvai-persistence": "approvals.decision",
@@ -2319,6 +2930,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "aiAssessment": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
+    "properties": {
+     "riskScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "riskBand": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "critical"
+      ]
+     },
+     "priorityScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "escalationSuggestion": {
+      "type": "object",
+      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
+      "properties": {
+       "action": {
+        "type": "string",
+        "enum": [
+         "escalate",
+         "addBackupApprover",
+         "none"
+        ]
+       },
+       "reason": {
+        "type": "string",
+        "nullable": true
+       }
+      }
+     },
+     "signals": {
+      "type": "array",
+      "maxItems": 10,
+      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "code": {
+         "type": "string"
+        },
+        "contribution": {
+         "type": "number"
+        },
+        "detail": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     },
+     "scoreId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
+     },
+     "decisionRecordId": {
+      "type": "string",
+      "description": "The ai decision record, for the audit of what the AI said and why."
+     },
+     "assessedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    }
   }
  },
@@ -2611,6 +3300,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
  "ResourceBooking": {
   "type": "object",
   "x-ticvai-persistence": "resources.booking",
@@ -2775,6 +3483,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     }
    }
+  }
+ },
+ "ResourceKind": {
+  "type": "string",
+  "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n",
+  "enum": [
+   "cabana",
+   "lounger",
+   "locker",
+   "wheelchair",
+   "stroller",
+   "equipment",
+   "room",
+   "auditorium",
+   "vehicle",
+   "instructor",
+   "staff",
+   "table",
+   "pitch",
+   "studio",
+   "other"
+  ],
+  "x-ticvai-refuses": {
+   "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
   }
  },
  "ResourcePackage": {
@@ -3080,6 +3812,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string"
    }
   }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
  }
 }
 ```

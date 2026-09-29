@@ -1,0 +1,463 @@
+{
+ "answerConfigurationQuestion": {
+  "method": "POST",
+  "path": "/configuration-sessions/{sessionId}/answers",
+  "contract": "ai",
+  "summary": "Answer the current question",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiConfigurationTurn"
+ },
+ "approveWorkflow": {
+  "method": "PUT",
+  "path": "/workflow",
+  "contract": "catalogue",
+  "summary": "Approval Workflow Designer",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalWorkflowDesignerInput",
+  "responds": "ApprovalWorkflowDesignerView"
+ },
+ "buildConfigurationPlan": {
+  "method": "POST",
+  "path": "/configuration-sessions/{sessionId}/plan",
+  "contract": "ai",
+  "summary": "Compile the blueprint into a plan",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ },
+ "cancelActionPlan": {
+  "method": "POST",
+  "path": "/action-plans/{planId}/cancel",
+  "contract": "ai",
+  "summary": "Cancel a plan",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiActionPlan"
+ },
+ "decideBlueprintRecommendation": {
+  "method": "POST",
+  "path": "/configuration-sessions/{sessionId}/decisions/{decisionKey}",
+  "contract": "ai",
+  "summary": "Accept, modify, reject or defer a blueprint decision",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiBlueprintDecision"
+ },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
+ "getActionPlan": {
+  "method": "GET",
+  "path": "/action-plans/{planId}",
+  "contract": "ai",
+  "summary": "A plan with its steps",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ },
+ "getAiDecisionTrace": {
+  "method": "GET",
+  "path": "/decision-records/{decisionRecordId}/trace",
+  "contract": "ai",
+  "summary": "The full trace of a decision",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "depth",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiDecisionTrace"
+ },
+ "getAiVenueSettings": {
+  "method": "GET",
+  "path": "/venues/{venueId}/ai-settings",
+  "contract": "ai",
+  "summary": "The venue AI profile the baselines stand on",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiVenueSettings"
+ },
+ "getConfigurationBlueprint": {
+  "method": "GET",
+  "path": "/configuration-sessions/{sessionId}/blueprint",
+  "contract": "ai",
+  "summary": "The blueprint so far",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "decisionClass",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiBlueprintView"
+ },
+ "getEffectiveAiPolicy": {
+  "method": "GET",
+  "path": "/governance/effective-policy",
+  "contract": "ai",
+  "summary": "The policy in force for a capability at a scope",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "environment",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiEffectivePolicy"
+ },
+ "listConfigurationSessions": {
+  "method": "GET",
+  "path": "/configuration-sessions",
+  "contract": "ai",
+  "summary": "Configuration-assistant sessions",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "intent",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProposedActions": {
+  "method": "GET",
+  "path": "/proposed-actions",
+  "contract": "ai",
+  "summary": "What the assistant has proposed and nobody has decided",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
+ "pauseActionPlan": {
+  "method": "POST",
+  "path": "/action-plans/{planId}/pause",
+  "contract": "ai",
+  "summary": "Pause an executing plan",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiActionPlan"
+ },
+ "resumeActionPlan": {
+  "method": "POST",
+  "path": "/action-plans/{planId}/resume",
+  "contract": "ai",
+  "summary": "Resume a paused plan",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiActionPlan"
+ },
+ "retryActionStep": {
+  "method": "POST",
+  "path": "/action-plans/{planId}/steps/{stepNumber}/retry",
+  "contract": "ai",
+  "summary": "Retry a failed step",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiActionStep"
+ },
+ "rollbackActionPlan": {
+  "method": "POST",
+  "path": "/action-plans/{planId}/rollback",
+  "contract": "ai",
+  "summary": "Plan a rollback",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "searchAiDecisions": {
+  "method": "GET",
+  "path": "/decision-records",
+  "contract": "ai",
+  "summary": "Find AI decisions",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "traceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "policyVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "modelVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setAiVenueSettings": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/ai-settings",
+  "contract": "ai",
+  "summary": "Set the venue AI profile",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiVenueSettings",
+  "responds": "AiVenueSettings"
+ },
+ "simulateActionPlan": {
+  "method": "POST",
+  "path": "/action-plans/{planId}/simulate",
+  "contract": "ai",
+  "summary": "Validate and simulate a plan without changing anything",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ },
+ "startConfigurationSession": {
+  "method": "POST",
+  "path": "/configuration-sessions",
+  "contract": "ai",
+  "summary": "Start the configuration assistant",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiConfigurationSession"
+ }
+}

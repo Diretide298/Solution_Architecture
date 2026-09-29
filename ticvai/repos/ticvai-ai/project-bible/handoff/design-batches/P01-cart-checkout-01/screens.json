@@ -17,34 +17,29 @@
     "WEB-005",
     "WEB-006",
     "WEB-007",
-    "WEB-008"
+    "WEB-008",
+    "WEB-016",
+    "WEB-047",
+    "WEB-048",
+    "WEB-049"
    ],
    "exitTo": [
     "WEB-001",
     "WEB-011",
     "WEB-012",
     "WEB-013",
+    "WEB-016",
     "WEB-030"
    ],
    "transitions": [
     {
-     "to": "WEB-011",
-     "trigger": "Enters contact details and answers consent",
-     "provenance": "flow F01 step 5→6, F02 step 3→4, F55 step 1→2"
-    },
-    {
-     "to": "WEB-030",
-     "trigger": "They transfer three tickets",
-     "provenance": "flow F55 step 3→4",
-     "operation": "checkoutCart"
-    },
-    {
      "to": "WEB-012",
      "trigger": "Checkout — Payment",
      "carries": [
-      "orderId"
+      "orderId",
+      "paymentId"
      ],
-     "provenance": "derived — WEB-012 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — WEB-012 declares entryState.params orderId, paymentId and WEB-010 holds orderId, paymentId, so an edge into it carries them"
     },
     {
      "to": "WEB-013",
@@ -52,7 +47,38 @@
      "carries": [
       "orderId"
      ],
-     "provenance": "derived — WEB-013 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — WEB-013 declares entryState.params orderId and WEB-010 holds orderId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-016 declares entryState.params challengeId, subjectId and WEB-010 holds subjectId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-012",
+     "trigger": "Guest code proved or signed in: straight to payment (details skipped)",
+     "provenance": "decided 29 September 2026 (P29), W1",
+     "carries": [
+      "orderId",
+      "paymentId"
+     ]
+    },
+    {
+     "to": "WEB-011",
+     "trigger": "Answers attendee forms and consent, only where the cart needs them",
+     "provenance": "flow F01 step 5→6, F02 step 3→4, F55 step 1→2"
+    },
+    {
+     "to": "WEB-030",
+     "trigger": "They transfer three tickets",
+     "provenance": "flow F55 step 3→4",
+     "operation": "checkoutCart",
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
@@ -60,13 +86,6 @@
   "pattern": "statusTracker",
   "patternReason": "`getCart` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Review and confirm what is being bought.",
-  "gaps": [
-   {
-    "operation": "getCouponCode",
-    "why": "**1 declared operation reach no component on this screen**: getCouponCode. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -76,7 +95,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected shopping cart",
+       "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
         "Cart.id",
@@ -92,12 +111,74 @@
         "Cart.taxTotal",
         "Cart.total",
         "Cart.appliedPromotionIds",
+        "Cart.couponCodes",
         "Cart.expiresAt",
         "Cart.extensionsUsed",
         "Cart.maxExtensions"
        ],
        "operation": "getCart",
        "provenance": "contract orders.yaml GET /carts/{cartId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The coupon code",
+       "bindsTo": "CouponCode",
+       "columns": [
+        "CouponCode.code",
+        "CouponCode.campaignId",
+        "CouponCode.batchId",
+        "CouponCode.status",
+        "CouponCode.assignedSubjectId",
+        "CouponCode.redemptionCount",
+        "CouponCode.maxRedemptions",
+        "CouponCode.discount",
+        "CouponCode.invalidReason",
+        "CouponCode.validFrom",
+        "CouponCode.validTo",
+        "CouponCode.redeemedAt",
+        "CouponCode.redeemedOrderId",
+        "CouponCode.scopePath"
+       ],
+       "operation": "getCouponCode",
+       "provenance": "contract promotions.yaml GET /coupon-codes/{code}"
+      },
+      {
+       "kind": "textField",
+       "label": "Promo code",
+       "bindsTo": "ApplyCartPromoCodeRequest.code",
+       "operation": "applyCartPromoCode",
+       "notes": "**Applied to the cart at once** with `applyCartPromoCode` (POST /carts/{cartId}/promo-codes, body `{code}`; decided 28 September, audit R073 (e)). The two refusals read differently: 422 `promoCodeInvalid` says the code does not exist, was voided or is used up; 422 `promoCodeNotApplicable` says the code is real but nothing in this cart qualifies. A 410 `cartExpired` sends the guest back to rebuild the cart. Accepted codes are listed from `Cart.couponCodes` and re-priced on every read.",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/promo-codes"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Apply code",
+       "operation": "applyCartPromoCode",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/promo-codes"
+      },
+      {
+       "kind": "banner",
+       "bindsTo": "PromotionEvaluation.rejected",
+       "notes": "When a code does not apply, say which condition failed. \"Expired\" and \"already used\" are very different conversations",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "label": "Visit date per line",
+       "notes": "Each line shows its visit date: `Performance.startsAt` for a line with a performance (the match date for a fixture). A table reservation is not a cart line (REV3-8), so it shows on its confirmation.",
+       "operation": "getPerformance",
+       "provenance": "decided 29 September, rev 3 23SEP-9"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Booking steps",
+       "bindsTo": "BookingFlow",
+       "columns": [
+        "BookingFlow.steps"
+       ],
+       "operation": "getPublishedBookingFlow",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (cart) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
       }
      ]
     },
@@ -107,69 +188,52 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save cart line",
        "operation": "updateCartLine",
        "provenance": "contract orders.yaml PATCH /carts/{cartId}/lines/{lineId}"
       },
       {
        "kind": "destructiveButton",
-       "label": "Remove",
+       "label": "Remove cart line",
        "operation": "removeCartLine",
        "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Extend",
+       "label": "Extend cart",
        "operation": "extendCart",
        "provenance": "contract orders.yaml POST /carts/{cartId}/extend"
       },
       {
        "kind": "secondaryButton",
-       "label": "Checkout",
+       "label": "Checkout cart",
        "operation": "checkoutCart",
        "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
       },
       {
        "kind": "destructiveButton",
-       "label": "Abandon",
+       "label": "Abandon cart",
        "operation": "abandonCart",
        "provenance": "contract orders.yaml DELETE /carts/{cartId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Evaluate",
+       "label": "Evaluate promotions",
        "operation": "evaluatePromotions",
        "provenance": "contract promotions.yaml POST /promotions/evaluate"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "Promo code",
-       "provenance": "carried from the previous definition"
       },
       {
-       "kind": "banner",
-       "bindsTo": "PromotionEvaluation.rejected",
-       "notes": "When a code does not apply, say which condition failed. \"Expired\" and \"already used\" are very different conversations",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "carried",
-     "components": [
+       "kind": "secondaryButton",
+       "label": "Create cart",
+       "operation": "createCart",
+       "provenance": "contract orders.yaml POST /carts"
+      },
       {
        "kind": "primaryButton",
        "label": "Checkout",
@@ -183,27 +247,137 @@
    {
     "id": "confirmRemoveCartLine",
     "component": "confirmDialog",
-    "trigger": "Remove",
+    "trigger": "Remove cart line",
     "body": "**Names what `removeCartLine` changes and what it leaves alone**, in the consequence rather than the verb. A shopping cart this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
+    "provenance": "client-verified"
    },
    {
     "id": "confirmAbandonCart",
     "component": "confirmDialog",
-    "trigger": "Abandon",
+    "trigger": "Abandon cart",
     "body": "**Names what `abandonCart` changes and what it leaves alone**, in the consequence rather than the verb. A shopping cart this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract orders.yaml DELETE /carts/{cartId}"
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formCreateCart",
+    "component": "modal",
+    "trigger": "Create cart",
+    "body": "**Collects what `createCart` sends before it is called.** Required: `venueId`, `channel`. Optional: `subjectId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create cart",
+     "operation": "createCart"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "channel",
+      "subjectId",
+      "locale"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formUpdateCartLine",
+    "component": "modal",
+    "trigger": "Save cart line",
+    "body": "**Collects what `updateCartLine` sends before it is called.** Required: `quantity`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save cart line",
+     "operation": "updateCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "quantity"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formCheckoutCart",
+    "component": "modal",
+    "trigger": "Checkout cart",
+    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Checkout cart",
+     "operation": "checkoutCart"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "attendees"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formEvaluatePromotions",
+    "component": "modal",
+    "trigger": "Evaluate promotions",
+    "body": "**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "EvaluatePromotionsRequest",
+    "confirm": {
+     "label": "Evaluate promotions",
+     "operation": "evaluatePromotions"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "channel",
+      "lines",
+      "subjectId",
+      "membershipTierId",
+      "couponCodes",
+      "evaluateAt"
+     ]
+    },
+    "provenance": "client-verified"
    }
   ],
   "states": {
-   "loading": "The shopping cart list.",
+   "loading": "The shopping cart, read by `getCart`.",
    "error": "Could not load. Names which read failed and leaves the shopping cart untouched.",
-   "emptyFirstRun": "No shopping cart yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the shopping cart are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No shopping cart yet. Offers Add cart line (`addCartLine`).",
+   "emptyNoAccess": "**The cart is open to anyone** — signed in, unverified or anonymous (ADR-0045, 18 September 2026). Nobody is turned away from it. The fork between signing in and continuing as a guest waits on `WEB-011`, and `checkoutCart` is what refuses.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
+   {
+    "operationId": "applyCartPromoCode",
+    "contract": "orders",
+    "purpose": "Apply a promo code to the cart; refused 422 promoCodeInvalid or promoCodeNotApplicable, shown as different messages (decided 28 September, audit R073 (e))",
+    "trigger": "onAction",
+    "invalidates": [
+     "getCart"
+    ]
+   },
    {
     "operationId": "getCart",
     "contract": "orders",
@@ -257,6 +431,32 @@
     "contract": "promotions",
     "purpose": "Look up a code",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCart",
+    "contract": "orders",
+    "purpose": "Start a cart",
+    "trigger": "onAction",
+    "provenance": "client-verified"
+   },
+   {
+    "operationId": "getPerformance",
+    "contract": "catalogue",
+    "purpose": "The visit date and time of each line (`Performance.startsAt`)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getResourceHold",
+    "contract": "resources",
+    "purpose": "The countdown of a cabana or spot held on the venue map (`expiresAt`)",
+    "trigger": "onInterval"
+   },
+   {
+    "operationId": "getPublishedBookingFlow",
+    "contract": "white-label",
+    "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), W12"
    }
   ],
   "entryState": {
@@ -272,16 +472,38 @@
     {
      "name": "lineId",
      "from": "deepLink"
+    },
+    {
+     "name": "performanceId",
+     "from": "navigation",
+     "optional": true
+    },
+    {
+     "name": "holdId",
+     "from": "navigation"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `code`, `lineId`."
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `code`, `lineId`. **A cold arrival opens the cart whatever the session is** — the identity fork waits until checkout (ADR-0045)."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-010"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-010",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary' changes it to slide-in, bottom sheet, floating icon or single column)",
+    "differences": "Not a separate screen: a persistent sidebar/drawer through the stepper, with a Rev 3 option to mirror it in Arabic. No 'extend hold' action (extendCart) — only hold timers on the seat step. Exit-intent dialog (exit.open) is a prototype addition."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "notes": "**Rev 3 (decided 29 September).** Visit date per line (23SEP-9). **Layout (REV3-10):** `cartLayout` may be `floatingIcon` (a round basket button with the count); in Arabic the cart stays on the right unless `cartSideInRtl` is `mirror` (default `keepRight`). **A line holding a cabana or spot from the venue map** (`resourceHoldId`) counts down from its `ResourceHold.expiresAt` (REV3-15). **Consent (REV3-26):** `checkoutCart` answers `422 consentRequired` while a required consent question is unanswered, and `consentAnswerBlocks` when an answer blocks a line; both send the guest back to the questions (WEB-006 pop-up, or WEB-011 for a flow with no date step). Promo code and abandon are declared (`applyCartPromoCode`, `abandonCart`; GAP-B3, already). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -328,19 +550,31 @@
   },
   "navigation": {
    "entryFrom": [
-    "WEB-010"
+    "WEB-010",
+    "WEB-016"
    ],
    "exitTo": [
     "WEB-001",
     "WEB-010",
     "WEB-012",
-    "WEB-013"
+    "WEB-013",
+    "WEB-016"
    ],
    "transitions": [
     {
-     "to": "WEB-010",
-     "trigger": "They check out",
-     "provenance": "flow F55 step 2→3"
+     "to": "WEB-016",
+     "trigger": "Chooses to sign in rather than continue as a guest",
+     "precondition": "no verified guest session — this is the fork of matrix 2.6.1 §2.4, offered here rather than in front of the cart",
+     "carries": [
+      "cartId"
+     ],
+     "returnsTo": "WEB-011",
+     "provenance": "ADR-0045, 18 September 2026 — the gate is the checkout page, not the cart; moved from WEB-010 where it was placed on 17 September"
+    },
+    {
+     "to": "WEB-013",
+     "trigger": "Booking Confirmation",
+     "provenance": "derived — WEB-013 declares entryState.params orderId and WEB-011 holds none of them, so the edge carries nothing and WEB-013 opens cold"
     },
     {
      "to": "WEB-012",
@@ -348,27 +582,26 @@
      "provenance": "flow F01 step 6→7, F02 step 4→5"
     },
     {
-     "to": "WEB-013",
-     "trigger": "Booking Confirmation",
+     "to": "WEB-012",
+     "trigger": "Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)",
+     "provenance": "decided 29 September 2026 (P29), W1"
+    },
+    {
+     "to": "WEB-010",
+     "trigger": "They check out",
+     "provenance": "flow F55 step 2→3",
      "carries": [
-      "orderId"
-     ],
-     "provenance": "derived — WEB-013 declares entryState.params orderId, so an edge into it must carry them"
+      "cartId",
+      "performanceId"
+     ]
     }
    ]
   },
-  "notes": "**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.",
+  "notes": "**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.\n\n**Rev 3 (decided 29 September).** Booking consent questions not yet answered are asked here (REV3-26). The sign-in gate may already have been passed at the Add-ons exit (`signInAt` `afterAddOns`, REV3-3); a guest who signed in there arrives with their details filled.\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September (W1).** **Skipped after the guest code, and when signed in**, unless the cart needs attendee forms or unanswered consent questions: no name, email or phone is asked again. The profile is created and completed later (WEB-020).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
   "purpose": "Collect who is coming and how to reach them.",
-  "gaps": [
-   {
-    "operation": "getGuestProfile",
-    "why": "**2 declared operations reach no component on this screen**: getGuestProfile, listConsentPurposes. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -378,7 +611,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every guest attendee forms",
+       "label": "Every guest device",
        "bindsTo": "GuestDevice",
        "columns": [
         "GuestDevice.id",
@@ -396,72 +629,23 @@
        ],
        "operation": "listGuestDevices",
        "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected guest attendee forms",
-       "bindsTo": "Wishlist",
+       "kind": "dataTable",
+       "label": "Every consent purpose config",
+       "bindsTo": "ConsentPurposeConfig",
        "columns": [
-        "Wishlist.subjectId",
-        "Wishlist.items"
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
        ],
-       "operation": "getWishlist",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Add",
-       "operation": "addToWishlist",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
       },
-      {
-       "kind": "secondaryButton",
-       "label": "Record",
-       "operation": "recordConsent",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register",
-       "operation": "registerGuestDevice",
-       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeFromWishlist",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Revoke",
-       "operation": "revokeGuestDevice",
-       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateMyProfile",
-       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "textField",
        "label": "Full name",
@@ -488,13 +672,139 @@
        "bindsTo": "ConsentPurposeConfig[]",
        "notes": "Marketing consent is opt-in and unticked. Transactional is required for service and is presented differently, not as a choice dressed as one",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "consentBlock",
+       "label": "Booking consent questions",
+       "bindsTo": "Cart.consentQuestions",
+       "notes": "Any consent question in `Cart.consentQuestions` not answered yet (a flow with no date step, or a product added later): per person or once per booking, as each question says; answers go to `recordConsentAnswers`. Distinct from marketing consent above.",
+       "operation": "getCart",
+       "provenance": "decided 29 September, rev 3 REV3-26"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Booking steps",
+       "bindsTo": "BookingFlow",
+       "columns": [
+        "BookingFlow.steps"
+       ],
+       "operation": "getPublishedBookingFlow",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (details) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected guest device",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.tokenRef",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt",
+        "GuestDevice.revokedAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The guest profile",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.mergedIntoSubjectId"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wishlist",
+       "bindsTo": "Wishlist",
+       "columns": [
+        "Wishlist.subjectId",
+        "Wishlist.items"
+       ],
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
       }
      ]
     },
     {
      "name": "actionBar",
-     "slot": "carried",
+     "slot": "rowActions",
      "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add to wishlist",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record consent",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register guest device",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove from wishlist",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke guest device",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save my profile",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Upload guest document",
+       "operation": "uploadGuestDocument",
+       "provenance": "contract marketing-crm.yaml POST /guest-documents"
+      },
       {
        "kind": "primaryButton",
        "label": "Continue to payment",
@@ -508,24 +818,137 @@
    {
     "id": "confirmRemoveFromWishlist",
     "component": "confirmDialog",
-    "trigger": "Remove",
+    "trigger": "Remove from wishlist",
     "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A guest attendee forms this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+    "provenance": "client-verified"
    },
    {
     "id": "confirmRevokeGuestDevice",
     "component": "confirmDialog",
-    "trigger": "Revoke",
+    "trigger": "Revoke guest device",
     "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A guest attendee forms this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formUploadGuestDocument",
+    "component": "modal",
+    "trigger": "Upload guest document",
+    "body": "**Collects what `uploadGuestDocument` sends before it is called.** Required: `id`, `subjectId`, `kind`, `storageRef`, `retainUntil`. Optional: `contentType`, `consentPurposeId`, `uploadedAt`, `uploadedByPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "GuestDocument",
+    "confirm": {
+     "label": "Upload guest document",
+     "operation": "uploadGuestDocument"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subjectId",
+      "kind",
+      "storageRef",
+      "retainUntil",
+      "contentType",
+      "consentPurposeId",
+      "uploadedAt",
+      "uploadedByPrincipalId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formAddToWishlist",
+    "component": "modal",
+    "trigger": "Add to wishlist",
+    "body": "**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add to wishlist",
+     "operation": "addToWishlist"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "performanceId",
+      "note"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRecordConsent",
+    "component": "modal",
+    "trigger": "Record consent",
+    "body": "**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RecordConsentRequest",
+    "confirm": {
+     "label": "Record consent",
+     "operation": "recordConsent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "purpose",
+      "decision",
+      "noticeVersion",
+      "source",
+      "recordedAt",
+      "channels"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRegisterGuestDevice",
+    "component": "modal",
+    "trigger": "Register guest device",
+    "body": "**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`. Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Register guest device",
+     "operation": "registerGuestDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "platform",
+      "token",
+      "appVersion",
+      "osVersion",
+      "deviceModel",
+      "locale"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formUpdateMyProfile",
+    "component": "modal",
+    "trigger": "Save my profile",
+    "body": "**Collects what `updateMyProfile` sends before it is called.** Nothing in the body is required. Optional: `displayName`, `email`, `phone`, `preferredLanguage`, `preferredChannel`, `dietary`, `accessibility`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save my profile",
+     "operation": "updateMyProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "displayName",
+      "email",
+      "phone",
+      "preferredLanguage",
+      "preferredChannel",
+      "dietary",
+      "accessibility"
+     ]
+    },
+    "provenance": "client-verified"
    }
   ],
   "states": {
    "loading": "The guest attendee forms list.",
    "error": "Could not load. Names which read failed and leaves the guest attendee forms untouched.",
-   "emptyFirstRun": "No guest attendee forms yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the guest attendee forms are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No guest attendee forms yet. Offers Add to wishlist (`addToWishlist`).",
+   "emptyNoResults": "Never shown: `listGuestDevices` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "apis": [
@@ -612,6 +1035,28 @@
     "contract": "marketing-crm",
     "purpose": "Provide a document a booking requires",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "The cart's consent questions still unanswered",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsentAnswers",
+    "contract": "marketing-crm",
+    "purpose": "Record answers to the booking's consent questions",
+    "trigger": "onAction",
+    "invalidates": [
+     "getCart"
+    ]
+   },
+   {
+    "operationId": "getPublishedBookingFlow",
+    "contract": "white-label",
+    "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), W12"
    }
   ],
   "entryState": {
@@ -627,18 +1072,37 @@
     {
      "name": "subjectId",
      "from": "session"
+    },
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
    "preloaded": [
-    "Wishlist.subjectId",
-    "Wishlist.items"
+    "GuestDevice.id",
+    "GuestDevice.subjectId",
+    "GuestDevice.platform",
+    "GuestDevice.tokenFingerprint",
+    "GuestDevice.tokenRef"
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-011"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-011",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Book → 'Your details' step (after Extras)",
+    "differences": "Sections are driven by the flow's requires list; prototype adds a signature, diving certification and vehicle plate fields. Wishlist/device operations listed in the YAML apis have no counterpart here. Saved guests prefill is described in Account but not shown on this step."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -687,43 +1151,51 @@
   },
   "navigation": {
    "entryFrom": [
-    "WEB-011"
+    "WEB-011",
+    "WEB-016",
+    "WEB-010"
    ],
    "exitTo": [
     "WEB-001",
     "WEB-010",
     "WEB-011",
-    "WEB-013"
+    "WEB-013",
+    "WEB-016"
    ],
    "transitions": [
-    {
-     "to": "WEB-013",
-     "trigger": "Receives confirmation and tickets",
-     "provenance": "flow F01 step 7→8"
-    },
     {
      "to": "WEB-010",
      "trigger": "Shopping Cart",
      "carries": [
-      "cartId",
-      "code",
-      "lineId"
+      "performanceId"
      ],
-     "provenance": "derived — WEB-010 declares entryState.params cartId, code, lineId, so an edge into it must carry them"
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-012 holds performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-011",
      "trigger": "Guest Details & Attendee Forms",
+     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId and WEB-012 holds none of them, so the edge carries nothing and WEB-011 opens cold"
+    },
+    {
+     "to": "WEB-016",
+     "trigger": "Sign in or use a guest code (when sign-in is asked at payment)",
      "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
+      "cartId"
      ],
-     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "precondition": "the guest is not signed in",
+     "provenance": "decided 29 September, rev 3 REV3-3: `BookingFlowConfig.signInAt` `atPayment`; the basket is kept"
+    },
+    {
+     "to": "WEB-013",
+     "trigger": "Receives confirmation and tickets",
+     "provenance": "flow F01 step 7→8",
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
-  "notes": "The unknown outcome is the one to build for. A payment taken but never confirmed must offer inquiry, not a retry — a retry double-charges and the guest finds out. **Card only, so tender currency equals base currency.** A guest paying with a foreign card is converted by their own issuer at their own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.",
+  "notes": "The unknown outcome is the one to build for. A payment taken but never confirmed must offer inquiry, not a retry — a retry double-charges and the guest finds out. **Card or wallet** (TenderKind `card`, `wallet`; decided 28 September, audit R080 (a)), **both in base currency, so tender currency equals base currency.** A guest paying with a foreign card is converted by their own issuer at their own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe. **No 'is this you?' at checkout** (decided 28 September, audit R120 (b)): a verified contact that matches an existing profile attaches the order automatically inside `checkoutCart` (ADR-0045), so `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch` were removed from this screen; only unverified matches go to staff review.\n\n**Rev 3 (decided 29 September, rev 3 REV3-3).** With `BookingFlowConfig.signInAt` `atPayment` the sign-in or guest-code gate is here rather than at the Add-ons exit; the basket is kept. Unknown and declined payment outcomes are declared (`inquirePaymentStatus`; GAP-B3, already).\n\n**The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow` returns the flow the product (or its category, else the venue default for its kind) uses, with its enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig` `bookingFlow`.\n\n**29 September.** W1: a guest who proved the contact with the code arrives here from the cart (WEB-011 skipped) and only ticks the T&Cs. M18-15: unticked marketing opt-in.",
   "openQuestions": [
    "Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot be tested without them."
   ],
@@ -740,7 +1212,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected checkout payment",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -762,6 +1234,36 @@
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
+      },
+      {
+       "kind": "cartPanel",
+       "notes": "Order summary stays visible throughout. Never collapsed behind a link",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "progressIndicator",
+       "label": "Booking steps",
+       "bindsTo": "BookingFlow",
+       "columns": [
+        "BookingFlow.steps"
+       ],
+       "operation": "getPublishedBookingFlow",
+       "notes": "The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
+       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+      },
+      {
+       "kind": "consentBlock",
+       "label": "Terms and conditions",
+       "operation": "createOrder",
+       "notes": "After the code the guest goes straight to the T&Cs tick and completes (W1).",
+       "provenance": "decided 29 September 2026 (P29), W1"
+      },
+      {
+       "kind": "toggle",
+       "label": "Send me offers and news",
+       "operation": "createOrder",
+       "notes": "Marketing opt-in beside the T&Cs, **never pre-ticked** (M18-15): `marketingConsents[]` on the order, bound to the verified contact.",
+       "provenance": "decided 29 September 2026 (P29), M18-15"
       }
      ]
     },
@@ -771,39 +1273,28 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create payment",
        "operation": "createPayment",
        "provenance": "contract orders.yaml POST /payments"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
-       "kind": "cartPanel",
-       "notes": "Order summary stays visible throughout. Never collapsed behind a link",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "carried",
-     "components": [
+       "kind": "secondaryButton",
+       "label": "Inquire payment status",
+       "operation": "inquirePaymentStatus",
+       "provenance": "contract orders.yaml POST /payments/{paymentId}/inquiry"
+      },
       {
        "kind": "primaryButton",
        "label": "Pay now",
@@ -814,11 +1305,10 @@
    ]
   },
   "states": {
-   "loading": "The checkout payment list.",
+   "loading": "The checkout payment, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the checkout payment untouched.",
-   "emptyFirstRun": "No checkout payment yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the checkout payment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No checkout payment yet. Offers Create order (`createOrder`).",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "apis": [
@@ -850,7 +1340,14 @@
     "operationId": "inquirePaymentStatus",
     "contract": "orders",
     "purpose": "Ask what happened to a payment that did not answer",
-    "trigger": "onLoad"
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getPublishedBookingFlow",
+    "contract": "white-label",
+    "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), W12"
    }
   ],
   "entryState": {
@@ -862,16 +1359,102 @@
     {
      "name": "paymentId",
      "from": "navigation"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-012"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-012",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted / Declined for the failure states; Config → Steps & cards → 'Guest checkout (code proof)' for the guest route",
+    "differences": "Contradicts 28 Sep decisions: YAML allows card or wallet only (R080) — prototype offers Apple Pay, Tabby split-in-4, pay on arrival and invoice/PO; YAML removed the 'is this you?' match at checkout (R120 b) — prototype still asks the guest to link or keep separate. The unknown-outcome inquiry state matches the YAML ('We couldn't confirm this payment yet… you won't be charged twice')."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formTransferOrderTickets",
+    "component": "modal",
+    "trigger": "Transfer order tickets",
+    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer order tickets",
+     "operation": "transferOrderTickets"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "ticketIds",
+      "recipient",
+      "message"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formCreatePayment",
+    "component": "modal",
+    "trigger": "Create payment",
+    "body": "**Collects what `createPayment` sends before it is called.** Required: `id`, `orderId`, `tender`, `amount`, `recordedAt`. Optional: `tenderCurrency`, `tenderAmount`, `walletAuthorisationId`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePaymentRequest",
+    "confirm": {
+     "label": "Create payment",
+     "operation": "createPayment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "orderId",
+      "tender",
+      "amount",
+      "recordedAt",
+      "tenderCurrency",
+      "tenderAmount",
+      "walletAuthorisationId",
+      "deviceId"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
+  "x-ticvai-make-or-break": "M18-15: may a guest-checkout customer be sent marketing on an opt-in taken at checkout (law and the client's marketing policy)? Until the client confirms, the opt-in is shown unticked and nothing is sent without it.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -925,6 +1508,7 @@
     "WEB-010",
     "WEB-011",
     "WEB-012",
+    "WEB-014",
     "WEB-018"
    ],
    "transitions": [
@@ -932,38 +1516,37 @@
      "to": "WEB-010",
      "trigger": "Shopping Cart",
      "carries": [
-      "cartId",
-      "code",
-      "lineId"
+      "lineId",
+      "performanceId"
      ],
-     "provenance": "derived — WEB-010 declares entryState.params cartId, code, lineId, so an edge into it must carry them"
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-013 holds lineId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-011",
      "trigger": "Guest Details & Attendee Forms",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId and WEB-013 holds none of them, so the edge carries nothing and WEB-011 opens cold"
     },
     {
      "to": "WEB-012",
      "trigger": "Checkout — Payment",
      "carries": [
-      "orderId"
+      "orderId",
+      "paymentId"
      ],
-     "provenance": "derived — WEB-012 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — WEB-012 declares entryState.params orderId, paymentId and WEB-013 holds orderId, paymentId, so an edge into it carries them"
     },
     {
      "to": "WEB-018",
      "trigger": "My Tickets",
      "carries": [
-      "entitlementId",
       "orderId"
      ],
-     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-013 holds orderId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-014",
+     "trigger": "Pay for a Booking",
+     "provenance": "derived — WEB-014 declares entryState.params token and WEB-013 holds none of them, so the edge carries nothing and WEB-014 opens cold"
     }
    ]
   },
@@ -981,7 +1564,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected booking confirmation",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -1003,31 +1586,7 @@
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       },
-      {
-       "kind": "secondaryButton",
-       "label": "Reprint",
-       "operation": "reprintOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "banner",
        "notes": "Confirmation with the order number prominent",
@@ -1044,15 +1603,32 @@
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer order tickets",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reprint order",
+       "operation": "reprintOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+      }
+     ]
     }
    ]
   },
   "states": {
-   "loading": "The booking confirmation list.",
+   "loading": "The booking confirmation, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the booking confirmation untouched.",
-   "emptyFirstRun": "No booking confirmation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the booking confirmation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No booking confirmation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -1085,11 +1661,61 @@
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-013"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-013",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Book → final step 'Confirmed' after paying",
+    "differences": "Prototype adds editing attendee details after purchase ('Change your details', signed-in only) and Reissue QR. No 'unpaid — pay now' route to WEB-014."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formTransferOrderTickets",
+    "component": "modal",
+    "trigger": "Transfer order tickets",
+    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer order tickets",
+     "operation": "transferOrderTickets"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "ticketIds",
+      "recipient",
+      "message"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formReprintOrder",
+    "component": "modal",
+    "trigger": "Reprint order",
+    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reprint order",
+     "operation": "reprintOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "recordedAt",
+      "destination",
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -1150,7 +1776,7 @@
      "carries": [
       "orderId"
      ],
-     "provenance": "derived — WEB-013 declares entryState.params orderId, so an edge into it must carry them"
+     "provenance": "derived — WEB-013 declares entryState.params orderId and WEB-014 holds orderId, so an edge into it carries them"
     }
    ]
   },
@@ -1168,7 +1794,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected pay for booking",
+       "label": "The payment link",
        "bindsTo": "PaymentLink",
        "columns": [
         "PaymentLink.id",
@@ -1188,25 +1814,7 @@
        ],
        "operation": "getPaymentLink",
        "provenance": "contract orders.yaml GET /payment-links/{token}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Pay",
-       "operation": "payByLink",
-       "provenance": "contract orders.yaml POST /payment-links/{token}/pay"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "detailPanel",
        "bindsTo": "PaymentLink",
@@ -1230,6 +1838,18 @@
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Pay by link",
+       "operation": "payByLink",
+       "provenance": "contract orders.yaml POST /payment-links/{token}/pay"
+      }
+     ]
     }
    ]
   },
@@ -1237,7 +1857,6 @@
    "loading": "The lines and the total, with the deadline counting down.",
    "error": "Could not load the booking. **The hold is unaffected** — a failed page load must not release inventory.",
    "emptyFirstRun": "**Not reachable empty** — a link always names an order. An empty state here means the token did not resolve, which is the error state.",
-   "emptyNoResults": "The filter narrowed it and the pay for booking are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "**The token is the credential, so there is no permission case** — either it resolves or it has gone.",
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
@@ -1265,11 +1884,37 @@
    "coldEntry": "**Cold is the only way in.** The guest arrives from an email, an SMS or a WhatsApp message with no session and quite possibly no account. **A link opened three days late is the ordinary case, not an edge** — the screen says the hold was released and offers to book again. Expired, already paid and superseded are three different messages, and **404 is never one of them**: telling somebody their booking does not exist when it expired is how a support call starts."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-014"
+   "status": "review",
+   "provenance": "designed",
+   "board": "wireframes/P01 Guest Web.dc.html#web-014",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "match": "none",
+    "note": "The prototype has no view for this screen. It was drawn in Claude Design on 29 September in the prototype's style and accepted as its design the same day (the frame on this screen's board): build the layout from that frame."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPayByLink",
+    "component": "modal",
+    "trigger": "Pay by link",
+    "body": "**Collects what `payByLink` sends before it is called.** Required: `providerToken`. Optional: `email`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Pay by link",
+     "operation": "payByLink"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "providerToken",
+      "email"
+     ]
+    },
+    "provenance": "designed"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",

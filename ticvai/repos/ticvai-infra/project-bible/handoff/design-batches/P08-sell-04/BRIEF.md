@@ -1,6 +1,6 @@
 # P08-sell-04 — P08 · Sell (4 of 4)
 
-**6 screens · 22 operations · 21 schemas · 13 permissions**
+**6 screens · 22 operations · 39 schemas · 13 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

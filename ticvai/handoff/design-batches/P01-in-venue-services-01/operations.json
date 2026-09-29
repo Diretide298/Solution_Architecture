@@ -1,4 +1,42 @@
 {
+ "addCartLine": {
+  "method": "POST",
+  "path": "/carts/{cartId}/lines",
+  "contract": "orders",
+  "summary": "Add something",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AddCartLineRequest",
+  "responds": "Cart"
+ },
+ "checkoutCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/checkout",
+  "contract": "orders",
+  "summary": "Turn the cart into an order",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
  "claimLocationSession": {
   "method": "POST",
   "path": "/location-sessions",
@@ -56,15 +94,15 @@
   "requestBody": "CreateGuestOrderRequest",
   "responds": "GuestOrderResult"
  },
- "createParkingEntitlement": {
+ "createPayment": {
   "method": "POST",
-  "path": "/parking-entitlements",
-  "contract": "access",
-  "summary": "A guest bought parking",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "path": "/payments",
+  "contract": "orders",
+  "summary": "Take a payment against an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
   "parameters": [
    {
     "name": null,
@@ -72,8 +110,8 @@
     "required": null
    }
   ],
-  "requestBody": "ParkingEntitlement",
-  "responds": "ParkingEntitlement"
+  "requestBody": "CreatePaymentRequest",
+  "responds": "Payment"
  },
  "createTableReservation": {
   "method": "POST",
@@ -93,6 +131,25 @@
   ],
   "requestBody": "TableReservation",
   "responds": "TableReservation"
+ },
+ "getFnbDeliveryPolicy": {
+  "method": "GET",
+  "path": "/fnb-delivery-policy",
+  "contract": "fnb",
+  "summary": "How an outlet does takeaway and delivery",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "FnbDeliveryPolicy"
  },
  "getGuestBill": {
   "method": "GET",
@@ -158,6 +215,11 @@
     "name": "version",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "draft",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -173,6 +235,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "draft",
+    "in": "query",
+    "required": null
+   },
    {
     "name": "stepFreeOnly",
     "in": "query",
@@ -295,6 +362,25 @@
   "requestBody": null,
   "responds": null
  },
+ "leaveRestaurantWaitlist": {
+  "method": "POST",
+  "path": "/waitlist/{entryId}/leave",
+  "contract": "fnb",
+  "summary": "Take a party off an outlet's waitlist",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RestaurantWaitlist"
+ },
  "leaveWaitlist": {
   "method": "DELETE",
   "path": "/waitlist-entries/{entryId}",
@@ -346,7 +432,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "DeliveryLocation"
+  "responds": "Page"
  },
  "listDiningOutlets": {
   "method": "GET",
@@ -380,7 +466,46 @@
    }
   ],
   "requestBody": null,
-  "responds": "DiningOutlet"
+  "responds": "Page"
+ },
+ "listFulfilmentSlots": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/fulfilment-slots",
+  "contract": "fnb",
+  "summary": "Collection times or delivery windows still open",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": "mode",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listModifierGroups": {
   "method": "GET",
@@ -404,18 +529,23 @@
    }
   ],
   "requestBody": null,
-  "responds": "ModifierGroup"
+  "responds": "Page"
  },
  "listParkingFacilities": {
   "method": "GET",
   "path": "/parking-facilities",
   "contract": "access",
   "summary": "Car parks at a venue, and how each integrates",
-  "permission": "ACCESS_POINT_CONFIGURE",
+  "permission": "PARKING_CONFIGURE",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
    {
     "name": null,
     "in": null,
@@ -428,7 +558,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "ParkingFacility"
+  "responds": "Page"
  },
  "listQueues": {
   "method": "GET",
@@ -480,7 +610,7 @@
     "required": null
    }
   ],
-  "requestBody": "ParkingEntitlement",
+  "requestBody": "UpdateParkingEntitlementRequest",
   "responds": "ParkingEntitlement"
  }
 }

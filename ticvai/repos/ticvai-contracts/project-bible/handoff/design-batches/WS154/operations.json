@@ -1,0 +1,522 @@
+{
+ "addRiskCaseEvidence": {
+  "method": "POST",
+  "path": "/risk/cases/{caseId}/evidence",
+  "contract": "ai",
+  "summary": "Add evidence to a case",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiRiskCaseEvidence",
+  "responds": "AiRiskCaseEvidence"
+ },
+ "assignChargeback": {
+  "method": "POST",
+  "path": "/chargebacks/{chargebackId}/assign",
+  "contract": "orders",
+  "summary": "Give a chargeback to an investigator, with a note",
+  "permission": "ORDER_REFUND_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Chargeback"
+ },
+ "backtestRiskStrategy": {
+  "method": "POST",
+  "path": "/risk/strategy/backtest",
+  "contract": "ai",
+  "summary": "Backtest a draft strategy",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskBacktest"
+ },
+ "closeRiskCase": {
+  "method": "POST",
+  "path": "/risk/cases/{caseId}/close",
+  "contract": "ai",
+  "summary": "Close a case with an outcome",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskCase"
+ },
+ "configureRiskStrategy": {
+  "method": "PUT",
+  "path": "/risk/strategy",
+  "contract": "ai",
+  "summary": "Set the risk strategy",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiRiskStrategy",
+  "responds": "AiRiskStrategy"
+ },
+ "createRiskCase": {
+  "method": "POST",
+  "path": "/risk/cases",
+  "contract": "ai",
+  "summary": "Open an investigation",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskCase"
+ },
+ "decideRiskAlert": {
+  "method": "POST",
+  "path": "/risk/alerts/{alertId}/decide",
+  "contract": "ai",
+  "summary": "Dismiss, monitor, mark false positive, or escalate",
+  "permission": "RISK_REVIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskAlert"
+ },
+ "expandRiskNetwork": {
+  "method": "GET",
+  "path": "/risk/network",
+  "contract": "ai",
+  "summary": "Expand the relationship graph around an entity",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "entityType",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "entityRef",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "hops",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "maxNodes",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskNetwork"
+ },
+ "getChargebackAnalytics": {
+  "method": "GET",
+  "path": "/chargebacks/analytics",
+  "contract": "orders",
+  "summary": "Chargeback rate, win and loss, by reason, provider, outcome and period",
+  "permission": "ORDER_REFUND_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "periodFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "minChargebacks",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "providerId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrdChargebackAnalytics"
+ },
+ "getEntityRisk": {
+  "method": "GET",
+  "path": "/risk/entities/{entityType}/{entityRef}",
+  "contract": "ai",
+  "summary": "Current risk of an entity",
+  "permission": "RISK_REVIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiEntityRisk"
+ },
+ "getPaymentPerformance": {
+  "method": "GET",
+  "path": "/payment-performance",
+  "contract": "payments",
+  "summary": "Authorisation rate, conversion and where payments are lost",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentPerformanceRow"
+ },
+ "getRiskCase": {
+  "method": "GET",
+  "path": "/risk/cases/{caseId}",
+  "contract": "ai",
+  "summary": "A case with its evidence and actions",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiRiskCaseDetail"
+ },
+ "listChargebacks": {
+  "method": "GET",
+  "path": "/chargebacks",
+  "contract": "orders",
+  "summary": "Open disputes, by deadline",
+  "permission": "ORDER_REFUND_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listFraudRules": {
+  "method": "GET",
+  "path": "/fraud-rules",
+  "contract": "orders",
+  "summary": "The rules evaluated before a charge",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRiskAlerts": {
+  "method": "GET",
+  "path": "/risk/alerts",
+  "contract": "ai",
+  "summary": "Risk alerts",
+  "permission": "RISK_REVIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "band",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "entityType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "proposeRiskAction": {
+  "method": "POST",
+  "path": "/risk/cases/{caseId}/actions",
+  "contract": "ai",
+  "summary": "Propose a restrictive action from a case",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskCaseAction"
+ },
+ "recordChargeback": {
+  "method": "POST",
+  "path": "/chargebacks/intake",
+  "contract": "orders",
+  "summary": "Take in a chargeback notified by a provider",
+  "permission": "ORDER_REFUND_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Chargeback"
+ },
+ "recordChargebackOutcome": {
+  "method": "POST",
+  "path": "/chargebacks/{chargebackId}/outcome",
+  "contract": "orders",
+  "summary": "Record the bank's decision and adjust the ledger",
+  "permission": "ORDER_REFUND_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Chargeback"
+ },
+ "respondToChargeback": {
+  "method": "POST",
+  "path": "/chargebacks/{chargebackId}/respond",
+  "contract": "orders",
+  "summary": "Submit evidence, or accept the loss",
+  "permission": "ORDER_REFUND_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Chargeback"
+ },
+ "setFraudRules": {
+  "method": "PUT",
+  "path": "/fraud-rules",
+  "contract": "orders",
+  "summary": "Change what holds a transaction",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FraudRuleSet",
+  "responds": "FraudRuleSet"
+ },
+ "setPaymentRiskRules": {
+  "method": "PUT",
+  "path": "/payment-risk-rules",
+  "contract": "payments",
+  "summary": "Velocity, behaviour, lists and what a hit does",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PaymentRiskRules",
+  "responds": "PaymentRiskRules"
+ },
+ "simulatePaymentConfiguration": {
+  "method": "POST",
+  "path": "/payment-configuration/simulate",
+  "contract": "payments",
+  "summary": "What a guest would be offered, and what it would cost",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RoutingContext",
+  "responds": "PaymentConfigurationSimulation"
+ },
+ "submitChargebackEvidence": {
+  "method": "POST",
+  "path": "/chargebacks/{chargebackId}/evidence",
+  "contract": "payments",
+  "summary": "Assemble and send a representment",
+  "permission": "PAYMENT_DISPUTE",
+  "offlineCapable": null,
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChargebackEvidence",
+  "responds": null
+ }
+}

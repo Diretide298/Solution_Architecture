@@ -1,0 +1,1757 @@
+[
+ {
+  "id": "ADM-589",
+  "name": "Digital Payments Command Center\\t71",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "4",
+   "number": "1",
+   "page": 70
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/digital-payments-command-center-t71-adm-589",
+   "component": "apps/ticvai-web/src/routes/commercial/DigitalPaymentsCommandCenterT71.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-590",
+    "ADM-591",
+    "ADM-592",
+    "ADM-593",
+    "ADM-594",
+    "ADM-595",
+    "ADM-596",
+    "ADM-597",
+    "ADM-598"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to Platform Dashboard",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "ADM-590",
+     "trigger": "Digital & Alternative Payment Method Manager\\t71",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-591",
+     "trigger": "Digital Wallet & Mobile Payment Configuration\\t72",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-592",
+     "trigger": "Payment Link Builder & Configuration\\t73",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-593",
+     "trigger": "Payment Link Distribution & Customer Journey Manager\\t74",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-594",
+     "trigger": "Hosted Checkout, Redirect & Return Flow Configuration\\t75",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-595",
+     "trigger": "Digital Payment Session & Transaction Monitor\\t76",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-596",
+     "trigger": "Authentication, Tokenization & Recurring Payment Controls\\t78",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-597",
+     "trigger": "Digital Payment Exception, Recovery & Expiry Center\\t79",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-598",
+     "trigger": "Digital Payment Simulator, Conversion & AI Advisor\\t80",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Compare) — counts over a population, then the population",
+  "purpose": "Provide centralized operational visibility across all digital and alternative payment journeys.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 70 §Compare"
+   }
+  ],
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Digital Payment Attempts",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Successful Payments",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Digital Payment Value",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Success Rate",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Payment Links Generated",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Payment Links Paid",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Payment Link Conversion",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Wallet Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Alternative Payment Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Payments",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expired Payment Requests",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Digital Payments",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §KPI Cards"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every digital payments \\t71",
+       "columns": [
+        "B2C",
+        "Mobile App",
+        "Call Center",
+        "B2B",
+        "POS Payment Link",
+        "Partner/API"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §Compare"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected digital payments \\t71",
+       "bindsTo": null,
+       "columns": [
+        "B2C",
+        "Mobile App",
+        "Call Center",
+        "B2B",
+        "POS Payment Link",
+        "Partner/API"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Show by”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §Compare"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The digital payments \\t71 list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the digital payments \\t71 untouched.",
+   "emptyFirstRun": "No digital payments \\t71 yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the digital payments \\t71 are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getPaymentPerformance",
+    "contract": "payments",
+    "purpose": "Digital payment performance",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-589",
+   "workshopBoard": "wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-589"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 70. 0 of 6 labels bound to a contract property; 18 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-590",
+  "name": "Digital & Alternative Payment Method Manager\\t71",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "4",
+   "number": "2",
+   "page": 70
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/digital-alternative-payment-method-manager-t71-adm-590",
+   "component": "apps/ticvai-web/src/routes/commercial/DigitalAlternativePaymentMethodManagerT71.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-589"
+   ],
+   "exitTo": [
+    "ADM-589"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-589",
+     "trigger": "Back to Digital Payments Command Center\\t71",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure the digital payment experiences available through TICVAI.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Online card, Mobile/digital wallets, Redirect payments, Stored-value wallet, Future payment methods through adapters. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 70 §Support provider-enabled methods such as"
+   },
+   {
+    "operation": null,
+    "why": "**Digital & Alternative Payment Method Manager\\t71 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 70"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 70"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Online card",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §Support provider-enabled methods such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Mobile/digital wallets",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §Support provider-enabled methods such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Redirect payments",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §Support provider-enabled methods such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Stored-value wallet",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §Support provider-enabled methods such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Future payment methods through adapters",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §Support provider-enabled methods such as"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The digital alternative payment list.",
+   "error": "Could not load. Names which read failed and leaves the digital alternative payment untouched.",
+   "emptyFirstRun": "No digital alternative payment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the digital alternative payment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPaymentMethods",
+    "contract": "payments",
+    "purpose": "Alternative methods",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updatePaymentMethod",
+    "contract": "payments",
+    "purpose": "Configure one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPaymentMethods"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-590",
+   "workshopBoard": "wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-590"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 70. 0 of 0 labels bound to a contract property; 5 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "methodId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-591",
+  "name": "Digital Wallet & Mobile Payment Configuration\\t72",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "4",
+   "number": "3",
+   "page": 71
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/digital-wallet-mobile-payment-configuration-t72-adm-591",
+   "component": "apps/ticvai-web/src/routes/commercial/DigitalWalletMobilePaymentConfigurationT72.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-589"
+   ],
+   "exitTo": [
+    "ADM-589"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-589",
+     "trigger": "Back to Digital Payments Command Center\\t71",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage wallet-based and mobile digital payment methods.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 71"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 71"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updatePaymentMethod",
+       "label": "Save payment method",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updatePaymentMethod"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The digital wallet mobile list.",
+   "error": "Could not load. Names which read failed and leaves the digital wallet mobile untouched.",
+   "emptyFirstRun": "No digital wallet mobile yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the digital wallet mobile are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "updatePaymentMethod",
+    "contract": "payments",
+    "purpose": "Digital wallet configuration",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listPaymentMethods"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-591",
+   "workshopBoard": "wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-591"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 71. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "methodId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-592",
+  "name": "Payment Link Builder & Configuration\\t73",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "4",
+   "number": "4",
+   "page": 72
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/payment-link-builder-configuration-t73-adm-592",
+   "component": "apps/ticvai-web/src/routes/commercial/PaymentLinkBuilderConfigurationT73.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-589"
+   ],
+   "exitTo": [
+    "ADM-589"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-589",
+     "trigger": "Back to Digital Payments Command Center\\t71",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Allow authorized users and systems to generate secure payment requests without requiring the customer to be physically present at a POS.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Payment Link Builder & Configuration\\t73 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Order / transaction reference",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer reference",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Amount",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Description",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Payment methods",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expiry",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Partial payment policy",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Language",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Return destination",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business unit",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel/source",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 72 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The payment link \\t73 configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the payment link \\t73 untouched.",
+   "emptyFirstRun": "No payment link \\t73 configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "createPaymentLink",
+    "contract": "orders",
+    "purpose": "Build a payment link",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-592",
+   "workshopBoard": "wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-592"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 72. 0 of 0 labels bound to a contract property; 13 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-593",
+  "name": "Payment Link Distribution & Customer Journey Manager\\t74",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "4",
+   "number": "5",
+   "page": 73
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/payment-link-distribution-customer-journey-manager-t74-adm-593",
+   "component": "apps/ticvai-web/src/routes/commercial/PaymentLinkDistributionCustomerJourneyManagerT74.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-589"
+   ],
+   "exitTo": [
+    "ADM-589"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-589",
+     "trigger": "Back to Digital Payments Command Center\\t71",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage how a generated payment request is delivered and how its lifecycle progresses.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Payment Link Distribution & Customer Journey Manager\\t74 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 73"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 73"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Resend, Change approved delivery channel, Extend expiry, Cancel. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 73 §Authorized users can"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "resendPaymentLink",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getPaymentLink",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "resendPaymentLink"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The payment link distribution list.",
+   "error": "Could not load. Names which read failed and leaves the payment link distribution untouched.",
+   "emptyFirstRun": "No payment link distribution yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the payment link distribution are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "resendPaymentLink",
+    "contract": "orders",
+    "purpose": "Distribute or resend",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getPaymentLink",
+    "contract": "orders",
+    "purpose": "Its state",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-593",
+   "workshopBoard": "wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-593"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 73. 0 of 0 labels bound to a contract property; 4 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "linkId",
+     "from": "navigation"
+    },
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-594",
+  "name": "Hosted Checkout, Redirect & Return Flow Configuration\\t75",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "4",
+   "number": "6",
+   "page": 74
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/hosted-checkout-redirect-return-flow-configuration-t75-adm-594",
+   "component": "apps/ticvai-web/src/routes/commercial/HostedCheckoutRedirectReturnFlowConfigurationT75.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-589"
+   ],
+   "exitTo": [
+    "ADM-589"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-589",
+     "trigger": "Back to Digital Payments Command Center\\t71",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure digital payment flows that require provider-hosted payment pages, redirects, SDKs, or asynchronous customer journeys.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Hosted checkout, External payment authorization. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 74 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Provider",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Success return",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Failure return",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cancel return",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Timeout",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Session expiry",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Callback",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Webhook",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allowed domains/apps",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Branding profile reference",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Hosted checkout",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "External payment authorization",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 74 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The hosted checkout redirect configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the hosted checkout redirect untouched.",
+   "emptyFirstRun": "No hosted checkout redirect configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setHostedCheckoutConfiguration",
+    "contract": "payments",
+    "purpose": "Redirect and return",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-594",
+   "workshopBoard": "wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-594"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 74. 0 of 0 labels bound to a contract property; 12 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-595",
+  "name": "Digital Payment Session & Transaction Monitor\\t76",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "4",
+   "number": "7",
+   "page": 75
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/digital-payment-session-transaction-monitor-t76-adm-595",
+   "component": "apps/ticvai-web/src/routes/commercial/DigitalPaymentSessionTransactionMonitorT76.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-589"
+   ],
+   "exitTo": [
+    "ADM-589"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-589",
+     "trigger": "Back to Digital Payments Command Center\\t71",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Provide operational teams with real-time visibility into digital payment sessions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 75 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search digital payment session",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 75 §Search by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Payment ID",
+        "Order",
+        "Payment link",
+        "Customer reference",
+        "Provider transaction",
+        "Channel",
+        "Payment method",
+        "Amount",
+        "Currency",
+        "Status",
+        "Date/time"
+       ],
+       "notes": "The pack filters this screen by payment id, order, payment link, customer reference, provider transaction, channel and 5 more — which are present is a decision the pack already made.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 75 §Search by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every digital payment session",
+       "columns": [
+        "TICVAI Payment ID",
+        "Order ID",
+        "Payment method",
+        "Provider",
+        "Gateway",
+        "Amount",
+        "Currency",
+        "Created",
+        "Session expiry",
+        "Customer journey stage",
+        "Provider status",
+        "TICVAI status"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 75 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected digital payment session",
+       "bindsTo": null,
+       "columns": [
+        "TICVAI Payment ID",
+        "Order ID",
+        "Payment method",
+        "Provider",
+        "Gateway",
+        "Amount",
+        "Currency",
+        "Created",
+        "Session expiry",
+        "Customer journey stage",
+        "Provider status",
+        "TICVAI status"
+       ],
+       "notes": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 75 §Show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Check Status, Cancel Session, Regenerate Link, View Provider Events, View Decision Trace. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 75 §Depending on permissions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The digital payment session list.",
+   "error": "Could not load. Names which read failed and leaves the digital payment session untouched.",
+   "emptyFirstRun": "No digital payment session yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the digital payment session are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "inquirePaymentStatus",
+    "contract": "orders",
+    "purpose": "Session and transaction state",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "TICVAI Payment ID",
+    "Order ID",
+    "Payment method",
+    "Provider",
+    "Gateway",
+    "Amount"
+   ],
+   "params": [
+    {
+     "name": "paymentId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-595",
+   "workshopBoard": "wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-595"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 75. 0 of 23 labels bound to a contract property; 28 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-596",
+  "name": "Authentication, Tokenization & Recurring Payment Controls\\t78",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "4",
+   "number": "8",
+   "page": 77
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/authentication-tokenization-recurring-payment-controls-t-adm-596",
+   "component": "apps/ticvai-web/src/routes/commercial/AuthenticationTokenizationRecurringPaymentContro.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-589"
+   ],
+   "exitTo": [
+    "ADM-589"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-589",
+     "trigger": "Back to Digital Payments Command Center\\t71",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Manage digital-payment security capabilities and reusable payment references without turning TICVAI into a card vault.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: 3-D Secure, Strong Customer Authentication where applicable, Provider risk authentication. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 77 §Support provider capabilities such as"
+   },
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 77 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every authentication tokenization recurring",
+       "columns": [
+        "Payment Instrument Reference",
+        "Provider",
+        "Token Status",
+        "Masked Identifier where allowed",
+        "Card/Instrument Type",
+        "Expiry metadata where provided",
+        "Customer/account relationship",
+        "Created",
+        "Last Used"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 77 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected authentication tokenization recurring",
+       "bindsTo": null,
+       "columns": [
+        "Payment Instrument Reference",
+        "Provider",
+        "Token Status",
+        "Masked Identifier where allowed",
+        "Card/Instrument Type",
+        "Expiry metadata where provided",
+        "Customer/account relationship",
+        "Created",
+        "Last Used"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Tokenization”, “Token States”, “Consent / Mandate Reference”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 77 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "3-D Secure",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 77 §Support provider capabilities such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Strong Customer Authentication where applicable",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 77 §Support provider capabilities such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Provider risk authentication",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 77 §Support provider capabilities such as"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The authentication tokenization recurring list.",
+   "error": "Could not load. Names which read failed and leaves the authentication tokenization recurring untouched.",
+   "emptyFirstRun": "No authentication tokenization recurring yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the authentication tokenization recurring are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setPaymentAuthenticationPolicy",
+    "contract": "payments",
+    "purpose": "3-D Secure, tokens and mandates",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Payment Instrument Reference",
+    "Provider",
+    "Token Status",
+    "Masked Identifier where allowed",
+    "Card/Instrument Type",
+    "Expiry metadata where provided"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-596",
+   "workshopBoard": "wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-596"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 77. 0 of 9 labels bound to a contract property; 16 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-597",
+  "name": "Digital Payment Exception, Recovery & Expiry Center\\t79",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "4",
+   "number": "9",
+   "page": 78
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/digital-payment-exception-recovery-expiry-center-t79-adm-597",
+   "component": "apps/ticvai-web/src/routes/commercial/DigitalPaymentExceptionRecoveryExpiryCenterT79.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-589"
+   ],
+   "exitTo": [
+    "ADM-589"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-589",
+     "trigger": "Back to Digital Payments Command Center\\t71",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Centralize operational handling of incomplete or abnormal digital-payment journeys.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 78 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every digital payment exception",
+       "columns": [
+        "Age",
+        "Severity",
+        "Owner",
+        "Status",
+        "Resolution"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 78 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected digital payment exception",
+       "bindsTo": null,
+       "columns": [
+        "Age",
+        "Severity",
+        "Owner",
+        "Status",
+        "Resolution"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Exception Types”, “Timed Out”, “Depending on condition”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 78 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The digital payment exception list.",
+   "error": "Could not load. Names which read failed and leaves the digital payment exception untouched.",
+   "emptyFirstRun": "No digital payment exception yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the digital payment exception are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setHostedCheckoutConfiguration",
+    "contract": "payments",
+    "purpose": "Expiry and orphan recovery",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "inquirePaymentStatus",
+    "contract": "orders",
+    "purpose": "Recover a session",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Age",
+    "Severity",
+    "Owner",
+    "Status",
+    "Resolution"
+   ],
+   "params": [
+    {
+     "name": "paymentId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-597",
+   "workshopBoard": "wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-597"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 78. 0 of 5 labels bound to a contract property; 5 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-598",
+  "name": "Digital Payment Simulator, Conversion & AI Advisor\\t80",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "4",
+   "number": "10",
+   "page": 79
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/digital-payment-simulator-conversion-ai-advisor-t80-adm-598",
+   "component": "apps/ticvai-web/src/routes/commercial/DigitalPaymentSimulatorConversionAiAdvisorT80.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-589"
+   ],
+   "exitTo": [
+    "ADM-589"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-589",
+     "trigger": "Back to Digital Payments Command Center\\t71",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Select; Merchant Configuration; Captured) and no display directory — it is settings, not a population",
+  "purpose": "Allow administrators to validate digital payment journeys and identify conversion opportunities before deploying configuration changes.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Payment method",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Provider",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Amount",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer type",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Device context",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Market",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transaction type",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "✓",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Merchant Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "↓",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 79 §Merchant Configuration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The digital payment simulator configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the digital payment simulator untouched.",
+   "emptyFirstRun": "No digital payment simulator configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "simulatePaymentConfiguration",
+    "contract": "payments",
+    "purpose": "Simulate the digital path",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-598",
+   "workshopBoard": "wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-598"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 79. 0 of 0 labels bound to a contract property; 13 of 235 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

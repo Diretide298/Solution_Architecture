@@ -1009,6 +1009,19 @@
        "derived": true,
        "impliedBy": "listAudienceDiscoveryTargeting",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "proposeLookalikeSegment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "proposeLookalikeSegment"
       }
      ]
     }
@@ -1027,6 +1040,13 @@
     "contract": "promotions",
     "purpose": "AI Audience Discovery & Targeting Optimization",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "proposeLookalikeSegment",
+    "contract": "ai",
+    "purpose": "Propose a lookalike segment from a seed segment or list, as rules to save",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1157,6 +1177,20 @@
     "purpose": "Threshold simulation",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Record which AI draft or proposal was used, or why it was refused",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "proposeLookalikeSegment",
+    "contract": "ai",
+    "purpose": "Propose a lookalike segment from a seed segment or list, as rules to save",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1169,6 +1203,10 @@
    "params": [
     {
      "name": "segmentId",
+     "from": "navigation"
+    },
+    {
+     "name": "actionId",
      "from": "navigation"
     }
    ]

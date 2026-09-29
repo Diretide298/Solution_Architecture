@@ -45,7 +45,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "ModifierGroup"
+  "responds": "Page"
  },
  "lookupShopAndDrop": {
   "method": "GET",

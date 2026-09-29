@@ -1,0 +1,435 @@
+{
+ "configureAiCapability": {
+  "method": "PUT",
+  "path": "/governance/capabilities/{capabilityKey}",
+  "contract": "ai",
+  "summary": "Register a capability, or change its owner, risk class or autonomy",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiCapabilityRegistration",
+  "responds": "AiCapabilityRegistration"
+ },
+ "createAiGovernancePolicyDraft": {
+  "method": "POST",
+  "path": "/governance/policy-drafts",
+  "contract": "ai",
+  "summary": "Draft a governance policy, or a new version of one",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiGovernancePolicyVersion"
+ },
+ "createAiPolicyException": {
+  "method": "POST",
+  "path": "/governance/policy-exceptions",
+  "contract": "ai",
+  "summary": "Grant a temporary exception to a governance policy",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiPolicyException",
+  "responds": "AiPolicyException"
+ },
+ "getEffectiveAiPolicy": {
+  "method": "GET",
+  "path": "/governance/effective-policy",
+  "contract": "ai",
+  "summary": "The policy in force for a capability at a scope",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "environment",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiEffectivePolicy"
+ },
+ "listAiCapabilities": {
+  "method": "GET",
+  "path": "/governance/capabilities",
+  "contract": "ai",
+  "summary": "The capability registry",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "family",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "riskClass",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiCapabilityMaturity": {
+  "method": "GET",
+  "path": "/capability-maturity",
+  "contract": "ai",
+  "summary": "Where each AI answer stands on the way from baseline to learned",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "stage",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiGovernanceAlerts": {
+  "method": "GET",
+  "path": "/governance-alerts",
+  "contract": "ai",
+  "summary": "Governance alerts",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiGovernancePolicyVersions": {
+  "method": "GET",
+  "path": "/governance/policy-versions",
+  "contract": "ai",
+  "summary": "Governance policies and their versions",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "policyId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiTools": {
+  "method": "GET",
+  "path": "/tools",
+  "contract": "ai",
+  "summary": "The tool registry",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "targetContract",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "effect",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listDataRetentionSettings": {
+  "method": "GET",
+  "path": "/data-retention-settings",
+  "contract": "tenancy",
+  "summary": "How long the tenant keeps each class of data",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "dataClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "pauseAiCapability": {
+  "method": "POST",
+  "path": "/governance/capabilities/{capabilityKey}/pause",
+  "contract": "ai",
+  "summary": "Stop a capability now",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiCapabilityRegistration"
+ },
+ "promoteAiRelease": {
+  "method": "POST",
+  "path": "/releases/{releaseId}/promote",
+  "contract": "ai",
+  "summary": "Promote a release to its next stage (a person)",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRelease"
+ },
+ "publishAiGovernancePolicy": {
+  "method": "POST",
+  "path": "/governance/policy-versions/{versionId}/publish",
+  "contract": "ai",
+  "summary": "Publish a simulated policy version",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiGovernancePolicyVersion"
+ },
+ "revokeAiPolicyException": {
+  "method": "POST",
+  "path": "/governance/policy-exceptions/{exceptionId}/revoke",
+  "contract": "ai",
+  "summary": "End an exception before it expires",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiPolicyException"
+ },
+ "setAiTool": {
+  "method": "PUT",
+  "path": "/tools/{toolKey}",
+  "contract": "ai",
+  "summary": "Register or change a tool (platform)",
+  "permission": "PLATFORM_AI_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiTool",
+  "responds": "AiTool"
+ },
+ "setDataRetentionSetting": {
+  "method": "PUT",
+  "path": "/data-retention-settings/{dataClass}",
+  "contract": "tenancy",
+  "summary": "Set how long the tenant keeps one class of data",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TenantDataRetentionSetting",
+  "responds": "TenantDataRetentionSetting"
+ },
+ "simulateAiGovernancePolicy": {
+  "method": "POST",
+  "path": "/governance/policy-versions/{versionId}/simulate",
+  "contract": "ai",
+  "summary": "Test a draft policy before it is published",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiPolicySimulation"
+ }
+}

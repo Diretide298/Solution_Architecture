@@ -1,6 +1,6 @@
 # P01-retail-01 — P01 · Retail
 
-**2 screens · 5 operations · 9 schemas · 3 permissions**
+**2 screens · 6 operations · 20 schemas · 3 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -61,8 +61,8 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-033` | Shop | listDetail | 4 | 0 | — |
-| `WEB-042` | Retail & Shop and Drop | listDetail | 4 | 0 | — |
+| `WEB-033` | Shop | listDetail | 5 | 1 | — |
+| `WEB-042` | Retail & Shop and Drop | listDetail | 6 | 1 | — |
 
 ---
 
@@ -99,13 +99,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "GST-062",
      "trigger": "On the way out they find their collection point",
      "provenance": "flow F51 step 2→3",
-     "operation": "reserveMerchandise",
      "crossesDevice": true,
      "back": false
     }
    ]
   },
-  "notes": "Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.",
+  "notes": "Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93. **Buy-and-collect is paid online** (decided 28 September, audit R236): the cart is checked out and paid here (`checkoutCart`, `createPayment`) and payment creates the shop-and-drop; `reserveMerchandise` was removed from the web. The app's GST-026 still reserves in the venue, where the reservation expiry runs 15 minutes ahead to the close of the operating day (audit R215 (2)).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -118,8 +117,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?outletId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?categoryId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "toggle",
+       "label": "In stock only",
+       "operation": "listMerchandise",
+       "notes": "Sends `?inStockOnly=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listMerchandise",
+       "notes": "Sends `?search=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every shop",
+       "label": "Every merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -137,6 +164,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listMerchandise",
        "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupMerchandise",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -146,7 +181,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected shop",
+       "label": "The selected merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -176,43 +211,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Lookup",
+       "label": "Lookup merchandise",
        "operation": "lookupMerchandise",
+       "notes": "Sends `?outletId=` — the outlet the guest is browsing — because a web caller has no workstation; price and stock are that outlet's, and an inactive item is not found (decided 28 September, audit R215 (1)).",
        "provenance": "contract retail.yaml GET /merchandise/lookup"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reserve",
-       "operation": "reserveMerchandise",
-       "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+       "label": "Check out to collect on the way out",
+       "operation": "checkoutCart",
+       "notes": "**Paid online at checkout** (decided 28 September, audit R236): merchandise marked for collection goes in the cart with `addCartLine`, the cart is checked out and paid here, and **payment creates the shop-and-drop** for collection on the way out. Nothing is reserved unpaid on the web; `reserveMerchandise` is not the web path.",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Pay",
+       "operation": "createPayment",
+       "provenance": "contract orders.yaml POST /payments"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "lookupMerchandise",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "reserveMerchandise",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -221,9 +242,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The shop list.",
    "error": "Could not load. Names which read failed and leaves the shop untouched.",
-   "emptyFirstRun": "No shop yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the shop are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No shop yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on outletId, categoryId, inStockOnly, search and the shop are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -236,17 +257,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "lookupMerchandise",
     "contract": "retail",
-    "purpose": "Price and stock check by barcode",
-    "trigger": "onLoad"
+    "purpose": "Price and stock check by barcode, at the outlet named by `outletId` (audit R215 (1))",
+    "trigger": "onAction"
    },
    {
-    "operationId": "reserveMerchandise",
-    "contract": "retail",
-    "purpose": "Reserve an item for collection",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMerchandise"
-    ]
+    "operationId": "checkoutCart",
+    "contract": "orders",
+    "purpose": "Turn the cart into an order; merchandise for collection is paid online (audit R236)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createPayment",
+    "contract": "orders",
+    "purpose": "Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit R236)",
+    "trigger": "onAction"
    },
    {
     "operationId": "addCartLine",
@@ -279,11 +303,44 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-033"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-033",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "No pre-arrival shop page; retail items appear as add-ons in the Extras step (images/shop product squares) and in At the venue → 'Shop & drop'",
+    "differences": "No browsable merchandise catalogue before arrival; the nearest is in-venue Shop & drop (WEB-042)."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -335,7 +392,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "WEB-001"
    ]
   },
-  "notes": "**The web could sell merchandise and could not arrange collection.** `lookupShopAndDrop` was app-only, which made the service half-available on the surface most guests use.",
+  "notes": "**The web could sell merchandise and could not arrange collection.** `lookupShopAndDrop` was app-only, which made the service half-available on the surface most guests use. **Paid online at checkout** (decided 28 September, audit R236): the guest adds the item to the cart for collection, checks out and pays (`addCartLine`, `checkoutCart`, `createPayment`), and payment creates the shop-and-drop that `lookupShopAndDrop` then finds; `reserveMerchandise` (\"reserved at purchase\") is no longer wired here.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -348,8 +405,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?outletId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?categoryId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "toggle",
+       "label": "In stock only",
+       "operation": "listMerchandise",
+       "notes": "Sends `?inStockOnly=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listMerchandise",
+       "notes": "Sends `?search=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every retail shop and",
+       "label": "Every merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -367,6 +452,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listMerchandise",
        "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "cardList",
+       "label": "Retail & Shop and Drop",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -376,7 +471,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected retail shop and",
+       "label": "The selected merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -406,37 +501,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Lookup",
+       "label": "Lookup merchandise",
        "operation": "lookupMerchandise",
+       "notes": "Sends `?outletId=` — the outlet the guest is browsing — because a web caller has no workstation; price and stock are that outlet's, and an inactive item is not found (decided 28 September, audit R215 (1)).",
        "provenance": "contract retail.yaml GET /merchandise/lookup"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reserve",
-       "operation": "reserveMerchandise",
-       "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+       "label": "Add to cart for collection",
+       "operation": "addCartLine",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       },
       {
        "kind": "secondaryButton",
-       "label": "Lookup",
-       "operation": "lookupShopAndDrop",
-       "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "label": "Retail & Shop and Drop",
-       "provenance": "carried from the previous definition"
+       "label": "Check out to collect on the way out",
+       "operation": "checkoutCart",
+       "notes": "**Paid online at checkout** (decided 28 September, audit R236): merchandise marked for collection goes in the cart with `addCartLine`, the cart is checked out and paid here, and **payment creates the shop-and-drop** for collection on the way out. Nothing is reserved unpaid on the web; `reserveMerchandise` is not the web path.",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
       },
       {
-       "kind": "detailPanel",
-       "label": "Detail",
-       "provenance": "carried from the previous definition"
+       "kind": "primaryButton",
+       "label": "Pay",
+       "operation": "createPayment",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Lookup shop and drop",
+       "operation": "lookupShopAndDrop",
+       "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
       }
      ]
     }
@@ -460,23 +553,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "lookupMerchandise",
     "contract": "retail",
-    "purpose": "Price and stock check by barcode",
-    "trigger": "onLoad"
+    "purpose": "Price and stock check by barcode, at the outlet named by `outletId` (audit R215 (1))",
+    "trigger": "onAction"
    },
    {
-    "operationId": "reserveMerchandise",
-    "contract": "retail",
-    "purpose": "Reserve an item for collection",
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Put the item in the cart, marked for collection on the way out (audit R236)",
     "trigger": "onAction",
     "invalidates": [
      "listMerchandise"
     ]
    },
    {
+    "operationId": "checkoutCart",
+    "contract": "orders",
+    "purpose": "Turn the cart into an order; merchandise for collection is paid online (audit R236)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createPayment",
+    "contract": "orders",
+    "purpose": "Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit R236)",
+    "trigger": "onAction"
+   },
+   {
     "operationId": "lookupShopAndDrop",
     "contract": "retail",
     "purpose": "Find a guest's dropped goods",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -484,6 +589,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "outletId",
      "from": "deepLink"
+    },
+    {
+     "name": "cartId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `outletId`.",
@@ -496,11 +605,44 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-042"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-042",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "At the venue → 'Shop & drop'",
+    "differences": "Pays in one tap on the page, not through the cart and checkout (YAML R236)."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add to cart for collection",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -559,6 +701,44 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "AddCartLineRequest",
   "responds": "Cart"
+ },
+ "checkoutCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/checkout",
+  "contract": "orders",
+  "summary": "Turn the cart into an order",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "createPayment": {
+  "method": "POST",
+  "path": "/payments",
+  "contract": "orders",
+  "summary": "Take a payment against an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePaymentRequest",
+  "responds": "Payment"
  },
  "listMerchandise": {
   "method": "GET",
@@ -628,6 +808,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": "includeSiblingOutlets",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -661,25 +846,6 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "ShopAndDrop"
- },
- "reserveMerchandise": {
-  "method": "POST",
-  "path": "/outlets/{outletId}/reserve",
-  "contract": "retail",
-  "summary": "Reserve an item for collection",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MerchandiseReservation"
  }
 }
 ```
@@ -710,12 +876,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Optional; sent by a page or till that shows the engine's recommendations. Not validated against the engine: an unknown id only fails to attribute.\n"
+   },
+   "tableReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A table deposit line (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` in `awaitingDeposit` this pays for, sent with `variantId` set to the booking's `deposit.variantId` and `quantity` 1. The price is the booking's `deposit.amount`. A booking that is not awaiting a deposit is refused 422 `depositNotDue`.\n"
+   },
    "seatIds": {
     "type": "array",
+    "maxItems": 50,
+    "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
     "items": {
      "type": "string",
-     "format": "uuid"
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
    },
    "parentLineId": {
     "type": "string",
@@ -724,8 +913,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "For an add-on attaching to a ticket already in the cart. **Removing the parent removes the child** — a locker with no admission is not a sale.\n"
    },
    "attributes": {
-    "type": "object",
-    "additionalProperties": true
+    "$ref": "#/components/schemas/OrderLineAttributes"
+   }
+  }
+ },
+ "BookedWindow": {
+  "type": "object",
+  "nullable": true,
+  "x-ticvai-persistence": "none — embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+  "description": "**The booked time window of an hourly product, such as a meeting room** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). The guest picks a date, a length and a start time from `resources.listProductStartTimes`; the length is the product's `length` variant (1 hour, 2 hours, half day, full day), priced per variant, so the price is the variant's. **`endsAt` minus `startsAt` must equal the chosen variant's length** (its `length` dimension value's `durationMinutes`), or the line is refused 422 `windowLengthMismatch`. Required on a product with `catalogue.Product.requiresTimeWindow` true and refused on any other (`windowRequired`, `windowNotAllowed`). The room itself is not named here: the window holds capacity of the room type, and `resources.allocateResources` picks the room at checkout (26 August minute: a guest books a meeting room product, never a raw room).\n",
+  "required": [
+   "startsAt",
+   "endsAt"
+  ],
+  "properties": {
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "After `startsAt`, on the same venue day."
    }
   }
  },
@@ -777,7 +986,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "$ref": "#/components/schemas/CartConflict"
     }
    },
+   "consentQuestions": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
+    "items": {
+     "allOf": [
+      {
+       "$ref": "../satellite/marketing-crm.yaml#/components/schemas/ConsentQuestion"
+      },
+      {
+       "type": "object",
+       "properties": {
+        "lineIds": {
+         "type": "array",
+         "description": "The cart lines that ask it. Empty for a question the flow asks.",
+         "items": {
+          "type": "string",
+          "format": "uuid"
+         }
+        },
+        "answered": {
+         "type": "boolean",
+         "description": "Every person (for `perPerson`) or the booking (for `perBooking`) has an answer."
+        }
+       }
+      }
+     ]
+    }
+   },
    "subtotal": {
+    "x-ticvai-column": "net_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "discountTotal": {
@@ -787,6 +1026,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "total": {
+    "x-ticvai-column": "gross_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "appliedPromotionIds": {
@@ -795,6 +1035,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "type": "string",
      "format": "uuid"
+    }
+   },
+   "couponCodes": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The promo codes the guest entered through `applyCartPromoCode` (decided 28 September, audit R073 (e)). **Sent as `couponCodes` on every promotions evaluation of this cart**, so a code is re-checked on each read like any promotion; a code that stops qualifying stays listed here and its promotion drops out of `appliedPromotionIds`.\n",
+    "items": {
+     "type": "string",
+     "maxLength": 100
     }
    },
    "expiresAt": {
@@ -834,7 +1083,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "overlappingTime",
      "sameSessionDifferentVenue",
      "exceedsPartySize",
-     "requiresPrerequisite"
+     "requiresPrerequisite",
+     "consentBlocksBooking"
     ]
    },
    "lineIds": {
@@ -849,7 +1099,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isBlocking": {
     "type": "boolean",
-    "description": "Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold.\n"
+    "description": "Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold. So is `consentBlocksBooking`: a consent question answered with the answer the venue set to block the booking (decided 29 September, rev 3 REV3-26).\n"
    }
   }
  },
@@ -883,12 +1133,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "nullable": true
    },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Set from `addCartLine`; checkout copies it to the order line.\n"
+   },
+   "tableReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` this line secures. Priced from the deposit the booking snapshotted, not from the variant. Becomes an `orders.deposit` row at checkout, not revenue. A table booking with no deposit never has a line (rev 3 REV3-8).\n"
+   },
    "seatIds": {
     "type": "array",
+    "maxItems": 50,
     "items": {
      "type": "string",
-     "format": "uuid"
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."
+   },
+   "attributes": {
+    "$ref": "#/components/schemas/OrderLineAttributes"
+   },
+   "parentLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The line this add-on is attached to, from `AddCartLineRequest.parentLineId`. Kept on the line because **removing the parent removes the child**, and `removeCartLine` has to be able to find the children.\n"
    },
    "overridePrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -927,9 +1208,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inventoryHoldId": {
     "type": "string",
-    "format": "uuid",
     "nullable": true,
-    "description": "The capacity held for this line. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
+    "description": "The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
    },
    "leaseExpiresAt": {
     "type": "string",
@@ -954,73 +1234,513 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "checkedOut"
   ]
  },
- "MerchandiseReservation": {
-  "x-ticvai-persistence": "retail.reservation + retail.reservation_line",
+ "CreatePaymentRequest": {
   "type": "object",
   "required": [
    "id",
-   "outletId",
-   "lines",
-   "status",
-   "expiresAt"
+   "orderId",
+   "tender",
+   "amount",
+   "recordedAt"
   ],
   "properties": {
    "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
+   },
+   "walletAuthorisationId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
+   },
+   "returnUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "ExchangeRateDecimal": {
+  "type": "string",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
+ },
+ "GuestMerchandiseItem": {
+  "x-ticvai-persistence": "none — guest projection of MerchandiseItem",
+  "type": "object",
+  "description": "**What a guest caller of `listMerchandise` receives.** The fields a shop screen shows and the ids a guest needs to reserve or buy, and nothing else: no inventory link, no catalogue variant, no stock count, no serial-number flag. `additionalProperties: false` is the guarantee: a staff field added to `MerchandiseItem` does not reach a guest by default.\n",
+  "additionalProperties": false,
+  "required": [
+   "id",
+   "name",
+   "outletId",
+   "price",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
     "type": "string"
    },
-   "reservationNumber": {
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "isAvailable": {
+    "type": "boolean",
+    "description": "True when the item is active and in stock at its outlet. An item with no `inventoryItemId` never runs out, so it is available while active.\n"
+   },
+   "isReturnable": {
+    "type": "boolean"
+   },
+   "returnWindowDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "MerchandiseItem": {
+  "x-ticvai-persistence": "retail.merchandise",
+  "type": "object",
+  "required": [
+   "id",
+   "sku",
+   "name",
+   "outletId",
+   "variantId",
+   "price",
+   "onHand",
+   "isActive"
+  ],
+  "properties": {
+   "description": {
+    "type": "string",
+    "description": "What the item is, in the guest's words. Indexed for guest-app search.\n"
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "barcode": {
+    "type": "string",
+    "nullable": true
+   },
+   "name": {
     "type": "string"
    },
    "outletId": {
     "type": "string",
     "format": "uuid"
    },
-   "subjectId": {
+   "categoryId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
    },
-   "lines": {
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue variant sold. Price and tax come from there."
+   },
+   "inventoryItemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The stock item depleted on sale. Null means the item sells but never runs out, which is almost always a configuration error.\n"
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "list_price"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "isReturnable": {
+    "type": "boolean",
+    "default": true
+   },
+   "returnWindowDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresSerialNumber": {
+    "type": "boolean",
+    "default": false
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Order": {
+  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath",
+   "channel",
+   "status",
+   "currency",
+   "currencyScale",
+   "grossAmount",
+   "taxAmount",
+   "netAmount",
+   "lines",
+   "createdAt",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client ULID from `CreateOrderRequest.id`."
+   },
+   "orderNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "droppedPromotions": {
     "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
     "items": {
      "type": "object",
+     "required": [
+      "promotionId"
+     ],
      "properties": {
-      "merchandiseId": {
+      "promotionId": {
        "type": "string",
        "format": "uuid"
       },
       "name": {
        "type": "string"
       },
-      "quantity": {
-       "type": "integer"
+      "reason": {
+       "type": "string",
+       "enum": [
+        "budgetCapReached"
+       ]
       }
      }
     }
    },
-   "status": {
-    "type": "string",
-    "enum": [
-     "reserved",
-     "collected",
-     "expired",
-     "cancelled"
-    ]
+   "totalPriceVariance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Sum across lines. Zero on a normal order."
    },
-   "collectionNote": {
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/OrderLine"
+    }
+   },
+   "payments": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Payment"
+    }
+   },
+   "principalId": {
     "type": "string",
+    "format": "uuid"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "shiftId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
-   "expiresAt": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "holdLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
+   },
+   "createdAt": {
     "type": "string",
     "format": "date-time"
    },
-   "collectedAt": {
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
    }
   }
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderLine": {
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-retired-columns": [
+   "promotion_id",
+   "name",
+   "reason"
+  ],
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateOrderLine"
+   },
+   {
+    "type": "object",
+    "required": [
+     "serverUnitPrice",
+     "taxAmount",
+     "netAmount",
+     "grossAmount"
+    ],
+    "properties": {
+     "serverUnitPrice": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "What the server computed on ingest."
+     },
+     "priceVariance": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"
+     },
+     "taxAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "netAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "grossAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "entitlementIds": {
+      "type": "array",
+      "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
+      "items": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      }
+     },
+     "crossRegionRightIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Redemption rights propagated to other cells for this line."
+     },
+     "reprintCount": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "readOnly": true,
+      "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
+     },
+     "venueId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "discounts": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.",
+      "items": {
+       "$ref": "#/components/schemas/OrderLineDiscount"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "OrderLineAttributes": {
+  "type": "object",
+  "nullable": true,
+  "additionalProperties": true,
+  "x-ticvai-persistence": "none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.\n",
+  "properties": {
+   "transport": {
+    "$ref": "#/components/schemas/TransportLineAttributes"
+   }
+  }
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
  },
  "Page": {
   "type": "object",
@@ -1041,6 +1761,147 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Payment": {
+  "x-ticvai-persistence": "orders.payment",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "status",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+   },
+   "fxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
+   },
+   "fxRateSource": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "manual",
+     "feed",
+     "cardScheme"
+    ],
+    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
+   },
+   "changeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "changeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "authorised",
+     "captured",
+     "pendingConfirmation",
+     "declined",
+     "failed",
+     "voided",
+     "refunded"
+    ]
+   },
+   "providerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
+   },
+   "lastInquiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "PriceCheck": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -1055,6 +1916,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "merchandiseId": {
     "type": "string",
     "format": "uuid"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The outlet whose price and stock this is: the asking workstation's outlet, or `outletId` for a caller with none (decided 28 September, audit R215).\n"
    },
    "sku": {
     "type": "string"
@@ -1110,7 +1976,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "required": [
    "id",
    "dropReference",
-   "saleId",
    "collectionPointId",
    "status",
    "collectBy"
@@ -1124,7 +1989,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Short and readable. Printed on the slip a guest may or may not keep."
    },
    "saleId": {
-    "type": "string"
+    "type": "string",
+    "nullable": true,
+    "description": "The till sale. Null for an online order, which sets `orderId` (audit R236)."
+   },
+   "orderId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The paid online order that created this collection (audit R236)."
    },
    "entitlementId": {
     "type": "string",
@@ -1200,6 +2072,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    }
   }
+ },
+ "TenderKind": {
+  "type": "string",
+  "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
+  "enum": [
+   "cash",
+   "card",
+   "wallet",
+   "voucher",
+   "bankTransfer",
+   "hotelCharge",
+   "installment",
+   "giftCard",
+   "complimentary"
+  ]
  }
 }
 ```

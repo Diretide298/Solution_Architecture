@@ -33,6 +33,17 @@
      "type": "integer"
     }
    },
+   "accessibilityNeedDeclared": {
+    "type": "boolean",
+    "default": false,
+    "description": "The party declares an accessibility need (5.6.7; decided 29 September, build pass). Grants priority only on a lane whose `QueueFastPass.accessibilityPriority` is on, and is recorded on the entry either way.\n"
+   },
+   "promotionCode": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "A promotion code the guest holds, checked against the lane's `QueueFastPass.promotionIds` (5.6.34). A code for a promotion the lane does not list grants nothing and is not an error.\n"
+   },
    "recordedAt": {
     "type": "string",
     "format": "date-time"
@@ -90,6 +101,12 @@
     "format": "uuid",
     "nullable": true
    },
+   "attractionCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. Read from catalogue, not stored here.\n"
+   },
    "status": {
     "$ref": "#/components/schemas/QueueStatus"
    },
@@ -103,7 +120,7 @@
    },
    "isStale": {
     "type": "boolean",
-    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current.\n"
+    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current, and it is not hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with its `asOf` and a stale marker.\n"
    },
    "heightRequirementCm": {
     "type": "integer",
@@ -115,7 +132,8 @@
    },
    "asOf": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "When the figure was produced — the queue's `waitTimeAsOf`."
    }
   }
  },
@@ -130,7 +148,7 @@
   ]
  },
  "WaitingGuest": {
-  "x-ticvai-persistence": "queue.waiting_guest",
+  "x-ticvai-persistence": "queue.entry",
   "type": "object",
   "required": [
    "id",
@@ -142,7 +160,9 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client-generated ULID from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
    },
    "queueId": {
     "type": "string",
@@ -181,6 +201,35 @@
    },
    "isFastPass": {
     "type": "boolean"
+   },
+   "priorityBasis": {
+    "type": "string",
+    "enum": [
+     "none",
+     "entitlement",
+     "loyaltyTier",
+     "promotion",
+     "accessibility"
+    ],
+    "default": "none",
+    "description": "Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first `QueueFastPass` criterion met at join, in the order entitlement, loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not `none`. Kept on the entry so a disputed priority can be explained afterwards.\n"
+   },
+   "priorityTierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`."
+   },
+   "priorityPromotionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The promotion that granted priority, where `priorityBasis` is `promotion`."
+   },
+   "accessibilityNeedDeclared": {
+    "type": "boolean",
+    "default": false,
+    "description": "What the party declared at join, shown to the operator at the front."
    },
    "entitlementId": {
     "type": "string",

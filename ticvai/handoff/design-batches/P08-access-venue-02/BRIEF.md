@@ -1,6 +1,6 @@
 # P08-access-venue-02 — P08 · Access & Venue (2 of 3)
 
-**10 screens · 53 operations · 60 schemas · 20 permissions**
+**10 screens · 56 operations · 83 schemas · 21 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 20 permissions apply here:
-  `ACCESS_OVERRIDE, ACCESS_VALIDATE, ASSET_MANAGE, ASSET_VIEW, AUDIT_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, QUEUE_MANAGE, QUEUE_VIEW`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 21 permissions apply here:
+  `ACCESS_OVERRIDE, ACCESS_VALIDATE, ASSET_LIBRARY_VIEW, ASSET_MANAGE, ASSET_VIEW, AUDIT_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, QUEUE_MANAGE`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -68,7 +68,7 @@ convincingly. It is never a caption.
 | `BO-072` | Incident Log | listDetail | 5 | 3 | — |
 | `BO-092` | Venue Maps | listDetail | 2 | 1 | — |
 | `BO-093` | Map Import & Labelling | configEditor | 5 | 1 | — |
-| `BO-094` | Map Editor & Publish | statusTracker | 7 | 4 | — |
+| `BO-094` | Map Editor & Publish | statusTracker | 10 | 4 | — |
 | `BO-095` | Resources | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch

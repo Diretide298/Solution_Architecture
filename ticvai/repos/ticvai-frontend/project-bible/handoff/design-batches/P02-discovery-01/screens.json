@@ -1,7 +1,7 @@
 [
  {
   "id": "GST-063",
-  "name": "Search",
+  "name": "Explore – Search Results",
   "module": "Discovery",
   "requiresModule": "ticketing",
   "wave": 1,
@@ -14,25 +14,38 @@
   },
   "navigation": {
    "exitTo": [
-    "GST-001"
+    "GST-001",
+    "GST-002",
+    "GST-004"
    ],
    "inferred": false,
    "entryFrom": [
-    "GST-001"
+    "GST-001",
+    "GST-002"
    ],
    "notes": "**Reached from GST-001** — search is reached from home. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
+     "provenance": "derived — GST-001 declares entryState.params  and GST-063 holds none of them, so the edge carries nothing and GST-001 opens cold"
+    },
+    {
+     "to": "GST-002",
+     "trigger": "Clears the search",
+     "provenance": "decided 29 September 2026 (P29), MOB-1"
+    },
+    {
+     "to": "GST-004",
+     "trigger": "Opens a result (Item Detail)",
      "carries": [
-      "subjectId"
+      "productId"
      ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "decided 29 September 2026 (P29), MOB-1, MOB-4"
     }
    ]
   },
-  "notes": "Added 17 August for parity with WEB-003. **Not on the wireframe board** — needs drawing. CF-93.",
+  "notes": "Added 17 August for parity with WEB-003. **Not on the wireframe board** — needs drawing. CF-93.\n\n**Rev 3 (decided 29 September).** Search returns info-only products flagged; they show `notBookableLabel` and open their details, and are hidden when `showInfoOnly` is off (REV3-14).\n\n**Mobile v4 (decided 29 September, MOB-1).** The search-results state of GST-002 Explore: **one implementation with GST-002, both ids kept** (as GAP-D3). `searchCatalogue` also takes `guidedAnswerIds` (W4) when the guest came through Help me choose.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`searchCatalogue` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -45,8 +58,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "searchCatalogue",
+       "notes": "Sends `?q=` to `searchCatalogue`.",
+       "provenance": "contract catalogue.yaml GET /search"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "searchCatalogue",
+       "notes": "Sends `?venueId=` to `searchCatalogue`.",
+       "provenance": "contract catalogue.yaml GET /search"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "searchCatalogue",
+       "notes": "Sends `?kind=` to `searchCatalogue`.",
+       "provenance": "contract catalogue.yaml GET /search"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every search",
+       "label": "Every money",
        "bindsTo": "Money",
        "columns": [
         "Money.amount",
@@ -64,7 +98,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected search",
+       "label": "The selected money",
        "bindsTo": "Money",
        "columns": [
         "Money.amount",
@@ -75,29 +109,14 @@
        "provenance": "contract catalogue.yaml GET /search"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "searchCatalogue",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The search list.",
    "error": "Could not load. Names which read failed and leaves the search untouched.",
-   "emptyFirstRun": "No search yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the search are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No search yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on q, venueId, kind and the search are still there. Names the active filter and offers to clear it.",
    "offline": "**The offline banner shows.** Results come only from what was already loaded, with a note that newer items may exist."
   },
   "apis": [
@@ -105,7 +124,7 @@
     "operationId": "searchCatalogue",
     "contract": "catalogue",
     "purpose": "Find something by name",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -117,8 +136,15 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-063"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-063",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "exact",
+    "view": "Explore tab → search"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {

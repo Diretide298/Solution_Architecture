@@ -18,6 +18,25 @@
   "requestBody": "AddCartLineRequest",
   "responds": "Cart"
  },
+ "bookVisitPlan": {
+  "method": "POST",
+  "path": "/visit-plans/{planId}/booking",
+  "contract": "venue-map",
+  "summary": "Book this plan — turn it into cart lines",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VisitPlanBooking"
+ },
  "checkoutCart": {
   "method": "POST",
   "path": "/carts/{cartId}/checkout",
@@ -94,6 +113,25 @@
   "requestBody": "CreateGuestOrderRequest",
   "responds": "GuestOrderResult"
  },
+ "generateVisitPlan": {
+  "method": "POST",
+  "path": "/visit-plans",
+  "contract": "venue-map",
+  "summary": "Build a visit plan from the party, the dates and what they like",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VisitPlanRequest",
+  "responds": "VisitPlan"
+ },
  "getCart": {
   "method": "GET",
   "path": "/carts/{cartId}",
@@ -103,7 +141,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Cart"
  },
@@ -143,6 +187,38 @@
   "parameters": [],
   "requestBody": null,
   "responds": "GuestOrderStatus"
+ },
+ "getTenantAppStatus": {
+  "method": "GET",
+  "path": "/tenant-config/status",
+  "contract": "white-label",
+  "summary": "App status and recent changes",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TenantAppStatus"
+ },
+ "getVisitPlan": {
+  "method": "GET",
+  "path": "/visit-plans/{planId}",
+  "contract": "venue-map",
+  "summary": "A visit plan, at its current version or an earlier one",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VisitPlan"
  },
  "getWaitTimes": {
   "method": "GET",
@@ -191,7 +267,7 @@
   "method": "GET",
   "path": "/catalogue/bundles",
   "contract": "catalogue",
-  "summary": "List published bundles",
+  "summary": "List published catalogue bundles",
   "permission": "PRODUCT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
@@ -212,6 +288,16 @@
   "parameters": [
    {
     "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "slug",
     "in": "query",
     "required": null
    },
@@ -264,7 +350,41 @@
    }
   ],
   "requestBody": null,
-  "responds": "Case"
+  "responds": "Page"
+ },
+ "listMyNotifications": {
+  "method": "GET",
+  "path": "/me/notifications",
+  "contract": "marketing-crm",
+  "summary": "The signed-in guest's notification feed",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "unreadOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listProducts": {
   "method": "GET",
@@ -292,6 +412,21 @@
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -305,11 +440,40 @@
   "requestBody": null,
   "responds": "Page"
  },
- "raiseMyCase": {
+ "listVisitPlanAlternatives": {
+  "method": "GET",
+  "path": "/visit-plans/{planId}/items/{itemId}/alternatives",
+  "contract": "venue-map",
+  "summary": "What could take this item's place",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "markMyNotificationsRead": {
   "method": "POST",
-  "path": "/my/cases",
+  "path": "/me/notifications/read",
   "contract": "marketing-crm",
-  "summary": "Report something — lost property, a complaint, a question",
+  "summary": "Mark the signed-in guest's notifications read",
   "permission": null,
   "offlineCapable": true,
   "conflictPolicy": "lastWriterWins",
@@ -322,16 +486,16 @@
    }
   ],
   "requestBody": null,
-  "responds": "Case"
+  "responds": null
  },
- "replyToMyCase": {
+ "raiseMyCase": {
   "method": "POST",
-  "path": "/my/cases/{caseId}/messages",
+  "path": "/my/cases",
   "contract": "marketing-crm",
-  "summary": "Reply on a case the guest raised",
+  "summary": "Report something — lost property, a complaint, a question",
   "permission": null,
   "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
+  "conflictPolicy": "append",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -342,6 +506,44 @@
   ],
   "requestBody": null,
   "responds": "Case"
+ },
+ "recordAnswerFeedback": {
+  "method": "POST",
+  "path": "/messages/{messageId}/feedback",
+  "contract": "ai",
+  "summary": "Say whether an answer helped",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiAnswerFeedback"
+ },
+ "replyToMyCase": {
+  "method": "POST",
+  "path": "/my/cases/{caseId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Reply on a case the guest raised",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CaseDetail"
  },
  "requestSuggestion": {
   "method": "POST",
@@ -418,5 +620,24 @@
   ],
   "requestBody": "SubmitReviewRequest",
   "responds": "Review"
+ },
+ "updateVisitPlan": {
+  "method": "PUT",
+  "path": "/visit-plans/{planId}",
+  "contract": "venue-map",
+  "summary": "Swap, remove, add, move or undo, as a new version",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VisitPlanUpdate",
+  "responds": "VisitPlan"
  }
 }

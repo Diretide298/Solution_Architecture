@@ -1,6 +1,6 @@
 # WS06 — Access Control board 6
 
-**10 screens · 18 operations · 28 schemas · 5 permissions**
+**10 screens · 18 operations · 32 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

@@ -22,7 +22,7 @@
    ],
    "notes": "**Reached from WEB-001** — a top-level section of the site. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely."
   },
-  "notes": "Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93.",
+  "notes": "Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93. **`evaluatePromotions` removed 27 September 2026 (audit root R292).** It evaluates promotions against a cart — `EvaluatePromotionsRequest` requires `venueId`, `channel` and at least one line with a variant, quantity and unit price — and this screen has no cart: it arrives with `promotionId` alone. Offers apply where the cart is, on WEB-005 and WEB-010, which keep the call.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
@@ -35,8 +35,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listPromotions",
+       "notes": "Sends `?venueId=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listPromotions",
+       "notes": "Sends `?status=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listPromotions",
+       "notes": "Sends `?activeAt=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every offers promotions",
+       "label": "Every promotion",
        "bindsTo": "Promotion",
        "columns": [
         "Promotion.code",
@@ -63,7 +84,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected offers promotions",
+       "label": "The selected promotion",
        "bindsTo": "Promotion",
        "columns": [
         "Promotion.code",
@@ -87,48 +108,15 @@
        "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
       }
      ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Evaluate",
-       "operation": "evaluatePromotions",
-       "provenance": "contract promotions.yaml POST /promotions/evaluate"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getPromotion",
-       "notes": "One record, read-only.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "evaluatePromotions",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The offers promotions list.",
    "error": "Could not load. Names which read failed and leaves the offers promotions untouched.",
-   "emptyFirstRun": "No offers promotions yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the offers promotions are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No offers promotions yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, status, activeAt and the offers promotions are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -142,16 +130,7 @@
     "operationId": "getPromotion",
     "contract": "promotions",
     "purpose": "Read a promotion",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "evaluatePromotions",
-    "contract": "promotions",
-    "purpose": "Evaluate promotions against a cart",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPromotions"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -171,9 +150,17 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-032"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-032",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Discover → 'Offers & promotions'",
+    "differences": "'Use this offer' returns to the listing; no personalised 'applies to you' filter."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {

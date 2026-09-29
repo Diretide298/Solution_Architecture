@@ -1,0 +1,347 @@
+{
+ "createB2bCreditAccount": {
+  "method": "POST",
+  "path": "/b2b-credit-accounts",
+  "contract": "payments",
+  "summary": "Open an on-account relationship",
+  "permission": "CREDIT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "B2bCreditAccount",
+  "responds": "B2bCreditAccount"
+ },
+ "getCreditConsumptionPolicy": {
+  "method": "GET",
+  "path": "/credit-consumption-policy",
+  "contract": "wallet",
+  "summary": "Which credit is spent first",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CreditConsumptionPolicy"
+ },
+ "getDunningPolicy": {
+  "method": "GET",
+  "path": "/dunning-policy",
+  "contract": "payments",
+  "summary": "How a failed recurring charge is chased",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DunningPolicy"
+ },
+ "getInstalmentPolicy": {
+  "method": "GET",
+  "path": "/instalment-policy",
+  "contract": "payments",
+  "summary": "What may be paid in instalments, and on what terms",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PayInstalmentPolicy"
+ },
+ "getMixedTenderRules": {
+  "method": "GET",
+  "path": "/mixed-tender-rules",
+  "contract": "payments",
+  "summary": "Which tenders may be combined, and in what order",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MixedTenderRules"
+ },
+ "listB2bCreditAccounts": {
+  "method": "GET",
+  "path": "/b2b-credit-accounts",
+  "contract": "payments",
+  "summary": "On-account customers, their limits and their exposure",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "overLimitOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "B2bCreditAccount"
+ },
+ "listDunningCases": {
+  "method": "GET",
+  "path": "/dunning-cases",
+  "contract": "payments",
+  "summary": "Recurring charges currently being chased",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOrderPaymentDetail": {
+  "method": "GET",
+  "path": "/order-payment-detail",
+  "contract": "orders",
+  "summary": "Order Payment Detail & Transaction Ledger",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderPaymentDetailTransactionLedgerView"
+ },
+ "listPaymentAllocationRules": {
+  "method": "GET",
+  "path": "/payment-allocation-rules",
+  "contract": "orders",
+  "summary": "The venue's split-tender allocation rules",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "terminalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "resolveDunningCase": {
+  "method": "POST",
+  "path": "/dunning-cases/{caseId}/resolve",
+  "contract": "payments",
+  "summary": "Stop chasing, with a reason",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "caseId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DunningCase"
+ },
+ "setB2bPaymentTerms": {
+  "method": "PUT",
+  "path": "/b2b-credit-accounts/{accountId}/terms",
+  "contract": "payments",
+  "summary": "Limit, terms, billing cycle and what happens at the limit",
+  "permission": "CREDIT_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "B2bPaymentTerms",
+  "responds": "B2bPaymentTerms"
+ },
+ "setDunningPolicy": {
+  "method": "PUT",
+  "path": "/dunning-policy",
+  "contract": "payments",
+  "summary": "Set the retry schedule and what happens when it runs out",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DunningPolicy",
+  "responds": "DunningPolicy"
+ },
+ "setInstalmentPolicy": {
+  "method": "PUT",
+  "path": "/instalment-policy",
+  "contract": "payments",
+  "summary": "Set which products may be paid in instalments, how many and how often",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PayInstalmentPolicy",
+  "responds": "PayInstalmentPolicy"
+ },
+ "setMixedTenderRules": {
+  "method": "PUT",
+  "path": "/mixed-tender-rules",
+  "contract": "payments",
+  "summary": "Split payment, tender sequence and restrictions",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MixedTenderRules",
+  "responds": "MixedTenderRules"
+ },
+ "setMultiPaymentSplit": {
+  "method": "PUT",
+  "path": "/multi-payment-split",
+  "contract": "orders",
+  "summary": "Multi-Payment, Split Tender & Payment Allocation Configuration",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MultiPaymentSplitTenderPaymentAllocationConfiguratioInput",
+  "responds": "MultiPaymentSplitTenderPaymentAllocationConfiguratioView"
+ },
+ "simulatePaymentConfiguration": {
+  "method": "POST",
+  "path": "/payment-configuration/simulate",
+  "contract": "payments",
+  "summary": "What a guest would be offered, and what it would cost",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RoutingContext",
+  "responds": "PaymentConfigurationSimulation"
+ }
+}

@@ -1,6 +1,6 @@
 # WS36 — Pricing   Revenue Management board 3
 
-**10 screens · 10 operations · 14 schemas · 2 permissions**
+**10 screens · 21 operations · 31 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `LEDGER_POST, LEDGER_VIEW, PRICE_CONFIGURE, PRODUCT_CONFIGURE, PRODUCT_VIEW, TAX_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-068` | Tax, Fee & Calculation Command Center | listDetail | 1 | 0 | — |
-| `ADM-069` | Tax Profile & Jurisdiction Configuration | configEditor | 1 | 0 | — |
+| `ADM-068` | Tax, Fee & Calculation Command Center | listDetail | 3 | 0 | — |
+| `ADM-069` | Tax Profile & Jurisdiction Configuration | configEditor | 5 | 0 | — |
 | `ADM-070` | Tax Rule & Treatment Builder | listDetail | 1 | 0 | — |
-| `ADM-071` | Fee & Surcharge Library | configEditor | 1 | 0 | — |
-| `ADM-072` | Fee Applicability & Charging Rule Builder | configEditor | 1 | 1 | — |
+| `ADM-071` | Fee & Surcharge Library | configEditor | 2 | 1 | — |
+| `ADM-072` | Fee Applicability & Charging Rule Builder | configEditor | 1 | 0 | — |
 | `ADM-073` | Fee Waiver, Tax Exemption & Exception Rules | configEditor | 1 | 0 | — |
-| `ADM-074` | Price Calculation Sequence & Formula Engine | configEditor | 1 | 0 | — |
-| `ADM-075` | Currency Precision, Rounding & Monetary Rules | listDetail | 1 | 0 | — |
+| `ADM-074` | Price Calculation Sequence & Formula Engine | configEditor | 2 | 1 | — |
+| `ADM-075` | Currency Precision, Rounding & Monetary Rules | listDetail | 2 | 1 | — |
 | `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | configEditor | 1 | 0 | — |
-| `ADM-077` | Calculation Validation, Reconciliation & Service Interface | listDetail | 1 | 0 | — |
+| `ADM-077` | Calculation Validation, Reconciliation & Service Interface | listDetail | 4 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-075, ADM-077 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-077 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-068 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-069",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can understand the complete status and health of TICVAI tax, fee and price-calculation configuration from one workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide Finance, Commercial and Pricing administrators with one central view of TICVAI's price-calculation configuration.",
-  "purposeNote": "Authorized administrators can understand the complete status and health of TICVAI tax, fee and price-calculation configuration from one workspace.",
   "gaps": [
    {
     "operation": null,
@@ -228,24 +224,102 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     },
     {
      "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Tax Profiles",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.activeTaxProfiles",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Tax Jurisdictions",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.taxJurisdictions",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Fee Profiles",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.activeFeeProfiles",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Surcharges",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.activeSurcharges",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Exemption Rules",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.exemptionRules",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Calculation Profiles",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.calculationProfiles",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products missing tax",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.productsMissingTax",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products Missing Calculation Profile",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.productsMissingCalculationProfile",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Configuration Conflicts",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.configurationConflicts",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Upcoming Tax Changes",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.upcomingTaxChanges",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Validation Issues",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.validationIssues",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Recently modified rules",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.recentlyModifiedRules",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
        "label": "Every tax fee calculation",
        "columns": [
-        "TaxFeeCalculationCommandCenterView.activeTaxProfiles",
-        "TaxFeeCalculationCommandCenterView.taxJurisdictions",
-        "TaxFeeCalculationCommandCenterView.activeFeeProfiles",
-        "TaxFeeCalculationCommandCenterView.activeSurcharges",
-        "TaxFeeCalculationCommandCenterView.exemptionRules",
-        "TaxFeeCalculationCommandCenterView.calculationProfiles",
-        "TaxFeeCalculationCommandCenterView.productsMissingTax",
-        "TaxFeeCalculationCommandCenterView.productsMissingCalculationProfile",
-        "TaxFeeCalculationCommandCenterView.configurationConflicts",
-        "TaxFeeCalculationCommandCenterView.upcomingTaxChanges",
-        "TaxFeeCalculationCommandCenterView.validationIssues",
-        "TaxFeeCalculationCommandCenterView.recentlyModifiedRules",
         "TaxFeeCalculationCommandCenterView.profileName",
         "TaxFeeCalculationCommandCenterView.type",
         "TaxFeeCalculationCommandCenterView.country",
@@ -253,7 +327,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "TaxFeeCalculationCommandCenterView.market",
         "TaxFeeCalculationCommandCenterView.currency",
         "TaxFeeCalculationCommandCenterView.productScope",
-        "TaxFeeCalculationCommandCenterView.effectivePeriod",
         "TaxFeeCalculationCommandCenterView.status",
         "TaxFeeCalculationCommandCenterView.owner"
        ],
@@ -272,18 +345,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected tax fee calculation",
        "bindsTo": "TaxFeeCalculationCommandCenterView",
        "columns": [
-        "TaxFeeCalculationCommandCenterView.activeTaxProfiles",
-        "TaxFeeCalculationCommandCenterView.taxJurisdictions",
-        "TaxFeeCalculationCommandCenterView.activeFeeProfiles",
-        "TaxFeeCalculationCommandCenterView.activeSurcharges",
-        "TaxFeeCalculationCommandCenterView.exemptionRules",
-        "TaxFeeCalculationCommandCenterView.calculationProfiles",
-        "TaxFeeCalculationCommandCenterView.productsMissingTax",
-        "TaxFeeCalculationCommandCenterView.productsMissingCalculationProfile",
-        "TaxFeeCalculationCommandCenterView.configurationConflicts",
-        "TaxFeeCalculationCommandCenterView.upcomingTaxChanges",
-        "TaxFeeCalculationCommandCenterView.validationIssues",
-        "TaxFeeCalculationCommandCenterView.recentlyModifiedRules",
         "TaxFeeCalculationCommandCenterView.profileName",
         "TaxFeeCalculationCommandCenterView.type",
         "TaxFeeCalculationCommandCenterView.country",
@@ -291,7 +352,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "TaxFeeCalculationCommandCenterView.market",
         "TaxFeeCalculationCommandCenterView.currency",
         "TaxFeeCalculationCommandCenterView.productScope",
-        "TaxFeeCalculationCommandCenterView.effectivePeriod",
         "TaxFeeCalculationCommandCenterView.status",
         "TaxFeeCalculationCommandCenterView.owner"
        ],
@@ -351,22 +411,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Tax, Fee & Calculation Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTaxInvoices",
+    "contract": "finance",
+    "purpose": "List tax invoices",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getVatReturn",
+    "contract": "finance",
+    "purpose": "VAT return (FTA boxes) for a period",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
    "preloaded": [
-    "TaxFeeCalculationCommandCenterView.activeTaxProfiles",
-    "TaxFeeCalculationCommandCenterView.taxJurisdictions",
-    "TaxFeeCalculationCommandCenterView.activeFeeProfiles",
-    "TaxFeeCalculationCommandCenterView.activeSurcharges",
-    "TaxFeeCalculationCommandCenterView.exemptionRules",
-    "TaxFeeCalculationCommandCenterView.calculationProfiles"
+    "TaxFeeCalculationCommandCenterSummary.activeTaxProfiles",
+    "TaxFeeCalculationCommandCenterSummary.taxJurisdictions",
+    "TaxFeeCalculationCommandCenterSummary.activeFeeProfiles",
+    "TaxFeeCalculationCommandCenterSummary.activeSurcharges",
+    "TaxFeeCalculationCommandCenterSummary.exemptionRules",
+    "TaxFeeCalculationCommandCenterSummary.calculationProfiles"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-068"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-068",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-068"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 39. 22 of 29 labels bound to a contract property; 35 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -430,10 +505,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "jurisdictions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define reusable tax profiles according to legal entity, country, jurisdiction and commercial context.",
-  "purposeNote": "jurisdictions.",
   "gaps": [
    {
     "operation": null,
@@ -554,16 +629,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setTaxProfileJurisdiction",
     "contract": "catalogue",
     "purpose": "Tax Profile & Jurisdiction Configuration",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listTaxInvoiceTemplates",
+    "contract": "finance",
+    "purpose": "Show invoice templates and number series",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setTaxInvoiceTemplate",
+    "contract": "finance",
+    "purpose": "Edit an invoice template and series",
     "trigger": "onAction",
-    "invalidates": [
-     "setTaxProfileJurisdiction"
-    ]
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listEInvoicingProviders",
+    "contract": "finance",
+    "purpose": "Show the e-invoicing provider connection",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setEInvoicingProvider",
+    "contract": "finance",
+    "purpose": "Configure the e-invoicing provider",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-069"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-069",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-069"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 40. 0 of 0 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -627,14 +728,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "taxable commercial transaction.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define how taxes are applied to products and transactions.",
-  "purposeNote": "taxable commercial transaction.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Fixed Tax. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Out of Scope, Fixed Tax. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 41 §Support"
    },
    {
@@ -672,6 +773,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Out of Scope",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 41 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Fixed Tax",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 41 §Support"
       }
@@ -695,18 +801,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setTaxRuleTreatment",
     "contract": "catalogue",
     "purpose": "Tax Rule & Treatment Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setTaxRuleTreatment"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-070"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-070",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-070"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 4 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 5 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -768,14 +872,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "than defining them separately within sales channels.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure whether the fee is) and no display directory — it is settings, not a population",
   "purpose": "Create standardized reusable non-base-price charges.",
-  "purposeNote": "than defining them separately within sales channels.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 16 actions on this screen and the screen declares 1 operation.** Unserved: Booking Fee, Transaction Fee, Service Fee, Convenience Fee, Delivery Fee, Handling Fee, Modification Fee, Rescheduling Fee …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 18 actions on this screen; 8 are served since the writers pass (29 September): Booking Fee, Transaction Fee, Service Fee, Convenience Fee, Delivery Fee, Handling Fee, Modification Fee, Rescheduling Fee by `setFeeDefinition`.** Still unserved: the rest of the pack list past the eight shown here. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
    }
   ],
@@ -906,6 +1010,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Rescheduling Fee",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save fee definition",
+       "operation": "setFeeDefinition",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The fee and surcharge library** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /fees"
       }
      ]
     }
@@ -923,14 +1035,60 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Fee & Surcharge Library",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setFeeDefinition",
+    "contract": "catalogue",
+    "purpose": "Create or update a fee or surcharge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFeeSurcharge"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-071"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-071",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-071"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 31 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 33 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetFeeDefinition",
+    "component": "modal",
+    "trigger": "Save fee definition",
+    "body": "**Collects what `setFeeDefinition` sends before it is called.** Required: `id`, `scopePath`, `code`, `name`, `feeType`, `valueType`, `chargeBasis`, `status`. Optional: `description`, `amount`, `percentage`, `tiers`, `taxTreatment`, `refundability`, `visibility`, `effectiveFrom`, `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PricingFee",
+    "confirm": {
+     "label": "Save fee definition",
+     "operation": "setFeeDefinition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "code",
+      "name",
+      "feeType",
+      "valueType",
+      "chargeBasis",
+      "status",
+      "description",
+      "amount",
+      "percentage",
+      "tiers",
+      "taxTreatment",
+      "refundability",
+      "visibility",
+      "effectiveFrom",
+      "effectiveTo"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /fees"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -992,14 +1150,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "satisfied.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure whether fees can) and no display directory — it is settings, not a population",
   "purpose": "Determine when a fee or surcharge should apply. Screen 10.3.4 defines the fee. Screen 10.3.5 defines the conditions that trigger it.",
-  "purposeNote": "satisfied.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Channel, Customer Type, Membership, Delivery Method, Order Value, Rule Priority, Stop Processing, Continue Processing. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 16 actions on this screen and the screen declares 1 operation.** Unserved: Product, Product Category, Channel, Venue, Event, Customer Type, Membership, Transaction Type …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
    }
   ],
@@ -1043,7 +1201,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Product",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Product Category",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Channel",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
       },
       {
@@ -1058,42 +1236,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
-       "label": "Delivery Method",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Order Value",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Rule Priority",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Stop Processing",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Continue Processing",
+       "label": "Transaction Type",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmStopProcessing",
-    "component": "confirmDialog",
-    "trigger": "Stop Processing",
-    "body": "**Stop Processing on a fee applicability charging is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
-   }
-  ],
   "states": {
    "loading": "The fee applicability charging configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the fee applicability charging untouched.",
@@ -1105,18 +1254,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setFeeApplicabilityCharging",
     "contract": "catalogue",
     "purpose": "Fee Applicability & Charging Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setFeeApplicabilityCharging"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-072"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-072",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-072"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 13 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 21 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1178,14 +1325,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Fees and taxes can only be waived or exempted through explicitly authorized rules or governed manual exceptions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population",
   "purpose": "Govern circumstances under which a normally applicable tax or fee may be reduced, waived or exempted.",
-  "purposeNote": "Fees and taxes can only be waived or exempted through explicitly authorized rules or governed manual exceptions.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Zero-Rated Tax, Operational Waiver, Contractual Waiver. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Zero-Rated Tax, Complimentary Transaction, Operational Waiver, Contractual Waiver. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
    }
   ],
@@ -1279,6 +1426,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Complimentary Transaction",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Operational Waiver",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
       },
@@ -1308,9 +1460,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-073"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-073",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-073"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 17 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 18 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1372,10 +1525,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "The system can deterministically calculate the final payable amount using a governed and traceable sequence of commercial components.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Each step should define) and no display directory — it is settings, not a population",
   "purpose": "Define the exact sequence TICVAI follows to calculate the final payable amount. This is the heart of Board 3.",
-  "purposeNote": "The system can deterministically calculate the final payable amount using a governed and traceable sequence of commercial components.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1419,6 +1572,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 47 §Each step should define"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save price calculation policy",
+       "operation": "setPriceCalculationPolicy",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The ordered steps that turn a rate into a payable amount** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /calculation-profiles"
+      }
+     ]
     }
    ]
   },
@@ -1434,14 +1601,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Price Calculation Sequence & Formula Engine",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPriceCalculationPolicy",
+    "contract": "catalogue",
+    "purpose": "Save a price calculation sequence, whole",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPriceCalculationSequence"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-074"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-074",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-074"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 47. 0 of 0 labels bound to a contract property; 7 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPriceCalculationPolicy",
+    "component": "modal",
+    "trigger": "Save price calculation policy",
+    "body": "**Collects what `setPriceCalculationPolicy` sends before it is called.** Required: `id`, `scopePath`, `code`, `name`, `status`. Optional: `isDefault`, `effectiveFrom`, `effectiveTo`, `steps`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CalculationProfile",
+    "confirm": {
+     "label": "Save price calculation policy",
+     "operation": "setPriceCalculationPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "code",
+      "name",
+      "status",
+      "isDefault",
+      "effectiveFrom",
+      "effectiveTo",
+      "steps"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /calculation-profiles"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1503,10 +1708,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "currency precision and rounding rules.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Ensure monetary calculations remain consistent across countries, currencies, channels and payment systems.",
-  "purposeNote": "currency precision and rounding rules.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1541,6 +1746,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 49 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Round Down",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 49 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save currency rounding rule",
+       "operation": "setCurrencyRoundingRule",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**One rounding profile per currency the tenant sells in** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /rounding-profiles"
+      }
+     ]
     }
    ]
   },
@@ -1557,6 +1781,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Currency Precision, Rounding & Monetary Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setCurrencyRoundingRule",
+    "contract": "catalogue",
+    "purpose": "Set precision and rounding for a currency",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCurrencyPrecisionRounding"
+    ]
    }
   ],
   "entryState": {
@@ -1567,9 +1800,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-075"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-075",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-075"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 49. 0 of 1 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 49. 0 of 1 labels bound to a contract property; 13 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetCurrencyRoundingRule",
+    "component": "modal",
+    "trigger": "Save currency rounding rule",
+    "body": "**Collects what `setCurrencyRoundingRule` sends before it is called.** Required: `id`, `scopePath`, `currency`, `decimalPlaces`, `roundingMethod`, `roundingStage`, `status`. Optional: `code`, `name`, `minimumMonetaryUnit`, `displayPrecision`, `calculationPrecision`, `cashRoundingIncrement`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RoundingProfile",
+    "confirm": {
+     "label": "Save currency rounding rule",
+     "operation": "setCurrencyRoundingRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "currency",
+      "decimalPlaces",
+      "roundingMethod",
+      "roundingStage",
+      "status",
+      "code",
+      "name",
+      "minimumMonetaryUnit",
+      "displayPrecision",
+      "calculationPrecision",
+      "cashRoundingIncrement"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /rounding-profiles"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1631,10 +1897,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can reproduce and explain every monetary component contributing to the final payable amount before configuration goes live.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
   "purpose": "Allow administrators to test the complete calculation before releasing configuration into production.",
-  "purposeNote": "Authorized users can reproduce and explain every monetary component contributing to the final payable amount before configuration goes live.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1733,16 +1999,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "simulatePriceBreakdownCalculation",
     "contract": "catalogue",
     "purpose": "Price Breakdown, Calculation Simulation & Explainability",
-    "trigger": "onAction",
-    "invalidates": [
-     "simulatePriceBreakdownCalculation"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-076"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-076",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-076"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 50. 0 of 0 labels bound to a contract property; 13 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1798,10 +2062,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "The calculation engine passes configured reconciliation and regression tests and exposes one authoritative calculation service to all TICVAI sales and operational modules. Board 3 — Final Screen Register # Backend Screen Core Responsibility 10.3. Calculation configuration Tax, Fee & Calculation Command Center 1 health 10.3. Tax Profile & Jurisdiction Configuration Tax master configuration 2 10.3. Tax Rule & Treatment Builder Tax applicability/calculation 3 10.3. Fee & Surcharge Library Reusable fee definitions 4 10.3. Fee Applicability & Charging Rule Builder Fee conditions 5 10.3. Fee Waiver,",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide final technical and commercial validation of the pricing calculation engine and define how other TICVAI modules consume it. Boards 1–3 established the commercial and calculation engines: Board 1: What prices exist? Board 2: Which price applies? Board 3: How is the final payable amount calculated?",
-  "purposeNote": "The calculation engine passes configured reconciliation and regression tests and exposes one authoritative calculation service to all TICVAI sales and operational modules. Board 3 — Final Screen Register # Backend Screen Core Responsibility 10.3. Calculation configuration Tax, Fee & Calculation Command Center 1 health 10.3. Tax Profile & Jurisdiction Configuration Tax master configuration 2 10.3. Tax Rule & Treatment Builder Tax applicability/calculation 3 10.3. Fee & Surcharge Library Reusable fee definitions 4 10.3. Fee Applicability & Charging Rule Builder Fee conditions 5 10.3. Fee Waiver,",
   "gaps": [
    {
     "operation": null,
@@ -1825,6 +2089,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "derived": true,
        "impliedBy": "listCalculationValidationReconciliation",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "transmitEInvoices",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "transmitEInvoices"
       }
      ]
     }
@@ -1843,21 +2120,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Calculation Validation, Reconciliation & Service Interface",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEInvoicingProviders",
+    "contract": "finance",
+    "purpose": "Show the e-invoicing provider connection",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listEInvoiceTransmissions",
+    "contract": "finance",
+    "purpose": "E-invoicing transmission log and failures",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "transmitEInvoices",
+    "contract": "finance",
+    "purpose": "Send / resend documents to e-invoicing",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
    "preloaded": [
-    "CalculationValidationReconciliationServiceInterfaceView.missingProfile",
-    "CalculationValidationReconciliationServiceInterfaceView.invalidRate",
-    "CalculationValidationReconciliationServiceInterfaceView.expiredRule",
-    "CalculationValidationReconciliationServiceInterfaceView.overlappingRule",
-    "CalculationValidationReconciliationServiceInterfaceView.conflictingRule"
+    "CalculationValidationReconciliationServiceInterfaceView.code"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-077"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-077",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-077"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 121 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1893,6 +2188,40 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "getVatReturn": {
+  "method": "GET",
+  "path": "/tax/vat-returns",
+  "contract": "finance",
+  "summary": "A legal entity's VAT return for a tax period, in the FTA's boxes",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "format",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FinVatReturn"
+ },
  "listCalculationValidationReconciliation": {
   "method": "GET",
   "path": "/calculation-validation-reconciliation",
@@ -1902,9 +2231,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "resultKind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "area",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "passed",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CalculationValidationReconciliationServiceInterfaceView"
+  "responds": "Page"
  },
  "listCurrencyPrecisionRounding": {
   "method": "GET",
@@ -1919,6 +2279,69 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "CurrencyPrecisionRoundingMonetaryRulesView"
  },
+ "listEInvoiceTransmissions": {
+  "method": "GET",
+  "path": "/e-invoicing/transmissions",
+  "contract": "finance",
+  "summary": "What was sent to the e-invoicing provider, and what came back",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "documentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listEInvoicingProviders": {
+  "method": "GET",
+  "path": "/e-invoicing/providers",
+  "contract": "finance",
+  "summary": "The e-invoicing service provider connection per legal entity",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listFeeSurcharge": {
   "method": "GET",
   "path": "/fee-surcharge",
@@ -1928,9 +2351,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "feeType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "FeeSurchargeLibraryView"
+  "responds": "Page"
  },
  "listFeeWaiverTax": {
   "method": "GET",
@@ -1941,9 +2390,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "exceptionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eligibilityBasis",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "FeeWaiverTaxExemptionExceptionRulesView"
+  "responds": "Page"
  },
  "listPriceCalculationSequence": {
   "method": "GET",
@@ -1954,9 +2429,30 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "calculationProfileId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "asOf",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PriceCalculationSequenceFormulaEngineView"
+  "responds": "Page"
  },
  "listTaxFeeCalculation": {
   "method": "GET",
@@ -1969,43 +2465,164 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "tax",
+    "name": "type",
     "in": "query",
     "required": false
    },
    {
-    "name": "fee",
+    "name": "country",
     "in": "query",
     "required": false
    },
    {
-    "name": "surcharge",
+    "name": "legalEntity",
     "in": "query",
     "required": false
    },
    {
-    "name": "waiver",
+    "name": "status",
     "in": "query",
     "required": false
    },
    {
-    "name": "exemption",
+    "name": "search",
     "in": "query",
     "required": false
    },
    {
-    "name": "calculationProfile",
-    "in": "query",
-    "required": false
+    "name": null,
+    "in": null,
+    "required": null
    },
    {
-    "name": "roundingProfile",
-    "in": "query",
-    "required": false
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "TaxFeeCalculationCommandCenterView"
+  "responds": "Page"
+ },
+ "listTaxInvoiceTemplates": {
+  "method": "GET",
+  "path": "/tax-invoice-templates",
+  "contract": "finance",
+  "summary": "Invoice and credit memo templates and number series, per legal entity",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTaxInvoices": {
+  "method": "GET",
+  "path": "/tax-invoices",
+  "contract": "finance",
+  "summary": "Tax invoices issued, newest first",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "invoiceType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setCurrencyRoundingRule": {
+  "method": "PUT",
+  "path": "/rounding-profiles",
+  "contract": "catalogue",
+  "summary": "Set precision and rounding for a currency",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RoundingProfile",
+  "responds": "RoundingProfile"
+ },
+ "setEInvoicingProvider": {
+  "method": "PUT",
+  "path": "/e-invoicing/providers",
+  "contract": "finance",
+  "summary": "Connect a legal entity to its accredited e-invoicing service provider",
+  "permission": "TAX_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FinEInvoicingProvider",
+  "responds": "FinEInvoicingProvider"
  },
  "setFeeApplicabilityCharging": {
   "method": "PUT",
@@ -2016,9 +2633,72 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "FeeApplicabilityChargingRuleBuilderInput",
   "responds": "FeeApplicabilityChargingRuleBuilderView"
+ },
+ "setFeeDefinition": {
+  "method": "PUT",
+  "path": "/fees",
+  "contract": "catalogue",
+  "summary": "Create or update a fee or surcharge",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PricingFee",
+  "responds": "PricingFee"
+ },
+ "setPriceCalculationPolicy": {
+  "method": "PUT",
+  "path": "/calculation-profiles",
+  "contract": "catalogue",
+  "summary": "Save a price calculation sequence, whole",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CalculationProfile",
+  "responds": "CalculationProfile"
+ },
+ "setTaxInvoiceTemplate": {
+  "method": "PUT",
+  "path": "/tax-invoice-templates",
+  "contract": "finance",
+  "summary": "Set a legal entity's template and number series for one document kind",
+  "permission": "TAX_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FinTaxInvoiceTemplate",
+  "responds": "FinTaxInvoiceTemplate"
  },
  "setTaxProfileJurisdiction": {
   "method": "PUT",
@@ -2029,7 +2709,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "TaxProfileJurisdictionConfigurationInput",
   "responds": "TaxProfileJurisdictionConfigurationView"
  },
@@ -2042,7 +2728,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "TaxRuleTreatmentBuilderInput",
   "responds": "TaxRuleTreatmentBuilderView"
  },
@@ -2055,9 +2747,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PriceBreakdownCalculationSimulationExplainabilityInput",
   "responds": "PriceBreakdownCalculationSimulationExplainabilityView"
+ },
+ "transmitEInvoices": {
+  "method": "POST",
+  "path": "/e-invoicing/transmissions",
+  "contract": "finance",
+  "summary": "Send issued tax documents to the e-invoicing provider",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }
 ```
@@ -2068,173 +2785,343 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "CalculationProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.calculation_profile + catalogue.calculation_step",
+  "description": "**The ordered sequence that turns a rate into a payable amount** (29 September, data model DM3). ADM-074: base rate, contextual rate, dynamic adjustment, promotion, package adjustment, fees, tax, rounding, final amount. Versioned; a calculation records the version it used (`calculationVersion`), so history is reproducible.",
+  "required": [
+   "id",
+   "scopePath",
+   "code",
+   "name",
+   "version",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 40
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "isDefault": {
+    "type": "boolean",
+    "default": false
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CatalogueConfigStatus"
+     }
+    ],
+    "default": "draft"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CalculationStep"
+    }
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "CalculationStep": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.calculation_step",
+  "description": "**One step of a calculation profile** (29 September, data model DM3). `dependsOn` names earlier steps; a cycle or a step depending on a later one is refused (`422 circularDependency` / `invalidSequence`).",
+  "required": [
+   "id",
+   "calculationProfileId",
+   "sequence",
+   "stepType",
+   "formulaType"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "calculationProfileId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sequence": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "stepType": {
+    "type": "string",
+    "enum": [
+     "commercialBaseRate",
+     "contextualRateSelection",
+     "dynamicPricingAdjustment",
+     "promotionDiscount",
+     "packageBundleAdjustment",
+     "feesSurcharges",
+     "taxCalculation",
+     "rounding",
+     "finalPayableAmount"
+    ]
+   },
+   "formulaType": {
+    "type": "string",
+    "enum": [
+     "fixedAmount",
+     "percentage",
+     "percentageOfBase",
+     "percentageOfSubtotal",
+     "tiered",
+     "conditional",
+     "minimum",
+     "maximum",
+     "customGovernedFormula"
+    ]
+   },
+   "input": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "formula": {
+    "type": "string",
+    "nullable": true
+   },
+   "dependsOn": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "output": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "taxability": {
+    "type": "string",
+    "enum": [
+     "inTaxBase",
+     "outsideTaxBase",
+     null
+    ],
+    "nullable": true
+   },
+   "roundingProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
  "CalculationValidationReconciliationServiceInterfaceView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Calculation Validation, Reconciliation & Service Interface displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "missingProfile": {
+   "resultId": {
     "type": "string",
-    "description": "Missing Profile"
+    "description": "Result ID"
    },
-   "invalidRate": {
-    "type": "number",
-    "description": "Invalid Rate"
-   },
-   "expiredRule": {
-    "type": "integer",
-    "description": "Expired Rule"
-   },
-   "overlappingRule": {
+   "resultKind": {
     "type": "string",
-    "description": "Overlapping Rule"
+    "enum": [
+     "validationFinding",
+     "testScenarioResult"
+    ],
+    "description": "A configuration finding or a test-suite scenario result"
    },
-   "conflictingRule": {
+   "area": {
     "type": "string",
-    "description": "Conflicting Rule"
+    "enum": [
+     "tax",
+     "fees",
+     "formula",
+     "currency",
+     "reconciliation",
+     "testSuite"
+    ],
+    "description": "Validation Area (p.52)"
    },
-   "missingTaxTreatment": {
+   "code": {
     "type": "string",
-    "description": "Missing Tax Treatment"
+    "enum": [
+     "missingProfile",
+     "invalidRate",
+     "expiredRule",
+     "overlappingRule",
+     "duplicateFee",
+     "conflictingRule",
+     "missingTaxTreatment",
+     "circularDependency",
+     "invalidSequence",
+     "missingInput",
+     "invalidPrecision",
+     "unsupportedCurrency",
+     "roundingDifference",
+     "reconciliationMismatch",
+     "scenarioFailed"
+    ],
+    "description": "What was checked"
    },
-   "circularDependency": {
+   "severity": {
     "type": "string",
-    "description": "Circular Dependency"
+    "enum": [
+     "critical",
+     "warning",
+     "information"
+    ],
+    "description": "Severity; critical blocks progress"
    },
-   "invalidSequence": {
+   "message": {
     "type": "string",
-    "description": "Invalid Sequence"
+    "description": "What was found"
    },
-   "missingInput": {
+   "subjectId": {
     "type": "string",
-    "description": "Missing Input"
+    "nullable": true,
+    "description": "The profile, rule, fee, formula or currency concerned"
    },
-   "invalidPrecision": {
+   "scenarioName": {
     "type": "string",
-    "description": "Invalid Precision"
+    "nullable": true,
+    "description": "Test scenario name"
    },
-   "unsupportedCurrency": {
+   "scenarioType": {
     "type": "string",
-    "description": "Unsupported Currency"
+    "enum": [
+     "standardB2cSale",
+     "posSale",
+     "memberSale",
+     "groupBooking",
+     "b2bSale",
+     "refund",
+     "reschedule",
+     "multiProductOrder",
+     "packageSale",
+     "multiCurrencySale"
+    ],
+    "description": "Test Suite scenario type (pp.52-53)",
+    "nullable": true
    },
-   "roundingDifference": {
-    "type": "string",
-    "description": "Rounding Difference"
+   "passed": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "Scenario passed; empty for a finding"
    },
-   "lineTotal": {
-    "type": "string",
-    "description": "Line Total"
-   },
-   "taxTotal": {
-    "type": "string",
-    "description": "Tax Total"
-   },
-   "feeTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee Total"
-   },
-   "discountTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount Total"
-   },
-   "finalTotal": {
-    "type": "string",
-    "description": "Final Total"
-   },
-   "standardB2cSale": {
-    "type": "string",
-    "description": "Standard B2C Sale"
-   },
-   "posSale": {
-    "type": "string",
-    "description": "POS Sale"
-   },
-   "memberSale": {
-    "type": "string",
-    "description": "Member Sale"
-   },
-   "groupBooking": {
-    "type": "string",
-    "description": "Group Booking"
-   },
-   "b2bSale": {
-    "type": "string",
-    "description": "B2B Sale"
-   },
-   "reschedule": {
-    "type": "string",
-    "description": "Reschedule"
-   },
-   "multiProductOrder": {
-    "type": "string",
-    "description": "Multi-Product Order"
-   },
-   "packageSale": {
-    "type": "string",
-    "description": "Package Sale"
-   },
-   "multiCurrencySale": {
-    "type": "string",
-    "description": "Multi-Currency Sale"
-   },
-   "selectedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Selected Price"
-   },
-   "discounts": {
-    "type": "string",
-    "description": "Discounts"
-   },
-   "fees": {
-    "type": "string",
-    "description": "Fees"
-   },
-   "taxes": {
-    "type": "string",
-    "description": "Taxes"
-   },
-   "rounding": {
-    "type": "string",
-    "description": "Rounding"
-   },
-   "finalPayable": {
-    "type": "string",
-    "description": "Final Payable"
+   "reconciliation": {
+    "type": "object",
+    "nullable": true,
+    "description": "Reconciliation (p.52): expected against actual totals for a scenario",
+    "properties": {
+     "lineTotal": {
+      "type": "object",
+      "properties": {
+       "expected": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       },
+       "actual": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      }
+     },
+     "taxTotal": {
+      "type": "object",
+      "properties": {
+       "expected": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       },
+       "actual": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      }
+     },
+     "feeTotal": {
+      "type": "object",
+      "properties": {
+       "expected": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       },
+       "actual": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      }
+     },
+     "discountTotal": {
+      "type": "object",
+      "properties": {
+       "expected": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       },
+       "actual": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      }
+     },
+     "finalTotal": {
+      "type": "object",
+      "properties": {
+       "expected": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       },
+       "actual": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      }
+     }
+    }
    },
    "calculationVersion": {
     "type": "string",
-    "description": "Calculation Version"
-   },
-   "explanationReference": {
-    "type": "string",
-    "description": "Explanation Reference"
-   },
-   "baseAed250": {
-    "type": "string",
-    "description": "Base: AED 250"
-   },
-   "discountAed25": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount: AED 25"
-   },
-   "feeAed10": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee: AED 10"
-   },
-   "vatAed1175": {
-    "type": "string",
-    "description": "VAT: AED 11.75"
-   },
-   "finalAed24675": {
-    "type": "string",
-    "description": "Final: AED 246.75"
-   },
-   "authentication": {
-    "type": "string",
-    "description": "Authentication"
+    "description": "Calculation version the result was produced with (Historical Reproducibility)"
    }
   }
+ },
+ "CatalogueConfigStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "active",
+   "inactive",
+   "retired"
+  ],
+  "description": "**The status of a catalogue configuration record** (29 September, data model DM3): price lists, rates, fees and fee rules, tax profiles and rules, calculation and rounding profiles, package pricing and templates. `draft` is being prepared and is never used by a calculation; `active` is in use from its effective date; `inactive` is switched off and may be switched back; `retired` is kept for history only. A record already used by a live price becomes `active` through a published change request, not by an edit."
  },
  "CurrencyPrecisionRoundingMonetaryRulesView": {
   "type": "object",
@@ -2244,95 +3131,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
    },
    "decimalPlaces": {
-    "type": "string",
-    "description": "Decimal Places"
+    "type": "integer",
+    "description": "Decimal Places of the currency, 0 to 3 (MoM 1 Sep §4.5)",
+    "minimum": 0,
+    "maximum": 3
    },
    "minimumMonetaryUnit": {
-    "type": "string",
-    "description": "Minimum Monetary Unit"
+    "type": "number",
+    "description": "Minimum Monetary Unit, e.g. 0.01, 0.001, 0.05"
    },
    "displayPrecision": {
-    "type": "string",
-    "description": "Display Precision"
+    "type": "integer",
+    "description": "Display Precision: decimals shown",
+    "minimum": 0,
+    "maximum": 3
    },
    "calculationPrecision": {
-    "type": "string",
-    "description": "Calculation Precision"
+    "type": "integer",
+    "description": "Calculation Precision: decimals carried while calculating; at most 4, the scale Money is stored at (decided 29 September, readiness close-out)",
+    "minimum": 0,
+    "maximum": 4
    },
    "roundingMethod": {
     "type": "string",
-    "description": "Rounding Method"
+    "enum": [
+     "standard",
+     "roundUp",
+     "roundDown",
+     "bankers",
+     "nearestCurrencyUnit",
+     "customRegulatoryRule"
+    ],
+    "description": "Rounding Method (p.49)"
    },
-   "standard": {
+   "ruleId": {
     "type": "string",
-    "description": "Standard"
+    "description": "Currency rule ID"
    },
-   "roundUp": {
+   "roundingStage": {
     "type": "string",
-    "description": "Round Up"
+    "enum": [
+     "perItem",
+     "perTax",
+     "perFee",
+     "perLine",
+     "atOrderTotal"
+    ],
+    "description": "Rounding Stage (p.50): where rounding happens"
    },
-   "roundDown": {
+   "cashRoundingIncrement": {
+    "type": "number",
+    "nullable": true,
+    "description": "Cash Rounding: increment cash totals round to (CHF 19.98 -> 20.00 at 0.05) while electronic payment keeps the exact total; empty for none"
+   },
+   "status": {
     "type": "string",
-    "description": "Round Down"
-   },
-   "bankerSRounding": {
-    "type": "string",
-    "description": "Banker's Rounding"
-   },
-   "nearestCurrencyUnit": {
-    "type": "string",
-    "description": "Nearest Currency Unit"
-   },
-   "customRegulatoryRule": {
-    "type": "string",
-    "description": "Custom Regulatory Rule"
-   },
-   "calculated": {
-    "type": "string",
-    "description": "Calculated (the pack shows AED 199.497)"
-   },
-   "display": {
-    "type": "string",
-    "description": "Display (the pack shows AED 199.50)"
-   },
-   "chf1998": {
-    "type": "string",
-    "description": "CHF 19.98"
-   },
-   "chf2000": {
-    "type": "string",
-    "description": "CHF 20.00"
-   },
-   "perItem": {
-    "type": "string",
-    "description": "Per Item"
-   },
-   "perTax": {
-    "type": "string",
-    "description": "Per Tax"
-   },
-   "perFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Per Fee"
-   },
-   "perLine": {
-    "type": "string",
-    "description": "Per Line"
-   },
-   "atOrderTotal": {
-    "type": "string",
-    "description": "At Order Total"
-   },
-   "resultingMonetaryValuesAreRounded": {
-    "type": "string",
-    "description": "resulting monetary values are rounded"
-   },
-   "resultingMonetaryValuesAreCalculated": {
-    "type": "string",
-    "description": "resulting monetary values are calculated"
+    "description": "Status: active or inactive"
    }
   }
  },
@@ -2344,87 +3202,184 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "product": {
     "type": "string",
-    "description": "Product"
+    "nullable": true,
+    "description": "Condition: product; empty for any"
    },
    "productCategory": {
     "type": "string",
-    "description": "Product Category"
+    "nullable": true,
+    "description": "Condition: product category"
    },
    "channel": {
-    "type": "string",
-    "description": "Channel"
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Condition: channel (Call Center Fee IF Channel = Call Center); empty for any"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "nullable": true,
+    "description": "Condition: venue"
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "nullable": true,
+    "description": "Condition: event"
    },
    "customerType": {
     "type": "string",
-    "description": "Customer Type"
+    "nullable": true,
+    "description": "Condition: customer type"
    },
    "membership": {
     "type": "string",
-    "description": "Membership"
+    "nullable": true,
+    "description": "Condition: membership product or tier"
    },
    "transactionType": {
     "type": "string",
-    "description": "Transaction Type"
+    "nullable": true,
+    "description": "Condition: transaction type"
    },
    "paymentMethod": {
     "type": "string",
-    "description": "Payment Method"
+    "nullable": true,
+    "description": "Condition: payment method"
    },
    "deliveryMethod": {
     "type": "string",
-    "description": "Delivery Method"
-   },
-   "orderValue": {
-    "type": "string",
-    "description": "Order Value"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
+    "nullable": true,
+    "description": "Condition: delivery method"
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "nullable": true,
+    "description": "Condition: market"
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "nullable": true,
+    "pattern": "^[A-Z]{2}$",
+    "description": "Condition: country"
    },
    "serviceAction": {
     "type": "string",
-    "description": "Service Action"
+    "enum": [
+     "newSale",
+     "modification",
+     "reschedule",
+     "cancellation",
+     "refund",
+     "upgrade"
+    ],
+    "description": "Condition: service action (Action = Reschedule); empty for any",
+    "nullable": true
    },
    "rulePriority": {
-    "type": "string",
-    "description": "Rule Priority"
+    "type": "integer",
+    "description": "Rule Priority: the lower number is evaluated first"
    },
-   "stopProcessing": {
+   "ruleId": {
     "type": "string",
-    "description": "Stop Processing"
+    "description": "Charging rule ID; empty on create"
    },
-   "continueProcessing": {
+   "ruleName": {
     "type": "string",
-    "description": "Continue Processing"
+    "description": "Rule name"
    },
-   "mutualExclusion": {
+   "feeId": {
     "type": "string",
-    "description": "Mutual Exclusion"
+    "description": "The fee from the library (Screen 10.3.4, ADM-071) this rule charges"
    },
-   "stack": {
+   "orderValueMin": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Threshold: order value at or above which the fee applies"
+   },
+   "orderValueMax": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Threshold: order value below which the fee applies (Order Value < AED 100 -> handling fee)"
+   },
+   "quantityMin": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Condition: minimum quantity"
+   },
+   "quantityMax": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Condition: maximum quantity"
+   },
+   "hoursBeforeEventMax": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Condition: the event occurs within this many hours (reschedule within 48 hours)"
+   },
+   "deliveryDestinationZones": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Condition: delivery destination zones (Dubai, Abu Dhabi, Ras Al Khaimah, international), matched from the checkout address (MoM 1 Sep §4.5 shipping fee)"
+   },
+   "combination": {
     "type": "string",
-    "description": "Stack"
+    "enum": [
+     "stack",
+     "replace",
+     "exclude"
+    ],
+    "description": "Fee Combination (p.45): add to other fees, replace them, or exclude named fees"
    },
-   "excludeAnotherFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Exclude Another Fee"
+   "excludedFeeIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Fees excluded or replaced when combination is exclude or replace"
+   },
+   "application": {
+    "type": "string",
+    "enum": [
+     "applyOnce",
+     "applyPerItem"
+    ],
+    "description": "Apply Once per order or Apply Per Item"
+   },
+   "onMatch": {
+    "type": "string",
+    "enum": [
+     "stopProcessing",
+     "continueProcessing"
+    ],
+    "description": "Stop or Continue Processing after this rule applies"
+   },
+   "mutualExclusionGroup": {
+    "type": "string",
+    "nullable": true,
+    "description": "Mutual Exclusion: rules sharing a group never apply together; empty for none"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, inactive or expired"
    }
   }
  },
@@ -2436,87 +3391,184 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "product": {
     "type": "string",
-    "description": "Product"
+    "nullable": true,
+    "description": "Condition: product; empty for any"
    },
    "productCategory": {
     "type": "string",
-    "description": "Product Category"
+    "nullable": true,
+    "description": "Condition: product category"
    },
    "channel": {
-    "type": "string",
-    "description": "Channel"
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Condition: channel (Call Center Fee IF Channel = Call Center); empty for any"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "nullable": true,
+    "description": "Condition: venue"
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "nullable": true,
+    "description": "Condition: event"
    },
    "customerType": {
     "type": "string",
-    "description": "Customer Type"
+    "nullable": true,
+    "description": "Condition: customer type"
    },
    "membership": {
     "type": "string",
-    "description": "Membership"
+    "nullable": true,
+    "description": "Condition: membership product or tier"
    },
    "transactionType": {
     "type": "string",
-    "description": "Transaction Type"
+    "nullable": true,
+    "description": "Condition: transaction type"
    },
    "paymentMethod": {
     "type": "string",
-    "description": "Payment Method"
+    "nullable": true,
+    "description": "Condition: payment method"
    },
    "deliveryMethod": {
     "type": "string",
-    "description": "Delivery Method"
-   },
-   "orderValue": {
-    "type": "string",
-    "description": "Order Value"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
+    "nullable": true,
+    "description": "Condition: delivery method"
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "nullable": true,
+    "description": "Condition: market"
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "nullable": true,
+    "pattern": "^[A-Z]{2}$",
+    "description": "Condition: country"
    },
    "serviceAction": {
     "type": "string",
-    "description": "Service Action"
+    "enum": [
+     "newSale",
+     "modification",
+     "reschedule",
+     "cancellation",
+     "refund",
+     "upgrade"
+    ],
+    "description": "Condition: service action (Action = Reschedule); empty for any",
+    "nullable": true
    },
    "rulePriority": {
-    "type": "string",
-    "description": "Rule Priority"
+    "type": "integer",
+    "description": "Rule Priority: the lower number is evaluated first"
    },
-   "stopProcessing": {
+   "ruleId": {
     "type": "string",
-    "description": "Stop Processing"
+    "description": "Charging rule ID; empty on create"
    },
-   "continueProcessing": {
+   "ruleName": {
     "type": "string",
-    "description": "Continue Processing"
+    "description": "Rule name"
    },
-   "mutualExclusion": {
+   "feeId": {
     "type": "string",
-    "description": "Mutual Exclusion"
+    "description": "The fee from the library (Screen 10.3.4, ADM-071) this rule charges"
    },
-   "stack": {
+   "orderValueMin": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Threshold: order value at or above which the fee applies"
+   },
+   "orderValueMax": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Threshold: order value below which the fee applies (Order Value < AED 100 -> handling fee)"
+   },
+   "quantityMin": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Condition: minimum quantity"
+   },
+   "quantityMax": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Condition: maximum quantity"
+   },
+   "hoursBeforeEventMax": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Condition: the event occurs within this many hours (reschedule within 48 hours)"
+   },
+   "deliveryDestinationZones": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Condition: delivery destination zones (Dubai, Abu Dhabi, Ras Al Khaimah, international), matched from the checkout address (MoM 1 Sep §4.5 shipping fee)"
+   },
+   "combination": {
     "type": "string",
-    "description": "Stack"
+    "enum": [
+     "stack",
+     "replace",
+     "exclude"
+    ],
+    "description": "Fee Combination (p.45): add to other fees, replace them, or exclude named fees"
    },
-   "excludeAnotherFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Exclude Another Fee"
+   "excludedFeeIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Fees excluded or replaced when combination is exclude or replace"
+   },
+   "application": {
+    "type": "string",
+    "enum": [
+     "applyOnce",
+     "applyPerItem"
+    ],
+    "description": "Apply Once per order or Apply Per Item"
+   },
+   "onMatch": {
+    "type": "string",
+    "enum": [
+     "stopProcessing",
+     "continueProcessing"
+    ],
+    "description": "Stop or Continue Processing after this rule applies"
+   },
+   "mutualExclusionGroup": {
+    "type": "string",
+    "nullable": true,
+    "description": "Mutual Exclusion: rules sharing a group never apply together; empty for none"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, inactive or expired"
    }
   }
  },
@@ -2526,158 +3578,144 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Fee & Surcharge Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "bookingFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Booking Fee"
-   },
-   "transactionFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Transaction Fee"
-   },
-   "serviceFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Service Fee"
-   },
-   "convenienceFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Convenience Fee"
-   },
-   "deliveryFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Delivery Fee"
-   },
-   "handlingFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Handling Fee"
-   },
-   "modificationFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Modification Fee"
-   },
-   "reschedulingFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Rescheduling Fee"
-   },
-   "cancellationFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cancellation Fee"
-   },
-   "paymentFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Payment Fee"
-   },
-   "channelFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Channel Fee"
-   },
-   "facilityFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Facility Fee"
-   },
-   "surcharge": {
-    "type": "string",
-    "description": "Surcharge"
-   },
-   "customFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Custom Fee"
-   },
-   "fixedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed Amount"
-   },
    "percentage": {
     "type": "number",
-    "description": "Percentage"
-   },
-   "perTicket": {
-    "type": "string",
-    "description": "Per Ticket"
-   },
-   "perProduct": {
-    "type": "string",
-    "description": "Per Product"
-   },
-   "perPerson": {
-    "type": "string",
-    "description": "Per Person"
-   },
-   "perOrder": {
-    "type": "string",
-    "description": "Per Order"
-   },
-   "perTransaction": {
-    "type": "string",
-    "description": "Per Transaction"
-   },
-   "perDay": {
-    "type": "string",
-    "description": "Per Day"
-   },
-   "tiered": {
-    "type": "string",
-    "description": "Tiered"
+    "nullable": true,
+    "description": "Value in percent when the method is percentage (Online Service Fee 3%)"
    },
    "feeName": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "type": "string",
     "description": "Fee Name"
    },
    "feeCode": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "type": "string",
     "description": "Fee Code"
    },
    "feeType": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee Type"
+    "type": "string",
+    "enum": [
+     "bookingFee",
+     "transactionFee",
+     "serviceFee",
+     "convenienceFee",
+     "deliveryFee",
+     "handlingFee",
+     "modificationFee",
+     "reschedulingFee",
+     "cancellationFee",
+     "refundFee",
+     "paymentFee",
+     "channelFee",
+     "facilityFee",
+     "surcharge",
+     "customFee"
+    ],
+    "description": "Fee Type (p.43)"
    },
    "description": {
     "type": "string",
     "description": "Description"
    },
-   "calculationMethod": {
+   "valueType": {
     "type": "string",
-    "description": "Calculation Method"
-   },
-   "value": {
-    "type": "string",
-    "description": "Value"
+    "enum": [
+     "fixedAmount",
+     "percentage",
+     "tiered"
+    ],
+    "description": "Calculation Method: how the value is expressed"
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
    },
    "taxTreatment": {
     "type": "string",
-    "description": "Tax Treatment"
+    "nullable": true,
+    "description": "Tax Treatment: the tax rule (ADM-070) applied to the fee; empty is flagged Missing Tax Treatment by validation"
    },
    "refundability": {
     "type": "string",
-    "description": "Refundability"
-   },
-   "effectivePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Effective Period"
+    "enum": [
+     "refundable",
+     "nonRefundable"
+    ],
+    "description": "Refundability when the order is refunded"
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: draft, active, inactive or expired"
    },
-   "customerVisible": {
+   "feeId": {
     "type": "string",
-    "description": "Customer Visible"
+    "description": "Fee ID"
    },
-   "includedInDisplayPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Included in Display Price"
-   },
-   "shownSeparately": {
+   "chargeBasis": {
     "type": "string",
-    "description": "Shown Separately"
+    "enum": [
+     "perTicket",
+     "perProduct",
+     "perPerson",
+     "perOrder",
+     "perTransaction",
+     "perDay"
+    ],
+    "description": "What the value is charged per (Call Center Booking Fee AED 15 per order; Online Service Fee 3% per transaction)"
    },
-   "internalOnly": {
+   "amount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Value when the method is fixedAmount"
+   },
+   "tiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromOrderValue": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "amount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true
+      },
+      "percentage": {
+       "type": "number",
+       "nullable": true
+      }
+     }
+    },
+    "description": "Tiers when the method is tiered"
+   },
+   "visibility": {
     "type": "string",
-    "description": "Internal Only"
+    "enum": [
+     "customerVisible",
+     "includedInDisplayPrice",
+     "shownSeparately",
+     "internalOnly"
+    ],
+    "description": "Fee Visibility (p.44)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    }
   }
  },
@@ -2687,105 +3725,796 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Fee Waiver, Tax Exemption & Exception Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "feeWaiver": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee Waiver"
-   },
-   "feeReduction": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee Reduction"
-   },
-   "taxExemption": {
-    "type": "string",
-    "description": "Tax Exemption"
-   },
-   "zeroRatedTax": {
-    "type": "string",
-    "description": "Zero-Rated Tax"
-   },
-   "complimentaryTransaction": {
-    "type": "string",
-    "description": "Complimentary Transaction"
-   },
-   "operationalWaiver": {
-    "type": "string",
-    "description": "Operational Waiver"
-   },
-   "contractualWaiver": {
-    "type": "string",
-    "description": "Contractual Waiver"
-   },
-   "membershipBenefit": {
-    "type": "string",
-    "description": "Membership Benefit"
-   },
-   "loyaltyTier": {
-    "type": "string",
-    "description": "Loyalty Tier"
-   },
-   "corporateAgreement": {
-    "type": "string",
-    "description": "Corporate Agreement"
-   },
-   "b2bContract": {
-    "type": "string",
-    "description": "B2B Contract"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer Segment"
-   },
-   "staffRole": {
-    "type": "string",
-    "description": "Staff Role"
-   },
-   "promotion": {
-    "type": "string",
-    "description": "Promotion"
-   },
-   "serviceRecovery": {
-    "type": "string",
-    "description": "Service Recovery"
-   },
-   "operationalIssue": {
-    "type": "string",
-    "description": "Operational Issue"
-   },
-   "legalExemption": {
-    "type": "string",
-    "description": "Legal Exemption"
-   },
-   "supervisorOverride": {
-    "type": "string",
-    "description": "Supervisor Override"
-   },
-   "reasonMandatory": {
-    "type": "string",
-    "description": "Reason mandatory"
-   },
-   "waiveAed25ModificationFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Waive AED 25 modification fee"
+   "reasonRequired": {
+    "type": "boolean",
+    "description": "Reason mandatory when the exception is applied"
    },
    "exemptionType": {
     "type": "string",
-    "description": "Exemption Type"
+    "nullable": true,
+    "description": "Exemption Type for tax exemptions, e.g. diplomatic, charity (the client's list); empty for fee exceptions"
    },
-   "reference": {
+   "ruleId": {
     "type": "string",
-    "description": "Reference"
+    "description": "Exception rule ID"
    },
-   "evidence": {
+   "ruleName": {
     "type": "string",
-    "description": "Evidence"
+    "description": "Rule name"
    },
-   "validity": {
+   "exceptionType": {
     "type": "string",
-    "description": "Validity"
+    "enum": [
+     "feeWaiver",
+     "feeReduction",
+     "taxExemption",
+     "zeroRatedTax",
+     "complimentaryTransaction",
+     "operationalWaiver",
+     "contractualWaiver"
+    ],
+    "description": "Exception Type (p.46)"
    },
-   "verificationStatus": {
+   "targetFeeIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Fees waived or reduced; empty for a tax exception"
+   },
+   "targetTaxProfileIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Tax profiles exempted or zero-rated; empty for a fee exception"
+   },
+   "reductionPercent": {
+    "type": "number",
+    "nullable": true,
+    "description": "Fee Reduction in percent; empty for a full waiver"
+   },
+   "reductionAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Fee Reduction as an amount; empty for a full waiver"
+   },
+   "eligibilityBasis": {
     "type": "string",
-    "description": "Verification Status"
+    "enum": [
+     "membershipBenefit",
+     "loyaltyTier",
+     "corporateAgreement",
+     "b2bContract",
+     "customerSegment",
+     "staffRole",
+     "promotion",
+     "serviceRecovery",
+     "operationalIssue",
+     "legalExemption",
+     "supervisorOverride"
+    ],
+    "description": "Eligibility Condition (p.46)"
+   },
+   "eligibilityRefId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The membership tier, agreement, contract, segment, role or promotion that qualifies (Gold Member -> Booking Fee waived)"
+   },
+   "approvalRequired": {
+    "type": "boolean",
+    "description": "Approval required before the exception takes effect"
+   },
+   "evidenceRequired": {
+    "type": "boolean",
+    "description": "Tax Exemption Evidence must be captured (p.47)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, inactive or expired"
+   }
+  }
+ },
+ "FinEInvoiceTransmission": {
+  "x-ticvai-persistence": "ledger.einvoice_transmission",
+  "type": "object",
+  "description": "6.1.1. One attempt to send one tax document to the provider, and its answer.",
+  "required": [
+   "id",
+   "documentKind",
+   "documentId",
+   "legalEntityId",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "documentKind": {
+    "type": "string",
+    "enum": [
+     "taxInvoice",
+     "creditMemo"
+    ]
+   },
+   "documentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "documentNumber": {
+    "type": "string"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "providerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "test",
+     "live"
+    ]
+   },
+   "status": {
+    "$ref": "#/components/schemas/FinEInvoiceTransmissionStatus"
+   },
+   "payloadHash": {
+    "type": "string",
+    "nullable": true,
+    "description": "SHA-256 of the document as sent, so a resend can be shown to be the same document."
+   },
+   "providerMessageId": {
+    "type": "string",
+    "nullable": true
+   },
+   "attempt": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "errorCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "errorMessage": {
+    "type": "string",
+    "nullable": true
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "answeredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   }
+  }
+ },
+ "FinEInvoiceTransmissionStatus": {
+  "type": "string",
+  "description": "6.1.1. `notRequired` where the legal entity's provider is `disabled` or absent.",
+  "enum": [
+   "notRequired",
+   "queued",
+   "sent",
+   "accepted",
+   "rejected",
+   "failed"
+  ]
+ },
+ "FinEInvoicingProvider": {
+  "x-ticvai-persistence": "ledger.einvoicing_provider",
+  "type": "object",
+  "description": "6.1.1. Also the `setEInvoicingProvider` body. One per legal entity.",
+  "required": [
+   "legalEntityId",
+   "providerName",
+   "mode"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "providerName": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "The accredited service provider the client appoints."
+   },
+   "endpointUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true
+   },
+   "testEndpointUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true
+   },
+   "credentialRef": {
+    "type": "string",
+    "maxLength": 300,
+    "nullable": true,
+    "description": "A reference to the secret in the vault; the secret is never stored here."
+   },
+   "participantId": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The legal entity's Peppol participant identifier."
+   },
+   "documentFormat": {
+    "type": "string",
+    "enum": [
+     "pintAe"
+    ],
+    "default": "pintAe"
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "disabled",
+     "test",
+     "live"
+    ]
+   },
+   "transmitWithinHours": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "lastAcceptedTestAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `tenant` scope."
+   }
+  }
+ },
+ "FinTaxCategory": {
+  "type": "string",
+  "description": "How a line is treated for VAT. Taken from the tax code the line was posted with.",
+  "enum": [
+   "standardRated",
+   "zeroRated",
+   "exempt",
+   "outOfScope",
+   "reverseCharge"
+  ]
+ },
+ "FinTaxInvoice": {
+  "x-ticvai-persistence": "ledger.tax_invoice + ledger.tax_invoice_line",
+  "type": "object",
+  "description": "5.7.93, 5.10.3. **A guest tax invoice, as issued, never edited.** Corrections are credit memos. The supplier block is a snapshot of the legal entity at issue, so a later change of address does not change a document already given to a guest.",
+  "required": [
+   "id",
+   "invoiceNumber",
+   "invoiceType",
+   "status",
+   "legalEntityId",
+   "issuedAt",
+   "supplyDate",
+   "currency",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "invoiceNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Server-assigned from the legal entity's series for the document kind, in sequence and without gaps, e.g. `INV-2026-000123`. Never reused."
+   },
+   "invoiceType": {
+    "$ref": "#/components/schemas/FinTaxInvoiceType"
+   },
+   "status": {
+    "$ref": "#/components/schemas/FinTaxInvoiceStatus"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "supplierName": {
+    "type": "string"
+   },
+   "supplierAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "supplierTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest the orders belong to; the key a guest's own reads filter on."
+   },
+   "buyerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerCountryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "buyerTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "customerAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "supplyDate": {
+    "type": "string",
+    "format": "date",
+    "description": "The date of supply where it differs from the issue date (the latest order's payment date on a consolidated invoice). A day in the region's time zone."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmountInLegalCurrency": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs, at the rate the orders were stored at."
+   },
+   "creditedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "supersedesInvoiceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "renditionAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The PDF rendered at issue; read through getTaxDocumentRendition."
+   },
+   "eInvoiceStatus": {
+    "$ref": "#/components/schemas/FinEInvoiceTransmissionStatus"
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Null where the platform issued it."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FinTaxInvoiceLine"
+    }
+   },
+   "taxSummary": {
+    "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "VAT per rate and category, summed from the lines for the response.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "taxCategory": {
+       "$ref": "#/components/schemas/FinTaxCategory"
+      },
+      "taxRate": {
+       "type": "number"
+      },
+      "taxableAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "taxAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written at the scope of the venue the orders were sold at, or the region for a consolidated invoice across venues."
+   }
+  }
+ },
+ "FinTaxInvoiceLine": {
+  "type": "object",
+  "description": "One line as it was sold and taxed. Amounts are in the invoice currency.",
+  "required": [
+   "lineNumber",
+   "description",
+   "quantity",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "taxCategory"
+  ],
+  "properties": {
+   "lineNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderLineId": {
+    "type": "string",
+    "nullable": true
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "quantity": {
+    "type": "number"
+   },
+   "unitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "taxRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "taxCategory": {
+    "$ref": "#/components/schemas/FinTaxCategory"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "creditedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "FinTaxInvoiceStatus": {
+  "type": "string",
+  "description": "`issued` until a credit memo is issued against it; `superseded` where a full invoice replaced a simplified one for the same supply (only if the law allows it; see issueTaxInvoice).",
+  "enum": [
+   "issued",
+   "partiallyCredited",
+   "fullyCredited",
+   "superseded"
+  ]
+ },
+ "FinTaxInvoiceTemplate": {
+  "x-ticvai-persistence": "ledger.tax_invoice_template",
+  "type": "object",
+  "description": "5.7.93, 5.7.94. Also the `setTaxInvoiceTemplate` body. One per legal entity and document kind.",
+  "required": [
+   "legalEntityId",
+   "documentKind",
+   "numberPrefix",
+   "languages"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "documentKind": {
+    "type": "string",
+    "enum": [
+     "taxInvoice",
+     "simplifiedTaxInvoice",
+     "creditMemo"
+    ]
+   },
+   "numberPrefix": {
+    "type": "string",
+    "maxLength": 20,
+    "description": "e.g. `INV-`, `SINV-`, `CN-`. The year is added by the series when `resetsYearly`."
+   },
+   "resetsYearly": {
+    "type": "boolean",
+    "default": true,
+    "description": "A new series per fiscal year of the legal entity."
+   },
+   "nextNumber": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "May be raised, never lowered below the last number issued."
+   },
+   "numberPadding": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 12,
+    "default": 6
+   },
+   "languages": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Rendered on one page in this order, e.g. `en`, `ar`.",
+    "items": {
+     "type": "string",
+     "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+    }
+   },
+   "title": {
+    "type": "object",
+    "description": "The document title per language, e.g. \"Tax Invoice\". Prescribed wording is law (CF-133).",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "footerText": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "logoAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "layoutKey": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true
+   },
+   "autoIssueOnPayment": {
+    "type": "boolean",
+    "default": false,
+    "description": "For `simplifiedTaxInvoice`, issue one on every paid order (the VAT receipt)."
+   },
+   "simplifiedAllowedUpTo": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "showLegalCurrencyTax": {
+    "type": "boolean",
+    "default": true,
+    "description": "Show the tax in the legal entity's currency when the invoice currency differs."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `tenant` scope."
+   }
+  }
+ },
+ "FinTaxInvoiceType": {
+  "type": "string",
+  "description": "5.7.93. `simplified` for one order with no recipient details, `full` for one order with them, `consolidated` for several paid orders of one buyer on one invoice.",
+  "enum": [
+   "simplified",
+   "full",
+   "consolidated"
+  ]
+ },
+ "FinVatReturn": {
+  "x-ticvai-persistence": "none — computed from ledger postings on the reporting replica",
+  "type": "object",
+  "description": "6.1.23. The FTA VAT 201 boxes for one legal entity and tax period.",
+  "required": [
+   "legalEntityId",
+   "periodFrom",
+   "periodTo",
+   "boxes",
+   "netTaxPayable"
+  ],
+  "properties": {
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "taxRegistrationNumber": {
+    "type": "string"
+   },
+   "periodFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "periodTo": {
+    "type": "string",
+    "format": "date"
+   },
+   "boxes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "box",
+      "amount",
+      "taxAmount"
+     ],
+     "properties": {
+      "box": {
+       "type": "string",
+       "description": "The form's box, e.g. `1a` (standard-rated supplies, Abu Dhabi) ... `1g`, `2` (tourist refunds), `3` (reverse charge), `4` (zero-rated), `5` (exempt), `6` and `7` (imports), `9` (standard-rated expenses), `10` (reverse charge inputs)."
+      },
+      "label": {
+       "type": "string"
+      },
+      "emirate": {
+       "type": "string",
+       "nullable": true
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "taxAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "adjustmentAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "taxCodeIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "postingCount": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "totalOutputTax": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalRecoverableTax": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netTaxPayable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "fileUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "description": "Set for `format` `csv` or `xlsx`; a short-lived link."
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -2795,64 +4524,75 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Price Breakdown, Calculation Simulation & Explainability submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "selectType": {
+   "customerId": {
     "type": "string",
-    "enum": [
-     "customer",
-     "product",
-     "quantity",
-     "venue",
-     "event",
-     "channel",
-     "date",
-     "timeslot",
-     "membership",
-     "promotion",
-     "paymentMethod",
-     "deliveryMethod",
-     "currency"
-    ],
-    "description": "Vocabulary listed under Select."
+    "nullable": true,
+    "description": "Customer"
    },
-   "aed50": {
+   "productId": {
     "type": "string",
-    "description": "− AED 50"
+    "description": "Product"
    },
-   "aed25": {
-    "type": "string",
-    "description": "− AED 25"
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity",
+    "minimum": 1
    },
-   "source": {
+   "venueId": {
     "type": "string",
-    "description": "Source"
+    "nullable": true,
+    "description": "Venue"
    },
-   "rule": {
+   "eventId": {
     "type": "string",
-    "description": "Rule"
+    "nullable": true,
+    "description": "Event"
    },
-   "formula": {
-    "type": "string",
-    "description": "Formula"
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Channel"
    },
-   "input": {
+   "date": {
     "type": "string",
-    "description": "Input"
+    "format": "date",
+    "description": "Date of visit"
    },
-   "output": {
+   "timeslotId": {
     "type": "string",
-    "description": "Output"
+    "nullable": true,
+    "description": "Timeslot"
    },
-   "reason": {
+   "membershipId": {
     "type": "string",
-    "description": "Reason"
+    "nullable": true,
+    "description": "Membership"
    },
-   "taxTreatment": {
+   "promotionCode": {
     "type": "string",
-    "description": "Tax Treatment"
+    "nullable": true,
+    "description": "Promotion"
    },
-   "sequence": {
+   "paymentMethod": {
     "type": "string",
-    "description": "Sequence"
+    "nullable": true,
+    "description": "Payment Method"
+   },
+   "deliveryMethod": {
+    "type": "string",
+    "nullable": true,
+    "description": "Delivery Method"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "compareChannels": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+    },
+    "description": "Channel Comparison (p.51): run the same transaction through these channels too; empty for none"
    }
   }
  },
@@ -2862,76 +4602,124 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Price Breakdown, Calculation Simulation & Explainability displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "selectType": {
-    "type": "string",
-    "enum": [
-     "customer",
-     "product",
-     "quantity",
-     "venue",
-     "event",
-     "channel",
-     "date",
-     "timeslot",
-     "membership",
-     "promotion",
-     "paymentMethod",
-     "deliveryMethod",
-     "currency"
-    ],
-    "description": "Vocabulary listed under Select."
-   },
-   "aed50": {
-    "type": "string",
-    "description": "− AED 50"
-   },
-   "aed25": {
-    "type": "string",
-    "description": "− AED 25"
-   },
-   "bookingFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Booking Fee (the pack shows AED 10)"
-   },
-   "vat": {
-    "type": "string",
-    "description": "VAT (the pack shows AED 21.75)"
-   },
    "finalPayable": {
-    "type": "string",
-    "description": "Final Payable (the pack shows AED 456.75)"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Final Payable"
    },
-   "source": {
-    "type": "string",
-    "description": "Source"
+   "components": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "sequence": {
+       "type": "integer"
+      },
+      "componentType": {
+       "type": "string",
+       "enum": [
+        "selectedRate",
+        "memberAdjustment",
+        "dynamicAdjustment",
+        "promotion",
+        "packageAdjustment",
+        "fee",
+        "surcharge",
+        "waiver",
+        "tax",
+        "rounding"
+       ]
+      },
+      "label": {
+       "type": "string",
+       "description": "e.g. Booking Fee, VAT"
+      },
+      "source": {
+       "type": "string",
+       "description": "Source: the price list, rule, fee or tax profile"
+      },
+      "rule": {
+       "type": "string",
+       "description": "Rule: id of the rule applied, e.g. FE-021, TAX-UAE-01"
+      },
+      "formula": {
+       "type": "string"
+      },
+      "input": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "Input amount"
+      },
+      "output": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "Output amount (negative for a reduction)"
+      },
+      "reason": {
+       "type": "string"
+      },
+      "taxTreatment": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    },
+    "description": "Explainability Panel and Rule Trace (p.51), in sequence"
    },
-   "rule": {
-    "type": "string",
-    "description": "Rule"
+   "selectedRate": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Selected Rate x quantity"
    },
-   "formula": {
-    "type": "string",
-    "description": "Formula"
+   "discountTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discounts and adjustments total"
    },
-   "input": {
-    "type": "string",
-    "description": "Input"
+   "feeTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fees total"
    },
-   "output": {
-    "type": "string",
-    "description": "Output"
+   "subtotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Subtotal before tax"
    },
-   "reason": {
-    "type": "string",
-    "description": "Reason"
+   "taxTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Tax total"
    },
-   "taxTreatment": {
+   "calculationVersion": {
     "type": "string",
-    "description": "Tax Treatment"
+    "description": "Calculation version used"
    },
-   "sequence": {
-    "type": "string",
-    "description": "Sequence"
+   "channelComparison": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "channel": {
+       "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+      },
+      "finalPayable": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "difference": {
+       "type": "string",
+       "description": "Why it differs, e.g. Call Center Booking Fee"
+      }
+     }
+    },
+    "description": "Channel Comparison results"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI observations for this screen; advisory only, never applied automatically"
    }
   }
  },
@@ -2943,91 +4731,356 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "input": {
     "type": "string",
-    "description": "Input"
+    "description": "Input: the named value the step reads, e.g. subtotal"
    },
    "formula": {
     "type": "string",
-    "description": "Formula"
+    "description": "Formula expression, governed"
    },
    "sequence": {
-    "type": "string",
-    "description": "Sequence"
+    "type": "integer",
+    "description": "Sequence: position in the pipeline"
    },
    "taxability": {
     "type": "string",
-    "description": "Taxability"
+    "enum": [
+     "inTaxBase",
+     "outsideTaxBase"
+    ],
+    "description": "Taxability: whether this step's amount is part of the tax base; a discount outsideTaxBase gives tax on the pre-discount price where the region requires it (MoM 1 Sep §4.5)"
    },
    "rounding": {
     "type": "string",
-    "description": "Rounding"
+    "nullable": true,
+    "description": "Rounding rule applied after the step (ADM-075); empty for none"
    },
-   "dependency": {
-    "type": "string",
-    "description": "Dependency"
+   "dependsOn": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Dependency: steps whose output this step needs"
    },
    "output": {
     "type": "string",
-    "description": "Output"
+    "description": "Output: the named value the step produces"
    },
-   "fixedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed Amount"
-   },
-   "percentage": {
-    "type": "number",
-    "description": "Percentage"
-   },
-   "percentageOfBase": {
-    "type": "number",
-    "description": "Percentage of Base"
-   },
-   "percentageOfSubtotal": {
-    "type": "number",
-    "description": "Percentage of Subtotal"
-   },
-   "tiered": {
+   "stepId": {
     "type": "string",
-    "description": "Tiered"
+    "description": "Step ID"
    },
-   "conditional": {
+   "calculationProfileId": {
     "type": "string",
-    "description": "Conditional"
+    "description": "Calculation profile the step belongs to"
    },
-   "minimum": {
+   "stepType": {
     "type": "string",
-    "description": "Minimum"
+    "enum": [
+     "commercialBaseRate",
+     "contextualRateSelection",
+     "dynamicPricingAdjustment",
+     "promotionDiscount",
+     "packageBundleAdjustment",
+     "feesSurcharges",
+     "taxCalculation",
+     "rounding",
+     "finalPayableAmount"
+    ],
+    "description": "Pipeline stage (Recommended Calculation Pipeline, pp.47-48)"
    },
-   "maximum": {
+   "formulaType": {
     "type": "string",
-    "description": "Maximum"
+    "enum": [
+     "fixedAmount",
+     "percentage",
+     "percentageOfBase",
+     "percentageOfSubtotal",
+     "tiered",
+     "conditional",
+     "minimum",
+     "maximum",
+     "customGovernedFormula"
+    ],
+    "description": "Formula Builder kind (p.48)"
    },
-   "customGovernedFormula": {
+   "version": {
     "type": "string",
-    "description": "Custom Governed Formula"
+    "description": "Formula version"
    },
-   "aed20": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "−AED 20"
+    "format": "date",
+    "description": "Effective From"
    },
-   "serviceFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Service Fee (the pack shows +AED 10)"
-   },
-   "vat": {
+   "effectiveTo": {
     "type": "string",
-    "description": "VAT (the pack shows 48 | Pag e, +AED 9.50)"
-   },
-   "final": {
-    "type": "string",
-    "description": "Final (the pack shows AED 199.50)"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    }
   }
  },
- "TaxFeeCalculationCommandCenterView": {
+ "PricingFee": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.fee",
+  "description": "**The fee and surcharge library** (29 September, data model DM3). ADM-071. What a fee is and how it computes; when it applies is `catalogue.fee_rule`. Distinct from `payments.fee_rule` (a provider's processing cost) and `orders.order_fee` (a fee as charged on one order).",
+  "required": [
+   "id",
+   "scopePath",
+   "code",
+   "name",
+   "feeType",
+   "valueType",
+   "chargeBasis",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 40
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "feeType": {
+    "type": "string",
+    "enum": [
+     "bookingFee",
+     "transactionFee",
+     "serviceFee",
+     "convenienceFee",
+     "deliveryFee",
+     "handlingFee",
+     "modificationFee",
+     "reschedulingFee",
+     "cancellationFee",
+     "refundFee",
+     "paymentFee",
+     "channelFee",
+     "facilityFee",
+     "surcharge",
+     "customFee"
+    ]
+   },
+   "valueType": {
+    "type": "string",
+    "enum": [
+     "fixedAmount",
+     "percentage",
+     "tiered"
+    ]
+   },
+   "chargeBasis": {
+    "type": "string",
+    "enum": [
+     "perTicket",
+     "perProduct",
+     "perPerson",
+     "perOrder",
+     "perTransaction",
+     "perDay"
+    ]
+   },
+   "amount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "percentage": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100
+   },
+   "tiers": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`[{fromOrderValue, amount, percentage}]` for `valueType: tiered`."
+   },
+   "taxTreatment": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "How the fee is taxed; a `catalogue.tax_rule` may refine it."
+   },
+   "refundability": {
+    "type": "string",
+    "enum": [
+     "refundable",
+     "nonRefundable"
+    ],
+    "default": "nonRefundable"
+   },
+   "visibility": {
+    "type": "string",
+    "enum": [
+     "customerVisible",
+     "includedInDisplayPrice",
+     "shownSeparately",
+     "internalOnly"
+    ],
+    "default": "shownSeparately"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CatalogueConfigStatus"
+     }
+    ],
+    "default": "draft"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "RoundingProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.rounding_profile",
+  "description": "**Precision and rounding for one currency** (29 September, data model DM3). ADM-075. One per currency the tenant sells in; the engine keeps line totals + tax + fees equal to the transaction total. Distinct from `payments.currency_rule` (settlement currency and payment limits). The currency here is the subject of the rule, not the denomination of an amount.",
+  "required": [
+   "id",
+   "scopePath",
+   "currency",
+   "decimalPlaces",
+   "roundingMethod",
+   "roundingStage",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `tenant` scope."
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "currency": {
+    "type": "string",
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$"
+   },
+   "decimalPlaces": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 3,
+    "description": "Up to three without rounding the third away (MoM 1 Sep 2026 §4.5)."
+   },
+   "minimumMonetaryUnit": {
+    "type": "number",
+    "nullable": true
+   },
+   "displayPrecision": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 4
+   },
+   "calculationPrecision": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "default": 4
+   },
+   "roundingMethod": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "roundUp",
+     "roundDown",
+     "bankers",
+     "nearestCurrencyUnit",
+     "customRegulatoryRule"
+    ]
+   },
+   "roundingStage": {
+    "type": "string",
+    "enum": [
+     "perItem",
+     "perTax",
+     "perFee",
+     "perLine",
+     "atOrderTotal"
+    ]
+   },
+   "cashRoundingIncrement": {
+    "type": "number",
+    "nullable": true
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CatalogueConfigStatus"
+     }
+    ],
+    "default": "active"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "TaxFeeCalculationCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Tax, Fee & Calculation Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Tax, Fee & Calculation Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "activeTaxProfiles": {
     "type": "integer",
@@ -3054,11 +5107,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Calculation Profiles"
    },
    "productsMissingTax": {
-    "type": "string",
-    "description": "Products Missing Tax"
+    "type": "integer",
+    "description": "Products Missing Tax: active products with no applicable tax profile"
    },
    "productsMissingCalculationProfile": {
-    "type": "string",
+    "type": "integer",
     "description": "Products Missing Calculation Profile"
    },
    "configurationConflicts": {
@@ -3075,15 +5128,46 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "recentlyModifiedRules": {
     "type": "integer",
-    "description": "Recently Modified Rules"
+    "description": "Recently Modified Rules: changed in the last 7 days (decided 29 September, readiness close-out)"
    },
+   "alerts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Alerts (pp.39-40), e.g. \"14 active products have no applicable VAT profile\""
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI observations for this screen; advisory only, never applied automatically"
+   }
+  }
+ },
+ "TaxFeeCalculationCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Tax, Fee & Calculation Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "profileName": {
     "type": "string",
     "description": "Profile Name"
    },
    "type": {
     "type": "string",
-    "description": "Type"
+    "enum": [
+     "tax",
+     "fee",
+     "surcharge",
+     "waiver",
+     "exemption",
+     "calculationProfile",
+     "roundingProfile"
+    ],
+    "description": "Configuration Type (p.39)"
    },
    "country": {
     "type": "string",
@@ -3099,24 +5183,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
    },
    "productScope": {
     "type": "string",
     "description": "Product Scope"
    },
-   "effectivePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Effective Period"
-   },
    "status": {
-    "type": "integer",
-    "description": "Status"
+    "type": "string",
+    "description": "Status: draft, active, inactive or expired"
    },
    "owner": {
     "type": "string",
     "description": "Owner"
+   },
+   "profileId": {
+    "type": "string",
+    "description": "ID of the tax profile, fee, rule or profile"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    }
   }
  },
@@ -3136,13 +5231,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "taxType": {
     "type": "string",
-    "description": "Tax Type"
+    "enum": [
+     "vat",
+     "gst",
+     "salesTax",
+     "entertainmentTax",
+     "tourismTax",
+     "municipalityTax",
+     "serviceTax",
+     "customRegulatoryTax"
+    ],
+    "description": "Tax Type (pp.40-41)"
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "description": "Country: ISO 3166-1 alpha-2 code",
+    "pattern": "^[A-Z]{2}$"
    },
-   "regionJurisdiction": {
+   "jurisdiction": {
     "type": "string",
     "description": "Region/Jurisdiction"
    },
@@ -3156,91 +5262,78 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
    },
    "effectiveFrom": {
     "type": "string",
-    "description": "Effective From"
+    "format": "date",
+    "description": "Effective From; new structures are future-dated and never change historical transactions"
    },
    "effectiveTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: draft, active, inactive or expired"
    },
    "owner": {
     "type": "string",
     "description": "Owner"
    },
-   "vat": {
-    "type": "string",
-    "description": "VAT"
-   },
-   "gst": {
-    "type": "string",
-    "description": "GST"
-   },
-   "salesTax": {
-    "type": "string",
-    "description": "Sales Tax"
-   },
-   "entertainmentTax": {
-    "type": "string",
-    "description": "Entertainment Tax"
-   },
-   "tourismTax": {
-    "type": "string",
-    "description": "Tourism Tax"
-   },
-   "municipalityTax": {
-    "type": "string",
-    "description": "Municipality Tax"
-   },
-   "serviceTax": {
-    "type": "string",
-    "description": "Service Tax"
-   },
-   "customRegulatoryTax": {
-    "type": "string",
-    "description": "Custom Regulatory Tax"
-   },
-   "market": {
-    "type": "string",
-    "description": "Market"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product Category"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "service": {
-    "type": "string",
-    "description": "Service"
-   },
-   "channelWhereLegallyApplicable": {
-    "type": "string",
-    "description": "Channel where legally applicable"
-   },
-   "countryUae": {
-    "type": "string",
-    "description": "Country: UAE"
-   },
-   "taxTypeVat": {
-    "type": "string",
-    "description": "Tax Type: VAT"
-   },
-   "rate5": {
+   "ratePercent": {
     "type": "number",
-    "description": "Rate: 5%"
+    "nullable": true,
+    "description": "Rate in percent (UAE VAT 5); empty when the tax is a fixed amount set on the tax rule"
+   },
+   "taxProfileId": {
+    "type": "string",
+    "description": "Tax profile ID; empty on create"
+   },
+   "jurisdictionLevel": {
+    "type": "string",
+    "enum": [
+     "country",
+     "region",
+     "municipality"
+    ],
+    "description": "Jurisdiction Hierarchy (p.41): the level this profile applies at"
+   },
+   "applicability": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "level": {
+       "type": "string",
+       "enum": [
+        "legalEntity",
+        "country",
+        "market",
+        "venue",
+        "productCategory",
+        "product",
+        "service",
+        "channel"
+       ]
+      },
+      "refId": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Applicability (p.41): where the profile applies; a channel only where legally applicable"
+   },
+   "taxBase": {
+    "type": "string",
+    "enum": [
+     "discountedPrice",
+     "preDiscountPrice"
+    ],
+    "description": "Which price the tax is computed on; preDiscountPrice where the jurisdiction taxes the full price before discount (MoM 1 Sep §4.5, e.g. Egypt). The client sets it per jurisdiction; discountedPrice is the default (decided 29 September, readiness close-out)"
    }
   }
  },
@@ -3260,13 +5353,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "taxType": {
     "type": "string",
-    "description": "Tax Type"
+    "enum": [
+     "vat",
+     "gst",
+     "salesTax",
+     "entertainmentTax",
+     "tourismTax",
+     "municipalityTax",
+     "serviceTax",
+     "customRegulatoryTax"
+    ],
+    "description": "Tax Type (pp.40-41)"
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "description": "Country: ISO 3166-1 alpha-2 code",
+    "pattern": "^[A-Z]{2}$"
    },
-   "regionJurisdiction": {
+   "jurisdiction": {
     "type": "string",
     "description": "Region/Jurisdiction"
    },
@@ -3280,95 +5384,86 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
    },
    "effectiveFrom": {
     "type": "string",
-    "description": "Effective From"
+    "format": "date",
+    "description": "Effective From; new structures are future-dated and never change historical transactions"
    },
    "effectiveTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: draft, active, inactive or expired"
    },
    "owner": {
     "type": "string",
     "description": "Owner"
    },
-   "vat": {
-    "type": "string",
-    "description": "VAT"
-   },
-   "gst": {
-    "type": "string",
-    "description": "GST"
-   },
-   "salesTax": {
-    "type": "string",
-    "description": "Sales Tax"
-   },
-   "entertainmentTax": {
-    "type": "string",
-    "description": "Entertainment Tax"
-   },
-   "tourismTax": {
-    "type": "string",
-    "description": "Tourism Tax"
-   },
-   "municipalityTax": {
-    "type": "string",
-    "description": "Municipality Tax"
-   },
-   "serviceTax": {
-    "type": "string",
-    "description": "Service Tax"
-   },
-   "customRegulatoryTax": {
-    "type": "string",
-    "description": "Custom Regulatory Tax"
-   },
-   "market": {
-    "type": "string",
-    "description": "Market"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product Category"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "service": {
-    "type": "string",
-    "description": "Service"
-   },
-   "channelWhereLegallyApplicable": {
-    "type": "string",
-    "description": "Channel where legally applicable"
-   },
-   "countryUae": {
-    "type": "string",
-    "description": "Country: UAE"
-   },
-   "taxTypeVat": {
-    "type": "string",
-    "description": "Tax Type: VAT"
-   },
-   "rate5": {
+   "ratePercent": {
     "type": "number",
-    "description": "Rate: 5%"
+    "nullable": true,
+    "description": "Rate in percent (UAE VAT 5); empty when the tax is a fixed amount set on the tax rule"
    },
-   "whereDifferentRulesApply": {
+   "taxProfileId": {
     "type": "string",
-    "description": "where different rules apply"
+    "description": "Tax profile ID; empty on create"
+   },
+   "jurisdictionLevel": {
+    "type": "string",
+    "enum": [
+     "country",
+     "region",
+     "municipality"
+    ],
+    "description": "Jurisdiction Hierarchy (p.41): the level this profile applies at"
+   },
+   "applicability": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "level": {
+       "type": "string",
+       "enum": [
+        "legalEntity",
+        "country",
+        "market",
+        "venue",
+        "productCategory",
+        "product",
+        "service",
+        "channel"
+       ]
+      },
+      "refId": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Applicability (p.41): where the profile applies; a channel only where legally applicable"
+   },
+   "taxBase": {
+    "type": "string",
+    "enum": [
+     "discountedPrice",
+     "preDiscountPrice"
+    ],
+    "description": "Which price the tax is computed on; preDiscountPrice where the jurisdiction taxes the full price before discount (MoM 1 Sep §4.5, e.g. Egypt). The client sets it per jurisdiction; discountedPrice is the default (decided 29 September, readiness close-out)"
+   },
+   "consumingProductCount": {
+    "type": "integer",
+    "description": "Dependencies: products using the profile; read-only"
+   },
+   "consumingVenueCount": {
+    "type": "integer",
+    "description": "Dependencies: venues using the profile; read-only"
    }
   }
  },
@@ -3378,94 +5473,142 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Tax Rule & Treatment Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "taxInclusive": {
-    "type": "string",
-    "description": "Tax Inclusive"
-   },
-   "taxExclusive": {
-    "type": "string",
-    "description": "Tax Exclusive"
-   },
-   "taxExempt": {
-    "type": "string",
-    "description": "Tax Exempt"
-   },
-   "zeroRated": {
-    "type": "string",
-    "description": "Zero Rated"
-   },
-   "outOfScope": {
-    "type": "string",
-    "description": "Out of Scope"
-   },
-   "percentage": {
-    "type": "number",
-    "description": "Percentage"
-   },
-   "fixedTax": {
-    "type": "string",
-    "description": "Fixed Tax"
-   },
-   "tiered": {
-    "type": "string",
-    "description": "Tiered"
-   },
-   "compound": {
-    "type": "string",
-    "description": "Compound"
-   },
-   "sequential": {
-    "type": "string",
-    "description": "Sequential"
-   },
-   "multipleConcurrentTaxes": {
-    "type": "string",
-    "description": "Multiple Concurrent Taxes"
-   },
-   "exampleInclusive": {
-    "type": "string",
-    "description": "Example — Inclusive"
-   },
-   "exampleExclusive": {
-    "type": "string",
-    "description": "Example — Exclusive"
-   },
    "product": {
     "type": "string",
-    "description": "Product"
+    "nullable": true,
+    "description": "Condition: product; empty for any"
    },
    "productCategory": {
     "type": "string",
-    "description": "Product Category"
+    "nullable": true,
+    "description": "Condition: product category; empty for any"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "nullable": true,
+    "description": "Condition: venue; empty for any"
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "nullable": true,
+    "pattern": "^[A-Z]{2}$",
+    "description": "Condition: country; empty for any"
    },
    "legalEntity": {
     "type": "string",
-    "description": "Legal Entity"
+    "nullable": true,
+    "description": "Condition: legal entity; empty for any"
    },
    "transactionType": {
     "type": "string",
-    "description": "Transaction Type"
+    "nullable": true,
+    "description": "Condition: transaction type (sale, refund, amendment, ...); empty for any"
    },
-   "customerTypeWhereLegallyRelevant": {
+   "customerType": {
     "type": "string",
-    "description": "Customer Type where legally relevant"
+    "nullable": true,
+    "description": "Condition: customer type, only where legally relevant"
    },
-   "salesChannelWhereLegallyRelevant": {
-    "type": "string",
-    "description": "Sales Channel where legally relevant"
+   "salesChannel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Condition: sales channel, only where legally relevant; empty for any"
    },
-   "effectiveDate": {
+   "taxRuleId": {
     "type": "string",
-    "format": "date-time",
-    "description": "Effective Date"
+    "description": "Tax rule ID; empty on create"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "Rule name"
+   },
+   "treatment": {
+    "type": "string",
+    "enum": [
+     "taxInclusive",
+     "taxExclusive",
+     "taxExempt",
+     "zeroRated",
+     "outOfScope"
+    ],
+    "description": "Tax Treatment (pp.41-42): inclusive (displayed price contains the tax) or exclusive (tax added on top), exempt, zero rated or out of scope"
+   },
+   "calculationMethod": {
+    "type": "string",
+    "enum": [
+     "percentage",
+     "fixedTax",
+     "tiered",
+     "compound",
+     "sequential",
+     "multipleConcurrent"
+    ],
+    "description": "Calculation Method (p.42)"
+   },
+   "taxes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "taxProfileId": {
+       "type": "string"
+      },
+      "sequence": {
+       "type": "integer",
+       "description": "Order of application (Base -> Entertainment Tax -> Municipality Fee -> VAT)"
+      },
+      "onPreviousTaxes": {
+       "type": "boolean",
+       "description": "Tax-on-tax: computed on the base plus the taxes before it (MoM 1 Sep §4.5)"
+      },
+      "fixedAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "Amount when the method is fixedTax"
+      }
+     }
+    },
+    "description": "The tax profiles applied, in configurable sequence (Multiple Taxes, pp.42-43)"
+   },
+   "tiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "ratePercent": {
+       "type": "number"
+      }
+     }
+    },
+    "description": "Tiers when the method is tiered; empty otherwise"
+   },
+   "exemptionRuleIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Approved exemption conditions this rule honours (Screen 10.3.6, ADM-073)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, inactive or expired"
    }
   }
  },
@@ -3475,94 +5618,142 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Tax Rule & Treatment Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "taxInclusive": {
-    "type": "string",
-    "description": "Tax Inclusive"
-   },
-   "taxExclusive": {
-    "type": "string",
-    "description": "Tax Exclusive"
-   },
-   "taxExempt": {
-    "type": "string",
-    "description": "Tax Exempt"
-   },
-   "zeroRated": {
-    "type": "string",
-    "description": "Zero Rated"
-   },
-   "outOfScope": {
-    "type": "string",
-    "description": "Out of Scope"
-   },
-   "percentage": {
-    "type": "number",
-    "description": "Percentage"
-   },
-   "fixedTax": {
-    "type": "string",
-    "description": "Fixed Tax"
-   },
-   "tiered": {
-    "type": "string",
-    "description": "Tiered"
-   },
-   "compound": {
-    "type": "string",
-    "description": "Compound"
-   },
-   "sequential": {
-    "type": "string",
-    "description": "Sequential"
-   },
-   "multipleConcurrentTaxes": {
-    "type": "string",
-    "description": "Multiple Concurrent Taxes"
-   },
-   "exampleInclusive": {
-    "type": "string",
-    "description": "Example — Inclusive"
-   },
-   "exampleExclusive": {
-    "type": "string",
-    "description": "Example — Exclusive"
-   },
    "product": {
     "type": "string",
-    "description": "Product"
+    "nullable": true,
+    "description": "Condition: product; empty for any"
    },
    "productCategory": {
     "type": "string",
-    "description": "Product Category"
+    "nullable": true,
+    "description": "Condition: product category; empty for any"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "nullable": true,
+    "description": "Condition: venue; empty for any"
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "nullable": true,
+    "pattern": "^[A-Z]{2}$",
+    "description": "Condition: country; empty for any"
    },
    "legalEntity": {
     "type": "string",
-    "description": "Legal Entity"
+    "nullable": true,
+    "description": "Condition: legal entity; empty for any"
    },
    "transactionType": {
     "type": "string",
-    "description": "Transaction Type"
+    "nullable": true,
+    "description": "Condition: transaction type (sale, refund, amendment, ...); empty for any"
    },
-   "customerTypeWhereLegallyRelevant": {
+   "customerType": {
     "type": "string",
-    "description": "Customer Type where legally relevant"
+    "nullable": true,
+    "description": "Condition: customer type, only where legally relevant"
    },
-   "salesChannelWhereLegallyRelevant": {
-    "type": "string",
-    "description": "Sales Channel where legally relevant"
+   "salesChannel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Condition: sales channel, only where legally relevant; empty for any"
    },
-   "effectiveDate": {
+   "taxRuleId": {
     "type": "string",
-    "format": "date-time",
-    "description": "Effective Date"
+    "description": "Tax rule ID; empty on create"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "Rule name"
+   },
+   "treatment": {
+    "type": "string",
+    "enum": [
+     "taxInclusive",
+     "taxExclusive",
+     "taxExempt",
+     "zeroRated",
+     "outOfScope"
+    ],
+    "description": "Tax Treatment (pp.41-42): inclusive (displayed price contains the tax) or exclusive (tax added on top), exempt, zero rated or out of scope"
+   },
+   "calculationMethod": {
+    "type": "string",
+    "enum": [
+     "percentage",
+     "fixedTax",
+     "tiered",
+     "compound",
+     "sequential",
+     "multipleConcurrent"
+    ],
+    "description": "Calculation Method (p.42)"
+   },
+   "taxes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "taxProfileId": {
+       "type": "string"
+      },
+      "sequence": {
+       "type": "integer",
+       "description": "Order of application (Base -> Entertainment Tax -> Municipality Fee -> VAT)"
+      },
+      "onPreviousTaxes": {
+       "type": "boolean",
+       "description": "Tax-on-tax: computed on the base plus the taxes before it (MoM 1 Sep §4.5)"
+      },
+      "fixedAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "Amount when the method is fixedTax"
+      }
+     }
+    },
+    "description": "The tax profiles applied, in configurable sequence (Multiple Taxes, pp.42-43)"
+   },
+   "tiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "ratePercent": {
+       "type": "number"
+      }
+     }
+    },
+    "description": "Tiers when the method is tiered; empty otherwise"
+   },
+   "exemptionRuleIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Approved exemption conditions this rule honours (Screen 10.3.6, ADM-073)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, inactive or expired"
    }
   }
  }

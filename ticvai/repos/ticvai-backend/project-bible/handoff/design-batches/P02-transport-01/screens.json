@@ -1,0 +1,832 @@
+[
+ {
+  "id": "GST-076",
+  "name": "Intercity Trip — Route & Schedule",
+  "module": "Transport",
+  "requiresModule": "transport",
+  "wave": 3,
+  "implementation": {
+   "app": "guest-app",
+   "route": "/transport/route-and-schedule",
+   "component": "apps/guest-app/src/routes/transport/RouteAndScheduleList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001",
+    "GST-078",
+    "GST-079"
+   ],
+   "exitTo": [
+    "GST-001",
+    "GST-077",
+    "GST-078",
+    "GST-079"
+   ],
+   "transitions": [
+    {
+     "to": "GST-077",
+     "trigger": "Choose a departure",
+     "carries": [
+      "departureId",
+      "routeId"
+     ],
+     "provenance": "decided 29 September, rev 3 REV3-21; prototype r3bus → r3route"
+    },
+    {
+     "to": "GST-078",
+     "trigger": "Multi-trip cards",
+     "provenance": "decided 29 September, rev 3 REV3-21; prototype r3bus"
+    },
+    {
+     "to": "GST-079",
+     "trigger": "Favourites",
+     "provenance": "decided 29 September, rev 3 REV3-21; prototype r3bus",
+     "carries": [
+      "favouriteId"
+     ]
+    },
+    {
+     "to": "GST-001",
+     "trigger": "Home",
+     "back": true,
+     "provenance": "decided 29 September, rev 3 REV3-21"
+    }
+   ]
+  },
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope — stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a route map). **One-way:** From and To stations with a swap, the travel date (timetables are released 30 days ahead), the passengers (adult; child and student half fare; a person of determination travels free — proof is checked by the driver at boarding), a time period with its departure count, then departure cards (departs, arrives, duration, seats left, fare). **Next Available Trip** jumps to the first departure with room. A chosen departure shows a price card and the stop list with *Show full route* and a street map. **The street map needs the internet** and a third-party tile provider approved under audit R038; the stop list and schematic line need neither. Buying a trip is `addCartLine` with `attributes.transport` (route, stations, passenger type); the price comes from `quoteTransportFare`, and a departure with a seat map goes through seat selection on its `performanceId`. **Multi-trip:** 5- and 10-trip cards and weekly or monthly unlimited passes for the station pair, with the saving. **Favourites:** saved routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before departure* is the proposed default of the venue's modification policy, client to correct. **The real network (stations, fares, timetable) is an open value from the client**; the prototype's Emirates Link data is illustrative. **On the app this is four screens** (this one, GST-077 route and passengers, GST-078 multi-trip cards, GST-079 favourites), as the prototype draws them; the web draws one (WEB-049).",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`searchTransportDepartures` reads the population of departures; one is chosen and opens GST-077",
+  "purpose": "Find a departure between two stations for a date and a time of day.",
+  "openQuestions": [
+   "The real network — stations, routes, fares and timetable — is an open value from the client (decided 29 September, rev 3 REV3-21); the prototype's Emirates Link stations and prices are illustrative.",
+   "The street-map tile provider needs approval under audit R038; the approver is still to be named by the client."
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Trip type",
+       "notes": "One-way trip, Multi-trip, Favourites (tabs).",
+       "provenance": "decided 29 September, rev 3 REV3-21; prototype tabs"
+      },
+      {
+       "kind": "selectField",
+       "label": "From",
+       "bindsTo": "Station",
+       "operation": "listTransportStations",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "selectField",
+       "label": "To",
+       "bindsTo": "Station",
+       "operation": "listTransportStations",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "iconButton",
+       "label": "Swap stations",
+       "notes": "Swaps From and To and picks the paired route the other way.",
+       "operation": "listTransportRoutes",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Travel date",
+       "notes": "Timetables are released 30 days ahead.",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time period",
+       "notes": "Morning, Afternoon, Evening, Night, each with its count of departures.",
+       "operation": "searchTransportDepartures",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "cardList",
+       "label": "Departures",
+       "bindsTo": "DepartureOffer",
+       "columns": [
+        "DepartureOffer.routeCode",
+        "DepartureOffer.departsAt",
+        "DepartureOffer.arrivesAt",
+        "DepartureOffer.durationMinutes",
+        "DepartureOffer.seatsLeft",
+        "DepartureOffer.fare"
+       ],
+       "operation": "searchTransportDepartures",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Search Trips",
+       "operation": "searchTransportDepartures",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Next Available Trip",
+       "operation": "getNextTransportDeparture",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The stations and routes.",
+   "error": "Could not load. Names which read failed; nothing is bought.",
+   "emptyFirstRun": "**No routes are published for this venue yet.** Says so; the client still owes the real network (stations, fares, timetable).",
+   "emptyNoResults": "No departure in that period. Names the period and offers **Next Available Trip** or another period or date.",
+   "emptyNoAccess": "Searching and buying need no account. **Favourites need a signed-in guest**: a guest who is not signed in is offered sign-in and brought back, never shown an empty list.",
+   "offline": "**The offline banner shows.** A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "listTransportStations",
+    "contract": "transport",
+    "purpose": "The stations to pick From and To",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTransportRoutes",
+    "contract": "transport",
+    "purpose": "The routes between two stations (the swap uses the paired route)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "searchTransportDepartures",
+    "contract": "transport",
+    "purpose": "Departures for the stations, date, period and party, with counts per period",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getNextTransportDeparture",
+    "contract": "transport",
+    "purpose": "The next departure with room for the party",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "favouriteId",
+     "from": "GST-079",
+     "optional": true
+    }
+   ],
+   "coldEntry": "Arrives with nothing; a saved route from GST-079 prefills both stations."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-076",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Rev 3 feedback → Intercity bus · one-way (r3bus)"
+   }
+  },
+  "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-077",
+  "name": "Intercity Trip — Route & Passengers",
+  "module": "Transport",
+  "requiresModule": "transport",
+  "wave": 3,
+  "implementation": {
+   "app": "guest-app",
+   "route": "/transport/route-and-passengers",
+   "component": "apps/guest-app/src/routes/transport/RouteAndPassengersDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-076"
+   ],
+   "exitTo": [
+    "GST-076",
+    "GST-049",
+    "GST-041",
+    "GST-042"
+   ],
+   "transitions": [
+    {
+     "to": "GST-049",
+     "trigger": "Choose seats on this departure",
+     "carries": [
+      "performanceId"
+     ],
+     "precondition": "the departure has a seat map",
+     "provenance": "decided 29 September, rev 3 REV3-21 (step 2 of 3)"
+    },
+    {
+     "to": "GST-041",
+     "trigger": "Continue to payment",
+     "operation": "addCartLine",
+     "carries": [
+      "cartId"
+     ],
+     "provenance": "decided 29 September, rev 3 REV3-21 (step 3 of 3); prototype r3route"
+    },
+    {
+     "to": "GST-042",
+     "trigger": "Sign in to save this route",
+     "returnsTo": "GST-077",
+     "provenance": "decided 29 September, rev 3 REV3-21"
+    },
+    {
+     "to": "GST-076",
+     "trigger": "Back to departures",
+     "back": true,
+     "provenance": "decided 29 September, rev 3 REV3-21"
+    }
+   ]
+  },
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope — stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a route map). **One-way:** From and To stations with a swap, the travel date (timetables are released 30 days ahead), the passengers (adult; child and student half fare; a person of determination travels free — proof is checked by the driver at boarding), a time period with its departure count, then departure cards (departs, arrives, duration, seats left, fare). **Next Available Trip** jumps to the first departure with room. A chosen departure shows a price card and the stop list with *Show full route* and a street map. **The street map needs the internet** and a third-party tile provider approved under audit R038; the stop list and schematic line need neither. Buying a trip is `addCartLine` with `attributes.transport` (route, stations, passenger type); the price comes from `quoteTransportFare`, and a departure with a seat map goes through seat selection on its `performanceId`. **Multi-trip:** 5- and 10-trip cards and weekly or monthly unlimited passes for the station pair, with the saving. **Favourites:** saved routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before departure* is the proposed default of the venue's modification policy, client to correct. **The real network (stations, fares, timetable) is an open value from the client**; the prototype's Emirates Link data is illustrative.",
+  "density": "comfortable",
+  "pattern": "statusTracker",
+  "patternReason": "`getTransportRoute` reads the one route of the chosen departure; the screen is about that one trip",
+  "purpose": "See the chosen departure's stops and map, add the passengers and buy the trip.",
+  "openQuestions": [
+   "The real network — stations, routes, fares and timetable — is an open value from the client (decided 29 September, rev 3 REV3-21); the prototype's Emirates Link stations and prices are illustrative.",
+   "The street-map tile provider needs approval under audit R038; the approver is still to be named by the client."
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "timeline",
+       "label": "Stops",
+       "bindsTo": "RouteMap.stops",
+       "notes": "From and To with the stops between folded: *Show full route (n stops)*.",
+       "operation": "getTransportRouteMap",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Street map",
+       "bindsTo": "RouteMap",
+       "notes": "Needs the internet and a third-party tile provider approved under audit R038; hidden offline, where the stop list and schematic line remain.",
+       "operation": "getTransportRouteMap",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "numberField",
+       "label": "Passengers",
+       "bindsTo": "PassengerType",
+       "notes": "Adult, child 5-11 and student at half fare, person of determination free (one companion at the adult fare); proof is checked at boarding.",
+       "operation": "getTransportFareTable",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Price card",
+       "bindsTo": "FareQuote",
+       "notes": "Line code and direction (e.g. E101-Out), departs, arrives, seats available, fare per passenger type and total.",
+       "operation": "quoteTransportFare",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "actions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Continue to payment",
+       "notes": "A trip: the passenger type's `variantId`, the departure's `performanceId` and `attributes.transport`. A pass: the pass product's `variantId`, no performance.",
+       "operation": "addCartLine",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save this route",
+       "operation": "saveFavouriteRoute",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The route of the chosen departure.",
+   "error": "Could not load. Names which read failed; nothing is bought.",
+   "emptyFirstRun": "**No routes are published for this venue yet.** Says so; the client still owes the real network (stations, fares, timetable).",
+   "emptyNoResults": "No departure in that period. Names the period and offers **Next Available Trip** or another period or date.",
+   "emptyNoAccess": "Searching and buying need no account. **Favourites need a signed-in guest**: a guest who is not signed in is offered sign-in and brought back, never shown an empty list.",
+   "offline": "**The offline banner shows.** A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "getTransportRoute",
+    "contract": "transport",
+    "purpose": "The route and its stops",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTransportRouteMap",
+    "contract": "transport",
+    "purpose": "Stop list, line and bounds for the map",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTransportFareTable",
+    "contract": "transport",
+    "purpose": "Passenger types and fares of the route",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "quoteTransportFare",
+    "contract": "transport",
+    "purpose": "The price for the stations and passengers",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add the trip or pass to the basket (`attributes.transport`)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "saveFavouriteRoute",
+    "contract": "transport",
+    "purpose": "Save this route",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyFavouriteRoutes"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "routeId",
+     "from": "GST-076"
+    },
+    {
+     "name": "departureId",
+     "from": "GST-076"
+    },
+    {
+     "name": "cartId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**A departure that has left or was cancelled** says which and offers the next departure on the same route."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-077",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Rev 3 feedback → Bus route & passengers (r3route)"
+   }
+  },
+  "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-078",
+  "name": "Intercity Trip — Multi-trip Passes",
+  "module": "Transport",
+  "requiresModule": "transport",
+  "wave": 3,
+  "implementation": {
+   "app": "guest-app",
+   "route": "/transport/multi-trip-passes",
+   "component": "apps/guest-app/src/routes/transport/MultiTripPassesList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-076"
+   ],
+   "exitTo": [
+    "GST-076",
+    "GST-041"
+   ],
+   "transitions": [
+    {
+     "to": "GST-041",
+     "trigger": "Choose a pass",
+     "operation": "addCartLine",
+     "carries": [
+      "cartId"
+     ],
+     "provenance": "decided 29 September, rev 3 REV3-21; prototype r3busmulti"
+    },
+    {
+     "to": "GST-076",
+     "trigger": "One-way instead",
+     "back": true,
+     "provenance": "decided 29 September, rev 3 REV3-21; prototype r3busmulti"
+    }
+   ]
+  },
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope — stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a route map). **One-way:** From and To stations with a swap, the travel date (timetables are released 30 days ahead), the passengers (adult; child and student half fare; a person of determination travels free — proof is checked by the driver at boarding), a time period with its departure count, then departure cards (departs, arrives, duration, seats left, fare). **Next Available Trip** jumps to the first departure with room. A chosen departure shows a price card and the stop list with *Show full route* and a street map. **The street map needs the internet** and a third-party tile provider approved under audit R038; the stop list and schematic line need neither. Buying a trip is `addCartLine` with `attributes.transport` (route, stations, passenger type); the price comes from `quoteTransportFare`, and a departure with a seat map goes through seat selection on its `performanceId`. **Multi-trip:** 5- and 10-trip cards and weekly or monthly unlimited passes for the station pair, with the saving. **Favourites:** saved routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before departure* is the proposed default of the venue's modification policy, client to correct. **The real network (stations, fares, timetable) is an open value from the client**; the prototype's Emirates Link data is illustrative.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listTransportPassOffers` reads the population of passes for the station pair",
+  "purpose": "Buy a 5- or 10-trip card or a weekly or monthly unlimited pass for a station pair.",
+  "openQuestions": [
+   "The real network — stations, routes, fares and timetable — is an open value from the client (decided 29 September, rev 3 REV3-21); the prototype's Emirates Link stations and prices are illustrative.",
+   "The street-map tile provider needs approval under audit R038; the approver is still to be named by the client."
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "From",
+       "bindsTo": "Station",
+       "operation": "listTransportStations",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "selectField",
+       "label": "To",
+       "bindsTo": "Station",
+       "operation": "listTransportStations",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      },
+      {
+       "kind": "cardList",
+       "label": "Multi-trip cards",
+       "bindsTo": "PassOffer",
+       "columns": [
+        "PassOffer.name",
+        "PassOffer.trips",
+        "PassOffer.validityDays",
+        "PassOffer.price",
+        "PassOffer.saving"
+       ],
+       "notes": "The Multi-trip tab.",
+       "operation": "listTransportPassOffers",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Choose",
+       "notes": "A trip: the passenger type's `variantId`, the departure's `performanceId` and `attributes.transport`. A pass: the pass product's `variantId`, no performance.",
+       "operation": "addCartLine",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The passes for the station pair.",
+   "error": "Could not load. Names which read failed; nothing is bought.",
+   "emptyFirstRun": "**No routes are published for this venue yet.** Says so; the client still owes the real network (stations, fares, timetable).",
+   "emptyNoResults": "No departure in that period. Names the period and offers **Next Available Trip** or another period or date.",
+   "emptyNoAccess": "Searching and buying need no account. **Favourites need a signed-in guest**: a guest who is not signed in is offered sign-in and brought back, never shown an empty list.",
+   "offline": "**The offline banner shows.** A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "listTransportStations",
+    "contract": "transport",
+    "purpose": "The stations to pick From and To",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTransportPassOffers",
+    "contract": "transport",
+    "purpose": "Multi-trip and unlimited passes for the station pair",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add the trip or pass to the basket (`attributes.transport`)",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Arrives with the stations last chosen on GST-076, or asks for them."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-078",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Rev 3 feedback → Bus multi-trip cards (r3busmulti)"
+   }
+  },
+  "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-079",
+  "name": "Intercity Trip — Favourite Routes",
+  "module": "Transport",
+  "requiresModule": "transport",
+  "wave": 3,
+  "implementation": {
+   "app": "guest-app",
+   "route": "/transport/favourite-routes",
+   "component": "apps/guest-app/src/routes/transport/FavouriteRoutesList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-076"
+   ],
+   "exitTo": [
+    "GST-076",
+    "GST-042"
+   ],
+   "transitions": [
+    {
+     "to": "GST-076",
+     "trigger": "Book this route",
+     "carries": [
+      "favouriteId"
+     ],
+     "provenance": "decided 29 September, rev 3 REV3-21; prototype r3busfav: a saved route opens the one-way tab with both stations filled in"
+    },
+    {
+     "to": "GST-042",
+     "trigger": "Sign in to see saved routes",
+     "returnsTo": "GST-079",
+     "provenance": "decided 29 September, rev 3 REV3-21"
+    }
+   ]
+  },
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope — stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a route map). **One-way:** From and To stations with a swap, the travel date (timetables are released 30 days ahead), the passengers (adult; child and student half fare; a person of determination travels free — proof is checked by the driver at boarding), a time period with its departure count, then departure cards (departs, arrives, duration, seats left, fare). **Next Available Trip** jumps to the first departure with room. A chosen departure shows a price card and the stop list with *Show full route* and a street map. **The street map needs the internet** and a third-party tile provider approved under audit R038; the stop list and schematic line need neither. Buying a trip is `addCartLine` with `attributes.transport` (route, stations, passenger type); the price comes from `quoteTransportFare`, and a departure with a seat map goes through seat selection on its `performanceId`. **Multi-trip:** 5- and 10-trip cards and weekly or monthly unlimited passes for the station pair, with the saving. **Favourites:** saved routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before departure* is the proposed default of the venue's modification policy, client to correct. **The real network (stations, fares, timetable) is an open value from the client**; the prototype's Emirates Link data is illustrative.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listMyFavouriteRoutes` reads the guest's saved routes",
+  "purpose": "Rebook a saved route in two taps, or remove it.",
+  "openQuestions": [
+   "The real network — stations, routes, fares and timetable — is an open value from the client (decided 29 September, rev 3 REV3-21); the prototype's Emirates Link stations and prices are illustrative.",
+   "The street-map tile provider needs approval under audit R038; the approver is still to be named by the client."
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Favourite routes",
+       "bindsTo": "FavouriteRoute",
+       "columns": [
+        "FavouriteRoute.fromStationName",
+        "FavouriteRoute.toStationName",
+        "FavouriteRoute.adultFare"
+       ],
+       "notes": "The Favourites tab; *Book this route* prefills the one-way tab. Signed-in guests only.",
+       "operation": "listMyFavouriteRoutes",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Remove favourite",
+       "operation": "deleteFavouriteRoute",
+       "provenance": "decided 29 September, rev 3 REV3-21"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved routes.",
+   "error": "Could not load. Names which read failed; nothing is bought.",
+   "emptyFirstRun": "**No saved routes yet.** Says how to save one (Save this route on a trip) and offers the one-way search.",
+   "emptyNoResults": "No departure in that period. Names the period and offers **Next Available Trip** or another period or date.",
+   "emptyNoAccess": "Searching and buying need no account. **Favourites need a signed-in guest**: a guest who is not signed in is offered sign-in and brought back, never shown an empty list.",
+   "offline": "**The offline banner shows.** A route's stop list and schematic line already loaded stay readable with their age; the street map needs the connection. Searching departures, buying a trip or a pass and saving a favourite route need the connection."
+  },
+  "apis": [
+   {
+    "operationId": "listMyFavouriteRoutes",
+    "contract": "transport",
+    "purpose": "The guest's saved routes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "deleteFavouriteRoute",
+    "contract": "transport",
+    "purpose": "Remove a saved route",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyFavouriteRoutes"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "favouriteId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "Needs a signed-in guest; one who is not signed in is offered sign-in first."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-079",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Rev 3 feedback → Bus favourite routes (r3busfav)"
+   }
+  },
+  "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
+  "overlays": [
+   {
+    "id": "confirmDeleteFavouriteRoute",
+    "component": "confirmDialog",
+    "trigger": "Remove favourite",
+    "body": "**Remove this saved route?** It leaves Favourites; nothing already booked on it changes.",
+    "confirm": {
+     "label": "Remove",
+     "operation": "deleteFavouriteRoute"
+    },
+    "dismiss": {
+     "label": "Keep it",
+     "discards": []
+    },
+    "provenance": "client-verified"
+   }
+  ],
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

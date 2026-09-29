@@ -17,11 +17,100 @@
    "component": "apps/venue-management-web/src/routes/analytics/DashboardLibrary.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-022",
+    "ANL-023",
+    "ANL-024",
+    "ANL-025",
+    "ANL-026",
+    "ANL-027",
+    "ANL-028",
+    "ANL-029",
+    "ANL-030"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-001",
+     "trigger": "Back to Executive Command Center",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true,
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
+    },
+    {
+     "to": "ANL-030",
+     "trigger": "Dashboard Preview, Validation & Health",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "carries": [
+      "dashboardId"
+     ]
+    },
+    {
+     "to": "ANL-022",
+     "trigger": "Dashboard Creation Wizard",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-023",
+     "trigger": "Drag-and-Drop Dashboard Canvas",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "carries": [
+      "dashboardId"
+     ]
+    },
+    {
+     "to": "ANL-024",
+     "trigger": "Widget & Visualization Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-025",
+     "trigger": "KPI Builder",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-026",
+     "trigger": "Targets, Thresholds & KPI Status Rules",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-027",
+     "trigger": "Data & Filter Configuration",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "carries": [
+      "dashboardId"
+     ]
+    },
+    {
+     "to": "ANL-028",
+     "trigger": "Drill-Down & Interaction Designer",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "carries": [
+      "dashboardId"
+     ]
+    },
+    {
+     "to": "ANL-029",
+     "trigger": "Dashboard Access, Publishing & Versioning",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "carries": [
+      "dashboardId"
+     ]
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Authorized users can search, filter, manage, clone and govern dashboards from one central catalogue.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display dashboard cards/table containing; Dashboard Categories; Dashboard Types) and no metric row",
   "purpose": "Provide a centralized catalogue for all standard, custom, AI-generated and embedded TICVAI dashboards.",
-  "purposeNote": "Authorized users can search, filter, manage, clone and govern dashboards from one central catalogue.",
   "gaps": [
    {
     "operation": null,
@@ -133,7 +222,38 @@
    "emptyNoResults": "The filter narrowed it and the record are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listDashboards",
+    "contract": "reporting",
+    "purpose": "The library",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Open one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createDashboard",
+    "contract": "reporting",
+    "purpose": "Start a new one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listDashboards"
+    ]
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Dashboard Name",
@@ -142,83 +262,20 @@
     "Business Domain",
     "Owner",
     "Sites/Venues"
+   ],
+   "params": [
+    {
+     "name": "dashboardId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-021"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-021",
+   "workshopBoard": "wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-021"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 14. 0 of 31 labels bound to a contract property; 31 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-001"
-   ],
-   "exitTo": [
-    "ANL-001",
-    "ANL-022",
-    "ANL-023",
-    "ANL-024",
-    "ANL-025",
-    "ANL-026",
-    "ANL-027",
-    "ANL-028",
-    "ANL-029",
-    "ANL-030"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-001",
-     "trigger": "Back to Executive Command Center",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    },
-    {
-     "to": "ANL-030",
-     "trigger": "Dashboard Preview, Validation & Health",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-022",
-     "trigger": "Dashboard Creation Wizard",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-023",
-     "trigger": "Drag-and-Drop Dashboard Canvas",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-024",
-     "trigger": "Widget & Visualization Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-025",
-     "trigger": "KPI Builder",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-026",
-     "trigger": "Targets, Thresholds & KPI Status Rules",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-027",
-     "trigger": "Data & Filter Configuration",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-028",
-     "trigger": "Drill-Down & Interaction Designer",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-029",
-     "trigger": "Dashboard Access, Publishing & Versioning",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026"
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -260,11 +317,30 @@
    "component": "apps/venue-management-web/src/routes/analytics/DashboardCreationWizard.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true,
+     "carries": [
+      "dashboardId"
+     ]
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Users can create the initial dashboard configuration without technical/database knowledge.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Select; Select one or multiple domains) and no display directory — it is settings, not a population",
   "purpose": "Guide users through creation of a new dashboard.",
-  "purposeNote": "Users can create the initial dashboard configuration without technical/database knowledge.",
   "gaps": [
    {
     "operation": null,
@@ -379,28 +455,24 @@
    "emptyFirstRun": "No creation wizard configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createDashboard",
+    "contract": "reporting",
+    "purpose": "Create one",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listDashboards"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-022"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-022",
+   "workshopBoard": "wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-022"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 18 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-021"
-   ],
-   "exitTo": [
-    "ANL-021"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-021",
-     "trigger": "Back to Dashboard Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -442,11 +514,30 @@
    "component": "apps/venue-management-web/src/routes/analytics/DragAndDropDashboardCanvas.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true,
+     "carries": [
+      "dashboardId"
+     ]
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "A business analyst can visually construct a dashboard without coding.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide the main visual workspace for dashboard construction.",
-  "purposeNote": "A business analyst can visually construct a dashboard without coding.",
   "gaps": [
    {
     "operation": null,
@@ -461,7 +552,33 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateDashboard",
+       "label": "Save dashboard",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getDashboard",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateDashboard"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The drag-and-drop canvas list.",
@@ -470,25 +587,50 @@
    "emptyNoResults": "The filter narrowed it and the drag-and-drop canvas are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "updateDashboard",
+    "contract": "reporting",
+    "purpose": "Lay it out",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getDashboard",
+     "listDashboards"
+    ]
+   },
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "The dashboard being edited",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "deleteDashboard",
+    "contract": "reporting",
+    "purpose": "Archive this dashboard",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-023"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-023",
+   "workshopBoard": "wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-023"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-021"
-   ],
-   "exitTo": [
-    "ANL-021"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "ANL-021",
-     "trigger": "Back to Dashboard Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
+     "name": "dashboardId",
+     "from": "navigation"
     }
    ]
   },
@@ -533,11 +675,27 @@
    "component": "apps/venue-management-web/src/routes/analytics/WidgetVisualizationLibrary.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Authorized users can search the component library and drag supported visualizations directly onto the dashboard canvas.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§KPI Components) and no metric row",
   "purpose": "Provide reusable visual components for dashboard construction.",
-  "purposeNote": "Authorized users can search the component library and drag supported visualizations directly onto the dashboard canvas.",
   "gaps": [
    {
     "operation": null,
@@ -599,7 +757,15 @@
    "emptyNoResults": "The filter narrowed it and the widget visualization are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getSemanticModel",
+    "contract": "reporting",
+    "purpose": "What a widget can be bound to",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "KPI Card",
@@ -612,25 +778,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-024"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-024",
+   "workshopBoard": "wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-024"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 17. 0 of 6 labels bound to a contract property; 6 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-021"
-   ],
-   "exitTo": [
-    "ANL-021"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-021",
-     "trigger": "Back to Dashboard Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -672,11 +823,27 @@
    "component": "apps/venue-management-web/src/routes/analytics/KpiBuilder.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Administrators can centrally define reusable KPIs and ensure the same KPI calculation is used across TICVAI dashboards.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Define whether) and no display directory — it is settings, not a population",
   "purpose": "Allow authorized business users to create standardized enterprise KPIs.",
-  "purposeNote": "Administrators can centrally define reusable KPIs and ensure the same KPI calculation is used across TICVAI dashboards.",
   "gaps": [
    {
     "operation": null,
@@ -806,28 +973,32 @@
    "emptyFirstRun": "No kpi configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listKpis",
+    "contract": "reporting",
+    "purpose": "KPIs already defined",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createKpi",
+    "contract": "reporting",
+    "purpose": "Define one, for everywhere",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listKpis",
+     "getKpiValues"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-025"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-025",
+   "workshopBoard": "wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-025"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 21 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-021"
-   ],
-   "exitTo": [
-    "ANL-021"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-021",
-     "trigger": "Back to Dashboard Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -869,15 +1040,31 @@
    "component": "apps/venue-management-web/src/routes/analytics/TargetsThresholdsKpiStatusRules.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "KPI status and alert behavior are calculated dynamically using centrally configured business thresholds.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§For each KPI) and no metric row",
   "purpose": "Configure how TICVAI determines whether KPI performance is healthy, warning or critical.",
-  "purposeNote": "KPI status and alert behavior are calculated dynamically using centrally configured business thresholds.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Notify responsible user, Create operational task, Trigger AI analysis. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: If Critical → Generate Alert, Notify responsible user, Create operational task, Trigger AI analysis. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users can configure"
    },
    {
@@ -941,6 +1128,11 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "If Critical → Generate Alert",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users can configure"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Notify responsible user",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users can configure"
       },
@@ -965,7 +1157,25 @@
    "emptyNoResults": "The filter narrowed it and the targets thresholds kpi are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setKpiTargets",
+    "contract": "reporting",
+    "purpose": "Targets and thresholds",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getKpiValues"
+    ]
+   },
+   {
+    "operationId": "listKpis",
+    "contract": "reporting",
+    "purpose": "The KPI being targeted",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Target",
@@ -974,29 +1184,20 @@
     "Warning Threshold",
     "Critical Threshold",
     "Benchmark"
+   ],
+   "params": [
+    {
+     "name": "kpiId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-026"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-026",
+   "workshopBoard": "wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-026"
   },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 19. 0 of 8 labels bound to a contract property; 11 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-021"
-   ],
-   "exitTo": [
-    "ANL-021"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-021",
-     "trigger": "Back to Dashboard Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 19. 0 of 8 labels bound to a contract property; 12 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1038,11 +1239,30 @@
    "component": "apps/venue-management-web/src/routes/analytics/DataFilterConfiguration.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true,
+     "carries": [
+      "dashboardId"
+     ]
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Users can configure dashboard data and filters without direct access to underlying production databases.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select; Configure) and no display directory — it is settings, not a population",
   "purpose": "Control what data a dashboard/widget uses and how users can filter it.",
-  "purposeNote": "Users can configure dashboard data and filters without direct access to underlying production databases.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1166,25 +1386,37 @@
    "emptyNoResults": "The filter narrowed it and the data filter are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getSemanticModel",
+    "contract": "reporting",
+    "purpose": "Datasets and fields to filter on",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updateDashboard",
+    "contract": "reporting",
+    "purpose": "Save the filters",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getDashboard",
+     "listDashboards"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-027"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-027",
+   "workshopBoard": "wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-027"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 20. 0 of 6 labels bound to a contract property; 22 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-021"
-   ],
-   "exitTo": [
-    "ANL-021"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "ANL-021",
-     "trigger": "Back to Dashboard Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
+     "name": "dashboardId",
+     "from": "navigation"
     }
    ]
   },
@@ -1229,11 +1461,30 @@
    "component": "apps/venue-management-web/src/routes/analytics/DrillDownInteractionDesigner.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true,
+     "carries": [
+      "dashboardId"
+     ]
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Dashboard designers can visually configure analytical navigation without custom development.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Define) and no display directory — it is settings, not a population",
   "purpose": "Configure how users move from high-level KPIs into deeper analytics.",
-  "purposeNote": "Dashboard designers can visually configure analytical navigation without custom development.",
   "gaps": [
    {
     "operation": null,
@@ -1303,25 +1554,30 @@
    "emptyFirstRun": "No drill-down interaction designer configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "updateDashboard",
+    "contract": "reporting",
+    "purpose": "Drill-down behaviour",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getDashboard",
+     "listDashboards"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-028"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-028",
+   "workshopBoard": "wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-028"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 9 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-021"
-   ],
-   "exitTo": [
-    "ANL-021"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "ANL-021",
-     "trigger": "Back to Dashboard Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
+     "name": "dashboardId",
+     "from": "navigation"
     }
    ]
   },
@@ -1366,11 +1622,30 @@
    "component": "apps/venue-management-web/src/routes/analytics/DashboardAccessPublishingVersioning.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true,
+     "carries": [
+      "dashboardId"
+     ]
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Only authorized and approved dashboard configurations become available to production users, with complete version history.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Govern who can access dashboards and how dashboard changes reach production.",
-  "purposeNote": "Only authorized and approved dashboard configurations become available to production users, with complete version history.",
   "gaps": [
    {
     "operation": null,
@@ -1432,7 +1707,19 @@
    "emptyNoResults": "The filter narrowed it and the access publishing versioning are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "updateDashboard",
+    "contract": "reporting",
+    "purpose": "Publish and version",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getDashboard",
+     "listDashboards"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Version Number",
@@ -1441,29 +1728,20 @@
     "Change Description",
     "Approval Status",
     "Published Version"
+   ],
+   "params": [
+    {
+     "name": "dashboardId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-029"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-029",
+   "workshopBoard": "wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-029"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 23. 0 of 6 labels bound to a contract property; 6 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-021"
-   ],
-   "exitTo": [
-    "ANL-021"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-021",
-     "trigger": "Back to Dashboard Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1505,11 +1783,30 @@
    "component": "apps/venue-management-web/src/routes/analytics/DashboardPreviewValidationHealth.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true,
+     "carries": [
+      "dashboardId"
+     ]
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "The system prevents dashboards containing critical configuration or security errors from being published.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Validate dashboards before publication and monitor their technical/analytical health afterward.",
-  "purposeNote": "The system prevents dashboards containing critical configuration or security errors from being published.",
   "gaps": [
    {
     "operation": null,
@@ -1577,7 +1874,28 @@
    "emptyNoResults": "The filter narrowed it and the preview validation health are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Preview",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAnalyticsPipelines",
+    "contract": "reporting",
+    "purpose": "Whether its data is fresh",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Data Last Refreshed",
@@ -1586,29 +1904,20 @@
     "Query Performance",
     "Widget Load Time",
     "Failed Widgets"
+   ],
+   "params": [
+    {
+     "name": "dashboardId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-030"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-030",
+   "workshopBoard": "wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-030"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 23. 0 of 9 labels bound to a contract property; 9 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-021"
-   ],
-   "exitTo": [
-    "ANL-021"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-021",
-     "trigger": "Back to Dashboard Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",

@@ -77,6 +77,21 @@
     "type": "string",
     "nullable": true
    },
+   "missingRequirements": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting",
+    "items": {
+     "type": "string"
+    }
+   },
+   "decisionDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a decision is due — the approvals request's SLA. **A date, not a queue position**"
+   },
    "approvalRequestId": {
     "type": "string",
     "format": "uuid",
@@ -86,6 +101,27 @@
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "renewsHolderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"
+   },
+   "resubmissionOfApplicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.33. The rejected application this one resubmits, so the rejection stays in the record"
+   },
+   "resubmissionNote": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "What the applicant changed, from `resubmitAccreditationApplication`"
    },
    "submittedAt": {
     "type": "string",
@@ -139,6 +175,17 @@
    "nationality": {
     "type": "string",
     "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "12.1.16. The holder's own address — where a mobile credential and renewal notices go"
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.16. E.164"
    },
    "identityDocumentVerified": {
     "type": "boolean",
@@ -243,6 +290,12 @@
        "type": "integer",
        "nullable": true,
        "description": "**A cap on how many may be accredited in this category.** Without one, a category is a promise nobody counted.\n"
+      },
+      "badgeTemplateId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "The badge printed for this category; travels with the category when a programme is cloned"
       }
      }
     }
@@ -267,6 +320,24 @@
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "formId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "12.1.2. The `marketing-crm` form definition (`createForm`, BO-618) the applicant fills in. The requirements matrix's `field` rows name the form fields they check, so the form is configured without software development and what blocks approval stays in one place.\n"
+   },
+   "isTemplate": {
+    "type": "boolean",
+    "default": false,
+    "description": "12.1.56. **A reusable programme template**: never opened for applications, and what `cloneAccreditationProgramme` copies its categories, requirements, validity, notification rules and form link from.\n"
+   },
+   "templateProgrammeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The programme or template this one was cloned from"
    },
    "status": {
     "type": "string",
@@ -332,6 +403,84 @@
       "expiryMonths": {
        "type": "integer",
        "nullable": true
+      },
+      "formFieldKey": {
+       "type": "string",
+       "nullable": true,
+       "description": "For a `field` row, the key of the field on the programme's form that it checks"
+      },
+      "fieldType": {
+       "type": "string",
+       "nullable": true,
+       "description": "12.1.2. For a `field` row, what kind of answer it takes",
+       "enum": [
+        "text",
+        "email",
+        "phone",
+        "date",
+        "country",
+        "number",
+        "boolean",
+        "singleChoice",
+        "multipleChoice"
+       ]
+      },
+      "visibility": {
+       "type": "string",
+       "default": "mandatory",
+       "description": "Pack page 5 (BO-618) — mandatory, optional, conditional on another answer, or hidden",
+       "enum": [
+        "mandatory",
+        "optional",
+        "conditional",
+        "hidden"
+       ]
+      },
+      "condition": {
+       "type": "object",
+       "nullable": true,
+       "description": "For `conditional`, the answer that makes this row apply",
+       "properties": {
+        "requirementCode": {
+         "type": "string"
+        },
+        "equals": {
+         "type": "string"
+        }
+       }
+      },
+      "validation": {
+       "type": "object",
+       "nullable": true,
+       "description": "Checked on save and on submit; a failing answer is refused with the row's label",
+       "properties": {
+        "pattern": {
+         "type": "string",
+         "nullable": true
+        },
+        "minLength": {
+         "type": "integer",
+         "nullable": true
+        },
+        "maxLength": {
+         "type": "integer",
+         "nullable": true
+        },
+        "minValue": {
+         "type": "number",
+         "nullable": true
+        },
+        "maxValue": {
+         "type": "number",
+         "nullable": true
+        },
+        "allowedValues": {
+         "type": "array",
+         "items": {
+          "type": "string"
+         }
+        }
+       }
       }
      }
     }

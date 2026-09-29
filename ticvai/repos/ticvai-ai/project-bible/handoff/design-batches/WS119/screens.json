@@ -1,0 +1,1881 @@
+[
+ {
+  "id": "ADM-499",
+  "name": "Forecasting Command Center",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "board": "1",
+   "number": "1",
+   "page": 4
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/analytics/forecasting-command-center-adm-499",
+   "component": "apps/ticvai-web/src/routes/analytics/ForecastingCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-500",
+    "ADM-501",
+    "ADM-502",
+    "ADM-503",
+    "ADM-504",
+    "ADM-505",
+    "ADM-506",
+    "ADM-507",
+    "ADM-508"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to Platform Dashboard",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "ADM-500",
+     "trigger": "Forecast Configuration & Forecasting Strategy",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "definitionKey"
+     ]
+    },
+    {
+     "to": "ADM-501",
+     "trigger": "Forecast Data & Signal Configuration",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "definitionKey"
+     ]
+    },
+    {
+     "to": "ADM-502",
+     "trigger": "Attendance & Visitation Forecast",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-503",
+     "trigger": "Ticket, Product & Timeslot Demand Forecast",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-504",
+     "trigger": "Channel & Booking Pace Forecast",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-505",
+     "trigger": "Revenue & Commercial Forecast",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-506",
+     "trigger": "Forecast Drivers, Confidence & Explainability",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-507",
+     "trigger": "Forecast Scenario & What-If Simulator",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-508",
+     "trigger": "Forecast Accuracy, Review & Publication Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "definitionKey",
+      "versionId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide management with one central view of expected attendance, demand and revenue across venues and future periods.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Forecast Attendance Today",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast Attendance Tomorrow",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast Attendance Next 7 Days",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast Revenue",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Current Bookings",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expected Walk-In",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast Occupancy",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Demand Index",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast Confidence",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast vs Actual",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revenue Forecast Accuracy",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Forecast Alerts",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The forecasting list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the forecasting untouched.",
+   "emptyFirstRun": "No forecasting yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the forecasting are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listForecastDefinitions",
+    "contract": "ai",
+    "purpose": "What is forecast",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "exportForecastVersion",
+    "contract": "ai",
+    "purpose": "Export the forecast version as CSV, Excel or JSON",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-499",
+   "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-499"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 4. 0 of 0 labels bound to a contract property; 12 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "versionId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-500",
+  "name": "Forecast Configuration & Forecasting Strategy",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "board": "1",
+   "number": "2",
+   "page": 6
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/analytics/forecast-configuration-forecasting-strategy-adm-500",
+   "component": "apps/ticvai-web/src/routes/analytics/ForecastConfigurationForecastingStrategy.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-499"
+   ],
+   "exitTo": [
+    "ADM-499"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-499",
+     "trigger": "Back to Forecasting Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Fields; Options conceptually) and no display directory — it is settings, not a population",
+  "purpose": "Configure what TICVAI should forecast, at what level of detail, for what horizon and how frequently forecasts should be refreshed. This screen establishes the forecasting object.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Forecast Name",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Forecast Type",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Forecast Target",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Forecast Horizon",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time Granularity",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refresh Frequency",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Historical Window",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Model Strategy",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Confidence Policy",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective Dates",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Forecast Types",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attendance",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket Demand",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product Demand",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Revenue",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel Demand",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Timeslot Demand",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event Demand",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Membership Demand",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Add-On Demand",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Experience Demand",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Intraday",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Next Day",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "7 Days",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "14 Days",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "30 Days",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "90 Days",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 6 §Fields"
+      },
+      {
+       "kind": "selectField",
+       "label": "Producer",
+       "bindsTo": "AiForecastDefinition.producer",
+       "operation": "setForecastDefinition",
+       "notes": "`rule`, `statistical` or `ensemble` (M18-16). A model only arrives by promotion.",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "numberField",
+       "label": "History window (months)",
+       "bindsTo": "AiForecastDefinition.historyWindowMonths",
+       "operation": "setForecastDefinition",
+       "notes": "Default 36 (M18-16).",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cold start",
+       "bindsTo": "AiForecastDefinition.coldStart",
+       "operation": "setForecastDefinition",
+       "notes": "**What the forecast stands on before there is history** (AI functions review): the venue AI profile with the venue-type pattern, a sister venue, a category, or imported history; the starting range and how many observations the prior is worth.",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The forecast forecasting strategy configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the forecast forecasting strategy untouched.",
+   "emptyFirstRun": "No forecast forecasting strategy configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listForecastDefinitions",
+    "contract": "ai",
+    "purpose": "What is forecast",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setForecastDefinition",
+    "contract": "ai",
+    "purpose": "Define a forecast",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "runForecast",
+    "contract": "ai",
+    "purpose": "Run a forecast now",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-500",
+   "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-500"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 57 of 80 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "definitionKey",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-501",
+  "name": "Forecast Data & Signal Configuration",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "board": "1",
+   "number": "3",
+   "page": 8
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/analytics/forecast-data-signal-configuration-adm-501",
+   "component": "apps/ticvai-web/src/routes/analytics/ForecastDataSignalConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-499"
+   ],
+   "exitTo": [
+    "ADM-499"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-499",
+     "trigger": "Back to Forecasting Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define which historical, current and contextual signals may contribute to each forecast.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 8"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 8"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setForecastDefinition",
+       "label": "Save forecast definition",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listForecastSignals",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setForecastDefinition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The forecast data signal list.",
+   "error": "Could not load. Names which read failed and leaves the forecast data signal untouched.",
+   "emptyFirstRun": "No forecast data signal yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the forecast data signal are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setForecastDefinition",
+    "contract": "ai",
+    "purpose": "Define a forecast",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listForecastSignals",
+    "contract": "ai",
+    "purpose": "Forecast signals and their freshness",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "configureForecastSignalSource",
+    "contract": "ai",
+    "purpose": "Set up a forecast signal",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-501",
+   "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-501"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 88 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "definitionKey",
+     "from": "navigation"
+    },
+    {
+     "name": "signalKey",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-502",
+  "name": "Attendance & Visitation Forecast",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "board": "1",
+   "number": "4",
+   "page": 11
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/analytics/attendance-visitation-forecast-adm-502",
+   "component": "apps/ticvai-web/src/routes/analytics/AttendanceVisitationForecast.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-499"
+   ],
+   "exitTo": [
+    "ADM-499"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-499",
+     "trigger": "Back to Forecasting Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "versionId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide detailed prediction of future venue attendance.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 11"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "configureAnomalyDetector",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAiInsights",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "configureAnomalyDetector"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The attendance visitation forecast list.",
+   "error": "Could not load. Names which read failed and leaves the attendance visitation forecast untouched.",
+   "emptyFirstRun": "No attendance visitation forecast yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the attendance visitation forecast are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "configureAnomalyDetector",
+    "contract": "ai",
+    "purpose": "Set an alert when the forecast crosses a threshold (e.g. attendance p50 above N, occupancy above % of capacity)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAiInsights",
+    "contract": "ai",
+    "purpose": "Forecast threshold alerts (kind forecastThreshold)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-502",
+   "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-502"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "detectorKey",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-503",
+  "name": "Ticket, Product & Timeslot Demand Forecast",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "board": "1",
+   "number": "5",
+   "page": 12
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/analytics/ticket-product-timeslot-demand-forecast-adm-503",
+   "component": "apps/ticvai-web/src/routes/analytics/TicketProductTimeslotDemandForecast.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-499"
+   ],
+   "exitTo": [
+    "ADM-499"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-499",
+     "trigger": "Back to Forecasting Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "versionId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Predict demand at the product and inventory level so TICVAI can understand what customers are likely to buy, not only total attendance.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 12 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every ticket product timeslot",
+       "columns": [
+        "Days Before Visit",
+        "Cumulative Sales",
+        "Current Booking Curve",
+        "Historical Average",
+        "Forecast Final Demand",
+        "Product Relationships"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 12 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected ticket product timeslot",
+       "bindsTo": null,
+       "columns": [
+        "Days Before Visit",
+        "Cumulative Sales",
+        "Current Booking Curve",
+        "Historical Average",
+        "Forecast Final Demand",
+        "Product Relationships"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Family Meal demand typically increases”, “Where enough evidence exists, estimate”.",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 12 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The ticket product timeslot list.",
+   "error": "Could not load. Names which read failed and leaves the ticket product timeslot untouched.",
+   "emptyFirstRun": "No ticket product timeslot yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the ticket product timeslot are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Days Before Visit",
+    "Cumulative Sales",
+    "Current Booking Curve",
+    "Historical Average",
+    "Forecast Final Demand",
+    "Product Relationships"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-503",
+   "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-503"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 12. 0 of 6 labels bound to a contract property; 6 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-504",
+  "name": "Channel & Booking Pace Forecast",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "board": "1",
+   "number": "6",
+   "page": 13
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/analytics/channel-booking-pace-forecast-adm-504",
+   "component": "apps/ticvai-web/src/routes/analytics/ChannelBookingPaceForecast.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-499"
+   ],
+   "exitTo": [
+    "ADM-499"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-499",
+     "trigger": "Back to Forecasting Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "versionId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Forecast) and no metric row",
+  "purpose": "Predict where and when future sales are expected to arrive. This is particularly useful because a venue with 10,000 current bookings may still receive significant B2C, POS, reseller and walk-in volume.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 13 §Forecast"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every channel booking pace",
+       "columns": [
+        "B2C Website",
+        "Mobile App",
+        "POS",
+        "Flying POS",
+        "Kiosk",
+        "B2B",
+        "Reseller",
+        "OTA / API Partners where applicable",
+        "Call Center / Agent",
+        "Walk-In",
+        "Channel Forecast",
+        "Channel Current Expected Additional Final Forecast"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 13 §Forecast"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected channel booking pace",
+       "bindsTo": null,
+       "columns": [
+        "B2C Website",
+        "Mobile App",
+        "POS",
+        "Flying POS",
+        "Kiosk",
+        "B2B",
+        "Reseller",
+        "OTA / API Partners where applicable",
+        "Call Center / Agent",
+        "Walk-In",
+        "Channel Forecast",
+        "Channel Current Expected Additional Final Forecast"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “POS/Walk-In 0 2,950 2,950”.",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 13 §Forecast"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The channel booking pace list.",
+   "error": "Could not load. Names which read failed and leaves the channel booking pace untouched.",
+   "emptyFirstRun": "No channel booking pace yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the channel booking pace are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "B2C Website",
+    "Mobile App",
+    "POS",
+    "Flying POS",
+    "Kiosk",
+    "B2B"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-504",
+   "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-504"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 13. 0 of 12 labels bound to a contract property; 12 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-505",
+  "name": "Revenue & Commercial Forecast",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "board": "1",
+   "number": "7",
+   "page": 15
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/analytics/revenue-commercial-forecast-adm-505",
+   "component": "apps/ticvai-web/src/routes/analytics/RevenueCommercialForecast.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-499"
+   ],
+   "exitTo": [
+    "ADM-499"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-499",
+     "trigger": "Back to Forecasting Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "versionId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§Revenue KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Forecast future revenue based on predicted sales, attendance, product mix, current pricing and other approved commercial signals.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Forecast Ticket Revenue",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast Membership Revenue",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast Add-On Revenue",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast F&B Revenue where supported",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Forecast Retail Revenue where supported",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Total Forecast Revenue",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revenue per Visitor",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revenue vs Budget / Target where available",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revenue Confidence Range",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 15 §Revenue KPIs"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The revenue commercial forecast list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the revenue commercial forecast untouched.",
+   "emptyFirstRun": "No revenue commercial forecast yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the revenue commercial forecast are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-505",
+   "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-505"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 9 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-506",
+  "name": "Forecast Drivers, Confidence & Explainability",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "board": "1",
+   "number": "8",
+   "page": 16
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/analytics/forecast-drivers-confidence-explainability-adm-506",
+   "component": "apps/ticvai-web/src/routes/analytics/ForecastDriversConfidenceExplainability.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-499"
+   ],
+   "exitTo": [
+    "ADM-499"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-499",
+     "trigger": "Back to Forecasting Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "versionId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Explain why the forecast changed and how much uncertainty exists. This is essential because management should not receive only: “Tomorrow attendance = 16,120.” They need to understand the basis and uncertainty. Forecast Attendance 16,120 Confidence Range 15,300 – 17,050 Confidence Status High Key Drivers Example: Current Booking Pace Positive +Strong Saturday Historical Demand Positive +Strong Special Event Positive +Medium Weather Forecast Positive +Medium Current Price Neutral Recent Cancellation Rate Negative Medium Forecast Change Explanation Previous: 15,640 Current: 16,120 Change: +480 Structured explanation: Current booking pace increased above the historical Saturday pattern, while expected weather conditions improved. These signals contributed to an upward revision.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 16 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every forecast drivers confidence",
+       "columns": [
+        "Limited Historical Data",
+        "New Product",
+        "New Event",
+        "Missing Weather",
+        "Abnormal Promotion",
+        "High Cancellation Variability",
+        "Unusual Booking Pattern",
+        "Confidence by Horizon",
+        "92% / High",
+        "84% / High",
+        "71% / Medium",
+        "58% / Lower"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 16 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected forecast drivers confidence",
+       "bindsTo": null,
+       "columns": [
+        "Limited Historical Data",
+        "New Product",
+        "New Event",
+        "Missing Weather",
+        "Abnormal Promotion",
+        "High Cancellation Variability",
+        "Unusual Booking Pattern",
+        "Confidence by Horizon",
+        "92% / High",
+        "84% / High",
+        "71% / Medium",
+        "58% / Lower"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Where applicable”, “Ensemble”.",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 16 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The forecast drivers confidence list.",
+   "error": "Could not load. Names which read failed and leaves the forecast drivers confidence untouched.",
+   "emptyFirstRun": "No forecast drivers confidence yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the forecast drivers confidence are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "explainMetricChange",
+    "contract": "ai",
+    "purpose": "Why did this metric change",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listForecastVersions",
+    "contract": "ai",
+    "purpose": "Forecast versions",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getForecastAccuracy",
+    "contract": "ai",
+    "purpose": "Measured forecast accuracy",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Limited Historical Data",
+    "New Product",
+    "New Event",
+    "Missing Weather",
+    "Abnormal Promotion",
+    "High Cancellation Variability"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-506",
+   "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-506"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 16. 0 of 12 labels bound to a contract property; 12 of 64 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-507",
+  "name": "Forecast Scenario & What-If Simulator",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "board": "1",
+   "number": "9",
+   "page": 18
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/analytics/forecast-scenario-what-if-simulator-adm-507",
+   "component": "apps/ticvai-web/src/routes/analytics/ForecastScenarioWhatIfSimulator.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-499"
+   ],
+   "exitTo": [
+    "ADM-499"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-499",
+     "trigger": "Back to Forecasting Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "versionId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Allow management to test possible future conditions without changing production configuration. This is one of the most important screens.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 18 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every forecast scenario what-if",
+       "columns": [
+        "Attendance",
+        "Revenue",
+        "Product Demand",
+        "Peak Time",
+        "Capacity Pressure",
+        "Confidence",
+        "Operational Implications"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 18 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected forecast scenario what-if",
+       "bindsTo": null,
+       "columns": [
+        "Attendance",
+        "Revenue",
+        "Product Demand",
+        "Peak Time",
+        "Capacity Pressure",
+        "Confidence",
+        "Operational Implications"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Attendance”, “Simulation”, “Important Boundary”, “If management chooses a scenario”.",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 18 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The forecast scenario what-if list.",
+   "error": "Could not load. Names which read failed and leaves the forecast scenario what-if untouched.",
+   "emptyFirstRun": "No forecast scenario what-if yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the forecast scenario what-if are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createForecastScenario",
+    "contract": "ai",
+    "purpose": "Run a what-if",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "compareForecastScenarios",
+    "contract": "ai",
+    "purpose": "Compare scenarios",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Attendance",
+    "Revenue",
+    "Product Demand",
+    "Peak Time",
+    "Capacity Pressure",
+    "Confidence"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-507",
+   "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-507"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 18. 0 of 7 labels bound to a contract property; 7 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-508",
+  "name": "Forecast Accuracy, Review & Publication Center",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "board": "1",
+   "number": "10",
+   "page": 20
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/analytics/forecast-accuracy-review-publication-center-adm-508",
+   "component": "apps/ticvai-web/src/routes/analytics/ForecastAccuracyReviewPublicationCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-499"
+   ],
+   "exitTo": [
+    "ADM-499"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-499",
+     "trigger": "Back to Forecasting Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "versionId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
+  "purpose": "Measure forecast quality over time and publish approved forecast outputs for use by other TICVAI modules. A forecasting system should continuously answer: How accurate have our forecasts actually been? Forecast vs Actual Example:",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 20 §Analyze"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishForecastVersion",
+       "notes": "Declares `publishForecastVersion`. **The gate names what the publish will affect before it happens**: which tenants, venues or capabilities take the new version, and that the previous one stays available to roll back to.",
+       "provenance": "check-screens publish rule, 29 September 2026"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every forecast accuracy review",
+       "columns": [
+        "Venue",
+        "Product",
+        "Channel",
+        "Timeslot",
+        "Day Type",
+        "Forecast Horizon",
+        "Model",
+        "Event Type",
+        "Forecast Bias",
+        "Saturday Walk-In",
+        "7.4%",
+        "MODEL REVIEW RECOMMENDED",
+        "Forecast Version",
+        "Forecast ID",
+        "Version",
+        "Generated Time",
+        "Model Version",
+        "Data Cut-Off",
+        "Confidence",
+        "Status",
+        "Publication Status",
+        "Draft",
+        "Generated",
+        "Reviewed",
+        "Published",
+        "Superseded",
+        "Archived"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 20 §Analyze"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected forecast accuracy review",
+       "bindsTo": null,
+       "columns": [
+        "Venue",
+        "Product",
+        "Channel",
+        "Timeslot",
+        "Day Type",
+        "Forecast Horizon",
+        "Model",
+        "Event Type",
+        "Forecast Bias",
+        "Saturday Walk-In",
+        "7.4%",
+        "MODEL REVIEW RECOMMENDED",
+        "Forecast Version",
+        "Forecast ID",
+        "Version",
+        "Generated Time",
+        "Model Version",
+        "Data Cut-Off",
+        "Confidence",
+        "Status",
+        "Publication Status",
+        "Draft",
+        "Generated",
+        "Reviewed",
+        "Published",
+        "Superseded",
+        "Archived"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Next Day”, “Consumers”, “DATA PREPARATION / FEATURE LAYER”, “CONFIDENCE & EXPLAINABILITY”, “SCENARIO ENGINE”, “Conceptually”.",
+       "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 20 §Analyze"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The forecast accuracy review list.",
+   "error": "Could not load. Names which read failed and leaves the forecast accuracy review untouched.",
+   "emptyFirstRun": "No forecast accuracy review yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the forecast accuracy review are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "runForecast",
+    "contract": "ai",
+    "purpose": "Run a forecast now",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listForecastVersions",
+    "contract": "ai",
+    "purpose": "Forecast versions",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "publishForecastVersion",
+    "contract": "ai",
+    "purpose": "Publish a forecast version",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getForecastAccuracy",
+    "contract": "ai",
+    "purpose": "Measured forecast accuracy",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "exportForecastVersion",
+    "contract": "ai",
+    "purpose": "Export the forecast version as CSV, Excel or JSON",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Venue",
+    "Product",
+    "Channel",
+    "Timeslot",
+    "Day Type",
+    "Forecast Horizon"
+   ],
+   "params": [
+    {
+     "name": "definitionKey",
+     "from": "navigation"
+    },
+    {
+     "name": "versionId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-508",
+   "workshopBoard": "wireframes/WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html#adm-508"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Forecasting_and_Predictive_Intelligence_Reference.pdf page 20. 0 of 27 labels bound to a contract property; 27 of 311 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

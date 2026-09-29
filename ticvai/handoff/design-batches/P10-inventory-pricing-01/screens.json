@@ -18,7 +18,6 @@
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
     "PTR-002",
     "PTR-003",
     "PTR-008"
@@ -26,51 +25,34 @@
    "fromFlows": true,
    "transitions": [
     {
-     "to": "PTR-008",
-     "trigger": "Receives vouchers",
-     "provenance": "flow F10 step 2→3",
-     "operation": "createOrder"
-    },
-    {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-002",
      "trigger": "Partner Dashboard",
      "carries": [
-      "accountId",
       "orderId"
      ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId and PTR-005 holds orderId, so an edge into it carries them"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-005 holds none of them, so the edge carries nothing and PTR-003 opens cold"
+    },
+    {
+     "to": "PTR-008",
+     "trigger": "Receives vouchers",
+     "provenance": "flow F10 step 2→3",
+     "operation": "createOrder",
      "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+      "orderId"
+     ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class).",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class). **Capacity writes removed 29 September** (M17-04); a partner no longer creates or amends a capacity envelope or sets channel allocations; it reads them and may still return its own unsold allocation (`relinquishChannelAllocation`).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act",
   "purpose": "See inventory & allocation view for this venue.",
-  "gaps": [
-   {
-    "operation": "getOrder",
-    "why": "**4 declared operations reach no component on this screen**: getOrder, getOrderStatement, listOrderRefunds, listOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -79,8 +61,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Performance id",
+       "operation": "listChannelCapacities",
+       "notes": "Sends `?performanceId=` to `listChannelCapacities`.",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every inventory allocation",
+       "label": "Every channel capacity",
        "bindsTo": "ChannelCapacity",
        "columns": [
         "ChannelCapacity.id",
@@ -98,6 +87,53 @@
        ],
        "operation": "listChannelCapacities",
        "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every refund",
+       "bindsTo": "Refund",
+       "columns": [
+        "Refund.id",
+        "Refund.orderId",
+        "Refund.batchId",
+        "Refund.fxRate",
+        "Refund.taxReversalEntryId",
+        "Refund.settleTo",
+        "Refund.fxVariance",
+        "Refund.amount",
+        "Refund.appliedPercentage",
+        "Refund.status",
+        "Refund.reason",
+        "Refund.requestedByPrincipalId"
+       ],
+       "operation": "listOrderRefunds",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -107,7 +143,70 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected inventory allocation",
+       "label": "The selected channel capacity",
+       "bindsTo": "ChannelCapacity",
+       "columns": [
+        "ChannelCapacity.id",
+        "ChannelCapacity.performanceId",
+        "ChannelCapacity.name",
+        "ChannelCapacity.seatCategoryId",
+        "ChannelCapacity.oversellAllowance",
+        "ChannelCapacity.oversellBasis",
+        "ChannelCapacity.capacity",
+        "ChannelCapacity.sold",
+        "ChannelCapacity.leased",
+        "ChannelCapacity.remaining",
+        "ChannelCapacity.hasChannelAllocations",
+        "ChannelCapacity.isSeated"
+       ],
+       "operation": "listChannelCapacities",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order statement",
+       "bindsTo": "OrderStatement",
+       "columns": [
+        "OrderStatement.orderId",
+        "OrderStatement.orderNumber",
+        "OrderStatement.currency",
+        "OrderStatement.currencyScale",
+        "OrderStatement.entries",
+        "OrderStatement.totalPaid",
+        "OrderStatement.totalRefunded",
+        "OrderStatement.currentBalance"
+       ],
+       "operation": "getOrderStatement",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/statement"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The channel allocation set",
        "bindsTo": "ChannelAllocationSet",
        "columns": [
         "ChannelAllocationSet.channelCapacityId",
@@ -128,124 +227,63 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Apply",
+       "label": "Apply manual discount",
        "operation": "applyManualDiscount",
        "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createChannelCapacity",
-       "provenance": "contract catalogue.yaml POST /channel-capacities"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Exchange",
+       "label": "Exchange order lines",
        "operation": "exchangeOrderLines",
        "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
       },
       {
        "kind": "secondaryButton",
-       "label": "Hold",
+       "label": "Hold order",
        "operation": "holdOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
       },
       {
        "kind": "secondaryButton",
-       "label": "Modify",
+       "label": "Modify order",
        "operation": "modifyOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
       },
       {
        "kind": "secondaryButton",
-       "label": "Release hold",
+       "label": "Release channel allocation",
        "operation": "relinquishChannelAllocation",
        "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reprint",
+       "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reschedule",
+       "label": "Reschedule order",
        "operation": "rescheduleOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
+       "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setChannelAllocations",
-       "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateChannelCapacity",
-       "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
-      },
-      {
        "kind": "destructiveButton",
-       "label": "Void",
+       "label": "Void order",
        "operation": "voidOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "label": "Create order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listChannelCapacities",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidOrder",
-       "label": "Void order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -255,44 +293,210 @@
    {
     "id": "confirmVoidOrder",
     "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A inventory allocation this affects should be identified in the dialog, not just counted.",
+    "trigger": "Void order",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A inventory allocation this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.",
     "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders"
+   },
+   {
+    "id": "formApplyManualDiscount",
+    "component": "modal",
+    "trigger": "Apply manual discount",
+    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ManualDiscountRequest",
+    "confirm": {
+     "label": "Apply manual discount",
+     "operation": "applyManualDiscount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "lineId",
+      "amount",
+      "percentage",
+      "reasonCode",
+      "approverPrincipalId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+   },
+   {
+    "id": "formExchangeOrderLines",
+    "component": "modal",
+    "trigger": "Exchange order lines",
+    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ExchangeOrderRequest",
+    "confirm": {
+     "label": "Exchange order lines",
+     "operation": "exchangeOrderLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outgoingLineIds",
+      "incomingLines",
+      "recordedAt",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+   },
+   {
+    "id": "formHoldOrder",
+    "component": "modal",
+    "trigger": "Hold order",
+    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold order",
+     "operation": "holdOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "label",
+      "holdUntil"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+   },
+   {
+    "id": "formModifyOrder",
+    "component": "modal",
+    "trigger": "Modify order",
+    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ModifyOrderRequest",
+    "confirm": {
+     "label": "Modify order",
+     "operation": "modifyOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "recordedAt",
+      "addLines",
+      "removeLineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+   },
+   {
+    "id": "formRelinquishChannelAllocation",
+    "component": "modal",
+    "trigger": "Release channel allocation",
+    "body": "**Collects what `relinquishChannelAllocation` sends before it is called.** Required: `channels`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release channel allocation",
+     "operation": "relinquishChannelAllocation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "channels",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
+   },
+   {
+    "id": "formReprintOrder",
+    "component": "modal",
+    "trigger": "Reprint order",
+    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reprint order",
+     "operation": "reprintOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "recordedAt",
+      "destination",
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+   },
+   {
+    "id": "formRescheduleOrder",
+    "component": "modal",
+    "trigger": "Reschedule order",
+    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reschedule order",
+     "operation": "rescheduleOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetPerformanceId",
+      "recordedAt",
+      "lineIds",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
    }
   ],
   "states": {
    "loading": "The inventory allocation list.",
    "error": "Could not load. Names which read failed and leaves the inventory allocation untouched.",
-   "emptyFirstRun": "No inventory allocation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the inventory allocation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No inventory allocation yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on performanceId and the inventory allocation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "getChannelAllocations",
     "contract": "catalogue",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createOrder",
     "contract": "orders",
     "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "applyManualDiscount",
     "contract": "orders",
     "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "createChannelCapacity",
-    "contract": "catalogue",
-    "purpose": "Create a capacity envelope",
     "trigger": "onAction",
     "invalidates": [
      "listChannelCapacities"
@@ -311,13 +515,13 @@
     "operationId": "getOrder",
     "contract": "orders",
     "purpose": "Read an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getOrderStatement",
     "contract": "orders",
     "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "holdOrder",
@@ -338,7 +542,7 @@
     "operationId": "listOrderRefunds",
     "contract": "orders",
     "purpose": "List refunds against an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listOrders",
@@ -392,24 +596,6 @@
     ]
    },
    {
-    "operationId": "setChannelAllocations",
-    "contract": "catalogue",
-    "purpose": "Allocate envelope capacity across channels",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "updateChannelCapacity",
-    "contract": "catalogue",
-    "purpose": "Amend an envelope",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
     "operationId": "voidOrder",
     "contract": "orders",
     "purpose": "Void an order",
@@ -432,11 +618,11 @@
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "ChannelAllocationSet.channelCapacityId",
-    "ChannelAllocationSet.capacity",
-    "ChannelAllocationSet.allocations",
-    "ChannelAllocationSet.generalPoolUnits",
-    "ChannelAllocationSet.totalSold"
+    "ChannelCapacity.id",
+    "ChannelCapacity.performanceId",
+    "ChannelCapacity.name",
+    "ChannelCapacity.seatCategoryId",
+    "ChannelCapacity.oversellAllowance"
    ]
   },
   "wireframe": {
@@ -488,51 +674,21 @@
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-002",
     "PTR-003"
    ],
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-006 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Read only since 29 September** (decided 17 September, M17-04; applied 29 September, P29). Partners never create products, prices or performances through the API or this portal; product configuration stays in the venue back office (BO-007, BO-008, BO-009), and a partner reads the products assigned to its channel (`listProducts`, `getProduct`, `listProductVariants`) and its partner price lists (`listPriceLists`, `getPriceList`, `listPrices`). The create, set, copy, transition and update actions were removed with the partner audience on those catalogue writes.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getPriceList` reads one of them — list, select, act",
-  "purpose": "Find product catalog (b2b pricing) for this venue.",
-  "gaps": [
-   {
-    "operation": "getProduct",
-    "why": "**5 declared operations reach no component on this screen**: getProduct, listAlternativeCodes, listPriceLists, listPrices, listProductVariants. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "purpose": "See the products assigned to this partner and the partner prices, read only.",
   "layout": {
    "template": "split",
    "regions": [
@@ -541,8 +697,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every product catalog (b2b",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -560,6 +737,70 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every alternative code",
+       "bindsTo": "AlternativeCode",
+       "columns": [
+        "AlternativeCode.code",
+        "AlternativeCode.partnerId",
+        "AlternativeCode.partnerName",
+        "AlternativeCode.variantId",
+        "AlternativeCode.note"
+       ],
+       "operation": "listAlternativeCodes",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/alternative-codes"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every price list",
+       "bindsTo": "PriceList",
+       "columns": [
+        "PriceList.id",
+        "PriceList.code",
+        "PriceList.name",
+        "PriceList.venueId",
+        "PriceList.currency",
+        "PriceList.currencyScale",
+        "PriceList.channels",
+        "PriceList.validFrom",
+        "PriceList.validTo",
+        "PriceList.priority"
+       ],
+       "operation": "listPriceLists",
+       "provenance": "contract catalogue.yaml GET /price-lists"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every price",
+       "bindsTo": "Price",
+       "columns": [
+        "Price.id",
+        "Price.priceListId",
+        "Price.variantId",
+        "Price.amount",
+        "Price.taxCodeId"
+       ],
+       "operation": "listPrices",
+       "provenance": "contract catalogue.yaml GET /price-lists/{priceListId}/prices"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every product variant",
+       "bindsTo": "ProductVariant",
+       "columns": [
+        "ProductVariant.id",
+        "ProductVariant.productId",
+        "ProductVariant.sku",
+        "ProductVariant.axisValues",
+        "ProductVariant.name",
+        "ProductVariant.barcode",
+        "ProductVariant.isDefault",
+        "ProductVariant.isActive"
+       ],
+       "operation": "listProductVariants",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
       }
      ]
     },
@@ -569,7 +810,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected product catalog (b2b",
+       "label": "The selected product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.categoryId",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.isStockTracked"
+       ],
+       "operation": "getProduct",
+       "provenance": "contract catalogue.yaml GET /products/{productId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The price list",
        "bindsTo": "PriceList",
        "columns": [
         "PriceList.id",
@@ -594,63 +860,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Copy",
-       "operation": "copyPriceList",
-       "provenance": "contract catalogue.yaml POST /price-lists/{priceListId}/copy"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createPriceList",
-       "provenance": "contract catalogue.yaml POST /price-lists"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createProduct",
-       "provenance": "contract catalogue.yaml POST /products"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resolve",
+       "label": "Resolve product by code",
        "operation": "resolveProductByCode",
        "provenance": "contract catalogue.yaml GET /products/resolve"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setAlternativeCodes",
-       "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setPrices",
-       "provenance": "contract catalogue.yaml PUT /price-lists/{priceListId}/prices"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setProductAttributes",
-       "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Transition",
-       "operation": "transitionProductLifecycle",
-       "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updatePriceList",
-       "provenance": "contract catalogue.yaml PATCH /price-lists/{priceListId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateProduct",
-       "provenance": "contract catalogue.yaml PATCH /products/{productId}"
       }
      ]
     }
@@ -659,9 +871,9 @@
   "states": {
    "loading": "The product catalog (b2b list.",
    "error": "Could not load. Names which read failed and leaves the product catalog (b2b untouched.",
-   "emptyFirstRun": "No product catalog (b2b yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the product catalog (b2b are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No product is assigned to this partner yet. **Offers no create action** — a partner never creates products or prices (M17-04); it says to ask the venue to assign products and a partner price list.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the product catalog (b2b are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -674,46 +886,19 @@
     "operationId": "getPriceList",
     "contract": "catalogue",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "copyPriceList",
-    "contract": "catalogue",
-    "purpose": "Copy a price list, optionally with an adjustment",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "createPriceList",
-    "contract": "catalogue",
-    "purpose": "Create a price list",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "createProduct",
-    "contract": "catalogue",
-    "purpose": "Create a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "getProduct",
     "contract": "catalogue",
     "purpose": "Read a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listAlternativeCodes",
     "contract": "catalogue",
     "purpose": "External identifiers for a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listPriceLists",
@@ -725,73 +910,19 @@
     "operationId": "listPrices",
     "contract": "catalogue",
     "purpose": "List prices in a list",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listProductVariants",
     "contract": "catalogue",
     "purpose": "List generated variants",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "resolveProductByCode",
     "contract": "catalogue",
     "purpose": "Resolve a partner code to a product",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setAlternativeCodes",
-    "contract": "catalogue",
-    "purpose": "Set external identifiers",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "setPrices",
-    "contract": "catalogue",
-    "purpose": "Set prices in bulk",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "setProductAttributes",
-    "contract": "catalogue",
-    "purpose": "Set the attribute axes for a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "transitionProductLifecycle",
-    "contract": "catalogue",
-    "purpose": "Move a product through its lifecycle",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "updatePriceList",
-    "contract": "catalogue",
-    "purpose": "Amend a price list",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "updateProduct",
-    "contract": "catalogue",
-    "purpose": "Update a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -807,11 +938,11 @@
    ],
    "coldEntry": "**A shared product link after the product retired.** Shows what replaced it where a successor exists, and the catalogue where none does.",
    "preloaded": [
-    "PriceList.id",
-    "PriceList.code",
-    "PriceList.name",
-    "PriceList.venueId",
-    "PriceList.currency"
+    "Product.id",
+    "Product.code",
+    "Product.name",
+    "Product.description",
+    "Product.kind"
    ]
   },
   "wireframe": {
@@ -864,8 +995,6 @@
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-002",
     "PTR-003",
     "PTR-008"
    ],
@@ -878,30 +1007,9 @@
      "operation": "getAvailability"
     },
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-007 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -913,8 +1021,8 @@
   "gaps": [
    {
     "operation": "getAvailability",
-    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getAvailability` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract catalogue.yaml GET /availability"
    }
   ],
   "layout": {
@@ -922,16 +1030,23 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Availability",
+       "operation": "getAvailability",
+       "notes": "Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract catalogue.yaml GET /availability"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The availability search list.",
    "error": "Could not load. Names which read failed and leaves the availability search untouched.",
-   "emptyFirstRun": "No availability search yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the availability search are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No availability search yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {

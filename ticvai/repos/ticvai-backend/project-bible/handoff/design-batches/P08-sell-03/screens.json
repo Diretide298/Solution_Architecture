@@ -332,6 +332,20 @@
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Booking flow for this category",
+       "bindsTo": "ProductCategory.bookingFlowId",
+       "operation": "listBookingFlows",
+       "notes": "**Every product filed here that names no flow of its own is sold through this one** (decided 29 September, W12). Empty means the venue's flow for each product's kind. Saved with `setProductCategories`.",
+       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)"
+      }
+     ]
     }
    ]
   },
@@ -343,6 +357,13 @@
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listBookingFlows",
+    "contract": "white-label",
+    "purpose": "The booking flows a category can default to (W12)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, W12 (P29)"
+   },
    {
     "operationId": "listProductCategories",
     "contract": "catalogue",
@@ -1636,18 +1657,6 @@
   },
   "apis": [
    {
-    "operationId": "getRecommendations",
-    "contract": "promotions",
-    "purpose": "What else this guest might want",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "getUpsellSuggestions",
-    "contract": "promotions",
-    "purpose": "Suggestions for a cart",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "createUpsellRule",
     "contract": "promotions",
     "purpose": "Create an upsell rule",
@@ -1660,6 +1669,13 @@
     "purpose": "Remove an upsell rule",
     "trigger": "onAction",
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "decideRecommendations",
+    "contract": "ai",
+    "purpose": "Fill a recommendation slot",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {

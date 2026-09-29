@@ -1,6 +1,6 @@
 # WS19 — Approval Workflows and Governance board 7
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 13 operations · 19 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `APPROVAL_CONFIGURE, APPROVAL_VIEW, DEVELOPER_MANAGE, DEVELOPER_VIEW, PERMISSION_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-349` | Approval Integration Command Center | commandCentre | 0 | 0 | — |
-| `ADM-350` | Module Integration Registry | listDetail | 0 | 0 | — |
-| `ADM-351` | Approval API Management | configEditor | 0 | 0 | — |
-| `ADM-352` | Workflow Event Framework | listDetail | 0 | 0 | — |
-| `ADM-353` | Webhook Configuration & Subscription Manager | configEditor | 0 | 0 | — |
-| `ADM-354` | External Workflow System Integration | configEditor | 0 | 0 | — |
-| `ADM-355` | Data & Workflow Mapping Studio | listDetail | 0 | 0 | — |
-| `ADM-356` | Integration Security & Access Control | listDetail | 0 | 0 | — |
-| `ADM-357` | Integration Monitoring, Error & Retry Center | listDetail | 0 | 0 | — |
-| `ADM-358` | Integration Analytics & AI Health Advisor | listDetail | 0 | 0 | — |
+| `ADM-349` | Approval Integration Command Center | commandCentre | 3 | 0 | — |
+| `ADM-350` | Module Integration Registry | listDetail | 1 | 0 | — |
+| `ADM-351` | Approval API Management | configEditor | 1 | 0 | — |
+| `ADM-352` | Workflow Event Framework | listDetail | 2 | 0 | — |
+| `ADM-353` | Webhook Configuration & Subscription Manager | configEditor | 3 | 0 | — |
+| `ADM-354` | External Workflow System Integration | configEditor | 3 | 0 | — |
+| `ADM-355` | Data & Workflow Mapping Studio | listDetail | 1 | 0 | — |
+| `ADM-356` | Integration Security & Access Control | listDetail | 1 | 0 | — |
+| `ADM-357` | Integration Monitoring, Error & Retry Center | listDetail | 2 | 0 | — |
+| `ADM-358` | Integration Analytics & AI Health Advisor | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

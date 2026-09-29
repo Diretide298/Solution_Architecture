@@ -1,0 +1,141 @@
+{
+ "getProductAffinity": {
+  "method": "GET",
+  "path": "/product-affinity",
+  "contract": "promotions",
+  "summary": "What is actually bought together",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "minLift",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "windowDays",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductAffinity"
+ },
+ "getRecommendationPerformance": {
+  "method": "GET",
+  "path": "/recommendation-performance",
+  "contract": "promotions",
+  "summary": "Impressions, acceptance, revenue and incremental lift",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationPerformance"
+ },
+ "listUpsellCrossSell": {
+  "method": "GET",
+  "path": "/upsell-cross-sell",
+  "contract": "promotions",
+  "summary": "Upsell, Cross-Sell & Attach-Rate Analytics",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UpsellCrossSellAttachRateAnalyticsView"
+ },
+ "setProductRelationships": {
+  "method": "PUT",
+  "path": "/product-relationships",
+  "contract": "promotions",
+  "summary": "Declare what upgrades to, pairs with or replaces what",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductRelationship"
+ },
+ "simulateRecommendationStrategy": {
+  "method": "POST",
+  "path": "/recommendation-simulations",
+  "contract": "promotions",
+  "summary": "Replay a strategy against history before it goes live",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationPerformance"
+ },
+ "updateRecommendationStrategy": {
+  "method": "PUT",
+  "path": "/recommendation-strategies/{strategyId}",
+  "contract": "promotions",
+  "summary": "Change a strategy",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecommendationStrategy",
+  "responds": "RecommendationStrategy"
+ }
+}

@@ -1,0 +1,168 @@
+{
+ "createApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Raise a request",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateApprovalRequest",
+  "responds": "ApprovalRequest"
+ },
+ "createPaymentMethod": {
+  "method": "POST",
+  "path": "/payment-methods",
+  "contract": "payments",
+  "summary": "Add a payment method to the catalogue",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PaymentMethod",
+  "responds": "PaymentMethod"
+ },
+ "getPaymentPerformance": {
+  "method": "GET",
+  "path": "/payment-performance",
+  "contract": "payments",
+  "summary": "Authorisation rate, conversion and where payments are lost",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentPerformanceRow"
+ },
+ "getPaymentRules": {
+  "method": "GET",
+  "path": "/payments/rules",
+  "contract": "payments",
+  "summary": "Currency, eligibility and fee rules as one set",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PaymentRuleSet"
+ },
+ "listPaymentMethods": {
+  "method": "GET",
+  "path": "/payment-methods",
+  "contract": "payments",
+  "summary": "The methods this tenant can offer, and where",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentMethod"
+ },
+ "setPaymentRules": {
+  "method": "PUT",
+  "path": "/payments/rules",
+  "contract": "payments",
+  "summary": "Replace the payment rule set",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PaymentRuleSet",
+  "responds": "PaymentRuleSet"
+ },
+ "simulatePaymentConfiguration": {
+  "method": "POST",
+  "path": "/payment-configuration/simulate",
+  "contract": "payments",
+  "summary": "What a guest would be offered, and what it would cost",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RoutingContext",
+  "responds": "PaymentConfigurationSimulation"
+ },
+ "updatePaymentMethod": {
+  "method": "PUT",
+  "path": "/payment-methods/{methodId}",
+  "contract": "payments",
+  "summary": "Change availability, fees and eligibility",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PaymentMethod",
+  "responds": "PaymentMethod"
+ }
+}

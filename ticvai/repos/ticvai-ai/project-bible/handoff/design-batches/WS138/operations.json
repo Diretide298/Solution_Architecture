@@ -75,6 +75,25 @@
   "requestBody": "InvitationCampaign",
   "responds": "InvitationCampaign"
  },
+ "decideAiInsight": {
+  "method": "POST",
+  "path": "/insights/{insightId}/decide",
+  "contract": "ai",
+  "summary": "Review, accept, reject or mark an insight actioned",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiInsight"
+ },
  "getCampaign": {
   "method": "GET",
   "path": "/campaigns/{campaignId}",
@@ -179,6 +198,45 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listMarketingRecommendations": {
+  "method": "GET",
+  "path": "/marketing-recommendations",
+  "contract": "ai",
+  "summary": "Recommendations on marketing campaigns and journeys",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "targetKind",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "targetRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listMessageTemplates": {
   "method": "GET",
   "path": "/message-templates",
@@ -237,6 +295,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "proposeMarketingContent": {
+  "method": "POST",
+  "path": "/ai/content-drafts",
+  "contract": "ai",
+  "summary": "Draft marketing content for a person to edit and apply",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "recordTouchPoint": {
   "method": "POST",
   "path": "/attribution/touches",
@@ -255,6 +332,25 @@
   ],
   "requestBody": "TouchPoint",
   "responds": "TouchPoint"
+ },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
  },
  "updateCampaign": {
   "method": "PATCH",

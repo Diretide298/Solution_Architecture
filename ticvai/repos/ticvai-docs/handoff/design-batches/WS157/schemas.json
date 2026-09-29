@@ -282,7 +282,17 @@
    },
    "teardownMinutes": {
     "type": "integer",
-    "default": 0
+    "default": 0,
+    "description": "After the booking. **Kept as it is** (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added after the teardown, so a room with no teardown and a 15-minute clean is free 15 minutes after each booking ends.\n"
+   },
+   "cleaningPolicy": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ResourceCleaningPolicy"
+     }
+    ],
+    "nullable": true,
+    "description": "How the resource is cleaned between uses (decided 29 September, W10). Null means no cleaning is scheduled beyond `teardownMinutes`."
    },
    "requiresQualification": {
     "type": "array",
@@ -360,6 +370,49 @@
    },
    "scopePath": {
     "type": "string"
+   }
+  }
+ },
+ "ResourceCleaningPolicy": {
+  "x-ticvai-persistence": "none — columns on resources.resource",
+  "type": "object",
+  "description": "**When the resource is cleaned, and what that takes out of availability** (decided 29 September, W10; the meeting-room case from the 29 September website review).\n- `afterEveryBooking` (option A): `bufferMinutes` blocked after every booking, after its teardown. - `timesPerDay` (option B): `cleaningsPerDay` cleanings of `bufferMinutes` each, between `windowStart` and `windowEnd`, **placed by the system**. The targets are spread evenly across the window; each is put in the free gap nearest its target that is long enough, and never on a booking, a hold or a block. **A confirmed booking is never moved for a cleaning.** Placement is computed on read from the day's bookings, so it moves when bookings change, and a start time is offered only if every cleaning of that day can still be placed after it is booked.\n`createResource` and `updateResource` refuse a policy with `timesPerDay` and no `cleaningsPerDay`, or a window that ends before it starts, with `422`.\n",
+  "required": [
+   "mode",
+   "bufferMinutes"
+  ],
+  "properties": {
+   "mode": {
+    "type": "string",
+    "enum": [
+     "afterEveryBooking",
+     "timesPerDay"
+    ]
+   },
+   "bufferMinutes": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 240,
+    "description": "Minutes one cleaning takes. The prototype uses 15 (proposed default, client to correct)."
+   },
+   "cleaningsPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 24,
+    "nullable": true,
+    "description": "Required for `timesPerDay`; ignored for `afterEveryBooking`."
+   },
+   "windowStart": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Venue-local time the cleaning window opens. Null means the resource's opening time."
+   },
+   "windowEnd": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Venue-local time the cleaning window closes. Null means the resource's closing time."
    }
   }
  },
@@ -569,6 +622,113 @@
    }
   }
  },
+ "RotaAssignment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.rota_assignment",
+  "required": [
+   "principalId",
+   "venueId",
+   "startsAt",
+   "endsAt",
+   "position"
+  ],
+  "properties": {
+   "overtimeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "BL-044, 1.2.83. **UAE labour law limits working hours and mandates rest periods**, and nothing in the package counted either. Derived from attendance against the shift.\n"
+   },
+   "restPeriodBefore": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Minutes since the previous shift ended. **The check that stops a closing shift followed by an opening one**, which is legal in most places and unsafe in all of them.\n"
+   },
+   "breachesWorkingHourLimit": {
+    "type": "boolean",
+    "default": false,
+    "readOnly": true,
+    "description": "**Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a month later means it was worked.\n"
+   },
+   "labourCost": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "**Cost at the point of scheduling.** A manager building a rota without seeing its cost is a manager who finds out from finance.\n"
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "position": {
+    "type": "string",
+    "description": "What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n**A position code, not a label.** It is the same value as `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an assignment spelled differently from the rule it fills is counted against nothing and the gap stays open. Tenant-defined, which is why it is not an enum here.\n"
+   },
+   "requiredRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Checked on assignment. A rota naming someone unqualified is a rota that gets overridden."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the position needs a till. **The link between a rota and a cash session**, without merging the two.\n"
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "$ref": "#/components/schemas/RotaStatus"
+   },
+   "breakMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "RotaStatus": {
+  "type": "string",
+  "enum": [
+   "planned",
+   "published",
+   "confirmed",
+   "swapPending",
+   "cancelled",
+   "completed",
+   "noShow"
+  ]
+ },
  "ShiftTemplate": {
   "type": "object",
   "x-ticvai-persistence": "workforce.shift_template",
@@ -699,6 +859,35 @@
      "type": "string",
      "format": "uuid"
     }
+   },
+   "basisApplied": {
+    "type": "string",
+    "enum": [
+     "minimum",
+     "forecastRequirement"
+    ],
+    "description": "Which figure `required` is for this row. With `higherOfBoth`, the larger; with `forecastRequirement` and no handed-over requirement for the period, `minimum`."
+   },
+   "minimumRequired": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The configured minimum for the position and window."
+   },
+   "forecastRequired": {
+    "type": "number",
+    "nullable": true,
+    "description": "The forecast staff requirement (p50) for the position and window, from `workforce.forecast_requirement`. Null where none was handed over."
+   },
+   "forecastRequiredP90": {
+    "type": "number",
+    "nullable": true,
+    "description": "The busy-case requirement, for planning to the busy case."
+   },
+   "forecastVersionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The AI forecast version the requirement is bound to (AIP-067), so a manager can open the forecast behind it."
    }
   }
  },
@@ -1483,6 +1672,72 @@
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "WorkforceSyncRun": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.sync_run",
+  "description": "**One synchronisation, and what it did.** Board 10 asks the page to show successful records, failed records, warnings and mapping errors rather than *\"integration failed\"* — and to say the operational consequence: *\"12 employee availability updates could not be synchronised. Four employees have assignments within the next 24 hours.\"* That sentence needs counts on a row, not a log line.\n",
+  "required": [
+   "sourceId",
+   "startedAt",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "finishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "running",
+     "succeeded",
+     "partial",
+     "failed"
+    ]
+   },
+   "recordsRead": {
+    "type": "integer"
+   },
+   "recordsApplied": {
+    "type": "integer"
+   },
+   "recordsFailed": {
+    "type": "integer"
+   },
+   "warningCount": {
+    "type": "integer"
+   },
+   "mappingErrorCount": {
+    "type": "integer"
+   },
+   "trigger": {
+    "type": "string",
+    "enum": [
+     "scheduled",
+     "manual",
+     "webhook",
+     "fileImport"
+    ]
    },
    "scopePath": {
     "type": "string",

@@ -1,0 +1,372 @@
+{
+ "ProductAffinity": {
+  "type": "object",
+  "description": "Upsell boards 3.3 and 3.4. **Support and lift together**, because high support with no lift is two popular products rather than a relationship.\n",
+  "properties": {
+   "fromProductId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toProductId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "basketsTogether": {
+    "type": "integer"
+   },
+   "support": {
+    "type": "number"
+   },
+   "confidence": {
+    "type": "number"
+   },
+   "lift": {
+    "type": "number"
+   },
+   "windowDays": {
+    "type": "integer"
+   },
+   "computedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "ProductRelationship": {
+  "type": "object",
+  "x-ticvai-persistence": "promotions.product_relationship",
+  "description": "Upsell boards 2.2 and 3.2. **Declared, and distinguishable from measured affinity.**",
+  "required": [
+   "fromProductId",
+   "toProductId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "fromProductId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toProductId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "upgradesTo",
+     "downgradesTo",
+     "crossSell",
+     "accessory",
+     "substitute",
+     "requires",
+     "incompatibleWith"
+    ]
+   },
+   "ladderPosition": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**For upgrade ladders only.** Standard → Premium → VIP is ordered, and an unordered set cannot answer *what is the next step up*.\n"
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "declared",
+     "measured",
+     "aiProposed"
+    ],
+    "default": "declared"
+   },
+   "strength": {
+    "type": "number",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RecommendationPerformance": {
+  "type": "object",
+  "description": "Board 6.5. **Attributed and incremental reported apart** — the first flatters.",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "impressions": {
+    "type": "integer"
+   },
+   "clicks": {
+    "type": "integer"
+   },
+   "accepted": {
+    "type": "integer"
+   },
+   "acceptanceRate": {
+    "type": "number"
+   },
+   "attributedRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "incrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "holdoutAcceptanceRate": {
+    "type": "number",
+    "nullable": true
+   },
+   "lift": {
+    "type": "number",
+    "nullable": true
+   }
+  }
+ },
+ "RecommendationStrategy": {
+  "type": "object",
+  "x-ticvai-persistence": "promotions.recommendation_strategy",
+  "description": "Upsell board 1. **Objective, placement, ranking and guardrail in one record**, because any one of them alone produces a recommender that is either aimless or dangerous.\n",
+  "required": [
+   "code",
+   "name",
+   "objective"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "objective": {
+    "type": "string",
+    "enum": [
+     "attachRevenue",
+     "averageOrderValue",
+     "upgradeRate",
+     "visitFrequency",
+     "inventoryBalance",
+     "guestSatisfaction"
+    ]
+   },
+   "kinds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "upsell",
+      "upgrade",
+      "crossSell",
+      "bundle",
+      "nextBestOffer",
+      "reactivation"
+     ]
+    }
+   },
+   "itemKinds": {
+    "type": "array",
+    "description": "What the strategy may put in a slot (29 September, build pass, group G2, from group G1's handoff; 8.6.30 to 8.6.36, 5.4.21, 22.6.18): `product` (the default and the behaviour before), `offer` (a live promotion marked `recommendable`), `reward` (a marketing-crm loyalty reward the guest can redeem) and `challenge` (a challenge they can join). Mirrors `ai.decideRecommendations` item kinds.",
+    "default": [
+     "product"
+    ],
+    "items": {
+     "type": "string",
+     "enum": [
+      "product",
+      "offer",
+      "reward",
+      "challenge"
+     ]
+    }
+   },
+   "placements": {
+    "type": "array",
+    "description": "`homepage` (8.6.10) and `loyalty` (5.4.21, 22.6.18) added 29 September (build pass, group G2), matching the placements `ai.decideRecommendations` fills.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "productPage",
+      "cart",
+      "checkout",
+      "postPurchase",
+      "preVisitEmail",
+      "inVenueApp",
+      "kiosk",
+      "pos",
+      "signage",
+      "callCentre",
+      "homepage",
+      "loyalty"
+     ]
+    }
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "maxRecommendations": {
+    "type": "integer",
+    "default": 3,
+    "description": "**A guardrail before it is a layout choice.** Nine upsells at checkout is not a denser page, it is an abandoned basket.\n"
+   },
+   "minConfidence": {
+    "type": "number",
+    "nullable": true
+   },
+   "rankingWeights": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "number"
+    },
+    "description": "Propensity, margin, inventory pressure, affinity, recency."
+   },
+   "requireAvailability": {
+    "type": "boolean",
+    "default": true
+   },
+   "excludeInBasket": {
+    "type": "boolean",
+    "default": true
+   },
+   "guardrails": {
+    "type": "object",
+    "properties": {
+     "maxDiscountPercent": {
+      "type": "number",
+      "nullable": true
+     },
+     "minMarginPercent": {
+      "type": "number",
+      "nullable": true
+     },
+     "neverRecommendCategoryIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "requireHumanApproval": {
+      "type": "boolean",
+      "default": false
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "paused",
+     "retired"
+    ]
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "UpsellCrossSellAttachRateAnalyticsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Upsell, Cross-Sell & Attach-Rate Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "crossSellRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cross-Sell Revenue"
+   },
+   "upsellRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Upsell Revenue"
+   },
+   "attachRate": {
+    "type": "number",
+    "description": "Attach Rate"
+   },
+   "itemsPerTransaction": {
+    "type": "string",
+    "description": "Items per Transaction"
+   },
+   "revenuePerTransaction": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue per Transaction"
+   },
+   "recommendedOfferAcceptance": {
+    "type": "string",
+    "description": "Recommended Offer Acceptance"
+   },
+   "incrementalBasketValue": {
+    "type": "string",
+    "description": "Incremental Basket Value"
+   },
+   "crossCategoryConversion": {
+    "type": "number",
+    "description": "Cross-Category Conversion"
+   },
+   "ticketTicket": {
+    "type": "string",
+    "description": "Ticket → Ticket"
+   },
+   "ticketFB": {
+    "type": "string",
+    "description": "Ticket → F&B"
+   },
+   "ticketRetail": {
+    "type": "string",
+    "description": "Ticket → Retail"
+   },
+   "ticketExperience": {
+    "type": "string",
+    "description": "Ticket → Experience"
+   },
+   "ticketMembership": {
+    "type": "string",
+    "description": "Ticket → Membership"
+   },
+   "fBRetail": {
+    "type": "string",
+    "description": "F&B → Retail"
+   },
+   "retailFB": {
+    "type": "string",
+    "description": "Retail → F&B"
+   },
+   "membershipExperience": {
+    "type": "string",
+    "description": "Membership → Experience"
+   }
+  }
+ }
+}

@@ -53,7 +53,10 @@
     {
      "to": "BO-618",
      "trigger": "Accreditation Form Builder",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "programmeId"
+     ]
     },
     {
      "to": "BO-619",
@@ -63,7 +66,10 @@
     {
      "to": "BO-620",
      "trigger": "Accreditation Program Setup",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "programmeId"
+     ]
     },
     {
      "to": "BO-621",
@@ -83,7 +89,10 @@
     {
      "to": "BO-624",
      "trigger": "Registration Rules & Publication",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "programmeId"
+     ]
     }
    ]
   },
@@ -289,6 +298,13 @@
     "purpose": "The directory",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "withdrawAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Withdraw an application on the applicant's behalf",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -299,6 +315,12 @@
     "Accreditation category",
     "Organization/company",
     "Event"
+   ],
+   "params": [
+    {
+     "name": "applicationId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -421,6 +443,20 @@
     "invalidates": [
      "listAccreditationApplications"
     ]
+   },
+   {
+    "operationId": "updateAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Save a draft application",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "submitAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Submit the draft",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -429,6 +465,14 @@
    "workshopBoard": "wireframes/WS01 ACCREDITATION Board 1.dc.html#bo-617"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "applicationId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -532,6 +576,13 @@
     "purpose": "Build the application form",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "updateAccreditationProgramme",
+    "contract": "accreditation",
+    "purpose": "Link the built form to the programme (formId)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -540,6 +591,14 @@
    "workshopBoard": "wireframes/WS01 ACCREDITATION Board 1.dc.html#bo-618"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 5. 0 of 0 labels bound to a contract property; 2 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "programmeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -770,6 +829,27 @@
     "invalidates": [
      "listAccreditationProgrammes"
     ]
+   },
+   {
+    "operationId": "listAccreditationProgrammes",
+    "contract": "accreditation",
+    "purpose": "Templates to start from (isTemplate=true)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "cloneAccreditationProgramme",
+    "contract": "accreditation",
+    "purpose": "Create from template or from last season",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "updateAccreditationProgramme",
+    "contract": "accreditation",
+    "purpose": "Amend a programme, or save it as a template",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -778,6 +858,14 @@
    "workshopBoard": "wireframes/WS01 ACCREDITATION Board 1.dc.html#bo-620"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "programmeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1289,6 +1377,13 @@
     "invalidates": [
      "listAccreditationProgrammes"
     ]
+   },
+   {
+    "operationId": "updateAccreditationProgramme",
+    "contract": "accreditation",
+    "purpose": "Set the application window and open or close the programme",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1297,6 +1392,14 @@
    "workshopBoard": "wireframes/WS01 ACCREDITATION Board 1.dc.html#bo-624"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "programmeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

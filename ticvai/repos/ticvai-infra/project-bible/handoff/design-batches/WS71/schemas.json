@@ -1,1 +1,732 @@
-{}
+{
+ "Aggregation": {
+  "type": "string",
+  "enum": [
+   "none",
+   "count",
+   "countDistinct",
+   "sum",
+   "average",
+   "min",
+   "max"
+  ]
+ },
+ "AnalyticsPipeline": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.pipeline",
+  "description": "BI board 10.7. **Freshness decides whether a dashboard can be trusted.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "sourceKind": {
+    "type": "string"
+   },
+   "datasets": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "schedule": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastRunAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastSuccessAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "freshnessMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "expectedFreshnessMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "degraded",
+     "stale",
+     "failed",
+     "paused"
+    ]
+   },
+   "lastError": {
+    "type": "string",
+    "nullable": true
+   },
+   "rowsLastRun": {
+    "type": "integer",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AnalyticsUsageRow": {
+  "type": "object",
+  "description": "BI board 10.9. **The number that lets a BI estate be pruned.**",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "opens": {
+    "type": "integer"
+   },
+   "distinctUsers": {
+    "type": "integer"
+   },
+   "lastOpenedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "averageRuntimeMs": {
+    "type": "integer",
+    "nullable": true
+   },
+   "rowsScanned": {
+    "type": "integer",
+    "nullable": true
+   },
+   "neverOpened": {
+    "type": "boolean"
+   }
+  }
+ },
+ "BenchmarkNormalisation": {
+  "type": "string",
+  "description": "The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`.",
+  "enum": [
+   "none",
+   "perVisitor",
+   "perOperatingHour",
+   "perStaffedPosition",
+   "perSquareMetre"
+  ]
+ },
+ "BenchmarkRow": {
+  "type": "object",
+  "description": "BI board 10.4. **The normalisation travels with the comparison.**",
+  "properties": {
+   "scopePath": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "normalisedValue": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "normaliseBy": {
+    "$ref": "#/components/schemas/BenchmarkNormalisation"
+   },
+   "rank": {
+    "type": "integer"
+   },
+   "percentile": {
+    "type": "number",
+    "nullable": true
+   }
+  }
+ },
+ "CreateDashboardRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "module",
+   "tiles"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "module": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey",
+    "description": "**Which module this dashboard belongs to, and therefore who may see it.** Added 22 September for the command centre: one shell that shows each login the dashboards of the modules it is entitled to. **A dashboard with no module could not be placed in that shell at all** — the field the whole design hangs on did not exist.\n**Required, and `core` is the answer for a dashboard that belongs to no optional module.** An empty field and *belongs everywhere* look identical, and only one of them is a decision — the rule `ModuleKey` already states for screens.\n**Creating one is gated twice**, by `REPORT_MANAGE` and by the module: a principal cannot build a dashboard for a module the tenant has not licensed or that the principal holds no permission in. The server refuses with `409`; a client that hides the option has not enforced anything.\n"
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Narrows every tile to one venue. Omitting it shows each viewer everything their own scope permits — it can never show a viewer beyond that. The same rule as `RunReportRequest.venueId`.\n"
+   },
+   "isShared": {
+    "type": "boolean",
+    "default": false
+   },
+   "tiles": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 24,
+    "items": {
+     "$ref": "#/components/schemas/DashboardTile"
+    }
+   }
+  }
+ },
+ "Dashboard": {
+  "x-ticvai-persistence": "reporting.dashboard + reporting.dashboard_tile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateDashboardRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "ownerPrincipalId",
+     "aggregateCost",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "aggregateCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Combined refresh load of every tile."
+     },
+     "archivedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "FieldType": {
+  "type": "string",
+  "enum": [
+   "string",
+   "integer",
+   "decimal",
+   "money",
+   "boolean",
+   "date",
+   "dateTime",
+   "uuid",
+   "enum"
+  ]
+ },
+ "KpiDefinition": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.kpi_definition",
+  "description": "BI boards 2.5 and 10.2. **One definition, referenced everywhere** — otherwise *revenue* means two things in the same meeting.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "description": "`takings` and `admissions` are seeded for every tenant as system KPIs (decided 28 September, audit R283), and the five accreditation KPIs for every tenant with the accreditation module (29 September, build pass). The seeded codes are `ReportingSystemKpi`.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "domain": {
+    "type": "string",
+    "nullable": true
+   },
+   "formula": {
+    "type": "string",
+    "description": "**Expressed against the semantic model, not against tables.** A KPI written in SQL is a KPI that breaks when the warehouse is reshaped.\n"
+   },
+   "unit": {
+    "type": "string",
+    "enum": [
+     "currency",
+     "count",
+     "percentage",
+     "duration",
+     "ratio",
+     "score"
+    ]
+   },
+   "higherIsBetter": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Refund rate and revenue both go up.** Without this the status colour is a coin toss.\n"
+   },
+   "defaultPeriod": {
+    "type": "string",
+    "nullable": true
+   },
+   "owner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "KpiTarget": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.kpi_target",
+  "description": "BI board 2.6. **The threshold is what turns a number into a status.**",
+  "required": [
+   "scopePath",
+   "period",
+   "target"
+  ],
+  "properties": {
+   "kpiId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The scope this target applies to. With `period`, the key `setKpiTargets` matches on."
+   },
+   "period": {
+    "type": "string"
+   },
+   "target": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "amberAt": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "redAt": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "stretch": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   }
+  }
+ },
+ "KpiValue": {
+  "type": "object",
+  "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
+  "properties": {
+   "kpiId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
+   },
+   "name": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "period": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "target": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "comparison": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "variancePercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "up",
+     "down",
+     "flat"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "green",
+     "amber",
+     "red",
+     "noTarget"
+    ]
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "stale": {
+    "type": "boolean",
+    "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
+   }
+  }
+ },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "SecurityAnalyticsAiDetectionGovernanceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Security Analytics, AI Detection & Governance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "fraudAttempts": {
+    "type": "integer",
+    "description": "Fraud Attempts"
+   },
+   "preventedFraud": {
+    "type": "integer",
+    "description": "Prevented Fraud"
+   },
+   "credentialSharing": {
+    "type": "integer",
+    "description": "Credential Sharing"
+   },
+   "biometricAlerts": {
+    "type": "integer",
+    "description": "Biometric Alerts"
+   },
+   "deviceBindingViolations": {
+    "type": "integer",
+    "description": "Device-Binding Violations"
+   },
+   "companionViolations": {
+    "type": "integer",
+    "description": "Companion Violations"
+   },
+   "blacklistHits": {
+    "type": "integer",
+    "description": "Blacklist Hits"
+   },
+   "identityLocks": {
+    "type": "integer",
+    "description": "Identity Locks"
+   },
+   "securityOverrides": {
+    "type": "integer",
+    "description": "Security Overrides"
+   },
+   "detectionRate": {
+    "type": "number",
+    "description": "Detection Rate"
+   },
+   "falsePositiveIndicator": {
+    "type": "number",
+    "description": "False Positive Indicator"
+   },
+   "operatorOverrideRate": {
+    "type": "number",
+    "description": "Operator Override Rate"
+   },
+   "averageInvestigationTime": {
+    "type": "integer",
+    "description": "Minutes"
+   },
+   "averageResponseTime": {
+    "type": "integer",
+    "description": "Minutes"
+   },
+   "recurringFraudRate": {
+    "type": "number",
+    "description": "Recurring Fraud Rate"
+   },
+   "financialExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Financial Exposure"
+   },
+   "estimatedFraudPrevented": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Estimated Fraud Prevented"
+   },
+   "duplicateUsage": {
+    "type": "integer"
+   }
+  }
+ },
+ "SemanticModel": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.semantic_model",
+  "description": "BI boards 3.3 and 10.6. **A vocabulary, not a schema.** Exposing joins to report authors produces reports that are wrong invisibly.\n",
+  "properties": {
+   "version": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "Assigned by the server on each publish."
+   },
+   "domains": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "description": {
+       "type": "string",
+       "nullable": true
+      },
+      "datasets": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "code": {
+          "type": "string"
+         },
+         "name": {
+          "type": "string"
+         },
+         "grain": {
+          "type": "string",
+          "description": "**What one row means.** The single most common cause of a wrong report is a join that silently multiplied the grain.\n"
+         },
+         "fields": {
+          "type": "array",
+          "items": {
+           "type": "object",
+           "properties": {
+            "code": {
+             "type": "string"
+            },
+            "label": {
+             "type": "string"
+            },
+            "dataType": {
+             "$ref": "#/components/schemas/FieldType"
+            },
+            "aggregation": {
+             "allOf": [
+              {
+               "$ref": "#/components/schemas/Aggregation"
+              }
+             ],
+             "nullable": true,
+             "description": "The default aggregation for the field, where it has one."
+            },
+            "sensitive": {
+             "type": "boolean",
+             "default": false
+            },
+            "description": {
+             "type": "string",
+             "nullable": true
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "relationships": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromDataset": {
+       "type": "string"
+      },
+      "toDataset": {
+       "type": "string"
+      },
+      "cardinality": {
+       "type": "string",
+       "enum": [
+        "oneToOne",
+        "oneToMany",
+        "manyToOne",
+        "manyToMany"
+       ]
+      }
+     }
+    }
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "SiteNormalisationBasis": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.site_normalisation_basis",
+  "description": "BI boards 7.9 and 10.4. **The denominators a benchmark divides by**, per site and period: visitors, operating hours, staffed positions and area, one for each `BenchmarkNormalisation` other than `none`. Read by `getAnalyticsBenchmark` for the period that covers the benchmark (data model, 29 September).\n",
+  "required": [
+   "scopePath",
+   "periodStart",
+   "periodEnd"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The site (venue scope) the basis applies to."
+   },
+   "periodStart": {
+    "type": "string",
+    "format": "date"
+   },
+   "periodEnd": {
+    "type": "string",
+    "format": "date"
+   },
+   "visitors": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "`perVisitor`."
+   },
+   "operatingHours": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "description": "`perOperatingHour`."
+   },
+   "staffedPositions": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "description": "`perStaffedPosition`. Average positions staffed over the period."
+   },
+   "areaSquareMetres": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "description": "`perSquareMetre`. Operated area."
+   }
+  }
+ }
+}

@@ -1,6 +1,6 @@
 # P15-kitchen-01 — P15 · Kitchen
 
-**10 screens · 24 operations · 18 schemas · 8 permissions**
+**10 screens · 27 operations · 28 schemas · 8 permissions**
 
 Platform P15 Kitchen Display · ships as **venue-pos** ·
 staff audience · kiosk ·
@@ -62,12 +62,12 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `KIT-001` | Kitchen Operations Command Center | commandCentre | 3 | 0 | — |
-| `KIT-002` | Kitchen Display System (KDS) | listDetail | 7 | 0 | — |
-| `KIT-003` | Order Firing & Course Management | configEditor | 5 | 0 | — |
+| `KIT-002` | Kitchen Display System (KDS) | listDetail | 7 | 6 | — |
+| `KIT-003` | Order Firing & Course Management | configEditor | 6 | 4 | — |
 | `KIT-004` | Active Order Management & Fulfilment Journey | listDetail | 2 | 0 | — |
-| `KIT-005` | Kitchen Station Workload & Dynamic Routing | listDetail | 2 | 0 | — |
-| `KIT-006` | Expeditor & Order Assembly | listDetail | 5 | 0 | — |
-| `KIT-007` | Guest Collection, Buzzer & Digital Notification | listDetail | 2 | 0 | — |
-| `KIT-008` | Exceptions, Re-Fire & Unavailable Items | listDetail | 5 | 0 | — |
-| `KIT-009` | SLA, Priority & Service Rules | configEditor | 2 | 0 | — |
-| `KIT-010` | Kitchen Performance, AI & Operational Optimization | statusTracker | 2 | 0 | — |
+| `KIT-005` | Kitchen Station Workload & Dynamic Routing | listDetail | 4 | 1 | — |
+| `KIT-006` | Expeditor & Order Assembly | listDetail | 5 | 3 | — |
+| `KIT-007` | Guest Collection, Buzzer & Digital Notification | listDetail | 2 | 1 | — |
+| `KIT-008` | Exceptions, Re-Fire & Unavailable Items | listDetail | 6 | 3 | — |
+| `KIT-009` | SLA, Priority & Service Rules | configEditor | 3 | 1 | — |
+| `KIT-010` | Kitchen Performance, AI & Operational Optimization | statusTracker | 3 | 1 | — |

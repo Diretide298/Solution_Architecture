@@ -1,0 +1,311 @@
+{
+ "createDeviceFirmware": {
+  "method": "POST",
+  "path": "/device-firmware",
+  "contract": "tenancy",
+  "summary": "Register a firmware or software release before it is deployed",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceFirmware",
+  "responds": "DeviceFirmware"
+ },
+ "createWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders",
+  "contract": "maintenance",
+  "summary": "Raise a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateWorkOrderRequest",
+  "responds": "WorkOrder"
+ },
+ "enrolDevice": {
+  "method": "POST",
+  "path": "/devices/{deviceId}/enrolment",
+  "contract": "tenancy",
+  "summary": "Take a registered device through enrolment to activation",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceEnrolment",
+  "responds": "RegisteredDevice"
+ },
+ "getDeviceFirmware": {
+  "method": "GET",
+  "path": "/device-firmware/{firmwareId}",
+  "contract": "tenancy",
+  "summary": "Read one firmware release, and how much of the fleet is on it",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DeviceFirmware"
+ },
+ "getDeviceTelemetry": {
+  "method": "GET",
+  "path": "/devices/{deviceId}/telemetry",
+  "contract": "tenancy",
+  "summary": "Battery, performance and consumables over time",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "metric",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeviceTelemetryPoint"
+ },
+ "listDeviceFirmware": {
+  "method": "GET",
+  "path": "/device-firmware",
+  "contract": "tenancy",
+  "summary": "Firmware and software versions, and what is running where",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "deviceKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeviceFirmware"
+ },
+ "listDevices": {
+  "method": "GET",
+  "path": "/devices",
+  "contract": "tenancy",
+  "summary": "List registered devices",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPaymentTerminalCertifications": {
+  "method": "GET",
+  "path": "/payment-terminal-certifications",
+  "contract": "payments",
+  "summary": "EMV and PCI certification of each terminal model and kernel",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "modelCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringBefore",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPaymentTerminals": {
+  "method": "GET",
+  "path": "/payment-terminals",
+  "contract": "payments",
+  "summary": "Terminals, and the payment configuration on each",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentTerminal"
+ },
+ "listStoredForwardTransactions": {
+  "method": "GET",
+  "path": "/payment-terminals/{terminalId}/forwarded",
+  "contract": "payments",
+  "summary": "What a terminal took offline and has not yet sent",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "StoredForwardTransaction"
+ },
+ "recordPaymentTerminalCertification": {
+  "method": "PUT",
+  "path": "/payment-terminal-certifications/{modelCode}",
+  "contract": "payments",
+  "summary": "Record a terminal model's EMV and PCI certification",
+  "permission": "PAYMENT_PROVIDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PayTerminalCertification",
+  "responds": "PayTerminalCertification"
+ },
+ "setDeviceAssignment": {
+  "method": "PUT",
+  "path": "/devices/{deviceId}/assignment",
+  "contract": "tenancy",
+  "summary": "Who owns it, who holds it, and where it is",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceAssignment",
+  "responds": "DeviceAssignment"
+ },
+ "setPaymentTerminalConfiguration": {
+  "method": "PUT",
+  "path": "/payment-terminals",
+  "contract": "payments",
+  "summary": "Merchant account, acquirer, EMV and offline behaviour",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PaymentTerminal",
+  "responds": "PaymentTerminal"
+ },
+ "testPaymentProviderConnection": {
+  "method": "POST",
+  "path": "/payment-providers/{connectionId}/test",
+  "contract": "payments",
+  "summary": "Prove the connection works before anybody pays through it",
+  "permission": "PAYMENT_PROVIDER_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProviderTestResult"
+ }
+}

@@ -1,6 +1,6 @@
 # P02-support-01 — P02 · Support
 
-**1 screens · 3 operations · 3 schemas · 0 permissions**
+**1 screens · 3 operations · 8 schemas · 0 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -50,8 +50,8 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 0 permissions apply here:
   ``. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: raiseMyCase
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **0 of these operations work offline**
+  
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -62,4 +62,4 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-034` | Lost & Found | listDetail | 3 | 0 | — |
+| `GST-034` | Lost & Found | listDetail | 3 | 2 | — |

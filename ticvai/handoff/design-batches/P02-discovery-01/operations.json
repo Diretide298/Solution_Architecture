@@ -25,6 +25,11 @@
     "required": null
    },
    {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null

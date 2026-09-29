@@ -1,0 +1,1700 @@
+[
+ {
+  "id": "ADM-599",
+  "name": "Mixed Tender & Credit Command Center\\t93",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "5",
+   "number": "1",
+   "page": 92
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/mixed-tender-credit-command-center-t93-adm-599",
+   "component": "apps/ticvai-web/src/routes/commercial/MixedTenderCreditCommandCenterT93.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-600",
+    "ADM-601",
+    "ADM-602",
+    "ADM-603",
+    "ADM-604",
+    "ADM-605",
+    "ADM-606",
+    "ADM-607",
+    "ADM-608"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to Platform Dashboard",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "ADM-600",
+     "trigger": "Mixed Tender Rule & Combination Builder\\t93",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-601",
+     "trigger": "Split Payment & Tender Allocation Manager\\t94",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-602",
+     "trigger": "B2B Credit Account & Limit Manager\\t95",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-603",
+     "trigger": "B2B Invoice, On-Account & Payment Terms Configuration\\t96",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-604",
+     "trigger": "Stored Value, Gift Card & Voucher Tender Controls\\t97",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-605",
+     "trigger": "Advanced Payment Eligibility, Sequence & Restriction Rules\\t98",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-606",
+     "trigger": "Partial Payment, Failure & Recovery Manager\\t100",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-607",
+     "trigger": "Mixed Tender Transaction Trace & Allocation Audit\\t100",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-608",
+     "trigger": "Mixed Tender Simulator, Credit Exposure & AI Advisor\\t102",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide centralized operational visibility over mixed-tender and account-credit transactions.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Mixed-Tender Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Mixed-Tender Value",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average Tenders per Transaction",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "B2B Credit Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "B2B Credit Utilized",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Outstanding B2B Credit",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Invoice / On-Account Transactions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Gift Card Contributions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Stored-Value Contributions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Split Payment Failures",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Partially Paid Orders",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Payment Allocation Exceptions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §KPI Cards"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The mixed tender credit list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the mixed tender credit untouched.",
+   "emptyFirstRun": "No mixed tender credit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the mixed tender credit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getMixedTenderRules",
+    "contract": "payments",
+    "purpose": "Tender rules in force",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-599",
+   "workshopBoard": "wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-599"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 92. 0 of 0 labels bound to a contract property; 12 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-600",
+  "name": "Mixed Tender Rule & Combination Builder\\t93",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "5",
+   "number": "2",
+   "page": 92
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/mixed-tender-rule-combination-builder-t93-adm-600",
+   "component": "apps/ticvai-web/src/routes/commercial/MixedTenderRuleCombinationBuilderT93.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-599"
+   ],
+   "exitTo": [
+    "ADM-599"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-599",
+     "trigger": "Back to Mixed Tender & Credit Command Center\\t93",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Card r t Credit; Card) and no metric row",
+  "purpose": "Define which payment methods may be combined within a single transaction.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 92 §Card r t Credit"
+   },
+   {
+    "operation": null,
+    "why": "**Mixed Tender Rule & Combination Builder\\t93 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every mixed tender rule",
+       "columns": [
+        "Card ✓ ✓ ✓ ✓ ✓ ✓",
+        "Cash ✓ — ✓ ✓ ✓ ✓",
+        "Voucher ✓ ✓ ✓* — ✓ ✓"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §Card r t Credit"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected mixed tender rule",
+       "bindsTo": null,
+       "columns": [
+        "Card ✓ ✓ ✓ ✓ ✓ ✓",
+        "Cash ✓ — ✓ ✓ ✓ ✓",
+        "Voucher ✓ ✓ ✓* — ✓ ✓"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Gift”, “Maximum”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 92 §Card r t Credit"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The mixed tender rule list.",
+   "error": "Could not load. Names which read failed and leaves the mixed tender rule untouched.",
+   "emptyFirstRun": "No mixed tender rule yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the mixed tender rule are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setMixedTenderRules",
+    "contract": "payments",
+    "purpose": "Which combinations are allowed",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getMixedTenderRules"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Card ✓ ✓ ✓ ✓ ✓ ✓",
+    "Cash ✓ — ✓ ✓ ✓ ✓",
+    "Voucher ✓ ✓ ✓* — ✓ ✓"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-600",
+   "workshopBoard": "wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-600"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 92. 0 of 3 labels bound to a contract property; 13 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-601",
+  "name": "Split Payment & Tender Allocation Manager\\t94",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "5",
+   "number": "3",
+   "page": 93
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/split-payment-tender-allocation-manager-t94-adm-601",
+   "component": "apps/ticvai-web/src/routes/commercial/SplitPaymentTenderAllocationManagerT94.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-599"
+   ],
+   "exitTo": [
+    "ADM-599"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-599",
+     "trigger": "Back to Mixed Tender & Credit Command Center\\t93",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Determine how an order total is allocated across several payment methods.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Split Payment & Tender Allocation Manager\\t94 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 93"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 93"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setMultiPaymentSplit",
+       "label": "Save multi payment split",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setMultiPaymentSplit"
+      },
+      {
+       "kind": "textField",
+       "label": "Channel",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?channel=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "textField",
+       "label": "Terminal id",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?terminalId=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "textField",
+       "label": "Product id",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?productId=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listPaymentAllocationRules",
+       "notes": "Sends `?isActive=` to `listPaymentAllocationRules`.",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every payment allocation rule",
+       "bindsTo": "PaymentAllocationRule",
+       "columns": [
+        "PaymentAllocationRule.id",
+        "PaymentAllocationRule.channel",
+        "PaymentAllocationRule.terminalId",
+        "PaymentAllocationRule.productId",
+        "PaymentAllocationRule.orderType",
+        "PaymentAllocationRule.customerType",
+        "PaymentAllocationRule.allocationLevel",
+        "PaymentAllocationRule.isActive",
+        "PaymentAllocationRule.scopePath"
+       ],
+       "operation": "listPaymentAllocationRules",
+       "provenance": "contract orders.yaml GET /payment-allocation-rules"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The split payment tender list.",
+   "error": "Could not load. Names which read failed and leaves the split payment tender untouched.",
+   "emptyFirstRun": "No split payment tender yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the split payment tender are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setMultiPaymentSplit",
+    "contract": "orders",
+    "purpose": "Allocate a split payment",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setMixedTenderRules",
+    "contract": "payments",
+    "purpose": "The sequence rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getMixedTenderRules"
+    ]
+   },
+   {
+    "operationId": "listPaymentAllocationRules",
+    "contract": "orders",
+    "purpose": "The venue's split-tender allocation rules",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-601",
+   "workshopBoard": "wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-601"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 93. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-602",
+  "name": "B2B Credit Account & Limit Manager\\t95",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "5",
+   "number": "4",
+   "page": 94
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/b2b-credit-account-limit-manager-t95-adm-602",
+   "component": "apps/ticvai-web/src/routes/commercial/B2bCreditAccountLimitManagerT95.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-599"
+   ],
+   "exitTo": [
+    "ADM-599"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-599",
+     "trigger": "Back to Mixed Tender & Credit Command Center\\t93",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Manage payment credit facilities granted to authorized B2B customers, resellers, corporate clients or partners. This is not the general B2B customer profile. The B2B/CRM module remains authoritative for the customer/account itself. Board 5 owns the payment-credit capability.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**B2B Credit Account & Limit Manager\\t95 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Credit limit",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 94 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective dates",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 94 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 94 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allowed business units",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 94 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allowed channels",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 94 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Payment terms",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 94 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval level",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 94 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The b2b credit account configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the b2b credit account untouched.",
+   "emptyFirstRun": "No b2b credit account configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listB2bCreditAccounts",
+    "contract": "payments",
+    "purpose": "On-account customers",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createB2bCreditAccount",
+    "contract": "payments",
+    "purpose": "Open an account",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listB2bCreditAccounts"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-602",
+   "workshopBoard": "wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-602"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 94. 0 of 0 labels bound to a contract property; 17 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-603",
+  "name": "B2B Invoice, On-Account & Payment Terms Configuration\\t96",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "5",
+   "number": "5",
+   "page": 95
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/b2b-invoice-on-account-payment-terms-configuration-t96-adm-603",
+   "component": "apps/ticvai-web/src/routes/commercial/B2bInvoiceOnAccountPaymentTermsConfigurationT96.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-599"
+   ],
+   "exitTo": [
+    "ADM-599"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-599",
+     "trigger": "Back to Mixed Tender & Credit Command Center\\t93",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Define) and no display directory — it is settings, not a population",
+  "purpose": "Configure how approved B2B customers can transact without immediate full payment.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Customer/account",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Credit agreement",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Payment term",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Billing cycle",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Invoice requirement",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Purchase order requirement",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval requirement",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transaction maximum",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Outstanding balance limit",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 95 §Define"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The b2b invoice on-account configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the b2b invoice on-account untouched.",
+   "emptyFirstRun": "No b2b invoice on-account configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setB2bPaymentTerms",
+    "contract": "payments",
+    "purpose": "Limit, terms and billing cycle",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listB2bCreditAccounts"
+    ]
+   },
+   {
+    "operationId": "getInstalmentPolicy",
+    "contract": "payments",
+    "purpose": "Show the instalment policy",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setInstalmentPolicy",
+    "contract": "payments",
+    "purpose": "Edit the instalment policy",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-603",
+   "workshopBoard": "wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-603"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 95. 0 of 0 labels bound to a contract property; 10 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "accountId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-604",
+  "name": "Stored Value, Gift Card & Voucher Tender Controls\\t97",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "5",
+   "number": "6",
+   "page": 96
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/stored-value-gift-card-voucher-tender-controls-t97-adm-604",
+   "component": "apps/ticvai-web/src/routes/commercial/StoredValueGiftCardVoucherTenderControlsT97.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-599"
+   ],
+   "exitTo": [
+    "ADM-599"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-599",
+     "trigger": "Back to Mixed Tender & Credit Command Center\\t93",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Manage how stored-value instruments participate in payment without duplicating the Wallet or Voucher modules.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Can be used as tender",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 96 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Can combine with card",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 96 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Can combine with cash",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 96 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Can combine with B2B credit",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 96 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum redemption",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 96 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum redemption",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 96 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Full/partial balance usage",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 96 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency restrictions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 96 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product restrictions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 96 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue restrictions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 96 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel restrictions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 96 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The stored value gift configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the stored value gift untouched.",
+   "emptyFirstRun": "No stored value gift configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setMixedTenderRules",
+    "contract": "payments",
+    "purpose": "Stored value and voucher tenders",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getMixedTenderRules"
+    ]
+   },
+   {
+    "operationId": "getCreditConsumptionPolicy",
+    "contract": "wallet",
+    "purpose": "The order within stored value",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-604",
+   "workshopBoard": "wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-604"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 96. 0 of 0 labels bound to a contract property; 11 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-605",
+  "name": "Advanced Payment Eligibility, Sequence & Restriction Rules\\t98",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "5",
+   "number": "7",
+   "page": 97
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/advanced-payment-eligibility-sequence-restriction-rules--adm-605",
+   "component": "apps/ticvai-web/src/routes/commercial/AdvancedPaymentEligibilitySequenceRestrictionRul.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-599"
+   ],
+   "exitTo": [
+    "ADM-599"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-599",
+     "trigger": "Back to Mixed Tender & Credit Command Center\\t93",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Gift Card second) and no metric row",
+  "purpose": "Provide advanced transaction-level payment rules beyond the general method availability configured in Board 1.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Minimum card amount, Credit restriction, Voucher exclusivity. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 97 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 97 §Gift Card second"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every advanced payment eligibility",
+       "columns": [
+        "↓"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 97 §Gift Card second"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected advanced payment eligibility",
+       "bindsTo": null,
+       "columns": [
+        "↓"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Board 1 answers”, “Board 5 answers”, “AND”, “Voucher first”, “B2B Credit third”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 97 §Gift Card second"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Minimum card amount",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 97 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Credit restriction",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 97 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Voucher exclusivity",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 97 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The advanced payment eligibility list.",
+   "error": "Could not load. Names which read failed and leaves the advanced payment eligibility untouched.",
+   "emptyFirstRun": "No advanced payment eligibility yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the advanced payment eligibility are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setMixedTenderRules",
+    "contract": "payments",
+    "purpose": "Sequence and restrictions",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getMixedTenderRules"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "↓"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-605",
+   "workshopBoard": "wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-605"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 97. 0 of 1 labels bound to a contract property; 4 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-606",
+  "name": "Partial Payment, Failure & Recovery Manager\\t100",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "5",
+   "number": "8",
+   "page": 99
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/partial-payment-failure-recovery-manager-t100-adm-606",
+   "component": "apps/ticvai-web/src/routes/commercial/PartialPaymentFailureRecoveryManagerT100.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-599"
+   ],
+   "exitTo": [
+    "ADM-599"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-599",
+     "trigger": "Back to Mixed Tender & Credit Command Center\\t93",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Gift Card; Card) and no metric row",
+  "purpose": "Handle situations where some tenders succeed but another tender fails. This is one of the most important screens in Board 5.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card"
+   },
+   {
+    "operation": null,
+    "why": "**Partial Payment, Failure & Recovery Manager\\t100 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every partial payment failure",
+       "columns": [
+        "AED 200 ✓",
+        "AED 800 ✕"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected partial payment failure",
+       "bindsTo": null,
+       "columns": [
+        "AED 200 ✓",
+        "AED 800 ✕"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “AED 200 successfully consumed”, “Partial Payment States”, “Timeout”, “Partially Paid”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The partial payment failure list.",
+   "error": "Could not load. Names which read failed and leaves the partial payment failure untouched.",
+   "emptyFirstRun": "No partial payment failure yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the partial payment failure are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setMixedTenderRules",
+    "contract": "payments",
+    "purpose": "Partial payment and recovery",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getMixedTenderRules"
+    ]
+   },
+   {
+    "operationId": "getDunningPolicy",
+    "contract": "payments",
+    "purpose": "Read the retry schedule this venue runs",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDunningPolicy",
+    "contract": "payments",
+    "purpose": "Set attempts, spacing and what happens when they run out",
+    "trigger": "onSave"
+   },
+   {
+    "operationId": "listDunningCases",
+    "contract": "payments",
+    "purpose": "The queue, ordered by attempts remaining",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "resolveDunningCase",
+    "contract": "payments",
+    "purpose": "Stop chasing, with a reason",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "AED 200 ✓",
+    "AED 800 ✕"
+   ],
+   "params": [
+    {
+     "name": "caseId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-606",
+   "workshopBoard": "wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-606"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 99. 0 of 2 labels bound to a contract property; 2 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-607",
+  "name": "Mixed Tender Transaction Trace & Allocation Audit\\t100",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "5",
+   "number": "9",
+   "page": 100
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/mixed-tender-transaction-trace-allocation-audit-t100-adm-607",
+   "component": "apps/ticvai-web/src/routes/commercial/MixedTenderTransactionTraceAllocationAuditT100.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-599"
+   ],
+   "exitTo": [
+    "ADM-599"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-599",
+     "trigger": "Back to Mixed Tender & Credit Command Center\\t93",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
+  "purpose": "Provide a complete financial and operational explanation of every multi-tender transaction.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Operator/customer",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 100 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 100 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rules applied",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 100 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Payment IDs",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 100 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tender references",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 100 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Amounts",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 100 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 100 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Timestamps",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 100 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Overrides",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 100 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 100 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reversal/refund relationship",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 100 §Capture"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The mixed tender transaction configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the mixed tender transaction untouched.",
+   "emptyFirstRun": "No mixed tender transaction configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "listOrderPaymentDetail",
+    "contract": "orders",
+    "purpose": "Trace the allocation",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-607",
+   "workshopBoard": "wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-607"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 100. 0 of 0 labels bound to a contract property; 11 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-608",
+  "name": "Mixed Tender Simulator, Credit Exposure & AI Advisor\\t102",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "5",
+   "number": "10",
+   "page": 101
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/mixed-tender-simulator-credit-exposure-ai-advisor-t102-adm-608",
+   "component": "apps/ticvai-web/src/routes/commercial/MixedTenderSimulatorCreditExposureAiAdvisorT102.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-599"
+   ],
+   "exitTo": [
+    "ADM-599"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-599",
+     "trigger": "Back to Mixed Tender & Credit Command Center\\t93",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Gift Card; Card; Gift Card AED 200) and no metric row",
+  "purpose": "Allow administrators to test complex tender combinations before activating rules.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved: Require card for excess, Request approval, Reject B2B credit, Reduce credit allocation. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 101 §Available actions according to policy"
+   },
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 101 §Gift Card"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every mixed tender simulator",
+       "columns": [
+        "↓",
+        "AED 200 deducted",
+        "No ticket/order",
+        "No clear recovery process",
+        "→ Cash"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 101 §Gift Card"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected mixed tender simulator",
+       "bindsTo": null,
+       "columns": [
+        "↓",
+        "AED 200 deducted",
+        "No ticket/order",
+        "No clear recovery process",
+        "→ Cash"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Order”, “AED 1,000 order”, “AED 1,000”, “Validate Tender Combination”, “Validate Balances / Credit”, “Process Tenders”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 101 §Gift Card"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Require card for excess",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 101 §Available actions according to policy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request approval",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 101 §Available actions according to policy"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Reject B2B credit",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 101 §Available actions according to policy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reduce credit allocation",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 101 §Available actions according to policy"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRejectBBCredit",
+    "component": "confirmDialog",
+    "trigger": "Reject B2B credit",
+    "body": "**Reject B2B credit on a mixed tender simulator is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Payment_Payment_Orchestration.pdf, page 101 §Available actions according to policy"
+   }
+  ],
+  "states": {
+   "loading": "The mixed tender simulator list.",
+   "error": "Could not load. Names which read failed and leaves the mixed tender simulator untouched.",
+   "emptyFirstRun": "No mixed tender simulator yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the mixed tender simulator are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "simulatePaymentConfiguration",
+    "contract": "payments",
+    "purpose": "Simulate mixed tender",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listB2bCreditAccounts",
+    "contract": "payments",
+    "purpose": "Credit exposure",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "↓",
+    "AED 200 deducted",
+    "No ticket/order",
+    "No clear recovery process",
+    "→ Cash"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-608",
+   "workshopBoard": "wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-608"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 101. 0 of 5 labels bound to a contract property; 25 of 178 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

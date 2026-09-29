@@ -16,22 +16,8 @@
     "EMP-003",
     "EMP-060"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.**",
   "density": "comfortable",
@@ -50,8 +36,43 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Item id",
+       "operation": "listStockMovements",
+       "notes": "Sends `?itemId=` to `listStockMovements`.",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
+       "kind": "textField",
+       "label": "Location id",
+       "operation": "listStockMovements",
+       "notes": "Sends `?locationId=` to `listStockMovements`.",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listStockMovements",
+       "notes": "Sends `?kind=` to `listStockMovements`.",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded from",
+       "operation": "listStockMovements",
+       "notes": "Sends `?recordedFrom=` to `listStockMovements`.",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded to",
+       "operation": "listStockMovements",
+       "notes": "Sends `?recordedTo=` to `listStockMovements`.",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every retail inventory",
+       "label": "Every stock movement",
        "bindsTo": "StockMovement",
        "columns": [
         "StockMovement.id",
@@ -69,6 +90,21 @@
        ],
        "operation": "listStockMovements",
        "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search retail inventory command center",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -78,7 +114,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected retail inventory",
+       "label": "The selected stock movement",
+       "bindsTo": "StockMovement",
+       "columns": [
+        "StockMovement.id",
+        "StockMovement.itemId",
+        "StockMovement.locationId",
+        "StockMovement.kind",
+        "StockMovement.quantity",
+        "StockMovement.unit",
+        "StockMovement.reason",
+        "StockMovement.costCenterId",
+        "StockMovement.recordedAt",
+        "StockMovement.balanceAfter",
+        "StockMovement.unitCost",
+        "StockMovement.totalCost",
+        "StockMovement.principalId",
+        "StockMovement.sourceType",
+        "StockMovement.sourceId",
+        "StockMovement.journalEntryId"
+       ],
+       "operation": "listStockMovements",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The stock position",
        "bindsTo": "StockPosition",
        "columns": [
         "StockPosition.itemId",
@@ -98,36 +159,15 @@
        "provenance": "contract inventory.yaml GET /stock"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search retail inventory command center",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "cardList",
-       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Confirm",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The retail inventory list.",
    "error": "Could not load. Names which read failed and leaves the retail inventory untouched.",
-   "emptyFirstRun": "No retail inventory yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the retail inventory are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No retail inventory yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on itemId, locationId, kind, recordedFrom, recordedTo and the retail inventory are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -142,6 +182,34 @@
     "contract": "inventory",
     "purpose": "The movement ledger",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Today's takings and revenue KPIs on the phone",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Store manager's mobile dashboard",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAlerts",
+    "contract": "reporting",
+    "purpose": "Daily revenue alerts (also pushed, deliverTo push)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "acknowledgeAlert",
+    "contract": "reporting",
+    "purpose": "Acknowledge an alert",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -149,21 +217,30 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "alertId",
+     "from": "navigation"
+    },
+    {
+     "name": "dashboardId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
    "preloaded": [
-    "StockPosition.itemId",
-    "StockPosition.itemName",
-    "StockPosition.sku",
-    "StockPosition.locationId",
-    "StockPosition.locationName"
+    "StockMovement.id",
+    "StockMovement.itemId",
+    "StockMovement.locationId",
+    "StockMovement.kind",
+    "StockMovement.quantity"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-061",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -228,8 +305,8 @@
   "gaps": [
    {
     "operation": "getHaccpStatus",
-    "why": "**1 declared operation reach no component on this screen**: getHaccpStatus. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getHaccpStatus` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract fnb.yaml GET /food-safety/status"
    }
   ],
   "layout": {
@@ -241,7 +318,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected store stock sku",
+       "label": "The stock position",
        "bindsTo": "StockPosition",
        "columns": [
         "StockPosition.itemId",
@@ -259,31 +336,14 @@
        ],
        "operation": "getStockPositions",
        "provenance": "contract inventory.yaml GET /stock"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setItemAvailability",
-       "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Log",
-       "operation": "logTemperature",
-       "provenance": "contract fnb.yaml POST /food-safety/temperature-logs"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "kind": "detailPanel",
+       "label": "Haccp status",
+       "operation": "getHaccpStatus",
+       "notes": "Shows `checksDue`, `checksMissed`, `openActions`, `unsignedActions`, `oldestOpenActionAgeHours`, `lastInspectionAt` from `getHaccpStatus`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract fnb.yaml GET /food-safety/status"
+      },
       {
        "kind": "searchField",
        "label": "Search store stock",
@@ -300,15 +360,32 @@
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save item availability",
+       "operation": "setItemAvailability",
+       "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Log temperature",
+       "operation": "logTemperature",
+       "provenance": "contract fnb.yaml POST /food-safety/temperature-logs"
+      }
+     ]
     }
    ]
   },
   "states": {
-   "loading": "The store stock sku list.",
+   "loading": "The store stock sku, read by `getStockPositions`.",
    "error": "Could not load. Names which read failed and leaves the store stock sku untouched.",
-   "emptyFirstRun": "No store stock sku yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the store stock sku are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No store stock sku yet. Offers Log temperature (`logTemperature`).",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -354,10 +431,62 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-062",
+   "derivedFrom": "wireframes/reference/FnB Board 5.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetItemAvailability",
+    "component": "modal",
+    "trigger": "Save item availability",
+    "body": "**Collects what `setItemAvailability` sends before it is called.** Required: `isAvailable`, `recordedAt`. Optional: `reason`, `restoreAt`. **`note` is collected too, and required when the reason is Other** — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save item availability",
+     "operation": "setItemAvailability"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "isAvailable",
+      "recordedAt",
+      "reason",
+      "restoreAt",
+      "note"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+   },
+   {
+    "id": "formLogTemperature",
+    "component": "modal",
+    "trigger": "Log temperature",
+    "body": "**Collects what `logTemperature` sends before it is called.** Required: `id`, `checkPointId`, `recordedAt`, `valueCelsius`, `outcome`. Optional: `checkPointKind`, `recordedByPrincipalId`, `minCelsius`, `maxCelsius`, `deviceReported`, `correctiveActionId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "TemperatureLog",
+    "confirm": {
+     "label": "Log temperature",
+     "operation": "logTemperature"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "checkPointId",
+      "recordedAt",
+      "valueCelsius",
+      "outcome",
+      "checkPointKind",
+      "recordedByPrincipalId",
+      "minCelsius",
+      "maxCelsius",
+      "deviceReported",
+      "correctiveActionId"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /food-safety/temperature-logs"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -395,22 +524,8 @@
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed.",
   "density": "comfortable",
@@ -428,8 +543,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listRequisitions",
+       "notes": "Sends `?status=` to `listRequisitions`.",
+       "provenance": "contract inventory.yaml GET /requisitions"
+      },
+      {
+       "kind": "textField",
+       "label": "Raised by principal id",
+       "operation": "listRequisitions",
+       "notes": "Sends `?raisedByPrincipalId=` to `listRequisitions`.",
+       "provenance": "contract inventory.yaml GET /requisitions"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every requisition smart store",
+       "label": "Every requisition",
        "bindsTo": "Requisition",
        "columns": [
         "Requisition.id",
@@ -447,6 +576,21 @@
        ],
        "operation": "listRequisitions",
        "provenance": "contract inventory.yaml GET /requisitions"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search requisition",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -456,7 +600,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected requisition smart store",
+       "label": "The selected requisition",
        "bindsTo": "Requisition",
        "columns": [
         "Requisition.id",
@@ -483,30 +627,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create requisition",
        "operation": "createRequisition",
        "provenance": "contract inventory.yaml POST /requisitions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search requisition",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "cardList",
-       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Confirm",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -515,9 +638,9 @@
   "states": {
    "loading": "The requisition smart store list.",
    "error": "Could not load. Names which read failed and leaves the requisition smart store untouched.",
-   "emptyFirstRun": "No requisition smart store yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the requisition smart store are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No requisition smart store yet. Offers Create requisition (`createRequisition`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, raisedByPrincipalId and the requisition smart store are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listRequisitions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -557,10 +680,37 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-063",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateRequisition",
+    "component": "modal",
+    "trigger": "Create requisition",
+    "body": "**Collects what `createRequisition` sends before it is called.** Required: `id`, `venueId`, `lines`, `requiredBy`. Optional: `departmentId`, `costCenterId`, `justification`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateRequisitionRequest",
+    "confirm": {
+     "label": "Create requisition",
+     "operation": "createRequisition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "lines",
+      "requiredBy",
+      "departmentId",
+      "costCenterId",
+      "justification"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /requisitions"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -598,22 +748,8 @@
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed.",
   "density": "comfortable",
@@ -632,7 +768,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every store-to-store warehouse transfers",
+       "label": "Every stock location",
        "bindsTo": "StockLocation",
        "columns": [
         "StockLocation.id",
@@ -645,6 +781,21 @@
        ],
        "operation": "listStockLocations",
        "provenance": "contract inventory.yaml GET /stock-locations"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search store-to-store",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -654,7 +805,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected store-to-store warehouse transfers",
+       "label": "The selected stock location",
        "bindsTo": "StockLocation",
        "columns": [
         "StockLocation.id",
@@ -676,30 +827,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create stock transfer",
        "operation": "createStockTransfer",
        "provenance": "contract inventory.yaml POST /stock-transfers"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search store-to-store",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "cardList",
-       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Confirm",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -708,9 +838,9 @@
   "states": {
    "loading": "The store-to-store warehouse transfers list.",
    "error": "Could not load. Names which read failed and leaves the store-to-store warehouse transfers untouched.",
-   "emptyFirstRun": "No store-to-store warehouse transfers yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the store-to-store warehouse transfers are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No store-to-store warehouse transfers yet. Offers Create stock transfer (`createStockTransfer`).",
+   "emptyNoResults": "Never shown: `listStockLocations` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listStockLocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -750,10 +880,36 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-064",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateStockTransfer",
+    "component": "modal",
+    "trigger": "Create stock transfer",
+    "body": "**Collects what `createStockTransfer` sends before it is called.** Required: `id`, `fromLocationId`, `toLocationId`, `lines`, `recordedAt`. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateStockTransferRequest",
+    "confirm": {
+     "label": "Create stock transfer",
+     "operation": "createStockTransfer"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "fromLocationId",
+      "toLocationId",
+      "lines",
+      "recordedAt",
+      "note"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-transfers"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -791,27 +947,20 @@
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
    "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    },
     {
      "to": "BO-052",
      "trigger": "The rest is received and the transfer closes short",
      "provenance": "flow F35 step 3→4",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "purchaseOrderId",
+      "receiptId",
+      "transferId"
+     ]
     }
    ]
   },
@@ -823,13 +972,6 @@
   "pattern": "statusTracker",
   "patternReason": "`getStockTransfer` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Receiving & Store Put-Away — from the client design board, 20 August.",
-  "gaps": [
-   {
-    "operation": "getStockTransfer",
-    "why": "**1 declared operation reach no component on this screen**: getStockTransfer. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -839,19 +981,20 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create goods receipt",
        "operation": "createGoodsReceipt",
        "provenance": "contract inventory.yaml POST /goods-receipts"
       },
       {
        "kind": "destructiveButton",
-       "label": "Reject",
+       "label": "Reject received goods",
        "operation": "rejectReceivedGoods",
-       "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject"
+       "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject",
+       "notes": "Rejects by receipt line (`lineId`, the batch and expiry received), not by item (audit R171); when the reason is Other a note is required, and the operation refuses 400 without it (decided 28 September, audit R222)."
       },
       {
        "kind": "secondaryButton",
-       "label": "Log",
+       "label": "Log cold chain",
        "operation": "logColdChain",
        "provenance": "contract fnb.yaml POST /food-safety/cold-chain"
       }
@@ -875,6 +1018,27 @@
        "kind": "primaryButton",
        "label": "Confirm",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The stock transfer",
+       "bindsTo": "StockTransfer",
+       "columns": [
+        "StockTransfer.id",
+        "StockTransfer.transferNumber",
+        "StockTransfer.fromLocationId",
+        "StockTransfer.toLocationId",
+        "StockTransfer.status",
+        "StockTransfer.lines",
+        "StockTransfer.dispatchedByPrincipalId",
+        "StockTransfer.receivedByPrincipalId",
+        "StockTransfer.dispatchedAt",
+        "StockTransfer.receivedAt",
+        "StockTransfer.closeShortReason",
+        "StockTransfer.scopePath"
+       ],
+       "operation": "getStockTransfer",
+       "provenance": "contract inventory.yaml GET /stock-transfers/{transferId}"
       }
      ]
     }
@@ -884,17 +1048,65 @@
    {
     "id": "confirmRejectReceivedGoods",
     "component": "confirmDialog",
-    "trigger": "Reject",
-    "body": "**Names what `rejectReceivedGoods` changes and what it leaves alone**, in the consequence rather than the verb. A receiving store put-away this affects should be identified in the dialog, not just counted.",
+    "trigger": "Reject received goods",
+    "body": "**Names what `rejectReceivedGoods` changes and what it leaves alone**, in the consequence rather than the verb. A receiving store put-away this affects should be identified in the dialog, not just counted. **Collects what `rejectReceivedGoods` sends before it is called.** Required: `lines`, `reason`. Optional: `note`.",
     "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject"
+   },
+   {
+    "id": "formCreateGoodsReceipt",
+    "component": "modal",
+    "trigger": "Create goods receipt",
+    "body": "**Collects what `createGoodsReceipt` sends before it is called.** Required: `id`, `purchaseOrderId`, `locationId`, `lines`, `recordedAt`. Optional: `deliveryNoteReference`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateGoodsReceiptRequest",
+    "confirm": {
+     "label": "Create goods receipt",
+     "operation": "createGoodsReceipt"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "purchaseOrderId",
+      "locationId",
+      "lines",
+      "recordedAt",
+      "deliveryNoteReference"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /goods-receipts"
+   },
+   {
+    "id": "formLogColdChain",
+    "component": "modal",
+    "trigger": "Log cold chain",
+    "body": "**Collects what `logColdChain` sends before it is called.** Required: `id`, `recordedAt`, `valueCelsius`, `decision`. Optional: `goodsReceiptId`, `transferId`, `thresholdCelsius`, `correctiveActionId`, `supplierClaimRaised`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ColdChainEvent",
+    "confirm": {
+     "label": "Log cold chain",
+     "operation": "logColdChain"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "recordedAt",
+      "valueCelsius",
+      "decision",
+      "goodsReceiptId",
+      "transferId",
+      "thresholdCelsius",
+      "correctiveActionId",
+      "supplierClaimRaised"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /food-safety/cold-chain"
    }
   ],
   "states": {
-   "loading": "The receiving store put-away list.",
+   "loading": "The receiving store put-away, read by `getStockTransfer`.",
    "error": "Could not load. Names which read failed and leaves the receiving store put-away untouched.",
-   "emptyFirstRun": "No receiving store put-away yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the receiving store put-away are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No receiving store put-away yet. Offers Create goods receipt (`createGoodsReceipt`).",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getStockTransfer` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -945,6 +1157,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-065",
+   "derivedFrom": "wireframes/reference/FnB Board 5.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -986,28 +1199,19 @@
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
    "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    },
     {
      "to": "BO-079",
      "trigger": "The supervisor reviews the variance",
      "provenance": "flow F30 step 3→4, F30 step 6→7",
      "operation": "enterCountLine",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "countId"
+     ]
     }
    ]
   },
@@ -1028,7 +1232,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected stock count cycle",
+       "label": "The count variance",
        "bindsTo": "CountVariance",
        "columns": [
         "CountVariance.countId",
@@ -1037,7 +1241,23 @@
         "CountVariance.lines"
        ],
        "operation": "getCountVariance",
-       "provenance": "contract inventory.yaml GET /stock-counts/{countId}/variance"
+       "provenance": "contract inventory.yaml GET /stock-counts/{countId}/variance",
+       "notes": "**Shown only after the count is submitted.** While the count is `open` or `counting` the screen shows no expected quantity and no variance, and `getCountVariance` answers 409 whatever the caller's permission (decided 28 September, audit R110 (a))."
+      },
+      {
+       "kind": "searchField",
+       "label": "Search stock count",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking. **The lines arrive pre-filled from on-hand stock** — one card per item at the location, with a blank count and no expected figure; the counter enters what is on the shelf (audit R110 (a), R171 (7)).",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1047,65 +1267,43 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Start",
+       "label": "Start stock count",
        "operation": "startStockCount",
        "provenance": "contract inventory.yaml POST /stock-counts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Post",
+       "label": "Post stock count",
        "operation": "postStockCount",
        "provenance": "contract inventory.yaml POST /stock-counts/{countId}/post"
       },
       {
        "kind": "secondaryButton",
-       "label": "Enter",
+       "label": "Enter count line",
        "operation": "enterCountLine",
-       "provenance": "contract fnb.yaml POST /stock-counts/{countId}/lines"
+       "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/lines"
       },
       {
        "kind": "secondaryButton",
-       "label": "Request",
+       "label": "Request recount",
        "operation": "requestRecount",
-       "provenance": "contract fnb.yaml POST /stock-counts/{countId}/recount"
+       "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/recount"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save daily count",
        "operation": "setDailyCount",
        "provenance": "contract inventory.yaml PUT /stock-counts/daily"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search stock count",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "cardList",
-       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Confirm",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The stock count cycle list.",
+   "loading": "The stock count cycle, read by `getCountVariance`.",
    "error": "Could not load. Names which read failed and leaves the stock count cycle untouched.",
-   "emptyFirstRun": "No stock count cycle yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the stock count cycle are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No stock count cycle yet. Offers Request recount (`requestRecount`).",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getCountVariance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1124,7 +1322,7 @@
    {
     "operationId": "getCountVariance",
     "contract": "inventory",
-    "purpose": "Variance between counted and expected",
+    "purpose": "Variance between counted and expected, after submission only (409 while open or counting, audit R110 (a))",
     "trigger": "onLoad"
    },
    {
@@ -1163,9 +1361,112 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-066",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formStartStockCount",
+    "component": "modal",
+    "trigger": "Start stock count",
+    "body": "**Collects what `startStockCount` sends before it is called.** Required: `id`, `locationId`, `kind`. Optional: `categoryIds`, `isBlind` (defaults true). Starting pre-fills one line per item with stock at the location, expected snapshotted and hidden until submission (audit R110 (a)). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "StartStockCountRequest",
+    "confirm": {
+     "label": "Start stock count",
+     "operation": "startStockCount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "locationId",
+      "kind",
+      "categoryIds",
+      "isBlind"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-counts"
+   },
+   {
+    "id": "formPostStockCount",
+    "component": "modal",
+    "trigger": "Post stock count",
+    "body": "**Collects what `postStockCount` sends before it is called.** Nothing in the body is required. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Post stock count",
+     "operation": "postStockCount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-counts/{countId}/post"
+   },
+   {
+    "id": "formEnterCountLine",
+    "component": "modal",
+    "trigger": "Enter count line",
+    "body": "**Collects what `enterCountLine` sends before it is called.** Required: `recordedAt`, `itemId`, `countedQuantity`. Optional: `locationId`, `uom`, `batchId`, `note`. `enterCountLine` returns no expected quantity or variance, and the screen shows neither until the count is submitted, then reads `getCountVariance` (decided 28 September, audit R110 (a)). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Enter count line",
+     "operation": "enterCountLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "itemId",
+      "countedQuantity",
+      "locationId",
+      "uom",
+      "batchId",
+      "note"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/lines"
+   },
+   {
+    "id": "formRequestRecount",
+    "component": "modal",
+    "trigger": "Request recount",
+    "body": "**Collects what `requestRecount` sends before it is called.** Required: `lineIds`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request recount",
+     "operation": "requestRecount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /fnb-stock-counts/{countId}/recount"
+   },
+   {
+    "id": "formSetDailyCount",
+    "component": "modal",
+    "trigger": "Save daily count",
+    "body": "**Collects what `setDailyCount` sends before it is called.** Required: `itemIds`. Optional: `locationId`, `dueBy`, `postsAdjustment`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save daily count",
+     "operation": "setDailyCount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "itemIds",
+      "locationId",
+      "dueBy",
+      "postsAdjustment"
+     ]
+    },
+    "provenance": "contract inventory.yaml PUT /stock-counts/daily"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1203,28 +1504,20 @@
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
    "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    },
     {
      "to": "BO-044",
      "trigger": "The venue manager reviews open and unsigned findings before service",
      "provenance": "flow F28 step 5→6",
      "operation": "signCorrectiveAction",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "actionId",
+      "outletId"
+     ]
     }
    ]
   },
@@ -1236,13 +1529,6 @@
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`recordWaste`, `createStockMovement`, `logTemperature`) and no read of a population — it is settings, not a list",
   "purpose": "Damage, Loss, Shrinkage & Stock Adjustment — from the client design board, 20 August.",
-  "gaps": [
-   {
-    "operation": "recordWaste",
-    "why": "**`recordWaste` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract fnb.yaml POST /outlets/{outletId}/waste"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1252,25 +1538,25 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Record",
+       "label": "Record waste",
        "operation": "recordWaste",
        "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create stock movement",
        "operation": "createStockMovement",
        "provenance": "contract inventory.yaml POST /stock-movements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Log",
+       "label": "Log temperature",
        "operation": "logTemperature",
        "provenance": "contract fnb.yaml POST /food-safety/temperature-logs"
       },
       {
        "kind": "secondaryButton",
-       "label": "Sign",
+       "label": "Sign corrective action",
        "operation": "signCorrectiveAction",
        "provenance": "contract fnb.yaml POST /food-safety/corrective-actions/{actionId}/sign"
       }
@@ -1294,6 +1580,40 @@
        "kind": "primaryButton",
        "label": "Confirm",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Id",
+       "operation": "recordWaste",
+       "notes": "Required.",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Lines",
+       "operation": "recordWaste",
+       "notes": "Required.",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reason",
+       "operation": "recordWaste",
+       "notes": "Required.",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded at",
+       "operation": "recordWaste",
+       "notes": "Required.",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "textField",
+       "label": "Note",
+       "operation": "recordWaste",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
       }
      ]
     }
@@ -1302,8 +1622,8 @@
   "states": {
    "loading": "The saved damage loss shrinkage.",
    "error": "Could not load. Names which read failed and leaves the damage loss shrinkage untouched.",
-   "emptyFirstRun": "No damage loss shrinkage configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No damage loss shrinkage configured. The form opens empty and `recordWaste` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_MODIFY`, which `recordWaste` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1316,7 +1636,7 @@
    {
     "operationId": "createStockMovement",
     "contract": "inventory",
-    "purpose": "Record an issue, return or adjustment",
+    "purpose": "Record an adjustment in or out, or waste; positive quantity, reason required (audit R171)",
     "trigger": "onAction"
    },
    {
@@ -1354,10 +1674,85 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-067",
+   "derivedFrom": "wireframes/reference/FnB Board 5.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateStockMovement",
+    "component": "modal",
+    "trigger": "Create stock movement",
+    "body": "**Collects what `createStockMovement` sends before it is called.** Required: `id`, `itemId`, `locationId`, `kind`, `quantity`, `recordedAt`. Optional: `unit`, `reason`, `costCenterId`. **The kind picker offers `adjustmentIn`, `adjustmentOut` and `waste`** — the kind decides the direction, so the quantity is always entered positive; `countGain` and `countLoss` are shown on movements a count posted but are not offered here. **A reason is mandatory for an adjustment or waste** (400 without one) (decided 28 September, audit R171). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateStockMovementRequest",
+    "confirm": {
+     "label": "Create stock movement",
+     "operation": "createStockMovement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "itemId",
+      "locationId",
+      "kind",
+      "quantity",
+      "recordedAt",
+      "unit",
+      "reason",
+      "costCenterId"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /stock-movements"
+   },
+   {
+    "id": "formLogTemperature",
+    "component": "modal",
+    "trigger": "Log temperature",
+    "body": "**Collects what `logTemperature` sends before it is called.** Required: `id`, `checkPointId`, `recordedAt`, `valueCelsius`, `outcome`. Optional: `checkPointKind`, `recordedByPrincipalId`, `minCelsius`, `maxCelsius`, `deviceReported`, `correctiveActionId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "TemperatureLog",
+    "confirm": {
+     "label": "Log temperature",
+     "operation": "logTemperature"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "checkPointId",
+      "recordedAt",
+      "valueCelsius",
+      "outcome",
+      "checkPointKind",
+      "recordedByPrincipalId",
+      "minCelsius",
+      "maxCelsius",
+      "deviceReported",
+      "correctiveActionId"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /food-safety/temperature-logs"
+   },
+   {
+    "id": "formSignCorrectiveAction",
+    "component": "modal",
+    "trigger": "Sign corrective action",
+    "body": "**Collects what `signCorrectiveAction` sends before it is called.** Required: `actionTaken`. Optional: `disposal`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Sign corrective action",
+     "operation": "signCorrectiveAction"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "actionTaken",
+      "disposal"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /food-safety/corrective-actions/{actionId}/sign"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1395,22 +1790,8 @@
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `Retail Board 4.dc.html` frame `ret-4h`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Reservation, Allocation &amp; Omnichannel Inventory* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
   "density": "comfortable",
@@ -1429,7 +1810,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected reservation allocation omnichannel",
+       "label": "The stock position",
        "bindsTo": "StockPosition",
        "columns": [
         "StockPosition.itemId",
@@ -1447,25 +1828,7 @@
        ],
        "operation": "getStockPositions",
        "provenance": "contract inventory.yaml GET /stock"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Reserve",
-       "operation": "reserveMerchandise",
-       "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "searchField",
        "label": "Search reservation, allocation",
@@ -1482,15 +1845,26 @@
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Reserve merchandise",
+       "operation": "reserveMerchandise",
+       "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+      }
+     ]
     }
    ]
   },
   "states": {
-   "loading": "The reservation allocation omnichannel list.",
+   "loading": "The reservation allocation omnichannel, read by `getStockPositions`.",
    "error": "Could not load. Names which read failed and leaves the reservation allocation omnichannel untouched.",
-   "emptyFirstRun": "No reservation allocation omnichannel yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reservation allocation omnichannel are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No reservation allocation omnichannel yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1524,9 +1898,33 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-068",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formReserveMerchandise",
+    "component": "modal",
+    "trigger": "Reserve merchandise",
+    "body": "**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`, `expiresAt`. Optional: `subjectId`, `collectionNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reserve merchandise",
+     "operation": "reserveMerchandise"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "expiresAt",
+      "subjectId",
+      "collectionNote"
+     ]
+    },
+    "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1564,22 +1962,8 @@
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Drawn 31 August** — `Retail Board 4.dc.html` frame `ret-4j`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Barcode, RFID, Serialized Stock &amp; Traceability* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
   "density": "comfortable",
@@ -1597,8 +1981,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Serial",
+       "operation": "listSerialisedItems",
+       "notes": "Sends `?serial=` to `listSerialisedItems`.",
+       "provenance": "contract inventory.yaml GET /serialised-items"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listSerialisedItems",
+       "notes": "Sends `?status=` to `listSerialisedItems`.",
+       "provenance": "contract inventory.yaml GET /serialised-items"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every barcode rfid serialized",
+       "label": "Every serialised",
        "bindsTo": "SerialisedItem",
        "columns": [
         "SerialisedItem.id",
@@ -1613,6 +2011,21 @@
        ],
        "operation": "listSerialisedItems",
        "provenance": "contract inventory.yaml GET /serialised-items"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search barcode, rfid, serialized stock",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1622,7 +2035,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected barcode rfid serialized",
+       "label": "The selected serialised",
        "bindsTo": "SerialisedItem",
        "columns": [
         "SerialisedItem.id",
@@ -1646,30 +2059,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Lookup",
+       "label": "Lookup merchandise",
        "operation": "lookupMerchandise",
        "provenance": "contract retail.yaml GET /merchandise/lookup"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search barcode, rfid, serialized stock",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "cardList",
-       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Confirm",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1678,9 +2070,9 @@
   "states": {
    "loading": "The barcode rfid serialized list.",
    "error": "Could not load. Names which read failed and leaves the barcode rfid serialized untouched.",
-   "emptyFirstRun": "No barcode rfid serialized yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the barcode rfid serialized are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No barcode rfid serialized yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on serial, status and the barcode rfid serialized are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listSerialisedItems` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1694,7 +2086,7 @@
     "operationId": "lookupMerchandise",
     "contract": "retail",
     "purpose": "Price and stock check by barcode",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1717,6 +2109,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-069",
+   "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -1757,22 +2150,8 @@
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `Inventory Board 1.dc.html` frame `inv-10` (*Inventory Exceptions, Data Quality & AI*). **Inventory Board 1 is the only one of the seven that maps onto screens this package has** — item master, categories, UoM, locations, statuses, movement history. Boards 2 to 7 draw a warehouse and procurement suite the contracts do not contain.",
   "density": "comfortable",
@@ -1790,8 +2169,43 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listAlerts",
+       "notes": "Sends `?status=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listAlerts",
+       "notes": "Sends `?severity=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listAlerts",
+       "notes": "Sends `?workstationId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listAlerts",
+       "notes": "Sends `?shiftId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Item id",
+       "operation": "listAlerts",
+       "notes": "Sends `?itemId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every inventory exceptions replenishment",
+       "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
         "Alert.id",
@@ -1809,6 +2223,21 @@
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search inventory exceptions, ai replenishment",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1818,7 +2247,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected inventory exceptions replenishment",
+       "label": "The selected alert",
        "bindsTo": "Alert",
        "columns": [
         "Alert.id",
@@ -1845,36 +2274,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Acknowledge",
+       "label": "Acknowledge alert",
        "operation": "acknowledgeAlert",
        "provenance": "contract reporting.yaml POST /alerts/{alertId}/acknowledge"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create requisition",
        "operation": "createRequisition",
        "provenance": "contract inventory.yaml POST /requisitions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "label": "Search inventory exceptions, ai replenishment",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "cardList",
-       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Confirm",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1883,9 +2291,9 @@
   "states": {
    "loading": "The inventory exceptions replenishment list.",
    "error": "Could not load. Names which read failed and leaves the inventory exceptions replenishment untouched.",
-   "emptyFirstRun": "No inventory exceptions replenishment yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the inventory exceptions replenishment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No inventory exceptions replenishment yet. Offers Create requisition (`createRequisition`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, severity, workstationId, shiftId, itemId and the inventory exceptions replenishment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available offline.** `listAlerts` reads the analytical replica (ADR-0016). **Corrected 24 August** — the shared \"works from cache and queues what it records\" wording was applied to a screen whose only operation is an analytical read."
   },
   "apis": [
@@ -1938,9 +2346,53 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-070",
+   "derivedFrom": "wireframes/reference/Inventory Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Inventory Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAcknowledgeAlert",
+    "component": "modal",
+    "trigger": "Acknowledge alert",
+    "body": "**Collects what `acknowledgeAlert` sends before it is called.** Nothing in the body is required. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Acknowledge alert",
+     "operation": "acknowledgeAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /alerts/{alertId}/acknowledge"
+   },
+   {
+    "id": "formCreateRequisition",
+    "component": "modal",
+    "trigger": "Create requisition",
+    "body": "**Collects what `createRequisition` sends before it is called.** Required: `id`, `venueId`, `lines`, `requiredBy`. Optional: `departmentId`, `costCenterId`, `justification`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateRequisitionRequest",
+    "confirm": {
+     "label": "Create requisition",
+     "operation": "createRequisition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "lines",
+      "requiredBy",
+      "departmentId",
+      "costCenterId",
+      "justification"
+     ]
+    },
+    "provenance": "contract inventory.yaml POST /requisitions"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",

@@ -1,6 +1,6 @@
 # P08-venue-operations-01 — P08 · Venue Operations (1 of 2)
 
-**10 screens · 80 operations · 82 schemas · 33 permissions**
+**10 screens · 85 operations · 117 schemas · 33 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,12 +61,12 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-036` | Device Registry | listDetail | 12 | 4 | — |
-| `BO-044` | F&B Outlets | listDetail | 20 | 8 | — |
+| `BO-044` | F&B Outlets | listDetail | 21 | 8 | — |
 | `BO-058` | Reporting Home | listDetail | 11 | 7 | — |
 | `BO-060` | Attendance & Footfall | listDetail | 16 | 10 | — |
 | `BO-064` | Zones & Areas | listDetail | 10 | 6 | — |
 | `BO-067` | Integrations | commandCentre | 5 | 2 | — |
-| `BO-070` | Work Orders | listDetail | 9 | 7 | — |
+| `BO-070` | Work Orders | listDetail | 13 | 7 | — |
 | `BO-100` | Venue Home | listDetail | 3 | 0 | — |
 | `BO-108` | Venue Operations | listDetail | 5 | 0 | — |
 | `BO-128` | Live Workstation Health Monitor | listDetail | 3 | 1 | — |
@@ -1120,6 +1120,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "getTableMap",
      "listFnbOrders"
     ]
+   },
+   {
+    "operationId": "setDeliveryLocationOutletMapping",
+    "contract": "fnb",
+    "purpose": "Assign serving outlets to delivery locations",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1132,6 +1139,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "actionId",
      "from": "deepLink",
      "optional": true
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `outletId`, `actionId`.",
@@ -3451,6 +3462,78 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Priority and how it was set",
+       "bindsTo": "WorkOrder",
+       "columns": [
+        "WorkOrder.priority",
+        "WorkOrder.priorityScore",
+        "WorkOrder.prioritySource",
+        "WorkOrder.faultAssessment",
+        "WorkOrder.requiredQualificationCodes"
+       ],
+       "operation": "getWorkOrder",
+       "notes": "**The score and its source side by side** (decided 17 September, M17-01): *scored* (the venue policy), *asset override* or *manual*, so a supervisor sees why a fault is urgent.",
+       "provenance": "contract maintenance.yaml WorkOrder.priorityScore"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Suggested technicians",
+       "bindsTo": "WorkOrderAssigneeSuggestion",
+       "columns": [
+        "WorkOrderAssigneeSuggestion.rank",
+        "WorkOrderAssigneeSuggestion.name",
+        "WorkOrderAssigneeSuggestion.hasAllQualifications",
+        "WorkOrderAssigneeSuggestion.missingQualificationCodes",
+        "WorkOrderAssigneeSuggestion.onShift",
+        "WorkOrderAssigneeSuggestion.openWorkOrderCount"
+       ],
+       "operation": "suggestWorkOrderAssignee",
+       "notes": "**Smart assignment, confirmed by the maintenance head** (decided 17 September, M17-13). The ranking assigns nothing; *Assign* on a row sends its principal with `updateWorkOrder`.",
+       "provenance": "contract maintenance.yaml GET /work-orders/{workOrderId}/assignee-suggestions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Assign suggested technician",
+       "operation": "updateWorkOrder",
+       "notes": "Sends the chosen row's `principalId` as `assignedToPrincipalId` (M17-13).",
+       "provenance": "contract maintenance.yaml PATCH /work-orders/{workOrderId}"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Vendor requests",
+       "bindsTo": "VendorServiceRequest",
+       "columns": [
+        "VendorServiceRequest.supplierId",
+        "VendorServiceRequest.scope",
+        "VendorServiceRequest.status",
+        "VendorServiceRequest.vendorReference",
+        "VendorServiceRequest.quotedCost",
+        "VendorServiceRequest.scheduledVisitAt"
+       ],
+       "operation": "listVendorServiceRequests",
+       "notes": "Outside vendors engaged on this work order (decided 17 September, M17-13).",
+       "provenance": "contract maintenance.yaml GET /vendor-service-requests"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request a vendor",
+       "operation": "createVendorServiceRequest",
+       "provenance": "contract maintenance.yaml POST /vendor-service-requests"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Update vendor request",
+       "operation": "updateVendorServiceRequest",
+       "provenance": "contract maintenance.yaml PATCH /vendor-service-requests/{vendorServiceRequestId}"
+      }
+     ]
     }
    ]
   },
@@ -3462,6 +3545,40 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "suggestWorkOrderAssignee",
+    "contract": "maintenance",
+    "purpose": "Technicians ranked by skill, shift and load (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (P29)"
+   },
+   {
+    "operationId": "listVendorServiceRequests",
+    "contract": "maintenance",
+    "purpose": "Outside vendors on this work order (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (P29)"
+   },
+   {
+    "operationId": "createVendorServiceRequest",
+    "contract": "maintenance",
+    "purpose": "Engage an outside vendor (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (P29)",
+    "invalidates": [
+     "listVendorServiceRequests"
+    ]
+   },
+   {
+    "operationId": "updateVendorServiceRequest",
+    "contract": "maintenance",
+    "purpose": "Move a vendor request along (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (P29)",
+    "invalidates": [
+     "listVendorServiceRequests"
+    ]
+   },
    {
     "operationId": "listWorkOrders",
     "contract": "maintenance",
@@ -3544,6 +3661,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "workOrderId",
      "from": "deepLink",
      "optional": true
+    },
+    {
+     "name": "vendorServiceRequestId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Without `workOrderId` the list opens** — the ordinary arrival from BO-108 Venue Operations (decided 29 September, VM close-out). **A staff link opened cold resolves the thing or says plainly that it is gone.** A work order opened from an alert shows its current state; if it was closed or cancelled the screen says which and offers the list rather than an error. **The scope is resolved from the session, never from the link.** Arrives with `workOrderId`.",
@@ -3566,7 +3687,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formCreateWorkOrder",
     "component": "modal",
     "trigger": "Raise work order",
-    "body": "**Collects what `createWorkOrder` sends before it is called.** Required: `id`, `title`, `venueId`, `priority`, `recordedAt`. Optional: `description`, `assetId`, `locationDescription`, `kind`, `categoryId`, `assignedToPrincipalId`, `dueAt`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createWorkOrder` sends before it is called.** Required: `id`, `title`, `venueId`, `recordedAt`. Optional: `description`, `assetId`, `locationDescription`, `kind`, `priority`, `categoryId`, `assignedToPrincipalId`, `dueAt`, `attachmentRefs`, `faultAssessment` and `requiredQualificationCodes`. **Priority is left empty to be scored** (M17-01): the asset's override, else the venue policy's score of the fault assessment; choosing one makes it manual. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreateWorkOrderRequest",
     "confirm": {
      "label": "Raise work order",
@@ -3584,7 +3705,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "categoryId",
       "assignedToPrincipalId",
       "dueAt",
-      "attachmentRefs"
+      "attachmentRefs",
+      "faultAssessment",
+      "requiredQualificationCodes"
      ]
     },
     "provenance": "contract maintenance.yaml POST /work-orders"
@@ -4771,7 +4894,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-129",
      "trigger": "Software, Configuration & Version Management",
-     "provenance": "derived — BO-129 declares entryState.params profileId, rolloutId, workstationId and BO-108 holds none of them, so the edge carries nothing and BO-129 opens cold"
+     "provenance": "derived — BO-129 declares entryState.params firmwareId, profileId, rolloutId, workstationId and BO-108 holds none of them, so the edge carries nothing and BO-129 opens cold"
     },
     {
      "to": "BO-130",
@@ -5572,6 +5695,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "CreateReportScheduleRequest",
   "responds": "ReportSchedule"
  },
+ "createVendorServiceRequest": {
+  "method": "POST",
+  "path": "/vendor-service-requests",
+  "contract": "maintenance",
+  "summary": "Engage an outside vendor on a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VendorServiceRequest",
+  "responds": "VendorServiceRequest"
+ },
  "createWebhookSubscription": {
   "method": "POST",
   "path": "/webhook-subscriptions",
@@ -5809,6 +5951,16 @@ Method, path, parameters, request and response for every operation these screens
     "name": "compareTo",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -5824,6 +5976,16 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "workstation",
   "parameters": [
+   {
+    "name": "sinceVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "validFrom",
     "in": "query",
@@ -5988,7 +6150,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Give the device an identity it can prove",
   "permission": "DEVICE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -6574,6 +6736,45 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listVendorServiceRequests": {
+  "method": "GET",
+  "path": "/vendor-service-requests",
+  "contract": "maintenance",
+  "summary": "Requests sent to outside vendors",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workOrderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "supplierId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWebhookDeliveries": {
   "method": "GET",
   "path": "/webhook-subscriptions/{subscriptionId}/deliveries",
@@ -6638,6 +6839,21 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "overdueOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
     "in": "query",
     "required": null
    },
@@ -6872,7 +7088,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Cut a device off now",
   "permission": "DEVICE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -6946,6 +7162,30 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "AccessPointGeofence",
   "responds": "AccessPoint"
  },
+ "setDeliveryLocationOutletMapping": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/delivery-location-outlets",
+  "contract": "fnb",
+  "summary": "Set which outlets deliver to which delivery locations",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeliveryLocation"
+ },
  "setFnbDeliveryPolicy": {
   "method": "PUT",
   "path": "/fnb-delivery-policy",
@@ -6956,6 +7196,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -7017,6 +7262,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -7059,6 +7309,30 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "CorrectiveAction"
+ },
+ "suggestWorkOrderAssignee": {
+  "method": "GET",
+  "path": "/work-orders/{workOrderId}/assignee-suggestions",
+  "contract": "maintenance",
+  "summary": "Who should take this work order, ranked",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "syncScans": {
   "method": "POST",
@@ -7155,6 +7429,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "CreateReportRequest",
   "responds": "ReportDefinition"
  },
+ "updateVendorServiceRequest": {
+  "method": "PATCH",
+  "path": "/vendor-service-requests/{vendorServiceRequestId}",
+  "contract": "maintenance",
+  "summary": "Move a vendor request along",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VendorServiceRequest"
+ },
  "updateWorkOrder": {
   "method": "PATCH",
   "path": "/work-orders/{workOrderId}",
@@ -7221,6 +7514,255 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessAccreditationCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "access.accreditation_credential",
+  "x-ticvai-agreed": "29 September: build pass (group OWN, from group RA's handoff; BL-181); the events accreditation.credentialIssued and accreditation.holderStatusChanged name access as their critical consumer",
+  "description": "**What a gate needs to admit an accredited person, kept by `access`** (29 September, build). Written only by the consumers of `accreditation.credentialIssued` (a row per credential; a replacement sets the replaced row's `admits` false) and `accreditation.holderStatusChanged` (every credential of the holder: `admits` false unless the holder is `active`, validity taken from the event). Read by `validateAccess` and shipped in the offline package. The record of truth stays in `accreditation`; this is a copy shaped for the gate, never edited by a person.",
+  "required": [
+   "id",
+   "holderId",
+   "encodedIdentifier",
+   "admits",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The accreditation credential's id (`credentialId` on the events)."
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "description": "printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued."
+   },
+   "encodedIdentifier": {
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "What the gate reads from the credential. Never sent to webhook subscribers."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "zoneIds": {
+    "type": "array",
+    "description": "The holder's effective zones, from the event (`effectiveZones`).",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "holderStatus": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "archived"
+    ],
+    "description": "The holder's status as last published; only `active` admits."
+   },
+   "admits": {
+    "type": "boolean",
+    "description": "False once the credential is replaced or the holder is not active."
+   },
+   "sourceChangedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The `issuedAt` or `changedAt` of the event last applied; an older event arriving late is ignored."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005), the accreditation programme's scope."
+   }
+  }
+ },
+ "AccessDynamicPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.dynamic_policy",
+  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.",
+  "required": [
+   "id",
+   "scopePath",
+   "name",
+   "policyType",
+   "conditionExpression",
+   "result",
+   "status",
+   "currentVersion"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The policyId"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node; where it applies further is access.policy_scope_assignment"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "policyType": {
+    "type": "string",
+    "enum": [
+     "guestAttribute",
+     "accreditation",
+     "occupancy",
+     "employee",
+     "risk",
+     "membership",
+     "timeEvent"
+    ]
+   },
+   "contextType": {
+    "type": "string",
+    "enum": [
+     "date",
+     "day",
+     "time",
+     "season",
+     "event",
+     "performance",
+     "specialEvent",
+     "holiday",
+     "operatingCalendar",
+     "occupancy",
+     "attractionStatus"
+    ],
+    "nullable": true,
+    "description": "Context/time/event policies (setContextTimeEvent)"
+   },
+   "identityType": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "member",
+     "annualPassHolder",
+     "employee",
+     "contractor",
+     "vendor",
+     "performer",
+     "media",
+     "vip",
+     "security",
+     "emergencyServices",
+     "eventStaff"
+    ],
+    "nullable": true,
+    "description": "Identity-based policies (listIdentityMembershipAccreditation)"
+   },
+   "conditionExpression": {
+    "type": "string",
+    "description": "Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN"
+   },
+   "result": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ]
+   },
+   "priority": {
+    "type": "integer",
+    "nullable": true
+   },
+   "allowedZoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "deniedZoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "monitorThresholdPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Occupancy policies. Percent at which the band becomes Monitor"
+   },
+   "restrictThresholdPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Occupancy policies. Percent at which the band becomes Restrict"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The grant expires automatically at validTo"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "inactive",
+     "expired"
+    ],
+    "default": "draft"
+   },
+   "currentVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "The version in force (access.dynamic_policy_version)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AccessPoint": {
   "x-ticvai-persistence": "access.access_point",
   "type": "object",
@@ -7553,10 +8095,41 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopes": {
     "type": "array",
-    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing.\n",
+    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing. **Module scopes** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, one of `listApiScopes`.\n",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[a-zA-Z]+\\.(read|write)$"
     }
+   },
+   "issuedBy": {
+    "type": "string",
+    "enum": [
+     "partner",
+     "ticvai"
+    ],
+    "readOnly": true,
+    "description": "Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved `requestProductionAccess`.\n"
+   },
+   "certificationListingId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "control.integration_listing",
+    "description": "For a production client, the certified integration it was issued against."
+   },
+   "credentialTtlDays": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 730,
+    "nullable": true,
+    "description": "Key lifetime. Default 365 for production, 90 for sandbox (M17-06, configurable expiry)."
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the key stops working unless rotated. No token is issued after it."
    },
    "allowedTenantIds": {
     "type": "array",
@@ -7568,7 +8141,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "ipAllowList": {
     "type": "array",
-    "description": "13.1.38. Optional, and the strongest control available where an integrator has fixed egress.",
+    "description": "13.1.38. **Required on a production client** (17 September minutes, M17-07: endpoints are protected by IP allow-listing, not left open to the internet); optional in the sandbox. CIDR ranges. Checked at token issue and on every call.\n",
     "items": {
      "type": "string"
     }
@@ -7588,6 +8161,191 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "readOnly": true,
     "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   }
+  }
+ },
+ "Asset": {
+  "x-ticvai-persistence": "maintenance.asset",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateAssetRequest"
+   },
+   {
+    "type": "object",
+    "x-ticvai-retired-columns": [
+     "is_maintenance_overdue",
+     "document_refs"
+    ],
+    "required": [
+     "id",
+     "status"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "resourceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "1.2.x. **Where this asset is also bookable.** An AV rig is an asset to maintain and a resource to allocate, and they are the same object seen from two sides.\n**`resources` owns the calendar and this owns the condition.** An asset out of service makes its resource unbookable, which is one link rather than two models of availability.\n"
+     },
+     "deviceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "BL-160. **Where this asset is also a registered device.** A turnstile is an asset to maintain and a device to operate, and — exactly as with `resourceId` above — they are the same object seen from two sides.\n**Nothing joined them before this.** A turnstile controller reporting `needsAttention` could not raise a work order against itself, and an engineer closing one had no way back to the device whose firmware caused it.\n**Null for most assets and for most devices.** A chiller is not a device and a signature pad is not on the asset register; the link is sparse, and it lives here rather than on `platform.device` because `platform` is the foundation tier and a foreign key pointing from it into `maintenance` would invert the tiers — every cell running a spine would carry a column for a satellite it may not deploy.\n"
+     },
+     "acquisitionCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "acquiredOn": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     },
+     "depreciation": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Recorded here and posted by `finance`.** Depreciation is an accounting act and the asset register is where the useful life is actually known — an engineer knows a chiller lasts fifteen years and an accountant knows what to do about it.\n",
+      "properties": {
+       "method": {
+        "type": "string",
+        "enum": [
+         "straightLine",
+         "reducingBalance",
+         "unitsOfProduction",
+         "none"
+        ]
+       },
+       "usefulLifeMonths": {
+        "type": "integer"
+       },
+       "residualValue": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       },
+       "accumulatedDepreciation": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      }
+     },
+     "retiredOn": {
+      "type": "string",
+      "format": "date",
+      "nullable": true,
+      "description": "**Retirement is not deletion.** A work order from three years ago still names this asset, and an inspection record with no asset is an inspection of nothing.\n"
+     },
+     "disposalProceeds": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "status": {
+      "$ref": "#/components/schemas/AssetStatus"
+     },
+     "statusReason": {
+      "type": "string",
+      "nullable": true
+     },
+     "openWorkOrderCount": {
+      "type": "integer",
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "Work orders on this asset whose status is `open`, `assigned`, `inProgress`, `paused` or `awaitingParts` — the same set `AssetDetail.openWorkOrders` returns. **Maintained on write**: `createWorkOrder` and every transition into or out of that set (complete, cancel, close, reject back to open) adjust it in the same transaction as the work-order row.\n"
+     },
+     "nextMaintenanceDueAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "The earliest `nextDueAt` among this asset's active maintenance plans; null when none has one. **Maintained on write**: recomputed whenever one of those plans is created, amended, suspended or has its `nextDueAt` moved by a completed work order. `listAssets?maintenanceDue` filters on this column against the clock.\n"
+     },
+     "isMaintenanceOverdue": {
+      "type": "boolean",
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "`nextMaintenanceDueAt` is in the past at the moment of the read. **Computed on read and not stored** — it depends on the clock, so a stored copy is stale the minute after it is written.\n"
+     },
+     "lastInspectionAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "`performedAt` of the latest inspection submitted against this asset. **Maintained on write** by `submitInspection`, in the same transaction as the inspection row; an inspection synced late with an earlier `performedAt` does not move it back.\n"
+     },
+     "usageCounter": {
+      "type": "number",
+      "nullable": true,
+      "description": "Cycles, hours or kilometres. Drives usage-based maintenance."
+     }
+    }
+   }
+  ]
+ },
+ "AssetStatus": {
+  "type": "string",
+  "enum": [
+   "inService",
+   "outOfService",
+   "underMaintenance",
+   "awaitingParts",
+   "retired",
+   "disposed"
+  ]
+ },
+ "AuditRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.audit_record",
+  "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
+  "required": [
+   "id",
+   "action",
+   "occurredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Who acted."
+   },
+   "orgUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The scope node the action happened in."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The workstation it was done from, where there was one."
+   },
+   "action": {
+    "type": "string",
+    "description": "What was done, as the writing operation names it."
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The thing acted on** — a profile, a shift, an order. The same value the `subjectRef` filter matches.\n"
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When. The list is ordered by this, most recent first."
+   },
+   "platformStaffGrantId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"
    }
   }
  },
@@ -7887,6 +8645,161 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CreateAssetRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "assetTag",
+   "name",
+   "venueId",
+   "criticality"
+  ],
+  "properties": {
+   "assetTag": {
+    "type": "string",
+    "maxLength": 64,
+    "x-ticvai-unique": "venue",
+    "description": "**Unique per venue** (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with `409` `duplicate-code`. Two venues may each have an `A-001`.\n"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "criticality": {
+    "$ref": "#/components/schemas/AssetCriticality"
+   },
+   "priorityOverride": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "nullable": true,
+    "description": "**\"If this device goes down, raise this priority\"** (decided 17 September, M17-01). A corrective work order raised on this asset takes this priority instead of the score. Null means the score decides.\n"
+   },
+   "manufacturer": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "model": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "serialNumber": {
+    "type": "string",
+    "maxLength": 128
+   },
+   "commissionedAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "warrantyExpiresAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "linkedProductIds": {
+    "type": "array",
+    "description": "Products this asset delivers. A fault here can stop them selling.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "linkedAccessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Access point this asset controls. Out of service blocks it."
+   },
+   "requiresInspectionToReturn": {
+    "type": "boolean",
+    "default": false,
+    "description": "True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe.\n"
+   },
+   "documents": {
+    "type": "array",
+    "description": "Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where `AssetDetail.documents` reads them from.\n",
+    "items": {
+     "$ref": "#/components/schemas/AssetDocumentInput"
+    }
+   },
+   "documentRefs": {
+    "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "**The refs alone, kept for callers that predate `documents`.** Each ref sent here is stored as an `asset_document` row with no name and no kind. Returned as the refs of `documents`, computed on read — there is no second copy to fall out of step.\n",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "CreateFnbOrderLine": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "menuItemId",
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "menuItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "modifierOptionIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "Free text to the kitchen. Allergy notes belong here and are surfaced prominently."
+   },
+   "seatNumber": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Which cover ordered it. Drives split-by-covers accurately."
+   },
+   "course": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Course grouping, so the kitchen fires in sequence."
+   },
+   "redeemEntitlementId": {
+    "type": "string",
+    "nullable": true,
+    "x-ticvai-references": "access.entitlement",
+    "description": "**A meal combo redeemed at the till or by a scan** (29 September, MOB-4; applied 30 September). The entitlement a bundle's `fnbMenuItem` component issued (promotions `BundleComponent.componentKind: fnbMenuItem`, `menuItemId`, `redeemAtOutletIds`). The line is priced at zero against it, `menuItemId` must be the component's menu item and the outlet one of `redeemAtOutletIds` (or any outlet with the item on a live menu when that list is empty), and the entitlement is marked used in the same step through access `validateAccess` at the outlet. An entitlement already used, for another item or outlet, or not yet valid is refused 409 `entitlementNotRedeemable`; a till that is offline queues the redemption like any sale and the replay is refused the same way if it was used meanwhile."
+   }
+  }
+ },
  "CreateReportRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -8033,7 +8946,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id",
    "title",
    "venueId",
-   "priority",
    "recordedAt"
   ],
   "properties": {
@@ -8070,7 +8982,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "default": "corrective"
    },
    "priority": {
-    "$ref": "#/components/schemas/WorkOrderPriority"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "description": "**Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the fault.\n"
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13)."
    },
    "categoryId": {
     "type": "string",
@@ -8104,7 +9032,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "DataSource": {
   "type": "string",
-  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n",
+  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n\n**`forecastPoints` added 29 September** (8.2.55, build pass, group G2): the points of published AI forecast versions; see `x-ticvai-forecast-points`.\n\n**Three accreditation sources added 29 September** (12.1.50, build pass): `accreditationApplications`, `accreditationHolders` and `accreditationCredentials`, over `accreditation.application`, `accreditation.holder` and `accreditation.credential`. They are what the accreditation KPIs and any accreditation report or export (`exportReportResult`, csv or xlsx) are built over. **All three name a person**, and `REPORT_EXPORT_PII` gates them as it gates `guests`.\n",
   "enum": [
    "orders",
    "orderLines",
@@ -8139,7 +9067,92 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "forms",
    "challenges",
    "wallets",
-   "resaleListings"
+   "resaleListings",
+   "accreditationApplications",
+   "accreditationHolders",
+   "accreditationCredentials",
+   "forecastPoints"
+  ],
+  "x-ticvai-forecast-points": "**`forecastPoints` added 29 September (build pass, group G2; 8.2.55)**: one row per forecast point (`ai.forecast_point`) of a **published** forecast version (`ai.forecast_version` status `published`), with the definition it belongs to (`ai.forecast_definition`: subject, grain, unit), the period, the dimension key and the p10, p50 and p90 values. Draft, awaiting-approval and superseded versions are not reachable, and scenario points (`scenarioId` set) only with the scenario named as a filter: **a forecast leaves the platform as the one somebody published**. It is how a forecast is exported (`runReport` then `exportReportResult`, csv or xlsx), scheduled or put on a dashboard. Names no person, so `REPORT_EXPORT` is enough. Read from the reporting replica of the AI log database (design 2.4), never from the model service.\n"
+ },
+ "DeliveryLocation": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.delivery_location",
+  "required": [
+   "id",
+   "venueId",
+   "kind",
+   "label",
+   "isServiceable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/DeliveryLocationKind"
+   },
+   "label": {
+    "type": "string",
+    "description": "What a runner is told. \"Cabana 12\", \"Row H Seat 4\", \"Lawn — north gate\"."
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "tableId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set where the location is a restaurant table, so it shares table state."
+   },
+   "seatId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Set where the seat is the address. References the seat map."
+   },
+   "servingOutletIds": {
+    "type": "array",
+    "description": "Which outlets deliver here. A cabana served by the pool bar and not the restaurant is normal, and a location nothing serves is not an address.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "isServiceable": {
+    "type": "boolean",
+    "description": "False where the location exists but is not currently taking delivery — closed section, weather, no runner on shift.\n"
+   },
+   "unserviceableReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "walkTimeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "From the serving outlet. Feeds the guest's estimate — a cabana eight minutes away is not the same promise as a table by the kitchen.\n"
+   }
+  }
+ },
+ "DeliveryLocationKind": {
+  "type": "string",
+  "description": "4.6.26. One concept, because a runner needs one instruction.",
+  "enum": [
+   "table",
+   "seat",
+   "cabana",
+   "sunbed",
+   "poolside",
+   "box",
+   "suite",
+   "lawn",
+   "collectionPoint",
+   "namedLocation"
   ]
  },
  "DenyReason": {
@@ -8279,8 +9292,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "wristbandEncoder",
    "signaturePad",
    "scale",
-   "camera"
-  ]
+   "camera",
+   "mobileHandset"
+  ],
+  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n"
  },
  "Direction": {
   "type": "string",
@@ -8544,6 +9559,134 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "FnbOrder": {
+  "x-ticvai-persistence": "fnb.service_order + fnb.service_order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "outletId",
+   "serviceMode",
+   "status",
+   "lines",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
+   },
+   "tableVisitId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/FnbOrderStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "allOf": [
+      {
+       "$ref": "#/components/schemas/CreateFnbOrderLine"
+      },
+      {
+       "type": "object",
+       "properties": {
+        "status": {
+         "$ref": "#/components/schemas/FnbOrderStatus"
+        },
+        "unitPrice": {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        },
+        "lineTotal": {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       }
+      }
+     ]
+    }
+   },
+   "salesOrderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "x-ticvai-references": "orders.sales_order",
+    "description": "**Retyped 29 September (SD-046)**: `orders.sales_order.id` is a ULID, so a uuid here could never join. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Taken from their `fnb.order`. Ours had `recordedAt` and `syncedAt`, which are both offline-sync fields, and no plain updated timestamp.\n"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "kitchenTicketId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "kitchenTickets": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The kitchen tickets this order created, one per station (SD-046). Returned, not stored here; they are `fnb.kitchen_ticket` rows.",
+    "items": {
+     "$ref": "#/components/schemas/KitchenTicket"
+    }
+   },
+   "estimatedReadyAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "FnbOrderStatus": {
+  "type": "string",
+  "description": "The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or `delivered` at all, which made collection and delivery indistinguishable from a server putting a plate down.\n`accepted` matters because an outlet may refuse: past last orders, out of a key ingredient, or simply too far behind. A guest whose order sat in `placed` for ten minutes and was then rejected has a worse experience than one refused immediately.\n",
+  "enum": [
+   "ordered",
+   "accepted",
+   "inPreparation",
+   "ready",
+   "served",
+   "collected",
+   "delivered",
+   "cancelled",
+   "refunded"
+  ]
+ },
  "GeneratedQuery": {
   "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
   "type": "object",
@@ -8569,6 +9712,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "type": "string"
     }
+   },
+   "compiledSql": {
+    "type": "string",
+    "nullable": true,
+    "description": "The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"
    }
   }
  },
@@ -8681,6 +9829,345 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "GuestMerchandiseItem": {
+  "x-ticvai-persistence": "none — guest projection of MerchandiseItem",
+  "type": "object",
+  "description": "**What a guest caller of `listMerchandise` receives.** The fields a shop screen shows and the ids a guest needs to reserve or buy, and nothing else: no inventory link, no catalogue variant, no stock count, no serial-number flag. `additionalProperties: false` is the guarantee: a staff field added to `MerchandiseItem` does not reach a guest by default.\n",
+  "additionalProperties": false,
+  "required": [
+   "id",
+   "name",
+   "outletId",
+   "price",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "isAvailable": {
+    "type": "boolean",
+    "description": "True when the item is active and in stock at its outlet. An item with no `inventoryItemId` never runs out, so it is available while active.\n"
+   },
+   "isReturnable": {
+    "type": "boolean"
+   },
+   "returnWindowDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "Incident": {
+  "x-ticvai-persistence": "maintenance.incident",
+  "type": "object",
+  "required": [
+   "id",
+   "incidentNumber",
+   "kind",
+   "severity",
+   "status",
+   "venueId",
+   "occurredAt",
+   "reportedByPrincipalId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "incidentNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/IncidentKind"
+   },
+   "severity": {
+    "$ref": "#/components/schemas/IncidentSeverity"
+   },
+   "status": {
+    "$ref": "#/components/schemas/IncidentStatus"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "locationDescription": {
+    "type": "string",
+    "nullable": true
+   },
+   "isReportable": {
+    "type": "boolean",
+    "description": "Requires notification to an external authority within a statutory window."
+   },
+   "notificationDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reportedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "correctiveWorkOrderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "IncidentKind": {
+  "type": "string",
+  "enum": [
+   "guestInjury",
+   "staffInjury",
+   "nearMiss",
+   "propertyDamage",
+   "equipmentFailure",
+   "securityIncident",
+   "fireOrEvacuation",
+   "foodSafety",
+   "environmental",
+   "other"
+  ]
+ },
+ "IncidentSeverity": {
+  "type": "string",
+  "enum": [
+   "nearMiss",
+   "minor",
+   "moderate",
+   "major",
+   "critical"
+  ]
+ },
+ "IncidentStatus": {
+  "type": "string",
+  "enum": [
+   "reported",
+   "underInvestigation",
+   "actionRequired",
+   "closed"
+  ]
+ },
+ "KitchenTicket": {
+  "x-ticvai-persistence": "fnb.kitchen_ticket + fnb.kitchen_ticket_line",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "outletId",
+   "status",
+   "lines",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The F&B order the ticket was created from on acceptance (`FnbOrder.id`)."
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tableLabel": {
+    "type": "string",
+    "nullable": true
+   },
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
+   },
+   "coursing": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CoursingPolicy"
+     }
+    ],
+    "nullable": true,
+    "description": "BL-131. **Starters before mains is the entire job of a kitchen pass**, and the model fired everything at once.\n`holdAndFire` waits for a server to call it; `timed` fires on a clock; `phased` staggers by course. **Without this a table gets its dessert while eating its starter.**\n"
+   },
+   "buzzerCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "BL-128. **The pager number handed to a guest at a counter.** Recorded against the order so a lost buzzer is a lookup rather than an argument.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/KitchenTicketStatus"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Higher fires sooner. Raised by Fast Pass or supervisor override."
+   },
+   "prioritisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "prioritiseReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "name",
+      "quantity",
+      "status"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "modifiers": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      },
+      "allergens": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/AllergenCode"
+       }
+      },
+      "refireOfLineId": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "nullable": true,
+       "readOnly": true,
+       "description": "**Set on a refire.** The line it remakes, which stays — food cost counts both, the bill counts one (`refireItem`)."
+      },
+      "refireReason": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/RefireReason"
+        }
+       ],
+       "nullable": true,
+       "readOnly": true
+      },
+      "isChargeable": {
+       "type": "boolean",
+       "nullable": true,
+       "readOnly": true,
+       "description": "A refire's `chargeable` flag. Null on a line that is not a refire."
+      },
+      "course": {
+       "type": "integer",
+       "nullable": true
+      },
+      "stationId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "status": {
+       "$ref": "#/components/schemas/KitchenTicketStatus"
+      }
+     }
+    }
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "targetReadyAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "elapsedSeconds": {
+    "type": "integer"
+   }
+  }
+ },
  "KpiValue": {
   "type": "object",
   "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
@@ -8691,6 +10178,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "code": {
     "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
    },
    "name": {
     "type": "string"
@@ -8762,6 +10260,86 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "font",
    "archive"
   ]
+ },
+ "MerchandiseItem": {
+  "x-ticvai-persistence": "retail.merchandise",
+  "type": "object",
+  "required": [
+   "id",
+   "sku",
+   "name",
+   "outletId",
+   "variantId",
+   "price",
+   "onHand",
+   "isActive"
+  ],
+  "properties": {
+   "description": {
+    "type": "string",
+    "description": "What the item is, in the guest's words. Indexed for guest-app search.\n"
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "barcode": {
+    "type": "string",
+    "nullable": true
+   },
+   "name": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue variant sold. Price and tax come from there."
+   },
+   "inventoryItemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The stock item depleted on sale. Null means the item sells but never runs out, which is almost always a configuration error.\n"
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "list_price"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "isReturnable": {
+    "type": "boolean",
+    "default": true
+   },
+   "returnWindowDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresSerialNumber": {
+    "type": "boolean",
+    "default": false
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
  },
  "MerchandiseReservation": {
   "x-ticvai-persistence": "retail.reservation + retail.reservation_line",
@@ -8863,15 +10441,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "assetDowntime",
    "meanTimeToRepair",
    "challengeCompletionRate",
-   "attributedRevenue"
+   "attributedRevenue",
+   "loyaltyActiveMembers",
+   "loyaltyTierDistribution",
+   "loyaltyPointsLiability",
+   "loyaltyBreakageRate",
+   "loyaltyMemberRetention",
+   "challengeParticipationRate",
+   "gamificationLoyaltyImpact",
+   "gamificationMembershipImpact",
+   "gamificationRetention",
+   "accreditationApplications",
+   "accreditationTimeToDecision",
+   "accreditationCredentialsIssued",
+   "accreditationActiveHolders",
+   "accreditationRenewalsDue",
+   "staffingShortfall"
   ],
   "x-ticvai-money-valued": [
    "inventoryValuation",
    "resaleCommission",
    "revenuePerEntitlement",
    "revenuePerVisitor",
-   "attributedRevenue"
+   "attributedRevenue",
+   "loyaltyPointsLiability"
   ],
+  "x-ticvai-extended-29-september": "**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n",
   "x-ticvai-money-valued-note": "**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n",
   "x-ticvai-extended": "18 August 2026",
   "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"
@@ -8963,6 +10558,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "NaturalLanguageAnswer": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -8971,7 +10595,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "question",
    "interpretation",
    "result",
-   "confidence"
+   "reliability"
   ],
   "properties": {
    "conversationId": {
@@ -8982,19 +10606,59 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "interpretation": {
     "type": "string",
-    "description": "What the question was understood to mean, in plain language."
+    "description": "What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."
+   },
+   "semanticSpec": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingSemanticQuerySpec"
+     }
+    ],
+    "nullable": true,
+    "description": "What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"
    },
    "generatedQuery": {
-    "$ref": "#/components/schemas/GeneratedQuery",
-    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`.\n"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/GeneratedQuery"
+     }
+    ],
+    "nullable": true,
+    "description": "The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"
    },
    "result": {
-    "$ref": "#/components/schemas/ReportResult"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportResult"
+     }
+    ],
+    "nullable": true,
+    "description": "Null when the question is outside the semantic model."
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."
+   },
+   "reliability": {
+    "$ref": "#/components/schemas/ReportingAnswerReliability"
+   },
+   "unavailableReason": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingUnavailableReason"
+     }
+    ],
+    "nullable": true,
+    "description": "Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."
    },
    "confidence": {
     "type": "number",
     "minimum": 0,
-    "maximum": 1
+    "maximum": 1,
+    "deprecated": true,
+    "description": "Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."
    },
    "suggestedFollowUps": {
     "type": "array",
@@ -9041,8 +10705,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "entitlementsVersion": {
+    "type": "integer",
+    "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
+   },
+   "dynamicPolicies": {
+    "type": "array",
+    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one.",
+    "items": {
+     "$ref": "#/components/schemas/AccessDynamicPolicy"
+    }
+   },
    "entitlements": {
     "type": "array",
+    "description": "Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device removes them.",
     "items": {
      "type": "object",
      "required": [
@@ -9190,6 +10866,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   },
+   "accreditationCredentials": {
+    "type": "array",
+    "description": "Accreditation credentials that admit at this access point, from access.accreditation_credential (29 September, build; BL-181). Only rows that admit are included; a credential dropped from one package to the next no longer admits.",
+    "items": {
+     "$ref": "#/components/schemas/AccessAccreditationCredential"
+    }
    }
   }
  },
@@ -9268,6 +10951,48 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "default": true
    }
   }
+ },
+ "OfflineScan": {
+  "x-ticvai-persistence": "none — client-side journal",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/ValidateRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "sequence",
+     "localOutcome"
+    ],
+    "properties": {
+     "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per device. The server processes in this order."
+     },
+     "localOutcome": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/ScanOutcome"
+       }
+      ],
+      "description": "What the device decided offline. The server is authoritative and may disagree; disagreements are returned for reconciliation, not discarded.\n"
+     },
+     "localDenyReason": {
+      "$ref": "#/components/schemas/DenyReason"
+     },
+     "overriddenByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "overrideReason": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   }
+  ]
  },
  "OpeningHoursWindow": {
   "type": "object",
@@ -9420,6 +11145,50 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "ticketOffice",
    "mobile"
   ]
+ },
+ "OutletStockLine": {
+  "x-ticvai-persistence": "none — projection over inventory",
+  "type": "object",
+  "required": [
+   "merchandiseId",
+   "name",
+   "onHand",
+   "isBelowReorderPoint"
+  ],
+  "properties": {
+   "merchandiseId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "categoryName": {
+    "type": "string",
+    "nullable": true
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "allocated": {
+    "type": "number",
+    "description": "Held by an unexpired collection reservation."
+   },
+   "available": {
+    "type": "number"
+   },
+   "isBelowReorderPoint": {
+    "type": "boolean"
+   },
+   "lastSoldAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
  },
  "Page": {
   "type": "object",
@@ -9580,11 +11349,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "RegisteredDevice": {
   "x-ticvai-persistence": "platform.device",
   "type": "object",
+  "description": "**The device register of record** (decided 29 September, build pass). Identity, enrolment, credential, firmware and push registration for every device in the estate live on this row. `access.access_device` places access-control devices in the gate topology and repeats serial, versions, health and lifecycle; the two are not merged yet, and where they disagree this row wins.\n",
   "required": [
    "id",
    "kind",
-   "driver",
-   "workstationId"
+   "driver"
   ],
   "properties": {
    "id": {
@@ -9605,7 +11374,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "workstationId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September); `registerDevice` refuses either mistake with `422`.\n"
    },
    "model": {
     "type": "string",
@@ -9860,6 +11631,85 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "ReportExecution": {
+  "x-ticvai-persistence": "reporting.execution",
+  "type": "object",
+  "required": [
+   "id",
+   "reportId",
+   "definitionVersion",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "reportId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "reportName": {
+    "type": "string"
+   },
+   "definitionVersion": {
+    "type": "string",
+    "description": "The version this ran against. With the parameters and scope below, it is everything needed to reproduce the result.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ExecutionStatus"
+   },
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The parameters it ran with, keyed by `ReportParameter.key` of `definitionVersion` — defaults filled in, so the record is complete."
+   },
+   "scopeApplied": {
+    "type": "array",
+    "description": "Scope paths the caller held. What constrained the result.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "rowCount": {
+    "type": "integer",
+    "nullable": true
+   },
+   "durationMs": {
+    "type": "integer",
+    "nullable": true
+   },
+   "error": {
+    "type": "string",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scheduleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Results are retained for a limited period, then discarded."
+   }
+  }
+ },
  "ReportFilter": {
   "x-ticvai-persistence": "reporting.report_filter",
   "type": "object",
@@ -10045,6 +11895,105 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "ReportingAnswerReliability": {
+  "type": "string",
+  "description": "**How far an analytics answer can be relied on** (decided 29 September, AI system design 5.6): a category, never a bare percentage. `grounded`: every figure comes from a result of the compiled spec. `partial`: part of the question was answered and the rest was not modelled. `conflictingSources`: the result and a cited source disagree. `insufficientEvidence`: the question could not be answered, including \"not available yet\" outside the semantic model. The same four values as `ai.yaml`'s assistant answers.\n",
+  "enum": [
+   "grounded",
+   "partial",
+   "conflictingSources",
+   "insufficientEvidence"
+  ]
+ },
+ "ReportingSemanticQuerySpec": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "**A question in the semantic model's own vocabulary** (decided 29 September, AI system design 2.2 E and 5.7). What the model returns for a live-number question instead of SQL, and what `runSemanticQuery` takes. Every code is a `SemanticModel` field code or a KPI code; Reporting validates the spec against the published model and compiles it deterministically, so the same spec compiles to the same SQL for the same model version.\n",
+  "required": [
+   "metric",
+   "period"
+  ],
+  "properties": {
+   "metric": {
+    "type": "string",
+    "description": "A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The governed definition the dashboards use, so the number matches them."
+   },
+   "dimensions": {
+    "type": "array",
+    "maxItems": 5,
+    "description": "Field codes to group by. Each must be reachable from the metric's dataset through a relationship the semantic model declares.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "operator"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "description": "A `SemanticModel` field code."
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "equals",
+        "notEquals",
+        "greaterThan",
+        "lessThan",
+        "between",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+       ]
+      },
+      "values": {
+       "type": "array",
+       "description": "**Open on purpose; typed by the field.** One value for the comparison operators, exactly two (from, to) for `between`, any number for `in` and `notIn`, none for `isNull` and `isNotNull`.\n",
+       "items": {}
+      }
+     }
+    }
+   },
+   "period": {
+    "type": "string",
+    "description": "ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the form `explainMetricChange` takes."
+   },
+   "comparison": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `getKpiValues` `compareTo`. With one, each row carries the metric for the comparison beside the current value.",
+    "enum": [
+     "previousPeriod",
+     "samePeriodLastYear",
+     "target",
+     "benchmark"
+    ]
+   },
+   "semanticModelVersion": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "The `SemanticModel.version` the spec was validated and compiled against. Set by Reporting."
+   }
+  }
+ },
+ "ReportingUnavailableReason": {
+  "type": "string",
+  "description": "Which part of a question is outside the semantic model, so the answer is \"not available yet\" (design 5.7). A metric or field the caller may not see is reported as not modelled, so the reason does not reveal that it exists.",
+  "enum": [
+   "metricNotModelled",
+   "dimensionNotModelled",
+   "filterNotModelled",
+   "comparisonNotAvailable",
+   "periodOutsideHistory"
+  ]
+ },
  "ResolutionCode": {
   "type": "string",
   "enum": [
@@ -10208,6 +12157,128 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ScanEvent": {
+  "x-ticvai-persistence": "access.scan_event",
+  "type": "object",
+  "required": [
+   "id",
+   "accessPointId",
+   "venueId",
+   "outcome",
+   "direction",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The scan's client-generated ULID, the key offline replay deduplicates on."
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "ticketId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The `Entitlement.id` scanned; null where the media resolved to nothing."
+   },
+   "mediaCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "outcome": {
+    "$ref": "#/components/schemas/ScanOutcome"
+   },
+   "denyReason": {
+    "$ref": "#/components/schemas/DenyReason"
+   },
+   "direction": {
+    "$ref": "#/components/schemas/Direction"
+   },
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "overridesScanId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "**Set only on an override row**, naming the denied scan it admits against (decided 28 September, audit R228). The denied scan itself is never updated: the denial and the override are two rows, and at most one override row names any scan. Null on every other scan.\n"
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supervisor's justification, on the override row only. The overriding principal is that row's `operatorPrincipalId`."
+   },
+   "dynamicPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The dynamic access policy (`access.dynamic_policy`) whose result decided this scan; null when no dynamic policy matched and the entitlement alone decided (added 29 September, build pass, 3.3.48). `listDynamicPolicyEffectiveness` counts from it."
+   },
+   "dynamicPolicyVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "The version of that policy in force at the scan, so a report spanning a change counts each version apart."
+   },
+   "dynamicPolicyResult": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ],
+    "nullable": true,
+    "description": "What the policy decided, which for a step-up is not the same as the scan's outcome."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "description": "Admissions this scan counted. More than one only for a group wave (`validateGroupAccess`) or a quantity entitlement consumed in one pass (added 29 September, data-model close-out DM1)."
+   },
+   "localSequence": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "packageVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The offline package (`access.edge_package`) the device validated against; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Null while pending. Differs from recordedAt for offline scans."
+   }
+  }
+ },
  "ScanOutcome": {
   "type": "string",
   "enum": [
@@ -10288,6 +12359,309 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "outlet",
    "subject"
   ]
+ },
+ "ServiceMode": {
+  "type": "string",
+  "enum": [
+   "quickService",
+   "tableService",
+   "roomService",
+   "collection",
+   "delivery"
+  ]
+ },
+ "Shift": {
+  "x-ticvai-persistence": "orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident",
+  "description": "**`approvals` and `incidents` are child rows** (26 September, pull audit R099): `orders.pos_shift_approval` and `orders.pos_shift_incident`, one row per item, keyed to the shift. Until then the contract carried both and `orders.pos_shift` had nowhere to put either.\n",
+  "type": "object",
+  "required": [
+   "id",
+   "workstationId",
+   "venueId",
+   "scopePath",
+   "principalId",
+   "status",
+   "currency",
+   "currencyScale",
+   "openedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID. Also the idempotency key."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Who opened it. Cash reconciles to a person and a drawer."
+   },
+   "principalDisplayName": {
+    "type": "string"
+   },
+   "incidents": {
+    "type": "array",
+    "description": "BL-097. **A till has exceptions and there was nowhere to write them** — a no-sale, a drawer opened without a transaction, a manager override, a guest dispute.\n**This is the log a cash-up investigation starts from**, and a shift that balances with four unexplained no-sales is not a shift that balanced.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "noSale",
+        "drawerOpen",
+        "override",
+        "voidAfterPayment",
+        "guestDispute",
+        "tillJam",
+        "priceQuery",
+        "other"
+       ]
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "status": {
+    "$ref": "#/components/schemas/ShiftStatus"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "depositBoxCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "bagNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "openingFloat": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "salesTotal": {
+    "x-ticvai-column": "gross_sales_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the till took in sales, as the guest paid it — tax included."
+   },
+   "refundsTotal": {
+    "x-ticvai-column": "gross_refunded_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the till paid back, as the guest was refunded it — tax included."
+   },
+   "liftsTotal": {
+    "x-ticvai-column": "lifted_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net."
+   },
+   "expectedCash": {
+    "x-ticvai-column": "expected_cash_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept.\n"
+   },
+   "countedCash": {
+    "x-ticvai-column": "counted_cash_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "What the close count found. Null until the shift is counted."
+   },
+   "variance": {
+    "x-ticvai-column": "variance_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "Counted minus expected, as `ShiftCloseResult.variance`. Negative is short."
+   },
+   "heldLeaseCount": {
+    "type": "integer",
+    "description": "Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the device recorded the open. `openedAt` is the server's time."
+   },
+   "suspendedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "suspendReason": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The `reason` given to `suspendShift`. Cleared on resume."
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "closedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who submitted the close count. `reopenShift` refuses an approver who is this principal, and until 26 September there was nothing to compare against (pull audit R099).\n"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Null while the shift has unsynced operations."
+   },
+   "approvals": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "principalId",
+      "at"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "open",
+        "close",
+        "variance"
+       ],
+       "description": "`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`.\n"
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "ShiftStatus": {
+  "type": "string",
+  "enum": [
+   "pendingApproval",
+   "open",
+   "suspended",
+   "pendingVariance",
+   "pendingClosure",
+   "closed",
+   "autoClosed"
+  ]
+ },
+ "TableDefinition": {
+  "x-ticvai-persistence": "fnb.dining_table",
+  "type": "object",
+  "description": "A restaurant (dining) table, reserved with `createTableReservation`. Not a map-bookable `resources` table, which is a non-dining spot sold like a cabana (decided 29 September, rev 3 GAP-C2).",
+  "required": [
+   "id",
+   "label",
+   "capacity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "label": {
+    "type": "string",
+    "maxLength": 32,
+    "x-ticvai-unique": "venue",
+    "description": "**The table code, unique per venue** (decided 28 September, audit R108). Two tables in one venue never share a label, across all its outlets, so *T12* names one table wherever it is read. `createTable` and `updateTable` refuse a duplicate with `409` `duplicate-code`.\n"
+   },
+   "capacity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "position": {
+    "type": "object",
+    "properties": {
+     "x": {
+      "type": "number"
+     },
+     "y": {
+      "type": "number"
+     }
+    }
+   },
+   "shape": {
+    "type": "string",
+    "enum": [
+     "round",
+     "square",
+     "rectangle",
+     "booth",
+     "bar"
+    ]
+   },
+   "isOutOfService": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Damaged, or its section closed.** `getTableMap` shows it as `outOfService` and a claim on it is refused with `tableOutOfService`."
+   }
+  }
  },
  "TableMap": {
   "x-ticvai-persistence": "none — projection",
@@ -10556,6 +12930,97 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "VendorServiceRequest": {
+  "x-ticvai-persistence": "maintenance.vendor_service_request",
+  "type": "object",
+  "description": "**An outside vendor engaged on a work order** (decided 17 September, M17-13). The supplier is an `inventory.supplier`.\n",
+  "required": [
+   "workOrderId",
+   "supplierId",
+   "scope"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "workOrderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scope": {
+    "type": "string",
+    "maxLength": 2000,
+    "description": "What the vendor is asked to do."
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VendorServiceRequestStatus"
+     }
+    ],
+    "default": "draft"
+   },
+   "vendorReference": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "quotedCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "finalCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scheduledVisitAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "VendorServiceRequestStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "sent",
+   "accepted",
+   "scheduled",
+   "completed",
+   "cancelled"
+  ]
+ },
  "VenueSettings": {
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
@@ -10572,6 +13037,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "readOnly": true,
     "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
    "currencyCode": {
     "type": "string",
@@ -11181,6 +13654,64 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "WebhookEventType": {
+  "type": "string",
+  "description": "**The webhook event catalogue: every event a subscription may name** (29 September, build pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`, published through `platform.outbox` by exactly one context. A name is added here in the same change that adds its event file, and never before.\n**Added 29 September**, each closing a requirement that had the webhook mechanism and nothing to subscribe to:\n| Events | Publisher | Requirement | |---|---|---| | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 | | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 | | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 | | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 | | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 | | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) | | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) | | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |\n**Published and deliberately not offered** (29 September, build pass, group G2): `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is high-volume fraud telemetry, not a business fact a receiver acts on.\n",
+  "enum": [
+   "access.validated",
+   "accreditation.applicationDecided",
+   "accreditation.credentialIssued",
+   "accreditation.holderStatusChanged",
+   "accreditation.renewalDue",
+   "ai.ceilingApproaching",
+   "apiClient.anomalyDetected",
+   "approval.escalated",
+   "approval.expired",
+   "approval.granted",
+   "approval.rejected",
+   "approval.requested",
+   "approval.stepCompleted",
+   "assets.documentIndexed",
+   "cart.abandoned",
+   "catalogue.productPublished",
+   "consent.deviceConsentClaimed",
+   "consent.deviceConsentRecorded",
+   "conversation.handedOver",
+   "device.enrolmentChanged",
+   "device.firmwareReleased",
+   "device.firmwareRolloutCompleted",
+   "device.statusChanged",
+   "device.tamperDetected",
+   "entitlement.expiringSoon",
+   "entitlement.issued",
+   "entitlement.statusChanged",
+   "fnb.menuPublished",
+   "fnb.orderReady",
+   "inventory.purchaseOrderReceived",
+   "ledger.journalPosted",
+   "ledger.periodClosed",
+   "maintenance.assetReturnedToService",
+   "maintenance.templatePublished",
+   "maintenance.workOrderCompleted",
+   "marketing.caseClosed",
+   "order.chargebackRecorded",
+   "order.completed",
+   "order.paid",
+   "order.refunded",
+   "performance.cancelled",
+   "reporting.definitionPublished",
+   "retail.merchandisePublished",
+   "seat.blocked",
+   "seat.held",
+   "seat.released",
+   "seat.sold",
+   "seatMap.published",
+   "shift.closed",
+   "stock.depleted",
+   "tenant.suspended",
+   "whitelabel.contentPublished"
+  ]
+ },
  "WebhookSubscription": {
   "type": "object",
   "x-ticvai-persistence": "control.webhook_subscription",
@@ -11207,9 +13738,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "eventTypes": {
     "type": "array",
-    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to.\n",
+    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to. Each entry is a name from the webhook event catalogue (`WebhookEventType`).\n",
     "items": {
-     "type": "string"
+     "$ref": "#/components/schemas/WebhookEventType"
     }
    },
    "filters": {
@@ -11335,6 +13866,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "priority": {
     "$ref": "#/components/schemas/WorkOrderPriority"
    },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."
+   },
+   "prioritySource": {
+    "type": "string",
+    "enum": [
+     "scored",
+     "assetOverride",
+     "manual"
+    ],
+    "readOnly": true,
+    "description": "Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs (M17-13)."
+   },
    "kind": {
     "$ref": "#/components/schemas/WorkOrderKind"
    },
@@ -11421,6 +13980,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "WorkOrderAssigneeSuggestion": {
+  "x-ticvai-persistence": "none — computed on read",
+  "type": "object",
+  "required": [
+   "principalId",
+   "rank"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "rank": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "hasAllQualifications": {
+    "type": "boolean"
+   },
+   "missingQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "onShift": {
+    "type": "boolean",
+    "description": "On shift now or before the work order is due."
+   },
+   "openWorkOrderCount": {
+    "type": "integer"
+   }
+  }
+ },
  "WorkOrderDetail": {
   "x-ticvai-persistence": "maintenance.work_order",
   "allOf": [
@@ -11484,6 +14080,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         },
         "quantity": {
          "type": "number"
+        },
+        "reservedQuantity": {
+         "type": "number",
+         "description": "Still reserved for this work order and not yet issued (M17-02)."
         },
         "cost": {
          "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -11601,6 +14201,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    }
   ]
+ },
+ "WorkOrderFaultAssessment": {
+  "x-ticvai-persistence": "none — columns on maintenance.work_order",
+  "type": "object",
+  "description": "What the person raising a fault says about it, which the priority score reads (M17-01).",
+  "properties": {
+   "safetyRisk": {
+    "type": "boolean",
+    "default": false
+   },
+   "guestImpact": {
+    "type": "string",
+    "enum": [
+     "none",
+     "degraded",
+     "closed"
+    ],
+    "default": "none"
+   }
+  }
  },
  "WorkOrderKind": {
   "type": "string",

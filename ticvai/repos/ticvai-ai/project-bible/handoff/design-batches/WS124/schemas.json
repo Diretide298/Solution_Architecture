@@ -1,0 +1,1257 @@
+{
+ "AiAutonomyLevel": {
+  "type": "integer",
+  "minimum": 0,
+  "maximum": 4,
+  "description": "**One autonomy scale for every capability** (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). 0 disabled; 1 advisory (explains and recommends, nothing is drafted to run); 2 prepare (drafts a proposal a person applies in the owning screen); 3 execute with approval (the plan runs after approval, through owning APIs); 4 controlled auto (runs without approval, only for listed low-risk reversible actions inside pre-approved ranges). **Not the approval tier**: `ProposedAction.approvalLevel` is the tier."
+ },
+ "AiCapabilityFamily": {
+  "type": "string",
+  "enum": [
+   "gatewayAndModels",
+   "governance",
+   "actionPipeline",
+   "knowledgeRetrieval",
+   "assistants",
+   "analyticsInsights",
+   "configurationAssistant",
+   "forecasting",
+   "anomalyDetection",
+   "riskIntelligence",
+   "recommendations",
+   "decisionRecords",
+   "operationsEvaluation",
+   "residencyPrivacy"
+  ],
+  "description": "The fourteen capabilities of the AI system design (section 1.1), C1 to C14 in order: gateway and model registry, governance decision point, action pipeline and human oversight, knowledge and retrieval, assistants, analytics assistant and insights, configuration assistant, forecasting and operational requirements, anomaly detection, fraud and risk intelligence, recommendation and upsell engine, decision records and audit, operations/evaluation/cost, residency/privacy/tenancy. **Every registered capability belongs to exactly one**, which is what `AiPolicy.enabledCapabilities` and the usage report group by."
+ },
+ "AiCapabilityHealth": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from gateway telemetry, ai.activity and the breaker state in cache",
+  "description": "How one capability is running over the last hour (21 September minutes, M21-13).",
+  "required": [
+   "capabilityKey"
+  ],
+  "properties": {
+   "capabilityKey": {
+    "type": "string"
+   },
+   "availability": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "p95LatencyMs": {
+    "type": "integer"
+   },
+   "latencyBudgetMs": {
+    "type": "integer",
+    "nullable": true
+   },
+   "errorRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "breakerState": {
+    "type": "string",
+    "enum": [
+     "closed",
+     "halfOpen",
+     "open"
+    ]
+   },
+   "degraded": {
+    "type": "boolean",
+    "description": "Answering from its degradation mode (rules only, search only, a person)."
+   },
+   "dataFreshness": {
+    "type": "string",
+    "nullable": true,
+    "description": "e.g. index lag, the last forecast published."
+   },
+   "requests": {
+    "type": "integer"
+   },
+   "measuredAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AiCapabilityRegistration": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.capability",
+  "description": "**An entry in the capability registry** (design 3.1 Registry, AIC-144, AIC-145; ADM-520). Nothing becomes an operational AI capability without a row here: owner, function, risk class, autonomy, data categories and lifecycle per environment. `autonomyCeiling` is the platform ceiling for the tenant; a tenant or venue may lower `autonomyLevel`, never raise it (AIC-151).",
+  "required": [
+   "capabilityKey",
+   "family",
+   "riskClass",
+   "autonomyLevel"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "capabilityKey": {
+    "type": "string",
+    "description": "Stable key, unique per tenant: `assistant.guest`, `forecast.attendance`, `risk.transaction`, `config.assistant`, `recommend.checkout`."
+   },
+   "family": {
+    "$ref": "#/components/schemas/AiCapabilityFamily"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "The accountable business owner (AIC-144)."
+   },
+   "businessFunction": {
+    "type": "string",
+    "nullable": true
+   },
+   "riskClass": {
+    "$ref": "#/components/schemas/AiRiskClass"
+   },
+   "autonomyCeiling": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiAutonomyLevel"
+     }
+    ],
+    "readOnly": true,
+    "description": "The first-release ceiling for this capability (design 3.8 table). Read-only to a tenant."
+   },
+   "autonomyLevel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiAutonomyLevel"
+     }
+    ],
+    "description": "The level in force at this scope. At most `autonomyCeiling`."
+   },
+   "dataCategories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Data categories the capability reads (ADM-524)."
+   },
+   "lifecycle": {
+    "type": "object",
+    "description": "Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production.",
+    "properties": {
+     "development": {
+      "type": "string",
+      "enum": [
+       "draft",
+       "pilot",
+       "active",
+       "retired"
+      ]
+     },
+     "staging": {
+      "type": "string",
+      "enum": [
+       "draft",
+       "pilot",
+       "active",
+       "retired"
+      ]
+     },
+     "production": {
+      "type": "string",
+      "enum": [
+       "draft",
+       "pilot",
+       "active",
+       "retired"
+      ]
+     }
+    }
+   },
+   "degradationMode": {
+    "type": "string",
+    "enum": [
+     "rulesOnly",
+     "searchOnly",
+     "humanHandoff",
+     "hidden",
+     "failOpen",
+     "lastPublished"
+    ],
+    "description": "What the capability does when its model or the service is unavailable (design 3.7, AIC-241)."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "paused"
+    ],
+    "readOnly": true,
+    "description": "Paused by `pauseAiCapability`: the capability answers from its degradation mode until resumed."
+   },
+   "pausedReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "pausedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiControl": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.control",
+  "description": "**A governance control** (AIC-219, ADM-551). Deterministic controls run nightly as SQL over system records (design 4.4): every applied tier-2 action has an approver other than the requester; no L3+ action executed without approval; no card field in any prompt.",
+  "required": [
+   "controlKey",
+   "name",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "controlKey": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "deterministic",
+     "manual"
+    ]
+   },
+   "checkRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The registered check a deterministic control runs. Not free SQL from a request."
+   },
+   "frequency": {
+    "type": "string",
+    "enum": [
+     "nightly",
+     "weekly",
+     "monthly",
+     "onDemand"
+    ]
+   },
+   "capabilityKeys": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "effectiveness": {
+    "type": "string",
+    "enum": [
+     "effective",
+     "partiallyEffective",
+     "ineffective",
+     "untested"
+    ],
+    "readOnly": true
+   },
+   "lastTestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiControlTest": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.control_test",
+  "description": "One run of a control and what it found. **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
+  "required": [
+   "controlId",
+   "result"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "controlId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.control"
+   },
+   "result": {
+    "type": "string",
+    "enum": [
+     "pass",
+     "fail",
+     "error"
+    ]
+   },
+   "exceptionsFound": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "evidence": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "runByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "Null where the nightly job ran it."
+   },
+   "runAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiEvaluationRun": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.eval_run",
+  "description": "One evaluation of a candidate against its baseline: offline golden set, backtest or shadow comparison. **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
+  "required": [
+   "suiteId",
+   "kind",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "suiteId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.eval_suite"
+   },
+   "releaseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.release"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "offline",
+     "backtest",
+     "shadow"
+    ]
+   },
+   "candidateRef": {
+    "type": "string"
+   },
+   "baselineRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "running",
+     "passed",
+     "failed",
+     "error"
+    ],
+    "readOnly": true
+   },
+   "metrics": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true
+   },
+   "gate": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The promotion gate thresholds (design 3.5 table) and whether each passed."
+   },
+   "isolationCasesPassed": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "False blocks release, whatever the other metrics say."
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiGovernanceAlert": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.governance_alert",
+  "description": "**A governance alert** (design 4.4, AIC-210..223; ADM-549..555). Kept separate from operational incidents and linked where both apply (AIC-250). **`promotionReady`** (design 3.12, decided 29 September): a shadow model passed its promotion gate; the alert names the release and waits for a person to call `promoteAiRelease`. Monitoring never switches a model (AIC-252).",
+  "required": [
+   "kind",
+   "severity",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "policyViolation",
+     "crossScopeAttempt",
+     "maskingDefect",
+     "dataUsage",
+     "behaviourDrift",
+     "inputDrift",
+     "bias",
+     "overrideRateShift",
+     "controlFailed",
+     "spend",
+     "providerBreaker",
+     "evaluationRegression",
+     "forecastNotPublished",
+     "indexLag",
+     "promotionReady"
+    ]
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "info",
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "capabilityKey": {
+    "type": "string",
+    "nullable": true
+   },
+   "releaseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.release",
+    "description": "For `promotionReady` and `evaluationRegression`: the release concerned."
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "evidence": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "acknowledged",
+     "dismissed",
+     "resolved",
+     "incidentOpened"
+    ],
+    "readOnly": true
+   },
+   "incidentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.incident"
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiIncident": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.incident",
+  "description": "**An AI governance incident** (ADM-556): detection, containment, investigation, remediation and closure.",
+  "required": [
+   "reference",
+   "title",
+   "severity",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "reference": {
+    "type": "string",
+    "readOnly": true
+   },
+   "title": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "governance",
+     "operational",
+     "both"
+    ]
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "contained",
+     "investigating",
+     "remediating",
+     "closed"
+    ],
+    "readOnly": true
+   },
+   "capabilityKeys": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "alertIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "operationalIncidentRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The linked operational incident, where both apply (AIC-250)."
+   },
+   "containment": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "action": {
+       "type": "string"
+      },
+      "targetRef": {
+       "type": "string"
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "byPrincipalId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    },
+    "readOnly": true
+   },
+   "rootCause": {
+    "type": "string",
+    "nullable": true
+   },
+   "remediation": {
+    "type": "string",
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "containedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiRelease": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.release",
+  "description": "**The release pointer per capability and tenant** (design 3.5): draft, offline evaluation, shadow, canary, production, monitored. Rollback is a pointer switch. **A model goes live only when a person promotes it** (design 3.12, decided 29 September).",
+  "required": [
+   "capabilityKey",
+   "artefactKind",
+   "candidateRef",
+   "layer",
+   "stage"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "capabilityKey": {
+    "type": "string"
+   },
+   "artefactKind": {
+    "type": "string",
+    "enum": [
+     "model",
+     "prompt",
+     "routing",
+     "embedding",
+     "retrieval",
+     "rule"
+    ]
+   },
+   "candidateRef": {
+    "type": "string"
+   },
+   "currentRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "What production runs now: the rule, or the previously promoted artefact."
+   },
+   "previousRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "layer": {
+    "type": "string",
+    "enum": [
+     "platform",
+     "tenant"
+    ]
+   },
+   "suggestionKind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/SuggestionKind"
+     }
+    ],
+    "nullable": true,
+    "description": "Where the capability answers a `requestSuggestion` kind: promotion rewrites that kind's assignment in `AiPolicy.suggestionProviders`."
+   },
+   "stage": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "offlineEval",
+     "shadow",
+     "canary",
+     "production",
+     "monitored",
+     "rolledBack",
+     "rejected"
+    ],
+    "readOnly": true
+   },
+   "shadowStartedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "gatePassedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the shadow run passed its gate and `promotionReady` was raised."
+   },
+   "canaryScope": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Venues or share of traffic in canary."
+   },
+   "promotedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "promotedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "rolledBackByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "rolledBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiRiskClass": {
+  "type": "string",
+  "enum": [
+   "low",
+   "medium",
+   "high",
+   "critical"
+  ],
+  "description": "Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). The governance decision point scores against it."
+ },
+ "AiRiskRegisterEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.risk_register",
+  "description": "**The AI risk register** (ADM-550): ongoing risks of AI capabilities with likelihood, impact, controls and residual rating. Board 1 classifies capabilities; this manages the risks over time.",
+  "required": [
+   "title",
+   "category",
+   "likelihood",
+   "impact"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "title": {
+    "type": "string"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "customer",
+     "commercial",
+     "financial",
+     "operational",
+     "security",
+     "modelQuality",
+     "privacy",
+     "compliance"
+    ]
+   },
+   "capabilityKeys": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "likelihood": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 5
+   },
+   "impact": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 5
+   },
+   "inherentRating": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "readOnly": true
+   },
+   "controlKeys": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "residualRating": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "treatment": {
+    "type": "string",
+    "enum": [
+     "accept",
+     "mitigate",
+     "transfer",
+     "avoid"
+    ]
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "mitigating",
+     "accepted",
+     "closed"
+    ]
+   },
+   "reviewDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiTrainingRun": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.training_run",
+  "description": "**One per-tenant training run** (29 September, AI functions review; design 3.5): trained on the tenant's own data only, backtested, then run in shadow. When its shadow period passes the gate, the release moves to `gatePassedAt` and a `promotionReady` alert goes to the admin (AI-D16).",
+  "required": [
+   "capabilityKey",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "capabilityKey": {
+    "type": "string"
+   },
+   "suggestionKind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/SuggestionKind"
+     }
+    ],
+    "nullable": true
+   },
+   "forecastDefinitionKey": {
+    "type": "string",
+    "nullable": true
+   },
+   "trainingWindowFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "trainingWindowTo": {
+    "type": "string",
+    "format": "date"
+   },
+   "dataCutoffAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "includesImportedHistory": {
+    "type": "boolean",
+    "default": false
+   },
+   "featureSetVersion": {
+    "type": "string"
+   },
+   "artefactRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The model file in the tenant's Blob container."
+   },
+   "backtestRunId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.eval_run"
+   },
+   "releaseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.release"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "training",
+     "backtesting",
+     "shadow",
+     "gatePassed",
+     "gateFailed",
+     "failed"
+    ]
+   },
+   "metrics": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiUsageReport": {
+  "type": "object",
+  "x-ticvai-persistence": "none — aggregated from ai.activity",
+  "properties": {
+   "from": {
+    "type": "string",
+    "format": "date"
+   },
+   "to": {
+    "type": "string",
+    "format": "date"
+   },
+   "groupBy": {
+    "type": "string"
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "interactions": {
+       "type": "integer"
+      },
+      "promptTokens": {
+       "type": "integer"
+      },
+      "completionTokens": {
+       "type": "integer"
+      },
+      "cost": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "p95LatencyMs": {
+       "type": "integer"
+      },
+      "refusalRate": {
+       "type": "number"
+      },
+      "rejectionRate": {
+       "type": "number",
+       "description": "Proposals a person refused. **The number that says whether the assistant is worth having**, and the one nobody thinks to measure.\n"
+      }
+     }
+    }
+   },
+   "forecast": {
+    "type": "object",
+    "nullable": true,
+    "description": "**A month-end projection, labelled a forecast** (AI design 2.3, 4.5). Present where `to` is inside the current month. Never added into `rows`.\n",
+    "properties": {
+     "label": {
+      "type": "string",
+      "enum": [
+       "forecast"
+      ]
+     },
+     "periodEnd": {
+      "type": "string",
+      "format": "date"
+     },
+     "projectedTokens": {
+      "type": "integer"
+     },
+     "projectedCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "basis": {
+      "type": "string",
+      "description": "How it was projected, e.g. the run rate of the last 7 days."
+     }
+    }
+   }
+  }
+ },
+ "GovernanceRiskAiMonitoringControlCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Governance Risk, AI Monitoring & Control Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "risk": {
+    "type": "string",
+    "enum": [
+     "productWithoutOwner",
+     "missingApproval",
+     "outdatedPricing",
+     "conflictingValidity",
+     "missingChannelConfiguration",
+     "orphanedDependency",
+     "unusedProduct",
+     "duplicateProduct",
+     "unusualConfigurationChange",
+     "highOverrideLevel",
+     "scheduledPublicationConflict",
+     "expiredCommercialConfiguration",
+     "activeAfterEventEnd",
+     "brokenDependency"
+    ],
+    "description": "Risk detected (AI Monitoring, pack p.26)"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product name"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue name"
+   },
+   "businessImpact": {
+    "type": "string",
+    "description": "Business impact, in plain language"
+   },
+   "recommendedAction": {
+    "type": "string",
+    "description": "Recommended action; advisory"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner (display name)",
+    "nullable": true
+   },
+   "dueDate": {
+    "type": "string",
+    "description": "Due date",
+    "format": "date",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: open, acknowledged, inRemediation, resolved or dismissed (decided 29 September, readiness close-out)"
+   },
+   "riskId": {
+    "type": "string",
+    "description": "Risk id",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid",
+    "nullable": true
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "description": "Severity (Risk Dashboard)"
+   },
+   "explanation": {
+    "type": "string",
+    "description": "AI explanation, e.g. the two products share 96% of their configuration; advisory"
+   },
+   "detectedAt": {
+    "type": "string",
+    "description": "Detected",
+    "format": "date-time"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "SuggestionKind": {
+  "type": "string",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline.\n",
+  "enum": [
+   "price",
+   "replenishment",
+   "requisition",
+   "demandForecast",
+   "prepPlan",
+   "menuEngineering",
+   "staffing",
+   "slaTarget",
+   "waitTime",
+   "upsell",
+   "segmentation",
+   "anomaly",
+   "scenario",
+   "sendTime",
+   "wasteRisk",
+   "queueBalancing",
+   "itinerary"
+  ]
+ }
+}

@@ -1,6 +1,6 @@
 # WS49 — Promotions   Bundles Management board 5
 
-**10 screens · 10 operations · 14 schemas · 2 permissions**
+**10 screens · 13 operations · 18 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,16 +61,16 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `ADM-178` | Bundle & Combo Command Center | commandCentre | 1 | 0 | — |
-| `ADM-179` | Bundle Definition & Setup | configEditor | 1 | 0 | — |
+| `ADM-179` | Bundle Definition & Setup | configEditor | 2 | 0 | — |
 | `ADM-180` | Bundle Component Builder | configEditor | 1 | 0 | — |
 | `ADM-181` | Guest Choice & Build-Your-Own Bundle Designer | configEditor | 1 | 0 | — |
 | `ADM-182` | Bundle Pricing & Commercial Model | configEditor | 1 | 0 | — |
 | `ADM-183` | Bundle Availability, Capacity & Validation | listDetail | 1 | 0 | — |
 | `ADM-184` | Bundle Validity, Scheduling & Redemption Rules | listDetail | 1 | 0 | — |
-| `ADM-185` | Partner & External Product Bundle Manager | listDetail | 1 | 0 | — |
+| `ADM-185` | Partner & External Product Bundle Manager | listDetail | 3 | 1 | — |
 | `ADM-186` | Revenue Allocation, Cost & Settlement Rules | configEditor | 1 | 0 | — |
 | `ADM-187` | Bundle Preview, Simulation & AI Recommendation | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-183, ADM-184, ADM-185, ADM-187 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-183, ADM-184 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

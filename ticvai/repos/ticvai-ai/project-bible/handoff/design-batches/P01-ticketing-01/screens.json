@@ -26,17 +26,18 @@
     {
      "to": "WEB-031",
      "trigger": "My Reservations",
-     "carries": [
-      "reservationId"
-     ],
-     "provenance": "derived — WEB-031 declares entryState.params reservationId, so an edge into it must carry them"
+     "provenance": "derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds none of them, so the edge carries nothing and WEB-031 opens cold"
     },
     {
      "to": "GST-014",
      "trigger": "The friend claims it in the app",
      "provenance": "flow F55 step 4→5",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "orderId",
+      "transferId"
+     ]
     }
    ]
   },
@@ -53,8 +54,50 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every ticket transfer",
+       "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -76,7 +119,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected ticket transfer",
+       "label": "The selected order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -98,29 +141,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       },
       {
        "kind": "secondaryButton",
-       "label": "Claim",
+       "label": "Claim ticket transfer",
        "operation": "claimTicketTransfer",
        "provenance": "contract orders.yaml POST /ticket-transfers/{transferId}/claim"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "transferOrderTickets",
-       "provenance": "carried from the previous definition"
+       "label": "Create resale listing",
+       "operation": "createResaleListing",
+       "provenance": "contract orders.yaml POST /resale-listings"
       }
      ]
     }
@@ -129,9 +164,9 @@
   "states": {
    "loading": "The ticket transfer list.",
    "error": "Could not load. Names which read failed and leaves the ticket transfer untouched.",
-   "emptyFirstRun": "No ticket transfer yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the ticket transfer are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No ticket transfer yet. Offers Create resale listing (`createResaleListing`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket transfer are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible."
   },
   "apis": [
@@ -187,11 +222,77 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-030"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-030",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Account → 'Transfer & resale'; My tickets → Manage → 'Transfer ticket'; Confirmation → 'Transfer tickets'",
+    "differences": "List pane with toast actions; no recipient form. Prototype adds cancel transfer and withdraw resale listing."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateResaleListing",
+    "component": "modal",
+    "trigger": "Create resale listing",
+    "body": "**Collects what `createResaleListing` sends before it is called.** Required: `entitlementId`, `askPrice`. Optional: `sellerSubjectId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateResaleListingRequest",
+    "confirm": {
+     "label": "Create resale listing",
+     "operation": "createResaleListing"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "entitlementId",
+      "askPrice",
+      "sellerSubjectId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formTransferOrderTickets",
+    "component": "modal",
+    "trigger": "Transfer order tickets",
+    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer order tickets",
+     "operation": "transferOrderTickets"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "ticketIds",
+      "recipient",
+      "message"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formClaimTicketTransfer",
+    "component": "modal",
+    "trigger": "Claim ticket transfer",
+    "body": "**Collects what `claimTicketTransfer` sends before it is called.** Required: `claimToken`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Claim ticket transfer",
+     "operation": "claimTicketTransfer"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "claimToken"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -248,14 +349,13 @@
      "to": "WEB-030",
      "trigger": "Ticket Transfer",
      "carries": [
-      "orderId",
-      "transferId"
+      "orderId"
      ],
-     "provenance": "derived — WEB-030 declares entryState.params orderId, transferId, so an edge into it must carry them"
+     "provenance": "derived — WEB-030 declares entryState.params orderId, transferId and WEB-031 holds orderId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.",
+  "notes": "Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.\n\n**Rev 3 (decided 29 September).** **Table deposit (REV3-8b):** a dining deposit is a venue option, off unless the venue enables it in Venue Management (`DepositPolicy.dining`; amount and basis are the venue's), superseding audit R077 (a). A reservation holding a deposit shows its amount, when it stops being refundable (`refundableUntil`) and the late-cancel and no-show terms. Group booking on the web is this screen (`requestGroupBooking`; GAP-D3, already); school and party requests are unchanged (DG-4).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listReservations` reads the population and `getReservation` reads one of them — list, select, act",
@@ -281,6 +381,40 @@
        ],
        "operation": "listReservations",
        "provenance": "contract orders.yaml GET /reservations"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "listGroupPackages",
+       "notes": "Sends `?kind=` to `listGroupPackages`.",
+       "provenance": "contract catalogue.yaml GET /group-packages"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every group package definition",
+       "bindsTo": "GroupPackageDefinition",
+       "columns": [
+        "GroupPackageDefinition.id",
+        "GroupPackageDefinition.productId",
+        "GroupPackageDefinition.kind",
+        "GroupPackageDefinition.maxParticipants",
+        "GroupPackageDefinition.durationMinutes",
+        "GroupPackageDefinition.hostCount",
+        "GroupPackageDefinition.pricingBasis",
+        "GroupPackageDefinition.freeLeaderRatio",
+        "GroupPackageDefinition.paymentMode",
+        "GroupPackageDefinition.includes",
+        "GroupPackageDefinition.scopePath"
+       ],
+       "operation": "listGroupPackages",
+       "provenance": "contract catalogue.yaml GET /group-packages"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -290,11 +424,69 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected reservations",
+       "label": "The selected group package definition",
+       "bindsTo": "GroupPackageDefinition",
+       "columns": [
+        "GroupPackageDefinition.id",
+        "GroupPackageDefinition.productId",
+        "GroupPackageDefinition.kind",
+        "GroupPackageDefinition.maxParticipants",
+        "GroupPackageDefinition.durationMinutes",
+        "GroupPackageDefinition.hostCount",
+        "GroupPackageDefinition.pricingBasis",
+        "GroupPackageDefinition.freeLeaderRatio",
+        "GroupPackageDefinition.paymentMode",
+        "GroupPackageDefinition.includes",
+        "GroupPackageDefinition.scopePath"
+       ],
+       "operation": "getGroupPackageDefinition",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/group-package"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The group booking",
+       "bindsTo": "GroupBooking",
+       "columns": [
+        "GroupBooking.id",
+        "GroupBooking.kind",
+        "GroupBooking.packageProductId",
+        "GroupBooking.yearGroup",
+        "GroupBooking.accessAndDietaryNeeds",
+        "GroupBooking.celebrantName",
+        "GroupBooking.celebrantTurningAge",
+        "GroupBooking.allergiesAndRequests",
+        "GroupBooking.finalHeadcountDueBy",
+        "GroupBooking.quoteSentAt",
+        "GroupBooking.riskAssessmentSentAt",
+        "GroupBooking.preferredDate",
+        "GroupBooking.orderId",
+        "GroupBooking.leaderSubjectId",
+        "GroupBooking.organisationName",
+        "GroupBooking.expectedSize"
+       ],
+       "operation": "getGroupBooking",
+       "provenance": "contract orders.yaml GET /group-bookings/{groupBookingId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The resource availability",
+       "bindsTo": "ResourceAvailability",
+       "columns": [
+        "ResourceAvailability.resourceId",
+        "ResourceAvailability.freeWindows",
+        "ResourceAvailability.blockedWindows"
+       ],
+       "operation": "getResourceAvailability",
+       "provenance": "contract resources.yaml GET /resources/{resourceId}/availability"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The reservation",
        "bindsTo": "Reservation",
        "columns": [
         "Reservation.id",
         "Reservation.venueId",
+        "Reservation.subjectId",
         "Reservation.status",
         "Reservation.lines",
         "Reservation.expiresAt",
@@ -311,45 +503,21 @@
      "components": [
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel reservation",
        "operation": "cancelReservation",
        "provenance": "contract orders.yaml DELETE /reservations/{reservationId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getReservation",
-       "notes": "One record, read-only.",
-       "provenance": "carried from the previous definition"
       },
       {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "cancelReservation",
-       "label": "Cancel reservation",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
+       "kind": "primaryButton",
+       "label": "Request group booking",
+       "operation": "requestGroupBooking",
+       "provenance": "contract orders.yaml POST /group-booking-requests"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "cancelReservation",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
+       "label": "Save table reservation",
+       "operation": "updateTableReservation",
+       "provenance": "contract fnb.yaml PATCH /table-reservations/{reservationId}"
       }
      ]
     }
@@ -359,20 +527,96 @@
    {
     "id": "confirmCancelReservation",
     "component": "confirmDialog",
-    "trigger": "Cancel",
+    "trigger": "Cancel reservation",
     "body": "**Names what `cancelReservation` changes and what it leaves alone**, in the consequence rather than the verb. A reservations this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract orders.yaml DELETE /reservations/{reservationId}"
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRequestGroupBooking",
+    "component": "modal",
+    "trigger": "Request group booking",
+    "body": "**Collects what `requestGroupBooking` sends before it is called.** Required: `kind`, `packageProductId`, `preferredDate`, `expectedSize`. Optional: `organisationName`, `yearGroup`, `accessAndDietaryNeeds`, `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "GroupBookingRequest",
+    "confirm": {
+     "label": "Request group booking",
+     "operation": "requestGroupBooking"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "packageProductId",
+      "preferredDate",
+      "expectedSize",
+      "organisationName",
+      "yearGroup",
+      "accessAndDietaryNeeds",
+      "celebrantName",
+      "celebrantTurningAge",
+      "allergiesAndRequests"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formUpdateTableReservation",
+    "component": "modal",
+    "trigger": "Save table reservation",
+    "body": "**Collects what `updateTableReservation` sends before it is called.** Required: `outletId`, `partySize`, `startsAt`. Optional: `id`, `subjectId`, `guestName`, `contactPoint`, `durationMinutes`, `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "TableReservation",
+    "confirm": {
+     "label": "Save table reservation",
+     "operation": "updateTableReservation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "outletId",
+      "partySize",
+      "startsAt",
+      "id",
+      "subjectId",
+      "guestName",
+      "contactPoint",
+      "durationMinutes",
+      "tables",
+      "status",
+      "groupId",
+      "notes",
+      "actualPartySize",
+      "tableVisitId"
+     ]
+    },
+    "provenance": "client-verified"
    }
   ],
   "states": {
    "loading": "The reservations list.",
    "error": "Could not load. Names which read failed and leaves the reservations untouched.",
-   "emptyFirstRun": "No reservations yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reservations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No reservations yet. Offers Request group booking (`requestGroupBooking`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on kind and the reservations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have."
   },
   "apis": [
+   {
+    "operationId": "listGroupPackages",
+    "contract": "catalogue",
+    "purpose": "School-trip formats and party packages",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGroupPackageDefinition",
+    "contract": "catalogue",
+    "purpose": "What a package includes",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "requestGroupBooking",
+    "contract": "orders",
+    "purpose": "Ask for a school trip or a birthday party",
+    "trigger": "onAction"
+   },
    {
     "operationId": "listReservations",
     "contract": "orders",
@@ -383,7 +627,7 @@
     "operationId": "getReservation",
     "contract": "orders",
     "purpose": "Read a reservation",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "cancelReservation",
@@ -395,22 +639,16 @@
     ]
    },
    {
-    "operationId": "bookResource",
-    "contract": "resources",
-    "purpose": "Book a cabana or similar",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "getGroupBooking",
     "contract": "orders",
     "purpose": "A group booking this guest belongs to",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getResourceAvailability",
     "contract": "resources",
     "purpose": "What is free and when",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "updateTableReservation",
@@ -432,6 +670,10 @@
     {
      "name": "resourceId",
      "from": "navigation"
+    },
+    {
+     "name": "productId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `reservationId`.",
@@ -444,9 +686,17 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-031"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-031",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Account → 'Reservations'",
+    "differences": "The prototype uses the WEB-031 label for the group booking request dialog (deposit / invoice quote) inside Kids Club → 'Birthday party / group' and 'School trip', which the YAML covers only through requestGroupBooking. 'Pay now' on a held reservation has no YAML route (WEB-014 is pay-by-link)."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -504,34 +754,23 @@
     {
      "to": "WEB-030",
      "trigger": "Ticket Transfer",
-     "carries": [
-      "orderId",
-      "transferId"
-     ],
-     "provenance": "derived — WEB-030 declares entryState.params orderId, transferId, so an edge into it must carry them"
+     "provenance": "derived — WEB-030 declares entryState.params orderId, transferId and WEB-035 holds none of them, so the edge carries nothing and WEB-030 opens cold"
     },
     {
      "to": "WEB-031",
      "trigger": "My Reservations",
      "carries": [
-      "reservationId"
+      "productId"
      ],
-     "provenance": "derived — WEB-031 declares entryState.params reservationId, so an edge into it must carry them"
+     "provenance": "derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-035 holds productId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "Added 17 August. **The surface the matrix names** — 2.6.33 *\"website should be able to display multi currency\"* and 2.9.1 *\"in the B2C portal for guests comparison\"*. Wave 1 against the app's Wave 2, because **the website is where an overseas guest compares before booking** and the app is where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer.",
+  "notes": "Added 17 August. **The surface the matrix names** — 2.6.33 *\"website should be able to display multi currency\"* and 2.9.1 *\"in the B2C portal for guests comparison\"*. Wave 1 against the app's Wave 2, because **the website is where an overseas guest compares before booking** and the app is where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer.\n\n**Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (open, client to choose).\n\nRates carry `fetchedAt` (`listFxRates`; GAP-B3, already); the prototype's fixed demo rate is prototype-only (CFG-7, no change).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listFxRates` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Compare prices in your own currency before you travel.",
-  "gaps": [
-   {
-    "operation": "listProducts",
-    "why": "**1 declared operation reach no component on this screen**: listProducts. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -540,8 +779,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Venue",
+       "operation": "listFxRates",
+       "notes": "Sends `?venueId=` to `listFxRates`, from the venue the guest picked (see the home screen), so the list is the region's rates narrowed to the currencies this venue shows. Rates are set per region and each venue picks which currencies it shows (decided 28 September, audit R120 (a)).",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
+       "kind": "datePicker",
+       "label": "As at",
+       "operation": "listFxRates",
+       "notes": "Sends `?asAt=` to `listFxRates`.",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
+       "kind": "textField",
+       "label": "Purpose",
+       "operation": "listFxRates",
+       "notes": "Sends `?purpose=` to `listFxRates`.",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every multi-currency pricing",
+       "label": "Every FX rate",
        "bindsTo": "FxRate",
        "columns": [
         "FxRate.id",
@@ -558,6 +818,27 @@
        ],
        "operation": "listFxRates",
        "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
       }
      ]
     },
@@ -567,7 +848,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected multi-currency pricing",
+       "label": "The selected FX rate",
        "bindsTo": "FxRate",
        "columns": [
         "FxRate.id",
@@ -592,16 +873,16 @@
   "states": {
    "loading": "The multi-currency pricing list.",
    "error": "Could not load. Names which read failed and leaves the multi-currency pricing untouched.",
-   "emptyFirstRun": "No multi-currency pricing yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the multi-currency pricing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No multi-currency pricing yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on asAt, purpose and the multi-currency pricing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows. Last known rates stay, with their age.** A rate is a number a guest may act on, and an undated one they cannot judge."
   },
   "apis": [
    {
     "operationId": "listFxRates",
     "contract": "finance",
-    "purpose": "The rates in force",
+    "purpose": "The rates in force for the venue's shown currencies — always called with `venueId` (decided 28 September, audit R120 (a))",
     "trigger": "onLoad"
    },
    {
@@ -621,9 +902,17 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-035"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-035",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Discover → 'Prices in your currency'",
+    "differences": "Matches the YAML's charged-vs-shown rule. Separately, Config → Currency switches the whole storefront currency, which contradicts 'always charged in AED'."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {

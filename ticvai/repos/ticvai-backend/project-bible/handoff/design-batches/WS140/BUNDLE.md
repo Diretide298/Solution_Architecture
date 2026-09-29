@@ -1,6 +1,6 @@
 # WS140 — Marketing CRM Configuration Reference v1.0 board 6
 
-**10 screens · 13 operations · 12 schemas · 4 permissions**
+**10 screens · 16 operations · 16 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `GUEST_MANAGE, MARKETING_MANAGE, MARKETING_SEND, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `AI_USE, GUEST_MANAGE, MARKETING_MANAGE, MARKETING_SEND, MARKETING_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,15 +61,15 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-784` | Communications Center | listDetail | 1 | 0 | — |
-| `BO-785` | Template Library | listDetail | 2 | 0 | — |
-| `BO-786` | Newsletter Builder | listDetail | 1 | 0 | — |
-| `BO-787` | Content Blocks & Product Feed | listDetail | 1 | 0 | — |
+| `BO-785` | Template Library | listDetail | 4 | 0 | — |
+| `BO-786` | Newsletter Builder | listDetail | 2 | 0 | — |
+| `BO-787` | Content Blocks & Product Feed | listDetail | 2 | 0 | — |
 | `BO-788` | Subscriptions & Preferences | listDetail | 3 | 0 | — |
-| `BO-789` | Transactional Notification Rules | listDetail | 2 | 0 | — |
+| `BO-789` | Transactional Notification Rules | listDetail | 3 | 0 | — |
 | `BO-790` | Scheduling, Priority & Approval | listDetail | 1 | 0 | — |
 | `BO-791` | Delivery, Retry & Failover | listDetail | 2 | 0 | — |
 | `BO-792` | Deliverability & Analytics | listDetail | 1 | 0 | — |
-| `BO-793` | AI Content, Translation & Audit | listDetail | 1 | 0 | — |
+| `BO-793` | AI Content, Translation & Audit | listDetail | 4 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -349,6 +349,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Create one",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "proposeTranslations",
+    "contract": "ai",
+    "purpose": "Draft other languages of a message template (any channel) for review",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -473,6 +487,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Build a newsletter",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -592,6 +613,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Content blocks and product feed",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -860,6 +888,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Notification rules",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1340,6 +1375,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Content, translation and branding",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Record which AI draft or proposal was used, or why it was refused",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "proposeTranslations",
+    "contract": "ai",
+    "purpose": "Draft other languages of a message template (any channel) for review",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1348,6 +1404,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS75 Marketing CRM Configuration Reference v1.0 Board 6.dc.html#bo-793"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "actionId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1417,6 +1481,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "MessageTemplate",
   "responds": "MessageTemplate"
+ },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
  },
  "getMarketingSubscription": {
   "method": "GET",
@@ -1740,6 +1823,44 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "proposeMarketingContent": {
+  "method": "POST",
+  "path": "/ai/content-drafts",
+  "contract": "ai",
+  "summary": "Draft marketing content for a person to edit and apply",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "proposeTranslations": {
+  "method": "POST",
+  "path": "/ai/translate",
+  "contract": "ai",
+  "summary": "Fill translation gaps with a first pass, for a human to edit",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "retryMessageDispatch": {
   "method": "POST",
   "path": "/message-dispatches/{dispatchId}/retry",
@@ -2024,6 +2145,141 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "DeliveryQueueFailureRetryManagementView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.message_template, marketing.communication_provider (new)",
+  "description": "One communication in the delivery queue and where it stands.",
+  "required": [
+   "communicationId",
+   "channel",
+   "status",
+   "attempts",
+   "createdAt"
+  ],
+  "properties": {
+   "communicationId": {
+    "type": "string",
+    "description": "marketing.message_dispatch id."
+   },
+   "sourceModule": {
+    "type": "string",
+    "enum": [
+     "crm",
+     "ticketing",
+     "membership",
+     "waiver",
+     "groupSales",
+     "customerService",
+     "finance",
+     "wallet",
+     "resourceManagement",
+     "accessControl",
+     "other"
+    ]
+   },
+   "businessEvent": {
+    "type": "string",
+    "description": "The originating event type, e.g. TicketIssued."
+   },
+   "businessEventId": {
+    "type": "string",
+    "description": "The originating event instance, kept so a failed message can be replayed with its context."
+   },
+   "recipient": {
+    "type": "string",
+    "description": "Address or number, masked (e.g. j***@example.com) unless the caller holds GUEST_VIEW_PII."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "template": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "code": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "provider": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "P1",
+     "P2",
+     "P3",
+     "P4"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "processing",
+     "sent",
+     "delivered",
+     "failed",
+     "retrying",
+     "deadLettered",
+     "cancelled"
+    ]
+   },
+   "attempts": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "lastFailureCategory": {
+    "type": "string",
+    "enum": [
+     "providerUnavailable",
+     "invalidAddress",
+     "invalidMobile",
+     "rateLimited",
+     "authenticationError",
+     "templateRejected",
+     "timeout",
+     "consentBlock",
+     "unknownError"
+    ]
+   },
+   "lastFailureMessage": {
+    "type": "string"
+   },
+   "nextAttemptAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "LocalisedText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
@@ -2294,6 +2550,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "The `MessageTrigger` that fired it, and through its `event` the `BusinessEvent` and source module; null for a campaign or a direct send. Attempts are in `MessageDispatchAttempt`. (decided 29 September, data model for the agreed operations)"
    },
+   "campaignVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "marketing.campaign_variant",
+    "description": "The A/B variant sent (22.1.17; 29 September, build pass, group G2). Null for a single-content campaign or a triggered message."
+   },
+   "plannedSendAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The per-recipient hour chosen by `sendTimeMode` `optimised` (22.3.19, 22.9.16); null when sent at the scheduled time."
+   },
    "status": {
     "type": "string",
     "enum": [
@@ -2447,7 +2716,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "event": {
     "type": "string",
-    "description": "The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n"
+    "description": "The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n**`entitlement.expiringSoon` is in the catalogue since 29 September** (build pass, group G2; 5.5.30): the pre-expiry reminder for a ticket or pass. Its anchor is the event time; the notice period is the template's `expiryNoticeDays`, so `offsetMinutes` is normally 0.\n"
    },
    "templateId": {
     "type": "string",
@@ -2477,6 +2746,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "default": "transactional",
     "description": "**A queue-turn alert and a monthly newsletter are not the same urgency and were the same dispatch.** `operational` bypasses batching and quiet hours; `marketing` never does.\n"
    },
+   "sendTimeMode": {
+    "type": "string",
+    "enum": [
+     "fixed",
+     "optimised"
+    ],
+    "default": "fixed",
+    "description": "**Only for `priority` `marketing`** (29 September, build pass, group G2; 22.9.16): `optimised` holds the notification to the recipient's suggested hour from `ai.requestSuggestion` (kind `sendTime`) within the next 24 hours, on the suggested consented channel. `operational` and `transactional` messages are never delayed for it, and a `setMessageTrigger` asking for it on them is refused (400)."
+   },
    "isActive": {
     "type": "boolean",
     "default": true
@@ -2504,6 +2782,126 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "ProposedAction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.proposed_action",
+  "required": [
+   "id",
+   "kind",
+   "targetContract",
+   "targetOperation",
+   "payload",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "interactionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "pricing",
+     "promotion",
+     "operational",
+     "financial",
+     "configuration",
+     "content",
+     "audience"
+    ],
+    "description": "`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."
+   },
+   "targetContract": {
+    "type": "string",
+    "description": "Which contract would perform it. The assistant never performs it itself."
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "description": "**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n",
+    "enum": [
+     "proposed",
+     "approved",
+     "rejected",
+     "applied",
+     "expired"
+    ]
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."
+   },
+   "approvalLevel": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"
+   },
+   "proposedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.action_plan",
+    "description": "The plan this action presents for a decision (AI design 2.2 D, 3.8)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
    }
   }
  },
@@ -2723,6 +3121,141 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "RoutingPriorityThrottlingFallbackRulesView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.communication_routing_rule",
+  "description": "One routing rule, read by listRoutingPriorityThrottling and written by setCommunicationRoutingRule. Unset selectors match anything; a rule with more selectors set is more specific.\n",
+  "required": [
+   "id",
+   "channel",
+   "providers",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "country": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$"
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "messageClass": {
+    "type": "string",
+    "enum": [
+     "transactional",
+     "operational",
+     "service",
+     "marketing"
+    ]
+   },
+   "priorityClass": {
+    "type": "string",
+    "enum": [
+     "P1",
+     "P2",
+     "P3",
+     "P4"
+    ]
+   },
+   "recipientType": {
+    "type": "string",
+    "enum": [
+     "customer",
+     "partner",
+     "employee"
+    ]
+   },
+   "providers": {
+    "type": "array",
+    "description": "Tried in order; a provider below minimum health is skipped.",
+    "items": {
+     "type": "object",
+     "required": [
+      "providerId",
+      "role"
+     ],
+     "properties": {
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "providerName": {
+       "type": "string",
+       "readOnly": true
+      },
+      "role": {
+       "type": "string",
+       "enum": [
+        "primary",
+        "secondary",
+        "emergencyFallback"
+       ]
+      }
+     }
+    }
+   },
+   "skipUnhealthyProviders": {
+    "type": "boolean",
+    "description": "Route past providers whose health is degraded or worse."
+   },
+   "costAware": {
+    "type": "boolean",
+    "description": "Among providers meeting the service and compliance rules, prefer the cheapest."
+   },
+   "channelFallback": {
+    "type": "array",
+    "description": "Alternate channels, in order, when delivery on this channel fails; used only where consent and preferences permit.",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "throttle": {
+    "type": "object",
+    "properties": {
+     "messagesPerSecond": {
+      "type": "integer",
+      "minimum": 1
+     },
+     "messagesPerMinute": {
+      "type": "integer",
+      "minimum": 1
+     },
+     "brandMessagesPerMinute": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Cap across every rule for the same brand."
+     },
+     "eventMessagesPerMinute": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Cap per originating business event."
+     }
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "Suppression": {
   "x-ticvai-persistence": "marketing.suppression",
   "type": "object",
@@ -2760,6 +3293,133 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "scopePath": {
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "SystemTransactionalTemplateRegistryView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.message_template, marketing.message_template_version (new), marketing.message_trigger",
+  "description": "One version of one template on one channel and language, with its content and variables.",
+  "required": [
+   "templateId",
+   "code",
+   "name",
+   "channel",
+   "language",
+   "version",
+   "status",
+   "ownership"
+  ],
+  "properties": {
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "marketing.message_template id."
+   },
+   "code": {
+    "type": "string",
+    "description": "The human template ID (e.g. TICKET_CONFIRMATION)."
+   },
+   "name": {
+    "type": "string"
+   },
+   "businessEvent": {
+    "type": "string",
+    "description": "The registered business event this template answers (e.g. TicketIssued)."
+   },
+   "sourceModule": {
+    "type": "string",
+    "enum": [
+     "crm",
+     "ticketing",
+     "membership",
+     "waiver",
+     "groupSales",
+     "customerService",
+     "finance",
+     "wallet",
+     "resourceManagement",
+     "accessControl",
+     "other"
+    ]
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "language": {
+    "type": "string",
+    "description": "BCP 47 tag."
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "archived"
+    ]
+   },
+   "ownership": {
+    "type": "string",
+    "enum": [
+     "platform",
+     "crm"
+    ],
+    "description": "platform = transactional template owned here; crm = marketing template owned by CRM."
+   },
+   "subject": {
+    "type": "string"
+   },
+   "header": {
+    "type": "string"
+   },
+   "body": {
+    "type": "string"
+   },
+   "footer": {
+    "type": "string"
+   },
+   "ctaLabel": {
+    "type": "string"
+   },
+   "ctaUrl": {
+    "type": "string",
+    "description": "May contain variables, e.g. {{TicketLink}}."
+   },
+   "attachmentKinds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticketPdf",
+      "invoicePdf",
+      "walletPass",
+      "calendarInvite",
+      "waiverPdf"
+     ]
+    }
+   },
+   "variables": {
+    "type": "array",
+    "description": "Dynamic variables the content uses (e.g. CustomerName, OrderNumber, EventDate, AmountDue).",
+    "items": {
+     "type": "string"
+    }
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  }

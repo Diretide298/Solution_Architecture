@@ -1,6 +1,6 @@
 # WS137 — Marketing CRM Configuration Reference v1.0 board 3
 
-**10 screens · 9 operations · 10 schemas · 3 permissions**
+**10 screens · 11 operations · 13 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `MARKETING_MANAGE, MARKETING_VIEW, PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_USE, MARKETING_MANAGE, MARKETING_VIEW, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -67,8 +67,8 @@ convincingly. It is never a caption.
 | `BO-758` | Membership & Loyalty Segments | listDetail | 1 | 0 | — |
 | `BO-759` | Demographic & Geographic | listDetail | 1 | 0 | — |
 | `BO-760` | Revenue & Engagement Segments | listDetail | 1 | 0 | — |
-| `BO-761` | AI Audience Discovery | listDetail | 1 | 0 | — |
-| `BO-762` | Predictive Audiences | listDetail | 2 | 0 | — |
+| `BO-761` | AI Audience Discovery | listDetail | 2 | 0 | — |
+| `BO-762` | Predictive Audiences | listDetail | 4 | 0 | — |
 | `BO-763` | Activation & Governance | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch

@@ -1,6 +1,6 @@
 # P01-engagement-support-01 — P01 · Engagement & Support
 
-**6 screens · 21 operations · 34 schemas · 4 permissions**
+**6 screens · 24 operations · 43 schemas · 4 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -61,16 +61,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-025` | Help Centre / FAQ | statusTracker | 3 | 0 | — |
+| `WEB-025` | Help Centre / FAQ | statusTracker | 3 | 1 | — |
 | `WEB-026` | Survey & Feedback | configEditor | 1 | 0 | — |
-| `WEB-027` | Newsletter Subscription | listDetail | 9 | 2 | — |
+| `WEB-027` | Newsletter Subscription | listDetail | 9 | 6 | — |
 | `WEB-028` | Contact & Venue Information | statusTracker | 1 | 0 | — |
-| `WEB-044` | AI Concierge – Home | statusTracker | 7 | 0 | — |
-| `WEB-046` | In-Venue Notifications | configEditor | 1 | 0 | — |
+| `WEB-044` | AI Concierge – Home | statusTracker | 8 | 5 | — |
+| `WEB-046` | In-Venue Notifications | configEditor | 3 | 0 | — |
 
 ## Thin screens in this batch
 
-**WEB-028, WEB-046 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**WEB-028 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -108,16 +108,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-025 holds none of them, so the edge carries nothing and WEB-027 opens cold"
     }
    ]
   },
-  "notes": "Same content the AI concierge grounds on. One source, two surfaces. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Same content the AI concierge grounds on. One source, two surfaces. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** The guest Help screen shows the app status and a public, localised *What's new* (GAP-B2). Built as one implementation with WEB-045, both ids kept (GAP-D3). The live agent is reached through the concierge handover (`handoverToAgent` on WEB-044; GAP-B3, already).",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
@@ -131,7 +126,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected help faq",
+       "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
        "columns": [
         "TenantAppStatus.isPublished",
@@ -151,24 +146,44 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "contract white-label.yaml GET /tenant-config/status"
       },
       {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createCase",
-       "label": "Create case",
-       "notes": "The act the screen exists for."
-      },
-      {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCases",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Every case",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.kind",
+        "Case.channel",
+        "Case.recordedAt",
+        "Case.syncedAt",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority"
+       ],
+       "operation": "listCases",
+       "provenance": "contract marketing-crm.yaml GET /cases"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createCase"
+       "kind": "cardList",
+       "label": "What's new",
+       "notes": "Newest first, at most 10: version, date and the localised release notes, from `getTenantAppStatus` `whatsNew` (a public field; the staff-only `recentChanges` stays staff only).",
+       "operation": "getTenantAppStatus",
+       "provenance": "decided 29 September, rev 3 GAP-B2"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create case",
+       "operation": "createCase",
+       "provenance": "contract marketing-crm.yaml POST /cases"
       }
      ]
     }
@@ -178,9 +193,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "Articles load",
    "error": "Could not load",
    "emptyFirstRun": "No articles — offers contact instead of an empty help centre",
-   "emptyNoResults": "The filter narrowed it and the help faq are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising and replying need the connection."
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. **Raising a case and replying are disabled offline** — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff."
   },
   "apis": [
    {
@@ -203,11 +217,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-025"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-025",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Header 'Help'",
+    "differences": "Also carries policies and the accessibility statement (YAML WEB-045) and the case list (YAML WEB-034's listMyCases) on the same page."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateCase",
+    "component": "modal",
+    "trigger": "Create case",
+    "body": "**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCaseRequest",
+    "confirm": {
+     "label": "Create case",
+     "operation": "createCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subject",
+      "description",
+      "channel",
+      "recordedAt",
+      "subjectId",
+      "categoryId",
+      "priority",
+      "kind",
+      "venueId",
+      "relatedOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -267,12 +320,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-026 holds none of them, so the edge carries nothing and WEB-027 opens cold"
     }
    ]
   },
@@ -344,30 +392,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Submit",
+       "label": "Submit review",
        "operation": "submitReview",
        "provenance": "contract marketing-crm.yaml POST /reviews"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "submitReview",
-       "label": "Submit review",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "submitReview",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -375,9 +402,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "states": {
    "loading": "Survey loads",
-   "error": "Could not submit. **The answers are kept** and retried",
+   "error": "**Could not submit. The answers are kept on the form, and the guest retries by pressing Submit again** — nothing resends by itself: guest web is online-only (docs/architecture/offline-and-sync.md, *B2C web: None*), so there is no outbox behind this screen. The retry reuses the first attempt's `Idempotency-Key`, so a submit that did reach the server before the failure is not recorded as a second review.",
    "emptyFirstRun": "—",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -385,13 +412,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "submitReview",
     "contract": "marketing-crm",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-026"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-026",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Account → 'Reviews & feedback'",
+    "differences": "List of visits to rate with toast actions; no rating form or survey questions are drawn."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -455,13 +490,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
   "purpose": "Record newsletter subscription for this venue.",
-  "gaps": [
-   {
-    "operation": "getMarketingSubscription",
-    "why": "**1 declared operation reach no component on this screen**: getMarketingSubscription. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -471,7 +499,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every newsletter subscription",
+       "label": "Every guest device",
        "bindsTo": "GuestDevice",
        "columns": [
         "GuestDevice.id",
@@ -489,6 +517,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listGuestDevices",
        "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -498,7 +533,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected newsletter subscription",
+       "label": "The selected guest device",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.tokenRef",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt",
+        "GuestDevice.revokedAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The marketing subscription",
+       "bindsTo": "MarketingSubscription",
+       "columns": [
+        "MarketingSubscription.id",
+        "MarketingSubscription.subjectId",
+        "MarketingSubscription.channel",
+        "MarketingSubscription.listName",
+        "MarketingSubscription.isSubscribed",
+        "MarketingSubscription.source",
+        "MarketingSubscription.unsubscribeToken"
+       ],
+       "operation": "getMarketingSubscription",
+       "provenance": "contract marketing-crm.yaml GET /marketing-subscriptions"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wishlist",
        "bindsTo": "Wishlist",
        "columns": [
         "Wishlist.subjectId",
@@ -515,75 +589,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Record",
+       "label": "Record consent",
        "operation": "recordConsent",
        "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
+       "label": "Add to wishlist",
        "operation": "addToWishlist",
        "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
       },
       {
        "kind": "secondaryButton",
-       "label": "Register",
+       "label": "Register guest device",
        "operation": "registerGuestDevice",
        "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
       },
       {
        "kind": "destructiveButton",
-       "label": "Remove",
+       "label": "Remove from wishlist",
        "operation": "removeFromWishlist",
        "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
       },
       {
        "kind": "destructiveButton",
-       "label": "Revoke",
+       "label": "Revoke guest device",
        "operation": "revokeGuestDevice",
        "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save marketing subscription",
        "operation": "setMarketingSubscription",
        "provenance": "contract marketing-crm.yaml PUT /marketing-subscriptions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listGuestDevices",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "removeFromWishlist",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "label": "Remove from wishlist",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "recordConsent",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -593,16 +631,104 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmRemoveFromWishlist",
     "component": "confirmDialog",
-    "trigger": "Remove",
+    "trigger": "Remove from wishlist",
     "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A newsletter subscription this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+    "provenance": "client-verified"
    },
    {
     "id": "confirmRevokeGuestDevice",
     "component": "confirmDialog",
-    "trigger": "Revoke",
+    "trigger": "Revoke guest device",
     "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A newsletter subscription this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRecordConsent",
+    "component": "modal",
+    "trigger": "Record consent",
+    "body": "**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RecordConsentRequest",
+    "confirm": {
+     "label": "Record consent",
+     "operation": "recordConsent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "purpose",
+      "decision",
+      "noticeVersion",
+      "source",
+      "recordedAt",
+      "channels"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formAddToWishlist",
+    "component": "modal",
+    "trigger": "Add to wishlist",
+    "body": "**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add to wishlist",
+     "operation": "addToWishlist"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "performanceId",
+      "note"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRegisterGuestDevice",
+    "component": "modal",
+    "trigger": "Register guest device",
+    "body": "**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`. Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Register guest device",
+     "operation": "registerGuestDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "platform",
+      "token",
+      "appVersion",
+      "osVersion",
+      "deviceModel",
+      "locale"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formSetMarketingSubscription",
+    "component": "modal",
+    "trigger": "Save marketing subscription",
+    "body": "**Collects what `setMarketingSubscription` sends before it is called.** Required: `id`, `subjectId`, `channel`, `listName`, `isSubscribed`. Optional: `source`, `unsubscribeToken`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "MarketingSubscription",
+    "confirm": {
+     "label": "Save marketing subscription",
+     "operation": "setMarketingSubscription"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subjectId",
+      "channel",
+      "listName",
+      "isSubscribed",
+      "source",
+      "unsubscribeToken"
+     ]
+    },
+    "provenance": "client-verified"
    }
   ],
   "states": {
@@ -610,7 +736,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not subscribe. **Consent is not recorded on a failed request**, because a subscription the guest believes happened and did not is worse than a visible failure",
    "emptyFirstRun": "—",
    "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A consent change must reach the server to mean anything."
   },
   "apis": [
@@ -618,7 +744,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "recordConsent",
     "contract": "marketing-crm",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "addToWishlist",
@@ -701,14 +827,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
    "preloaded": [
-    "Wishlist.subjectId",
-    "Wishlist.items"
+    "GuestDevice.id",
+    "GuestDevice.subjectId",
+    "GuestDevice.platform",
+    "GuestDevice.tokenFingerprint",
+    "GuestDevice.tokenRef"
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-027"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-027",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Account → 'Newsletters'; Contact page → 'Choose newsletters'",
+    "differences": "Per-venue and channel toggles only for signed-in guests; no signed-out email sign-up form."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -770,16 +907,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
-     "carries": [
-      "deviceId",
-      "itemId",
-      "subjectId"
-     ],
-     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-028 holds none of them, so the edge carries nothing and WEB-027 opens cold"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Contact bound 28 September** to `getTenantAppStatus.contact` (decided 28 September, audit R073 (f)).",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
@@ -793,7 +925,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected contact venue information",
+       "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
        "columns": [
         "TenantAppStatus.isPublished",
@@ -811,6 +943,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getTenantAppStatus",
        "provenance": "contract white-label.yaml GET /tenant-config/status"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "How to reach the venue",
+       "bindsTo": "VenueContact",
+       "columns": [
+        "VenueContact.phone",
+        "VenueContact.email",
+        "VenueContact.whatsapp",
+        "VenueContact.address",
+        "VenueContact.openingHours"
+       ],
+       "operation": "getTenantAppStatus",
+       "notes": "**From `getTenantAppStatus.contact`** (decided 28 September, audit R073 (f)): phone, email, WhatsApp, address and opening hours, set from CMS-001 through `setMaintenanceMode`. Each is optional and a missing one is left out rather than shown blank.",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
       }
      ]
     }
@@ -820,8 +967,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "Venue details",
    "error": "Could not load. Falls back to the tenant contact details from the cached config",
    "emptyFirstRun": "—",
-   "emptyNoResults": "The filter narrowed it and the contact venue information are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -833,9 +979,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-028"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-028",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Footer 'Contact', or Discover → 'Contact & venue info'",
+    "differences": "Links to parking and accessibility from the contact cards; otherwise matches."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -889,7 +1043,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "WEB-001"
    ]
   },
-  "notes": "**A concierge in a browser is a concierge.** ADR-0020 keeps it read-only against the transactional core regardless of surface. **Renamed 31 August** from *AI Concierge*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getGuestMenu. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "notes": "**A concierge in a browser is a concierge.** ADR-0020 keeps it read-only against the transactional core regardless of surface. **Renamed 31 August** from *AI Concierge*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getGuestMenu. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September, rev 3 CFG-5).** The concierge entry shows as mascot art when `BookingFlowConfig.conciergeMascot` is on (default on), otherwise as a plain button.",
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getGuestMenu` reads one record and nothing reads a population — the screen is about that one thing",
@@ -903,7 +1057,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected concierge home",
+       "label": "The guest menu",
        "bindsTo": "GuestMenu",
        "columns": [
         "GuestMenu.outletId",
@@ -916,43 +1070,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getGuestMenu",
        "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createAiConversation",
-       "provenance": "contract ai.yaml POST /conversations"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Send",
-       "operation": "sendAiMessage",
-       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+       "kind": "dataTable",
+       "label": "Every AI conversation",
+       "bindsTo": "AiConversation",
+       "columns": [
+        "AiConversation.id",
+        "AiConversation.principalId",
+        "AiConversation.scopePath",
+        "AiConversation.module",
+        "AiConversation.locale",
+        "AiConversation.messageCount",
+        "AiConversation.startedAt",
+        "AiConversation.lastMessageAt"
+       ],
+       "operation": "listAiConversations",
+       "provenance": "contract ai.yaml GET /conversations"
       },
-      {
-       "kind": "secondaryButton",
-       "label": "Handover",
-       "operation": "handoverToAgent",
-       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Request",
-       "operation": "requestSuggestion",
-       "provenance": "contract ai.yaml POST /ai/suggestions"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "cardList",
        "label": "AI Concierge",
@@ -962,6 +1097,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "Detail",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create AI conversation",
+       "operation": "createAiConversation",
+       "provenance": "contract ai.yaml POST /conversations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send AI message",
+       "operation": "sendAiMessage",
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Handover to agent",
+       "operation": "handoverToAgent",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request suggestion",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send conversation message",
+       "operation": "sendConversationMessage",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/messages"
       }
      ]
     }
@@ -1017,6 +1188,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Ask the concierge something",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "recordAnswerFeedback",
+    "contract": "ai",
+    "purpose": "Say whether an answer helped",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1028,16 +1206,123 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "outletId",
      "from": "session"
+    },
+    {
+     "name": "messageId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `conversationId`."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-044"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-044",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Floating 'Ask Sahli' button on every page",
+    "differences": "A floating chat panel rather than a home screen; no conversation history list (listAiConversations)."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSendConversationMessage",
+    "component": "modal",
+    "trigger": "Send conversation message",
+    "body": "**Collects what `sendConversationMessage` sends before it is called.** Required: `body`. Optional: `attachments`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Send conversation message",
+     "operation": "sendConversationMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "body",
+      "attachments"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formCreateAiConversation",
+    "component": "modal",
+    "trigger": "Create AI conversation",
+    "body": "**Collects what `createAiConversation` sends before it is called.** Required: `module`. Optional: `locale`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create AI conversation",
+     "operation": "createAiConversation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "module",
+      "locale"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formSendAiMessage",
+    "component": "modal",
+    "trigger": "Send AI message",
+    "body": "**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional: `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Send AI message",
+     "operation": "sendAiMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "content",
+      "collectionIds"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formHandoverToAgent",
+    "component": "modal",
+    "trigger": "Handover to agent",
+    "body": "**Collects what `handoverToAgent` sends before it is called.** Required: `reason`. Optional: `summary`, `preferredQueueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Handover to agent",
+     "operation": "handoverToAgent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "summary",
+      "preferredQueueId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRequestSuggestion",
+    "component": "modal",
+    "trigger": "Request suggestion",
+    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request suggestion",
+     "operation": "requestSuggestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "subjectRef",
+      "horizon",
+      "context"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -1089,18 +1374,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "WEB-001"
    ]
   },
-  "notes": "**Web push is weaker than native and it is not absent.** A guest with a tab open gets their queue call; the app does it better and the web does it.",
+  "notes": "**Web push is weaker than native and it is not absent.** A guest with a tab open gets their queue call; the app does it better and the web does it. **Back in the first release** (decided 29 September, rev 3 GAP-C1): the notifications feed is needed in the first release, which reverses audit R242's deferral of this screen. The `deferred` block is removed and the screen returns to `wave: 2`, where it sat before R242. Queue calls and order status still also show on the queue and order screens, which poll.",
   "density": "compact",
   "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`claimLocationSession`) and no read of a population — it is settings, not a list",
+  "patternReason": "`listMyNotifications` reads the feed (decided 29 September, rev 3 GAP-C1); the location-session claim stays a form on the same screen, so the pattern is kept until the screen is redrawn",
   "purpose": "Queue calls, order updates, venue notices.",
-  "gaps": [
-   {
-    "operation": "claimLocationSession",
-    "why": "**`claimLocationSession` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract fnb.yaml POST /location-sessions"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1110,9 +1388,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Claim",
+       "label": "Claim location session",
        "operation": "claimLocationSession",
        "provenance": "contract fnb.yaml POST /location-sessions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Mark all as read",
+       "operation": "markMyNotificationsRead",
+       "notes": "Sends `{all: true}`. Only the guest's own notifications are marked.",
+       "provenance": "contract marketing-crm.yaml POST /me/notifications/read"
       }
      ]
     },
@@ -1122,13 +1407,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "cardList",
-       "label": "In-Venue Notifications",
-       "provenance": "carried from the previous definition"
+       "label": "Notifications",
+       "bindsTo": "GuestNotification",
+       "operation": "listMyNotifications",
+       "notes": "**Newest first, unread ones marked.** Each card shows the kind, title, body and when it was queued; tapping one opens its `deepLink` (an order, a queue ticket, a booking) and marks it read. `unreadCount` is the badge on the tab. Sends `?venueId=` for the venue the guest picked.",
+       "provenance": "contract marketing-crm.yaml GET /me/notifications (decided 29 September, rev 3 GAP-C1)"
       },
       {
        "kind": "detailPanel",
        "label": "Detail",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Location code",
+       "operation": "claimLocationSession",
+       "provenance": "contract fnb.yaml POST /location-sessions"
+      },
+      {
+       "kind": "textField",
+       "label": "Seat reference",
+       "operation": "claimLocationSession",
+       "provenance": "contract fnb.yaml POST /location-sessions"
+      },
+      {
+       "kind": "numberField",
+       "label": "Party size",
+       "operation": "claimLocationSession",
+       "provenance": "contract fnb.yaml POST /location-sessions"
+      },
+      {
+       "kind": "toggle",
+       "label": "Unread only",
+       "operation": "listMyNotifications",
+       "notes": "Sends `?unreadOnly=` to `listMyNotifications`.",
+       "provenance": "contract marketing-crm.yaml GET /me/notifications"
       }
      ]
     }
@@ -1139,13 +1452,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
-   "offline": "**The offline banner shows.** Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late."
+   "offline": "**The offline banner shows.** Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late.",
+   "emptyNoResults": "**No unread notifications.** Names the Unread only filter and offers to show all; the read ones are still there."
   },
   "apis": [
    {
     "operationId": "claimLocationSession",
     "contract": "fnb",
     "purpose": "Tell the platform where the guest is",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listMyNotifications",
+    "contract": "marketing-crm",
+    "purpose": "The guest's notification feed, newest first: queue calls, order ready, booking changes, venue alerts (decided 29 September, rev 3 GAP-C1)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "markMyNotificationsRead",
+    "contract": "marketing-crm",
+    "purpose": "Mark the opened notifications, or all of them, read",
     "trigger": "onAction"
    }
   ],
@@ -1154,9 +1480,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with no parameter — the venue comes from the site."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-046"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-046",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "At the venue → 'Alerts'",
+    "differences": "Deferred in the YAML (release later, R242: no in-app feed in the first release), but the prototype draws it as a live section, so the client will expect it."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1379,7 +1713,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "AiConversation"
+  "responds": "Page"
  },
  "listCases": {
   "method": "GET",
@@ -1408,6 +1742,11 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "membershipId",
     "in": "query",
     "required": null
    },
@@ -1447,7 +1786,79 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "GuestDevice"
+  "responds": "Page"
+ },
+ "listMyNotifications": {
+  "method": "GET",
+  "path": "/me/notifications",
+  "contract": "marketing-crm",
+  "summary": "The signed-in guest's notification feed",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "unreadOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "markMyNotificationsRead": {
+  "method": "POST",
+  "path": "/me/notifications/read",
+  "contract": "marketing-crm",
+  "summary": "Mark the signed-in guest's notifications read",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "recordAnswerFeedback": {
+  "method": "POST",
+  "path": "/messages/{messageId}/feedback",
+  "contract": "ai",
+  "summary": "Say whether an answer helped",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiAnswerFeedback"
  },
  "recordConsent": {
   "method": "POST",
@@ -1591,7 +2002,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MarketingSubscription",
   "responds": "MarketingSubscription"
  },
@@ -1623,6 +2040,89 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiAnswerFeedback": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.answer_feedback",
+  "description": "**What a person thought of an answer** (AIC-062). One label per message per person; it feeds the golden sets and the knowledge-gap list, never an online update (design 3.5).",
+  "required": [
+   "messageId",
+   "rating"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "messageId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.message"
+   },
+   "conversationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.conversation"
+   },
+   "rating": {
+    "type": "string",
+    "enum": [
+     "helpful",
+     "notHelpful"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "wrong",
+     "outdated",
+     "incomplete",
+     "notGrounded",
+     "unsafe",
+     "other"
+    ],
+    "nullable": true
+   },
+   "comment": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 1000
+   },
+   "audience": {
+    "type": "string",
+    "enum": [
+     "staff",
+     "guest"
+    ],
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The guest, where the audience is `guest`."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "AiConversation": {
   "type": "object",
   "x-ticvai-persistence": "ai.conversation",
@@ -1645,7 +2145,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string"
    },
    "module": {
-    "type": "string"
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
    },
    "locale": {
     "type": "string"
@@ -1660,6 +2160,97 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "lastMessageAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "AiMaturity": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "required": [
+   "stage",
+   "basedOn"
+  ],
+  "properties": {
+   "stage": {
+    "type": "string",
+    "enum": [
+     "starting",
+     "learning",
+     "established",
+     "learned"
+    ],
+    "description": "`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."
+   },
+   "basedOn": {
+    "type": "string",
+    "description": "The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "source"
+     ],
+     "properties": {
+      "source": {
+       "type": "string",
+       "enum": [
+        "venueSettings",
+        "startingPattern",
+        "calendar",
+        "weather",
+        "bookingsOnHand",
+        "ownHistory",
+        "importedHistory",
+        "configuration",
+        "trainedModel"
+       ]
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true,
+       "description": "e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."
+      },
+      "observations": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "ownDataShare": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."
+   },
+   "limitedHistory": {
+    "type": "boolean"
+   },
+   "nextStage": {
+    "type": "object",
+    "nullable": true,
+    "description": "What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.",
+    "properties": {
+     "stage": {
+      "type": "string",
+      "enum": [
+       "learning",
+       "established",
+       "learned"
+      ]
+     },
+     "needs": {
+      "type": "string"
+     },
+     "expectedBy": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     }
+    }
    }
   }
  },
@@ -1694,10 +2285,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string"
    },
    "sources": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AiSource"
-    }
+    "$ref": "#/components/schemas/AiSourceList"
    },
    "confidence": {
     "type": "number",
@@ -1749,45 +2337,57 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "gemini",
    "anthropic",
    "azureOpenai",
-   "localLlm"
+   "localLlm",
+   "openaiCompatible"
+  ],
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
+ },
+ "AiSourceList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**The sources an answer was grounded in, stored with the answer** (8.3.70). One `jsonb` column on the row that carries it — `ai.message.sources` and `ai.activity.sources` — because the grounding audit reads the list as it was when the answer was given, and a source is never queried on its own.\n",
+  "items": {
+   "$ref": "#/components/schemas/AiSource"
+  }
+ },
+ "AllergenCode": {
+  "type": "string",
+  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
+  "enum": [
+   "gluten",
+   "crustaceans",
+   "eggs",
+   "fish",
+   "peanuts",
+   "soybeans",
+   "milk",
+   "nuts",
+   "celery",
+   "mustard",
+   "sesame",
+   "sulphites",
+   "lupin",
+   "molluscs"
   ]
  },
- "AiSource": {
-  "type": "object",
-  "x-ticvai-persistence": "none — embedded in the interaction",
-  "description": "What the answer was grounded in (8.3.70). **An answer with no sources is a guess**, and the interface should show it as one.\n",
-  "properties": {
-   "kind": {
-    "type": "string",
-    "enum": [
-     "document",
-     "product",
-     "entitlement",
-     "report",
-     "record"
-    ]
-   },
-   "id": {
-    "type": "string"
-   },
-   "title": {
-    "type": "string"
-   },
-   "collectionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "excerpt": {
-    "type": "string"
-   },
-   "relevance": {
-    "type": "number"
-   }
-  }
+ "AppAvailability": {
+  "type": "string",
+  "description": "**The sold-out or closed signal (decided 28 September, audit R073).** `open` is the normal state. `soldOut` shows WEB-029's sold-out state across the app while browsing still works; `closed` shows the closed state (a weather closure, a private event). Neither refuses a request on its own: it is what the guest is told, and a sale is still refused by availability where it applies. Set with `setMaintenanceMode`.\n",
+  "enum": [
+   "open",
+   "soldOut",
+   "closed"
+  ],
+  "default": "open"
  },
  "Case": {
   "x-ticvai-persistence": "marketing.case",
+  "x-ticvai-retired-columns": [
+   "guest_name",
+   "subject",
+   "is_sla_breached"
+  ],
   "type": "object",
   "required": [
    "id",
@@ -1799,10 +2399,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID."
    },
    "caseNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"
    },
    "subjectId": {
     "type": "string",
@@ -1811,15 +2415,60 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "guestName": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"
    },
    "subject": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-column": "title",
+    "description": "**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CaseKind"
+     }
+    ],
+    "nullable": true,
+    "description": "What the guest said it was about, where the guest raised it."
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the case was raised — the start of the SLA clock."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the case arrived. Equal to `recordedAt` for a case raised online."
    },
    "categoryId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"
+   },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"
    },
    "status": {
     "$ref": "#/components/schemas/CaseStatus"
@@ -1847,7 +2496,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    },
    "isSlaBreached": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"
    },
    "slaPausedSeconds": {
     "type": "integer",
@@ -1866,6 +2518,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    }
   }
+ },
+ "CaseKind": {
+  "type": "string",
+  "description": "**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n",
+  "enum": [
+   "lostProperty",
+   "complaint",
+   "question",
+   "accessibility",
+   "refundRequest",
+   "other"
+  ]
  },
  "CasePriority": {
   "type": "string",
@@ -1915,8 +2579,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "pos",
    "callCentre",
    "import",
-   "agentRecorded"
-  ]
+   "agentRecorded",
+   "cookieBanner",
+   "checkout"
+  ],
+  "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
  },
  "ConsentState": {
   "x-ticvai-persistence": "none — projection over consent_record",
@@ -2059,12 +2726,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "queuePosition": {
     "type": "integer",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). Null once claimed."
    },
    "estimatedWaitSeconds": {
     "type": "integer",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). Null once claimed."
    },
    "handoverReason": {
     "type": "string",
@@ -2156,7 +2827,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "ConversationMessage": {
   "type": "object",
-  "x-ticvai-persistence": "marketing.conversation_message",
+  "x-ticvai-persistence": "marketing.conversation_message + marketing.conversation_message_attachment",
   "required": [
    "id",
    "sender",
@@ -2270,6 +2941,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. Must belong to `subjectId` when both are given (422). (decided 29 September, coordinator decision DM4, writers pass)"
+   },
    "priority": {
     "allOf": [
      {
@@ -2277,6 +2954,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     ],
     "default": "normal"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CaseKind"
    },
    "channel": {
     "$ref": "#/components/schemas/MessageChannel"
@@ -2290,13 +2970,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "attachmentRefs": {
     "type": "array",
+    "description": "Stored on the opening `CaseMessage`, not on the case.",
     "items": {
      "type": "string"
     }
    },
    "recordedAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "Device time the case was raised. The server stamps `Case.syncedAt` on arrival."
    }
   }
  },
@@ -2346,6 +3028,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "tokenFingerprint": {
     "type": "string",
     "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
+   },
+   "tokenRef": {
+    "type": "string",
+    "writeOnly": true,
+    "description": "**A vault reference to the push token**, written by the server from `registerGuestDevice.token` — the same pattern as `PaymentProvider.credentialRef`. Never the token and never returned; the sender resolves it at send time. Without it a registered device could not be sent to.\n"
    },
    "appVersion": {
     "type": "string",
@@ -2479,7 +3166,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
           "type": "array",
           "description": "Always present. Not a field a tenant may choose to omit.",
           "items": {
-           "type": "string"
+           "$ref": "#/components/schemas/AllergenCode"
           }
          },
          "preparationMinutes": {
@@ -2497,6 +3184,55 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "GuestNotification": {
+  "type": "object",
+  "description": "One in-app message as the guest sees it. A view of `marketing.message_dispatch`, channel `inApp`.",
+  "required": [
+   "id",
+   "title",
+   "queuedAt",
+   "read"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "queueCall",
+     "orderReady",
+     "bookingChange",
+     "venueAlert",
+     "offer",
+     "other"
+    ]
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "deepLink": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where tapping the notification leads in the app (an order, a queue ticket, a booking)."
+   },
+   "queuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "read": {
+    "type": "boolean"
    }
   }
  },
@@ -2519,7 +3255,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "locationId": {
     "type": "string",
@@ -2539,6 +3276,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "visitId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true,
     "description": "The table visit this session orders onto, where the location is a table. Absent for a cabana or a seat, which have no visit concept — the order stands alone.\n"
    },
@@ -2559,18 +3297,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "MarketingSubscription": {
   "type": "object",
   "x-ticvai-persistence": "marketing.subscription",
+  "x-ticvai-retired-columns": [
+   "guest_id",
+   "subscribed"
+  ],
   "description": "**Drafted 4 September.** What a guest asked to receive. **Deliberately separate from `marketing.consent`** - consent is what the law allows, a subscription is what the person wants, and a system that stores one and reports the other is the reason unsubscribe links stop working.",
   "required": [
-   "id"
+   "id",
+   "subjectId",
+   "channel",
+   "listName",
+   "isSubscribed"
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
-   "guestId": {
+   "subjectId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The guest — from the guest session, or from `unsubscribeToken` when there is no session."
    },
    "channel": {
     "type": "string",
@@ -2583,7 +3332,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "listName": {
     "type": "string"
    },
-   "subscribed": {
+   "isSubscribed": {
     "type": "boolean"
    },
    "source": {
@@ -2591,10 +3340,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Where the opt-in happened, because a regulator asks."
    },
    "unsubscribeToken": {
+    "writeOnly": true,
     "type": "string",
-    "description": "**Unsubscribe must work without a login.**"
+    "description": "**Unsubscribe must work without a login.** The link in a message carries the token and `setMarketingSubscription` accepts it in place of a session. **Write-only: never returned**, so a `MARKETING_VIEW` holder reading subscriptions cannot act as the guest."
    },
    "updatedAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    }
@@ -2611,9 +3362,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "post"
   ]
  },
+ "MinimumAppVersion": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "nullable": true,
+  "description": "**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n",
+  "properties": {
+   "ios": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   },
+   "android": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^\\d+\\.\\d+\\.\\d+$"
+   }
+  }
+ },
  "ModifierGroup": {
   "x-ticvai-persistence": "fnb.modifier_group + fnb.modifier_option",
   "type": "object",
+  "description": "**An F&B modifier is a choice added to a dish at the moment of ordering** — *no onions*, *extra cheese*, *cooked medium*. **It is not an Attribute**, the axis that generates catalogue variants (naming-and-style §3 lists *Modifier* as a banned synonym for that), and the two must not be merged: a variant is a different product with its own stock, a modifier is an instruction on a line with at most a price delta.\n",
   "required": [
    "id",
    "code",
@@ -2668,6 +3438,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "isAvailable": {
        "type": "boolean"
+      },
+      "allergens": {
+       "type": "array",
+       "description": "What choosing this option adds to the dish. `attachModifierGroup` refuses a group that adds one the item does not declare, and `verifyAllergens` reports it as `via` `modifier`.",
+       "items": {
+        "$ref": "#/components/schemas/AllergenCode"
+       }
       }
      }
     }
@@ -2677,6 +3454,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
+ },
+ "ModuleKey": {
+  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
  },
  "Page": {
   "type": "object",
@@ -2724,8 +3504,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "promotion",
      "operational",
      "financial",
-     "configuration"
-    ]
+     "configuration",
+     "content",
+     "audience"
+    ],
+    "description": "`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."
    },
    "targetContract": {
     "type": "string",
@@ -2737,13 +3520,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "payload": {
     "type": "object",
     "additionalProperties": true,
-    "description": "The request body a person would submit, ready to review."
+    "description": "The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"
    },
    "summary": {
     "type": "string"
    },
    "status": {
     "type": "string",
+    "description": "**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n",
     "enum": [
      "proposed",
      "approved",
@@ -2752,9 +3536,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "expired"
     ]
    },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."
+   },
    "approvalLevel": {
     "type": "integer",
-    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority."
+    "minimum": 1,
+    "maximum": 2,
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"
    },
    "decidedByPrincipalId": {
     "type": "string",
@@ -2774,6 +3568,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.action_plan",
+    "description": "The plan this action presents for a decision (AI design 2.2 D, 3.8)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
    }
   }
  },
@@ -2891,9 +3711,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "aspects": {
     "type": "array",
-    "description": "Aspect chips — exhibitions, staff, cleanliness, food, value.",
+    "description": "Aspect chips — the closed set the description always named.",
+    "uniqueItems": true,
     "items": {
-     "type": "string"
+     "type": "string",
+     "enum": [
+      "exhibitions",
+      "staff",
+      "cleanliness",
+      "food",
+      "value"
+     ]
     }
    },
    "recordedAt": {
@@ -2910,6 +3738,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id",
    "kind",
    "basis",
+   "maturity",
    "producedAt"
   ],
   "properties": {
@@ -2956,6 +3785,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
    },
+   "maturity": {
+    "$ref": "#/components/schemas/AiMaturity"
+   },
    "producedAt": {
     "type": "string",
     "format": "date-time"
@@ -2981,7 +3813,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "SuggestionKind": {
   "type": "string",
-  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline.\n",
   "enum": [
    "price",
    "replenishment",
@@ -2995,12 +3827,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "upsell",
    "segmentation",
    "anomaly",
-   "scenario"
+   "scenario",
+   "sendTime",
+   "wasteRisk",
+   "queueBalancing",
+   "itinerary"
   ]
  },
  "TenantAppStatus": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
+  "description": "Computed on read. The published fields come from the current `ConfigVersion`, the maintenance fields from the tenant's `tenant_config` row (`setMaintenanceMode`), and the draft fields from the working draft. **Fields marked staff only are left out of a response to a caller without a staff session** (`getTenantAppStatus`).\n",
   "required": [
    "tenantId",
    "isPublished",
@@ -3012,7 +3849,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid"
    },
    "isPublished": {
-    "type": "boolean"
+    "type": "boolean",
+    "x-ticvai-derived": "onRead",
+    "description": "True once any version has been published."
    },
    "publishedVersion": {
     "type": "string",
@@ -3024,19 +3863,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    },
    "draftVersion": {
-    "type": "string"
+    "type": "string",
+    "description": "Staff only."
    },
    "hasUnpublishedChanges": {
-    "type": "boolean"
+    "type": "boolean",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. The working draft differs from the current version's `snapshot`."
    },
    "activeModuleCount": {
-    "type": "integer"
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. `ModuleEnablement` rows with `isEnabled` true."
    },
    "licensedModuleCount": {
-    "type": "integer"
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. `ModuleEnablement` rows with `isLicensed` true."
    },
    "activePageCount": {
-    "type": "integer"
+    "type": "integer",
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. Content pages that are `published` and enabled."
    },
    "isInMaintenance": {
     "type": "boolean"
@@ -3049,8 +3897,101 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "nullable": true
    },
+   "minimumAppVersion": {
+    "$ref": "#/components/schemas/MinimumAppVersion"
+   },
+   "contact": {
+    "$ref": "#/components/schemas/VenueContact"
+   },
+   "availability": {
+    "$ref": "#/components/schemas/AppAvailability"
+   },
+   "availabilityMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "What the sold-out or closed screen says (WEB-029). Null shows the default wording."
+   },
+   "venues": {
+    "type": "array",
+    "maxItems": 200,
+    "x-ticvai-derived": "onRead",
+    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "venueId",
+      "name"
+     ],
+     "properties": {
+      "venueId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "**The venue's scope node** (`tenancy.OrgUnit.id`, level venue): what every guest screen that declares `venueId` `from: session` reads once the guest picks it."
+      },
+      "name": {
+       "type": "string",
+       "maxLength": 200,
+       "description": "The venue's name (`tenancy.OrgUnit.name`)."
+      },
+      "city": {
+       "type": "string",
+       "maxLength": 120,
+       "nullable": true,
+       "description": "Shown under the name so two venues with similar names can be told apart."
+      },
+      "openingHoursToday": {
+       "type": "object",
+       "nullable": true,
+       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.",
+       "properties": {
+        "opens": {
+         "type": "string",
+         "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "closes": {
+         "type": "string",
+         "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        }
+       }
+      }
+     }
+    }
+   },
+   "whatsNew": {
+    "type": "array",
+    "maxItems": 10,
+    "x-ticvai-derived": "onRead",
+    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "version",
+      "publishedAt",
+      "notes"
+     ],
+     "properties": {
+      "version": {
+       "type": "string",
+       "description": "The release version."
+      },
+      "publishedAt": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When the release reached the tenant's cell."
+      },
+      "notes": {
+       "$ref": "#/components/schemas/LocalisedText"
+      }
+     }
+    }
+   },
    "recentChanges": {
     "type": "array",
+    "description": "Staff only. Names the principal behind each change, so it never reaches a public response.",
     "items": {
      "type": "object",
      "properties": {
@@ -3070,6 +4011,44 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "VenueContact": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "nullable": true,
+  "description": "How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because nothing here is personal.\n",
+  "properties": {
+   "phone": {
+    "type": "string",
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "whatsapp": {
+    "type": "string",
+    "nullable": true
+   },
+   "address": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "openingHours": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "Prose, as the guest reads it. The bookable hours are the catalogue's."
    }
   }
  },
@@ -3119,7 +4098,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "nullable": true
       },
       "price": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "x-ticvai-column": "list_price",
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "The variant's current list price when the wishlist is read. Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column); the wire keeps `price`."
       },
       "imageAssetRef": {
        "type": "string",

@@ -18,7 +18,26 @@
     "WEB-002",
     "WEB-003",
     "WEB-004",
+    "WEB-008",
+    "WEB-009",
+    "WEB-015",
     "WEB-016",
+    "WEB-017",
+    "WEB-018",
+    "WEB-019",
+    "WEB-020",
+    "WEB-021",
+    "WEB-022",
+    "WEB-023",
+    "WEB-024",
+    "WEB-025",
+    "WEB-026",
+    "WEB-027",
+    "WEB-028",
+    "WEB-029",
+    "WEB-032",
+    "WEB-033",
+    "WEB-034",
     "WEB-036",
     "WEB-037",
     "WEB-038",
@@ -29,18 +48,18 @@
     "WEB-043",
     "WEB-044",
     "WEB-045",
-    "WEB-046"
+    "WEB-046",
+    "WEB-049",
+    "WEB-050"
    ],
    "transitions": [
     {
-     "to": "WEB-004",
-     "trigger": "Opens a product and decides",
-     "provenance": "flow F01 step 1→2"
-    },
-    {
      "to": "WEB-002",
      "trigger": "Event & Attraction Listing",
-     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher",
+     "carries": [
+      "eventId"
+     ]
     },
     {
      "to": "WEB-003",
@@ -80,7 +99,10 @@
     {
      "to": "WEB-041",
      "trigger": "Parking – Reserve & Pay",
-     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher",
+     "carries": [
+      "entitlementId"
+     ]
     },
     {
      "to": "WEB-042",
@@ -106,20 +128,137 @@
      "to": "WEB-046",
      "trigger": "In-Venue Notifications",
      "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-008",
+     "trigger": "Add-ons & Upsell",
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them, so the edge carries nothing and WEB-008 opens cold"
+    },
+    {
+     "to": "WEB-009",
+     "trigger": "Wishlist",
+     "provenance": "derived — WEB-009 declares entryState.params itemId and WEB-001 holds none of them, so the edge carries nothing and WEB-009 opens cold"
+    },
+    {
+     "to": "WEB-015",
+     "trigger": "Branded Queue / Waiting Room",
+     "provenance": "derived — WEB-015 declares entryState.params entryId and WEB-001 holds none of them, so the edge carries nothing and WEB-015 opens cold"
+    },
+    {
+     "to": "WEB-017",
+     "trigger": "My Account Dashboard",
+     "provenance": "derived — WEB-017 declares entryState.params deviceId, itemId, token and WEB-001 holds none of them, so the edge carries nothing and WEB-017 opens cold"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-001 holds entitlementId, orderId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-019",
+     "trigger": "Order History",
+     "provenance": "derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-001 holds none of them, so the edge carries nothing and WEB-019 opens cold"
+    },
+    {
+     "to": "WEB-021",
+     "trigger": "Wallet & Gift Cards",
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none of them, so the edge carries nothing and WEB-021 opens cold"
+    },
+    {
+     "to": "WEB-022",
+     "trigger": "Membership Plans",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — WEB-022 declares entryState.params productId and WEB-001 holds productId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-023",
+     "trigger": "Membership Management",
+     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-001 holds none of them, so the edge carries nothing and WEB-023 opens cold"
+    },
+    {
+     "to": "WEB-024",
+     "trigger": "Devices, Wishlist & Consent",
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-001 holds none of them, so the edge carries nothing and WEB-024 opens cold"
+    },
+    {
+     "to": "WEB-027",
+     "trigger": "Newsletter Subscription",
+     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId and WEB-001 holds none of them, so the edge carries nothing and WEB-027 opens cold"
+    },
+    {
+     "to": "WEB-032",
+     "trigger": "Offers & Promotions",
+     "provenance": "derived — WEB-032 declares entryState.params promotionId and WEB-001 holds none of them, so the edge carries nothing and WEB-032 opens cold"
+    },
+    {
+     "to": "WEB-033",
+     "trigger": "Shop",
+     "provenance": "derived — WEB-033 declares entryState.params outletId and WEB-001 holds none of them, so the edge carries nothing and WEB-033 opens cold"
+    },
+    {
+     "to": "WEB-034",
+     "trigger": "Lost & Found",
+     "provenance": "derived — WEB-034 declares entryState.params caseId and WEB-001 holds none of them, so the edge carries nothing and WEB-034 opens cold"
+    },
+    {
+     "to": "WEB-020",
+     "trigger": "Profile & Preferences",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-025",
+     "trigger": "Help Centre / FAQ",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-026",
+     "trigger": "Survey & Feedback",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-028",
+     "trigger": "Contact & Venue Information",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-029",
+     "trigger": "Error / Sold Out / Maintenance",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-049",
+     "trigger": "Book a trip (a transport venue)",
+     "provenance": "decided 29 September, rev 3 REV3-21: transport ticketing is in scope; the transport venue's home call to action opens the route and schedule screen"
+    },
+    {
+     "to": "WEB-050",
+     "trigger": "Plan your visit (header)",
+     "provenance": "decided 29 September 2026 (P29), MOB-6; web build Plan your visit"
+    },
+    {
+     "to": "WEB-004",
+     "trigger": "Opens a product and decides",
+     "provenance": "flow F01 step 1→2",
+     "carries": [
+      "productId"
+     ]
     }
+   ],
+   "entryFrom": [
+    "WEB-049"
    ]
   },
+  "notes": "**Venue selection added 28 September** (decided 28 September, audit R267): a venue picker on first open, remembered on the device, **Change venue** in the header, and a visit-day suggestion from the guest's ticket. The options come from `getTenantAppStatus.venues`, the tenant's active venues, public and cacheable.\n\n**Rev 3 (decided 29 September).** Category cards render as a grid or as one scrolling row per `BookingFlowConfig.cardLayout` (the retired `categoryDisplay` of 23SEP-18 is removed, W7). The event banner lists dates only when `BookingFlowConfig.eventBannerDates` is on (default off; 23SEP-19); the date picker always sits at the top of the booking step. The venue picked here (audit R267) is the venue whose booking-flow settings apply on every booking screen, and the booking screens' *Booking at* bar changes it (REV3-18). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11). The UI preset stays `BookingFlowConfig.preset` (CFG-1, no change); the search box in the banner is off by default (`searchInBanner` default false, CFG-6). The in-venue notifications link is live again: WEB-046 is back in the first release (GAP-C1, reversing audit R242).\n\n**29 September.** *Plan your visit* in the header opens WEB-050 full screen (MOB-6). W7: `categoryDisplay` is retired.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getTenantAppStatus` reads one of them — list, select, act",
   "purpose": "Show a guest what is on and give them one obvious way to start booking.",
-  "gaps": [
-   {
-    "operation": "getTenantConfig",
-    "why": "**1 declared operation reach no component on this screen**: getTenantConfig. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -128,8 +267,51 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Your venue",
+       "bindsTo": "TenantAppStatus.venues",
+       "operation": "getTenantAppStatus",
+       "notes": "**The guest picks a venue on first open** (decided 28 September, audit R267): shown before anything else when the device has no venue remembered, and remembered on the device after that. The chosen `venueId` is what every screen that declares `venueId` `from: session` reads, and it is sent as `?venueId=` to `listProducts`. The options are `getTenantAppStatus.venues` (venue id, name, city, today's opening hours), the tenant's active venues, returned without a session.",
+       "provenance": "contract white-label.yaml GET /tenant-config/status (TenantAppStatus.venues, audit R267)"
+      },
+      {
+       "kind": "banner",
+       "label": "Visiting today?",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.venueId",
+        "Entitlement.validFrom",
+        "Entitlement.validTo"
+       ],
+       "operation": "listMyEntitlements",
+       "notes": "**On a visit day the app suggests the ticket's venue** (decided 28 September, audit R267): for a signed-in guest, an entitlement from `listMyEntitlements` (`state=upcoming`) valid today at a venue other than the chosen one offers **Switch to that venue**; the guest decides, the app never switches by itself.",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      },
+      {
+       "kind": "banner",
+       "label": "Sold out or closed today",
+       "bindsTo": "TenantAppStatus.availabilityMessage",
+       "operation": "getTenantAppStatus",
+       "notes": "From `getTenantAppStatus.availability` (`open`, `soldOut`, `closed`) and `availabilityMessage` (decided 28 September, audit R073 (f)); nothing shows while it is `open`.",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every home landing",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -147,6 +329,18 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "banner",
+       "bindsTo": "TenantAppStatus.maintenanceMessage",
+       "notes": "Only when isInMaintenance. Tenant-branded, never a generic error page",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "bindsTo": "HomepageLayout.sections",
+       "notes": "Section order comes from tenant configuration (WLB-011), not from code. A section referencing a disabled module must not render at all",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -156,7 +350,57 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected home landing",
+       "label": "The selected product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.categoryId",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.isStockTracked"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant config",
+       "bindsTo": "TenantConfig",
+       "columns": [
+        "TenantConfig.isDraft",
+        "TenantConfig.brand",
+        "TenantConfig.appIcons",
+        "TenantConfig.bookingFlow",
+        "TenantConfig.theme",
+        "TenantConfig.fonts",
+        "TenantConfig.footer",
+        "TenantConfig.notificationBranding",
+        "TenantConfig.enabledPaymentMethods",
+        "TenantConfig.accessibility",
+        "TenantConfig.header",
+        "TenantConfig.navigation",
+        "TenantConfig.homepage",
+        "TenantConfig.modules",
+        "TenantConfig.features",
+        "TenantConfig.languages"
+       ],
+       "operation": "getTenantConfig",
+       "provenance": "contract white-label.yaml GET /tenant-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
        "columns": [
         "TenantAppStatus.isPublished",
@@ -191,24 +435,12 @@
        "label": "Sign in",
        "notes": "Becomes an account menu once authenticated",
        "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "banner",
-       "bindsTo": "TenantAppStatus.maintenanceMessage",
-       "notes": "Only when isInMaintenance. Tenant-branded, never a generic error page",
-       "provenance": "carried from the previous definition"
       },
       {
-       "kind": "cardList",
-       "bindsTo": "HomepageLayout.sections",
-       "notes": "Section order comes from tenant configuration (WLB-011), not from code. A section referencing a disabled module must not render at all",
-       "provenance": "carried from the previous definition"
+       "kind": "secondaryButton",
+       "label": "Change venue",
+       "notes": "Reopens the venue picker; the new choice replaces the remembered one on this device and every venue-scoped screen reloads for it (decided 28 September, audit R267).",
+       "provenance": "decided 28 September 2026, audit R267"
       }
      ]
     }
@@ -217,9 +449,9 @@
   "states": {
    "loading": "The home landing list.",
    "error": "Could not load. Names which read failed and leaves the home landing untouched.",
-   "emptyFirstRun": "No home landing yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the home landing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No home landing yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the home landing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -240,21 +472,78 @@
     "contract": "catalogue",
     "purpose": "List products",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "The guest's upcoming tickets, so a visit day can suggest the ticket's venue (decided 28 September, audit R267); only when signed in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCookieConsentRuntime",
+    "contract": "marketing-crm",
+    "purpose": "Cookie banner on first visit and what the tag loader may load",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordDeviceConsent",
+    "contract": "marketing-crm",
+    "purpose": "Accept all, reject non-essential or save preferences from the banner",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAnalyticsProviders",
+    "contract": "white-label",
+    "purpose": "Analytics tags to inject once their consent category is granted",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideRecommendations",
+    "contract": "ai",
+    "purpose": "Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordRecommendationEvents",
+    "contract": "ai",
+    "purpose": "Report impressions, clicks and declines of recommended items",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordStorefrontSessionEvents",
+    "contract": "white-label",
+    "purpose": "Runtime-shell beacon of hashed browsing behaviour for fraud prevention (every page of the session; bound on the home screen as the shell's entry)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
+   "coldEntry": "**A cold arrival is the ordinary case.** **The venue comes from the device** (decided 28 September, audit R267): on first open the guest picks one, it is remembered on the device and changeable from the header, and on a visit day the ticket's venue is suggested. Every guest screen that declares `venueId` `from: session` reads that remembered choice.",
    "preloaded": [
-    "TenantAppStatus.isPublished",
-    "TenantAppStatus.publishedVersion",
-    "TenantAppStatus.publishedAt",
-    "TenantAppStatus.draftVersion",
-    "TenantAppStatus.hasUnpublishedChanges"
+    "Product.id",
+    "Product.code",
+    "Product.name",
+    "Product.description",
+    "Product.kind"
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-001"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-001",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Header 'Discover' (default view on load)",
+    "differences": "No first-open venue picker remembered on the device and no 'Change venue' in the header (YAML R267); the prototype shows 'Browse by venue' tiles instead and switches venue from the Config drawer. Prototype adds a resume-booking card, a video 'Tonight in the city' panel, live queue times on cards and footer links to Contact / Accessibility / Service status. YAML emptyNoAccess/offline states are not drawn on Home (offline exists only as a demo tweak)."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -309,7 +598,8 @@
    "exitTo": [
     "WEB-001",
     "WEB-003",
-    "WEB-004"
+    "WEB-004",
+    "WEB-005"
    ],
    "transitions": [
     {
@@ -319,22 +609,23 @@
       "eventId",
       "productId"
      ],
-     "provenance": "derived — WEB-004 declares entryState.params eventId, productId, so an edge into it must carry them"
+     "provenance": "derived — WEB-004 declares entryState.params eventId, productId and WEB-002 holds eventId, productId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-005",
+     "trigger": "Book (the ticket counters open as a side panel on the listing)",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "decided 29 September, rev 3 23SEP-5: WEB-005 may render as a side panel on WEB-002 and WEB-004"
     }
    ]
   },
-  "notes": "**Cross-surface parity, 31 August**: added getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "notes": "**Cross-surface parity, 31 August**: added getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Categories: tiles from `listProductCategories`, then `listProducts?categoryId=`, or one flat list, per `BookingFlowConfig.ticketCategories` (REV3-16); tiles as a grid or a row per `cardLayout` (`categoryDisplay` retired, W7). **Info-only products** (`Product.guestListing` `infoOnly`) are listed with `notBookableLabel` (default *Info only / Not bookable online*) and open their details instead of adding to the basket; they are hidden when `BookingFlowConfig.showInfoOnly` is off (REV3-14). Each card shows the product's own primary image (`Product.media` `isPrimary`, `searchCatalogue` `primaryMedia`; 23SEP-4). **Book** opens the ticket counters (WEB-005) as a side panel on this listing rather than a new page (23SEP-5). Card layout, size and density are the enums `cardLayout` [stackedRows, splitRows, cardsAcross, posterCards], `cardSize` [compact, standard, large, extraLarge] and `density` [compact, standard, roomy] (DG-6). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant's values with that venue's `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).\n\n**29 September.** W4: Help me choose filters this list, with *Show everything*. W3: view-only products show Call sales / Email sales. W7: `categoryDisplay` retired.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act",
   "purpose": "Browse and filter everything bookable.",
-  "gaps": [
-   {
-    "operation": "listPerformances",
-    "why": "**2 declared operations reach no component on this screen**: listPerformances, searchCatalogue. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -343,8 +634,37 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "cardList",
+       "label": "Category tiles",
+       "bindsTo": "ProductCategory",
+       "notes": "Shown when `BookingFlowConfig.ticketCategories` is `categoryThenSubcategory` (the default): the category tiles (name, image) first, then that category's products through `listProducts?categoryId=`. `flatList` skips the tiles. Tiles lay out as a grid or one scrolling row per `BookingFlowConfig.cardLayout` (W7).",
+       "operation": "listProductCategories",
+       "provenance": "decided 29 September, rev 3 REV3-16, 23SEP-18"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every event attraction listing",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -362,38 +682,37 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected event attraction listing",
-       "bindsTo": "WaitTime",
+       "kind": "dataTable",
+       "label": "Every performance",
+       "bindsTo": "Performance",
        "columns": [
-        "WaitTime.queueId",
-        "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.status",
-        "WaitTime.waitMinutes",
-        "WaitTime.source",
-        "WaitTime.isStale",
-        "WaitTime.heightRequirementCm",
-        "WaitTime.zone",
-        "WaitTime.asOf"
+        "Performance.id",
+        "Performance.eventId",
+        "Performance.startsAt",
+        "Performance.endsAt",
+        "Performance.approvalRequestId",
+        "Performance.requiresApprovalToCancel",
+        "Performance.status",
+        "Performance.admissionRulesId",
+        "Performance.seatMapId"
        ],
-       "operation": "getWaitTimes",
-       "provenance": "contract queue.yaml GET /queues/wait-times"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "operation": "listPerformances",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every money",
+       "bindsTo": "Money",
+       "columns": [
+        "Money.amount",
+        "Money.currency",
+        "Money.scale"
+       ],
+       "operation": "searchCatalogue",
+       "provenance": "contract catalogue.yaml GET /search"
+      },
       {
        "kind": "searchField",
        "label": "Search events and attractions",
@@ -415,6 +734,79 @@
        "bindsTo": "Product[]",
        "notes": "Cursor pagination. Infinite scroll with an explicit load-more fallback",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "label": "Help me choose",
+       "operation": "getPublishedGuidedChoice",
+       "notes": "**The answers filter the list** (W4): sent as `guidedAnswerIds` to `listProducts` (and `searchCatalogue`), so web, app and kiosk filter the same way on the server.",
+       "provenance": "decided 29 September 2026 (P29), W4"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Show everything",
+       "operation": "listProducts",
+       "notes": "Clears the Help me choose filter (W4).",
+       "provenance": "decided 29 September 2026 (P29), W4"
+      },
+      {
+       "kind": "cardList",
+       "label": "Contact sales",
+       "bindsTo": "Product.salesContact",
+       "operation": "listProducts",
+       "notes": "**View-only products** (W3): Call sales / Email sales from `Product.salesContact` instead of Book.",
+       "provenance": "decided 29 September 2026 (P29), W3"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.categoryId",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.isStockTracked"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
       }
      ]
     }
@@ -423,9 +815,9 @@
   "states": {
    "loading": "The event attraction listing list.",
    "error": "Could not load. Names which read failed and leaves the event attraction listing untouched.",
-   "emptyFirstRun": "No event attraction listing yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the event attraction listing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No event attraction listing yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the event attraction listing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -445,13 +837,26 @@
     "operationId": "searchCatalogue",
     "contract": "catalogue",
     "purpose": "Find something by name",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getWaitTimes",
     "contract": "queue",
     "purpose": "Wait times across a venue",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductCategories",
+    "contract": "catalogue",
+    "purpose": "The category tiles (a tree: parentId, displayOrder, image)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPublishedGuidedChoice",
+    "contract": "white-label",
+    "purpose": "Help me choose: the questions whose answers filter this list (W4)",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), W4"
    }
   ],
   "entryState": {
@@ -459,6 +864,10 @@
     {
      "name": "eventId",
      "from": "deepLink"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `eventId`.",
@@ -471,9 +880,16 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-002"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-002",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "exact",
+    "view": "Header 'What's on'"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -534,34 +950,23 @@
     {
      "to": "WEB-002",
      "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — WEB-002 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — WEB-002 declares entryState.params eventId and WEB-003 holds none of them, so the edge carries nothing and WEB-002 opens cold"
     },
     {
      "to": "WEB-004",
      "trigger": "Attraction Details",
      "carries": [
-      "eventId",
       "productId"
      ],
-     "provenance": "derived — WEB-004 declares entryState.params eventId, productId, so an edge into it must carry them"
+     "provenance": "derived — WEB-004 declares entryState.params eventId, productId and WEB-003 holds productId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September, rev 3 REV3-14).** `searchCatalogue` now also returns info-only products, flagged (`guestListing` `infoOnly`): the result shows `notBookableLabel` (default *Info only / Not bookable online*) and opens the details (WEB-004), never Add to basket. Hidden when `BookingFlowConfig.showInfoOnly` is off. Each result shows its own primary image (23SEP-4).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`searchCatalogue` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Find something when the guest does not know what it is called.",
-  "gaps": [
-   {
-    "operation": "listProducts",
-    "why": "**1 declared operation reach no component on this screen**: listProducts. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -570,8 +975,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "searchCatalogue",
+       "notes": "Sends `?q=` to `searchCatalogue`.",
+       "provenance": "contract catalogue.yaml GET /search"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "searchCatalogue",
+       "notes": "Sends `?venueId=` to `searchCatalogue`.",
+       "provenance": "contract catalogue.yaml GET /search"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kind",
+       "operation": "searchCatalogue",
+       "notes": "Sends `?kind=` to `searchCatalogue`.",
+       "provenance": "contract catalogue.yaml GET /search"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every search results",
+       "label": "Every money",
        "bindsTo": "Money",
        "columns": [
         "Money.amount",
@@ -580,6 +1006,27 @@
        ],
        "operation": "searchCatalogue",
        "provenance": "contract catalogue.yaml GET /search"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
       }
      ]
     },
@@ -589,7 +1036,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected search results",
+       "label": "The selected money",
        "bindsTo": "Money",
        "columns": [
         "Money.amount",
@@ -606,9 +1053,9 @@
   "states": {
    "loading": "The search results list.",
    "error": "Could not load. Names which read failed and leaves the search results untouched.",
-   "emptyFirstRun": "No search results yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the search results are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No search results yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on q, venueId, kind and the search results are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Results come only from what was already loaded, with a note that newer items may exist."
   },
   "apis": [
@@ -616,7 +1063,7 @@
     "operationId": "searchCatalogue",
     "contract": "catalogue",
     "purpose": "Find something by name",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listProducts",
@@ -633,9 +1080,17 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-003"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-003",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Discover → search box in the hero (opens the search panel) → Enter lands on What's on filtered by the query",
+    "differences": "No separate results page: results render as a type-ahead overlay and then in the WEB-002 listing with the query applied. Recent and popular searches are prototype additions not in the YAML."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -686,42 +1141,76 @@
    "entryFrom": [
     "WEB-001",
     "WEB-002",
-    "WEB-003"
+    "WEB-003",
+    "WEB-047",
+    "WEB-048"
    ],
    "exitTo": [
     "WEB-001",
     "WEB-002",
     "WEB-003",
-    "WEB-005"
+    "WEB-005",
+    "WEB-006",
+    "WEB-007",
+    "WEB-047",
+    "WEB-048"
    ],
    "transitions": [
-    {
-     "to": "WEB-005",
-     "trigger": "Chooses ticket types and quantities",
-     "provenance": "flow F01 step 2→3"
-    },
     {
      "to": "WEB-002",
      "trigger": "Event & Attraction Listing",
      "carries": [
       "eventId"
      ],
-     "provenance": "derived — WEB-002 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — WEB-002 declares entryState.params eventId and WEB-004 holds eventId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-005",
+     "trigger": "Chooses ticket types and quantities",
+     "provenance": "flow F01 step 2→3",
+     "carries": [
+      "productId"
+     ]
+    },
+    {
+     "to": "WEB-006",
+     "trigger": "Book (a dated product: date first, then time, then tickets)",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "decided 29 September, rev 3 REV3-2: the dated flow runs date → time → ticket; flow F01 step 2→3"
+    },
+    {
+     "to": "WEB-007",
+     "trigger": "Book (a fixture with one on-sale performance opens straight on the seat map)",
+     "carries": [
+      "performanceId"
+     ],
+     "provenance": "decided 29 September, rev 3 23SEP-16 and REV3-4: WEB-006 is skipped when the event has exactly one on-sale performance"
+    },
+    {
+     "to": "WEB-047",
+     "trigger": "Book (a cabana, lounger or other spot placed on the venue map)",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "decided 29 September, rev 3 REV3-15 and GAP-C2"
+    },
+    {
+     "to": "WEB-048",
+     "trigger": "Book (a space sold by the hour, e.g. a meeting room)",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "decided 29 September, rev 3 REV3-13"
     }
    ]
   },
-  "notes": "**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "notes": "**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Ticket tags from `Product.displayTags` when `BookingFlowConfig.ticketTags` is on (23SEP-3); Read more opens on the product's own video or photo (`Product.media`, 23SEP-4). An info-only product shows its `notBookableLabel` and no Book button (REV3-14). **Book** opens the ticket counters as a side panel here (23SEP-5); a dated product goes to the date and time first (WEB-006, REV3-2); a fixture with a single on-sale performance opens straight on the seat map with the fixture as a strip at its top (WEB-007, 23SEP-16, REV3-4); a product placed on a venue map opens the map booking (WEB-047, REV3-15); a product sold by the hour opens the space booking (WEB-048, REV3-13). The event banner lists dates only when `BookingFlowConfig.eventBannerDates` is on (default off, 23SEP-19). Help me choose sits on the booking step (WEB-005), where the prototype draws it, not here (REV3-11).\n\n**29 September.** W3: view-only products show Call sales / Email sales instead of Book. M18-13: in single-event mode, a banner or video hero and only the next seven days, with a calendar for later dates (M17-08).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPerformances` reads the population and `getProduct` reads one of them — list, select, act",
   "purpose": "Decide whether to book this.",
-  "gaps": [
-   {
-    "operation": "getAvailability",
-    "why": "**2 declared operations reach no component on this screen**: getAvailability, getWaitTimes. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -730,8 +1219,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listPerformances",
+       "notes": "Sends `?from=` to `listPerformances`.",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      },
+      {
+       "kind": "datePicker",
+       "label": "To",
+       "operation": "listPerformances",
+       "notes": "Sends `?to=` to `listPerformances`.",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every attraction",
+       "label": "Every performance",
        "bindsTo": "Performance",
        "columns": [
         "Performance.id",
@@ -746,6 +1249,51 @@
        ],
        "operation": "listPerformances",
        "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Availability",
+       "operation": "getAvailability",
+       "notes": "From `getAvailability`, now a `PerformanceAvailabilityPage` (a Page of `PerformanceAvailability`, each with `startsAt`): `channelCapacityId`, `performanceId`, `startsAt`, `capacity`, `sold`, `leased`, `remaining`, `byChannel`. The time grid calls it once with `eventId`, `from` and `to` for every performance in the window (decided 29 September, rev 3 REV3-1), not once per tile.",
+       "provenance": "contract catalogue.yaml GET /availability",
+       "bindsTo": "PerformanceAvailability"
+      },
+      {
+       "kind": "banner",
+       "bindsTo": "Product.lifecycleState",
+       "notes": "Shown only when withdrawn — reachable via a stale link but no longer sellable. A silent 404 on a shared link is a bad guest experience",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "label": "Ticket tags",
+       "bindsTo": "Product.displayTags",
+       "notes": "Up to six tags (clock, height, free, calendar, id) with an icon by kind, e.g. *2 Hours*, *Min 1.10 m*, *Valid 90 days*. Where the product has none, derived on read from duration, validity and the height rule. Shown only when `BookingFlowConfig.ticketTags` is on (default on).",
+       "operation": "getProduct",
+       "provenance": "decided 29 September, rev 3 23SEP-3"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Photo and video",
+       "bindsTo": "Product.media",
+       "notes": "Read more opens on the primary video or photo (`Product.media`, `isPrimary`).",
+       "operation": "getProduct",
+       "provenance": "decided 29 September, rev 3 23SEP-4"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Call sales / Email sales",
+       "bindsTo": "Product.salesContact",
+       "operation": "getProduct",
+       "notes": "**View-only product** (W3): no Book; the sales contact from `Product.salesContact` (phone, email, note; the venue contact when absent).",
+       "provenance": "decided 29 September 2026 (P29), W3"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Next 7 days",
+       "operation": "listPerformances",
+       "notes": "**Single-event page** (M18-13): banner or video hero, a brief description, and a date strip of the next `dateStripDays` days (default 7) with a calendar icon for later dates (M17-08).",
+       "provenance": "decided 29 September 2026 (P29), M18-13, M17-08"
       }
      ]
     },
@@ -755,7 +1303,68 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected attraction",
+       "label": "The selected performance",
+       "bindsTo": "Performance",
+       "columns": [
+        "Performance.id",
+        "Performance.eventId",
+        "Performance.startsAt",
+        "Performance.endsAt",
+        "Performance.approvalRequestId",
+        "Performance.requiresApprovalToCancel",
+        "Performance.status",
+        "Performance.admissionRulesId",
+        "Performance.seatMapId"
+       ],
+       "operation": "listPerformances",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The product eligibility rule",
+       "bindsTo": "ProductEligibilityRule",
+       "columns": [
+        "ProductEligibilityRule.id",
+        "ProductEligibilityRule.productId",
+        "ProductEligibilityRule.minAgeYears",
+        "ProductEligibilityRule.maxAgeYears",
+        "ProductEligibilityRule.minHeightCm",
+        "ProductEligibilityRule.maxHeightCm",
+        "ProductEligibilityRule.heightBandsCm",
+        "ProductEligibilityRule.accompaniedBelowAge",
+        "ProductEligibilityRule.guardianSignatureAgeFrom",
+        "ProductEligibilityRule.guardianSignatureAgeTo",
+        "ProductEligibilityRule.waiverRequired",
+        "ProductEligibilityRule.swimAbility",
+        "ProductEligibilityRule.refundableIfIneligibleAtGate",
+        "ProductEligibilityRule.scopePath"
+       ],
+       "operation": "getProductEligibilityRule",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/eligibility-rule"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -770,25 +1379,13 @@
         "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo",
+        "Product.categoryId",
         "Product.lifecycleState",
         "Product.isSellable",
-        "Product.hasVariants",
-        "Product.variantCount"
+        "Product.isStockTracked"
        ],
        "operation": "getProduct",
        "provenance": "contract catalogue.yaml GET /products/{productId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "banner",
-       "bindsTo": "Product.lifecycleState",
-       "notes": "Shown only when withdrawn — reachable via a stale link but no longer sellable. A silent 404 on a shared link is a bad guest experience",
-       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -809,12 +1406,18 @@
   "states": {
    "loading": "The attraction list.",
    "error": "Could not load. Names which read failed and leaves the attraction untouched.",
-   "emptyFirstRun": "No attraction yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the attraction are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No attraction yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
+   {
+    "operationId": "getProductEligibilityRule",
+    "contract": "catalogue",
+    "purpose": "Age and height limits",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "getProduct",
     "contract": "catalogue",
@@ -853,19 +1456,330 @@
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "Product.id",
-    "Product.code",
-    "Product.name",
-    "Product.description",
-    "Product.kind"
+    "Performance.id",
+    "Performance.eventId",
+    "Performance.startsAt",
+    "Performance.endsAt",
+    "Performance.approvalRequestId"
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-004"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-004",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "partial",
+    "view": "Config → Marketing layer → 'Single-event page' on, then Book; or any product card → 'Read more' dialog; or a listing card's preview aside",
+    "differences": "No standing attraction-detail page in the default flow: details are a banner above the booking step (behind a Config toggle), a pop-up per product, or the listing preview. Eligibility rule display (getProductEligibilityRule) appears only as tags. Prototype labels it WEB-003b, not WEB-004."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-050",
+  "name": "Plan Your Visit",
+  "module": "Discovery & Browse",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "AI-35",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/plan-your-visit",
+   "component": "apps/guest-web/src/routes/PlanYourVisit.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "inferred": false,
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-010",
+    "WEB-001",
+    "WEB-004"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-010",
+     "trigger": "Book this plan",
+     "operation": "bookVisitPlan",
+     "carries": [
+      "cartId"
+     ],
+     "onFailure": [
+      {
+       "when": "an item sold out since the plan was made",
+       "to": "WEB-050",
+       "note": "Names it and offers a swap; the rest of the plan is kept."
+      }
+     ],
+     "provenance": "decided 29 September 2026 (P29), MOB-6; web build: Book this plan goes straight into booking"
+    },
+    {
+     "to": "WEB-004",
+     "trigger": "Opens an item on the plan",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "decided 29 September 2026 (P29), MOB-6"
+    },
+    {
+     "to": "WEB-001",
+     "trigger": "Back to tickets",
+     "provenance": "decided 29 September 2026 (P29), MOB-6"
+    }
+   ]
+  },
+  "notes": "**Added 29 September (P29)**: the 29 September web build has *Plan your visit* in the header, opening the planner full screen, and *Book this plan* goes straight into booking. The web twin of the Plan tab (GST-051 questions, GST-053 plan), binding the same planner operations (venue-map `generateVisitPlan`, `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives`, `bookVisitPlan`). Block A (29 September re-plan, superseding R187 and GAP-C3). Rules-based; the AI planner chat is app-only for now. Hidden when the venue turns module `visitPlanner` off.",
+  "density": "compact",
+  "pattern": "multiStepForm",
+  "patternReason": "The Visit Planner prototype: six questions, then the plan with Book this plan",
+  "purpose": "Plan a visit on the website: answer six questions, get a day-by-day plan, edit it, and book it in one go.",
+  "layout": {
+   "template": "fullscreen",
+   "regions": [
+    {
+     "name": "progress",
+     "slot": "progress",
+     "components": [
+      {
+       "kind": "progressIndicator",
+       "label": "Plan your visit · n of 6",
+       "notes": "Who, heights (skipped with no children), days (up to 3), pace, interests, lunch.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6; Visit Planner prototype"
+      }
+     ]
+    },
+    {
+     "name": "fields",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "numberField",
+       "label": "Adults and children",
+       "notes": "Adults 1-8 (12+), children 0-8 (3-11).",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "selectField",
+       "label": "How tall are the children?",
+       "operation": "listProducts",
+       "notes": "Per child; rides over the limit are left out (`ProductEligibilityRule`).",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Which days are you visiting?",
+       "notes": "Up to three.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "selectField",
+       "label": "How busy should each day be?",
+       "notes": "Packed, Balanced or Relaxed.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "What are you most interested in?",
+       "operation": "listProducts",
+       "notes": "Interest tags of the venue.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "selectField",
+       "label": "What would you like for lunch?",
+       "notes": "Cuisines of the outlets.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Make my plan",
+       "operation": "generateVisitPlan",
+       "notes": "Runs the rules planner.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      }
+     ]
+    },
+    {
+     "name": "review",
+     "slot": "review",
+     "components": [
+      {
+       "kind": "timeline",
+       "label": "Your plan",
+       "bindsTo": "VisitPlanItem",
+       "operation": "getVisitPlan",
+       "notes": "Day tabs; arrival, timed items and lunch.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Swap / + Add something",
+       "operation": "listVisitPlanAlternatives",
+       "notes": "Candidates that suit everyone in the group.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Remove / Undo changes",
+       "operation": "updateVisitPlan",
+       "notes": "Each change is a new version.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "toggle",
+       "label": "Add Fast Track",
+       "operation": "updateVisitPlan",
+       "notes": "Per guest, with the queuing time saved.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Estimated total",
+       "operation": "getVisitPlan",
+       "notes": "Estimate for the group; confirmed in booking.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      }
+     ]
+    },
+    {
+     "name": "submit",
+     "slot": "submit",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Book this plan",
+       "operation": "bookVisitPlan",
+       "notes": "Cart lines from the plan; opens the cart.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Change answers",
+       "notes": "Back to the questions.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The plan builds in place; the answers stay on screen.",
+   "error": "Could not build or load the plan. Names what failed; the answers are kept.",
+   "emptyFirstRun": "No plan yet: the first question is shown.",
+   "emptyNoResults": "Nothing suits the whole group on that day: says which answer ruled everything out and offers to change it.",
+   "emptyNoAccess": "A guest holds no permission. Anyone can build a plan; signing in is asked only to save it, and booking follows the cart's own sign-in gate.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+  },
+  "apis": [
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "Interests and height limits of what the planner may include",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
+   },
+   {
+    "operationId": "generateVisitPlan",
+    "contract": "venue-map",
+    "purpose": "Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
+   },
+   {
+    "operationId": "getVisitPlan",
+    "contract": "venue-map",
+    "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
+   },
+   {
+    "operationId": "updateVisitPlan",
+    "contract": "venue-map",
+    "purpose": "Swap, remove, add or undo: each change is a new version, so undo goes back one",
+    "trigger": "onAction",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
+   },
+   {
+    "operationId": "listVisitPlanAlternatives",
+    "contract": "venue-map",
+    "purpose": "Swap candidates for one item that suit everyone in the party",
+    "trigger": "onAction",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
+   },
+   {
+    "operationId": "bookVisitPlan",
+    "contract": "venue-map",
+    "purpose": "Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart",
+    "trigger": "onAction",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "planId",
+     "from": "deepLink",
+     "optional": true
+    },
+    {
+     "name": "itemId",
+     "from": "navigation",
+     "optional": true
+    }
+   ],
+   "coldEntry": "Starts at the first question; a saved-plan link opens the plan, or says it has passed and offers to plan again. `itemId` is the plan item the guest taps Swap on, picked on this screen."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-050",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Visit Planner.dc.html",
+    "rev": "Visit Planner (29 September build)",
+    "verified": "2026-09-29",
+    "match": "exact",
+    "view": "Header *Plan your visit* (web build), or the Visit Planner file: questions, then Your plan and Book this plan"
+   }
+  },
   "_platform": {
    "code": "P01",
    "audience": "guest",

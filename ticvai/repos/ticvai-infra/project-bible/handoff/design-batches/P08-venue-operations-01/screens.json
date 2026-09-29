@@ -1040,6 +1040,13 @@
      "getTableMap",
      "listFnbOrders"
     ]
+   },
+   {
+    "operationId": "setDeliveryLocationOutletMapping",
+    "contract": "fnb",
+    "purpose": "Assign serving outlets to delivery locations",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1052,6 +1059,10 @@
      "name": "actionId",
      "from": "deepLink",
      "optional": true
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `outletId`, `actionId`.",
@@ -3371,6 +3382,78 @@
        "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Priority and how it was set",
+       "bindsTo": "WorkOrder",
+       "columns": [
+        "WorkOrder.priority",
+        "WorkOrder.priorityScore",
+        "WorkOrder.prioritySource",
+        "WorkOrder.faultAssessment",
+        "WorkOrder.requiredQualificationCodes"
+       ],
+       "operation": "getWorkOrder",
+       "notes": "**The score and its source side by side** (decided 17 September, M17-01): *scored* (the venue policy), *asset override* or *manual*, so a supervisor sees why a fault is urgent.",
+       "provenance": "contract maintenance.yaml WorkOrder.priorityScore"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Suggested technicians",
+       "bindsTo": "WorkOrderAssigneeSuggestion",
+       "columns": [
+        "WorkOrderAssigneeSuggestion.rank",
+        "WorkOrderAssigneeSuggestion.name",
+        "WorkOrderAssigneeSuggestion.hasAllQualifications",
+        "WorkOrderAssigneeSuggestion.missingQualificationCodes",
+        "WorkOrderAssigneeSuggestion.onShift",
+        "WorkOrderAssigneeSuggestion.openWorkOrderCount"
+       ],
+       "operation": "suggestWorkOrderAssignee",
+       "notes": "**Smart assignment, confirmed by the maintenance head** (decided 17 September, M17-13). The ranking assigns nothing; *Assign* on a row sends its principal with `updateWorkOrder`.",
+       "provenance": "contract maintenance.yaml GET /work-orders/{workOrderId}/assignee-suggestions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Assign suggested technician",
+       "operation": "updateWorkOrder",
+       "notes": "Sends the chosen row's `principalId` as `assignedToPrincipalId` (M17-13).",
+       "provenance": "contract maintenance.yaml PATCH /work-orders/{workOrderId}"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Vendor requests",
+       "bindsTo": "VendorServiceRequest",
+       "columns": [
+        "VendorServiceRequest.supplierId",
+        "VendorServiceRequest.scope",
+        "VendorServiceRequest.status",
+        "VendorServiceRequest.vendorReference",
+        "VendorServiceRequest.quotedCost",
+        "VendorServiceRequest.scheduledVisitAt"
+       ],
+       "operation": "listVendorServiceRequests",
+       "notes": "Outside vendors engaged on this work order (decided 17 September, M17-13).",
+       "provenance": "contract maintenance.yaml GET /vendor-service-requests"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request a vendor",
+       "operation": "createVendorServiceRequest",
+       "provenance": "contract maintenance.yaml POST /vendor-service-requests"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Update vendor request",
+       "operation": "updateVendorServiceRequest",
+       "provenance": "contract maintenance.yaml PATCH /vendor-service-requests/{vendorServiceRequestId}"
+      }
+     ]
     }
    ]
   },
@@ -3382,6 +3465,40 @@
    "emptyNoAccess": "Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "suggestWorkOrderAssignee",
+    "contract": "maintenance",
+    "purpose": "Technicians ranked by skill, shift and load (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (P29)"
+   },
+   {
+    "operationId": "listVendorServiceRequests",
+    "contract": "maintenance",
+    "purpose": "Outside vendors on this work order (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (P29)"
+   },
+   {
+    "operationId": "createVendorServiceRequest",
+    "contract": "maintenance",
+    "purpose": "Engage an outside vendor (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (P29)",
+    "invalidates": [
+     "listVendorServiceRequests"
+    ]
+   },
+   {
+    "operationId": "updateVendorServiceRequest",
+    "contract": "maintenance",
+    "purpose": "Move a vendor request along (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (P29)",
+    "invalidates": [
+     "listVendorServiceRequests"
+    ]
+   },
    {
     "operationId": "listWorkOrders",
     "contract": "maintenance",
@@ -3464,6 +3581,10 @@
      "name": "workOrderId",
      "from": "deepLink",
      "optional": true
+    },
+    {
+     "name": "vendorServiceRequestId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Without `workOrderId` the list opens** — the ordinary arrival from BO-108 Venue Operations (decided 29 September, VM close-out). **A staff link opened cold resolves the thing or says plainly that it is gone.** A work order opened from an alert shows its current state; if it was closed or cancelled the screen says which and offers the list rather than an error. **The scope is resolved from the session, never from the link.** Arrives with `workOrderId`.",
@@ -3486,7 +3607,7 @@
     "id": "formCreateWorkOrder",
     "component": "modal",
     "trigger": "Raise work order",
-    "body": "**Collects what `createWorkOrder` sends before it is called.** Required: `id`, `title`, `venueId`, `priority`, `recordedAt`. Optional: `description`, `assetId`, `locationDescription`, `kind`, `categoryId`, `assignedToPrincipalId`, `dueAt`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createWorkOrder` sends before it is called.** Required: `id`, `title`, `venueId`, `recordedAt`. Optional: `description`, `assetId`, `locationDescription`, `kind`, `priority`, `categoryId`, `assignedToPrincipalId`, `dueAt`, `attachmentRefs`, `faultAssessment` and `requiredQualificationCodes`. **Priority is left empty to be scored** (M17-01): the asset's override, else the venue policy's score of the fault assessment; choosing one makes it manual. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreateWorkOrderRequest",
     "confirm": {
      "label": "Raise work order",
@@ -3504,7 +3625,9 @@
       "categoryId",
       "assignedToPrincipalId",
       "dueAt",
-      "attachmentRefs"
+      "attachmentRefs",
+      "faultAssessment",
+      "requiredQualificationCodes"
      ]
     },
     "provenance": "contract maintenance.yaml POST /work-orders"
@@ -4691,7 +4814,7 @@
     {
      "to": "BO-129",
      "trigger": "Software, Configuration & Version Management",
-     "provenance": "derived — BO-129 declares entryState.params profileId, rolloutId, workstationId and BO-108 holds none of them, so the edge carries nothing and BO-129 opens cold"
+     "provenance": "derived — BO-129 declares entryState.params firmwareId, profileId, rolloutId, workstationId and BO-108 holds none of them, so the edge carries nothing and BO-129 opens cold"
     },
     {
      "to": "BO-130",

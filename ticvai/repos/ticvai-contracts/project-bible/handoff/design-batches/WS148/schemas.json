@@ -1,0 +1,512 @@
+{
+ "PaymentFailoverPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.failover_policy",
+  "description": "Board 2.7. **A decline is final; a timeout is not. Retrying the first is how a guest gets charged twice.**\n",
+  "properties": {
+   "retryableOutcomes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "timeout",
+      "connectionRefused",
+      "providerError5xx",
+      "rateLimited",
+      "issuerUnavailable"
+     ]
+    },
+    "description": "**Explicit, rather than \"anything that was not a success\".**"
+   },
+   "maxAttempts": {
+    "type": "integer",
+    "default": 2
+   },
+   "backoffMs": {
+    "type": "integer",
+    "default": 500
+   },
+   "failoverToNextProvider": {
+    "type": "boolean",
+    "default": true
+   },
+   "circuitBreaker": {
+    "type": "object",
+    "description": "**A hundred tills each discovering an outage independently is a hundred queues.**\n",
+    "properties": {
+     "failureThresholdPercent": {
+      "type": "number",
+      "default": 25
+     },
+     "windowSeconds": {
+      "type": "integer",
+      "default": 60
+     },
+     "minimumSample": {
+      "type": "integer",
+      "default": 20
+     },
+     "openForSeconds": {
+      "type": "integer",
+      "default": 300
+     },
+     "alertOnOpen": {
+      "type": "boolean",
+      "default": true
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "PaymentProviderConnection": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.provider_connection",
+  "description": "Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped.**",
+  "required": [
+   "code",
+   "providerKind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "providerKind": {
+    "type": "string",
+    "enum": [
+     "gateway",
+     "psp",
+     "acquirer",
+     "walletProvider",
+     "bnplProvider"
+    ]
+   },
+   "environment": {
+    "type": "string",
+    "enum": [
+     "sandbox",
+     "production"
+    ]
+   },
+   "credentialFingerprint": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Written, never read back.** Enough to confirm which key is in use without the key being retrievable from a screen.\n"
+   },
+   "capabilities": {
+    "type": "object",
+    "properties": {
+     "methods": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "currencies": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "partialCapture": {
+      "type": "boolean",
+      "default": false
+     },
+     "multipleCapture": {
+      "type": "boolean",
+      "default": false
+     },
+     "refundWindowDays": {
+      "type": "integer",
+      "nullable": true
+     },
+     "tokenisation": {
+      "type": "boolean",
+      "default": false
+     },
+     "threeDSecure": {
+      "type": "boolean",
+      "default": false
+     },
+     "cardPresent": {
+      "type": "boolean",
+      "default": false
+     }
+    }
+   },
+   "merchantAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "testing",
+     "active",
+     "degraded",
+     "disabled"
+    ]
+   },
+   "lastTestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "PaymentRoutingRule": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.routing_rule",
+  "description": "Boards 2.5 and 2.6. **Priority and distribution are both needed.**",
+  "required": [
+   "code"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "priority": {
+    "type": "integer",
+    "default": 0
+   },
+   "conditions": {
+    "type": "object",
+    "properties": {
+     "methodIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "currencies": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "venueIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "channels": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "minimumAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "maximumAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "cardSchemes": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "cardIssuerCountries": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "targets": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "connectionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "sharePercent": {
+       "type": "integer",
+       "nullable": true
+      },
+      "rank": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "strategy": {
+    "type": "string",
+    "enum": [
+     "priorityOrder",
+     "loadShare",
+     "lowestCost",
+     "highestAuthRate"
+    ],
+    "default": "priorityOrder"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "ProviderEconomics": {
+  "type": "object",
+  "description": "Board 2.9. **Cost per transaction is a routing input.**",
+  "properties": {
+   "connectionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "providerName": {
+    "type": "string"
+   },
+   "transactions": {
+    "type": "integer"
+   },
+   "grossVolume": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "schemeFees": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "interchange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "acquirerMargin": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "fxSpread": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargebackCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "effectiveRatePercent": {
+    "type": "number"
+   }
+  }
+ },
+ "ProviderHealth": {
+  "type": "object",
+  "description": "Board 2.8. **Authorisation rate is the number, and it is not uptime.**",
+  "properties": {
+   "connectionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "providerName": {
+    "type": "string"
+   },
+   "transactions": {
+    "type": "integer"
+   },
+   "authorisationRate": {
+    "type": "number"
+   },
+   "baselineAuthorisationRate": {
+    "type": "number",
+    "nullable": true
+   },
+   "declineRate": {
+    "type": "number"
+   },
+   "errorRate": {
+    "type": "number"
+   },
+   "p50LatencyMs": {
+    "type": "integer"
+   },
+   "p95LatencyMs": {
+    "type": "integer"
+   },
+   "circuitState": {
+    "type": "string",
+    "enum": [
+     "closed",
+     "open",
+     "halfOpen"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "degraded",
+     "failing",
+     "disabled"
+    ]
+   }
+  }
+ },
+ "ProviderTestResult": {
+  "type": "object",
+  "description": "Board 3.10. **A provider configured and never tested fails on the first real transaction.**\n",
+  "properties": {
+   "connectionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "testedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "checks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "credentials",
+        "authorise",
+        "capture",
+        "refund",
+        "void",
+        "tokenise",
+        "webhook"
+       ]
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "latencyMs": {
+       "type": "integer",
+       "nullable": true
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "overall": {
+    "type": "string",
+    "enum": [
+     "pass",
+     "partial",
+     "fail"
+    ]
+   }
+  }
+ },
+ "RoutingContext": {
+  "type": "object",
+  "required": [
+   "amount"
+  ],
+  "properties": {
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "methodId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "type": "string",
+    "nullable": true
+   },
+   "cardScheme": {
+    "type": "string",
+    "nullable": true
+   },
+   "cardIssuerCountry": {
+    "type": "string",
+    "nullable": true
+   },
+   "cardPresent": {
+    "type": "boolean",
+    "default": false
+   },
+   "customerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "RoutingDecision": {
+  "type": "object",
+  "description": "Board 2.10. **Includes the rules that did not match**, because routing that is subtly wrong still succeeds.\n",
+  "properties": {
+   "chosenConnectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "chosenProviderName": {
+    "type": "string",
+    "nullable": true
+   },
+   "estimatedCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "trace": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "ruleCode": {
+       "type": "string"
+      },
+      "matched": {
+       "type": "boolean"
+      },
+      "skippedBecause": {
+       "type": "string",
+       "nullable": true
+      },
+      "candidateConnectionId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "fallbackChain": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ }
+}

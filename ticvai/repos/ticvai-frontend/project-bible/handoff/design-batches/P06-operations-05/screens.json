@@ -29,18 +29,12 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-048 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-048 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     }
    ]
   },
@@ -49,13 +43,6 @@
   "pattern": "listDetail",
   "patternReason": "`listInspectionTemplates` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Confirm a gate is fit to open before the first guest reaches it.",
-  "gaps": [
-   {
-    "operation": "listInspections",
-    "why": "**1 declared operation reach no component on this screen**: listInspections. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -65,7 +52,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every opening checklist",
+       "label": "Every inspection template",
        "bindsTo": "InspectionTemplate",
        "columns": [
         "InspectionTemplate.id",
@@ -80,6 +67,27 @@
        ],
        "operation": "listInspectionTemplates",
        "provenance": "contract maintenance.yaml GET /inspection-templates"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every inspection",
+       "bindsTo": "Inspection",
+       "columns": [
+        "Inspection.id",
+        "Inspection.templateId",
+        "Inspection.templateName",
+        "Inspection.venueId",
+        "Inspection.assetId",
+        "Inspection.outcome",
+        "Inspection.failedItemCount",
+        "Inspection.failedSafetyCriticalCount",
+        "Inspection.performedByPrincipalId",
+        "Inspection.performedAt",
+        "Inspection.recordedAt",
+        "Inspection.syncedAt"
+       ],
+       "operation": "listInspections",
+       "provenance": "contract maintenance.yaml GET /inspections"
       }
      ]
     },
@@ -89,7 +97,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected opening checklist",
+       "label": "The selected inspection template",
        "bindsTo": "InspectionTemplate",
        "columns": [
         "InspectionTemplate.id",
@@ -113,48 +121,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Submit",
+       "label": "Submit inspection",
        "operation": "submitInspection",
        "provenance": "contract maintenance.yaml POST /inspections"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create inspection template",
        "operation": "createInspectionTemplate",
        "provenance": "contract maintenance.yaml POST /inspection-templates"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listInspectionTemplates",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "submitInspection",
-       "label": "Submit inspection",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "submitInspection",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -163,9 +138,9 @@
   "states": {
    "loading": "The opening checklist list.",
    "error": "Could not load. Names which read failed and leaves the opening checklist untouched.",
-   "emptyFirstRun": "No opening checklist yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the opening checklist are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No opening checklist yet. Offers Submit inspection (`submitInspection`).",
+   "emptyNoResults": "Never shown: `listInspectionTemplates` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `INSPECTION_VIEW`, which `listInspectionTemplates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Works from the cached template. Completions queue"
   },
   "apis": [
@@ -215,6 +190,59 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-048"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSubmitInspection",
+    "component": "modal",
+    "trigger": "Submit inspection",
+    "body": "**Collects what `submitInspection` sends before it is called.** Required: `id`, `templateId`, `venueId`, `responses`, `recordedAt`. Optional: `assetId`, `signatureRef`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SubmitInspectionRequest",
+    "confirm": {
+     "label": "Submit inspection",
+     "operation": "submitInspection"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "templateId",
+      "venueId",
+      "responses",
+      "recordedAt",
+      "assetId",
+      "signatureRef"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /inspections"
+   },
+   {
+    "id": "formCreateInspectionTemplate",
+    "component": "modal",
+    "trigger": "Create inspection template",
+    "body": "**Collects what `createInspectionTemplate` sends before it is called.** Required: `id`, `code`, `name`, `items`. Optional: `instructions`, `venueId`, `appliesToAssetCategoryId`, `frequency`, `retentionYears`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "InspectionTemplate",
+    "confirm": {
+     "label": "Create inspection template",
+     "operation": "createInspectionTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "items",
+      "instructions",
+      "venueId",
+      "appliesToAssetCategoryId",
+      "frequency",
+      "retentionYears",
+      "isActive"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /inspection-templates"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -253,7 +281,8 @@
    "exitTo": [
     "EMP-001",
     "EMP-002",
-    "EMP-003"
+    "EMP-003",
+    "EMP-050"
    ],
    "inferred": false,
    "entryFrom": [
@@ -265,27 +294,22 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-047 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-047 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-047 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+    },
+    {
+     "to": "EMP-050",
+     "trigger": "Post-incident restore",
+     "provenance": "derived — EMP-050 declares entryState.params incidentId and EMP-047 holds none of them, so the edge carries nothing and EMP-050 opens cold"
     }
    ]
   },
@@ -302,8 +326,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "toggle",
+       "label": "Unacknowledged only",
+       "operation": "listAnnouncements",
+       "notes": "Sends `?unacknowledgedOnly=` to `listAnnouncements`.",
+       "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every emergency mode",
+       "label": "Every announcement",
        "bindsTo": "Announcement",
        "columns": [
         "Announcement.id",
@@ -321,6 +352,12 @@
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishAnnouncement",
+       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -330,7 +367,28 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected emergency mode",
+       "label": "The selected announcement",
+       "bindsTo": "Announcement",
+       "columns": [
+        "Announcement.id",
+        "Announcement.title",
+        "Announcement.body",
+        "Announcement.kind",
+        "Announcement.venueIds",
+        "Announcement.departmentIds",
+        "Announcement.roleIds",
+        "Announcement.requiresAcknowledgement",
+        "Announcement.expiresAt",
+        "Announcement.publishedByPrincipalId",
+        "Announcement.publishedAt",
+        "Announcement.locale"
+       ],
+       "operation": "listAnnouncements",
+       "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The announcement reach",
        "bindsTo": "AnnouncementReach",
        "columns": [
         "AnnouncementReach.announcementId",
@@ -350,15 +408,16 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Acknowledge",
+       "label": "Acknowledge announcement",
        "operation": "acknowledgeAnnouncement",
        "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
       },
       {
        "kind": "secondaryButton",
-       "label": "Publish",
+       "label": "Publish announcement",
        "operation": "publishAnnouncement",
-       "provenance": "contract workforce.yaml POST /announcements"
+       "provenance": "contract workforce.yaml POST /announcements",
+       "notes": "Kind `emergency` needs ANNOUNCEMENT_EMERGENCY, not ANNOUNCEMENT_PUBLISH; without it the emergency kind is not offered and a publish is refused 403 `emergency-permission-required` (decided 28 September, audit R091 (1))."
       },
       {
        "kind": "publishGate",
@@ -367,47 +426,15 @@
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAnnouncements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "acknowledgeAnnouncement",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishAnnouncement",
-       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The emergency mode list.",
    "error": "Could not load. Names which read failed and leaves the emergency mode untouched.",
-   "emptyFirstRun": "No emergency mode yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the emergency mode are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No emergency mode yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on unacknowledgedOnly and the emergency mode are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Fully offline by design"
   },
   "apis": [
@@ -430,7 +457,7 @@
     "operationId": "getAnnouncementReach",
     "contract": "workforce",
     "purpose": "Who has acknowledged, and who has not",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "publishAnnouncement",
@@ -451,11 +478,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
    "preloaded": [
-    "AnnouncementReach.announcementId",
-    "AnnouncementReach.targeted",
-    "AnnouncementReach.delivered",
-    "AnnouncementReach.acknowledged",
-    "AnnouncementReach.outstanding"
+    "Announcement.id",
+    "Announcement.title",
+    "Announcement.body",
+    "Announcement.kind",
+    "Announcement.venueIds"
    ]
   },
   "wireframe": {
@@ -464,6 +491,37 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-047"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPublishAnnouncement",
+    "component": "modal",
+    "trigger": "Publish announcement",
+    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY** (audit R091 (1)). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Announcement",
+    "confirm": {
+     "label": "Publish announcement",
+     "operation": "publishAnnouncement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "title",
+      "body",
+      "kind",
+      "publishedAt",
+      "id",
+      "venueIds",
+      "departmentIds",
+      "roleIds",
+      "requiresAcknowledgement",
+      "expiresAt",
+      "publishedByPrincipalId",
+      "locale"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /announcements"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -520,27 +578,20 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-050 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-050 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
      "carries": [
-      "incidentId",
-      "shiftId"
+      "incidentId"
      ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-050 holds incidentId, so an edge into it carries them"
     }
    ]
   },
@@ -557,8 +608,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listIncidents",
+       "notes": "Sends `?severity=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listIncidents",
+       "notes": "Sends `?status=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is reportable",
+       "operation": "listIncidents",
+       "notes": "Sends `?isReportable=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every post-incident restore",
+       "label": "Every incident",
        "bindsTo": "Incident",
        "columns": [
         "Incident.id",
@@ -585,7 +657,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected post-incident restore",
+       "label": "The selected incident",
+       "bindsTo": "Incident",
+       "columns": [
+        "Incident.id",
+        "Incident.incidentNumber",
+        "Incident.kind",
+        "Incident.severity",
+        "Incident.status",
+        "Incident.venueId",
+        "Incident.assetId",
+        "Incident.locationDescription",
+        "Incident.isReportable",
+        "Incident.notificationDueAt",
+        "Incident.notifiedAt",
+        "Incident.assignedToPrincipalId",
+        "Incident.reportedByPrincipalId",
+        "Incident.correctiveWorkOrderId",
+        "Incident.occurredAt",
+        "Incident.recordedAt"
+       ],
+       "operation": "listIncidents",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The incident",
        "bindsTo": "IncidentDetail",
        "columns": [
         "IncidentDetail.id",
@@ -616,41 +713,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Record",
+       "label": "Record authority notification",
        "operation": "recordAuthorityNotification",
        "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save incident",
        "operation": "updateIncident",
        "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listIncidents",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "recordAuthorityNotification",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -659,9 +730,9 @@
   "states": {
    "loading": "The post-incident restore list.",
    "error": "Could not load. Names which read failed and leaves the post-incident restore untouched.",
-   "emptyFirstRun": "No post-incident restore yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the post-incident restore are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No post-incident restore yet. Offers Record authority notification (`recordAuthorityNotification`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on severity, status, isReportable and the post-incident restore are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works offline by design.** Post-incident restore is exactly when the network is worst"
   },
   "apis": [
@@ -675,7 +746,7 @@
     "operationId": "getIncident",
     "contract": "maintenance",
     "purpose": "Read an incident",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "recordAuthorityNotification",
@@ -705,11 +776,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `incidentId`.",
    "preloaded": [
-    "IncidentDetail.id",
-    "IncidentDetail.incidentNumber",
-    "IncidentDetail.kind",
-    "IncidentDetail.severity",
-    "IncidentDetail.status"
+    "Incident.id",
+    "Incident.incidentNumber",
+    "Incident.kind",
+    "Incident.severity",
+    "Incident.status"
    ]
   },
   "wireframe": {
@@ -718,6 +789,53 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-050"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRecordAuthorityNotification",
+    "component": "modal",
+    "trigger": "Record authority notification",
+    "body": "**Collects what `recordAuthorityNotification` sends before it is called.** Required: `authority`, `notifiedAt`. Optional: `reference`, `notifiedByPrincipalId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record authority notification",
+     "operation": "recordAuthorityNotification"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "authority",
+      "notifiedAt",
+      "reference",
+      "notifiedByPrincipalId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
+   },
+   {
+    "id": "formUpdateIncident",
+    "component": "modal",
+    "trigger": "Save incident",
+    "body": "**Collects what `updateIncident` sends before it is called.** Nothing in the body is required. Optional: `status`, `severity`, `assignedToPrincipalId`, `investigationNote`, `rootCause`, `correctiveActions`, `correctiveWorkOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save incident",
+     "operation": "updateIncident"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "severity",
+      "assignedToPrincipalId",
+      "investigationNote",
+      "rootCause",
+      "correctiveActions",
+      "correctiveWorkOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -767,27 +885,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-045 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-045 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-045 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -808,14 +916,7 @@
    "regions": [
     {
      "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -823,8 +924,6 @@
    "loading": "—",
    "error": "—",
    "emptyFirstRun": "—",
-   "emptyNoResults": "The filter narrowed it and the arabic rtl are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Fully offline.** Direction is a device setting, not a server one"
   },
   "apis": [],
@@ -883,27 +982,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-046 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-046 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-046 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -936,20 +1025,13 @@
     },
     {
      "name": "contentBody",
-     "slot": "carried",
      "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "logout",
-       "provenance": "carried from the previous definition"
+       "impliedBy": "logout"
       }
      ]
     }
@@ -959,7 +1041,6 @@
    "loading": "Closing the session",
    "error": "**Sign-out with a pending journal warns rather than blocks.** A steward handing over a device must not be trapped by a failed sync",
    "emptyFirstRun": "—",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Signs out locally and the journal stays on the device for the next steward"
   },
   "apis": [
@@ -1026,27 +1107,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-049 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-049 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-049 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -1063,8 +1134,43 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Access point id",
+       "operation": "listScans",
+       "notes": "Sends `?accessPointId=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "textField",
+       "label": "Ticket id",
+       "operation": "listScans",
+       "notes": "Sends `?ticketId=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "textField",
+       "label": "Outcome",
+       "operation": "listScans",
+       "notes": "Sends `?outcome=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded from",
+       "operation": "listScans",
+       "notes": "Sends `?recordedFrom=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Recorded to",
+       "operation": "listScans",
+       "notes": "Sends `?recordedTo=` to `listScans`.",
+       "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every hand over the",
+       "label": "Every scan event",
        "bindsTo": "ScanEvent",
        "columns": [
         "ScanEvent.id",
@@ -1078,10 +1184,17 @@
         "ScanEvent.direction",
         "ScanEvent.operatorPrincipalId",
         "ScanEvent.deviceId",
-        "ScanEvent.overriddenByPrincipalId"
+        "ScanEvent.overridesScanId"
        ],
        "operation": "listScans",
        "provenance": "contract access.yaml GET /access/scans"
+      },
+      {
+       "kind": "scanTarget",
+       "derived": true,
+       "impliedBy": "listScans",
+       "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1091,7 +1204,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected hand over the",
+       "label": "The selected scan event",
        "bindsTo": "ScanEvent",
        "columns": [
         "ScanEvent.id",
@@ -1105,7 +1218,7 @@
         "ScanEvent.direction",
         "ScanEvent.operatorPrincipalId",
         "ScanEvent.deviceId",
-        "ScanEvent.overriddenByPrincipalId",
+        "ScanEvent.overridesScanId",
         "ScanEvent.overrideReason",
         "ScanEvent.recordedAt",
         "ScanEvent.syncedAt"
@@ -1121,35 +1234,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Sync",
+       "label": "Sync scans",
        "operation": "syncScans",
        "provenance": "contract access.yaml POST /access/scans"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "scanTarget",
-       "derived": true,
-       "impliedBy": "listScans",
-       "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "syncScans",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1158,9 +1245,9 @@
   "states": {
    "loading": "The hand over the list.",
    "error": "Could not load. Names which read failed and leaves the hand over the untouched.",
-   "emptyFirstRun": "No hand over the yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the hand over the are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No hand over the yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the hand over the are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The point of the screen.** It exists because the journal outlives the shift"
   },
   "apis": [
@@ -1195,6 +1282,26 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-049"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSyncScans",
+    "component": "modal",
+    "trigger": "Sync scans",
+    "body": "**Collects what `syncScans` sends before it is called.** Required: `deviceId`, `scans`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Sync scans",
+     "operation": "syncScans"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "deviceId",
+      "scans"
+     ]
+    },
+    "provenance": "contract access.yaml POST /access/scans"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",

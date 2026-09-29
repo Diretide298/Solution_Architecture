@@ -1,6 +1,6 @@
 # P02-in-venue-services-01 — P02 · In-venue Services
 
-**10 screens · 28 operations · 40 schemas · 7 permissions**
+**10 screens · 32 operations · 74 schemas · 7 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,9 +48,9 @@ convincingly. It is never a caption.
 ## Rules that are not style preferences
 
 - **Every control that can be refused must be gated.** 7 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, ORDER_MODIFY, PRODUCT_VIEW, QUEUE_VIEW, RESOURCE_BOOK, RESOURCE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
+  `ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PARKING_CONFIGURE, PRODUCT_VIEW, QUEUE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **8 of these operations work offline**: getTenantAppStatus, getVenueMap, getVenueMapGraph, getWaitTimes, joinRestaurantWaitlist, listParkingFacilities, listProducts, listQueues
+- **10 of these operations work offline**: createPayment, getOrder, getTenantAppStatus, getVenueMap, getVenueMapGraph, getWaitTimes, joinRestaurantWaitlist, listParkingFacilities
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -64,15 +64,15 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `GST-021` | Interactive Map | listDetail | 4 | 0 | — |
 | `GST-022` | Attraction Wait Times | statusTracker | 1 | 0 | — |
-| `GST-023` | Virtual Queue | statusTracker | 5 | 0 | — |
-| `GST-024` | F&B – Browse & Order | listDetail | 8 | 0 | — |
-| `GST-025` | F&B – Order Tracking | statusTracker | 3 | 0 | — |
-| `GST-027` | Parking – Reserve & Pay | listDetail | 3 | 0 | — |
+| `GST-023` | Virtual Queue | statusTracker | 5 | 1 | — |
+| `GST-024` | F&B – Browse & Order | listDetail | 10 | 3 | — |
+| `GST-025` | F&B – Order Tracking | statusTracker | 3 | 1 | — |
+| `GST-027` | Parking – Reserve & Pay | listDetail | 5 | 2 | — |
 | `GST-028` | Parking – Reservation Confirmed | listDetail | 2 | 0 | — |
-| `GST-029` | Venue Info & Services | listDetail | 2 | 0 | — |
-| `GST-038` | Digital Companion Mode | listDetail | 3 | 0 | — |
-| `GST-070` | Reserve a Table or Cabana | statusTracker | 7 | 0 | — |
+| `GST-029` | Venue Info & Services | listDetail | 3 | 0 | — |
+| `GST-038` | At the Venue | listDetail | 3 | 0 | — |
+| `GST-070` | Reserve a Table | form | 7 | 5 | — |
 
 ## Thin screens in this batch
 
-**GST-022, GST-023, GST-025, GST-028, GST-029, GST-038 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-022, GST-025 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

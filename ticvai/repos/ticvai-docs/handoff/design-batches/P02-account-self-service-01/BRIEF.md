@@ -1,6 +1,6 @@
 # P02-account-self-service-01 — P02 · Account & Self-Service (1 of 2)
 
-**10 screens · 38 operations · 29 schemas · 4 permissions**
+**10 screens · 46 operations · 48 schemas · 6 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, LEDGER_POST, LEDGER_VIEW, ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **5 of these operations work offline**: getEntitlement, getGuestSession, getOrder, listMyEntitlements, listOrders
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -62,17 +62,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-012` | My Tickets | listDetail | 6 | 0 | — |
-| `GST-013` | Ticket Details | statusTracker | 4 | 0 | — |
-| `GST-018` | Add to Calendar / Reminders | listDetail | 3 | 0 | — |
-| `GST-019` | Order History | listDetail | 4 | 0 | — |
-| `GST-020` | Saved Items / Wishlist | statusTracker | 3 | 1 | — |
-| `GST-039` | Profile | configEditor | 2 | 0 | — |
-| `GST-042` | Simple Registration & OTP | listDetail | 18 | 1 | — |
+| `GST-012` | My Tickets | listDetail | 6 | 1 | — |
+| `GST-013` | Ticket Details | statusTracker | 5 | 2 | — |
+| `GST-018` | Add to Calendar / Reminders | listDetail | 6 | 2 | — |
+| `GST-019` | Order History | listDetail | 9 | 1 | — |
+| `GST-020` | Saved Items / Wishlist | statusTracker | 3 | 2 | — |
+| `GST-039` | Profile | configEditor | 2 | 1 | — |
+| `GST-042` | Simple Registration & OTP | form | 13 | 8 | — |
 | `GST-045` | Ticket Delivery & Sharing | configEditor | 1 | 0 | — |
-| `GST-055` | Dynamic QR Ticket | configEditor | 1 | 0 | — |
-| `GST-066` | Privacy & My Data | statusTracker | 5 | 1 | — |
+| `GST-055` | Dynamic QR Ticket | configEditor | 5 | 1 | — |
+| `GST-066` | Privacy & My Data | statusTracker | 9 | 3 | — |
 
 ## Thin screens in this batch
 
-**GST-012, GST-013, GST-018, GST-019, GST-020, GST-045, GST-055 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-020 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

@@ -1,6 +1,6 @@
-# P13-white-label-02 — P13 · White Label (2 of 2)
+# P13-white-label-02 — P13 · White Label (2 of 3)
 
-**10 screens · 35 operations · 42 schemas · 9 permissions**
+**10 screens · 40 operations · 64 schemas · 10 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 9 permissions apply here:
-  `GUEST_MANAGE, GUEST_VIEW, MARKETING_MANAGE, PRODUCT_VIEW, ROLE_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH, USER_MANAGE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 10 permissions apply here:
+  `AI_USE, GUEST_MANAGE, GUEST_VIEW, MARKETING_MANAGE, PRODUCT_VIEW, ROLE_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH, USER_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -63,13 +63,13 @@ convincingly. It is never a caption.
 | `CMS-013` | SEO & Metadata | configEditor | 1 | 0 | — |
 | `CMS-011` | Translations | configEditor | 1 | 0 | — |
 | `CMS-012` | RTL Preview | statusTracker | 2 | 0 | — |
-| `CMS-014` | Publishing Workflow | statusTracker | 3 | 1 | — |
+| `CMS-014` | Publishing Workflow | statusTracker | 4 | 1 | — |
 | `CMS-015` | Version History | listDetail | 3 | 1 | — |
-| `CMS-016` | Site Settings | statusTracker | 5 | 1 | — |
+| `CMS-016` | Site Settings | statusTracker | 6 | 1 | — |
 | `CMS-017` | Domain & Certificate | listDetail | 4 | 1 | — |
 | `CMS-018` | Consent & Legal | listDetail | 8 | 4 | — |
 | `CMS-019` | User Access | listDetail | 2 | 0 | — |
-| `CMS-101` | Help Me Choose | listDetail | 9 | 3 | — |
+| `CMS-101` | Help Me Choose | listDetail | 12 | 3 | — |
 
 ## Thin screens in this batch
 
@@ -580,7 +580,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "CMS-001",
     "CMS-002",
     "CMS-003",
-    "CMS-015"
+    "CMS-015",
+    "CMS-103",
+    "CMS-104",
+    "CMS-102"
    ],
    "inferred": true,
    "fromFlows": true,
@@ -604,6 +607,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "derived — CMS-003 declares entryState.params bannerId, pageId, policyKind, version and CMS-014 holds version, so an edge into it carries them"
     },
     {
+     "to": "CMS-103",
+     "trigger": "Fix a booking flow",
+     "provenance": "authored 29 September, W12 (an invalid flow blocks the publish)",
+     "carries": [
+      "bookingFlowId"
+     ]
+    },
+    {
+     "to": "CMS-104",
+     "trigger": "Build the mobile app",
+     "provenance": "authored 29 September, M24-08 (build-time changes reach guests with a store release)"
+    },
+    {
+     "to": "CMS-102",
+     "trigger": "Back to the Site Builder",
+     "provenance": "authored 29 September, W12 (step 7)"
+    },
+    {
      "to": "CMS-015",
      "trigger": "Rolls back when something is wrong",
      "provenance": "flow F22 step 5→6",
@@ -617,7 +638,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Move a change from draft to live, with someone accountable.",
+  "purpose": "Move a change from draft to live, with someone accountable (Site Builder step 7).",
   "layout": {
    "template": "detail",
    "regions": [
@@ -649,7 +670,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "publishGate",
        "impliedBy": "publishTenantConfig",
-       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate. **Booking flows publish here with the rest of the site (decided 29 September, W12)**: the gate lists each venue flow that changed, and an invalid one (`bookingFlowInvalid`) or a bookable kind with no flow (`bookingFlowMissing`) blocks the publish with a link to CMS-103.\n",
        "provenance": "carried from the previous definition"
       }
      ]
@@ -704,6 +725,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "App status and recent changes",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listBookingFlows",
+    "contract": "white-label",
+    "purpose": "The venue's flows and whether each is valid, for the gate (W12)",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
@@ -732,6 +759,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "provenance": "contract white-label.yaml POST /tenant-config/publish"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -996,7 +1031,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "CMS-013",
     "CMS-017",
     "CMS-018",
-    "CMS-101"
+    "CMS-101",
+    "CMS-103"
    ],
    "inferred": false,
    "entryFrom": [
@@ -1033,6 +1069,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds none of them, so the edge carries nothing and CMS-018 opens cold"
     },
     {
+     "to": "CMS-103",
+     "trigger": "Booking flows",
+     "provenance": "authored 29 September, W12 (flow-level settings and step order moved to CMS-103)",
+     "carries": [
+      "bookingFlowId"
+     ]
+    },
+    {
      "to": "CMS-101",
      "trigger": "Help me choose",
      "provenance": "authored 29 September, rev 3 REV3-11 — Help me choose sits on the booking page these settings shape, so it is set up from here"
@@ -1043,7 +1087,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getTenantConfig` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "The values the whole site inherits from, and the booking-flow settings each venue may override (decided 29 September, rev 3 CFG-11).",
+  "purpose": "The values the whole site inherits from, and the venue-wide booking settings each venue may override (decided 29 September, rev 3 CFG-11); the settings of one flow are on CMS-103 (W12).",
   "layout": {
    "template": "detail",
    "regions": [
@@ -1085,7 +1129,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "BookingFlowConfig.cartLayout",
         "BookingFlowConfig.cardLayout",
         "BookingFlowConfig.cardSize",
-        "BookingFlowConfig.extrasStep",
         "BookingFlowConfig.seatPicker",
         "BookingFlowConfig.mapView",
         "BookingFlowConfig.density",
@@ -1095,28 +1138,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "BookingFlowConfig.singleEventPage",
         "BookingFlowConfig.quantitiesOnAddOns",
         "BookingFlowConfig.cartSideInRtl",
-        "BookingFlowConfig.categoryDisplay",
         "BookingFlowConfig.eventBannerDates",
         "BookingFlowConfig.timesPerPage",
         "BookingFlowConfig.dayPartFilter",
         "BookingFlowConfig.dayPartBoundaries",
-        "BookingFlowConfig.performanceReveal",
-        "BookingFlowConfig.signInAt",
-        "BookingFlowConfig.seatEventDateMode",
         "BookingFlowConfig.seatViewPosition",
         "BookingFlowConfig.seatTimeBar",
         "BookingFlowConfig.ticketCategories",
         "BookingFlowConfig.ticketTags",
         "BookingFlowConfig.cardInfo",
-        "BookingFlowConfig.quickTour",
         "BookingFlowConfig.conciergeMascot",
         "BookingFlowConfig.showInfoOnly",
         "BookingFlowConfig.locationSwitcher",
-        "BookingFlowConfig.consentQuestionIds",
+        "BookingFlowConfig.guestContactFields",
+        "BookingFlowConfig.dateStripDays",
         "BookingFlowConfig.venueOverrides"
        ],
        "operation": "getBookingFlowConfig",
-       "notes": "**The rev 3 booking rules, each with its default** (decided 29 September, rev 3). `timesPerPage` 8, 12, 24 or all (24) and `dayPartFilter` (on), with `dayPartBoundaries` afternoon from 12:00 and evening from 17:00 in the venue time zone (REV3-1); `performanceReveal` date, then time, then tickets, or all at once (REV3-2); `signInAt` after add-ons or at payment (REV3-3); `seatEventDateMode` an inline step or a pop-up on the seat map (REV3-4); `seatViewPosition` bottom, right, left or top, web only (REV3-5); `seatTimeBar` (on, REV3-6); `cartLayout` gains `floatingIcon` and `cartSideInRtl` keeps the basket right or mirrors it (REV3-10); `showInfoOnly` (on, REV3-14); `ticketCategories` category then subcategory, or a flat list (REV3-16); `locationSwitcher` (REV3-18); `quickTour` (off, REV3-20); `ticketTags` (on, 23SEP-3); `cardInfo` (on, 23SEP-6); `categoryDisplay` grid or row strip (23SEP-18); `eventBannerDates` (off, 23SEP-19); `conciergeMascot` (on, CFG-5). `cardLayout`, `cardSize` and `density` are fixed lists now: stacked rows, split rows, cards across, poster cards; compact, standard, large, extra large; compact, standard, roomy (DG-6). **There is no swim-consent toggle and no F&B-modifier toggle**: a consent question is attached to the flow or the product (REV3-26), and modifiers show when an item has groups attached (REV3-9).",
+       "notes": "**Venue-wide booking settings only (decided 29 September, W12).** The settings that belong to one flow (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, the flow's consent questions) moved to each flow on CMS-103, and `categoryDisplay` is gone (W7, superseding 23SEP-18: `cardLayout` carries rows or grid). Here: `timesPerPage` and the day-part chips (REV3-1); `seatViewPosition` (REV3-5); `seatTimeBar` (REV3-6); `cartLayout` and `cartSideInRtl` (REV3-10); `showInfoOnly` (REV3-14); `ticketCategories` (REV3-16); `locationSwitcher` (REV3-18); `ticketTags` (23SEP-3); `cardInfo` (23SEP-6); `eventBannerDates` (23SEP-19); `conciergeMascot` (CFG-5); the card and density enums (DG-6); **`guestContactFields`**, what the guest-checkout pop-up asks: email only, + name or + mobile (W1); **`dateStripDays`**, the days on the date strip before the calendar icon, default 7 (M17-08).",
        "provenance": "contract white-label.yaml GET /tenant-config/booking-flow"
       },
       {
@@ -1137,14 +1176,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "operation": "getBookingFlowConfig",
        "notes": "**One row per venue that overrides anything** (decided 29 September, rev 3 CFG-11). The editor sets only the fields that differ; a field left empty inherits the tenant value, and clearing one removes it from the override. A venue that is not one of the tenant's active venues, or a second row for the same venue, is refused `400` and the row is marked. An override kept for a closed venue is shown greyed: it has no effect.",
        "provenance": "contract white-label.yaml GET /tenant-config/booking-flow"
-      },
-      {
-       "kind": "multiSelect",
-       "label": "Consent questions this booking flow asks",
-       "bindsTo": "BookingFlowConfig.consentQuestionIds",
-       "operation": "listConsentQuestions",
-       "notes": "**The questions every booking in this flow asks, whatever the product** (decided 29 September, rev 3 REV3-26), e.g. a water park's \"Are you able to swim?\". Options are the active questions from `listConsentQuestions`, written on CMS-018; a product's own questions are attached on BO-008. The guest is asked the union, each question once. Overridable per venue like every other setting here.",
-       "provenance": "contract marketing-crm.yaml GET /consent-questions"
       }
      ]
     },
@@ -1189,16 +1220,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "trigger": "onLoad"
    },
    {
-    "operationId": "listConsentQuestions",
-    "contract": "marketing-crm",
-    "purpose": "The venue's consent questions, to attach to the booking flow (rev 3 REV3-26)",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "listOrgUnits",
     "contract": "tenancy",
     "purpose": "The tenant's venues, for the per-venue override picker (rev 3 CFG-11)",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAnalyticsProviders",
+    "contract": "white-label",
+    "purpose": "Connected analytics platforms",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setAnalyticsProvider",
+    "contract": "white-label",
+    "purpose": "Connect or change an analytics platform",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1212,7 +1251,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formSetBookingFlowConfig",
     "component": "modal",
     "trigger": "Save booking flow config",
-    "body": "**Collects what `setBookingFlowConfig` sends before it is called.** Nothing in the body is required. Optional: `preset`, `stepIndicator`, `cartLayout`, `cardLayout`, `cardSize`, `extrasStep`, `seatPicker`, `mapView`, `density`, `embedMode`, `heroBanner`, `searchInBanner`, `singleEventPage`, `quantitiesOnAddOns`, the rev 3 booking rules on the panel above, `consentQuestionIds` and `venueOverrides` (decided 29 September, rev 3 CFG-11). **The body is the tenant settings plus every venue override**: saving a venue's override sends the whole configuration with that venue's row changed. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBookingFlowConfig` sends before it is called.** Nothing in the body is required. Optional: `preset`, `stepIndicator`, `cartLayout`, `cardLayout`, `cardSize`, `seatPicker`, `mapView`, `density`, `embedMode`, `heroBanner`, `searchInBanner`, `singleEventPage`, `quantitiesOnAddOns`, the venue-wide rev 3 booking rules on the panel above, `guestContactFields` (W1), `dateStripDays` (M17-08) and `venueOverrides` (decided 29 September, rev 3 CFG-11). **The body is the tenant settings plus every venue override**: saving a venue's override sends the whole configuration with that venue's row changed. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "BookingFlowConfig",
     "confirm": {
      "label": "Save booking flow config",
@@ -1226,7 +1265,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "cartLayout",
       "cardLayout",
       "cardSize",
-      "extrasStep",
       "seatPicker",
       "mapView",
       "density",
@@ -1236,24 +1274,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "singleEventPage",
       "quantitiesOnAddOns",
       "cartSideInRtl",
-      "categoryDisplay",
       "eventBannerDates",
       "timesPerPage",
       "dayPartFilter",
       "dayPartBoundaries",
-      "performanceReveal",
-      "signInAt",
-      "seatEventDateMode",
       "seatViewPosition",
       "seatTimeBar",
       "ticketCategories",
       "ticketTags",
       "cardInfo",
-      "quickTour",
       "conciergeMascot",
       "showInfoOnly",
       "locationSwitcher",
-      "consentQuestionIds",
+      "guestContactFields",
+      "dateStripDays",
       "venueOverrides"
      ]
     },
@@ -2134,10 +2168,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "entryFrom": [
-    "CMS-016"
+    "CMS-016",
+    "CMS-102"
    ],
    "exitTo": [
-    "CMS-016"
+    "CMS-016",
+    "CMS-102"
    ],
    "inferred": false,
    "notes": "**Reached from CMS-016 Site Settings**, beside the booking-flow settings, because Help me choose sits on the booking page those settings shape (decided 29 September, rev 3 REV3-11).",
@@ -2147,6 +2183,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Back to Site Settings",
      "provenance": "authored 29 September, rev 3 REV3-11",
      "back": true
+    },
+    {
+     "to": "CMS-102",
+     "trigger": "Back to the Site Builder",
+     "provenance": "authored 29 September, W12 (step 4)",
+     "back": true
     }
    ]
   },
@@ -2154,7 +2196,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listGuidedChoices` reads the venue's set-ups and the editor acts on one of them — list, select, act",
-  "purpose": "Set up a venue's Help me choose, review what the assistant suggests from the venue's products, preview it and publish it.",
+  "purpose": "Set up a venue's Help me choose so its answers filter the catalogue, review the question set the assistant proposes from the venue's products, preview the filtered list and publish it (Site Builder step 4).",
   "layout": {
    "template": "split",
    "regions": [
@@ -2220,6 +2262,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "GuidedChoice.name",
         "GuidedChoice.mode",
         "GuidedChoice.showBanner",
+        "GuidedChoice.behaviour",
+        "GuidedChoice.showEverything",
         "GuidedChoice.questions",
         "GuidedChoice.status",
         "GuidedChoice.source",
@@ -2228,13 +2272,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "GuidedChoice.publishedBy"
        ],
        "operation": "listGuidedChoices",
-       "notes": "**The editor.** `mode`: a button on the booking page, a pop-up on the guest's first arrival as well, or off (configured but not shown). `showBanner`: the dark banner under the products. One or two questions, two to four answers each: title, one-liner (140 characters), icon, badge (24 characters), target (a product, category, event or booking module, picked from `listProducts`, `listProductCategories` and `listEvents`) and the result card (title, body, image; absent fields fall back to the target's own). Every text in every tenant language.",
+       "notes": "**The editor.** `mode`: a button on the booking page, a pop-up on the guest's first arrival as well, or off (configured but not shown). `showBanner`: the dark banner under the products. One or two questions, two to four answers each: title, one-liner (140 characters), icon, badge (24 characters), target (a product, category, event or booking module, picked from `listProducts`, `listProductCategories` and `listEvents`) and the result card (title, body, image; absent fields fall back to the target's own). Every text in every tenant language.\n**Help me choose filters (decided 29 September, W4).** `behaviour` filter (default) or recommend; up to four questions, each of a kind: choice, yes/no, age, level or certification. **The filter builder** sets what each answer keeps: products, categories, segment tags, an age range, swimmers only or never, a certificate held or not; a target may also be a booking flow (`listBookingFlows`). An answer may pre-fill a consent question, which the guest still confirms. The \"Show everything\" link is on by default.",
        "provenance": "contract white-label.yaml GET /venues/{venueId}/guided-choices"
       },
       {
        "kind": "livePreview",
        "label": "Preview",
-       "notes": "**Renders the draft as a guest would meet it**: the button or pop-up, the banner, each question and the result card, in each language and in both directions. Drawn from the record in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up until Publish.",
+       "notes": "**Renders the draft as a guest would meet it**: the button or pop-up, the banner, each question and the result card, in each language and in both directions. Drawn from the record in hand; it calls nothing and publishes nothing, and guests keep seeing the published set-up until Publish. **Preview the filtered list**: for each combination of answers, the products left (read with `listProducts` and the answer's filter), so an answer that leaves nothing bookable shows before it is published (W4).",
        "provenance": "authored 29 September, rev 3 REV3-11"
       },
       {
@@ -2363,6 +2407,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Events an answer can open",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listBookingFlows",
+    "contract": "white-label",
+    "purpose": "The venue's flows an answer can open (target kind bookingFlow, W12)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "suggestGuidedChoice",
+    "contract": "ai",
+    "purpose": "Ask the assistant for a question set from product attributes (age and height rules, level tags, certifications); it lands here as a draft through white-label proposeGuidedChoice (W4)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getGuidedChoiceSuggestion",
+    "contract": "ai",
+    "purpose": "The reasons behind a Help me choose suggestion",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2373,6 +2437,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     },
     {
      "name": "guidedChoiceId",
+     "from": "navigation"
+    },
+    {
+     "name": "suggestionId",
      "from": "navigation"
     }
    ],
@@ -2580,6 +2648,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "BookingFlowConfig"
  },
+ "getGuidedChoiceSuggestion": {
+  "method": "GET",
+  "path": "/guided-choice-suggestions/{suggestionId}",
+  "contract": "ai",
+  "summary": "The reasons behind a Help me choose suggestion",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiGuidedChoiceSuggestion"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",
@@ -2611,6 +2692,64 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "TenantConfig"
+ },
+ "listAnalyticsProviders": {
+  "method": "GET",
+  "path": "/tenant-config/analytics-providers",
+  "contract": "white-label",
+  "summary": "The analytics platforms the storefront and app report to",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listBookingFlows": {
+  "method": "GET",
+  "path": "/venues/{venueId}/booking-flows",
+  "contract": "white-label",
+  "summary": "A venue's booking flows, in the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "flowTypeKey",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listConfigVersions": {
   "method": "GET",
@@ -2950,6 +3089,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -3063,6 +3207,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "TenantConfig"
  },
+ "setAnalyticsProvider": {
+  "method": "PUT",
+  "path": "/tenant-config/analytics-providers",
+  "contract": "white-label",
+  "summary": "Connect the storefront and app to an analytics platform",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "StorefrontAnalyticsProvider",
+  "responds": "StorefrontAnalyticsProvider"
+ },
  "setBookingFlowConfig": {
   "method": "PUT",
   "path": "/tenant-config/booking-flow",
@@ -3157,6 +3320,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "SeoMetadata",
   "responds": "SeoMetadata"
+ },
+ "suggestGuidedChoice": {
+  "method": "POST",
+  "path": "/venues/{venueId}/guided-choice-suggestions",
+  "contract": "ai",
+  "summary": "Suggest a Help me choose set-up from the venue's catalogue",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "unpublishGuidedChoice": {
   "method": "POST",
@@ -3294,6 +3476,144 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "AiGuidedChoiceSuggestion": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.guided_choice_suggestion",
+  "description": "**One Help me choose suggestion for a venue** (design 3.11, decided 29 September; C7 at autonomy \"suggest\"). Holds the reasons: the products read, the one or two attributes chosen, the split each makes, the answer mapping and where the wording came from. Its `id` is the `suggestionRef` on the white-label draft (`white-label.proposeGuidedChoice`). Nothing is ever published from here.",
+  "required": [
+   "venueId",
+   "trigger",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "trigger": {
+    "type": "string",
+    "enum": [
+     "productsUploaded",
+     "mappedProductWithdrawn",
+     "productsUncovered",
+     "manual"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "running",
+     "proposed",
+     "noSuggestion",
+     "failed",
+     "superseded"
+    ],
+    "readOnly": true
+   },
+   "productCount": {
+    "type": "integer",
+    "minimum": 0,
+    "readOnly": true
+   },
+   "questions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "attribute": {
+       "type": "string",
+       "description": "The catalogue attribute asked about: audience, level, minimum height or age, duration, price band, format, language."
+      },
+      "order": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "split": {
+       "type": "object",
+       "additionalProperties": true,
+       "description": "How evenly it divides the bookable products: products per answer."
+      },
+      "droppedBecause": {
+       "type": "string",
+       "nullable": true,
+       "description": "Set where an attribute was considered and dropped (an answer would leave nothing bookable)."
+      },
+      "answers": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "value": {
+          "type": "string"
+         },
+         "leadsTo": {
+          "type": "string",
+          "enum": [
+           "product",
+           "category",
+           "flow"
+          ]
+         },
+         "targetRef": {
+          "type": "string"
+         }
+        }
+       }
+      }
+     }
+    },
+    "readOnly": true,
+    "description": "The questions chosen, in the order asked. Deterministic: the same catalogue gives the same questions."
+   },
+   "wordingSource": {
+    "type": "string",
+    "enum": [
+     "model",
+     "attributeNames"
+    ],
+    "readOnly": true,
+    "description": "Where the text came from. `attributeNames` when no model was available: the rules alone still make a usable draft."
+   },
+   "modelVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "promptTemplateVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "guidedChoiceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The white-label draft `GuidedChoice` it produced."
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "AppAvailability": {
   "type": "string",
   "description": "**The sold-out or closed signal (decided 28 September, audit R073).** `open` is the normal state. `soldOut` shows WEB-029's sold-out state across the app while browsing still works; `closed` shows the closed state (a weather closure, a private event). Neither refuses a request on its own: it is what the guest is told, and a sale is still refused by availability where it applies. Set with `setMaintenanceMode`.\n",
@@ -3366,6 +3686,195 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "BookingConsentRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.booking_consent_record",
+  "description": "**One answer to one consent question, as given** (decided 29 September, rev 3 REV3-26). Append-only: a changed answer is a new record and this one gets `supersededAt`. Distinct from `ConsentRecord`, which is a guest's standing decision about a data-processing purpose; this is an answer given for a booking.\n",
+  "required": [
+   "id",
+   "questionId",
+   "questionVersion",
+   "questionKind",
+   "answer",
+   "scope",
+   "source",
+   "answeredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "readOnly": true
+   },
+   "questionId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "questionVersion": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "questionKind": {
+    "$ref": "#/components/schemas/ConsentQuestionKind"
+   },
+   "answer": {
+    "type": "string",
+    "enum": [
+     "yes",
+     "no"
+    ]
+   },
+   "scope": {
+    "type": "string",
+    "enum": [
+     "perPerson",
+     "perBooking"
+    ]
+   },
+   "blocksBooking": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "The answer is the question's `blockingAnswer` at that version."
+   },
+   "cartId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "cartLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Set by `orders.checkoutCart` when the cart becomes an order."
+   },
+   "orderLineId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "readOnly": true
+   },
+   "personIndex": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "personName": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true
+   },
+   "personSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "answeredBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The guest who answered, from the session. Null for an anonymous cart."
+   },
+   "answeredByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The staff member who answered on the guest's behalf."
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "answeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "supersededAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   }
+  }
+ },
+ "BookingFlow": {
+  "x-ticvai-persistence": "whitelabel.booking_flow",
+  "type": "object",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "required": [
+   "flowTypeKey",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `createBookingFlowDefinition`."
+   },
+   "flowTypeKey": {
+    "$ref": "#/components/schemas/BookingFlowTypeKey"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
+   },
+   "isDefaultForType": {
+    "type": "boolean",
+    "default": false,
+    "description": "At most one per venue and type; setting it takes it from the previous default."
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
+   },
+   "steps": {
+    "type": "array",
+    "maxItems": 30,
+    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlowStep"
+    }
+   },
+   "settings": {
+    "$ref": "#/components/schemas/BookingFlowLevelSettings"
+   },
+   "isValid": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "BookingFlowConfig": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "description": "**Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** One tenant with several venues (the Kids Club branches, Coastal Aqua beside Union Arena) needs them to differ. The settings in force at a venue are the tenant's, with that venue's entry in `venueOverrides` laid over them field by field. The guest app resolves them for the venue the guest picked (audit R267); `effectiveForVenueId` on `getBookingFlowConfig` returns them resolved.\n",
@@ -3389,10 +3898,70 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "BookingFlowLevelSettings": {
+  "x-ticvai-persistence": "none — jsonb column on whitelabel.booking_flow",
+  "type": "object",
+  "description": "**The settings that belong to one flow, not to the venue (decided 29 September, W12).** Moved here from `BookingFlowSettings`, which keeps the venue-wide ones. Each keeps its rev 3 meaning and default. A field left out takes its default.\n",
+  "properties": {
+   "performanceReveal": {
+    "type": "string",
+    "enum": [
+     "dateTimeTicket",
+     "allAtOnce"
+    ],
+    "default": "dateTimeTicket",
+    "description": "**Performance reveal (rev 3 REV3-2).** `dateTimeTicket` shows the times only once a date is picked and the tickets only once a time is picked; `allAtOnce` shows them together. Product-first (W8) is the step order of `experienceWorkshop`, not a value here.\n"
+   },
+   "signInAt": {
+    "type": "string",
+    "enum": [
+     "afterAddOns",
+     "atPayment"
+    ],
+    "default": "afterAddOns",
+    "description": "**Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3).** `afterAddOns` asks as the guest leaves the extras step; `atPayment` asks at payment. The basket is kept either way.\n"
+   },
+   "seatEventDateMode": {
+    "type": "string",
+    "enum": [
+     "inlineStep",
+     "popupOnSeatMap"
+    ],
+    "default": "inlineStep",
+    "description": "**Date and time on a seated event (rev 3 REV3-4).** `inlineStep` asks for them before the seat map; `popupOnSeatMap` opens the seat map with a date and time pop-up. Read only by the seated flow types.\n"
+   },
+   "extrasStep": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "always",
+     "never"
+    ],
+    "default": "auto",
+    "description": "`auto` shows the extras step only when the cart's products have add-ons; `never` is the same as turning the optional `extras` step off."
+   },
+   "quickTour": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Quick tour (rev 3 REV3-20).** A first visit gets a coach-mark tour of this flow's steps, replayable from a Quick tour button. Seen-state kept on the device only.\n"
+   },
+   "consentQuestionIds": {
+    "type": "array",
+    "maxItems": 10,
+    "uniqueItems": true,
+    "default": [],
+    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400. A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
  "BookingFlowSettings": {
   "type": "object",
   "x-ticvai-persistence": "none — embedded in tenant_config",
-  "description": "**Every guest booking-flow setting, once.** `BookingFlowConfig` is these at tenant level plus `venueOverrides`; a `BookingFlowVenueOverride` carries any subset of them for one venue (decided 29 September, rev 3 CFG-11). The Rev 3 settings (`timesPerPage` onwards) are the options the client's rev 3 prototype shows under Config → Booking rules and Build your experience.\n",
+  "description": "**Every guest booking-flow setting, once.** `BookingFlowConfig` is these at tenant level plus `venueOverrides`; a `BookingFlowVenueOverride` carries any subset of them for one venue (decided 29 September, rev 3 CFG-11). The Rev 3 settings (`timesPerPage` onwards) are the options the client's rev 3 prototype shows under Config → Booking rules and Build your experience.\n**Venue-wide only (decided 29 September, W12).** The settings that belong to one flow moved to `BookingFlowLevelSettings` on each `BookingFlow`; `categoryDisplay` was removed (W7).\n",
   "properties": {
    "preset": {
     "type": "string",
@@ -3466,24 +4035,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "default": "compact",
     "description": "Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). `standard` replaces `regular`."
-   },
-   "categoryDisplay": {
-    "type": "string",
-    "enum": [
-     "grid",
-     "rowStrip"
-    ],
-    "default": "grid",
-    "description": "How the product category cards on WEB-001, WEB-002 and GST-002 are shown, a grid or a single scrolling row (decided 29 September, rev 3 23SEP-18)."
-   },
-   "extrasStep": {
-    "type": "string",
-    "enum": [
-     "auto",
-     "always",
-     "never"
-    ],
-    "default": "auto"
    },
    "seatPicker": {
     "type": "string",
@@ -3577,24 +4128,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     }
    },
-   "signInAt": {
-    "type": "string",
-    "enum": [
-     "afterAddOns",
-     "atPayment"
-    ],
-    "default": "afterAddOns",
-    "description": "**Where the guest is asked to sign in, or for a guest-checkout code (decided 29 September, rev 3 REV3-3).** `afterAddOns` asks as the guest leaves Add-ons (WEB-008 on web, GST-041 on mobile); `atPayment` asks at payment (WEB-012). The basket is kept either way: the sign-in gates checkout, never the cart (`FeatureToggle` `guestCheckout`).\n"
-   },
-   "seatEventDateMode": {
-    "type": "string",
-    "enum": [
-     "inlineStep",
-     "popupOnSeatMap"
-    ],
-    "default": "inlineStep",
-    "description": "**Date and time on a seated event (decided 29 September, rev 3 REV3-4).** `inlineStep` asks for them on WEB-006 or GST-007 before the seat map; `popupOnSeatMap` opens the seat map with a date and time pop-up over it. An event with exactly one on-sale performance skips the question in both modes.\n"
-   },
    "seatViewPosition": {
     "type": "string",
     "enum": [
@@ -3630,24 +4163,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "default": true,
     "description": "**Extra info on cards (decided 29 September, rev 3 23SEP-6).** Shows each ticket type's description, who it is for and what it includes, under its name.\n"
    },
-   "quickTour": {
-    "type": "boolean",
-    "default": false,
-    "description": "**Quick tour (decided 29 September, rev 3 REV3-20).** On, a first visit gets a four-step coach-mark tour (date, time, tickets, basket) with Back, Next and End, replayable from a Quick tour button. Whether the guest has seen it is kept on the device only, never on the server.\n"
-   },
    "conciergeMascot": {
     "type": "boolean",
     "default": true,
     "description": "**The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5).** Read only where the `aiConciergeChat` feature is on.\n"
-   },
-   "performanceReveal": {
-    "type": "string",
-    "enum": [
-     "dateTimeTicket",
-     "allAtOnce"
-    ],
-    "default": "dateTimeTicket",
-    "description": "**Performance reveal (decided 29 September, rev 3 REV3-2).** `dateTimeTicket` shows the times only once a date is picked and the tickets only once a time is picked, with Continue off until both are chosen; `allAtOnce` shows the three together.\n"
    },
    "showInfoOnly": {
     "type": "boolean",
@@ -3659,18 +4178,104 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "default": false,
     "description": "**Location switcher (decided 29 September, rev 3 REV3-18).** On, the booking screens carry a \"Booking at\" bar with Change location, reusing the guest's venue choice (audit R267). Off unless the tenant or venue enables it; it has no effect for a tenant with one venue.\n"
    },
-   "consentQuestionIds": {
+   "guestContactFields": {
     "type": "array",
-    "maxItems": 10,
+    "minItems": 1,
+    "maxItems": 3,
     "uniqueItems": true,
-    "default": [],
-    "description": "**The booking flow's own consent questions (decided 29 September, rev 3 REV3-26).** Asked on every booking where these settings are in force (a venue sets its own through `venueOverrides`), together with those of each product in the cart (`Product.consentQuestionIds`, catalogue), each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400. Empty asks none.\n",
+    "default": [
+     "email"
+    ],
     "items": {
      "type": "string",
-     "format": "uuid"
-    }
+     "enum": [
+      "email",
+      "mobile",
+      "name"
+     ]
+    },
+    "description": "**What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1).** The prototype's Email only, + name and + mobile. Must include the contact the guest's code is sent to and matched on (identity `GuestMatchPolicy.matchBy`), or 400. After the code is verified the guest is not asked for these again: the flow goes to the terms and payment, and the profile is completed later (WEB-020, GST-039). Read only where the `guestCheckout` feature is on.\n"
+   },
+   "dateStripDays": {
+    "type": "integer",
+    "minimum": 3,
+    "maximum": 31,
+    "default": 7,
+    "description": "**The date strip (decided 17 September, M17-08).** How many days from today the date step shows as a strip before the calendar icon that opens the full month; later dates are picked from the calendar.\n"
    }
   }
+ },
+ "BookingFlowStep": {
+  "x-ticvai-persistence": "whitelabel.booking_flow_step",
+  "type": "object",
+  "description": "One step of a venue's flow, in the venue's order (decided 29 September, W12).",
+  "required": [
+   "stepKey",
+   "enabled",
+   "sortOrder"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "stepKey": {
+    "$ref": "#/components/schemas/BookingFlowStepKey"
+   },
+   "enabled": {
+    "type": "boolean",
+    "description": "A `required` step cannot be off; the flow saves and `isValid` turns false."
+   },
+   "sortOrder": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "requirement": {
+    "type": "string",
+    "enum": [
+     "required",
+     "optional",
+     "conditional"
+    ],
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the flow type, so the CMS can mark the step without a second read."
+   },
+   "settings": {
+    "type": "object",
+    "additionalProperties": true,
+    "default": {},
+    "description": "The step's own settings, by the names the type's `stepSettings` gives for this step (e.g. `languages` on `language`, `minHours` on `duration`). A name the type does not give is refused with 400."
+   }
+  }
+ },
+ "BookingFlowTypeKey": {
+  "type": "string",
+  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize` are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
+  "enum": [
+   "datedDayPass",
+   "timedEntry",
+   "openDated",
+   "seatedFixedPerformance",
+   "seatedDateTimeSeatMap",
+   "experienceWorkshop",
+   "surfSession",
+   "meetingRoomHourly",
+   "cabanaMap",
+   "cabanaBySize",
+   "guidedTourByLanguage",
+   "transport",
+   "tableReservation",
+   "membership",
+   "giftCard",
+   "multiLocation"
+  ]
  },
  "BookingFlowVenueOverride": {
   "type": "object",
@@ -3756,6 +4361,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "readOnly": true,
     "description": "Always `buildTime` for native apps. The guest web app takes a splash change at the publish, with no build (audit R163)."
+   },
+   "introVideoAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The optional intro video (decided 29 September, MOB-5).** A video `MediaAsset` from the media library (CMS-010). Streamed, so a change reaches guests with the publish and needs no app build.\n"
+   },
+   "introVideoMode": {
+    "type": "string",
+    "enum": [
+     "off",
+     "firstLaunch",
+     "everyLaunch"
+    ],
+    "default": "off",
+    "description": "When GST-001 plays it full screen. \"Skip introduction\" is always shown. Anything but `off` needs `introVideoAssetRef`, or 400."
    }
   }
  },
@@ -3765,6 +4386,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "enum": [
    "runtime",
    "buildTime"
+  ]
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
   ]
  },
  "ConfigDiff": {
@@ -3833,7 +4466,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "policyVersionMissing",
    "noVisibleNavigationItems",
    "unlicensedModuleEnabled",
-   "arabicFontMissing"
+   "arabicFontMissing",
+   "bookingFlowInvalid",
+   "bookingFlowMissing"
   ]
  },
  "ConfigValidationReport": {
@@ -4117,6 +4752,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "custom"
   ]
  },
+ "ConsentSource": {
+  "type": "string",
+  "enum": [
+   "guestApp",
+   "website",
+   "kiosk",
+   "pos",
+   "callCentre",
+   "import",
+   "agentRecorded",
+   "cookieBanner",
+   "checkout"
+  ],
+  "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
+ },
  "CustomDomain": {
   "type": "object",
   "x-ticvai-persistence": "whitelabel.custom_domain",
@@ -4215,6 +4865,50 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "failureReason": {
     "type": "string",
     "nullable": true
+   }
+  }
+ },
+ "Event": {
+  "x-ticvai-persistence": "catalogue.event",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "parentEventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For grouped events."
+   },
+   "performanceCount": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "How many performances the event has. Counted by the server; never sent by a client."
+   },
+   "isActive": {
+    "type": "boolean"
    }
   }
  },
@@ -4387,10 +5081,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "GuestListing": {
+  "type": "string",
+  "enum": [
+   "bookable",
+   "infoOnly",
+   "hidden"
+  ],
+  "default": "bookable",
+  "description": "**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"
+ },
  "GuidedChoice": {
   "x-ticvai-persistence": "whitelabel.guided_choice + whitelabel.guided_choice_question + whitelabel.guided_choice_answer",
   "type": "object",
-  "description": "**Help me choose (decided 29 September, rev 3 REV3-11).** A venue's short set of questions that ends on a result card opening the booking flow, product, category or event that fits. Each question has a few answers with a title, a one-line body, an icon and an optional badge; **the answer the guest picks on the last question decides the result**, and each earlier answer carries a target too, so a one-question setting still ends on a result. Venue configuration, never hard-coded: set up in Venue Management, off unless the venue publishes one.\n**Two sources, one review.** `manual` is written by staff; `aiSuggested` is proposed by the `ai` service from the venue's uploaded products (a suggestion, reviewed and published by a person, never auto-published). Both arrive as `draft`.\n",
+  "description": "**Help me choose (decided 29 September, rev 3 REV3-11).** A venue's short set of questions that ends on a result card opening the booking flow, product, category or event that fits. Each question has a few answers with a title, a one-line body, an icon and an optional badge; **the answer the guest picks on the last question decides the result**, and each earlier answer carries a target too, so a one-question setting still ends on a result. Venue configuration, never hard-coded: set up in Venue Management, off unless the venue publishes one.\n**Two sources, one review.** `manual` is written by staff; `aiSuggested` is proposed by the `ai` service from the venue's uploaded products (a suggestion, reviewed and published by a person, never auto-published). Both arrive as `draft`.\n**Help me choose filters the catalogue (decided 29 September, W4).** With `behaviour` `filter`, the default, each answer's `filter` narrows the products the guest sees (web, mobile and kiosk alike, through catalogue `listProducts` and `searchCatalogue` `guidedAnswerIds`), with a \"Show everything\" link; `recommend` keeps the rev 3 result card from the last answer's `target`. **It is never a consent step**: an answer may pre-fill a REV3-26 consent question (`consentPrefill`), which the guest still confirms, so the question is not asked twice and the consent stays explicit.\n",
   "required": [
    "id",
    "venueId",
@@ -4433,11 +5137,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "default": true,
     "description": "The dark banner under the products (\"Choose from the experiences above or let us help you decide\") with a Help me choose button. Ignored when `mode` is `off`."
    },
+   "behaviour": {
+    "type": "string",
+    "enum": [
+     "filter",
+     "recommend"
+    ],
+    "default": "filter",
+    "description": "**`filter` (default) narrows the list; `recommend` ends on one result card (decided 29 September, W4).** With `filter`, every answer needs a `filter` and `target` is optional; with `recommend`, every answer on the last question needs a `target`. `publishGuidedChoice` refuses the other case with 422.\n"
+   },
+   "showEverything": {
+    "type": "boolean",
+    "default": true,
+    "description": "The \"Show everything\" link under a filtered list, which clears the answers (W4)."
+   },
    "questions": {
     "type": "array",
     "minItems": 1,
-    "maxItems": 2,
-    "description": "**One or two questions**, as the prototype's Questions setting offers (proposed, client to correct; decided 29 September, rev 3 REV3-11). Shown in `sortOrder`.\n",
+    "maxItems": 4,
+    "description": "**One to four questions** (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). Shown in `sortOrder`.\n",
     "items": {
      "type": "object",
      "required": [
@@ -4455,6 +5173,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "title": {
        "$ref": "#/components/schemas/LocalisedText"
       },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "choice",
+        "yesNo",
+        "age",
+        "level",
+        "certification"
+       ],
+       "default": "choice",
+       "description": "**What the question asks (decided 29 September, W4).** `choice` free answers; `yesNo` two answers (e.g. \"Can everyone swim?\"); `age` answers carrying an age range; `level` answers carrying a level tag; `certification` answers saying whether the guest holds a certificate (e.g. a diving licence). The kind decides which `filter` fields its answers use.\n"
+      },
       "sortOrder": {
        "type": "integer",
        "minimum": 0
@@ -4468,7 +5198,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "type": "object",
         "required": [
          "title",
-         "target",
          "sortOrder"
         ],
         "properties": {
@@ -4509,7 +5238,85 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
           "minimum": 0
          },
          "target": {
-          "$ref": "#/components/schemas/GuidedChoiceTarget"
+          "allOf": [
+           {
+            "$ref": "#/components/schemas/GuidedChoiceTarget"
+           }
+          ],
+          "nullable": true,
+          "description": "Required with `behaviour` `recommend` on the last question; optional with `filter`, where it is the card shown above the filtered list."
+         },
+         "filter": {
+          "type": "object",
+          "nullable": true,
+          "description": "**What this answer keeps in the list (decided 29 September, W4).** Every field set must hold; answers to different questions are combined with AND. Required with `behaviour` `filter`. The server applies it (catalogue `guidedAnswerIds`), so web, mobile and kiosk show the same list.\n",
+          "properties": {
+           "productIds": {
+            "type": "array",
+            "items": {
+             "type": "string",
+             "format": "uuid"
+            }
+           },
+           "productCategoryIds": {
+            "type": "array",
+            "items": {
+             "type": "string",
+             "format": "uuid"
+            }
+           },
+           "segmentTags": {
+            "type": "array",
+            "description": "Catalogue `Product.segmentTags`, e.g. a level tag.",
+            "items": {
+             "type": "string"
+            }
+           },
+           "minAgeYears": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true
+           },
+           "maxAgeYears": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true,
+            "description": "With `minAgeYears`, checked against each product's age rule (catalogue `ProductEligibilityRule`)."
+           },
+           "requiresSwimmer": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "False hides products whose eligibility needs a swimmer; true keeps only those."
+           },
+           "certificationCode": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 40,
+            "description": "Keeps products that need this certificate, or with `holdsCertification` false, hides them."
+           },
+           "holdsCertification": {
+            "type": "boolean",
+            "nullable": true
+           }
+          }
+         },
+         "consentPrefill": {
+          "type": "object",
+          "nullable": true,
+          "description": "**Pre-fills a REV3-26 consent question from this answer (decided 29 September, W4).** The guest still ticks it at the consent step; nothing is recorded as consent until they do.\n",
+          "required": [
+           "consentQuestionId",
+           "answer"
+          ],
+          "properties": {
+           "consentQuestionId": {
+            "type": "string",
+            "format": "uuid"
+           },
+           "answer": {
+            "type": "boolean"
+           }
+          }
          },
          "result": {
           "type": "object",
@@ -4601,7 +5408,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "product",
      "productCategory",
      "event",
-     "module"
+     "module",
+     "bookingFlow"
     ]
    },
    "productId": {
@@ -4630,6 +5438,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "nullable": true,
     "description": "Required when `kind` is `module`. The module must be enabled."
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required when `kind` is `bookingFlow` (decided 29 September, W12; BUILD-YOUR-EXPERIENCE \"each answer points to one booking flow\"). One of the venue's enabled `BookingFlow`s."
    }
   }
  },
@@ -4714,7 +5528,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "maxItems": {
        "type": "integer",
-       "nullable": true
+       "nullable": true,
+       "description": "How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3)."
+      },
+      "heroStyle": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "carousel",
+        "video",
+        "poster",
+        "split",
+        null
+       ],
+       "description": "For `heroBanner` only (decided 29 September, MOB-3)."
       }
      }
     }
@@ -4854,6 +5681,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_item",
   "type": "object",
+  "description": "**The mobile tab set is venue configuration (decided 29 September, MOB-1; 29 September brief decision 6).** Before a tenant saves its own, `bottomNavigation` is Home, Explore, Plan and Tickets (each an `appSection` link), with the Buy tickets button beside them; Map is an optional tab. Plan is left out while `visitPlanner` is off.\n",
   "required": [
    "kind",
    "items"
@@ -4909,6 +5737,74 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   },
+   "buyButton": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The persistent Buy tickets button (decided 29 September, MOB-2).** On every screen of the mobile app except the booking and checkout steps; it opens GST-003. Read with `bottomNavigation`.\n",
+    "properties": {
+     "style": {
+      "type": "string",
+      "enum": [
+       "raised",
+       "floating",
+       "flat",
+       "hidden"
+      ],
+      "default": "raised",
+      "description": "`raised` sits in the centre of the tab bar, as the v4 prototype shows; `hidden` turns it off."
+     },
+     "label": {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    }
+   }
+  }
+ },
+ "OrgUnit": {
+  "x-ticvai-persistence": "platform.scope",
+  "type": "object",
+  "required": [
+   "id",
+   "level",
+   "path",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "level": {
+    "$ref": "#/components/schemas/ScopeLevel"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "path": {
+    "type": "string",
+    "description": "Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "isActive": {
+    "type": "boolean",
+    "description": "False causes every permission query at or beneath this node to resolve to DENY.\n"
+   },
+   "childCount": {
+    "type": "integer",
+    "minimum": 0
    }
   }
  },
@@ -4988,6 +5884,308 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "accessibility"
   ]
  },
+ "Principal": {
+  "x-ticvai-persistence": "identity.principal",
+  "type": "object",
+  "required": [
+   "id",
+   "username",
+   "displayName",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "username": {
+    "type": "string"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Past this, resolution returns DENY regardless of grants."
+   },
+   "primaryRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Determines the landing screen when the principal holds several roles and picks one at login.\n"
+   },
+   "roles": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/RoleSummary"
+    }
+   },
+   "lastLoginAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Product": {
+  "x-ticvai-persistence": "catalogue.product",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "kind",
+   "venueId",
+   "scopePath",
+   "isSellable",
+   "hasVariants"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "familyKey": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[A-Za-z0-9_-]+$",
+    "nullable": true,
+    "x-ticvai-unique": "venue",
+    "description": "**The same product at another location** (decided 29 September, rev 3 REV3-18). Optional. A tenant that sells one attraction at several venues gives each venue's product the same key, e.g. `aquarium-entry`; the key names the family across the tenant and each venue has at most one product in it, so a second product at the same venue with the key is refused with `409 duplicate-code`. **What it is for:** when a guest changes location on the booking screen (the 'Booking at' switcher, `BookingFlowConfig.locationSwitcher`), lines whose product shares a `familyKey` with a product at the new venue are carried over to that product, with times and prices refreshed; every other line is cleared. Null means the product belongs to no family and its lines always clear on a switch. Compared case-insensitively, like `code`.\n"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ProductKind"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "responsibleDepartmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who owns this product commercially. A scope node at `department` level."
+   },
+   "onSaleFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "1.4.8. **A seasonal product should not need somebody awake at midnight.** Archiving already runs on a timer in this contract, so the machinery exists; `effectiveFrom` appears on tax codes, FX rates and white-label policies and not here.\n"
+   },
+   "onSaleTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Taken from their `fnb.product` and `retail.product`, 20 September.** `catalogue.product_category` has existed since 20 August with two operations and nothing could be filed under it — a merchandise hierarchy with a tree and no leaves. Their per-domain product tables both carried this column and ours did not.\n"
+   },
+   "lifecycleState": {
+    "$ref": "#/components/schemas/ProductLifecycleState"
+   },
+   "isSellable": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "True only when live **and** carried by a published bundle. Approval and publication are different acts.\n**Derived, never set.** It changes when `transitionProductLifecycle` moves the product and when `publishBundle` carries it, so `updateProduct` does not take it — `withdraw` is how a product stops selling.\n"
+   },
+   "isStockTracked": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Taken from their `fnb.product`, 20 September.** Whether a sale decrements stock, which is not what `isSellable` asks. A ticket is sellable and tracks no stock; a bottle of water is both. Without it, an F&B sale cannot tell inventory whether to move.\n"
+   },
+   "hasVariants": {
+    "type": "boolean"
+   },
+   "variantCount": {
+    "type": "integer"
+   },
+   "segmentTags": {
+    "type": "array",
+    "description": "7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n**A level is a tag under `level/`** (decided 29 September, rev 3 REV3-19): `level/beginner`, `level/intermediate`, `level/advanced`, `level/expert` (proposed codes, client to correct). A guest screen filters on it with `listProducts` `segmentTag`, and the words a guest reads beside each option come from `ProductCategory.description`, not from the tag.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "codeSchema": {
+    "type": "string",
+    "readOnly": true,
+    "description": "7.3.4 specifies `[ParkCode]-[ProductType]-[Variant]`. **`Product.code` existed and nothing required a format**, so a venue with three thousand products had three thousand conventions.\nThe tenant sets the pattern and the platform generates against it. **Validation is the point, not the string** — a code typed by hand is a code that will not sort.\n"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    }
+   },
+   "entitlementTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "What the buyer receives. Null for products that grant nothing — F&B and retail. Identity and entitlement are separate concerns.\n"
+   },
+   "blockedOffline": {
+    "type": "boolean",
+    "description": "True for seated and retail. Seated because a seat map is not a count; retail because stock depletes in real time.\n"
+   },
+   "dataMaskValues": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Custom fields. JSONB-backed, defined by the venue's data mask."
+   },
+   "guestListing": {
+    "$ref": "#/components/schemas/GuestListing"
+   },
+   "notBookableLabel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 REV3-14). Each value at most 60 characters. Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.\n"
+   },
+   "salesContact": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductSalesContact"
+     }
+    ],
+    "nullable": true,
+    "description": "**Who a guest contacts to book a view-only product** (decided 29 September, W3), e.g. a training course listed with full details and no Book button. Shown as *Call sales* and *Email sales* on an `infoOnly` product. Null means the venue's own contact (white-label `getTenantAppStatus.contact`). Ignored unless `guestListing` is `infoOnly`.\n"
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+   },
+   "displayTags": {
+    "type": "array",
+    "maxItems": 6,
+    "items": {
+     "$ref": "#/components/schemas/ProductDisplayTag"
+    },
+    "description": "**Short facts a guest reads on the ticket card and under *Read more***: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). Not `segmentTags`, which are for reporting and segmentation and which a guest never reads.\n**Derived on read when none are set.** When the venue has written no tags, a read returns tags derived from the product's duration (`clock`), entitlement validity (`calendar`) and the eligibility rule's `minHeightCm` (`height`), each marked `derived: true`; they are never stored. Once the venue writes any tag, only what it wrote is returned. Whether the guest screen shows them is `BookingFlowConfig.ticketTags` (white-label).\n"
+   },
+   "media": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "$ref": "#/components/schemas/ProductMedia"
+    },
+    "description": "**The product's own photos and video** (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each product's primary image, so two tickets in one category no longer share the category's picture (`ProductCategory.imageAssetId`).\nEvery `assetId` names an asset of the asset library (`assets.yaml` `MediaAsset`) in status `ready` whose kind matches `kind`; anything else is a `422`. **Exactly one item is `isPrimary`** when the list is not empty, and an `assetId` appears once; otherwise `400`. Setting the list records each reference as asset usage (`MediaUsage` with `surface: product`, `referenceId` the product id, `isLive` true while the product is listed to guests), which is what stops a used asset being archived from under the product.\n"
+   },
+   "consentQuestionIds": {
+    "type": "array",
+    "maxItems": 10,
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
+   },
+   "requiresTimeWindow": {
+    "type": "boolean",
+    "default": false,
+    "description": "**True for a space sold by the hour**, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). The product is the room type (*focus pod*, *majlis*, *boardroom*, *auditorium*), never a named room; its lengths are a `length` axis (`setProductAttributes`) whose values carry `durationMinutes`, and each length is a variant priced on its own in the price list, so price is the room rate for that length. The cart line carries the booked start and end (orders), the end being the start plus the chosen variant's `durationMinutes`; `resources.listProductStartTimes` supplies the start times for a variant and a date and `allocateResources` picks the room from the product's resource requirements (`setExperienceResourceRequirements`) at checkout. True requires every active variant to have a `durationMinutes`; otherwise `422`.\n"
+   },
+   "productOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The product owner (29 September, data model DM3), set with `setProductContextOwnership`. `responsibleDepartmentId` is the owning department."
+   },
+   "operationalContact": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "A principal id or a name, as the context screen takes it."
+   },
+   "businessUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `ledger.legal_entity`, read through finance."
+   },
+   "attractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "siteId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The brand, as the context screen names it (a catalogue brand category)."
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "salesTerritory": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   }
+  }
+ },
  "ProductCategory": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.product_category",
@@ -5057,6 +6255,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "The short line a guest reads under a category option, e.g. *Surf lessons: learn on the beginner wave with a coach* (decided 29 September, rev 3 REV3-19). Each language value at most 200 characters.\n"
    },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The booking flow for every product filed here** that names none of its own (decided 29 September, W12, BO-115). Null means the venue's flow for each product's `kind`. A white-label `BookingFlow` of the venue; `setProductCategories` refuses any other id with `422`.\n"
+   },
    "isActive": {
     "type": "boolean",
     "default": true,
@@ -5086,6 +6290,229 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     }
    }
+  ]
+ },
+ "ProductDisplayTag": {
+  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
+  "type": "object",
+  "required": [
+   "kind",
+   "label"
+  ],
+  "description": "One short fact on a ticket card (decided 29 September, 23SEP-3). `kind` picks the icon.",
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "clock",
+     "height",
+     "free",
+     "calendar",
+     "id"
+    ],
+    "description": "`clock` a duration, `height` a height rule, `free` something included free, `calendar` a validity, `id` a document the guest must bring."
+   },
+   "label": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
+   },
+   "derived": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "True on a tag the server derived on read because the venue set none. Never sent."
+   }
+  }
+ },
+ "ProductKind": {
+  "type": "string",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n",
+  "enum": [
+   "admission",
+   "timedAdmission",
+   "datedAdmission",
+   "openDated",
+   "seated",
+   "membership",
+   "bundle",
+   "fnb",
+   "retail",
+   "rental",
+   "addOn",
+   "giftCard"
+  ]
+ },
+ "ProductLifecycleState": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "inReview",
+   "approved",
+   "live",
+   "withdrawn",
+   "archived"
+  ]
+ },
+ "ProductMedia": {
+  "x-ticvai-persistence": "catalogue.product_media",
+  "type": "object",
+  "required": [
+   "assetId",
+   "kind",
+   "isPrimary"
+  ],
+  "description": "One photo or video of a product, referencing the asset library (decided 29 September, 23SEP-4). One row per product and asset, so the asset library can answer which products use an asset.\n",
+  "properties": {
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "image",
+     "video"
+    ]
+   },
+   "isPrimary": {
+    "type": "boolean",
+    "default": false,
+    "description": "The item *Read more* opens on and a listing shows. Exactly one per product."
+   },
+   "displayOrder": {
+    "type": "integer",
+    "default": 100
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   }
+  }
+ },
+ "ProductSalesContact": {
+  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
+  "type": "object",
+  "description": "Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n",
+  "minProperties": 1,
+  "properties": {
+   "phone": {
+    "type": "string",
+    "maxLength": 32,
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "maxLength": 254,
+    "nullable": true
+   },
+   "note": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."
+   }
+  }
+ },
+ "Role": {
+  "x-ticvai-persistence": "identity.role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "permissions": {
+    "type": "array",
+    "description": "**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/Permission"
+    }
+   },
+   "inheritsFromRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Role composition, one level deep and no deeper.** A supervisor role that is a cashier plus three permissions is how venues actually describe them.\n**Cycles are refused and depth is capped at one**, because a permission set nobody can read off the screen is a permission set nobody audits.\n"
+   },
+   "isSystem": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n"
+   },
+   "principalCount": {
+    "type": "integer"
+   },
+   "grantCount": {
+    "type": "integer"
+   }
+  }
+ },
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ScopeLevel": {
+  "type": "string",
+  "description": "**The eight organisational levels, plus `subject`.** Restored 24 August.\n`tenancy.yaml` holds the authoritative definition of the eight levels and this mirrors them so a contract can reference a level without depending on the whole tenancy surface. **Seven organisational levels plus `outlet`** — a commercial branch beside the organisational one (CF-138, ADR-0018). **A department has requisitions and rotas; an outlet has a menu and stock**, and modelling a restaurant as a department would put it in the staffing tree.\n\n**`subject` is the one value tenancy does not have, and it is not a level.** It is here because `check-package` reads this enum as the closed vocabulary for `x-ticvai-scope-level`, and some operations act on one guest's own resources, which sit in no node of the venue hierarchy. So `subject` is valid as an operation's scope level and never as a `ScopeRef.level`: every `ScopeRef` is a row of `platform.scope`, and those carry one of the eight.\n",
+  "enum": [
+   "tenant",
+   "brand",
+   "region",
+   "venue",
+   "department",
+   "subDepartment",
+   "workstation",
+   "outlet",
+   "subject"
   ]
  },
  "SeoMetadata": {
@@ -5175,6 +6602,106 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "readOnly": true,
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "StorefrontAnalyticsProvider": {
+  "type": "object",
+  "x-ticvai-persistence": "whitelabel.analytics_provider",
+  "description": "**One analytics platform the storefront or app reports to** (22.10.29, 29 September build). Venue configuration: a null `venueId` is the tenant-wide default a venue's own row replaces.",
+  "required": [
+   "provider",
+   "measurementId",
+   "surfaces",
+   "consentCategory",
+   "isEnabled"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "provider": {
+    "type": "string",
+    "enum": [
+     "googleAnalytics4",
+     "googleTagManager",
+     "adobeAnalytics",
+     "metaPixel",
+     "matomo",
+     "other"
+    ]
+   },
+   "providerLabel": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The name, when `provider` is `other`."
+   },
+   "measurementId": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id)."
+   },
+   "surfaces": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "string",
+     "enum": [
+      "guestWeb",
+      "guestApp"
+     ]
+    }
+   },
+   "consentCategory": {
+    "type": "string",
+    "enum": [
+     "functional",
+     "analytics",
+     "personalisation",
+     "marketing"
+    ],
+    "default": "analytics",
+    "description": "The cookie category the visitor must grant before this provider loads (marketing-crm `CookieCategory`)."
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true
+   },
+   "reportingPropertyId": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The property `getStorefrontInsights` asks the reporting API about (a GA4 property id). Staff only."
+   },
+   "reportingCredentialRef": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "writeOnly": true,
+    "description": "The vault reference of the reporting credential. Accepted, never returned."
+   },
+   "hasReportingCredential": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "Whether a reporting credential is held, since the reference itself is never returned."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -5388,6 +6915,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "bookingFlow": {
     "$ref": "#/components/schemas/BookingFlowConfig"
+   },
+   "bookingFlows": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Every venue's booking flows in the draft (`whitelabel.booking_flow`), so a publish snapshots them with the rest (decided 29 September, W12).",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlow"
+    }
    },
    "theme": {
     "$ref": "#/components/schemas/Theme"
@@ -5624,6 +7160,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "default": "solid",
     "description": "Button shape (decided 29 September, rev 3 CFG-3)."
+   },
+   "componentColours": {
+    "type": "object",
+    "description": "**Colours for single interactive elements (decided 17 September, M17-11).** Each is optional and falls back to the theme colours. Every pair passes the same contrast check as the theme (`ContrastProblem`), or `setTheme` refuses it with 400. The guest flow stays the standard one; only the colours change.\n",
+    "properties": {
+     "primaryCta": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "payButton": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "addToCart": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "buyTicketsButton": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "link": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "badge": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     }
+    }
    }
   }
  },

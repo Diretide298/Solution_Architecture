@@ -1,6 +1,6 @@
 # WS60 — Ticket Media   Credential Management board 2
 
-**10 screens · 18 operations · 25 schemas · 5 permissions**
+**10 screens · 18 operations · 27 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

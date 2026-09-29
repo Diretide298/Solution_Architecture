@@ -1,0 +1,522 @@
+{
+ "closeAiIncident": {
+  "method": "POST",
+  "path": "/incidents/{incidentId}/close",
+  "contract": "ai",
+  "summary": "Close an incident",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiIncident"
+ },
+ "containAiIncident": {
+  "method": "POST",
+  "path": "/incidents/{incidentId}/contain",
+  "contract": "ai",
+  "summary": "Contain an incident",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiIncident"
+ },
+ "decideAiGovernanceAlert": {
+  "method": "POST",
+  "path": "/governance-alerts/{alertId}/decide",
+  "contract": "ai",
+  "summary": "Acknowledge, dismiss, resolve, or open an incident",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiGovernanceAlert"
+ },
+ "exportAiEvidencePackage": {
+  "method": "POST",
+  "path": "/evidence-packages",
+  "contract": "ai",
+  "summary": "Export an evidence package",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getAiUsage": {
+  "method": "GET",
+  "path": "/usage",
+  "contract": "ai",
+  "summary": "Usage, cost and performance",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiUsageReport"
+ },
+ "listAiCapabilityHealth": {
+  "method": "GET",
+  "path": "/governance/capability-health",
+  "contract": "ai",
+  "summary": "How each AI capability is running now",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "breakerState",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiControls": {
+  "method": "GET",
+  "path": "/controls",
+  "contract": "ai",
+  "summary": "Governance controls",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "effectiveness",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiEvaluations": {
+  "method": "GET",
+  "path": "/evaluations",
+  "contract": "ai",
+  "summary": "Evaluation runs",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "releaseId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiGovernanceAlerts": {
+  "method": "GET",
+  "path": "/governance-alerts",
+  "contract": "ai",
+  "summary": "Governance alerts",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiIncidents": {
+  "method": "GET",
+  "path": "/incidents",
+  "contract": "ai",
+  "summary": "AI incidents",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiRiskRegister": {
+  "method": "GET",
+  "path": "/risk-register",
+  "contract": "ai",
+  "summary": "The AI risk register",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiTrainingRuns": {
+  "method": "GET",
+  "path": "/training-runs",
+  "contract": "ai",
+  "summary": "The per-tenant training and backtest runs",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listGovernanceRiskMonitoring": {
+  "method": "GET",
+  "path": "/governance-risk-monitoring",
+  "contract": "catalogue",
+  "summary": "Governance Risk, AI Monitoring & Control Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "severity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "openAiIncident": {
+  "method": "POST",
+  "path": "/incidents",
+  "contract": "ai",
+  "summary": "Open an AI incident",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiIncident"
+ },
+ "pauseAiCapability": {
+  "method": "POST",
+  "path": "/governance/capabilities/{capabilityKey}/pause",
+  "contract": "ai",
+  "summary": "Stop a capability now",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiCapabilityRegistration"
+ },
+ "promoteAiRelease": {
+  "method": "POST",
+  "path": "/releases/{releaseId}/promote",
+  "contract": "ai",
+  "summary": "Promote a release to its next stage (a person)",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRelease"
+ },
+ "rollbackAiRelease": {
+  "method": "POST",
+  "path": "/releases/{releaseId}/rollback",
+  "contract": "ai",
+  "summary": "Roll a release back",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRelease"
+ },
+ "runAiControlTest": {
+  "method": "POST",
+  "path": "/controls/{controlKey}/tests",
+  "contract": "ai",
+  "summary": "Test a control now",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiControlTest"
+ },
+ "runAiEvaluation": {
+  "method": "POST",
+  "path": "/evaluations",
+  "contract": "ai",
+  "summary": "Evaluate a candidate",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setAiRiskRegisterEntry": {
+  "method": "PUT",
+  "path": "/risk-register/{entryId}",
+  "contract": "ai",
+  "summary": "Record or update a risk register entry",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiRiskRegisterEntry",
+  "responds": "AiRiskRegisterEntry"
+ }
+}

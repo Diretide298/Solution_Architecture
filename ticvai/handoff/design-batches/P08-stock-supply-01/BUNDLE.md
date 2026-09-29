@@ -1,6 +1,6 @@
 # P08-stock-supply-01 — P08 · Stock & Supply (1 of 2)
 
-**10 screens · 51 operations · 32 schemas · 12 permissions**
+**10 screens · 56 operations · 42 schemas · 12 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -67,9 +67,9 @@ convincingly. It is never a caption.
 | `BO-078` | Requisitions | approvalInbox | 10 | 6 | — |
 | `BO-079` | Stock Count | listDetail | 9 | 7 | — |
 | `BO-080` | Stock Transfers | listDetail | 6 | 4 | — |
-| `BO-081` | Inventory Items | listDetail | 7 | 3 | — |
+| `BO-081` | Inventory Items | listDetail | 9 | 3 | — |
 | `BO-082` | Stock Movements | listDetail | 4 | 2 | — |
-| `BO-083` | Suppliers | listDetail | 5 | 3 | — |
+| `BO-083` | Suppliers | listDetail | 8 | 3 | — |
 
 ## Thin screens in this batch
 
@@ -2929,6 +2929,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listInventoryItems"
     ]
+   },
+   {
+    "operationId": "getInventoryKitDefinition",
+    "contract": "inventory",
+    "purpose": "Show kit components",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setInventoryKitDefinition",
+    "contract": "inventory",
+    "purpose": "Edit kit components",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -3568,6 +3582,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "reporting",
     "purpose": "getSupplierPerformance",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listSupplierContracts",
+    "contract": "inventory",
+    "purpose": "Supplier contracts list",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createSupplierContract",
+    "contract": "inventory",
+    "purpose": "Add a supplier contract",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "updateSupplierContract",
+    "contract": "inventory",
+    "purpose": "Edit, activate or end a supplier contract",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -3575,6 +3610,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "supplierId",
      "from": "deepLink"
+    },
+    {
+     "name": "contractId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `supplierId`."
@@ -3999,6 +4038,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "Supplier",
   "responds": "Supplier"
  },
+ "createSupplierContract": {
+  "method": "POST",
+  "path": "/suppliers/{supplierId}/contracts",
+  "contract": "inventory",
+  "summary": "Record a purchasing contract with a supplier",
+  "permission": "PROCUREMENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "InventorySupplierContract"
+ },
  "enterCountLine": {
   "method": "POST",
   "path": "/fnb-stock-counts/{countId}/lines",
@@ -4043,6 +4101,19 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [],
   "requestBody": null,
   "responds": "InventoryItem"
+ },
+ "getInventoryKitDefinition": {
+  "method": "GET",
+  "path": "/inventory-items/{itemId}/kit-definition",
+  "contract": "inventory",
+  "summary": "The components a kit item is made of",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "InventoryKitDefinition"
  },
  "getPurchaseOrder": {
   "method": "GET",
@@ -4507,6 +4578,45 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listSupplierContracts": {
+  "method": "GET",
+  "path": "/supplier-contracts",
+  "contract": "inventory",
+  "summary": "Supplier contracts, by supplier, status or expiry",
+  "permission": "PROCUREMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "supplierId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringBefore",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listSuppliers": {
   "method": "GET",
   "path": "/suppliers",
@@ -4726,6 +4836,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "PurchaseOrder"
  },
+ "setInventoryKitDefinition": {
+  "method": "PUT",
+  "path": "/inventory-items/{itemId}/kit-definition",
+  "contract": "inventory",
+  "summary": "Make an item a kit of other stocked items",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "InventoryKitDefinition",
+  "responds": "InventoryKitDefinition"
+ },
  "setItemAvailability": {
   "method": "PUT",
   "path": "/menu-items/{itemId}/availability",
@@ -4736,6 +4865,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -4839,6 +4973,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Supplier"
+ },
+ "updateSupplierContract": {
+  "method": "PATCH",
+  "path": "/supplier-contracts/{contractId}",
+  "contract": "inventory",
+  "summary": "Extend, activate or end a supplier contract",
+  "permission": "PROCUREMENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "InventorySupplierContract"
  }
 }
 ```
@@ -5576,6 +5729,140 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "InventoryKitComponent": {
+  "x-ticvai-persistence": "inventory.kit_component",
+  "type": "object",
+  "description": "4.4.20. One component of a kit and the quantity one kit consumes.",
+  "required": [
+   "componentItemId",
+   "quantity"
+  ],
+  "properties": {
+   "kitItemId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "componentItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "number",
+    "exclusiveMinimum": 0
+   },
+   "unit": {
+    "type": "string",
+    "nullable": true,
+    "description": "The component's base unit where omitted."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written at the kit item's venue scope."
+   }
+  }
+ },
+ "InventoryKitDefinition": {
+  "x-ticvai-persistence": "none — composed of the item's inventory.kit_component rows",
+  "type": "object",
+  "description": "4.4.20. Also the `setInventoryKitDefinition` body.",
+  "required": [
+   "components"
+  ],
+  "properties": {
+   "kitItemId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "components": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/InventoryKitComponent"
+    }
+   }
+  }
+ },
+ "InventorySupplierContract": {
+  "type": "object",
+  "x-ticvai-persistence": "inventory.supplier_contract",
+  "description": "**Taken from the backend workbook, 20 September.** Stores purchasing agreements, validity dates, and commercial terms agreed with a supplier.",
+  "required": [
+   "supplierId",
+   "number",
+   "name",
+   "validFrom",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "number": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "currencyCode": {
+    "type": "string",
+    "maxLength": 10,
+    "nullable": true
+   },
+   "paymentTermsDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "documentReference": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 30,
+    "enum": [
+     "draft",
+     "active",
+     "expired",
+     "terminated"
+    ],
+    "description": "Written by `createSupplierContract` and `updateSupplierContract`; `expired` is set by the server once `validTo` has passed (29 September, writers pass)."
+   },
+   "statusReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "LocationKind": {
   "type": "string",
   "enum": [
@@ -5670,6 +5957,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "MovementKind": {
   "type": "string",
   "description": "**The kind decides the direction** (decided 28 September, audit R171). In: `receipt`, `transferIn`, `adjustmentIn`, `countGain`, `production` (the finished item entering stock; the ingredients leave as `issue`). Out: `issue`, `saleDepletion`, `waste`, `adjustmentOut`, `transferOut`, `countLoss`, `supplierReturn`. `adjustment` and `countAdjustment` were split into an in and an out kind so that no kind has two directions.\n",
@@ -5687,6 +6003,95 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "supplierReturn",
    "production"
   ]
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
  },
  "Page": {
   "type": "object",
@@ -6234,6 +6639,55 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cancelled"
   ]
  },
+ "RequisitionSuggestion": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "itemId",
+   "onHand",
+   "reorderPoint",
+   "suggestedQuantity"
+  ],
+  "properties": {
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemName": {
+    "type": "string"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "reorderPoint": {
+    "type": "number"
+   },
+   "parLevel": {
+    "type": "number"
+   },
+   "suggestedQuantity": {
+    "type": "number"
+   },
+   "averageDailyConsumption": {
+    "type": "number"
+   },
+   "daysOfCoverRemaining": {
+    "type": "number"
+   },
+   "preferredSupplierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "leadTimeDays": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
  "StartStockCountRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -6453,6 +6907,62 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "StockPosition": {
+  "x-ticvai-persistence": "none — derived from movements",
+  "type": "object",
+  "required": [
+   "itemId",
+   "locationId",
+   "onHand",
+   "unit"
+  ],
+  "properties": {
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemName": {
+    "type": "string"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationName": {
+    "type": "string"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "allocated": {
+    "type": "number",
+    "description": "**Reserved for orders**: the quantity under an active stock reservation for an order (decided 28 September, audit R171). A transfer is not allocation: dispatched stock has already left on-hand and sits in transit.\n"
+   },
+   "available": {
+    "type": "number",
+    "description": "**On-hand minus allocated** (decided 28 September, audit R171). What can still be sold or issued.\n"
+   },
+   "unit": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lastCountedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastMovementAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "StockTransfer": {
   "x-ticvai-persistence": "inventory.transfer + inventory.transfer_line",
   "type": "object",
@@ -6620,6 +7130,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "SupervisorStepUp": {
+  "type": "object",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "required": [
+   "principalId",
+   "credential"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The supervisor signing. Recorded against the act."
+   },
+   "credential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
    }
   }
  },

@@ -1,6 +1,6 @@
 # P02-in-venue-experience-01 — P02 · In-Venue Experience
 
-**2 screens · 3 operations · 3 schemas · 2 permissions**
+**2 screens · 3 operations · 5 schemas · 2 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-061` | Menu Item Detail | listDetail | 2 | 0 | — |
+| `GST-061` | Menu Item Detail | listDetail | 2 | 1 | — |
 | `GST-062` | Shop & Drop Collection | configEditor | 1 | 0 | — |
 
 ## Thin screens in this batch
@@ -103,14 +103,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-061 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
-  "notes": "P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August. **Cross-surface parity, 31 August**: added listModifierGroups. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "notes": "P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August. **Cross-surface parity, 31 August**: added listModifierGroups. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.\n\n**Rev 3 (decided 29 September).** Modifier side panel drawn (REV3-9, no api change); the *F&B add-ons & modifiers* toggle is dropped.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listModifierGroups` reads the population and `getGuestMenu` reads one of them — list, select, act",
@@ -124,7 +121,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every menu item",
+       "label": "Every modifier group",
        "bindsTo": "ModifierGroup",
        "columns": [
         "ModifierGroup.id",
@@ -137,6 +134,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listModifierGroups",
        "provenance": "contract fnb.yaml GET /modifier-groups"
+      },
+      {
+       "kind": "selectField",
+       "label": "Modifiers",
+       "notes": "Constraints come from the group — minimum, maximum, required",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "notes": "Allergens. Always present; not a field a tenant may omit (4.8.9)",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -146,7 +154,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected menu item",
+       "label": "The selected modifier group",
+       "bindsTo": "ModifierGroup",
+       "columns": [
+        "ModifierGroup.id",
+        "ModifierGroup.code",
+        "ModifierGroup.name",
+        "ModifierGroup.minSelections",
+        "ModifierGroup.maxSelections",
+        "ModifierGroup.options",
+        "ModifierGroup.scopePath"
+       ],
+       "operation": "listModifierGroups",
+       "provenance": "contract fnb.yaml GET /modifier-groups"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The guest menu",
        "bindsTo": "GuestMenu",
        "columns": [
         "GuestMenu.outletId",
@@ -161,23 +185,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "selectField",
-       "label": "Modifiers",
-       "notes": "Constraints come from the group — minimum, maximum, required",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "banner",
-       "notes": "Allergens. Always present; not a field a tenant may omit (4.8.9)",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
@@ -185,8 +192,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "Item skeleton",
    "error": "Item unavailable, with a route back to the menu",
    "emptyFirstRun": "Not applicable",
-   "emptyNoResults": "The filter narrowed it and the menu item are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: `listModifierGroups` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listModifierGroups` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute."
   },
   "apis": [
@@ -212,19 +219,49 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `outletId`.",
    "preloaded": [
-    "GuestMenu.outletId",
-    "GuestMenu.menuId",
-    "GuestMenu.name",
-    "GuestMenu.inForceUntil",
-    "GuestMenu.currency"
+    "ModifierGroup.id",
+    "ModifierGroup.code",
+    "ModifierGroup.name",
+    "ModifierGroup.minSelections",
+    "ModifierGroup.maxSelections"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-061"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-061",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Menu item detail; Rev 3 feedback → Menu item add-ons & modifiers",
+    "differences": "Rev 3 adds min/max selection rules for each modifier group, priced add-ons, leave-outs and a live total."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "modifierPanel",
+    "component": "drawer",
+    "trigger": "Add, on an item with modifier groups attached",
+    "body": "**A panel of choices**: choose-one groups (e.g. spice level), priced optional add-ons within their limits, leave-outs and quantity; the basket line lists the choices. Shown whenever the item has groups attached (`listModifierGroups`); no tenant on/off toggle (decided 29 September, rev 3 REV3-9).",
+    "bindsTo": "ModifierGroup",
+    "confirm": {
+     "label": "Add to order",
+     "carries": [
+      "modifierSelections"
+     ]
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "modifierSelections"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -282,18 +319,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-062 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
      "to": "GST-061",
      "trigger": "Menu Item Detail",
-     "carries": [
-      "outletId"
-     ],
-     "provenance": "derived — GST-061 declares entryState.params outletId, so an edge into it must carry them"
+     "provenance": "derived — GST-061 declares entryState.params outletId and GST-062 holds none of them, so the edge carries nothing and GST-061 opens cold"
     },
     {
      "to": "KSK-017",
@@ -326,7 +357,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Lookup",
+       "label": "Lookup shop and drop",
        "operation": "lookupShopAndDrop",
        "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
       }
@@ -348,8 +379,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The saved shop drop collection.",
    "error": "Could not load. Names which read failed and leaves the shop drop collection untouched.",
-   "emptyFirstRun": "No shop drop collection configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No shop drop collection configured. The form opens empty and `lookupShopAndDrop` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `lookupShopAndDrop` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection."
   },
   "apis": [
@@ -357,13 +388,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "lookupShopAndDrop",
     "contract": "retail",
     "purpose": "Find a guest's dropped goods",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-062"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-062",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 3 → Shop & drop collection",
+    "differences": "Prototype uses a separate SD code; the YAML says the guest collects with the ticket."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -452,7 +491,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "ModifierGroup"
+  "responds": "Page"
  },
  "lookupShopAndDrop": {
   "method": "GET",
@@ -492,6 +531,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AllergenCode": {
+  "type": "string",
+  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
+  "enum": [
+   "gluten",
+   "crustaceans",
+   "eggs",
+   "fish",
+   "peanuts",
+   "soybeans",
+   "milk",
+   "nuts",
+   "celery",
+   "mustard",
+   "sesame",
+   "sulphites",
+   "lupin",
+   "molluscs"
+  ]
+ },
  "GuestMenu": {
   "type": "object",
   "x-ticvai-persistence": "none — projection over menu, item and availability",
@@ -580,7 +639,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
           "type": "array",
           "description": "Always present. Not a field a tenant may choose to omit.",
           "items": {
-           "type": "string"
+           "$ref": "#/components/schemas/AllergenCode"
           }
          },
          "preparationMinutes": {
@@ -604,6 +663,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "ModifierGroup": {
   "x-ticvai-persistence": "fnb.modifier_group + fnb.modifier_option",
   "type": "object",
+  "description": "**An F&B modifier is a choice added to a dish at the moment of ordering** — *no onions*, *extra cheese*, *cooked medium*. **It is not an Attribute**, the axis that generates catalogue variants (naming-and-style §3 lists *Modifier* as a banned synonym for that), and the two must not be merged: a variant is a different product with its own stock, a modifier is an instruction on a line with at most a price delta.\n",
   "required": [
    "id",
    "code",
@@ -658,6 +718,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "isAvailable": {
        "type": "boolean"
+      },
+      "allergens": {
+       "type": "array",
+       "description": "What choosing this option adds to the dish. `attachModifierGroup` refuses a group that adds one the item does not declare, and `verifyAllergens` reports it as `via` `modifier`.",
+       "items": {
+        "$ref": "#/components/schemas/AllergenCode"
+       }
       }
      }
     }
@@ -668,13 +735,31 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
  "ShopAndDrop": {
   "type": "object",
   "x-ticvai-persistence": "retail.shop_and_drop + retail.shop_and_drop_line",
   "required": [
    "id",
    "dropReference",
-   "saleId",
    "collectionPointId",
    "status",
    "collectBy"
@@ -688,7 +773,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Short and readable. Printed on the slip a guest may or may not keep."
    },
    "saleId": {
-    "type": "string"
+    "type": "string",
+    "nullable": true,
+    "description": "The till sale. Null for an online order, which sets `orderId` (audit R236)."
+   },
+   "orderId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The paid online order that created this collection (audit R236)."
    },
    "entitlementId": {
     "type": "string",

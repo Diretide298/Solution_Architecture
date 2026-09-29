@@ -1,10 +1,165 @@
 {
+ "BiometricKind": {
+  "type": "string",
+  "description": "BL-106, CF-35. **Two different legal postures, not two settings on one record.** 3.2.44 describes a temporary facial model taken at a counter or a gate and deleted when the ticket expires; 3.2.43 describes an enduring Face Pass enrolled deliberately on three surfaces. **Storing both as one record with a date makes the stricter rule depend on a field nobody enforces**, which is what BL-106 was raised to stop.\n`facePass` — enduring, explicit consent, revocable by the guest, anchored to the validity of the entitlement it belongs to.\n`faceTag` — same-visit, **consent still explicit and still recorded**, anchored to the ticket and purged at close of the operating day. **PDPL Article 4 is a closed list of exceptions with no legitimate-interests basis**, so a short life does not remove the need for consent — it only shortens what the consent is for.\n",
+  "enum": [
+   "facePass",
+   "faceTag"
+  ]
+ },
+ "BiometricRetentionAnchor": {
+  "type": "string",
+  "readOnly": true,
+  "description": "BL-106, ADR-0047. **What the expiry is measured from, derived from the kind rather than chosen.** A retention period a person can type is a retention period somebody will type wrongly; the anchor follows the kind, and the kind follows how the biometric was taken.\n`entitlementValidity` — `facePass`. The face cannot outlive the pass it was enrolled for.\n`ticketValidity` — `faceTag` against a dated ticket.\n`operatingDayClose` — `faceTag` where the ticket has no end of its own, plus `VenueSettings.biometrics.faceTagPurgeMinutesAfterClose`.\n",
+  "enum": [
+   "entitlementValidity",
+   "ticketValidity",
+   "operatingDayClose"
+  ]
+ },
+ "CreateResaleListingRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "description": "Request only; persisted as `ResaleListing`. **What a seller decides**: which entitlement, and at what price. The id, the status, the fee snapshot and the partition key are the server's, which is why `createResaleListing` no longer takes the whole listing.\n",
+  "required": [
+   "entitlementId",
+   "askPrice"
+  ],
+  "properties": {
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "askPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "sellerSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The holder listing it. A guest caller is always the seller and may name only themselves; a member of staff listing on a guest's behalf names the guest."
+   }
+  }
+ },
+ "DelegatedAccess": {
+  "x-ticvai-persistence": "identity.delegated_access",
+  "type": "object",
+  "required": [
+   "id",
+   "permission",
+   "scopePath",
+   "effect"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "permission": {
+    "type": "string",
+    "description": "From the permission enum. `*` permitted on DENY only."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "CF-132, CL-05. **A grant held by a guest rather than a staff principal.**\nSection 5.5 asks for portfolios — a primary holder assigning entitlements, transfer between linked accounts, shared wallets with individual tracking — and it appears ten times across ten sections. **Every one of those reduces to the same question: who may act on whose behalf, over what, and until when.**\n**That is a grant, not a household table.** A primary holder assigning an entitlement is a grant. A group leader holding tickets for twelve is a grant. A corporate account enrolling members is a grant with a quota. **A shared wallet with individual tracking is a grant over a balance, and the transaction log already records who spent.**\n**A household table would answer one of those four.**\n"
+   },
+   "overSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Whose behalf. **Null for a staff grant, which is the existing behaviour** — every grant written before 18 August means exactly what it meant before.\n"
+   },
+   "overObjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Where the authority is over a thing rather than a scope** — a wallet, an entitlement, a booking. `scopePath` answers *where*; this answers *what*, and a guest's authority is almost always over a specific object rather than a branch of the tree.\n"
+   },
+   "delegationKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "primaryHolder",
+     "familyMember",
+     "groupLeader",
+     "attendee",
+     "corporateAdmin",
+     "corporateMember",
+     "carer"
+    ],
+    "description": "**What kind of relationship this expresses**, for display and for reporting. The mechanism does not branch on it — a family member and a group attendee are the same grant with different words around them, which is the point.\n"
+   },
+   "quota": {
+    "type": "integer",
+    "nullable": true,
+    "description": "2.14.15 and 4.3.11. **How many the holder may assign.** A corporate account with fifty allocations and a family with four are the same structure with different numbers.\n"
+   },
+   "isRevocableBySubject": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Whether the person it is over can end it.** A guest who linked a family member should be able to unlink them; a corporate member should not be able to revoke their employer's oversight — and **a delegation nobody can end is a delegation somebody will regret.**\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "effect": {
+    "type": "string",
+    "enum": [
+     "ALLOW",
+     "DENY"
+    ]
+   },
+   "permissionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Taken from `identity.user_access`, 20 September, when that table was collapsed into this one.** `permission` above is free text; this names a row in `identity.permission`, the catalogue wired the same day. A grant that names a catalogue row can be checked against the keys the contracts actually enforce — which is the whole point of a catalogue that reported *154 on operations, 35 in roles.yaml, 0 shared*.\nNullable because a role grant carries no permission at all.\n"
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Taken from `identity.user_access`. This table recorded `revokedBy` and not when, so it could say who revoked a grant and not whether it was before or after the thing somebody is asking about.\n"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "FacePassEnrolment": {
   "type": "object",
   "x-ticvai-persistence": "pii.subject_biometric",
   "description": "3.2.43. **Metadata about a facial profile. Never the profile.**\n",
   "required": [
    "id",
+   "kind",
    "subjectId",
    "entitlementId",
    "source",
@@ -13,7 +168,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "subjectId": {
     "type": "string",
@@ -21,15 +177,30 @@
    },
    "entitlementId": {
     "type": "string",
-    "format": "uuid"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The `Entitlement.id`, a ULID (`pii.subject_biometric.entitlement_id`)."
+   },
+   "kind": {
+    "$ref": "#/components/schemas/BiometricKind"
+   },
+   "retentionAnchor": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/BiometricRetentionAnchor"
+     }
+    ],
+    "x-ticvai-derived": "onWrite",
+    "description": "BL-106. **Derived from `kind`, never sent.** `facePass` anchors to the entitlement, `faceTag` to the ticket or to the close of the operating day.\n"
    },
    "source": {
     "type": "string",
     "enum": [
      "guestApp",
      "ticketCounter",
-     "annualPassCounter"
-    ]
+     "annualPassCounter",
+     "entryGate"
+    ],
+    "description": "**`entryGate` is valid for `faceTag` only**, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. 3.2.44 puts a Face Tag at a gate precisely because it dies the same day.\n"
    },
    "capturedAt": {
     "type": "string",
@@ -57,12 +228,12 @@
     "type": "string",
     "format": "date-time",
     "nullable": true,
-    "description": "**Bounded by the entitlement it belongs to.** A face outliving the pass it was enrolled for is a biometric held for no stated purpose, which CF-64 has to settle.\n"
+    "description": "**Bounded by whatever `retentionAnchor` names**, and a face outliving it is a biometric held for no stated purpose.\n**Settled 20 September by ADR-0047**, which CF-64 had been carrying since 6 August: a `facePass` cannot outlive its entitlement and a `faceTag` does not survive the close of the operating day. **These are ceilings rather than defaults** — they cannot be configured upward, because a retention that a tenant can extend without limit is the breach ADR-0047 gave the platform a ceiling to prevent.\n"
    }
   }
  },
  "GiftCard": {
-  "x-ticvai-persistence": "retail.gift_card",
+  "x-ticvai-persistence": "wallet.gift_card",
   "type": "object",
   "required": [
    "cardCode",
@@ -146,6 +317,11 @@
     "type": "string",
     "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
    },
+   "tokenRef": {
+    "type": "string",
+    "writeOnly": true,
+    "description": "**A vault reference to the push token**, written by the server from `registerGuestDevice.token` — the same pattern as `PaymentProvider.credentialRef`. Never the token and never returned; the sender resolves it at send time. Without it a registered device could not be sent to.\n"
+   },
    "appVersion": {
     "type": "string",
     "nullable": true
@@ -190,6 +366,242 @@
    }
   }
  },
+ "GuestSession": {
+  "x-ticvai-persistence": "none — Redis session registry",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "tokens",
+   "isVerified",
+   "expiresAt"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string",
+    "nullable": true
+   },
+   "tokens": {
+    "$ref": "#/components/schemas/TokenPair"
+   },
+   "isVerified": {
+    "type": "boolean",
+    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse and fill a cart but not transact: the gate is the checkout page (ADR-0045), where `checkoutCart` refuses it until the guest verifies or proves the contact by code. UAE Pass returns a verified identity, so it starts true. Rule on `verifyGuestEmail`, decided 17 September 2026.\n"
+   },
+   "identityProviders": {
+    "type": "array",
+    "description": "Linked providers. Several may resolve to one account.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "password",
+      "otp",
+      "apple",
+      "google",
+      "uaePass"
+     ]
+    }
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells (ADR-0010)."
+   },
+   "requiresMfa": {
+    "type": "boolean",
+    "default": false,
+    "description": "True only where the sign-in venue enabled guest two-step verification (`VenueSettings.identity.guestTwoStep`, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per venue). The session is then not usable until `verifyMfaChallenge` succeeds on a `signIn` challenge. Always false for a UAE Pass sign-in, which is already a verified two-factor identity (proposed, client to correct).\n"
+   },
+   "mfaMethods": {
+    "type": "array",
+    "description": "The guest's active methods, so the client can offer the right one. Empty when `requiresMfa` is false.",
+    "items": {
+     "$ref": "#/components/schemas/MfaMethod"
+    }
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**30 days, sliding** (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. **One session per device**: a guest may be signed in on a phone and a laptop at once, and a new sign-in on the same `deviceId` ends that device's previous session.\n"
+   }
+  }
+ },
+ "IdentityGuestDocumentSubmission": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the document goes to pii.subject_document and the verification to identity.guest_identity_verification",
+  "required": [
+   "documentKind",
+   "documentNumber",
+   "documentAssetId"
+  ],
+  "properties": {
+   "documentKind": {
+    "type": "string",
+    "enum": [
+     "passport",
+     "emiratesId",
+     "nationalId",
+     "drivingLicence",
+     "residencePermit",
+     "other"
+    ],
+    "description": "The vocabulary of `pii.subject_document.kind`."
+   },
+   "documentNumber": {
+    "type": "string",
+    "format": "password",
+    "writeOnly": true,
+    "maxLength": 64,
+    "description": "**Write-only, never returned.** Hashed on arrival; only the last four are kept in clear."
+   },
+   "issuingCountry": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "expiresOn": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "documentAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The uploaded scan or photo of the document."
+   },
+   "selfieAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A live photo for the reviewer to compare, where the policy asks for one. Deleted with the scan."
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "policyRequired",
+     "ageRestrictedPurchase",
+     "residentPricing",
+     "accountRecovery"
+    ],
+    "default": "policyRequired",
+    "description": "What the guest is verifying for; the review queue shows it."
+   }
+  }
+ },
+ "IdentityGuestVerification": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.guest_identity_verification",
+  "description": "**One guest identity-document verification** (5.3.21; decided 29 September, build pass): the document it checks, its status, the method and who decided. The document itself is `pii.subject_document`; this row holds no document number.",
+  "required": [
+   "id",
+   "subjectId",
+   "status",
+   "submittedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectDocumentId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `pii.subject_document` row submitted."
+   },
+   "documentKind": {
+    "type": "string",
+    "enum": [
+     "passport",
+     "emiratesId",
+     "nationalId",
+     "drivingLicence",
+     "residencePermit",
+     "other"
+    ]
+   },
+   "documentNumberLast4": {
+    "type": "string",
+    "maxLength": 4,
+    "nullable": true,
+    "readOnly": true
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "policyRequired",
+     "ageRestrictedPurchase",
+     "residentPricing",
+     "accountRecovery"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "verified",
+     "rejected",
+     "resubmissionRequested"
+    ],
+    "readOnly": true
+   },
+   "method": {
+    "type": "string",
+    "enum": [
+     "manualReview",
+     "documentScanner",
+     "provider"
+    ],
+    "nullable": true,
+    "readOnly": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "maxLength": 300,
+    "nullable": true,
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "documentImageDeletedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the scan (and any selfie) was deleted under the policy's retention."
+   }
+  }
+ },
  "LoyaltyPosition": {
   "x-ticvai-persistence": "marketing.loyalty_position",
   "type": "object",
@@ -200,6 +612,12 @@
    "tierCode"
   ],
   "properties": {
+   "leaderboardNickname": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 24,
+    "description": "BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"
+   },
    "subjectId": {
     "type": "string",
     "format": "uuid"
@@ -213,6 +631,12 @@
    },
    "lifetimePoints": {
     "type": "integer"
+   },
+   "tierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"
    },
    "tierCode": {
     "type": "string"
@@ -235,9 +659,153 @@
    }
   }
  },
+ "MfaEnrolment": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "methodId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
+   },
+   "methodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
+   },
+   "qrCodeUri": {
+    "type": "string",
+    "nullable": true
+   },
+   "recoveryCodes": {
+    "type": "array",
+    "description": "Returned once, in this enrolment response (`enrolMfaMethod` writes them, hashed, to `identity.mfa_recovery_code`). Not retrievable afterwards — `verifyMfaEnrolment` does not return them.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MfaKind": {
+  "type": "string",
+  "enum": [
+   "totp",
+   "smsOtp",
+   "emailOtp",
+   "biometric",
+   "hardwareToken"
+  ]
+ },
+ "MfaMethod": {
+  "x-ticvai-persistence": "identity.mfa_method",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "isActive",
+   "enrolledAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "label": {
+    "type": "string",
+    "nullable": true
+   },
+   "maskedTarget": {
+    "type": "string",
+    "nullable": true,
+    "description": "Partially masked destination, so a person can tell two methods apart."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "enrolledAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
  "PaymentToken": {
   "type": "object",
-  "x-ticvai-persistence": "orders.payment_token",
+  "x-ticvai-persistence": "payments.token",
   "description": "BL-116. **A stored credential, held by the provider and referenced here.** The platform never sees a card number, which is what keeps PCI scope where it belongs.\n**A token is provider-scoped.** A card tokenised with one gateway does not work with another, so a routing change does not silently move a guest's saved card — it means asking them again, and the model should make that visible rather than surprising.\n",
   "required": [
    "id",
@@ -262,7 +830,8 @@
    "token": {
     "type": "string",
     "format": "password",
-    "description": "**Write-only, never returned.** The provider's reference to a credential it holds.\n"
+    "writeOnly": true,
+    "description": "**Write-only, never returned.** The provider's reference to a credential it holds. Required on the stored row; absent from every response.\n"
    },
    "method": {
     "type": "string"
@@ -290,7 +859,7 @@
  "ResaleListing": {
   "type": "object",
   "x-ticvai-persistence": "orders.resale_listing",
-  "description": "BL-060. **Smaller than it first looked** — most of the machinery exists. An entitlement can already be transferred, an order can already be created, and payment already routes. What was missing is the listing itself and a cart line that can point at one.\n**A resale is a transfer with money attached**, and the venue is in the middle: the seller's entitlement is voided and a new one issued to the buyer, so **the ticket that admits is always one the venue issued.** That is what stops a screenshot at the gate.\n",
+  "description": "BL-060. **Smaller than it first looked** — most of the machinery exists. An entitlement can already be transferred, an order can already be created, and payment already routes. What was missing is the listing itself and a cart line that can point at one.\n**A resale is a transfer with money attached**, and the venue is in the middle: the buyer becomes the owner of the same entitlement (the virtual ticket ID is preserved, MoM 1 Sep 4.14), its media is re-issued and the transfer is logged, so **the media that admits is always one the venue issued.** That is what stops a screenshot at the gate.\n",
   "required": [
    "id",
    "entitlementId",
@@ -301,11 +870,12 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "entitlementId": {
     "type": "string",
-    "format": "uuid"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "sellerSubjectId": {
     "type": "string",
@@ -317,35 +887,86 @@
    "priceCapPercent": {
     "type": "number",
     "nullable": true,
-    "description": "**A ceiling as a percentage of face value**, because uncapped resale is a venue watching its own tickets sold at four times the price with its name on them. Null means uncapped, which is a venue decision rather than a default.\n"
+    "readOnly": true,
+    "description": "**A ceiling as a percentage of face value**, because uncapped resale is a venue watching its own tickets sold at four times the price with its name on them. Null means uncapped, which is a venue decision rather than a default. Snapshotted from `ResaleFeePolicy` at listing.\n"
    },
    "sellerFeePercent": {
-    "type": "number"
+    "type": "number",
+    "readOnly": true,
+    "description": "Snapshotted from `ResaleFeePolicy` at listing."
    },
    "buyerFeePercent": {
-    "type": "number"
+    "type": "number",
+    "readOnly": true,
+    "description": "Snapshotted from `ResaleFeePolicy` at listing."
    },
    "status": {
     "type": "string",
+    "readOnly": true,
     "enum": [
+     "pendingReview",
      "listed",
      "reserved",
      "sold",
      "withdrawn",
-     "expired"
-    ]
+     "expired",
+     "rejected"
+    ],
+    "description": "`pendingReview` and `rejected` added 29 September (DM5): a listing the marketplace's `moderationMode` sends to review waits there until `approveListingModeration` lists or rejects it."
    },
    "listedAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "readOnly": true
    },
    "soldToSubjectId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true
+   },
+   "reviewReasons": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Why the listing was sent to review (DM5, 29 September).",
+    "items": {
+     "type": "string",
+     "enum": [
+      "highResalePrice",
+      "unusualDiscount",
+      "highValueTicket",
+      "vipTicket",
+      "sellerRisk",
+      "newSeller",
+      "multipleListings",
+      "identityIssue",
+      "paymentIssue",
+      "ticketOwnershipConcern",
+      "fraudIndicator"
+     ]
+    }
+   },
+   "moderatedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "moderatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "moderationReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "readOnly": true
    },
    "payoutStatus": {
     "type": "string",
+    "readOnly": true,
     "enum": [
      "pending",
      "held",
@@ -356,7 +977,254 @@
    },
    "scopePath": {
     "type": "string",
+    "readOnly": true,
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Session": {
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "roleId",
+   "scope",
+   "effectivePermissions",
+   "saleBoardId"
+  ],
+  "properties": {
+   "sessionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "scope": {
+    "type": "array",
+    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+    }
+   },
+   "effectivePermissions": {
+    "allOf": [
+     {
+      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
+     }
+    ],
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+   },
+   "permissionsByScope": {
+    "type": "array",
+    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
+    }
+   },
+   "saleBoardId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
+   },
+   "workstation": {
+    "$ref": "#/components/schemas/WorkstationContext"
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "TokenPair": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "accessToken",
+   "refreshToken",
+   "expiresIn"
+  ],
+  "properties": {
+   "accessToken": {
+    "type": "string",
+    "description": "JWT carrying `sid`, validated per request against the session registry."
+   },
+   "refreshToken": {
+    "type": "string"
+   },
+   "expiresIn": {
+    "type": "integer",
+    "description": "Seconds"
+   }
+  }
+ },
+ "WalletTransaction": {
+  "x-ticvai-persistence": "wallet.wallet_transaction",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "amount",
+   "balanceAfter",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "wallet.wallet",
+    "description": "The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "wallet.hold",
+    "description": "The hold a spend settled, where it came through `holdWalletFunds`."
+   },
+   "kind": {
+    "$ref": "#/components/schemas/WalletTransactionKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balanceAfter": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "orderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WalletTransactionKind": {
+  "type": "string",
+  "enum": [
+   "topUp",
+   "spend",
+   "refund",
+   "adjustment",
+   "bonus",
+   "expiry",
+   "transfer"
+  ]
+ },
+ "WorkstationContext": {
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "venueId",
+   "regionId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Inherited from the workstation, never selected by the operator."
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "driver"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "receiptPrinter",
+        "ticketPrinter",
+        "cashDrawer",
+        "barcodeScanner",
+        "rfidReader",
+        "paymentTerminal",
+        "customerDisplay"
+       ]
+      },
+      "driver": {
+       "type": "string"
+      },
+      "identifier": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4
+   },
+   "timezone": {
+    "type": "string"
+   },
+   "cellName": {
+    "type": "string",
+    "description": "The cell serving this workstation's region. One cell per tenant per region (ADR-0014). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+   },
+   "deploymentProfile": {
+    "type": "string",
+    "enum": [
+     "terminalLocal",
+     "venueEdge",
+     "thin"
+    ],
+    "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
    }
   }
  }

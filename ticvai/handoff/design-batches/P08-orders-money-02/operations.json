@@ -113,6 +113,25 @@
   "requestBody": "CreateCashMovementRequest",
   "responds": "CashMovement"
  },
+ "createDeliveryLocation": {
+  "method": "POST",
+  "path": "/delivery-locations",
+  "contract": "fnb",
+  "summary": "Add a place food can be delivered to",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeliveryLocation"
+ },
  "createMerchandise": {
   "method": "POST",
   "path": "/merchandise",
@@ -326,7 +345,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
  },
@@ -1219,6 +1244,30 @@
   "requestBody": null,
   "responds": "ReportDefinition"
  },
+ "setDeliveryLocationOutletMapping": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/delivery-location-outlets",
+  "contract": "fnb",
+  "summary": "Set which outlets deliver to which delivery locations",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeliveryLocation"
+ },
  "setRefundPolicy": {
   "method": "PUT",
   "path": "/venues/{venueId}/refund-policy",
@@ -1229,6 +1278,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -1275,6 +1329,30 @@
   ],
   "requestBody": null,
   "responds": "Shift"
+ },
+ "updateDeliveryLocation": {
+  "method": "PATCH",
+  "path": "/delivery-locations/{locationId}",
+  "contract": "fnb",
+  "summary": "Rename a delivery location, or take it out of service",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeliveryLocation"
  },
  "updateMerchandise": {
   "method": "PATCH",

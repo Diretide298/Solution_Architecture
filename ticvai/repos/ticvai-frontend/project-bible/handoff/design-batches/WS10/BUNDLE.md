@@ -1,6 +1,6 @@
 # WS10 — Access Control board 10
 
-**10 screens · 19 operations · 28 schemas · 6 permissions**
+**10 screens · 20 operations · 31 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-234` | Dynamic Access Policy Command Center | listDetail | 2 | 0 | — |
+| `BO-234` | Dynamic Access Policy Command Center | listDetail | 3 | 0 | — |
 | `BO-235` | Access Attribute Catalog | listDetail | 2 | 0 | — |
 | `BO-236` | Visual Dynamic Policy Builder | listDetail | 1 | 0 | — |
 | `BO-237` | Context, Time, Event & Capacity Policy Builder | commandCentre | 1 | 0 | — |
@@ -69,7 +69,7 @@ convincingly. It is never a caption.
 | `BO-240` | Authorization Governance & Temporary Access | listDetail | 1 | 0 | — |
 | `BO-241` | Policy Evaluation Architecture & Offline Distribution | listDetail | 4 | 1 | — |
 | `BO-242` | Policy Simulation, Conflict & Impact Analysis | listDetail | 1 | 0 | — |
-| `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | listDetail | 5 | 1 | — |
+| `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | listDetail | 6 | 1 | — |
 
 ## Thin screens in this batch
 
@@ -318,6 +318,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listDynamicAccessPolicy"
     ]
+   },
+   {
+    "operationId": "listDynamicPolicyEffectiveness",
+    "contract": "access",
+    "purpose": "Open a policy's effectiveness from the command center",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1658,6 +1665,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "access",
     "purpose": "Roll back policy",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listDynamicPolicyEffectiveness",
+    "contract": "access",
+    "purpose": "Per-policy triggers, denials, overrides and trend over a period",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1824,6 +1838,55 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listDynamicPolicyEffectiveness": {
+  "method": "GET",
+  "path": "/dynamic-policy-effectiveness",
+  "contract": "access",
+  "summary": "How each gate admission policy has behaved over a period",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "policyId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "policyType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listIdentityMembershipAccreditation": {
   "method": "GET",
   "path": "/identity-membership-accreditation",
@@ -1950,7 +2013,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Define which zones, on which dates, at which times",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2217,6 +2280,118 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "attributeKey",
    "category"
   ]
+ },
+ "AccessDynamicPolicyEffectiveness": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from access.scan_event (dynamicPolicyId, dynamicPolicyResult and override rows) over the requested period, joined to access.dynamic_policy",
+  "description": "One gate admission policy over a period (3.3.48; decided 29 September, build pass).",
+  "required": [
+   "policyId",
+   "triggers"
+  ],
+  "properties": {
+   "policyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "policyName": {
+    "type": "string"
+   },
+   "policyType": {
+    "type": "string",
+    "enum": [
+     "guestAttribute",
+     "accreditation",
+     "occupancy",
+     "employee",
+     "risk",
+     "membership",
+     "timeEvent"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "inactive",
+     "expired"
+    ]
+   },
+   "versionsInPeriod": {
+    "type": "array",
+    "items": {
+     "type": "integer"
+    },
+    "description": "The versions that decided a scan in the period."
+   },
+   "triggers": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Scans this policy decided."
+   },
+   "allowed": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "denied": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "sentToReview": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "steppedUp": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Scans the policy sent to requireId, requireBiometric, requireCompanion or requireSupervisor."
+   },
+   "overridden": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Denials a supervisor then admitted against (an override row naming the denied scan)."
+   },
+   "overrideRatePercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "overridden over denied; null when nothing was denied."
+   },
+   "lastTriggeredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "neverTriggered": {
+    "type": "boolean",
+    "description": "Active through the period and decided nothing."
+   },
+   "trend": {
+    "type": "array",
+    "description": "One point per day in the period, in the venue's time zone.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "triggers": {
+       "type": "integer"
+      },
+      "denied": {
+       "type": "integer"
+      },
+      "overridden": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
  },
  "AccessPolicyEvaluationSetting": {
   "type": "object",
@@ -2644,6 +2819,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "aiAssessment": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
+    "properties": {
+     "riskScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "riskBand": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "critical"
+      ]
+     },
+     "priorityScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "escalationSuggestion": {
+      "type": "object",
+      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
+      "properties": {
+       "action": {
+        "type": "string",
+        "enum": [
+         "escalate",
+         "addBackupApprover",
+         "none"
+        ]
+       },
+       "reason": {
+        "type": "string",
+        "nullable": true
+       }
+      }
+     },
+     "signals": {
+      "type": "array",
+      "maxItems": 10,
+      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "code": {
+         "type": "string"
+        },
+        "contribution": {
+         "type": "number"
+        },
+        "detail": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     },
+     "scoreId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
+     },
+     "decisionRecordId": {
+      "type": "string",
+      "description": "The ai decision record, for the audit of what the AI said and why."
+     },
+     "assessedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    }
   }
  },
@@ -2660,6 +2913,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "withdrawn",
    "expired",
    "cancelled"
+  ]
+ },
+ "AuthorizationGovernanceTemporaryAccessView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Authorization Governance & Temporary Access displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "grantType": {
+    "type": "string",
+    "enum": [
+     "temporary",
+     "emergency",
+     "delegatedAdministration"
+    ]
+   },
+   "grantId": {
+    "type": "string"
+   },
+   "scope": {
+    "type": "string",
+    "description": "scope"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "description": "duration"
+   },
+   "reason": {
+    "type": "string",
+    "description": "reason"
+   },
+   "approver": {
+    "type": "string",
+    "description": "approver"
+   },
+   "granteeUserId": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingApproval",
+     "active",
+     "expired",
+     "revoked"
+    ]
+   }
+  },
+  "required": [
+   "grantId",
+   "grantType",
+   "scope",
+   "validFrom",
+   "validTo",
+   "reason"
   ]
  },
  "ContextTimeEventCapacityPolicyBuilderInput": {
@@ -2915,6 +3228,53 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "required": [
    "policyId"
   ]
+ },
+ "DynamicAccessPolicyCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "activePolicies": {
+    "type": "integer",
+    "description": "Active Policies"
+   },
+   "draftPolicies": {
+    "type": "integer",
+    "description": "Draft Policies"
+   },
+   "policiesPendingApproval": {
+    "type": "integer",
+    "description": "Policies Pending Approval"
+   },
+   "policiesTriggeredToday": {
+    "type": "integer",
+    "description": "Policies Triggered Today"
+   },
+   "allowDecisions": {
+    "type": "integer",
+    "description": "Allow Decisions"
+   },
+   "denyDecisions": {
+    "type": "integer",
+    "description": "Deny Decisions"
+   },
+   "reviewDecisions": {
+    "type": "integer",
+    "description": "Review decisions today"
+   },
+   "policyConflicts": {
+    "type": "integer",
+    "description": "Policy Conflicts"
+   },
+   "expiringPolicies": {
+    "type": "integer",
+    "description": "Expiring Policies"
+   },
+   "aiRecommendations": {
+    "type": "integer",
+    "description": "AI Recommendations"
+   }
+  }
  },
  "EdgeNodeLocalProcessingConfigurationInput": {
   "type": "object",

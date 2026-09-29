@@ -1,0 +1,115 @@
+{
+ "buildConfigurationPlan": {
+  "method": "POST",
+  "path": "/configuration-sessions/{sessionId}/plan",
+  "contract": "ai",
+  "summary": "Compile the blueprint into a plan",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ },
+ "decideBlueprintRecommendation": {
+  "method": "POST",
+  "path": "/configuration-sessions/{sessionId}/decisions/{decisionKey}",
+  "contract": "ai",
+  "summary": "Accept, modify, reject or defer a blueprint decision",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiBlueprintDecision"
+ },
+ "getActionPlan": {
+  "method": "GET",
+  "path": "/action-plans/{planId}",
+  "contract": "ai",
+  "summary": "A plan with its steps",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ },
+ "getConfigurationBlueprint": {
+  "method": "GET",
+  "path": "/configuration-sessions/{sessionId}/blueprint",
+  "contract": "ai",
+  "summary": "The blueprint so far",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "decisionClass",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiBlueprintView"
+ },
+ "setChannelPricingCommercial": {
+  "method": "PUT",
+  "path": "/channel-pricing-commercial",
+  "contract": "catalogue",
+  "summary": "Channel Pricing & Commercial Profile Assignment",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChannelPricingCommercialProfileAssignmentInput",
+  "responds": "ChannelPricingCommercialProfileAssignmentView"
+ },
+ "simulateActionPlan": {
+  "method": "POST",
+  "path": "/action-plans/{planId}/simulate",
+  "contract": "ai",
+  "summary": "Validate and simulate a plan without changing anything",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ }
+}

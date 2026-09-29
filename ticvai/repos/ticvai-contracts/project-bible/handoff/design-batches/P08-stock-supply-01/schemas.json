@@ -726,6 +726,140 @@
    }
   ]
  },
+ "InventoryKitComponent": {
+  "x-ticvai-persistence": "inventory.kit_component",
+  "type": "object",
+  "description": "4.4.20. One component of a kit and the quantity one kit consumes.",
+  "required": [
+   "componentItemId",
+   "quantity"
+  ],
+  "properties": {
+   "kitItemId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "componentItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "number",
+    "exclusiveMinimum": 0
+   },
+   "unit": {
+    "type": "string",
+    "nullable": true,
+    "description": "The component's base unit where omitted."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written at the kit item's venue scope."
+   }
+  }
+ },
+ "InventoryKitDefinition": {
+  "x-ticvai-persistence": "none — composed of the item's inventory.kit_component rows",
+  "type": "object",
+  "description": "4.4.20. Also the `setInventoryKitDefinition` body.",
+  "required": [
+   "components"
+  ],
+  "properties": {
+   "kitItemId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "components": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/InventoryKitComponent"
+    }
+   }
+  }
+ },
+ "InventorySupplierContract": {
+  "type": "object",
+  "x-ticvai-persistence": "inventory.supplier_contract",
+  "description": "**Taken from the backend workbook, 20 September.** Stores purchasing agreements, validity dates, and commercial terms agreed with a supplier.",
+  "required": [
+   "supplierId",
+   "number",
+   "name",
+   "validFrom",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "number": {
+    "type": "string",
+    "maxLength": 100
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "currencyCode": {
+    "type": "string",
+    "maxLength": 10,
+    "nullable": true
+   },
+   "paymentTermsDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "documentReference": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 30,
+    "enum": [
+     "draft",
+     "active",
+     "expired",
+     "terminated"
+    ],
+    "description": "Written by `createSupplierContract` and `updateSupplierContract`; `expired` is set by the server once `validTo` has passed (29 September, writers pass)."
+   },
+   "statusReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "LocationKind": {
   "type": "string",
   "enum": [
@@ -820,6 +954,35 @@
    }
   }
  },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "MovementKind": {
   "type": "string",
   "description": "**The kind decides the direction** (decided 28 September, audit R171). In: `receipt`, `transferIn`, `adjustmentIn`, `countGain`, `production` (the finished item entering stock; the ingredients leave as `issue`). Out: `issue`, `saleDepletion`, `waste`, `adjustmentOut`, `transferOut`, `countLoss`, `supplierReturn`. `adjustment` and `countAdjustment` were split into an in and an out kind so that no kind has two directions.\n",
@@ -837,6 +1000,95 @@
    "supplierReturn",
    "production"
   ]
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
  },
  "Page": {
   "type": "object",
@@ -1384,6 +1636,55 @@
    "cancelled"
   ]
  },
+ "RequisitionSuggestion": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "itemId",
+   "onHand",
+   "reorderPoint",
+   "suggestedQuantity"
+  ],
+  "properties": {
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemName": {
+    "type": "string"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "reorderPoint": {
+    "type": "number"
+   },
+   "parLevel": {
+    "type": "number"
+   },
+   "suggestedQuantity": {
+    "type": "number"
+   },
+   "averageDailyConsumption": {
+    "type": "number"
+   },
+   "daysOfCoverRemaining": {
+    "type": "number"
+   },
+   "preferredSupplierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "leadTimeDays": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
  "StartStockCountRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -1603,6 +1904,62 @@
    }
   ]
  },
+ "StockPosition": {
+  "x-ticvai-persistence": "none — derived from movements",
+  "type": "object",
+  "required": [
+   "itemId",
+   "locationId",
+   "onHand",
+   "unit"
+  ],
+  "properties": {
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemName": {
+    "type": "string"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationName": {
+    "type": "string"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "allocated": {
+    "type": "number",
+    "description": "**Reserved for orders**: the quantity under an active stock reservation for an order (decided 28 September, audit R171). A transfer is not allocation: dispatched stock has already left on-hand and sits in transit.\n"
+   },
+   "available": {
+    "type": "number",
+    "description": "**On-hand minus allocated** (decided 28 September, audit R171). What can still be sold or issued.\n"
+   },
+   "unit": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lastCountedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastMovementAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "StockTransfer": {
   "x-ticvai-persistence": "inventory.transfer + inventory.transfer_line",
   "type": "object",
@@ -1770,6 +2127,27 @@
       }
      }
     }
+   }
+  }
+ },
+ "SupervisorStepUp": {
+  "type": "object",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "required": [
+   "principalId",
+   "credential"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The supervisor signing. Recorded against the act."
+   },
+   "credential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
    }
   }
  },

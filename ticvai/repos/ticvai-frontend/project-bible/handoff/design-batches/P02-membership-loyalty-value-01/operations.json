@@ -1,11 +1,11 @@
 {
- "evaluatePromotions": {
+ "createInstalmentPlan": {
   "method": "POST",
-  "path": "/promotions/evaluate",
-  "contract": "promotions",
-  "summary": "Evaluate promotions against a cart",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": true,
+  "path": "/instalment-plans",
+  "contract": "payments",
+  "summary": "Split an order's payment into scheduled instalments on a stored card",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -15,8 +15,56 @@
     "required": null
    }
   ],
-  "requestBody": "EvaluatePromotionsRequest",
-  "responds": "PromotionEvaluation"
+  "requestBody": null,
+  "responds": "PayInstalmentPlan"
+ },
+ "decideRecommendations": {
+  "method": "POST",
+  "path": "/recommendations/decide",
+  "contract": "ai",
+  "summary": "Fill a recommendation slot",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRecommendationResult"
+ },
+ "getBillingStatement": {
+  "method": "GET",
+  "path": "/billing-statements/{statementId}",
+  "contract": "orders",
+  "summary": "One statement, with its lines",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "statementId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": "format",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "BillingStatement"
  },
  "getLoyaltyPosition": {
   "method": "GET",
@@ -27,7 +75,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": true
+   }
+  ],
   "requestBody": null,
   "responds": null
  },
@@ -53,15 +107,47 @@
  "getWallet": {
   "method": "GET",
   "path": "/wallets/{subjectId}",
-  "contract": "retail",
+  "contract": "wallet",
   "summary": "Read a guest wallet",
-  "permission": "ORDER_VIEW",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "getWalletAutoReloadSetting": {
+  "method": "GET",
+  "path": "/wallets/{walletId}/auto-reload",
+  "contract": "wallet",
+  "summary": "A wallet's own auto top-up, if the holder set one",
+  "permission": "WALLET_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "Wallet"
+  "responds": "WalletAutoReloadSetting"
+ },
+ "getWalletExitBalance": {
+  "method": "GET",
+  "path": "/wallets/{walletId}/exit-balance",
+  "contract": "wallet",
+  "summary": "What the holder owes or is owed on leaving",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletExitBalance"
  },
  "grantDelegation": {
   "method": "POST",
@@ -81,6 +167,40 @@
   ],
   "requestBody": null,
   "responds": "DelegatedAccess"
+ },
+ "listBillingStatements": {
+  "method": "GET",
+  "path": "/billing-statements",
+  "contract": "orders",
+  "summary": "What was charged, when, and against which agreement",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listDelegations": {
   "method": "GET",
@@ -104,7 +224,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Page"
  },
  "listGuestMemberships": {
   "method": "GET",
@@ -133,7 +253,41 @@
    }
   ],
   "requestBody": null,
-  "responds": "GuestMembership"
+  "responds": "Page"
+ },
+ "listInstalmentPlans": {
+  "method": "GET",
+  "path": "/instalment-plans",
+  "contract": "payments",
+  "summary": "Instalment plans and their schedules",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listLoyaltyProgrammes": {
   "method": "GET",
@@ -157,7 +311,31 @@
    }
   ],
   "requestBody": null,
-  "responds": "LoyaltyProgramme"
+  "responds": "Page"
+ },
+ "listMyPaymentIssues": {
+  "method": "GET",
+  "path": "/guests/me/payment-issues",
+  "contract": "payments",
+  "summary": "A guest's own failed recurring payments",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listProducts": {
   "method": "GET",
@@ -181,6 +359,21 @@
    },
    {
     "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
     "in": "query",
     "required": null
    },
@@ -240,9 +433,9 @@
  "listWalletTransactions": {
   "method": "GET",
   "path": "/wallets/{subjectId}/transactions",
-  "contract": "retail",
+  "contract": "wallet",
   "summary": "Wallet transaction history",
-  "permission": "ORDER_VIEW",
+  "permission": "WALLET_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -256,9 +449,100 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "recordRecommendationEvents": {
+  "method": "POST",
+  "path": "/recommendations/events",
+  "contract": "ai",
+  "summary": "Report what happened to recommended items",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "retryMyDunningPayment": {
+  "method": "POST",
+  "path": "/dunning-cases/{caseId}/retry",
+  "contract": "payments",
+  "summary": "Retry a declined membership payment now",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "caseId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": "RetryDunningPaymentRequest",
+  "responds": "DunningCase"
+ },
+ "setWalletAutoReloadSetting": {
+  "method": "PUT",
+  "path": "/wallets/{walletId}/auto-reload",
+  "contract": "wallet",
+  "summary": "Top the wallet up automatically from a stored card when it runs low",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletAutoReloadSetting",
+  "responds": "WalletAutoReloadSetting"
+ },
+ "settleWalletAtExit": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/exit-settlement",
+  "contract": "wallet",
+  "summary": "Settle a short balance, or refund a credit, when the holder leaves",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletExitSettlement"
  }
 }

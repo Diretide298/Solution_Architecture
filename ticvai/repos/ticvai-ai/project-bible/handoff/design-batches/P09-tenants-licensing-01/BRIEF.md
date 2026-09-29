@@ -1,6 +1,6 @@
 # P09-tenants-licensing-01 — P09 · Tenants & Licensing
 
-**9 screens · 34 operations · 39 schemas · 14 permissions**
+**9 screens · 40 operations · 46 schemas · 15 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 14 permissions apply here:
-  `DEVELOPER_ADMIN, DEVELOPER_VIEW, PARTNER_MANAGE, PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_CELL_MANAGE, PLATFORM_CELL_VIEW, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_TERMINATE, PLATFORM_TENANT_VIEW, SCOPE_MANAGE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 15 permissions apply here:
+  `DEVELOPER_ADMIN, DEVELOPER_VIEW, PARTNER_MANAGE, PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_CELL_MANAGE, PLATFORM_CELL_VIEW, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_TERMINATE, PLATFORM_TENANT_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: getTenantLicences
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,12 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-005` | Tenant Directory | listDetail | 15 | 3 | — |
-| `ADM-006` | Tenant Hierarchy Explorer | listDetail | 9 | 0 | — |
-| `ADM-007` | Module & Feature Entitlement | listDetail | 9 | 1 | — |
-| `ADM-008` | Subscription & Plan Management | listDetail | 19 | 0 | — |
-| `ADM-009` | Tenant Billing & Invoicing | listDetail | 9 | 0 | — |
+| `ADM-005` | Tenant Directory | listDetail | 16 | 9 | — |
+| `ADM-006` | Tenant Hierarchy Explorer | listDetail | 9 | 2 | — |
+| `ADM-007` | Module & Feature Entitlement | listDetail | 9 | 2 | — |
+| `ADM-008` | Subscription & Plan Management | listDetail | 19 | 7 | — |
+| `ADM-009` | Tenant Billing & Invoicing | listDetail | 10 | 1 | — |
 | `ADM-010` | Usage Metering | listDetail | 7 | 0 | — |
-| `ADM-011` | Licence & Seat Management | listDetail | 11 | 1 | — |
-| `ADM-012` | Tenant Isolation & Resource Pool | listDetail | 8 | 0 | — |
-| `ADM-015` | API Rate Limit & Quota Management | listDetail | 9 | 0 | — |
-
-## Thin screens in this batch
-
-**ADM-010, ADM-015 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `ADM-011` | Licence & Seat Management | listDetail | 11 | 4 | — |
+| `ADM-012` | Tenant Isolation & Resource Pool | listDetail | 8 | 1 | — |
+| `ADM-015` | API Rate Limit & Quota Management | listDetail | 13 | 3 | — |

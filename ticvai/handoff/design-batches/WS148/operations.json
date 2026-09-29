@@ -1,0 +1,176 @@
+{
+ "createPaymentProviderConnection": {
+  "method": "POST",
+  "path": "/payment-providers",
+  "contract": "payments",
+  "summary": "Connect a provider",
+  "permission": "PAYMENT_PROVIDER_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PaymentProviderConnection",
+  "responds": "PaymentProviderConnection"
+ },
+ "getPaymentProviderEconomics": {
+  "method": "GET",
+  "path": "/payment-providers/economics",
+  "contract": "payments",
+  "summary": "What each provider actually costs",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProviderEconomics"
+ },
+ "getPaymentProviderHealth": {
+  "method": "GET",
+  "path": "/payment-providers/health",
+  "contract": "payments",
+  "summary": "Authorisation rate, latency and availability, per provider",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProviderHealth"
+ },
+ "listPaymentProviderConnections": {
+  "method": "GET",
+  "path": "/payment-providers",
+  "contract": "payments",
+  "summary": "Gateways, PSPs and acquirers, and what each can do",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PaymentProviderConnection"
+ },
+ "listPaymentRoutingRules": {
+  "method": "GET",
+  "path": "/payment-routing-rules",
+  "contract": "payments",
+  "summary": "Which provider takes which transaction",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PaymentRoutingRule"
+ },
+ "setPaymentFailoverPolicy": {
+  "method": "PUT",
+  "path": "/payment-failover-policy",
+  "contract": "payments",
+  "summary": "What happens when a provider fails, and when to stop trying",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PaymentFailoverPolicy",
+  "responds": "PaymentFailoverPolicy"
+ },
+ "setPaymentRoutingRules": {
+  "method": "PUT",
+  "path": "/payment-routing-rules",
+  "contract": "payments",
+  "summary": "Route by method, currency, venue, amount, cost or share",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentRoutingRule"
+ },
+ "simulatePaymentRouting": {
+  "method": "POST",
+  "path": "/payment-routing/simulate",
+  "contract": "payments",
+  "summary": "Where would this transaction go, and why",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RoutingContext",
+  "responds": "RoutingDecision"
+ },
+ "testPaymentProviderConnection": {
+  "method": "POST",
+  "path": "/payment-providers/{connectionId}/test",
+  "contract": "payments",
+  "summary": "Prove the connection works before anybody pays through it",
+  "permission": "PAYMENT_PROVIDER_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProviderTestResult"
+ }
+}

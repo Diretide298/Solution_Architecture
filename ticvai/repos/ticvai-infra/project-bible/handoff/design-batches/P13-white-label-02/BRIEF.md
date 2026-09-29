@@ -1,6 +1,6 @@
-# P13-white-label-02 — P13 · White Label (2 of 2)
+# P13-white-label-02 — P13 · White Label (2 of 3)
 
-**10 screens · 35 operations · 42 schemas · 9 permissions**
+**10 screens · 40 operations · 64 schemas · 10 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 9 permissions apply here:
-  `GUEST_MANAGE, GUEST_VIEW, MARKETING_MANAGE, PRODUCT_VIEW, ROLE_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH, USER_MANAGE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 10 permissions apply here:
+  `AI_USE, GUEST_MANAGE, GUEST_VIEW, MARKETING_MANAGE, PRODUCT_VIEW, ROLE_MANAGE, SCOPE_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH, USER_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -63,13 +63,13 @@ convincingly. It is never a caption.
 | `CMS-013` | SEO & Metadata | configEditor | 1 | 0 | — |
 | `CMS-011` | Translations | configEditor | 1 | 0 | — |
 | `CMS-012` | RTL Preview | statusTracker | 2 | 0 | — |
-| `CMS-014` | Publishing Workflow | statusTracker | 3 | 1 | — |
+| `CMS-014` | Publishing Workflow | statusTracker | 4 | 1 | — |
 | `CMS-015` | Version History | listDetail | 3 | 1 | — |
-| `CMS-016` | Site Settings | statusTracker | 5 | 1 | — |
+| `CMS-016` | Site Settings | statusTracker | 6 | 1 | — |
 | `CMS-017` | Domain & Certificate | listDetail | 4 | 1 | — |
 | `CMS-018` | Consent & Legal | listDetail | 8 | 4 | — |
 | `CMS-019` | User Access | listDetail | 2 | 0 | — |
-| `CMS-101` | Help Me Choose | listDetail | 9 | 3 | — |
+| `CMS-101` | Help Me Choose | listDetail | 12 | 3 | — |
 
 ## Thin screens in this batch
 

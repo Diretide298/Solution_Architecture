@@ -1,0 +1,1041 @@
+{
+ "AiActionPlan": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_plan",
+  "description": "**A plan: plan, validate, simulate, approve, execute, with rollback** (design 2.2 D, 3.8; AIC-086..107). Independent of any conversation (AIC-102). Its steps are `ai.action_step`; the change set is hashed so what was approved is what runs (AIC-181).",
+  "required": [
+   "origin",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "origin": {
+    "type": "string",
+    "enum": [
+     "configurationSession",
+     "generateConfiguration",
+     "assistant",
+     "riskCase",
+     "operationalRequirement",
+     "rollback"
+    ]
+   },
+   "originRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "validated",
+     "simulated",
+     "awaitingApproval",
+     "approved",
+     "executing",
+     "paused",
+     "completed",
+     "partiallyCompleted",
+     "failed",
+     "compensated",
+     "cancelled",
+     "rolledBack"
+    ],
+    "readOnly": true
+   },
+   "autonomyLevel": {
+    "$ref": "#/components/schemas/AiAutonomyLevel"
+   },
+   "approvalTier": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). Not an autonomy level."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request, where tier 2 or the matrix caught the plan."
+   },
+   "proposedActionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.proposed_action",
+    "description": "The `ai.proposed_action` the plan is presented as for a decision."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "governanceOutcome": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiGovernanceOutcome"
+     }
+    ],
+    "readOnly": true
+   },
+   "policyVersionRef": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The governance policy version that decided it."
+   },
+   "simulation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4)."
+   },
+   "partialCompletionAllowed": {
+    "type": "boolean",
+    "default": false,
+    "description": "Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134)."
+   },
+   "rollbackOfPlanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiActionPlanDetail": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.action_plan with its ai.action_step rows",
+  "description": "A plan with its steps in DAG order.",
+  "required": [
+   "plan",
+   "steps"
+  ],
+  "properties": {
+   "plan": {
+    "$ref": "#/components/schemas/AiActionPlan"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiActionStep"
+    }
+   }
+  }
+ },
+ "AiActionStep": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_step",
+  "description": "One step of a plan: a registered tool against `targetContract.targetOperation` at a contract version (AIC-095), with payload, provenance, compensation and the idempotency key `plan:{id}:step:{n}`. **Scoped through its plan** (`platform.apply_parent_rls`). Each step records its target object's version; drift pauses the plan (AIC-182).",
+  "required": [
+   "planId",
+   "stepNumber",
+   "toolKey",
+   "targetContract",
+   "targetOperation",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "stepNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "dependsOn": {
+    "type": "array",
+    "items": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "description": "Step numbers that must succeed first. The plan is a DAG."
+   },
+   "toolKey": {
+    "type": "string"
+   },
+   "targetContract": {
+    "type": "string"
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "contractVersion": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body of `targetOperation`, validated against it before the plan is approved."
+   },
+   "provenance": {
+    "$ref": "#/components/schemas/AiProvenance"
+   },
+   "idempotencyKey": {
+    "type": "string",
+    "readOnly": true
+   },
+   "targetObjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "targetObjectVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The version the step was planned against. A different version at execution is drift."
+   },
+   "reversible": {
+    "type": "boolean"
+   },
+   "compensation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "validated",
+     "running",
+     "succeeded",
+     "failed",
+     "compensated",
+     "skipped",
+     "paused"
+    ],
+    "readOnly": true
+   },
+   "attempts": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 3,
+    "readOnly": true,
+    "description": "Bounded at 3 (AIC-135)."
+   },
+   "lastError": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resultRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The owning service's response: success is its answer, not a model's judgement (AIC-097)."
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "AiCapability": {
+  "type": "string",
+  "description": "What a capability needs, not which provider serves it. This indirection is what makes \"no provider SDK in capability code\" enforceable.\n**`speechToText` and `textToSpeech` added 18 August (BL-164)** — voice added rather than declined. **Speech is the capability where UAE residency is hardest to satisfy**: the major providers run it in fewer regions than text, and a guest speaking into a kiosk is producing personal data in the moment. `AiProvider.residency` already carries the constraint and **speech is the capability most likely to fail it**, which is why it is separate rather than folded into `chat`.\n",
+  "enum": [
+   "chat",
+   "embedding",
+   "vision",
+   "rerank",
+   "speechToText",
+   "textToSpeech"
+  ]
+ },
+ "AiDecisionRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.decision_record",
+  "description": "**The standard record for every governed decision** (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast publication, a plan step, an assistant answer at significant depth, a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
+  "required": [
+   "traceId",
+   "capabilityKey",
+   "outcome",
+   "recordHash"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "traceId": {
+    "type": "string"
+   },
+   "capabilityKey": {
+    "type": "string"
+   },
+   "task": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectKind": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "inputsRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself."
+   },
+   "evidence": {
+    "$ref": "#/components/schemas/AiEvidenceItemList"
+   },
+   "producer": {
+    "type": "string",
+    "nullable": true
+   },
+   "modelVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "promptTemplateVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "featureSetVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "knowledgeVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "ruleVersions": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "governanceOutcome": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiGovernanceOutcome"
+     }
+    ],
+    "nullable": true
+   },
+   "policyVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "approvals": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Approval requests and their decisions."
+   },
+   "humanDecision": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Override or intervention, where a person changed the outcome."
+   },
+   "executionResult": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "outcomeRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The business outcome it links to (an order, a published version, a closed case)."
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "answered",
+     "refused",
+     "allowed",
+     "blocked",
+     "executed",
+     "failed",
+     "approvedThenFailed",
+     "published",
+     "suggested"
+    ],
+    "description": "`approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit)."
+   },
+   "annotations": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "byPrincipalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "note": {
+       "type": "string"
+      }
+     }
+    },
+    "readOnly": true,
+    "description": "Corrections, appended; the original fields are never edited."
+   },
+   "previousHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "recordHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiDecisionTrace": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.decision_record with the rows it references",
+  "description": "**The full trace of one decision** (ADM-540..546): record, evidence, candidates and rules, model and runtime, governance and approvals, execution and business outcome. Depth is gated by permission (AIC-195).",
+  "required": [
+   "record"
+  ],
+  "properties": {
+   "record": {
+    "$ref": "#/components/schemas/AiDecisionRecord"
+   },
+   "depth": {
+    "type": "string",
+    "enum": [
+     "business",
+     "governance",
+     "technical"
+    ]
+   },
+   "explanation": {
+    "type": "string",
+    "description": "Built from structured evidence, never a model's chain of thought (AIC-192)."
+   },
+   "activity": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiInteraction"
+    },
+    "description": "The model calls behind it (`technical` depth)."
+   },
+   "plan": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiActionPlanDetail"
+     }
+    ],
+    "nullable": true
+   },
+   "interventions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiIntervention"
+    }
+   },
+   "chainVerified": {
+    "type": "boolean",
+    "description": "The hash chain around this record verifies."
+   }
+  }
+ },
+ "AiEvidenceItemList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "The evidence of one decision record, stored with it.",
+  "items": {
+   "$ref": "#/components/schemas/AiEvidenceItem"
+  }
+ },
+ "AiGovernanceOutcome": {
+  "type": "string",
+  "enum": [
+   "allow",
+   "allowWithConditions",
+   "prepareOnly",
+   "approvalRequired",
+   "escalate",
+   "block"
+  ],
+  "description": "What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). `block` is an answer, not an error, and is logged as outcome `refused`."
+ },
+ "AiInteraction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.activity",
+  "required": [
+   "id",
+   "principalId",
+   "capability",
+   "outcome",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "conversationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "audience": {
+    "type": "string",
+    "enum": [
+     "staff",
+     "guest"
+    ],
+    "description": "**Billing divides on this.** Staff usage is bounded by headcount; guest usage is bounded by footfall and curiosity, and a venue cannot stop guests asking questions.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest, where the audience is `guest`. `principalId` is null in that case — **a guest is not a principal**, and attributing their tokens to a staff member would be wrong twice.\n"
+   },
+   "billableToTenantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Resolved from `scopePath` at write time, not derived later. **Billing must not depend on walking a scope tree that has since been reorganised.**\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "capability": {
+    "type": "string"
+   },
+   "prompt": {
+    "type": "string"
+   },
+   "response": {
+    "type": "string"
+   },
+   "sources": {
+    "$ref": "#/components/schemas/AiSourceList"
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "answered",
+     "refused",
+     "applied",
+     "rejected",
+     "failed"
+    ]
+   },
+   "refusalReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "provider": {
+    "$ref": "#/components/schemas/AiProviderKind"
+   },
+   "model": {
+    "type": "string"
+   },
+   "promptTokens": {
+    "type": "integer"
+   },
+   "completionTokens": {
+    "type": "integer"
+   },
+   "cost": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "x-ticvai-column": "cost_amount",
+    "description": "What the call cost at the provider. **Money like every other amount** (naming-and-style 5.1) — it replaces an integer `costMinor` that carried no currency or scale, which AED and OMR read differently.\n"
+   },
+   "latencyMs": {
+    "type": "integer"
+   },
+   "maskedFieldCount": {
+    "type": "integer",
+    "description": "How many fields were redacted. Zero on a prompt touching guest data is a defect."
+   },
+   "traceId": {
+    "type": "string"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ai.decision_record` this call belongs to, where it was part of a governed decision (AI design 2.3, 3.9). Null for a call audited by this row alone."
+   },
+   "cacheLayer": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "guardrail",
+     "semantic",
+     "exact",
+     "negative",
+     "analytics"
+    ],
+    "description": "Which cache answered, where one did (AI design 3.6). Null for a model call."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AiIntervention": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.intervention",
+  "description": "**A person stepping in** (AIC-187, ADM-535, ADM-536): an override, pause, resume, stop, retry or rollback, with the original AI decision and the human one side by side.",
+  "required": [
+   "kind",
+   "targetKind",
+   "targetRef"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "override",
+     "pause",
+     "resume",
+     "cancel",
+     "retry",
+     "rollback",
+     "capabilityPause",
+     "capabilityResume"
+    ]
+   },
+   "targetKind": {
+    "type": "string",
+    "enum": [
+     "plan",
+     "step",
+     "decision",
+     "capability"
+    ]
+   },
+   "targetRef": {
+    "type": "string"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "originalDecision": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "humanDecision": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 2000
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiModel": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.model",
+  "description": "**The model catalogue** (design 3.1 Registry, 3.3; AIC-013, AIC-026). One row per model a task can be routed to: large language models, embedding and reranking models, and classical models (LightGBM, statistical forecasters) registered the same way so lifecycle, release and audit are uniform. **Platform rows** are mastered in the control plane and replicated read-only into each tenant database with the tenant root as `scopePath`; a tenant row exists only where bring-your-own-key is enabled for the tenant.",
+  "required": [
+   "layer",
+   "modelName",
+   "producerType"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "layer": {
+    "type": "string",
+    "enum": [
+     "platform",
+     "tenant"
+    ]
+   },
+   "providerKind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiProviderKind"
+     }
+    ],
+    "nullable": true
+   },
+   "producerType": {
+    "type": "string",
+    "enum": [
+     "llm",
+     "embedding",
+     "reranker",
+     "classical",
+     "rule"
+    ]
+   },
+   "modelName": {
+    "type": "string",
+    "description": "The deployment or model name as the provider knows it, or the package and version for a classical model."
+   },
+   "capabilities": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiCapability"
+    }
+   },
+   "contextTokens": {
+    "type": "integer",
+    "nullable": true
+   },
+   "toolCalling": {
+    "type": "boolean",
+    "default": false
+   },
+   "structuredOutput": {
+    "type": "boolean",
+    "default": false
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "residency": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where inference happens. Checked against `tenancy.RegionSettings.allowedAiResidencies`."
+   },
+   "inputCostPerMillionTokens": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "outputCostPerMillionTokens": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "lifecycle": {
+    "type": "object",
+    "description": "Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production.",
+    "properties": {
+     "development": {
+      "type": "string",
+      "enum": [
+       "draft",
+       "pilot",
+       "active",
+       "retired"
+      ]
+     },
+     "staging": {
+      "type": "string",
+      "enum": [
+       "draft",
+       "pilot",
+       "active",
+       "retired"
+      ]
+     },
+     "production": {
+      "type": "string",
+      "enum": [
+       "draft",
+       "pilot",
+       "active",
+       "retired"
+      ]
+     }
+    }
+   },
+   "isDefaultForTasks": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Tasks this model is the default for (AIC-010), e.g. `assistant.guest.answer`, `config.extract`."
+   },
+   "taskFitness": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**Evaluated fitness per task** (21 September minutes, M21-09, our proposal): a score from the task's golden set (`runAiEvaluation`) and the band the task needs. Below `floor` the model is underpowered for the task; far above `ceiling` it is overpowered (it costs more than the task needs). `setAiProvider` returns a warning (`AiProvider.fitnessWarnings`) when a choice falls outside the band, and ADM-037 shows the band beside `setAiModel`; neither refuses on it.",
+    "items": {
+     "type": "object",
+     "required": [
+      "taskKey",
+      "score"
+     ],
+     "properties": {
+      "taskKey": {
+       "type": "string"
+      },
+      "score": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "floor": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "ceiling": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1,
+       "nullable": true
+      },
+      "evaluationRunId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "evaluatedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiProviderKind": {
+  "type": "string",
+  "enum": [
+   "openai",
+   "gemini",
+   "anthropic",
+   "azureOpenai",
+   "localLlm",
+   "openaiCompatible"
+  ],
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
+ },
+ "AiRecommendationExplanation": {
+  "type": "object",
+  "x-ticvai-persistence": "none — built from ai.rec_decision and its decision record",
+  "description": "Why these items (AIR-193..202), at three depths each gated by permission (AIC-195): business, governance, technical.",
+  "required": [
+   "decisionId",
+   "depth"
+  ],
+  "properties": {
+   "decisionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "depth": {
+    "type": "string",
+    "enum": [
+     "business",
+     "governance",
+     "technical"
+    ]
+   },
+   "funnel": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "exclusions": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "items": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "trackingId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "productId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "reasons": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "scoreBreakdown": {
+       "type": "object",
+       "additionalProperties": true,
+       "nullable": true
+      }
+     }
+    }
+   },
+   "versions": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Strategy, model and feature-set versions. `technical` depth only."
+   }
+  }
+ },
+ "AiReplayResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — a re-simulation, never stored as a decision",
+  "description": "**A re-simulation, labelled as one** (AIC-206, ADM-548): the same inputs through today's or the recorded versions. It runs no production action and is never evidence of what happened.",
+  "required": [
+   "decisionRecordId",
+   "label",
+   "sameOutcome"
+  ],
+  "properties": {
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "label": {
+    "type": "string",
+    "enum": [
+     "reSimulation"
+    ]
+   },
+   "versionsUsed": {
+    "type": "string",
+    "enum": [
+     "recorded",
+     "current"
+    ]
+   },
+   "sameOutcome": {
+    "type": "boolean"
+   },
+   "original": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "replayed": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "differences": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

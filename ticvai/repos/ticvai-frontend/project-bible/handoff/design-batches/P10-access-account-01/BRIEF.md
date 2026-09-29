@@ -1,6 +1,6 @@
 # P10-access-account-01 — P10 · Access & Account
 
-**5 screens · 25 operations · 23 schemas · 11 permissions**
+**5 screens · 29 operations · 27 schemas · 12 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 11 permissions apply here:
-  `CREDIT_MANAGE, CREDIT_OVERRIDE, DEVELOPER_MANAGE, DEVELOPER_VIEW, GUEST_VIEW, ORDER_VIEW, PARTNER_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, SESSION_FORCE_LOGOUT, USER_MANAGE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 12 permissions apply here:
+  `CREDIT_MANAGE, CREDIT_OVERRIDE, DEVELOPER_MANAGE, DEVELOPER_VIEW, GUEST_VIEW, MARKETING_SEND, ORDER_VIEW, PARTNER_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, SESSION_FORCE_LOGOUT, USER_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: getCurrentSession, getGuestSession
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,8 +60,12 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-001` | Partner Login / MFA | listDetail | 12 | 3 | — |
-| `PTR-003` | Profile & Company Details | listDetail | 4 | 0 | — |
-| `PTR-004` | Notifications | statusTracker | 2 | 0 | — |
-| `PTR-019` | API Credentials & Integration | listDetail | 4 | 1 | — |
-| `PTR-020` | Sub-Agent Management | listDetail | 3 | 1 | — |
+| `PTR-001` | Partner Login / MFA | listDetail | 13 | 5 | — |
+| `PTR-003` | Profile & Company Details | listDetail | 4 | 2 | — |
+| `PTR-004` | Notifications | statusTracker | 2 | 1 | — |
+| `PTR-019` | API Credentials & Integration | listDetail | 7 | 4 | — |
+| `PTR-020` | Sub-Agent Management | listDetail | 3 | 2 | — |
+
+## Thin screens in this batch
+
+**PTR-004 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

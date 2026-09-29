@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AiAudienceDiscoveryTargetingOptimizationView"
  },
@@ -21,7 +27,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AudiencePreviewReachEligibilitySimulatorView"
  },
@@ -34,7 +46,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BehavioralTransactionTargetingView"
  },
@@ -60,7 +78,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CrmCustomerSegmentManagerView"
  },
@@ -73,7 +97,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MembershipLoyaltyGuestEligibilityView"
  },
@@ -99,7 +129,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "TargetingConflictFrequencyExclusionControlsView"
  },
@@ -113,6 +149,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "guestType",
     "in": "query",
@@ -152,6 +193,36 @@
     "name": "geographic",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "b2b",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "payment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "contextual",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "aiGenerated",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -166,8 +237,38 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "EligibilityRuleBuilderInput",
   "responds": "EligibilityRuleBuilderView"
+ },
+ "setResaleEligibilityRule": {
+  "method": "PUT",
+  "path": "/resale-eligibility-rule",
+  "contract": "orders",
+  "summary": "Resale Eligibility Rule Configuration",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResaleEligibilityRuleConfigurationInput",
+  "responds": "ResaleEligibilityRuleConfigurationView"
  }
 }

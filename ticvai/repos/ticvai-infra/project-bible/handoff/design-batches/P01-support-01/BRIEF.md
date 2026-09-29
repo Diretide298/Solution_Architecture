@@ -1,6 +1,6 @@
 # P01-support-01 — P01 · Support
 
-**2 screens · 5 operations · 7 schemas · 1 permissions**
+**2 screens · 6 operations · 17 schemas · 1 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -61,5 +61,5 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-034` | Lost & Found | listDetail | 3 | 0 | — |
-| `WEB-045` | Help Centre & Accessibility | listDetail | 2 | 0 | — |
+| `WEB-034` | Lost & Found | listDetail | 3 | 2 | — |
+| `WEB-045` | Help Centre & Accessibility | listDetail | 3 | 0 | — |

@@ -2,7 +2,7 @@
  "AccessAccessDevice": {
   "type": "object",
   "x-ticvai-persistence": "access.access_device",
-  "description": "One physical access-control device registered in a venue: a turnstile, reader, handheld, podium unit or BLE beacon, with its model, location, network references, reported versions and health, and provisioning stage. Merges access.gate_device and access.ble_beacon (a beacon is a device with a proximity threshold) (declared 29 September, data-model close-out DM1) Registered with registerAccessDevice and changed with updateAccessDevice; provisioning stage, versions and health are reported by the device; deviceGroupId is a free deployment label, not a key (decided 29 September, writers pass).",
+  "description": "One physical access-control device registered in a venue: a turnstile, reader, handheld, podium unit or BLE beacon, with its model, location, network references, reported versions and health, and provisioning stage. Merges access.gate_device and access.ble_beacon (a beacon is a device with a proximity threshold) (declared 29 September, data-model close-out DM1) Registered with registerAccessDevice and changed with updateAccessDevice; provisioning stage, versions and health are reported by the device; deviceGroupId is a free deployment label, not a key (decided 29 September, writers pass). **tenancy platform.device is the register of record** (29 September, build): this is the topology placement, and lifecycleStatus follows the register through the device.enrolmentChanged event.",
   "required": [
    "id",
    "venueId",
@@ -568,6 +568,137 @@
    "genderClassification"
   ]
  },
+ "DeviceGateCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Device & Gate Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "connectivity": {
+    "type": "string",
+    "description": "connectivity"
+   },
+   "lastHeartbeat": {
+    "type": "string",
+    "format": "date-time",
+    "description": "last heartbeat"
+   },
+   "configurationVersion": {
+    "type": "string",
+    "description": "configuration version"
+   },
+   "localRuleVersion": {
+    "type": "string",
+    "description": "local rule version"
+   },
+   "credentialSecurityPackageVersion": {
+    "type": "string",
+    "description": "credential/security package version"
+   },
+   "scannerHealth": {
+    "type": "string",
+    "description": "scanner health"
+   },
+   "controllerHealth": {
+    "type": "string",
+    "description": "controller health"
+   },
+   "cameraHealthWhereApplicable": {
+    "type": "string",
+    "description": "camera health where applicable"
+   },
+   "deviceId": {
+    "type": "string"
+   },
+   "deviceType": {
+    "type": "string",
+    "description": "e.g. Turnstile, VIP Gate, Handheld, Reader"
+   },
+   "accessPointId": {
+    "type": "string"
+   },
+   "mode": {
+    "type": "string",
+    "description": "Current operating mode"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "active",
+     "degraded",
+     "offline",
+     "localMode"
+    ]
+   }
+  }
+ },
+ "DeviceGateCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "totalDevices": {
+    "type": "integer",
+    "description": "Total Devices"
+   },
+   "online": {
+    "type": "integer",
+    "description": "Online"
+   },
+   "offline": {
+    "type": "integer",
+    "description": "Offline"
+   },
+   "degraded": {
+    "type": "integer",
+    "description": "Degraded"
+   },
+   "turnstiles": {
+    "type": "integer",
+    "description": "Turnstiles"
+   },
+   "handhelds": {
+    "type": "integer",
+    "description": "Handhelds"
+   },
+   "biometricReaders": {
+    "type": "integer",
+    "description": "Biometric Readers"
+   },
+   "rfidNfcReaders": {
+    "type": "integer",
+    "description": "RFID/NFC Readers"
+   },
+   "gatesOpen": {
+    "type": "integer",
+    "description": "Gates Open"
+   },
+   "gatesClosed": {
+    "type": "integer",
+    "description": "Gates Closed"
+   },
+   "devicesRequiringSync": {
+    "type": "integer",
+    "description": "Devices Requiring Sync"
+   },
+   "firmwareSoftwareExceptions": {
+    "type": "integer",
+    "description": "Firmware/Software Exceptions"
+   },
+   "hardwareAlerts": {
+    "type": "integer",
+    "description": "Hardware Alerts"
+   },
+   "ai": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI findings, e.g. a gate with a high scan-failure rate. Read-only."
+   }
+  }
+ },
  "DeviceKind": {
   "type": "string",
   "enum": [
@@ -590,8 +721,10 @@
    "wristbandEncoder",
    "signaturePad",
    "scale",
-   "camera"
-  ]
+   "camera",
+   "mobileHandset"
+  ],
+  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n"
  },
  "DeviceSoftwareContentRemoteConfigurationInput": {
   "type": "object",
@@ -1164,6 +1297,61 @@
    "name"
   ]
  },
+ "HardwareCompatibilityHealthTestingDeploymentView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Hardware Compatibility, Health, Testing & Deployment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "description": "Device identifier"
+   },
+   "capabilities": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dynamicQr",
+      "rfid",
+      "nfc",
+      "facePass",
+      "offline",
+      "heightCheck"
+     ]
+    },
+    "description": "Capabilities this device supports, from the compatibility matrix"
+   },
+   "rolloutScope": {
+    "type": "string",
+    "enum": [
+     "pilot",
+     "selectedGates",
+     "deviceGroup",
+     "venue"
+    ],
+    "description": "How far the production rollout of this device reaches"
+   },
+   "deviceName": {
+    "type": "string",
+    "description": "Device or gate name, e.g. Gate A, HH-01"
+   },
+   "lifecycleStatus": {
+    "type": "string",
+    "enum": [
+     "registered",
+     "configured",
+     "tested",
+     "approved",
+     "production"
+    ],
+    "description": "Certification stage; no device enters production until validated"
+   }
+  },
+  "required": [
+   "deviceId"
+  ]
+ },
  "HardwareDeploymentInput": {
   "type": "object",
   "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
@@ -1318,6 +1506,80 @@
    }
   }
  },
+ "PhysicalDeviceRegistrationProvisioningView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Physical Device Registration & Provisioning displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "description": "Device ID"
+   },
+   "serialNumber": {
+    "type": "string",
+    "description": "Serial Number"
+   },
+   "hardwareModel": {
+    "type": "string",
+    "description": "Hardware Model"
+   },
+   "manufacturer": {
+    "type": "string",
+    "description": "Manufacturer"
+   },
+   "tenantId": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "parkId": {
+    "type": "string",
+    "description": "Park"
+   },
+   "zoneId": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "accessPointId": {
+    "type": "string",
+    "description": "Access Point"
+   },
+   "gateLane": {
+    "type": "string",
+    "description": "Gate/Lane"
+   },
+   "ipNetworkReference": {
+    "type": "string",
+    "description": "IP/network reference"
+   },
+   "controllerReference": {
+    "type": "string",
+    "description": "controller reference"
+   },
+   "installationDate": {
+    "type": "string",
+    "format": "date",
+    "description": "installation date"
+   },
+   "provisioningStage": {
+    "type": "string",
+    "enum": [
+     "registered",
+     "hardwareProfileAssigned",
+     "locationAssigned",
+     "authenticated",
+     "configurationDownloaded",
+     "securityPackageDownloaded",
+     "connectivityTested",
+     "active"
+    ]
+   }
+  }
+ },
  "ReaderScannerPeripheralConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -1417,11 +1679,11 @@
  "RegisteredDevice": {
   "x-ticvai-persistence": "platform.device",
   "type": "object",
+  "description": "**The device register of record** (decided 29 September, build pass). Identity, enrolment, credential, firmware and push registration for every device in the estate live on this row. `access.access_device` places access-control devices in the gate topology and repeats serial, versions, health and lifecycle; the two are not merged yet, and where they disagree this row wins.\n",
   "required": [
    "id",
    "kind",
-   "driver",
-   "workstationId"
+   "driver"
   ],
   "properties": {
    "id": {
@@ -1442,7 +1704,9 @@
    },
    "workstationId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September); `registerDevice` refuses either mistake with `422`.\n"
    },
    "model": {
     "type": "string",

@@ -1,4 +1,24 @@
 {
+ "AllergenCode": {
+  "type": "string",
+  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
+  "enum": [
+   "gluten",
+   "crustaceans",
+   "eggs",
+   "fish",
+   "peanuts",
+   "soybeans",
+   "milk",
+   "nuts",
+   "celery",
+   "mustard",
+   "sesame",
+   "sulphites",
+   "lupin",
+   "molluscs"
+  ]
+ },
  "GuestMenu": {
   "type": "object",
   "x-ticvai-persistence": "none — projection over menu, item and availability",
@@ -87,7 +107,7 @@
           "type": "array",
           "description": "Always present. Not a field a tenant may choose to omit.",
           "items": {
-           "type": "string"
+           "$ref": "#/components/schemas/AllergenCode"
           }
          },
          "preparationMinutes": {
@@ -111,6 +131,7 @@
  "ModifierGroup": {
   "x-ticvai-persistence": "fnb.modifier_group + fnb.modifier_option",
   "type": "object",
+  "description": "**An F&B modifier is a choice added to a dish at the moment of ordering** — *no onions*, *extra cheese*, *cooked medium*. **It is not an Attribute**, the axis that generates catalogue variants (naming-and-style §3 lists *Modifier* as a banned synonym for that), and the two must not be merged: a variant is a different product with its own stock, a modifier is an instruction on a line with at most a price delta.\n",
   "required": [
    "id",
    "code",
@@ -165,6 +186,13 @@
       },
       "isAvailable": {
        "type": "boolean"
+      },
+      "allergens": {
+       "type": "array",
+       "description": "What choosing this option adds to the dish. `attachModifierGroup` refuses a group that adds one the item does not declare, and `verifyAllergens` reports it as `via` `modifier`.",
+       "items": {
+        "$ref": "#/components/schemas/AllergenCode"
+       }
       }
      }
     }
@@ -175,13 +203,31 @@
    }
   }
  },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
  "ShopAndDrop": {
   "type": "object",
   "x-ticvai-persistence": "retail.shop_and_drop + retail.shop_and_drop_line",
   "required": [
    "id",
    "dropReference",
-   "saleId",
    "collectionPointId",
    "status",
    "collectBy"
@@ -195,7 +241,14 @@
     "description": "Short and readable. Printed on the slip a guest may or may not keep."
    },
    "saleId": {
-    "type": "string"
+    "type": "string",
+    "nullable": true,
+    "description": "The till sale. Null for an online order, which sets `orderId` (audit R236)."
+   },
+   "orderId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The paid online order that created this collection (audit R236)."
    },
    "entitlementId": {
     "type": "string",

@@ -1,6 +1,6 @@
 # P01-retail-01 — P01 · Retail
 
-**2 screens · 5 operations · 9 schemas · 3 permissions**
+**2 screens · 6 operations · 20 schemas · 3 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -61,5 +61,5 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-033` | Shop | listDetail | 4 | 0 | — |
-| `WEB-042` | Retail & Shop and Drop | listDetail | 4 | 0 | — |
+| `WEB-033` | Shop | listDetail | 5 | 1 | — |
+| `WEB-042` | Retail & Shop and Drop | listDetail | 6 | 1 | — |

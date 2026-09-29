@@ -1,6 +1,6 @@
 # WS162 — Resource Management Configuration board 8
 
-**10 screens · 2 operations · 2 schemas · 1 permissions**
+**10 screens · 14 operations · 20 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `RESOURCE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `AI_USE, RESOURCE_VIEW, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -62,15 +62,15 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-923` | AI Resource Intelligence Command Center | listDetail | 1 | 0 | — |
 | `BO-924` | Optimal Resource Recommendation Engine | listDetail | 1 | 0 | — |
-| `BO-925` | AI Staff Recommendation & Workforce Matching | listDetail | 0 | 0 | — |
-| `BO-926` | Resource Demand Forecasting | listDetail | 0 | 0 | — |
-| `BO-927` | AI Staffing Requirement Forecast | configEditor | 0 | 0 | — |
-| `BO-928` | AI Conflict Resolution Assistant | listDetail | 0 | 0 | — |
-| `BO-929` | Automatic Schedule Optimization | listDetail | 0 | 0 | — |
+| `BO-925` | AI Staff Recommendation & Workforce Matching | listDetail | 2 | 0 | — |
+| `BO-926` | Resource Demand Forecasting | listDetail | 2 | 0 | — |
+| `BO-927` | AI Staffing Requirement Forecast | configEditor | 4 | 0 | — |
+| `BO-928` | AI Conflict Resolution Assistant | listDetail | 4 | 0 | — |
+| `BO-929` | Automatic Schedule Optimization | listDetail | 3 | 0 | — |
 | `BO-930` | Alternative & Replacement Resource | listDetail | 1 | 0 | — |
-| `BO-931` | Operational Scenario Simulator & Digital Twin | listDetail | 0 | 0 | — |
-| `BO-932` | Conversational AI Resource Copilot | listDetail | 0 | 0 | — |
+| `BO-931` | Operational Scenario Simulator & Digital Twin | listDetail | 2 | 0 | — |
+| `BO-932` | Conversational AI Resource Copilot | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 
-**BO-923, BO-924, BO-925, BO-926, BO-927, BO-929, BO-930, BO-931, BO-932 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-923, BO-924, BO-925, BO-926, BO-929, BO-930, BO-931, BO-932 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

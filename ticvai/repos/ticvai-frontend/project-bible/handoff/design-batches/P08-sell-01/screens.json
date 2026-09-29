@@ -279,6 +279,20 @@
        "provenance": "contract inventory.yaml POST /products/bulk"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Booking flow",
+       "bindsTo": "Product.bookingFlowId",
+       "operation": "listBookingFlows",
+       "notes": "The venue's booking flows from CMS-103 (`white-label.listBookingFlows`). Empty means the category's flow, then the venue's flow for the product kind (W8, W12). Saved with `createProduct` or `updateProduct`.",
+       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)"
+      }
+     ]
     }
    ]
   },
@@ -290,6 +304,13 @@
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listBookingFlows",
+    "contract": "white-label",
+    "purpose": "The booking flows a product can be sold through (W12)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, W12 (P29)"
+   },
    {
     "operationId": "listProducts",
     "contract": "catalogue",
@@ -401,6 +422,10 @@
     {
      "name": "productId",
      "from": "deepLink"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A shared product link after the product retired.** Shows what replaced it where a successor exists, and the catalogue where none does.",
@@ -426,7 +451,7 @@
     "id": "formCreateProduct",
     "component": "modal",
     "trigger": "Create product",
-    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`, `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`, `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3; `salesContact` (W3: who a guest calls or emails to book an info-only product) and `bookingFlowId` (W8, W12: the booking flow the product is sold through; empty means the category's flow, then the venue's flow for its kind), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreateProductRequest",
     "confirm": {
      "label": "Create product",
@@ -448,7 +473,9 @@
       "displayTags",
       "media",
       "consentQuestionIds",
-      "requiresTimeWindow"
+      "requiresTimeWindow",
+      "salesContact",
+      "bookingFlowId"
      ]
     },
     "provenance": "contract catalogue.yaml POST /products"
@@ -510,7 +537,7 @@
     "id": "formUpdateProduct",
     "component": "modal",
     "trigger": "Save product",
-    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`, `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3 REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`, `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3 REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13), `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "UpdateProductRequest",
     "confirm": {
      "label": "Save product",
@@ -528,7 +555,9 @@
       "displayTags",
       "media",
       "consentQuestionIds",
-      "requiresTimeWindow"
+      "requiresTimeWindow",
+      "salesContact",
+      "bookingFlowId"
      ]
     },
     "provenance": "contract catalogue.yaml PATCH /products/{productId}"
@@ -2130,6 +2159,28 @@
        "provenance": "contract catalogue.yaml PUT /package-pricing"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Component kind",
+       "bindsTo": "BundleComponent.componentKind",
+       "operation": "createBundle",
+       "notes": "**Admission, F&B menu item, retail, add-on or other** (decided 29 September, MOB-4). A *meal combo with admission* is one admission component and one F&B menu-item component; the guest buys it from a restaurant's item detail and the ticket comes with it.",
+       "provenance": "contract promotions.yaml BundleComponent.componentKind"
+      },
+      {
+       "kind": "selectField",
+       "label": "Menu item",
+       "bindsTo": "BundleComponent.menuItemId",
+       "operation": "listMenus",
+       "notes": "For an F&B menu-item component; the outlets that redeem it are `redeemAtOutletIds` (empty means any outlet with the item on a live menu).",
+       "provenance": "contract promotions.yaml BundleComponent.menuItemId"
+      }
+     ]
     }
    ]
   },
@@ -2141,6 +2192,13 @@
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getGroupPackageDefinition` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listMenus",
+    "contract": "fnb",
+    "purpose": "The menu item an F&B bundle component entitles the guest to (MOB-4)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, MOB-4 (P29)"
+   },
    {
     "operationId": "getGroupPackageDefinition",
     "contract": "catalogue",
@@ -4071,6 +4129,13 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "listPerformances",
+       "notes": "Performances by day, week or month; a slot opens its performance. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window as `from`/`to` and the category filter as `categoryId`.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
+      {
        "kind": "datePicker",
        "label": "From",
        "operation": "listPerformances",
@@ -4194,9 +4259,10 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create performances",
+       "label": "Create time slots",
        "operation": "createPerformances",
-       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
+       "notes": "**Time-slot creation, as the 24 September review asked (M24-01)**: start date and end date (`startsAt`, `recurrence.until`), first and last start time of the day, the interval between starts (`recurrence.intervalMinutes`, e.g. every 30 minutes), the slot length (`endsAt`), the days of the week (`recurrence.daysOfWeek`), language and format. A preview lists the slots it will create (`Prefer: validate-only`) before one is written; one performance per slot.",
+       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances; decided 29 September 2026, M24-01 (applied 30 September)"
       },
       {
        "kind": "destructiveButton",

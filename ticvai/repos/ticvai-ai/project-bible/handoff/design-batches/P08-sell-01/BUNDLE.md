@@ -1,6 +1,6 @@
 # P08-sell-01 — P08 · Sell (1 of 4)
 
-**10 screens · 88 operations · 80 schemas · 10 permissions**
+**10 screens · 89 operations · 100 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `CAPACITY_CONFIGURE, EVENT_CONFIGURE, PARTNER_MANAGE, PARTNER_VIEW, PERFORMANCE_CONFIGURE, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `CAPACITY_CONFIGURE, EVENT_CONFIGURE, PARTNER_MANAGE, PARTNER_VIEW, PERFORMANCE_CONFIGURE, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,10 +60,10 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-007` | Product Directory | listDetail | 14 | 7 | — |
+| `BO-007` | Product Directory | listDetail | 15 | 7 | — |
 | `BO-009` | Pricing Rules | listDetail | 11 | 4 | — |
 | `BO-010` | Promotions & Coupons | listDetail | 26 | 10 | — |
-| `BO-011` | Packages & Bundles | listDetail | 12 | 5 | — |
+| `BO-011` | Packages & Bundles | listDetail | 13 | 5 | — |
 | `BO-012` | Membership Products | listDetail | 12 | 6 | — |
 | `BO-013` | Channel & Distribution | listDetail | 10 | 6 | — |
 | `BO-014` | Catalogue Publishing | listDetail | 13 | 7 | — |
@@ -363,6 +363,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "contract inventory.yaml POST /products/bulk"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Booking flow",
+       "bindsTo": "Product.bookingFlowId",
+       "operation": "listBookingFlows",
+       "notes": "The venue's booking flows from CMS-103 (`white-label.listBookingFlows`). Empty means the category's flow, then the venue's flow for the product kind (W8, W12). Saved with `createProduct` or `updateProduct`.",
+       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)"
+      }
+     ]
     }
    ]
   },
@@ -374,6 +388,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listBookingFlows",
+    "contract": "white-label",
+    "purpose": "The booking flows a product can be sold through (W12)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, W12 (P29)"
+   },
    {
     "operationId": "listProducts",
     "contract": "catalogue",
@@ -485,6 +506,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "productId",
      "from": "deepLink"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A shared product link after the product retired.** Shows what replaced it where a successor exists, and the catalogue where none does.",
@@ -510,7 +535,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formCreateProduct",
     "component": "modal",
     "trigger": "Create product",
-    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`, `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createProduct` sends before it is called.** Required: `code`, `name`, `kind`, `venueId`. Optional: `description`, `channels`, `entitlementTemplateId`, `dataMaskValues`, `guestListing` and `notBookableLabel` (REV3-14), `displayTags` (23SEP-3), `media` (23SEP-4), `consentQuestionIds` (REV3-26), `requiresTimeWindow` (REV3-13), all decided 29 September, rev 3; `salesContact` (W3: who a guest calls or emails to book an info-only product) and `bookingFlowId` (W8, W12: the booking flow the product is sold through; empty means the category's flow, then the venue's flow for its kind), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "CreateProductRequest",
     "confirm": {
      "label": "Create product",
@@ -532,7 +557,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "displayTags",
       "media",
       "consentQuestionIds",
-      "requiresTimeWindow"
+      "requiresTimeWindow",
+      "salesContact",
+      "bookingFlowId"
      ]
     },
     "provenance": "contract catalogue.yaml POST /products"
@@ -594,7 +621,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formUpdateProduct",
     "component": "modal",
     "trigger": "Save product",
-    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`, `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3 REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateProduct` sends before it is called.** Nothing in the body is required. Optional: `name`, `description`, `channels`, `dataMaskValues`, `guestListing`, `notBookableLabel`, `displayTags`, `media`, `consentQuestionIds`, `requiresTimeWindow` (decided 29 September, rev 3 REV3-14, 23SEP-3, 23SEP-4, REV3-26, REV3-13), `salesContact` (W3) and `bookingFlowId` (W8, W12), decided 29 September. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "UpdateProductRequest",
     "confirm": {
      "label": "Save product",
@@ -612,7 +639,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "displayTags",
       "media",
       "consentQuestionIds",
-      "requiresTimeWindow"
+      "requiresTimeWindow",
+      "salesContact",
+      "bookingFlowId"
      ]
     },
     "provenance": "contract catalogue.yaml PATCH /products/{productId}"
@@ -2214,6 +2243,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "contract catalogue.yaml PUT /package-pricing"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Component kind",
+       "bindsTo": "BundleComponent.componentKind",
+       "operation": "createBundle",
+       "notes": "**Admission, F&B menu item, retail, add-on or other** (decided 29 September, MOB-4). A *meal combo with admission* is one admission component and one F&B menu-item component; the guest buys it from a restaurant's item detail and the ticket comes with it.",
+       "provenance": "contract promotions.yaml BundleComponent.componentKind"
+      },
+      {
+       "kind": "selectField",
+       "label": "Menu item",
+       "bindsTo": "BundleComponent.menuItemId",
+       "operation": "listMenus",
+       "notes": "For an F&B menu-item component; the outlets that redeem it are `redeemAtOutletIds` (empty means any outlet with the item on a live menu).",
+       "provenance": "contract promotions.yaml BundleComponent.menuItemId"
+      }
+     ]
     }
    ]
   },
@@ -2225,6 +2276,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getGroupPackageDefinition` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listMenus",
+    "contract": "fnb",
+    "purpose": "The menu item an F&B bundle component entitles the guest to (MOB-4)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, MOB-4 (P29)"
+   },
    {
     "operationId": "getGroupPackageDefinition",
     "contract": "catalogue",
@@ -4155,6 +4213,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "listPerformances",
+       "notes": "Performances by day, week or month; a slot opens its performance. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window as `from`/`to` and the category filter as `categoryId`.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
+      {
        "kind": "datePicker",
        "label": "From",
        "operation": "listPerformances",
@@ -4278,9 +4343,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create performances",
+       "label": "Create time slots",
        "operation": "createPerformances",
-       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
+       "notes": "**Time-slot creation, as the 24 September review asked (M24-01)**: start date and end date (`startsAt`, `recurrence.until`), first and last start time of the day, the interval between starts (`recurrence.intervalMinutes`, e.g. every 30 minutes), the slot length (`endsAt`), the days of the week (`recurrence.daysOfWeek`), language and format. A preview lists the slots it will create (`Prefer: validate-only`) before one is written; one performance per slot.",
+       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances; decided 29 September 2026, M24-01 (applied 30 September)"
       },
       {
        "kind": "destructiveButton",
@@ -5382,6 +5448,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "CreatePerformancesRequest",
@@ -5401,6 +5472,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "CreatePriceListRequest",
@@ -5416,6 +5492,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -5739,6 +5820,35 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "AlternativeCode"
  },
+ "listBookingFlows": {
+  "method": "GET",
+  "path": "/venues/{venueId}/booking-flows",
+  "contract": "white-label",
+  "summary": "A venue's booking flows, in the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "flowTypeKey",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listCatalogueBundles": {
   "method": "GET",
   "path": "/catalogue/bundles",
@@ -6058,6 +6168,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": "language",
     "in": "query",
     "required": null
@@ -6185,6 +6300,11 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
     "in": "query",
     "required": null
    },
@@ -6550,6 +6670,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -6617,6 +6742,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -6670,6 +6800,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -6883,6 +7018,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "UpdateProductRequest",
@@ -7061,6 +7201,205 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "BookingFlow": {
+  "x-ticvai-persistence": "whitelabel.booking_flow",
+  "type": "object",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "required": [
+   "flowTypeKey",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `createBookingFlowDefinition`."
+   },
+   "flowTypeKey": {
+    "$ref": "#/components/schemas/BookingFlowTypeKey"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
+   },
+   "isDefaultForType": {
+    "type": "boolean",
+    "default": false,
+    "description": "At most one per venue and type; setting it takes it from the previous default."
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
+   },
+   "steps": {
+    "type": "array",
+    "maxItems": 30,
+    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlowStep"
+    }
+   },
+   "settings": {
+    "$ref": "#/components/schemas/BookingFlowLevelSettings"
+   },
+   "isValid": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "BookingFlowLevelSettings": {
+  "x-ticvai-persistence": "none — jsonb column on whitelabel.booking_flow",
+  "type": "object",
+  "description": "**The settings that belong to one flow, not to the venue (decided 29 September, W12).** Moved here from `BookingFlowSettings`, which keeps the venue-wide ones. Each keeps its rev 3 meaning and default. A field left out takes its default.\n",
+  "properties": {
+   "performanceReveal": {
+    "type": "string",
+    "enum": [
+     "dateTimeTicket",
+     "allAtOnce"
+    ],
+    "default": "dateTimeTicket",
+    "description": "**Performance reveal (rev 3 REV3-2).** `dateTimeTicket` shows the times only once a date is picked and the tickets only once a time is picked; `allAtOnce` shows them together. Product-first (W8) is the step order of `experienceWorkshop`, not a value here.\n"
+   },
+   "signInAt": {
+    "type": "string",
+    "enum": [
+     "afterAddOns",
+     "atPayment"
+    ],
+    "default": "afterAddOns",
+    "description": "**Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3).** `afterAddOns` asks as the guest leaves the extras step; `atPayment` asks at payment. The basket is kept either way.\n"
+   },
+   "seatEventDateMode": {
+    "type": "string",
+    "enum": [
+     "inlineStep",
+     "popupOnSeatMap"
+    ],
+    "default": "inlineStep",
+    "description": "**Date and time on a seated event (rev 3 REV3-4).** `inlineStep` asks for them before the seat map; `popupOnSeatMap` opens the seat map with a date and time pop-up. Read only by the seated flow types.\n"
+   },
+   "extrasStep": {
+    "type": "string",
+    "enum": [
+     "auto",
+     "always",
+     "never"
+    ],
+    "default": "auto",
+    "description": "`auto` shows the extras step only when the cart's products have add-ons; `never` is the same as turning the optional `extras` step off."
+   },
+   "quickTour": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Quick tour (rev 3 REV3-20).** A first visit gets a coach-mark tour of this flow's steps, replayable from a Quick tour button. Seen-state kept on the device only.\n"
+   },
+   "consentQuestionIds": {
+    "type": "array",
+    "maxItems": 10,
+    "uniqueItems": true,
+    "default": [],
+    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400. A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "BookingFlowStep": {
+  "x-ticvai-persistence": "whitelabel.booking_flow_step",
+  "type": "object",
+  "description": "One step of a venue's flow, in the venue's order (decided 29 September, W12).",
+  "required": [
+   "stepKey",
+   "enabled",
+   "sortOrder"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "stepKey": {
+    "$ref": "#/components/schemas/BookingFlowStepKey"
+   },
+   "enabled": {
+    "type": "boolean",
+    "description": "A `required` step cannot be off; the flow saves and `isValid` turns false."
+   },
+   "sortOrder": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "requirement": {
+    "type": "string",
+    "enum": [
+     "required",
+     "optional",
+     "conditional"
+    ],
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the flow type, so the CMS can mark the step without a second read."
+   },
+   "settings": {
+    "type": "object",
+    "additionalProperties": true,
+    "default": {},
+    "description": "The step's own settings, by the names the type's `stepSettings` gives for this step (e.g. `languages` on `language`, `minHours` on `duration`). A name the type does not give is refused with 400."
+   }
+  }
+ },
+ "BookingFlowTypeKey": {
+  "type": "string",
+  "description": "**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize` are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n",
+  "enum": [
+   "datedDayPass",
+   "timedEntry",
+   "openDated",
+   "seatedFixedPerformance",
+   "seatedDateTimeSeatMap",
+   "experienceWorkshop",
+   "surfSession",
+   "meetingRoomHourly",
+   "cabanaMap",
+   "cabanaBySize",
+   "guidedTourByLanguage",
+   "transport",
+   "tableReservation",
+   "membership",
+   "giftCard",
+   "multiLocation"
+  ]
+ },
  "BulkPriceResult": {
   "type": "object",
   "description": "2.9.9. Dry run or applied — the shape is the same, `applied` says which.",
@@ -7225,6 +7564,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "componentKind": {
+    "$ref": "#/components/schemas/BundleComponentKind"
+   },
+   "menuItemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The F&B menu item a `fnbMenuItem` component entitles the guest to** (decided 29 September, MOB-4): the meal of a *meal combo with admission*. `variantId` is still the catalogue variant the menu item sells (fnb `MenuItem.variantId`), which prices and taxes it; this names what the outlet redeems. Required when `componentKind` is `fnbMenuItem`, else ignored; a menu item that does not sell `variantId` is a `422` on `createBundle`.\n"
+   },
+   "redeemAtOutletIds": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Outlets that redeem an `fnbMenuItem` component; empty means any outlet of the component's venue that has the menu item on a live menu (MOB-4)."
+   },
    "quantity": {
     "type": "integer",
     "minimum": 1
@@ -7343,6 +7700,93 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "appliedByWorkstations": {
     "type": "integer"
+   }
+  }
+ },
+ "CampaignBudget": {
+  "x-ticvai-persistence": "promotions.campaign_budget",
+  "type": "object",
+  "description": "One budget line of a commercial campaign (setCampaignBudgetFinancial): what kind of spend it caps, who funds it, what it covers, and what happens as it is consumed. **Consumed, committed and reserved are not stored**: consumed is the discount given on orders (`orders.discount`, `promotions.promotion.discount_given`), committed and reserved are priced carts not yet paid, all worked out on read so they cannot drift from the orders they summarise. (DM5, 29 September: data model for the agreed operations)",
+  "required": [
+   "budgetType",
+   "amount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "budgetType": {
+    "type": "string",
+    "enum": [
+     "total",
+     "discount",
+     "reward",
+     "freeProduct"
+    ],
+    "description": "The spend this line caps (total campaign, discount, reward or free-product budget)."
+   },
+   "fundingSource": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "venue",
+     "department",
+     "marketing",
+     "partner"
+    ],
+    "description": "Who pays for it; `partner` is a co-funded (e.g. bank or partner-funded) line."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scope": {
+    "type": "string",
+    "enum": [
+     "entireCampaign",
+     "promotion",
+     "product",
+     "channel",
+     "partner",
+     "customerSegment"
+    ],
+    "default": "entireCampaign",
+    "description": "What the line covers."
+   },
+   "scopeRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The promotion, product, partner or segment id, or the SalesChannel value, that `scope` names. Null for `entireCampaign`."
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The budget owner."
+   },
+   "costCentre": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true
+   },
+   "department": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "thresholdPolicy": {
+    "$ref": "#/components/schemas/BudgetThresholdPolicy"
    }
   }
  },
@@ -7623,15 +8067,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "sold": {
     "type": "integer",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Units sold. **Maintained on write** (decided 29 September, SD-023): raised by `convertInventoryHold` in the order transaction and by consumption a workstation reports on `renewInventoryHold` or `relinquishInventoryHold`, lowered when a refund or cancellation returns the units. Always `capacity + oversellAllowance = sold + leased + remaining`.\n"
    },
    "leased": {
     "type": "integer",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023)."
    },
    "remaining": {
     "type": "integer",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "What can still be held. **Decremented at the hold with a guarded statement** (`remaining >= n`) under the row lock, never at the sale, so two buyers cannot both take the last unit (SD-023, 29 September).\n"
    },
    "hasChannelAllocations": {
     "type": "boolean",
@@ -7850,6 +8300,70 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "description": "**The one a cashier gets without asking.** A combo with no default is four taps at every till in the venue.\n"
       }
      }
+    }
+   }
+  }
+ },
+ "CommercialCampaign": {
+  "x-ticvai-persistence": "promotions.campaign + promotions.campaign_budget",
+  "type": "object",
+  "description": "A commercial campaign: the grouping of promotions, coupon campaigns and bundles that share an owner, a business entity, dates and a budget. **Not `marketing.campaign`**, which is the CRM send campaign in another service. The header is saved with its budget lines by setCampaignBudgetFinancial (the budget screen is where the pack captures campaign, owner, business entity and effective dates), and on its own by createCommercialCampaign and updateCommercialCampaign; listCommercialCampaigns lists it (decided 29 September, writers pass); promotions, coupon campaigns and bundles point at it by `campaignId`. No status of its own: a campaign is live while its promotions are, and a threshold action that stops it pauses them. (DM5, 29 September: data model for the agreed operations)",
+  "required": [
+   "id",
+   "venueId",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The campaign (and budget) owner."
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The business entity that funds and books the campaign."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "budgets": {
+    "type": "array",
+    "description": "The rows of `promotions.campaign_budget`, one per budget line.",
+    "items": {
+     "$ref": "#/components/schemas/CampaignBudget"
     }
    }
   }
@@ -8487,6 +9001,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "nullable": true
    },
+   "salesContact": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductSalesContact"
+     }
+    ],
+    "nullable": true,
+    "description": "See `Product.salesContact` (W3, 29 September)."
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "See `Product.bookingFlowId` (W8, W12, 29 September)."
+   },
    "displayTags": {
     "type": "array",
     "maxItems": 6,
@@ -8595,6 +9124,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "nullable": true,
     "description": "The commercial campaign (`promotions.campaign`) this promotion belongs to; null for a promotion run on its own. The directory, calendar and campaign budget screens group by it. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "recommendable": {
+    "type": "boolean",
+    "default": false,
+    "description": "**May the recommendation engine show this offer to a guest** (8.6.30 to 8.6.36; 29 September, build pass, group G2, from group G1's handoff). False keeps a promotion to the basket, where `evaluatePromotions` applies it as before. True makes a live promotion a candidate item of kind `offer` in `ai.decideRecommendations` for the guests its conditions and `recommendableSegmentIds` admit: while it is live, `promotions.recommendationStrategyPublished` (kind `offers`) keeps the engine's candidate cache current, and it leaves the cache when it is paused, ends or expires. **The engine shows the offer; the discount is still computed here at the basket**, never by ai."
+   },
+   "recommendableSegmentIds": {
+    "type": "array",
+    "nullable": true,
+    "description": "The marketing-crm segments the offer may be recommended to; null means every guest its own conditions admit.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    }
   }
  },
@@ -8811,6 +9354,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "DiscountKind": {
+  "type": "string",
+  "enum": [
+   "percentage",
+   "fixedAmount",
+   "fixedPrice",
+   "buyXGetY",
+   "freeItem",
+   "tieredPercentage"
+  ]
+ },
  "DynamicPriceRuleDetail": {
   "type": "object",
   "x-ticvai-persistence": "none — composed from a rule, its conditions and its actions",
@@ -8918,6 +9472,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date",
     "nullable": true,
     "description": "Where `expiryAnchor` is `fixedDate`. Every pass expires the same day regardless of purchase."
+   },
+   "expiryNoticeDays": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 180,
+    "nullable": true,
+    "description": "**How many days before `validTo` access raises `entitlement.expiringSoon`** for an entitlement of this template still `issued` or `partiallyConsumed` (29 September, build pass, group G2; 5.5.30). What a pre-expiry message or campaign is triggered by. Null, the default, means no notice: a day ticket needs none, an annual pass might want 30. An entitlement bought inside its own notice period raises nothing."
    },
    "carriesStoredValue": {
     "type": "boolean",
@@ -9350,11 +9911,169 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "default": "bookable",
   "description": "**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"
  },
+ "GuestMerchandiseItem": {
+  "x-ticvai-persistence": "none — guest projection of MerchandiseItem",
+  "type": "object",
+  "description": "**What a guest caller of `listMerchandise` receives.** The fields a shop screen shows and the ids a guest needs to reserve or buy, and nothing else: no inventory link, no catalogue variant, no stock count, no serial-number flag. `additionalProperties: false` is the guarantee: a staff field added to `MerchandiseItem` does not reach a guest by default.\n",
+  "additionalProperties": false,
+  "required": [
+   "id",
+   "name",
+   "outletId",
+   "price",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "isAvailable": {
+    "type": "boolean",
+    "description": "True when the item is active and in stock at its outlet. An item with no `inventoryItemId` never runs out, so it is available while active.\n"
+   },
+   "isReturnable": {
+    "type": "boolean"
+   },
+   "returnWindowDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "GuestPromotion": {
+  "x-ticvai-persistence": "none — guest projection of promotions.promotion",
+  "type": "object",
+  "description": "**What a guest may see of a promotion.** `Promotion` carries the commercial internals (`budgetCap`, `maxRedemptions`, `redemptionCount`, `discountGiven`, `precedence`, `stackingGroup`), and `listPromotions` and `getPromotion` are guest-audience. A guest caller receives this shape instead. `additionalProperties: false` is the point: a server that adds an internal field to it fails validation instead of publishing the field.\n",
+  "additionalProperties": false,
+  "required": [
+   "id",
+   "code",
+   "name",
+   "discount",
+   "validFrom"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "discount": {
+    "$ref": "#/components/schemas/Discount"
+   },
+   "conditions": {
+    "$ref": "#/components/schemas/PromotionConditions"
+   },
+   "stackingMode": {
+    "$ref": "#/components/schemas/StackingMode"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "maxRedemptionsPerGuest": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
  "LocalisedText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
   "additionalProperties": {
    "type": "string"
+  }
+ },
+ "Menu": {
+  "x-ticvai-persistence": "fnb.menu",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "outletId",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "availability": {
+    "$ref": "#/components/schemas/MenuAvailability"
+   },
+   "sections": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/MenuSection"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "publishedVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `MenuVersion.version` live now. Null for a menu never published."
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
   }
  },
  "MenuAvailability": {
@@ -9476,6 +10195,38 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "MenuSection": {
+  "x-ticvai-persistence": "fnb.menu_section",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "sortOrder"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "items": {
+    "type": "array",
+    "description": "The section's items, in sale-board order. An item's membership is `MenuItem.menuSectionId`.",
+    "items": {
+     "$ref": "#/components/schemas/MenuItem"
+    }
+   }
+  }
+ },
  "MerchandiseItem": {
   "x-ticvai-persistence": "retail.merchandise",
   "type": "object",
@@ -9553,6 +10304,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isActive": {
     "type": "boolean"
+   }
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
    }
   }
  },
@@ -9907,6 +10687,39 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "y": {
     "type": "number"
+   }
+  }
+ },
+ "Price": {
+  "x-ticvai-persistence": "catalogue.price",
+  "type": "object",
+  "required": [
+   "priceListId",
+   "variantId",
+   "amount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "priceListId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    }
   }
  },
@@ -10426,6 +11239,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 REV3-14). Each value at most 60 characters. Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.\n"
    },
+   "salesContact": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductSalesContact"
+     }
+    ],
+    "nullable": true,
+    "description": "**Who a guest contacts to book a view-only product** (decided 29 September, W3), e.g. a training course listed with full details and no Book button. Shown as *Call sales* and *Email sales* on an `infoOnly` product. Null means the venue's own contact (white-label `getTenantAppStatus.contact`). Ignored unless `guestListing` is `infoOnly`.\n"
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+   },
    "displayTags": {
     "type": "array",
     "maxItems": 6,
@@ -10450,7 +11278,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "string",
      "format": "uuid"
     },
-    "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlowConfig.consentQuestionIds`, per venue through `venueOverrides`); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
+    "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
    },
    "requiresTimeWindow": {
     "type": "boolean",
@@ -10616,6 +11444,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     ],
     "nullable": true
+   }
+  }
+ },
+ "ProductSalesContact": {
+  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
+  "type": "object",
+  "description": "Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n",
+  "minProperties": 1,
+  "properties": {
+   "phone": {
+    "type": "string",
+    "maxLength": 32,
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "maxLength": 254,
+    "nullable": true
+   },
+   "note": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."
    }
   }
  },
@@ -11022,6 +11878,40 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "PromotionVariant": {
+  "x-ticvai-persistence": "promotions.promotion_variant",
+  "type": "object",
+  "description": "One arm of a promotion A/B test (BL-114), written by `setPromotionVariants`. **Stored as rows** because the split has to be read back at evaluation time. The body used to be a free object with no table behind it, so the variants a caller set could not be persisted.\n",
+  "required": [
+   "label",
+   "trafficPercent"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "promotionId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "Taken from the path."
+   },
+   "label": {
+    "type": "string"
+   },
+   "trafficPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "description": "Share of traffic. All variants of a promotion sum to 100, with no minimum per variant (decided 28 September, audit R101)."
+   },
+   "discountPercent": {
+    "type": "number"
+   }
+  }
+ },
  "ReportResult": {
   "x-ticvai-persistence": "none — result set, cached in object storage",
   "type": "object",
@@ -11112,6 +12002,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Queue regardless of size, for a result to be collected later."
    }
   }
+ },
+ "SalesChannel": {
+  "type": "string",
+  "description": "**Where a sale came from.** Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing at nothing.\n**Not interchangeable with the local `Channel` enums.** `catalogue.Channel` and `orders.Channel` are byte-identical duplicates of each other listing `pos, kiosk, web, mobile, b2b, ota, callCentre`; `orders.OrderChannel` lists `guestApp, guestWeb, partner, api, backOffice` on top. **Pointing the nine at a local enum would silently narrow them** — and the duplication between the two `Channel` enums is the reason a shared one existed in the first place.\n**This is the reporting dimension**: attribution, promotion eligibility and settlement all group by it, which is why it has to mean the same thing in `orders`, `catalogue`, `subscription` and `marketing-crm` rather than four things that nearly line up.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice",
+   "b2b",
+   "ota"
+  ]
  },
  "SeatAvailability": {
   "x-ticvai-persistence": "none — computed from seat, hold and block",
@@ -11255,6 +12161,48 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "SeatRecommendation": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "seatIds",
+   "totalPrice",
+   "isContiguous",
+   "rank"
+  ],
+  "properties": {
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "displayLabels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "totalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isContiguous": {
+    "type": "boolean"
+   },
+   "rank": {
+    "type": "integer",
+    "description": "Best first."
+   },
+   "rationale": {
+    "type": "string",
+    "description": "Why this option was chosen — closest to stage, best value in category, only contiguous block remaining. Shown to a call-centre agent, not the guest.\n"
+   }
+  }
+ },
  "SeatRecommendationRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -11314,6 +12262,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "unavailable"
   ]
  },
+ "SetPriceRequest": {
+  "type": "object",
+  "required": [
+   "variantId",
+   "amount"
+  ],
+  "properties": {
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid"
+   }
+  }
+ },
  "StackingMode": {
   "type": "string",
   "description": "How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine into a free ticket.\n",
@@ -11323,6 +12291,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "bestOnly",
    "stackWithGroup"
   ]
+ },
+ "SupervisorStepUp": {
+  "type": "object",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "required": [
+   "principalId",
+   "credential"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The supervisor signing. Recorded against the act."
+   },
+   "credential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
+   }
+  }
  },
  "UpdateProductRequest": {
   "type": "object",
@@ -11364,6 +12353,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "nullable": true
    },
+   "salesContact": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductSalesContact"
+     }
+    ],
+    "nullable": true,
+    "description": "See `Product.salesContact` (W3, 29 September)."
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "See `Product.bookingFlowId` (W8, W12, 29 September)."
+   },
    "displayTags": {
     "type": "array",
     "maxItems": 6,
@@ -11389,6 +12393,57 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "requiresTimeWindow": {
     "type": "boolean"
+   }
+  }
+ },
+ "VariantDimension": {
+  "x-ticvai-persistence": "catalogue.variant_dimension",
+  "type": "object",
+  "description": "**A length is an axis like any other** (decided 29 September, rev 3 REV3-13). A meeting room type sold by the hour has an axis `length` with values `1h`, `2h`, `halfDay`, `fullDay`, each carrying `durationMinutes` (proposed 60, 120, 240 and 480, client to correct), and each generated variant is priced on its own, so a half day need not cost four single hours.\n",
+  "required": [
+   "code",
+   "name",
+   "values"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "values": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "label"
+     ],
+     "properties": {
+      "code": {
+       "type": "string",
+       "maxLength": 64
+      },
+      "label": {
+       "type": "string",
+       "maxLength": 200
+      },
+      "priceDelta": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "durationMinutes": {
+       "type": "integer",
+       "minimum": 15,
+       "maximum": 1440,
+       "nullable": true,
+       "description": "How long a variant carrying this value books its space for, on a `length` axis of a product with `requiresTimeWindow` (decided 29 September, rev 3 REV3-13). Null on any other axis. One axis per product at most may carry it; a second is a `400`."
+      }
+     }
+    }
    }
   }
  },

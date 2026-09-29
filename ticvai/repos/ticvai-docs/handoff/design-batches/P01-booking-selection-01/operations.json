@@ -1,23 +1,4 @@
 {
- "acquireInventoryHold": {
-  "method": "POST",
-  "path": "/inventory-holds",
-  "contract": "catalogue",
-  "summary": "Acquire an inventory lease",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AcquireLeaseRequest",
-  "responds": "InventoryHold"
- },
  "addCartLine": {
   "method": "POST",
   "path": "/carts/{cartId}/lines",
@@ -56,6 +37,44 @@
   "requestBody": null,
   "responds": "Wishlist"
  },
+ "checkBookingEligibility": {
+  "method": "POST",
+  "path": "/eligibility-checks",
+  "contract": "catalogue",
+  "summary": "Can this party take part",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EligibilityCheckRequest",
+  "responds": "EligibilityCheckResult"
+ },
+ "createResourceHold": {
+  "method": "POST",
+  "path": "/resource-holds",
+  "contract": "resources",
+  "summary": "Hold a specific resource picked on the map",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateResourceHoldRequest",
+  "responds": "ResourceHold"
+ },
  "createSeatHold": {
   "method": "POST",
   "path": "/seat-holds",
@@ -74,6 +93,25 @@
   ],
   "requestBody": "CreateSeatHoldRequest",
   "responds": "SeatHold"
+ },
+ "decideRecommendations": {
+  "method": "POST",
+  "path": "/recommendations/decide",
+  "contract": "ai",
+  "summary": "Fill a recommendation slot",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRecommendationResult"
  },
  "evaluatePromotions": {
   "method": "POST",
@@ -94,6 +132,25 @@
   "requestBody": "EvaluatePromotionsRequest",
   "responds": "PromotionEvaluation"
  },
+ "extendResourceHold": {
+  "method": "POST",
+  "path": "/resource-holds/{holdId}/extend",
+  "contract": "resources",
+  "summary": "Extend a resource hold",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceHold"
+ },
  "getAvailability": {
   "method": "GET",
   "path": "/availability",
@@ -113,10 +170,35 @@
     "name": "channelCapacityId",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PerformanceAvailabilityPage"
  },
  "getBundle": {
   "method": "GET",
@@ -131,6 +213,59 @@
   "requestBody": null,
   "responds": "Bundle"
  },
+ "getCart": {
+  "method": "GET",
+  "path": "/carts/{cartId}",
+  "contract": "orders",
+  "summary": "The cart, priced and checked, right now",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "getMapResourceAvailability": {
+  "method": "GET",
+  "path": "/resource-availability",
+  "contract": "resources",
+  "summary": "Every bookable resource on a venue map, free or taken, in one call",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "mapId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MapResourceAvailability"
+ },
  "getPerformance": {
   "method": "GET",
   "path": "/performances/{performanceId}",
@@ -143,6 +278,61 @@
   "parameters": [],
   "requestBody": null,
   "responds": "Performance"
+ },
+ "getPublishedBookingFlow": {
+  "method": "GET",
+  "path": "/venues/{venueId}/booking-flow",
+  "contract": "white-label",
+  "summary": "The published booking flow a product or category books through",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productCategoryId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "flowTypeKey",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookingFlow"
+ },
+ "getPublishedGuidedChoice": {
+  "method": "GET",
+  "path": "/venues/{venueId}/guided-choice",
+  "contract": "white-label",
+  "summary": "The venue's published Help me choose",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuidedChoice"
+ },
+ "getResourceHold": {
+  "method": "GET",
+  "path": "/resource-holds/{holdId}",
+  "contract": "resources",
+  "summary": "Read a resource hold",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceHold"
  },
  "getSeatAvailability": {
   "method": "GET",
@@ -178,24 +368,29 @@
   "requestBody": null,
   "responds": "SeatAvailability"
  },
- "getUpsellSuggestions": {
-  "method": "POST",
-  "path": "/upsell-suggestions",
-  "contract": "promotions",
-  "summary": "Suggestions for a cart",
-  "permission": "PRODUCT_VIEW",
+ "getVenueMap": {
+  "method": "GET",
+  "path": "/venue-maps/{mapId}",
+  "contract": "venue-map",
+  "summary": "A map with its points and paths",
+  "permission": "VENUE_MAP_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": null,
-    "in": null,
+    "name": "version",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "draft",
+    "in": "query",
     "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "VenueMapDetail"
  },
  "getWishlist": {
   "method": "GET",
@@ -210,11 +405,40 @@
   "requestBody": null,
   "responds": "Wishlist"
  },
+ "listBookableVenueMaps": {
+  "method": "GET",
+  "path": "/bookable-venue-maps",
+  "contract": "venue-map",
+  "summary": "The published maps of a venue that carry bookable spots",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookableVenueMaps"
+ },
  "listCatalogueBundles": {
   "method": "GET",
   "path": "/catalogue/bundles",
   "contract": "catalogue",
-  "summary": "List published bundles",
+  "summary": "List published catalogue bundles",
   "permission": "PRODUCT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
@@ -222,6 +446,107 @@
   "parameters": [],
   "requestBody": null,
   "responds": "BundleSummary"
+ },
+ "listPerformances": {
+  "method": "GET",
+  "path": "/events/{eventId}/performances",
+  "contract": "catalogue",
+  "summary": "List performances of an event",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProductCategories": {
+  "method": "GET",
+  "path": "/product-categories",
+  "contract": "catalogue",
+  "summary": "The merchandise hierarchy — categories, brands, collections",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductCategoryNode"
+ },
+ "listProductStartTimes": {
+  "method": "GET",
+  "path": "/resource-start-times",
+  "contract": "resources",
+  "summary": "Start times a space sold by the hour can be booked at, for one length on one day",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "variantId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "stepMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listProductVariants": {
   "method": "GET",
@@ -247,6 +572,60 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "recommendSeats": {
   "method": "POST",
   "path": "/performances/{performanceId}/seat-recommendations",
@@ -256,8 +635,90 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "SeatRecommendationRequest",
+  "responds": null
+ },
+ "recordConsentAnswers": {
+  "method": "POST",
+  "path": "/consent-answers",
+  "contract": "marketing-crm",
+  "summary": "Answer the consent questions a booking asks",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentAnswersRequest",
+  "responds": null
+ },
+ "recordRecommendationEvents": {
+  "method": "POST",
+  "path": "/recommendations/events",
+  "contract": "ai",
+  "summary": "Report what happened to recommended items",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "relinquishResourceHold": {
+  "method": "DELETE",
+  "path": "/resource-holds/{holdId}",
+  "contract": "resources",
+  "summary": "Give up a resource hold",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "relinquishSeatHold": {
+  "method": "DELETE",
+  "path": "/seat-holds/{holdId}",
+  "contract": "seating",
+  "summary": "Release a hold",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
   "responds": null
  },
  "removeFromWishlist": {

@@ -1,6 +1,6 @@
 # P08-orders-money-03 — P08 · Orders & Money (3 of 3)
 
-**7 screens · 41 operations · 32 schemas · 8 permissions**
+**7 screens · 42 operations · 39 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -65,5 +65,5 @@ convincingly. It is never a caption.
 | `BO-076` | Revenue Recognition | listDetail | 5 | 2 | — |
 | `BO-077` | FX Rates & Variances | approvalInbox | 5 | 3 | — |
 | `BO-089` | Journal Entries | approvalInbox | 6 | 4 | — |
-| `BO-090` | Period Close | listDetail | 6 | 3 | — |
+| `BO-090` | Period Close | listDetail | 7 | 3 | — |
 | `BO-101` | Orders & Money | listDetail | 3 | 0 | — |

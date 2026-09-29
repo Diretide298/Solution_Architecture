@@ -27,7 +27,10 @@
      "trigger": "They track it",
      "provenance": "flow F54 step 3→4",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "caseId"
+     ]
     }
    ]
   },
@@ -45,7 +48,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every lost found",
+       "label": "Every case",
        "bindsTo": "Case",
        "columns": [
         "Case.id",
@@ -72,7 +75,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected lost found",
+       "label": "The selected case",
        "bindsTo": "Case",
        "columns": [
         "Case.id",
@@ -103,29 +106,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Raise",
+       "label": "Raise my case",
        "operation": "raiseMyCase",
        "provenance": "contract marketing-crm.yaml POST /my/cases"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reply",
+       "label": "Reply to my case",
        "operation": "replyToMyCase",
        "provenance": "contract marketing-crm.yaml POST /my/cases/{caseId}/messages"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "raiseMyCase",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -134,10 +123,10 @@
   "states": {
    "loading": "The lost found list.",
    "error": "Could not load. Names which read failed and leaves the lost found untouched.",
-   "emptyFirstRun": "No lost found yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the lost found are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Reports already loaded stay read-only with their age. Reporting and replying need the connection."
+   "emptyFirstRun": "No lost found yet. Offers Raise my case (`raiseMyCase`).",
+   "emptyNoResults": "Never shown: `listMyCases` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Reports already loaded stay read-only with their age. **Reporting a loss and replying are disabled offline** — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk or lost-property point, or any member of staff."
   },
   "apis": [
    {
@@ -183,11 +172,61 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-034"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-034",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Account → 'Lost & found, reports'; Help → 'Your cases' → Raise a case → topic 'Lost property'",
+    "differences": "No lost-item report form (item, where, when, photo); reported via the generic case form."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRaiseMyCase",
+    "component": "modal",
+    "trigger": "Raise my case",
+    "body": "**Collects what `raiseMyCase` sends before it is called.** Required: `id`, `kind`, `summary`, `recordedAt`. Optional: `detail`, `venueId`, `orderRef`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Raise my case",
+     "operation": "raiseMyCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "summary",
+      "recordedAt",
+      "detail",
+      "venueId",
+      "orderRef"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formReplyToMyCase",
+    "component": "modal",
+    "trigger": "Reply to my case",
+    "body": "**Collects what `replyToMyCase` sends before it is called.** Required: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reply to my case",
+     "operation": "replyToMyCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "message"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -239,18 +278,11 @@
     "WEB-001"
    ]
   },
-  "notes": "**P01 Board 4 drew *Help Centre* and *Accessibility Statement* and neither could load content.** `listFaqs` and `listContentPages` were app-only.",
+  "notes": "**P01 Board 4 drew *Help Centre* and *Accessibility Statement* and neither could load content.** `listFaqs` and `listContentPages` were app-only.\n\n**Rev 3 (decided 29 September).** Shows *What's new* (GAP-B2). One implementation with WEB-025, both ids kept (GAP-D3).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listFaqs` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Answers, policies and the accessibility statement.",
-  "gaps": [
-   {
-    "operation": "listContentPages",
-    "why": "**1 declared operation reach no component on this screen**: listContentPages. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -260,7 +292,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every help accessibility",
+       "label": "Every faq category",
        "bindsTo": "FaqCategory",
        "columns": [
         "FaqCategory.code",
@@ -271,33 +303,27 @@
        ],
        "operation": "listFaqs",
        "provenance": "contract white-label.yaml GET /tenant-config/faqs"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected help accessibility",
-       "bindsTo": "FaqCategory",
+       "kind": "dataTable",
+       "label": "Every content page",
+       "bindsTo": "ContentPage",
        "columns": [
-        "FaqCategory.code",
-        "FaqCategory.name",
-        "FaqCategory.sortOrder",
-        "FaqCategory.entries",
-        "FaqCategory.scopePath"
+        "ContentPage.id",
+        "ContentPage.slug",
+        "ContentPage.title",
+        "ContentPage.body",
+        "ContentPage.isEnabled",
+        "ContentPage.status",
+        "ContentPage.iconAssetRef",
+        "ContentPage.categoryCode",
+        "ContentPage.sortOrder",
+        "ContentPage.isReferenced",
+        "ContentPage.scopePath"
        ],
-       "operation": "listFaqs",
-       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "operation": "listContentPages",
+       "provenance": "contract white-label.yaml GET /tenant-config/pages"
+      },
       {
        "kind": "cardList",
        "label": "Help Centre & Accessibility",
@@ -307,6 +333,33 @@
        "kind": "detailPanel",
        "label": "Detail",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "label": "What's new",
+       "notes": "Public, localised release notes from `getTenantAppStatus` `whatsNew`, newest first.",
+       "operation": "getTenantAppStatus",
+       "provenance": "decided 29 September, rev 3 GAP-B2"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected faq category",
+       "bindsTo": "FaqCategory",
+       "columns": [
+        "FaqCategory.code",
+        "FaqCategory.name",
+        "FaqCategory.sortOrder",
+        "FaqCategory.entries",
+        "FaqCategory.scopePath"
+       ],
+       "operation": "listFaqs",
+       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
       }
      ]
     }
@@ -318,7 +371,7 @@
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
    "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "offline": "**The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising a case is disabled offline** — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff."
   },
   "apis": [
    {
@@ -331,6 +384,12 @@
     "operationId": "listContentPages",
     "contract": "white-label",
     "purpose": "List custom content pages",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "App status and the public *What's new*",
     "trigger": "onLoad"
    }
   ],
@@ -346,9 +405,17 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-045"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-045",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Header 'Help' → 'Policies and accessibility'; footer 'Accessibility'",
+    "differences": "Not a separate screen: part of the WEB-025 Help centre page."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {

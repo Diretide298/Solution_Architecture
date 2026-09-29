@@ -1,6 +1,6 @@
 # WS10 — Access Control board 10
 
-**10 screens · 19 operations · 28 schemas · 6 permissions**
+**10 screens · 20 operations · 31 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-234` | Dynamic Access Policy Command Center | listDetail | 2 | 0 | — |
+| `BO-234` | Dynamic Access Policy Command Center | listDetail | 3 | 0 | — |
 | `BO-235` | Access Attribute Catalog | listDetail | 2 | 0 | — |
 | `BO-236` | Visual Dynamic Policy Builder | listDetail | 1 | 0 | — |
 | `BO-237` | Context, Time, Event & Capacity Policy Builder | commandCentre | 1 | 0 | — |
@@ -69,7 +69,7 @@ convincingly. It is never a caption.
 | `BO-240` | Authorization Governance & Temporary Access | listDetail | 1 | 0 | — |
 | `BO-241` | Policy Evaluation Architecture & Offline Distribution | listDetail | 4 | 1 | — |
 | `BO-242` | Policy Simulation, Conflict & Impact Analysis | listDetail | 1 | 0 | — |
-| `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | listDetail | 5 | 1 | — |
+| `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | listDetail | 6 | 1 | — |
 
 ## Thin screens in this batch
 

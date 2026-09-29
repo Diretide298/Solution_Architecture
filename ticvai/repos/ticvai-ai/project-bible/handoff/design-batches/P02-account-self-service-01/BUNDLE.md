@@ -1,6 +1,6 @@
 # P02-account-self-service-01 — P02 · Account & Self-Service (1 of 2)
 
-**10 screens · 38 operations · 29 schemas · 4 permissions**
+**10 screens · 46 operations · 48 schemas · 6 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, LEDGER_POST, LEDGER_VIEW, ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **5 of these operations work offline**: getEntitlement, getGuestSession, getOrder, listMyEntitlements, listOrders
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -62,20 +62,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-012` | My Tickets | listDetail | 6 | 0 | — |
-| `GST-013` | Ticket Details | statusTracker | 4 | 0 | — |
-| `GST-018` | Add to Calendar / Reminders | listDetail | 3 | 0 | — |
-| `GST-019` | Order History | listDetail | 4 | 0 | — |
-| `GST-020` | Saved Items / Wishlist | statusTracker | 3 | 1 | — |
-| `GST-039` | Profile | configEditor | 2 | 0 | — |
-| `GST-042` | Simple Registration & OTP | listDetail | 18 | 1 | — |
+| `GST-012` | My Tickets | listDetail | 6 | 1 | — |
+| `GST-013` | Ticket Details | statusTracker | 5 | 2 | — |
+| `GST-018` | Add to Calendar / Reminders | listDetail | 6 | 2 | — |
+| `GST-019` | Order History | listDetail | 9 | 1 | — |
+| `GST-020` | Saved Items / Wishlist | statusTracker | 3 | 2 | — |
+| `GST-039` | Profile | configEditor | 2 | 1 | — |
+| `GST-042` | Simple Registration & OTP | form | 13 | 8 | — |
 | `GST-045` | Ticket Delivery & Sharing | configEditor | 1 | 0 | — |
-| `GST-055` | Dynamic QR Ticket | configEditor | 1 | 0 | — |
-| `GST-066` | Privacy & My Data | statusTracker | 5 | 1 | — |
+| `GST-055` | Dynamic QR Ticket | configEditor | 5 | 1 | — |
+| `GST-066` | Privacy & My Data | statusTracker | 9 | 3 | — |
 
 ## Thin screens in this batch
 
-**GST-012, GST-013, GST-018, GST-019, GST-020, GST-045, GST-055 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-020 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -107,37 +107,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-013"
    ],
    "transitions": [
     {
-     "to": "GST-013",
-     "trigger": "They open the one for now",
-     "provenance": "flow F50 step 3→4"
-    },
-    {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-012 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
+     "to": "GST-013",
+     "trigger": "They open the one for now",
+     "provenance": "flow F50 step 4→5",
      "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+      "entitlementId",
+      "orderId"
+     ]
     }
+   ],
+   "uses": [
+    "appTabs"
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. My Tickets. **Declared only `transferOrderTickets` until 20 August** — a guest could give a ticket away and could not read one. Raised by Pranay. **Rewired on the 20 August review.** **Cross-surface parity, 31 August**: added getEntitlementCredential, getEntitlementHistory, listEntitlements. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
-  "openQuestions": [
-   "Inventory cites `GET /tickets` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. My Tickets. **Declared only `transferOrderTickets` until 20 August** — a guest could give a ticket away and could not read one. Raised by Pranay. **Rewired on the 20 August review.** **Cross-surface parity, 31 August**: added getEntitlementCredential, getEntitlementHistory, listEntitlements. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.\n\n**Mobile v4 (decided 29 September, MOB-1, MOB-7).** The **Tickets** tab root. GST-013 Ticket Details and GST-055 Dynamic QR Ticket (refresh every 30 s) are unchanged.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
@@ -145,8 +137,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": "getEntitlementCredential",
-    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getEntitlementCredential` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract access.yaml GET /entitlements/{entitlementId}/credential"
+   },
+   {
+    "operation": "getEntitlementHistory",
+    "why": "**`getEntitlementHistory` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract access.yaml GET /entitlements/{entitlementId}/history"
    }
   ],
   "layout": {
@@ -157,8 +154,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "State",
+       "operation": "listMyEntitlements",
+       "notes": "Sends `?state=` to `listMyEntitlements`.",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      },
+      {
+       "kind": "toggle",
+       "label": "Include shared",
+       "operation": "listMyEntitlements",
+       "notes": "Sends `?includeShared=` to `listMyEntitlements`.",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every tickets",
+       "label": "Every entitlement",
        "bindsTo": "Entitlement",
        "columns": [
         "Entitlement.id",
@@ -176,6 +187,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listMyEntitlements",
        "provenance": "contract access.yaml GET /guests/me/entitlements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Entitlement history",
+       "operation": "getEntitlementHistory",
+       "notes": "Shows `at`, `kind`, `accessPointName`, `denyReason`, `byPrincipalName` from `getEntitlementHistory`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}/history"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every entitlement",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listEntitlements",
+       "provenance": "contract access.yaml GET /my/entitlements/all"
       }
      ]
     },
@@ -185,7 +224,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected tickets",
+       "label": "The selected entitlement",
        "bindsTo": "Entitlement",
        "columns": [
         "Entitlement.id",
@@ -207,6 +246,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getEntitlement",
        "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Entitlement credential",
+       "operation": "getEntitlementCredential",
+       "notes": "Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}/credential"
       }
      ]
     },
@@ -216,7 +262,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
@@ -227,10 +273,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The tickets list.",
    "error": "Could not load. Names which read failed and leaves the tickets untouched.",
-   "emptyFirstRun": "No tickets yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the tickets are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+   "emptyFirstRun": "No tickets yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on state, includeShared and the tickets are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection."
   },
   "apis": [
    {
@@ -295,10 +341,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-012"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-012",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "exact",
+    "view": "Tickets tab"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formTransferOrderTickets",
+    "component": "modal",
+    "trigger": "Transfer order tickets",
+    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer order tickets",
+     "operation": "transferOrderTickets"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "ticketIds",
+      "recipient",
+      "message"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -352,37 +426,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-055"
    ],
    "transitions": [
     {
-     "to": "GST-055",
-     "trigger": "The QR rotates as they walk to the gate",
-     "provenance": "flow F50 step 4→5"
-    },
-    {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-013 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
+     "to": "GST-055",
+     "trigger": "The QR rotates as they walk to the gate",
+     "provenance": "flow F50 step 5→6",
      "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+      "credentialId",
+      "entitlementId",
+      "orderId"
+     ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Ticket Details. **The credential is a separate call** — a list of tickets is a convenience and the credential admits somebody. **Rewired on the 20 August review.**",
-  "openQuestions": [
-   "Inventory cites `GET /tickets/{id}` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Ticket Details. **The credential is a separate call** — a list of tickets is a convenience and the credential admits somebody. **Rewired on the 20 August review.**\n\n**Rev 3 (decided 29 September).** Ticket tags from `Product.displayTags` when `ticketTags` is on (23SEP-3).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getEntitlement` reads one record and nothing reads a population — the screen is about that one thing",
@@ -390,8 +454,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": "getEntitlementCredential",
-    "why": "**2 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getEntitlementCredential` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract access.yaml GET /entitlements/{entitlementId}/credential"
+   },
+   {
+    "operation": "getEntitlementHistory",
+    "why": "**`getEntitlementHistory` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract access.yaml GET /entitlements/{entitlementId}/history"
    }
   ],
   "layout": {
@@ -403,7 +472,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected ticket",
+       "label": "The entitlement",
        "bindsTo": "Entitlement",
        "columns": [
         "Entitlement.id",
@@ -425,6 +494,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getEntitlement",
        "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Entitlement credential",
+       "operation": "getEntitlementCredential",
+       "notes": "Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one. **A rotating code derived on the device** (decided 28 September, audit R230): while online the screen fetches `rotation` (secret, `timeStepSeconds`, `digits`, `algorithm`, valid `validFrom` to `validTo`) and computes the current code from the seed and the clock, with a visible countdown to the next step; it keeps rotating with no signal. A null `rotation` (wristband, wallet pass) shows the static code.",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}/credential"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Entitlement history",
+       "operation": "getEntitlementHistory",
+       "notes": "Shows `at`, `kind`, `accessPointName`, `denyReason`, `byPrincipalName` from `getEntitlementHistory`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}/history"
       }
      ]
     },
@@ -434,9 +517,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Bind credential device",
+       "operation": "bindCredentialDevice",
+       "notes": "**The guest app binds a mobile credential to the phone it is shown on** (P02 GST-055 Dynamic QR Ticket), before the dynamic QR is displayed.",
+       "provenance": "contract access.yaml POST /my/credentials/{credentialId}/device-bindings"
       }
      ]
     }
@@ -446,9 +536,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "Availability is live, never cached",
    "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "emptyNoResults": "The filter narrowed it and the ticket are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getEntitlement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age, and a ticket's rotating code is derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Sharing, transferring and adding to a phone wallet need the connection."
   },
   "apis": [
    {
@@ -460,7 +549,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "getEntitlementCredential",
     "contract": "access",
-    "purpose": "The thing that gets scanned",
+    "purpose": "The thing that gets scanned — with the `rotation` seed the device derives the rotating code from (audit R230)",
     "trigger": "onLoad"
    },
    {
@@ -474,6 +563,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Transfer tickets to another guest",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "bindCredentialDevice",
+    "contract": "access",
+    "purpose": "Bind my credential to this device",
+    "trigger": "onAction",
+    "invalidates": [
+     "getEntitlement",
+     "getEntitlementCredential",
+     "getEntitlementHistory"
+    ]
    }
   ],
   "entryState": {
@@ -485,16 +585,72 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "orderId",
      "from": "deepLink"
+    },
+    {
+     "name": "credentialId",
+     "from": "navigation",
+     "optional": true
     }
    ],
    "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer. **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-013"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-013",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 1 → Ticket details",
+    "differences": "The YAML states come from an availability template (\"Sold out is a real answer\") and do not fit a ticket-detail screen."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formTransferOrderTickets",
+    "component": "modal",
+    "trigger": "Transfer order tickets",
+    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer order tickets",
+     "operation": "transferOrderTickets"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "ticketIds",
+      "recipient",
+      "message"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formBindCredentialDevice",
+    "component": "modal",
+    "trigger": "Bind credential device",
+    "body": "**Collects what `bindCredentialDevice` sends before it is called.** Required: `deviceId`. Optional: `deviceReference`, `appInstallationId`, `os`, `otp`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CredentialDeviceBindingInput",
+    "confirm": {
+     "label": "Bind credential device",
+     "operation": "bindCredentialDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "deviceId",
+      "deviceReference",
+      "appInstallationId",
+      "os",
+      "otp"
+     ]
+    },
+    "provenance": "contract access.yaml POST /my/credentials/{credentialId}/device-bindings"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -546,32 +702,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-018 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Add to Calendar and Reminders. **`issueWalletPass` is the operation this screen is for** — a wallet pass is the calendar entry. **Rewired on the 20 August review.**",
-  "openQuestions": [
-   "Inventory cites `local` — no matching operation. Written before the contracts existed."
-  ],
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
@@ -584,8 +725,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every add calendar reminders",
+       "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -607,7 +790,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected add calendar reminders",
+       "label": "The selected order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The visit reminder",
+       "bindsTo": "VisitReminder",
+       "columns": [
+        "VisitReminder.id",
+        "VisitReminder.orderId",
+        "VisitReminder.subjectId",
+        "VisitReminder.enabled",
+        "VisitReminder.leadTimeMinutes",
+        "VisitReminder.channels",
+        "VisitReminder.scopePath"
+       ],
+       "operation": "getVisitReminder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/reminder"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -638,9 +856,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Issue",
+       "label": "Issue wallet pass",
        "operation": "issueWalletPass",
        "provenance": "contract orders.yaml POST /wallet-passes"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Download order calendar event",
+       "operation": "getOrderCalendarEvent",
+       "notes": "Downloads `text/calendar`.",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/calendar-event"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save visit reminder",
+       "operation": "setVisitReminder",
+       "provenance": "contract orders.yaml PUT /orders/{orderId}/reminder"
       }
      ]
     }
@@ -649,17 +880,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The add calendar reminders list.",
    "error": "Could not load. Names which read failed and leaves the add calendar reminders untouched.",
-   "emptyFirstRun": "No add calendar reminders yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the add calendar reminders are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No add calendar reminders yet. Offers Issue wallet pass (`issueWalletPass`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the add calendar reminders are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrderCalendarEvent` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
+    "operationId": "getOrderCalendarEvent",
+    "contract": "orders",
+    "purpose": "Add the visit to the phone's calendar",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getVisitReminder",
+    "contract": "orders",
+    "purpose": "The reminder set for this booking",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setVisitReminder",
+    "contract": "orders",
+    "purpose": "Turn a visit reminder on or off",
+    "trigger": "onAction"
+   },
+   {
     "operationId": "getOrder",
     "contract": "orders",
     "purpose": "Read an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listOrders",
@@ -686,19 +935,70 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
+    "OrderSummary.id",
+    "OrderSummary.orderNumber",
+    "OrderSummary.status",
+    "OrderSummary.grossAmount",
+    "OrderSummary.refundedAmount"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-018"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-018",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 3 → Add to calendar / reminders"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetVisitReminder",
+    "component": "modal",
+    "trigger": "Save visit reminder",
+    "body": "**Collects what `setVisitReminder` sends before it is called.** Required: `enabled`. Optional: `id`, `orderId`, `subjectId`, `leadTimeMinutes`, `channels`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "VisitReminder",
+    "confirm": {
+     "label": "Save visit reminder",
+     "operation": "setVisitReminder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "enabled",
+      "id",
+      "orderId",
+      "subjectId",
+      "leadTimeMinutes",
+      "channels",
+      "scopePath"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formIssueWalletPass",
+    "component": "modal",
+    "trigger": "Issue wallet pass",
+    "body": "**Collects what `issueWalletPass` sends before it is called.** Required: `entitlementId`, `platform`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Issue wallet pass",
+     "operation": "issueWalletPass"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "entitlementId",
+      "platform"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -751,24 +1051,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003"
+    "GST-067"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-019 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
+     "to": "GST-067",
+     "trigger": "Ask for a refund or resell a ticket",
      "carries": [
-      "eventId"
+      "orderId"
      ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "decided 29 September, rev 3 GAP-D3: GST-008 no longer reaches refunds; order history does"
     }
    ]
   },
@@ -777,13 +1074,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
   "purpose": "Find order history (wallet) for this venue.",
-  "gaps": [
-   {
-    "operation": "listMyOrders",
-    "why": "**1 declared operation reach no component on this screen**: listMyOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -792,8 +1082,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every order history",
+       "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -806,6 +1138,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listOrders",
        "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every order",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount"
+       ],
+       "operation": "listMyOrders",
+       "provenance": "contract orders.yaml GET /my/orders"
       }
      ]
     },
@@ -815,7 +1168,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected order history",
+       "label": "The selected order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -846,7 +1218,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
@@ -857,9 +1229,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The order history list.",
    "error": "Could not load. Names which read failed and leaves the order history untouched.",
-   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No order history yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -873,7 +1245,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getOrder",
     "contract": "orders",
     "purpose": "Read an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listMyOrders",
@@ -889,6 +1261,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listOrders"
     ]
+   },
+   {
+    "operationId": "listTaxInvoices",
+    "contract": "finance",
+    "purpose": "List tax invoices",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "issueTaxInvoice",
+    "contract": "finance",
+    "purpose": "Issue a tax invoice",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getTaxInvoice",
+    "contract": "finance",
+    "purpose": "Show a tax invoice",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listCreditMemos",
+    "contract": "finance",
+    "purpose": "List credit memos",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getTaxDocumentRendition",
+    "contract": "finance",
+    "purpose": "Download the invoice / credit memo PDF",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -896,23 +1303,59 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "orderId",
      "from": "deepLink"
+    },
+    {
+     "name": "documentId",
+     "from": "navigation"
+    },
+    {
+     "name": "invoiceId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
+    "OrderSummary.id",
+    "OrderSummary.orderNumber",
+    "OrderSummary.status",
+    "OrderSummary.grossAmount",
+    "OrderSummary.refundedAmount"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-019"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-019",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Order history"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formTransferOrderTickets",
+    "component": "modal",
+    "trigger": "Transfer order tickets",
+    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer order tickets",
+     "operation": "transferOrderTickets"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "ticketIds",
+      "recipient",
+      "message"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -965,32 +1408,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-020 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Wishlist. **Device and consent operations removed 20 August** — Pranay asked why they were here, and the answer is that seven operations were attached in bulk to three unrelated screens. **Rewired on the 20 August review.**",
-  "openQuestions": [
-   "Inventory cites `GET /wishlist` — no matching operation. Written before the contracts existed."
-  ],
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getWishlist` reads one record and nothing reads a population — the screen is about that one thing",
@@ -1004,7 +1432,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected saved items wishlist",
+       "label": "The wishlist",
        "bindsTo": "Wishlist",
        "columns": [
         "Wishlist.subjectId",
@@ -1021,13 +1449,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add to wishlist",
        "operation": "addToWishlist",
        "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
       },
       {
        "kind": "destructiveButton",
-       "label": "Remove",
+       "label": "Remove from wishlist",
        "operation": "removeFromWishlist",
        "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
       }
@@ -1039,17 +1467,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmRemoveFromWishlist",
     "component": "confirmDialog",
-    "trigger": "Remove",
+    "trigger": "Remove from wishlist",
     "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A saved items wishlist this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formAddToWishlist",
+    "component": "modal",
+    "trigger": "Add to wishlist",
+    "body": "**Collects what `addToWishlist` sends before it is called.** Required: `variantId`. Optional: `performanceId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add to wishlist",
+     "operation": "addToWishlist"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "performanceId",
+      "note"
+     ]
+    },
+    "provenance": "client-verified"
    }
   ],
   "states": {
-   "loading": "The saved items wishlist list.",
+   "loading": "The saved items wishlist, read by `getWishlist`.",
    "error": "Could not load. Names which read failed and leaves the saved items wishlist untouched.",
-   "emptyFirstRun": "No saved items wishlist yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the saved items wishlist are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No saved items wishlist yet. Offers Add to wishlist (`addToWishlist`).",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -1087,8 +1532,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-020"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-020",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 3 → Saved items / wishlist"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1143,8 +1595,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
-    "GST-065"
+    "GST-065",
+    "GST-066",
+    "GST-069",
+    "GST-071",
+    "GST-073"
    ],
    "transitions": [
     {
@@ -1155,25 +1610,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-039 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "to": "GST-069",
+     "trigger": "Face Pass",
+     "provenance": "derived — GST-069 declares entryState.params enrolmentId and GST-039 holds none of them, so the edge carries nothing and GST-069 opens cold"
+    },
+    {
+     "to": "GST-071",
+     "trigger": "Payment Methods",
+     "provenance": "derived — GST-071 declares entryState.params cardCode, walletId and GST-039 holds none of them, so the edge carries nothing and GST-071 opens cold"
+    },
+    {
+     "to": "GST-073",
+     "trigger": "Security & Sign-in",
+     "provenance": "derived — GST-073 declares entryState.params challengeId, methodId and GST-039 holds none of them, so the edge carries nothing and GST-073 opens cold"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "Inventory cites `GET /guests/me` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**29 September (W1).** A profile created by guest checkout shows *Complete your details*.",
   "density": "comfortable",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`recordConsent`) and no read of a population — it is settings, not a list",
@@ -1220,6 +1676,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "recordedAt",
        "bindsTo": "RecordConsentRequest.recordedAt",
        "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "banner",
+       "label": "Complete your details",
+       "operation": "updateMyProfile",
+       "notes": "For a profile created by guest checkout (W1): asks for what the pop-up did not, whenever the guest likes; never blocks anything.",
+       "provenance": "decided 29 September 2026 (P29), W1"
       }
      ]
     },
@@ -1229,9 +1692,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Record",
+       "label": "Record consent",
        "operation": "recordConsent",
        "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save my profile",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
       }
      ]
     }
@@ -1240,8 +1709,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The saved profile.",
    "error": "Could not load. Names which read failed and leaves the profile untouched.",
-   "emptyFirstRun": "No profile configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No profile configured. The form opens empty and `recordConsent` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `updateMyProfile` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -1269,10 +1738,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-039"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-039",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 1 → Profile (also Account → Profile)",
+    "differences": "Emirates ID upload is on Profile in the prototype; the YAML has uploadGuestDocument on GST-066. Account also has a \"Saved guests (heights on file)\" row that no screen defines."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formUpdateMyProfile",
+    "component": "modal",
+    "trigger": "Save my profile",
+    "body": "**Collects what `updateMyProfile` sends before it is called.** Nothing in the body is required. Optional: `displayName`, `email`, `phone`, `preferredLanguage`, `preferredChannel`, `dietary`, `accessibility`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save my profile",
+     "operation": "updateMyProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "displayName",
+      "email",
+      "phone",
+      "preferredLanguage",
+      "preferredChannel",
+      "dietary",
+      "accessibility"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1319,195 +1821,162 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "navigation": {
    "entryFrom": [
-    "GST-001"
+    "GST-001",
+    "GST-041",
+    "GST-008",
+    "GST-077",
+    "GST-079"
    ],
    "inferred": true,
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003"
+    "GST-041"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-042 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
+     "to": "GST-041",
+     "trigger": "Signed in and verified — back to the cart",
+     "precondition": "arrived from the cart",
      "carries": [
-      "eventId"
+      "cartId"
      ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "decided 17 September 2026 — no order against an unproven contact; rule on identity verifyGuestEmail, per-site guestCheckout off by default (matrix 2.6.28)"
     },
     {
      "to": "WEB-016",
      "trigger": "A guest who checked out anonymously links their order",
      "provenance": "flow F56 step 2→3",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "challengeId",
+      "subjectId"
+     ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout.** `selectRole` is ADR-0002 staff authorisation; `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` already existed — the screen was reaching into the staff identity surface because nothing checked that a guest platform only calls guest operations.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout.** `selectRole` is ADR-0002 staff authorisation; `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` already existed — the screen was reaching into the staff identity surface because nothing checked that a guest platform only calls guest operations. **Rebuilt 28 September as a guest sign-in form** (decided 28 September, audit R167, R073 (a)): removed `login`, `startSsoAuthorization`, `completeSsoAuthorization`, `listSsoProviders` and the six MFA operations — guests have no enterprise SSO. **The second factor came back on 29 September, per venue** (see below). Password sign-in is `guestPasswordLogin`.\n\n**Rev 3 (decided 29 September).** **Guest two-step verification is per venue, off by default** (GAP-B1, `VenueSettings.identity.guestTwoStep`; supersedes the second part of audit R167; no enterprise SSO stands). The prompt appears only when signing in or acting at a venue that has it on; enrolment is on the guest's account (GST-073). **Sign-in gate (REV3-3):** reached from GST-008 (after add-ons) or GST-041 (at payment), returning to the basket with it kept; guest checkout and matching unchanged (DG-1).\n\n**The venue in context is sent** (decided 29 September, rev 3 GAP-B1, per venue): `verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin` and `createMfaChallenge` take an optional `venueId`, the venue the app or booking is in, so the second factor is asked only where that venue has guest two-step verification on.\n\n**29 September (W1).** The guest pop-up asks only `guestContactFields` (Email only / + name / + mobile), then the six-digit code (DG-1). After the code the guest is not asked for name, email or phone again: back to the basket and on to the T&Cs (GST-009).",
   "density": "comfortable",
-  "pattern": "listDetail",
-  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
-  "purpose": "Work with simple registration & otp for this venue.",
-  "gaps": [
-   {
-    "operation": "listSsoProviders",
-    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "pattern": "form",
+  "patternReason": "**A sign-in form, not a list.** Four ways in (a one-time code, a password, Apple or Google, UAE Pass) and a way to register; `getGuestSession` is the one piece of context. Rebuilt 28 September: the screen had been generated as a list of MFA methods and SSO providers, neither of which a guest has (decided 28 September, audit R167, R073 (a)). The second-factor prompt is back as a step of sign-in, only at a venue that has guest two-step verification on (decided 29 September, rev 3 GAP-B1).",
+  "purpose": "Get a guest into the app, fast, on a device that may be shared: a one-time code to the email or mobile, a password, Apple or Google, or UAE Pass, or register a new account. **No enterprise SSO for guests** (decided 28 September, audit R167, first part). **A second factor only where the venue enabled guest two-step verification** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of R167).",
   "layout": {
-   "template": "split",
+   "template": "form",
    "regions": [
     {
-     "name": "contentBody",
-     "slot": "collection",
+     "name": "signIn",
+     "slot": "fields",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every simple registration otp",
-       "bindsTo": "MfaMethod",
-       "columns": [
-        "MfaMethod.id",
-        "MfaMethod.kind",
-        "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
-        "MfaMethod.enrolledAt",
-        "MfaMethod.lastUsedAt"
-       ],
-       "operation": "listMfaMethods",
-       "provenance": "contract identity.yaml GET /auth/mfa/methods"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected simple registration otp",
-       "bindsTo": "GuestSession",
-       "columns": [
-        "GuestSession.subjectId",
-        "GuestSession.displayName",
-        "GuestSession.tokens",
-        "GuestSession.isVerified",
-        "GuestSession.identityProviders",
-        "GuestSession.guestLinkId",
-        "GuestSession.homeCellName",
-        "GuestSession.preferredLanguage",
-        "GuestSession.expiresAt"
-       ],
-       "operation": "getGuestSession",
-       "provenance": "contract identity.yaml GET /auth/guest/session"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
+       "kind": "textField",
+       "label": "Email or mobile number",
+       "operation": "requestGuestOtp",
+       "notes": "**Guest checkout asks only the configured fields** (W1): `BookingFlowSettings.guestContactFields` (email, mobile, name; at least the `GuestMatchPolicy.matchBy` key). Nothing else is asked.",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
       {
        "kind": "primaryButton",
-       "label": "Request",
+       "label": "Send me a code",
        "operation": "requestGuestOtp",
        "provenance": "contract identity.yaml POST /auth/guest/otp"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Complete",
-       "operation": "completeSsoAuthorization",
-       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
+       "kind": "textField",
+       "label": "Code",
+       "operation": "verifyGuestOtp",
+       "notes": "Shown once a code has been sent; `verifyGuestOtp` returns the `GuestSession`.",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Sign in with the code",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "textField",
+       "label": "Password",
+       "operation": "guestPasswordLogin",
+       "notes": "**Password sign-in** (decided 28 September, audit R073 (a)): sends `identifier`, `password` and the device's `deviceId` to `guestPasswordLogin`, which returns the same `GuestSession`. A wrong password, an unknown identifier and an account with no password are one answer (401) and the screen shows one message for all of them, never which it was. Signing in here ends this device's previous guest session.",
+       "provenance": "contract identity.yaml POST /auth/guest/password"
       },
       {
        "kind": "secondaryButton",
-       "label": "Enrol",
-       "operation": "enrolMfaMethod",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+       "label": "Sign in with password",
+       "operation": "guestPasswordLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/password"
       },
       {
        "kind": "secondaryButton",
-       "label": "Guest",
-       "operation": "guestLogout",
-       "provenance": "contract identity.yaml DELETE /auth/guest/session"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Guest",
+       "label": "Continue with Apple or Google",
        "operation": "guestSocialLogin",
        "provenance": "contract identity.yaml POST /auth/guest/social"
       },
       {
        "kind": "secondaryButton",
-       "label": "Guest",
+       "label": "Continue with UAE Pass",
        "operation": "guestUaePassLogin",
        "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
       },
       {
        "kind": "secondaryButton",
-       "label": "Link",
+       "label": "Create an account",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
+      },
+      {
+       "kind": "textField",
+       "label": "Verification code",
+       "notes": "Only when the returned `GuestSession` has `requiresMfa`: at a venue whose `VenueSettings.identity.guestTwoStep.enabled` is on, for a guest who enrolled a method. At any other venue nothing is asked.",
+       "operation": "verifyMfaChallenge",
+       "provenance": "decided 29 September, rev 3 GAP-B1 (per venue)"
+      }
+     ]
+    },
+    {
+     "name": "session",
+     "slot": "context",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Who is signed in on this device",
+       "bindsTo": "GuestSession",
+       "columns": [
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
+       ],
+       "operation": "getGuestSession",
+       "notes": "Shown only when a guest session already exists on this device, with a way to sign out so a shared device is handed over clean.",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Sign out",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link an order I placed as a guest",
        "operation": "linkGuestCheckout",
        "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
       },
       {
        "kind": "secondaryButton",
-       "label": "Login",
-       "operation": "login",
-       "provenance": "contract identity.yaml POST /auth/login"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Refresh",
+       "label": "Refresh token",
        "operation": "refreshToken",
+       "notes": "Not a button the guest sees; the client rotates the access token before it expires.",
        "provenance": "contract identity.yaml POST /auth/refresh"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Register",
-       "operation": "registerGuest",
-       "provenance": "contract identity.yaml POST /auth/guest/register"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Remove",
-       "operation": "removeMfaMethod",
-       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Start",
-       "operation": "startSsoAuthorization",
-       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyGuestOtp",
-       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Verify",
-       "operation": "verifyMfaEnrolment",
-       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
       }
      ]
     }
@@ -1515,44 +1984,176 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "overlays": [
    {
-    "id": "confirmRemoveMfaMethod",
-    "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A simple registration otp this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+    "id": "formRegisterGuest",
+    "component": "modal",
+    "trigger": "Create an account",
+    "body": "**Collects what `registerGuest` sends before it is called.** Required: `identifier`, `channel`. Optional: `displayName`, `password`, `preferredLanguage`, `consents`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RegisterGuestRequest",
+    "confirm": {
+     "label": "Register guest",
+     "operation": "registerGuest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "identifier",
+      "channel",
+      "displayName",
+      "password",
+      "preferredLanguage",
+      "consents"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formGuestPasswordLogin",
+    "component": "modal",
+    "trigger": "Sign in with password",
+    "body": "**Collects what `guestPasswordLogin` sends before it is called.** Required: `identifier`, `password`. Optional: `deviceId` (sent by the client, not typed). A 401 is one message whatever the cause; a 429 or a locked account says to try again later or use a one-time code instead (decided 28 September, audit R073 (a)). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Sign in",
+     "operation": "guestPasswordLogin"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "identifier",
+      "password",
+      "deviceId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formGuestSocialLogin",
+    "component": "modal",
+    "trigger": "Continue with Apple or Google",
+    "body": "**Collects what `guestSocialLogin` sends before it is called.** Required: `provider`, `idToken`. Optional: `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Guest social login",
+     "operation": "guestSocialLogin"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "provider",
+      "idToken",
+      "deviceId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formGuestUaePassLogin",
+    "component": "modal",
+    "trigger": "Continue with UAE Pass",
+    "body": "**Collects what `guestUaePassLogin` sends before it is called.** Required: `code`, `redirectUri`. Optional: `state`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Guest uae pass login",
+     "operation": "guestUaePassLogin"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "redirectUri",
+      "state",
+      "deviceId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formLinkGuestCheckout",
+    "component": "modal",
+    "trigger": "Link an order I placed as a guest",
+    "body": "**Collects what `linkGuestCheckout` sends before it is called.** Required: `orderReference`. Optional: `verificationCode`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Link guest checkout",
+     "operation": "linkGuestCheckout"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "orderReference",
+      "verificationCode"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRefreshToken",
+    "component": "modal",
+    "trigger": "Refresh token",
+    "body": "**Collects what `refreshToken` sends before it is called.** Required: `refreshToken`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Refresh token",
+     "operation": "refreshToken"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "refreshToken"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRequestGuestOtp",
+    "component": "modal",
+    "trigger": "Send me a code",
+    "body": "**Collects what `requestGuestOtp` sends before it is called.** Required: `identifier`, `channel`. Optional: `purpose`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request guest OTP",
+     "operation": "requestGuestOtp"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "identifier",
+      "channel",
+      "purpose"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formVerifyGuestOtp",
+    "component": "modal",
+    "trigger": "Sign in with the code",
+    "body": "**Collects what `verifyGuestOtp` sends before it is called.** Required: `identifier`, `code`. Optional: `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Verify guest OTP",
+     "operation": "verifyGuestOtp"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "identifier",
+      "code",
+      "deviceId"
+     ]
+    },
+    "provenance": "client-verified"
    }
   ],
   "states": {
-   "loading": "The simple registration otp list.",
-   "error": "Could not load. Names which read failed and leaves the simple registration otp untouched.",
-   "emptyFirstRun": "No simple registration otp yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the simple registration otp are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "loading": "Checking whether this device already holds a guest session. The sign-in form stays visible.",
+   "error": "Identity could not be reached. **Says so rather than saying the password or code is wrong**, and keeps what was typed.",
+   "emptyFirstRun": "**Nobody signed in on this device** — the normal state. The form offers a code, a password, Apple or Google and UAE Pass, and Create an account (`registerGuest`).",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025), and this is the screen a guest who is not signed in is sent to, so it has no no-access case of its own. A session that has expired lands here with the screen it came from kept, and returns to it after sign-in.",
+   "signInRefused": "**One message for every refusal of a password sign-in**: `guestPasswordLogin` answers 401 alike for a wrong password, an unknown identifier, an account with no password and a locked account, and the screen never says which. Too many attempts (429, or the lockout after `PasswordPolicy.lockoutAfterAttempts`) says to try again later and offers **Send me a code** instead (decided 28 September, audit R073 (a)).",
    "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "apis": [
    {
-    "operationId": "requestGuestOtp",
+    "operationId": "registerGuest",
     "contract": "identity",
-    "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "completeSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Exchange an SSO code for a session",
+    "purpose": "Create a guest account",
     "trigger": "onAction",
     "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "enrolMfaMethod",
-    "contract": "identity",
-    "purpose": "Enrol an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
+     "getGuestSession"
     ]
    },
    {
@@ -1567,7 +2168,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "End a guest session",
     "trigger": "onAction",
     "invalidates": [
-     "listMfaMethods"
+     "getGuestSession"
+    ]
+   },
+   {
+    "operationId": "guestPasswordLogin",
+    "contract": "identity",
+    "purpose": "Sign in with the email or mobile and the password set at registration (identifier, password, deviceId -> GuestSession); one indistinguishable 401, lockout, 429 (decided 28 September, audit R073 (a))",
+    "trigger": "onAction",
+    "invalidates": [
+     "getGuestSession"
     ]
    },
    {
@@ -1576,7 +2186,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Sign in with Apple or Google",
     "trigger": "onAction",
     "invalidates": [
-     "listMfaMethods"
+     "getGuestSession"
     ]
    },
    {
@@ -1585,71 +2195,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Sign in with a national identity provider",
     "trigger": "onAction",
     "invalidates": [
-     "listMfaMethods"
+     "getGuestSession"
     ]
    },
    {
     "operationId": "linkGuestCheckout",
     "contract": "identity",
     "purpose": "Attach a guest checkout to an account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "listMfaMethods",
-    "contract": "identity",
-    "purpose": "Enrolled MFA methods",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listSsoProviders",
-    "contract": "identity",
-    "purpose": "Identity providers configured for this tenant",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "login",
-    "contract": "identity",
-    "purpose": "Authenticate and open a session",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "refreshToken",
     "contract": "identity",
     "purpose": "Rotate the access token",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
+    "trigger": "onAction"
    },
    {
-    "operationId": "registerGuest",
+    "operationId": "requestGuestOtp",
     "contract": "identity",
-    "purpose": "Create a guest account",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove an MFA method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "startSsoAuthorization",
-    "contract": "identity",
-    "purpose": "Begin an SSO flow",
-    "trigger": "onLoad"
+    "purpose": "Request a one-time code",
+    "trigger": "onAction"
    },
    {
     "operationId": "verifyGuestOtp",
@@ -1657,56 +2222,61 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Verify a one-time code and issue a session",
     "trigger": "onAction",
     "invalidates": [
-     "listMfaMethods"
+     "getGuestSession"
     ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at a venue with guest two-step verification on",
+    "trigger": "onAction"
    },
    {
     "operationId": "verifyMfaChallenge",
     "contract": "identity",
-    "purpose": "Complete a step-up challenge",
+    "purpose": "Check the code and release the session",
     "trigger": "onAction",
     "invalidates": [
-     "listMfaMethods"
+     "getGuestSession"
     ]
    },
    {
-    "operationId": "verifyMfaEnrolment",
-    "contract": "identity",
-    "purpose": "Complete enrolment",
+    "operationId": "claimDeviceConsent",
+    "contract": "marketing-crm",
+    "purpose": "Attach this device's tracking decision to the guest after sign-in or registration",
     "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
    "params": [
     {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
      "name": "challengeId",
-     "from": "deepLink"
+     "from": "navigation"
     },
     {
-     "name": "methodId",
-     "from": "deepLink"
-    },
-    {
-     "name": "providerId",
-     "from": "deepLink"
+     "name": "subjectId",
+     "from": "navigation"
     }
    ],
-   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
-   "preloaded": [
-    "GuestSession.subjectId",
-    "GuestSession.displayName",
-    "GuestSession.tokens",
-    "GuestSession.isVerified",
-    "GuestSession.identityProviders"
-   ]
+   "coldEntry": "**Needs nothing.** A guest arriving cold signs in and goes Home; one sent from the cart carries `cartId` and goes back to it. The SSO deep-link parameter (`providerId`) went with the operations that used it (audit R167); a second-factor challenge is created in place, never arrives by link."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-042"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-042",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Account → All screens → Wave 1 → Simple registration & OTP (same #ident screen) + \"Log in or register\" sheet from home",
+    "differences": "Prototype has email code, Apple and Google only; the YAML also has password login, UAE Pass and explicit registration."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 18 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1760,43 +2330,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-045 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "Inventory cites `POST /tickets/{id}/share` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** GST-014 and GST-045 (and the old GST-008 transfer reading) are one implementation with several screen ids; the ids are kept (GAP-D3).",
   "density": "comfortable",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
   "purpose": "Find ticket delivery & sharing for this venue.",
-  "gaps": [
-   {
-    "operation": "transferOrderTickets",
-    "why": "**`transferOrderTickets` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract orders.yaml POST /orders/{orderId}/transfer"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1806,7 +2354,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
@@ -1816,11 +2364,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "components": [
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "transferOrderTickets"
+       "kind": "multiSelect",
+       "label": "Ticket ids",
+       "operation": "transferOrderTickets",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "textField",
+       "label": "Recipient",
+       "operation": "transferOrderTickets",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "textField",
+       "label": "Message",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
@@ -1830,7 +2391,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "Availability is live, never cached",
    "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible."
   },
   "apis": [
@@ -1852,8 +2412,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-045"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-045",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Account → All screens → Wave 2 → Ticket delivery & sharing (opens Ticket transfer)",
+    "differences": "No screen of its own; it shares GST-014’s screen until the client confirms."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1908,41 +2476,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-055 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "Inventory cites `GET /tickets/{id}/dynamic-qr` — no matching operation. Written before the contracts existed."
-  ],
   "density": "comfortable",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
   "purpose": "Find dynamic qr ticket for this venue.",
   "gaps": [
    {
-    "operation": "transferOrderTickets",
-    "why": "**`transferOrderTickets` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract orders.yaml POST /orders/{orderId}/transfer"
+    "operation": "getEntitlementCredential",
+    "why": "**`getEntitlementCredential` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract access.yaml GET /entitlements/{entitlementId}/credential"
    }
   ],
   "layout": {
@@ -1954,9 +2507,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Bind credential device",
+       "operation": "bindCredentialDevice",
+       "notes": "**The guest app binds a mobile credential to the phone it is shown on** (P02 GST-055 Dynamic QR Ticket), before the dynamic QR is displayed.",
+       "provenance": "contract access.yaml POST /my/credentials/{credentialId}/device-bindings"
       }
      ]
     },
@@ -1965,12 +2525,77 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "carried",
      "components": [
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "transferOrderTickets",
-       "provenance": "carried from the previous definition"
+       "kind": "dataTable",
+       "label": "Every entitlement",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Entitlement credential",
+       "operation": "getEntitlementCredential",
+       "notes": "Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one. **A rotating code derived on the device** (decided 28 September, audit R230): while online the screen fetches `rotation` (secret, `timeStepSeconds`, `digits`, `algorithm`, valid `validFrom` to `validTo`) and computes the current code from the seed and the clock, with a visible countdown to the next step; it keeps rotating with no signal. A null `rotation` (wristband, wallet pass) shows the static code.",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}/credential"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The entitlement",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Ticket ids",
+       "operation": "transferOrderTickets",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "textField",
+       "label": "Recipient",
+       "operation": "transferOrderTickets",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "textField",
+       "label": "Message",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
@@ -1980,15 +2605,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "Availability is live, never cached",
    "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** A ticket already loaded shows its rotating code, derived on the device from its seed, so it changes with no signal (decided 28 September, audit R230). Transferring a ticket needs the connection."
   },
   "apis": [
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "The guest's tickets and passes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "The selected ticket",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The QR code that gets scanned, refreshed — with the `rotation` seed the device derives the rotating code from (audit R230)",
+    "trigger": "onAction"
+   },
    {
     "operationId": "transferOrderTickets",
     "contract": "orders",
     "purpose": "Transfer tickets to another guest",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "bindCredentialDevice",
+    "contract": "access",
+    "purpose": "Bind my credential to this device",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
    }
   ],
   "entryState": {
@@ -1996,16 +2648,57 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "orderId",
      "from": "deepLink"
+    },
+    {
+     "name": "entitlementId",
+     "from": "navigation"
+    },
+    {
+     "name": "credentialId",
+     "from": "navigation",
+     "optional": true
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-055"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-055",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 1 → Dynamic QR ticket; also the Scan tab overlay",
+    "differences": "The Scan overlay also scans table codes and lockers (\"Scan a table code or locker with the same button\"), which the YAML does not cover."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formBindCredentialDevice",
+    "component": "modal",
+    "trigger": "Bind credential device",
+    "body": "**Collects what `bindCredentialDevice` sends before it is called.** Required: `deviceId`. Optional: `deviceReference`, `appInstallationId`, `os`, `otp`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CredentialDeviceBindingInput",
+    "confirm": {
+     "label": "Bind credential device",
+     "operation": "bindCredentialDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "deviceId",
+      "deviceReference",
+      "appInstallationId",
+      "os",
+      "otp"
+     ]
+    },
+    "provenance": "contract access.yaml POST /my/credentials/{credentialId}/device-bindings"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -2066,7 +2759,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "subjectId"
      ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-066 holds subjectId, so an edge into it carries them"
     }
    ]
   },
@@ -2076,13 +2769,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "statusTracker",
   "patternReason": "`getGuestConsents` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "**A guest can legally demand their data and its erasure, and had nowhere to ask.** `exportSubjectData` and `deleteGuestAccount` existed as guest-callable operations reachable from no guest surface — a",
-  "gaps": [
-   {
-    "operation": "exportSubjectData",
-    "why": "**1 declared operation reach no component on this screen**: exportSubjectData. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -2092,7 +2778,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected privacy data",
+       "label": "The consent state",
        "bindsTo": "ConsentState",
        "columns": [
         "ConsentState.subjectId",
@@ -2109,21 +2795,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "destructiveButton",
-       "label": "Delete",
+       "label": "Delete guest account",
        "operation": "deleteGuestAccount",
        "provenance": "contract identity.yaml DELETE /auth/guest/account"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save guest preferences",
        "operation": "updateGuestPreferences",
        "provenance": "contract marketing-crm.yaml PUT /guests/{subjectId}/preferences"
       },
       {
        "kind": "secondaryButton",
-       "label": "Upload",
+       "label": "Upload guest document",
        "operation": "uploadGuestDocument",
        "provenance": "contract marketing-crm.yaml POST /guest-documents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Export subject data",
+       "operation": "exportSubjectData",
+       "provenance": "contract identity.yaml POST /guests/{subjectId}/data-export"
       }
      ]
     }
@@ -2133,9 +2825,59 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmDeleteGuestAccount",
     "component": "confirmDialog",
-    "trigger": "Delete",
+    "trigger": "Delete guest account",
     "body": "**Names what `deleteGuestAccount` changes and what it leaves alone**, in the consequence rather than the verb. A privacy data this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract identity.yaml DELETE /auth/guest/account"
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formUpdateGuestPreferences",
+    "component": "modal",
+    "trigger": "Save guest preferences",
+    "body": "**Collects what `updateGuestPreferences` sends before it is called.** Nothing in the body is required. Optional: `id`, `subjectId`, `seatingPreference`, `drinkPreferences`, `dietary`, `accessibility`, `preferredChannel`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "GuestPreferences",
+    "confirm": {
+     "label": "Save guest preferences",
+     "operation": "updateGuestPreferences"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subjectId",
+      "seatingPreference",
+      "drinkPreferences",
+      "dietary",
+      "accessibility",
+      "preferredChannel"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formUploadGuestDocument",
+    "component": "modal",
+    "trigger": "Upload guest document",
+    "body": "**Collects what `uploadGuestDocument` sends before it is called.** Required: `id`, `subjectId`, `kind`, `storageRef`, `retainUntil`. Optional: `contentType`, `consentPurposeId`, `uploadedAt`, `uploadedByPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "GuestDocument",
+    "confirm": {
+     "label": "Upload guest document",
+     "operation": "uploadGuestDocument"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subjectId",
+      "kind",
+      "storageRef",
+      "retainUntil",
+      "contentType",
+      "consentPurposeId",
+      "uploadedAt",
+      "uploadedByPrincipalId"
+     ]
+    },
+    "provenance": "client-verified"
    }
   ],
   "states": {
@@ -2143,8 +2885,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Nothing requested yet.** No export, no erasure, no document — and that is the ordinary state. **The screen explains what each request means before offering it**, because an erasure a guest did not understand is one they will phone about.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a second factor set up offline is not a second factor."
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW_PII`, which `exportSubjectData` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in."
   },
   "apis": [
    {
@@ -2176,6 +2918,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Store a guest photo, ID or signed document",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getCookieConsentRuntime",
+    "contract": "marketing-crm",
+    "purpose": "Tracking preferences: categories and the current decision",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listPublishedTrackingTechnologies",
+    "contract": "marketing-crm",
+    "purpose": "Each SDK and tracker the app uses",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getDeviceConsentHistory",
+    "contract": "marketing-crm",
+    "purpose": "My tracking decisions so far",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordDeviceConsent",
+    "contract": "marketing-crm",
+    "purpose": "Change or withdraw tracking preferences",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2189,8 +2959,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-066"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-066",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Privacy & my data (#privacy; also Account → Data & privacy)",
+    "differences": "The prototype labels this screen \"GST-070 · Your data\" (aria-label \"GST-070 Data and privacy\"), but GST-070 is Reserve a Table in the YAML, so the label is wrong. Document upload is on Profile instead."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -2252,11 +3030,49 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Wishlist"
  },
- "completeSsoAuthorization": {
+ "bindCredentialDevice": {
   "method": "POST",
-  "path": "/auth/sso/{providerId}/callback",
+  "path": "/my/credentials/{credentialId}/device-bindings",
+  "contract": "access",
+  "summary": "Bind my credential to this device",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CredentialDeviceBindingInput",
+  "responds": "AccessDeviceBinding"
+ },
+ "claimDeviceConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents/claim-device",
+  "contract": "marketing-crm",
+  "summary": "Attach a browser's cookie decision to the guest who turned out to own it",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ClaimDeviceConsentRequest",
+  "responds": "ConsentState"
+ },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
   "contract": "identity",
-  "summary": "Exchange an SSO code for a session",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -2269,7 +3085,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "LoginResponse"
+  "responds": null
  },
  "deleteGuestAccount": {
   "method": "DELETE",
@@ -2290,25 +3106,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
- "enrolMfaMethod": {
-  "method": "POST",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrol an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaEnrolment"
- },
  "exportSubjectData": {
   "method": "POST",
   "path": "/guests/{subjectId}/data-export",
@@ -2327,6 +3124,69 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": null
+ },
+ "getCookieConsentRuntime": {
+  "method": "GET",
+  "path": "/storefront/cookie-consent",
+  "contract": "marketing-crm",
+  "summary": "What the page must show and what it may load",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "X-Consent-Key",
+    "in": "header",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "CookieConsentRuntime"
+ },
+ "getDeviceConsentHistory": {
+  "method": "GET",
+  "path": "/consent/device/history",
+  "contract": "marketing-crm",
+  "summary": "A visitor's own cookie decisions, oldest first",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "X-Consent-Key",
+    "in": "header",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "getEntitlement": {
   "method": "GET",
@@ -2408,9 +3268,73 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
+ },
+ "getOrderCalendarEvent": {
+  "method": "GET",
+  "path": "/orders/{orderId}/calendar-event",
+  "contract": "orders",
+  "summary": "The visit as a calendar entry",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getTaxDocumentRendition": {
+  "method": "GET",
+  "path": "/tax-documents/{documentId}/rendition",
+  "contract": "finance",
+  "summary": "The PDF of a tax invoice or credit memo, in a language",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FinTaxDocumentRendition"
+ },
+ "getTaxInvoice": {
+  "method": "GET",
+  "path": "/tax-invoices/{invoiceId}",
+  "contract": "finance",
+  "summary": "One tax invoice, with its lines, VAT per rate and credit memos",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FinTaxInvoice"
+ },
+ "getVisitReminder": {
+  "method": "GET",
+  "path": "/orders/{orderId}/reminder",
+  "contract": "orders",
+  "summary": "The guest's reminder for this booking",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VisitReminder"
  },
  "getWishlist": {
   "method": "GET",
@@ -2436,6 +3360,11 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "tenant",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "allDevices",
     "in": "query",
     "required": null
@@ -2443,6 +3372,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": null
+ },
+ "guestPasswordLogin": {
+  "method": "POST",
+  "path": "/auth/guest/password",
+  "contract": "identity",
+  "summary": "Sign in with an email or mobile and a password",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestSession"
  },
  "guestSocialLogin": {
   "method": "POST",
@@ -2482,6 +3430,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "GuestSession"
  },
+ "issueTaxInvoice": {
+  "method": "POST",
+  "path": "/tax-invoices",
+  "contract": "finance",
+  "summary": "Issue a tax invoice for one or more paid orders",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FinIssueTaxInvoiceRequest",
+  "responds": "FinTaxInvoice"
+ },
  "issueWalletPass": {
   "method": "POST",
   "path": "/wallet-passes",
@@ -2520,6 +3487,55 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
+ "listCreditMemos": {
+  "method": "GET",
+  "path": "/credit-memos",
+  "contract": "finance",
+  "summary": "Credit memos issued, newest first",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "taxInvoiceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "refundId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listEntitlements": {
   "method": "GET",
   "path": "/my/entitlements/all",
@@ -2530,6 +3546,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "includeExpired",
     "in": "query",
@@ -2547,20 +3568,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Entitlement"
- },
- "listMfaMethods": {
-  "method": "GET",
-  "path": "/auth/mfa/methods",
-  "contract": "identity",
-  "summary": "Enrolled MFA methods",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "MfaMethod"
+  "responds": "Page"
  },
  "listMyEntitlements": {
   "method": "GET",
@@ -2572,6 +3580,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "state",
     "in": "query",
@@ -2594,7 +3607,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Entitlement"
+  "responds": "Page"
  },
  "listMyOrders": {
   "method": "GET",
@@ -2606,6 +3619,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "since",
     "in": "query",
@@ -2623,7 +3641,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Order"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -2679,37 +3697,93 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
- "listSsoProviders": {
+ "listPublishedTrackingTechnologies": {
   "method": "GET",
-  "path": "/auth/sso/providers",
-  "contract": "identity",
-  "summary": "Identity providers configured for this tenant",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "SsoProvider"
- },
- "login": {
-  "method": "POST",
-  "path": "/auth/login",
-  "contract": "identity",
-  "summary": "Authenticate and open a session",
+  "path": "/storefront/cookie-consent/technologies",
+  "contract": "marketing-crm",
+  "summary": "The approved cookie registry, as the preference centre shows it",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
+    "name": "channel",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
    }
   ],
-  "requestBody": "LoginRequest",
-  "responds": "LoginResponse"
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTaxInvoices": {
+  "method": "GET",
+  "path": "/tax-invoices",
+  "contract": "finance",
+  "summary": "Tax invoices issued, newest first",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "invoiceType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "issuedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "recordConsent": {
   "method": "POST",
@@ -2729,6 +3803,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "RecordConsentRequest",
   "responds": "ConsentState"
+ },
+ "recordDeviceConsent": {
+  "method": "POST",
+  "path": "/consent/device",
+  "contract": "marketing-crm",
+  "summary": "Record a visitor's cookie decision, before anyone is known",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordDeviceConsentRequest",
+  "responds": "DeviceConsent"
  },
  "refreshToken": {
   "method": "POST",
@@ -2787,25 +3880,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
- "removeMfaMethod": {
-  "method": "DELETE",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Remove an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "requestGuestOtp": {
   "method": "POST",
   "path": "/auth/guest/otp",
@@ -2825,24 +3899,29 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
- "startSsoAuthorization": {
-  "method": "GET",
-  "path": "/auth/sso/{providerId}/authorize",
-  "contract": "identity",
-  "summary": "Begin an SSO flow",
-  "permission": null,
+ "setVisitReminder": {
+  "method": "PUT",
+  "path": "/orders/{orderId}/reminder",
+  "contract": "orders",
+  "summary": "Turn a visit reminder on or off",
+  "permission": "ORDER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "redirectUri",
-    "in": "query",
-    "required": true
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
-  "requestBody": null,
-  "responds": null
+  "requestBody": "VisitReminder",
+  "responds": "VisitReminder"
  },
  "transferOrderTickets": {
   "method": "POST",
@@ -2879,8 +3958,8 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": null
+  "requestBody": "GuestPreferences",
+  "responds": "GuestPreferences"
  },
  "updateMyProfile": {
   "method": "PATCH",
@@ -2943,7 +4022,7 @@ Method, path, parameters, request and response for every operation these screens
   "method": "POST",
   "path": "/auth/mfa/challenge/{challengeId}/verify",
   "contract": "identity",
-  "summary": "Complete a step-up challenge",
+  "summary": "Complete a sign-in or step-up challenge",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -2957,25 +4036,6 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": null
- },
- "verifyMfaEnrolment": {
-  "method": "POST",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Complete enrolment",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MfaMethod"
  }
 }
 ```
@@ -2986,6 +4046,110 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessDeviceBinding": {
+  "type": "object",
+  "x-ticvai-persistence": "access.device_binding",
+  "description": "One guest device bound to a credential, with its registration, last activation and security status; the binding policy in force is a deviceBinding row of access.credential_policy (declared 29 September, data-model close-out DM1). Written by bindCredentialDevice (the guest app) and releaseCredentialDevice; securityStatus is set by the sharing detection job (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "entitlementId",
+   "deviceId",
+   "registeredAt",
+   "securityStatus",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest (pii.subject)"
+   },
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "credentialBindingId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "deviceId": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "deviceReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "appInstallationId": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "os": {
+    "type": "string",
+    "maxLength": 50,
+    "nullable": true
+   },
+   "registeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastActivatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastKnownVenueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "securityStatus": {
+    "type": "string",
+    "enum": [
+     "normal",
+     "suspicious",
+     "blocked"
+    ],
+    "default": "normal"
+   },
+   "deactivatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Set when the binding is removed (deactivation, or a transfer of the credential)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "ClaimDeviceConsentRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "consentKey"
+  ],
+  "properties": {
+   "consentKey": {
+    "type": "string",
+    "maxLength": 64
+   }
+  }
+ },
  "ConsentDecision": {
   "type": "string",
   "enum": [
@@ -3014,8 +4178,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "pos",
    "callCentre",
    "import",
-   "agentRecorded"
-  ]
+   "agentRecorded",
+   "cookieBanner",
+   "checkout"
+  ],
+  "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
  },
  "ConsentState": {
   "x-ticvai-persistence": "none — projection over consent_record",
@@ -3069,6 +4236,529 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CookieBannerPreferenceCenterDesignerView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.cookie_banner_design",
+  "description": "One version of a cookie banner and preference-centre design (pack 17.1.6).",
+  "required": [
+   "channel",
+   "position",
+   "languages",
+   "rejectIsOneClick",
+   "categories"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null for the corporate design every brand inherits."
+   },
+   "inheritsFromId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "b2cWebsite",
+     "customerPortal",
+     "mobileApp",
+     "embeddedCheckout",
+     "whiteLabelSite",
+     "partnerMicrosite"
+    ]
+   },
+   "logoAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "position": {
+    "type": "string",
+    "enum": [
+     "top",
+     "bottom",
+     "popup",
+     "modal"
+    ]
+   },
+   "themeId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The white-label theme it takes colours and fonts from."
+   },
+   "buttons": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "action"
+     ],
+     "properties": {
+      "action": {
+       "type": "string",
+       "enum": [
+        "acceptAll",
+        "rejectNonEssential",
+        "managePreferences",
+        "savePreferences",
+        "doNotSellOrShare"
+       ]
+      },
+      "label": {
+       "$ref": "#/components/schemas/LocalisedText"
+      }
+     }
+    }
+   },
+   "rejectIsOneClick": {
+    "type": "boolean",
+    "default": true,
+    "description": "Must be true."
+   },
+   "links": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "label",
+      "policyKind"
+     ],
+     "properties": {
+      "label": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "policyKind": {
+       "type": "string",
+       "enum": [
+        "privacy",
+        "cookie",
+        "termsAndConditions"
+       ]
+      }
+     }
+    }
+   },
+   "categories": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "defaultOn"
+     ],
+     "properties": {
+      "category": {
+       "type": "string",
+       "enum": [
+        "strictlyNecessary",
+        "functional",
+        "analytics",
+        "personalisation",
+        "marketing"
+       ]
+      },
+      "description": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "defaultOn": {
+       "type": "boolean",
+       "description": "True only for `strictlyNecessary`, which is always active."
+      }
+     }
+    }
+   },
+   "languages": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "string",
+     "maxLength": 10
+    },
+    "description": "Every language the storefront serves; Arabic renders right to left."
+   },
+   "regulatoryRegimes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "gdpr",
+      "ePrivacy",
+      "ccpaCpra",
+      "lgpd",
+      "uaePdpl",
+      "saudiPdpl"
+     ]
+    },
+    "description": "2.6.60 (29 September, build). **The laws this design is published to satisfy**, so compliance is stated rather than assumed. The strictest posture (opt-in, one-click reject, every non-essential category off) already meets GDPR/ePrivacy, LGPD and both PDPLs; `ccpaCpra` adds the \"Do not sell or share\" button (`doNotSellOrShare`) and honours a Global Privacy Control signal as that opt-out."
+   },
+   "recordIpAddress": {
+    "type": "boolean",
+    "default": false,
+    "description": "2.6.55, \"if legally permitted\" (29 September, build). On, `recordDeviceConsent` writes the IP address and user agent to `pii.consent_identifier`; off, they are not kept anywhere. Off by default."
+   },
+   "noticeVersion": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Moves with the cookie policy (white-label `setPolicy`, kind `cookie`)."
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "superseded"
+    ],
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "CookieCategory": {
+  "type": "string",
+  "enum": [
+   "strictlyNecessary",
+   "functional",
+   "analytics",
+   "personalisation",
+   "marketing"
+  ],
+  "description": "2.6.53. The five categories the banner design (`CookieBannerPreferenceCenterDesignerView.categories`) offers; the matrix's \"preference\" category is `personalisation` (British spelling, as `ConsentPurpose`)."
+ },
+ "CookieConsentChannel": {
+  "type": "string",
+  "enum": [
+   "b2cWebsite",
+   "customerPortal",
+   "mobileApp",
+   "embeddedCheckout",
+   "whiteLabelSite",
+   "partnerMicrosite"
+  ],
+  "description": "The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6)."
+ },
+ "CookieConsentRuntime": {
+  "type": "object",
+  "x-ticvai-persistence": "none — assembled at read time from marketing.cookie_banner_design, marketing.tracking_technology and marketing.device_consent",
+  "description": "What `getCookieConsentRuntime` gives the storefront tag loader and the app SDK gate (2.6.52, 2.6.58).",
+  "required": [
+   "banner",
+   "noticeVersion",
+   "requiresDecision",
+   "allowedTechnologies",
+   "consentModeSignals"
+  ],
+  "properties": {
+   "banner": {
+    "$ref": "#/components/schemas/CookieBannerPreferenceCenterDesignerView"
+   },
+   "noticeVersion": {
+    "type": "string"
+   },
+   "requiresDecision": {
+    "type": "boolean",
+    "description": "True with no decision, an expired one, or one given against a superseded notice."
+   },
+   "decision": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/DeviceConsent"
+     }
+    ],
+    "nullable": true,
+    "description": "The latest decision for the presented key; null without a key."
+   },
+   "allowedTechnologies": {
+    "type": "array",
+    "description": "Per category, the approved technologies it unlocks. Anything not listed never loads.",
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "technologies"
+     ],
+     "properties": {
+      "category": {
+       "$ref": "#/components/schemas/CookieCategory"
+      },
+      "granted": {
+       "type": "boolean",
+       "description": "Whether the presented decision grants it; always true for `strictlyNecessary`."
+      },
+      "technologies": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "name",
+         "provider"
+        ],
+        "properties": {
+         "name": {
+          "type": "string"
+         },
+         "provider": {
+          "type": "string"
+         },
+         "technologyType": {
+          "type": "string"
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "consentModeSignals": {
+    "type": "object",
+    "description": "**The decision in Google consent-mode terms** (2.6.65), so Analytics and Tag Manager are told, not left to guess. `denied` wherever no decision grants the category.",
+    "properties": {
+     "adStorage": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "adUserData": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "adPersonalization": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "analyticsStorage": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "functionalityStorage": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "personalizationStorage": {
+      "type": "string",
+      "enum": [
+       "granted",
+       "denied"
+      ]
+     },
+     "securityStorage": {
+      "type": "string",
+      "enum": [
+       "granted"
+      ]
+     }
+    }
+   }
+  }
+ },
+ "CredentialDeviceBindingInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; written as access.device_binding (declared 29 September, writers pass)",
+  "required": [
+   "deviceId"
+  ],
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "maxLength": 128,
+    "description": "The app's stable device identifier"
+   },
+   "deviceReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "appInstallationId": {
+    "type": "string",
+    "maxLength": 128,
+    "nullable": true
+   },
+   "os": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true
+   },
+   "otp": {
+    "type": "string",
+    "maxLength": 12,
+    "nullable": true,
+    "description": "Verified one-time code, where the policy is otpVerificationRequired and this is a device change"
+   }
+  }
+ },
+ "DeviceConsent": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.device_consent + marketing.device_consent_category",
+  "description": "**One cookie decision by a visitor nobody has identified yet** (BL-073 §4b, decided 29 September). Append-only: a change of mind is a new row. Keyed for the visitor by `consentKey`, which the platform mints; the categories are child rows. The IP address and user agent, where recorded at all, are in `pii.consent_identifier` (`ConsentCaptureIdentifier`), never here.",
+  "required": [
+   "consentKey",
+   "channel",
+   "action",
+   "categories",
+   "noticeVersion",
+   "decidedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "consentKey": {
+    "type": "string",
+    "maxLength": 64,
+    "readOnly": true,
+    "description": "**Opaque, minted by us, not a device fingerprint.** It answers 2.6.55's \"user identifier/session ID\" and is the join key `claimDeviceConsent` needs. Shared by all the tenant's domains (2.6.62), never across tenants."
+   },
+   "channel": {
+    "$ref": "#/components/schemas/CookieConsentChannel"
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "bannerDesignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The published `CookieBannerPreferenceCenterDesignerView` version the visitor was shown."
+   },
+   "action": {
+    "$ref": "#/components/schemas/DeviceConsentAction"
+   },
+   "categories": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Every category of the design, with the decision this row gives it.",
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "decision"
+     ],
+     "properties": {
+      "category": {
+       "$ref": "#/components/schemas/CookieCategory"
+      },
+      "decision": {
+       "type": "string",
+       "enum": [
+        "granted",
+        "declined"
+       ]
+      }
+     }
+    }
+   },
+   "noticeVersion": {
+    "type": "string",
+    "description": "The cookie notice version decided against (white-label `setPolicy`, kind `cookie`)."
+   },
+   "language": {
+    "type": "string",
+    "maxLength": 10,
+    "nullable": true
+   },
+   "globalPrivacyControl": {
+    "type": "boolean",
+    "default": false,
+    "description": "The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing."
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "country": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The edge's geolocation of the request, for the geographic statistics (2.6.63). The address is not kept here."
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A device consent expires and a subject consent does not.** Set from the tenant's device-consent term; after it the banner asks again."
+   },
+   "claimedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Set once, by `claimDeviceConsent`. Never cleared."
+   },
+   "claimedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant."
+   }
+  }
+ },
+ "DeviceConsentAction": {
+  "type": "string",
+  "enum": [
+   "acceptAll",
+   "rejectNonEssential",
+   "savePreferences",
+   "withdraw",
+   "doNotSellOrShare"
+  ],
+  "description": "What the visitor pressed. `doNotSellOrShare` is the CCPA/CPRA opt-out link, shown where the design's `regulatoryRegimes` include `ccpaCpra`."
+ },
  "Entitlement": {
   "type": "object",
   "x-ticvai-persistence": "access.entitlement",
@@ -3087,7 +4777,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id": {
     "type": "string",
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n"
+    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
    },
    "templateId": {
     "type": "string",
@@ -3100,7 +4790,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "format": "uuid"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The order's id, a ULID as in `/orders/{orderId}` (`orders.sales_order.id`)."
    },
    "orderLineId": {
     "type": "string",
@@ -3138,12 +4829,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "validTo": {
     "type": "string",
     "format": "date-time",
-    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n"
+    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n**What the pre-expiry notice is measured from** (29 September, build pass, group G2; 5.5.30). A daily run in access publishes `entitlement.expiringSoon` once per entitlement and `validTo` when an entitlement in `issued` or `partiallyConsumed` comes within its template's `expiryNoticeDays` (`catalogue.EntitlementTemplate`), and not for one bought inside that window. Marketing turns it into the reminder (a `MessageTrigger` on the event, or a triggered campaign on `entitlementExpiring`); access only says the date is near. A freeze or renewal that moves `validTo` raises the next notice once.\n"
    },
    "entriesUsed": {
     "type": "integer",
     "default": 0,
-    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n"
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "**The number `validateAccess` decrements and nothing was decrementing.** A ten-entry pass with no counter is a ten-entry pass that admits forever.\n**Maintained on write**, in the same transaction as the admitting `access.scan_event` row: by `validateAccess`, `validateGroupAccess` (by the count admitted) and `syncScans` for each replayed admission the server accepts. A replayed scan the server downgrades to `denied` does not count.\n"
    },
    "entriesAllowed": {
     "type": "integer",
@@ -3152,16 +4845,39 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "lastEntryAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "`recordedAt` of the latest admission counted in `entriesUsed`, written by the same writes. A scan replayed late with an earlier `recordedAt` does not move it back.\n"
    },
    "frozenDays": {
     "type": "integer",
     "default": 0,
-    "description": "Days added by a freeze. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Days added by a freeze. **Maintained on write** by the freeze operation (`freezeEntitlement`), in the same write that extends `validTo` by those days. **Held here rather than computed from a freeze log**, because a gate has to answer in under 300ms and cannot replay a history to decide validity.\n"
    },
    "suspendedReason": {
     "type": "string",
     "nullable": true
+   },
+   "freezeReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "travelling",
+     "injury",
+     "personal",
+     "seasonal",
+     "other"
+    ],
+    "description": "The `reason` of the latest `freezeEntitlement` (audit R222). Null when never frozen."
+   },
+   "freezeNote": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 500,
+    "description": "The `note` the latest `freezeEntitlement` took, required there when `reason` is `other` (decided 28 September, audit R222). Kept so the quarterly review of `other` notes has something to read."
    },
    "isNameBound": {
     "type": "boolean",
@@ -3194,7 +4910,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "supersedesEntitlementId": {
     "type": "string",
-    "format": "uuid",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true,
     "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
    },
@@ -3203,8 +4919,600 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "nullable": true,
     "description": "Where the template carries stored value. **A `retail.Wallet` bound to the entitlement, not a balance on it** (CF-126).\n"
+   },
+   "facePassEnrolmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The active `facePass` enrolment on this entitlement (`FacePassEnrolment.id`), or null when none is. **Computed on read from `pii.subject_biometric` and not stored here** — the PII split keeps the biometric on its own side, and this carries only its id. It is how a screen holding a pass finds the enrolment `getFacePassEnrolment` and `revokeFacePass` take.\n"
    }
   }
+ },
+ "FinCreditMemo": {
+  "x-ticvai-persistence": "ledger.credit_memo + ledger.credit_memo_line",
+  "type": "object",
+  "description": "5.7.94. **A tax credit note against one tax invoice**, with its own series. Never edited.",
+  "required": [
+   "id",
+   "creditMemoNumber",
+   "taxInvoiceId",
+   "kind",
+   "reason",
+   "legalEntityId",
+   "issuedAt",
+   "currency",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "creditMemoNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Server-assigned from the legal entity's credit memo series, in sequence without gaps."
+   },
+   "taxInvoiceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "taxInvoiceNumber": {
+    "type": "string",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "full",
+     "partial"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "refund",
+     "cancellation",
+     "priceAdjustment",
+     "returnOfGoods",
+     "billingError",
+     "other"
+    ]
+   },
+   "refundId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "cancelledOrderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "buyerSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmountInLegalCurrency": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "renditionAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "eInvoiceStatus": {
+    "$ref": "#/components/schemas/FinEInvoiceTransmissionStatus"
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FinCreditMemoLine"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   }
+  }
+ },
+ "FinCreditMemoLine": {
+  "type": "object",
+  "required": [
+   "invoiceLineNumber",
+   "netAmount",
+   "taxAmount",
+   "grossAmount"
+  ],
+  "properties": {
+   "invoiceLineNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "quantity": {
+    "type": "number",
+    "nullable": true
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxRate": {
+    "type": "number"
+   },
+   "taxCategory": {
+    "$ref": "#/components/schemas/FinTaxCategory"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "FinEInvoiceTransmissionStatus": {
+  "type": "string",
+  "description": "6.1.1. `notRequired` where the legal entity's provider is `disabled` or absent.",
+  "enum": [
+   "notRequired",
+   "queued",
+   "sent",
+   "accepted",
+   "rejected",
+   "failed"
+  ]
+ },
+ "FinIssueTaxInvoiceRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "invoiceType",
+   "orderIds"
+  ],
+  "properties": {
+   "invoiceType": {
+    "$ref": "#/components/schemas/FinTaxInvoiceType"
+   },
+   "orderIds": {
+    "type": "array",
+    "minItems": 1,
+    "description": "One order for `simplified` and `full`; one or more for `consolidated`. Every order must be paid, of one buyer, one legal entity and one currency.",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "recipient": {
+    "$ref": "#/components/schemas/FinTaxInvoiceRecipient"
+   },
+   "languages": {
+    "type": "array",
+    "description": "Overrides the template's languages for this document, within those the template offers.",
+    "items": {
+     "type": "string",
+     "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+    }
+   },
+   "supersedesInvoiceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A simplified invoice this full invoice replaces for the same supply. Refused unless the law allows it (make-or-break on issueTaxInvoice)."
+   },
+   "deliverToEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "Sends the PDF on issue as well as returning it."
+   }
+  }
+ },
+ "FinTaxCategory": {
+  "type": "string",
+  "description": "How a line is treated for VAT. Taken from the tax code the line was posted with.",
+  "enum": [
+   "standardRated",
+   "zeroRated",
+   "exempt",
+   "outOfScope",
+   "reverseCharge"
+  ]
+ },
+ "FinTaxDocumentRendition": {
+  "x-ticvai-persistence": "none — a signed link to the stored PDF",
+  "type": "object",
+  "required": [
+   "documentId",
+   "documentKind",
+   "url",
+   "expiresAt"
+  ],
+  "properties": {
+   "documentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "documentKind": {
+    "type": "string",
+    "enum": [
+     "taxInvoice",
+     "creditMemo"
+    ]
+   },
+   "documentNumber": {
+    "type": "string"
+   },
+   "language": {
+    "type": "string",
+    "nullable": true
+   },
+   "contentType": {
+    "type": "string",
+    "default": "application/pdf"
+   },
+   "url": {
+    "type": "string",
+    "format": "uri"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "FinTaxInvoice": {
+  "x-ticvai-persistence": "ledger.tax_invoice + ledger.tax_invoice_line",
+  "type": "object",
+  "description": "5.7.93, 5.10.3. **A guest tax invoice, as issued, never edited.** Corrections are credit memos. The supplier block is a snapshot of the legal entity at issue, so a later change of address does not change a document already given to a guest.",
+  "required": [
+   "id",
+   "invoiceNumber",
+   "invoiceType",
+   "status",
+   "legalEntityId",
+   "issuedAt",
+   "supplyDate",
+   "currency",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "invoiceNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Server-assigned from the legal entity's series for the document kind, in sequence and without gaps, e.g. `INV-2026-000123`. Never reused."
+   },
+   "invoiceType": {
+    "$ref": "#/components/schemas/FinTaxInvoiceType"
+   },
+   "status": {
+    "$ref": "#/components/schemas/FinTaxInvoiceStatus"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    }
+   },
+   "supplierName": {
+    "type": "string"
+   },
+   "supplierAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "supplierTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest the orders belong to; the key a guest's own reads filter on."
+   },
+   "buyerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "buyerCountryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "buyerTaxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "customerAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "supplyDate": {
+    "type": "string",
+    "format": "date",
+    "description": "The date of supply where it differs from the issue date (the latest order's payment date on a consolidated invoice). A day in the region's time zone."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmountInLegalCurrency": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "The tax in the legal entity's currency (AED in the UAE) where the invoice currency differs, at the rate the orders were stored at."
+   },
+   "creditedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "supersedesInvoiceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "renditionAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The PDF rendered at issue; read through getTaxDocumentRendition."
+   },
+   "eInvoiceStatus": {
+    "$ref": "#/components/schemas/FinEInvoiceTransmissionStatus"
+   },
+   "issuedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Null where the platform issued it."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FinTaxInvoiceLine"
+    }
+   },
+   "taxSummary": {
+    "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "VAT per rate and category, summed from the lines for the response.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "taxCategory": {
+       "$ref": "#/components/schemas/FinTaxCategory"
+      },
+      "taxRate": {
+       "type": "number"
+      },
+      "taxableAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "taxAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written at the scope of the venue the orders were sold at, or the region for a consolidated invoice across venues."
+   }
+  }
+ },
+ "FinTaxInvoiceLine": {
+  "type": "object",
+  "description": "One line as it was sold and taxed. Amounts are in the invoice currency.",
+  "required": [
+   "lineNumber",
+   "description",
+   "quantity",
+   "netAmount",
+   "taxAmount",
+   "grossAmount",
+   "taxCategory"
+  ],
+  "properties": {
+   "lineNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderLineId": {
+    "type": "string",
+    "nullable": true
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "quantity": {
+    "type": "number"
+   },
+   "unitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "taxRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "taxCategory": {
+    "$ref": "#/components/schemas/FinTaxCategory"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "creditedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "FinTaxInvoiceRecipient": {
+  "x-ticvai-persistence": "none — copied onto the invoice as buyer columns",
+  "type": "object",
+  "description": "Who the invoice is addressed to. Required for `full` and `consolidated`.",
+  "required": [
+   "name"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 300
+   },
+   "address": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "countryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "taxRegistrationNumber": {
+    "type": "string",
+    "maxLength": 30,
+    "nullable": true,
+    "description": "The recipient's TRN where they are VAT-registered."
+   },
+   "customerAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The B2B credit account (payments `B2bCreditAccount`) where a company is invoiced."
+   }
+  }
+ },
+ "FinTaxInvoiceStatus": {
+  "type": "string",
+  "description": "`issued` until a credit memo is issued against it; `superseded` where a full invoice replaced a simplified one for the same supply (only if the law allows it; see issueTaxInvoice).",
+  "enum": [
+   "issued",
+   "partiallyCredited",
+   "fullyCredited",
+   "superseded"
+  ]
+ },
+ "FinTaxInvoiceType": {
+  "type": "string",
+  "description": "5.7.93. `simplified` for one order with no recipient details, `full` for one order with them, `consolidated` for several paid orders of one buyer on one invoice.",
+  "enum": [
+   "simplified",
+   "full",
+   "consolidated"
+  ]
  },
  "GuestDocument": {
   "type": "object",
@@ -3214,10 +5522,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id",
    "subjectId",
    "kind",
-   "storageRef"
+   "storageRef",
+   "retainUntil"
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -3239,7 +5549,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ]
    },
    "storageRef": {
-    "type": "string"
+    "type": "string",
+    "description": "**The stored object's key in the guest-document store**, which is deliberately not `assets` (BL-133). No operation in this contract issues one yet: `assets` `createUpload` is staff-only and writes the media library, so the upload step for this store is still to be designed.\n"
    },
    "contentType": {
     "type": "string"
@@ -3251,16 +5562,74 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "retainUntil": {
     "type": "string",
     "format": "date",
-    "description": "**Required, not optional.** A guest document with no deletion date is a guest document kept forever, and the retention question is the one CF-64 is open on.\n"
+    "description": "**Required, not optional.** A guest document with no deletion date is a guest document kept forever, and the retention question is the one CF-64 is open on.\n**Kept until its purpose ends, then for the period client counsel sets (decided 28 September, audit R149).** The caller sets `retainUntil` to the end of the purpose (the visit, the waiver's validity, the visa's expiry) plus that period. **The period per `kind` is an open value**: until counsel names it, it is zero, so the document is deleted when the purpose ends.\n"
    },
    "uploadedAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    },
    "uploadedByPrincipalId": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid",
     "nullable": true
+   }
+  }
+ },
+ "GuestPreferences": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_preference",
+  "description": "**What the guest likes, kept apart from what they permit** (consent) and from who they are (the profile). One row per subject. `dietary` and `accessibility` are here rather than as tags because BL-134 gives them their own consent purpose and retention.\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "seatingPreference": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 200
+   },
+   "drinkPreferences": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "dietary": {
+    "type": "array",
+    "description": "Also written by `updateMyProfile`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "accessibility": {
+    "type": "array",
+    "description": "Also written by `updateMyProfile`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "preferredChannel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "x-ticvai-persisted": false,
+    "description": "**Stored on the profile** (`GuestProfile.preferredChannel`) — carried here because the preference screen edits it beside the rest.\n"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -3346,6 +5715,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isActive": {
     "type": "boolean"
+   },
+   "mergedIntoSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"
+   },
+   "mergedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -3372,7 +5754,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isVerified": {
     "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
+    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse and fill a cart but not transact: the gate is the checkout page (ADR-0045), where `checkoutCart` refuses it until the guest verifies or proves the contact by code. UAE Pass returns a verified identity, so it starts true. Rule on `verifyGuestEmail`, decided 17 September 2026.\n"
    },
    "identityProviders": {
     "type": "array",
@@ -3393,6 +5775,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "Present where the guest is linked across cells (ADR-0010)."
    },
+   "requiresMfa": {
+    "type": "boolean",
+    "default": false,
+    "description": "True only where the sign-in venue enabled guest two-step verification (`VenueSettings.identity.guestTwoStep`, in tenancy) and this guest has an active method (decided 29 September, rev 3 GAP-B1, per venue). The session is then not usable until `verifyMfaChallenge` succeeds on a `signIn` challenge. Always false for a UAE Pass sign-in, which is already a verified two-factor identity (proposed, client to correct).\n"
+   },
+   "mfaMethods": {
+    "type": "array",
+    "description": "The guest's active methods, so the client can offer the right one. Empty when `requiresMfa` is false.",
+    "items": {
+     "$ref": "#/components/schemas/MfaMethod"
+    }
+   },
    "homeCellName": {
     "type": "string",
     "nullable": true
@@ -3404,77 +5798,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "expiresAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
+    "description": "**30 days, sliding** (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. **One session per device**: a guest may be signed in on a phone and a laptop at once, and a new sign-in on the same `deviceId` ends that device's previous session.\n"
    }
   }
- },
- "LoginRequest": {
-  "type": "object",
-  "required": [
-   "username",
-   "credential",
-   "workstationId"
-  ],
-  "properties": {
-   "username": {
-    "type": "string",
-    "maxLength": 256
-   },
-   "credential": {
-    "type": "string",
-    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
-    "maxLength": 512
-   },
-   "method": {
-    "type": "string",
-    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
-    "enum": [
-     "password",
-     "pin",
-     "card",
-     "rfid",
-     "sso"
-    ],
-    "default": "password"
-   },
-   "workstationId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
-   },
-   "deviceFingerprint": {
-    "type": "string",
-    "maxLength": 256
-   }
-  }
- },
- "LoginResponse": {
-  "x-ticvai-persistence": "none — computed",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   {
-    "type": "object",
-    "required": [
-     "requiresRoleSelection"
-    ],
-    "properties": {
-     "requiresRoleSelection": {
-      "type": "boolean"
-     },
-     "availableRoles": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/RoleSummary"
-      }
-     },
-     "session": {
-      "$ref": "#/components/schemas/Session"
-     }
-    }
-   }
-  ]
  },
  "MessageChannel": {
   "type": "string",
@@ -3485,59 +5811,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "push",
    "inApp",
    "post"
-  ]
- },
- "MfaEnrolment": {
-  "x-ticvai-persistence": "none — transient",
-  "type": "object",
-  "required": [
-   "methodId",
-   "kind"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
-   },
-   "methodId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MfaKind"
-   },
-   "secret": {
-    "type": "string",
-    "nullable": true,
-    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
-   },
-   "qrCodeUri": {
-    "type": "string",
-    "nullable": true
-   },
-   "recoveryCodes": {
-    "type": "array",
-    "description": "Returned once on successful verification. Not retrievable afterwards.",
-    "items": {
-     "type": "string"
-    }
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "MfaKind": {
-  "type": "string",
-  "enum": [
-   "totp",
-   "smsOtp",
-   "emailOtp",
-   "biometric",
-   "hardwareToken"
   ]
  },
  "MfaMethod": {
@@ -3603,10 +5876,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client ULID from `CreateOrderRequest.id`."
    },
    "orderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
    },
    "channel": {
     "allOf": [
@@ -3651,6 +5928,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "droppedPromotions": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "budgetCapReached"
+       ]
+      }
+     }
+    }
+   },
    "totalPriceVariance": {
     "allOf": [
      {
@@ -3681,12 +5985,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "subjectId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "holdLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -3718,7 +6037,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-retired-columns": [
+   "promotion_id",
+   "name",
+   "reason"
+  ],
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateOrderLine"
@@ -3759,8 +6083,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "entitlementIds": {
       "type": "array",
+      "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       }
      },
      "crossRegionRightIds": {
@@ -3769,6 +6095,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "string"
       },
       "description": "Redemption rights propagated to other cells for this line."
+     },
+     "reprintCount": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "readOnly": true,
+      "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
+     },
+     "venueId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "discounts": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.",
+      "items": {
+       "$ref": "#/components/schemas/OrderLineDiscount"
+      }
      }
     }
    }
@@ -3788,6 +6135,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "failed"
   ],
   "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
  },
  "Page": {
   "type": "object",
@@ -3821,10 +6228,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -3843,7 +6252,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "The amount in `tenderCurrency`, at that currency's own scale."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
    },
@@ -3887,7 +6300,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",
@@ -3901,6 +6352,47 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "syncedAt": {
     "type": "string",
     "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "PublishedTrackingTechnology": {
+  "type": "object",
+  "x-ticvai-persistence": "none — the approved rows of marketing.tracking_technology, guest-facing fields only",
+  "description": "One approved technology as the preference centre shows it (2.6.54).",
+  "required": [
+   "name",
+   "provider",
+   "category",
+   "isThirdParty"
+  ],
+  "properties": {
+   "name": {
+    "type": "string"
+   },
+   "provider": {
+    "type": "string"
+   },
+   "category": {
+    "$ref": "#/components/schemas/CookieCategory"
+   },
+   "technologyType": {
+    "type": "string"
+   },
+   "purpose": {
+    "type": "string",
+    "nullable": true
+   },
+   "durationDays": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Null for session storage."
+   },
+   "isThirdParty": {
+    "type": "boolean"
+   },
+   "privacyInformation": {
+    "type": "string",
     "nullable": true
    }
   }
@@ -3941,6 +6433,83 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "RecordDeviceConsentRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "description": "What the banner or preference centre sends to `recordDeviceConsent`.",
+  "required": [
+   "channel",
+   "action",
+   "noticeVersion",
+   "decidedAt"
+  ],
+  "properties": {
+   "consentKey": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "The key the browser or app already holds; omitted on a first decision, and one is minted."
+   },
+   "channel": {
+    "$ref": "#/components/schemas/CookieConsentChannel"
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "bannerDesignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "action": {
+    "$ref": "#/components/schemas/DeviceConsentAction"
+   },
+   "categories": {
+    "type": "array",
+    "description": "Required for `savePreferences`; ignored for the other actions, which decide every category themselves.",
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "decision"
+     ],
+     "properties": {
+      "category": {
+       "$ref": "#/components/schemas/CookieCategory"
+      },
+      "decision": {
+       "type": "string",
+       "enum": [
+        "granted",
+        "declined"
+       ]
+      }
+     }
+    }
+   },
+   "noticeVersion": {
+    "type": "string"
+   },
+   "language": {
+    "type": "string",
+    "maxLength": 10,
+    "nullable": true
+   },
+   "globalPrivacyControl": {
+    "type": "boolean",
+    "default": false
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "RegisterGuestRequest": {
   "type": "object",
   "required": [
@@ -3969,6 +6538,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "minLength": 8,
     "maxLength": 256,
+    "writeOnly": true,
     "description": "Optional. OTP-only accounts are supported and are the default."
    },
    "preferredLanguage": {
@@ -3992,30 +6562,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
-   }
-  }
- },
- "RoleSummary": {
-  "x-ticvai-persistence": "none — projection over role",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "type": "string"
-   },
-   "isPrimary": {
-    "type": "boolean"
    }
   }
  },
@@ -4085,46 +6631,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "SsoProtocol": {
-  "type": "string",
-  "enum": [
-   "oidc",
-   "saml2"
-  ]
- },
- "SsoProvider": {
-  "x-ticvai-persistence": "identity.sso_provider",
-  "type": "object",
-  "required": [
-   "id",
-   "displayName",
-   "protocol"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "protocol": {
-    "$ref": "#/components/schemas/SsoProtocol"
-   },
-   "iconAssetRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "isEnforced": {
-    "type": "boolean",
-    "description": "True disables password login for principals covered by this provider."
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
-   }
-  }
- },
  "TokenPair": {
   "x-ticvai-persistence": "none — transient",
   "type": "object",
@@ -4147,6 +6653,61 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "VisitReminder": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.visit_reminder",
+  "description": "**One reminder per booking, set by the guest.** Not a marketing message: it is sent only for a booking the guest holds, and only on channels they still consent to.\n**One per booking per guest** (decided 28 September, audit R123 (8)): unique on `orderId` and `subjectId`. Two guests sharing a booking each keep their own reminder, and `setVisitReminder` replaces the caller's own rather than adding a second.\n",
+  "required": [
+   "enabled"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The guest who set it. A booking shared with others reminds only the guest who asked."
+   },
+   "enabled": {
+    "type": "boolean"
+   },
+   "leadTimeMinutes": {
+    "type": "integer",
+    "minimum": 15,
+    "maximum": 10080,
+    "default": 1440,
+    "description": "How long before each session starts. A day by default; a week at most."
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "push",
+      "email",
+      "sms"
+     ]
+    },
+    "default": [
+     "push"
+    ]
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   }
+  }
+ },
  "WalletPass": {
   "type": "object",
   "x-ticvai-persistence": "orders.wallet_pass",
@@ -4165,7 +6726,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "entitlementId": {
     "type": "string",
-    "format": "uuid"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "platform": {
     "type": "string",
@@ -4180,6 +6741,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "authenticationToken": {
     "type": "string",
     "format": "password",
+    "writeOnly": true,
     "description": "**Write-only.** How the device proves it may fetch an update, and the reason a leaked serial alone is not enough to read somebody's ticket.\n"
    },
    "status": {
@@ -4252,7 +6814,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "nullable": true
       },
       "price": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "x-ticvai-column": "list_price",
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "The variant's current list price when the wishlist is read. Stored as `list_price` (naming-and-style 5.1 bans a bare `price` column); the wire keeps `price`."
       },
       "imageAssetRef": {
        "type": "string",
@@ -4276,6 +6840,92 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "WorkstationContext": {
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "venueId",
+   "regionId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Inherited from the workstation, never selected by the operator."
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "driver"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "receiptPrinter",
+        "ticketPrinter",
+        "cashDrawer",
+        "barcodeScanner",
+        "rfidReader",
+        "paymentTerminal",
+        "customerDisplay"
+       ]
+      },
+      "driver": {
+       "type": "string"
+      },
+      "identifier": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4
+   },
+   "timezone": {
+    "type": "string"
+   },
+   "cellName": {
+    "type": "string",
+    "description": "The cell serving this workstation's region. One cell per tenant per region (ADR-0014). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+   },
+   "deploymentProfile": {
+    "type": "string",
+    "enum": [
+     "terminalLocal",
+     "venueEdge",
+     "thin"
+    ],
+    "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
    }
   }
  }

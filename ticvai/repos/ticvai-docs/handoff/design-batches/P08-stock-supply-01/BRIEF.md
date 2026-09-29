@@ -1,6 +1,6 @@
 # P08-stock-supply-01 — P08 · Stock & Supply (1 of 2)
 
-**10 screens · 51 operations · 32 schemas · 12 permissions**
+**10 screens · 56 operations · 42 schemas · 12 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -67,9 +67,9 @@ convincingly. It is never a caption.
 | `BO-078` | Requisitions | approvalInbox | 10 | 6 | — |
 | `BO-079` | Stock Count | listDetail | 9 | 7 | — |
 | `BO-080` | Stock Transfers | listDetail | 6 | 4 | — |
-| `BO-081` | Inventory Items | listDetail | 7 | 3 | — |
+| `BO-081` | Inventory Items | listDetail | 9 | 3 | — |
 | `BO-082` | Stock Movements | listDetail | 4 | 2 | — |
-| `BO-083` | Suppliers | listDetail | 5 | 3 | — |
+| `BO-083` | Suppliers | listDetail | 8 | 3 | — |
 
 ## Thin screens in this batch
 

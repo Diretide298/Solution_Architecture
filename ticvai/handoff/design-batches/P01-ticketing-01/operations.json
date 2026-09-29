@@ -1,23 +1,4 @@
 {
- "bookResource": {
-  "method": "POST",
-  "path": "/resource-bookings",
-  "contract": "resources",
-  "summary": "Reserve a specific resource for a window",
-  "permission": "RESOURCE_BOOK",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ResourceBooking"
- },
  "cancelReservation": {
   "method": "DELETE",
   "path": "/reservations/{reservationId}",
@@ -72,14 +53,14 @@
     "required": null
    }
   ],
-  "requestBody": "ResaleListing",
+  "requestBody": "CreateResaleListingRequest",
   "responds": "ResaleListing"
  },
  "getGroupBooking": {
   "method": "GET",
   "path": "/group-bookings/{groupBookingId}",
   "contract": "orders",
-  "summary": "A group, its leader and its manifest",
+  "summary": "A group, its leader and its name-capture duty",
   "permission": "ORDER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -87,6 +68,25 @@
   "parameters": [],
   "requestBody": null,
   "responds": "GroupBooking"
+ },
+ "getGroupPackageDefinition": {
+  "method": "GET",
+  "path": "/products/{productId}/group-package",
+  "contract": "catalogue",
+  "summary": "A school-trip format or party package",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "GroupPackageDefinition"
  },
  "getReservation": {
   "method": "GET",
@@ -146,6 +146,11 @@
     "required": null
    },
    {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -157,7 +162,36 @@
    }
   ],
   "requestBody": null,
-  "responds": "FxRate"
+  "responds": "Page"
+ },
+ "listGroupPackages": {
+  "method": "GET",
+  "path": "/group-packages",
+  "contract": "catalogue",
+  "summary": "The school-trip formats or party packages on offer",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -239,6 +273,21 @@
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -286,6 +335,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "requestGroupBooking": {
+  "method": "POST",
+  "path": "/group-booking-requests",
+  "contract": "orders",
+  "summary": "Ask for a school trip or a birthday party",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GroupBookingRequest",
+  "responds": "GroupBooking"
+ },
  "transferOrderTickets": {
   "method": "POST",
   "path": "/orders/{orderId}/transfer",
@@ -315,6 +383,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

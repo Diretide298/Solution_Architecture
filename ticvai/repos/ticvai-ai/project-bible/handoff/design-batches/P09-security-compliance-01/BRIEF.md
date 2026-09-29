@@ -1,6 +1,6 @@
 # P09-security-compliance-01 — P09 · Security & Compliance
 
-**2 screens · 13 operations · 13 schemas · 4 permissions**
+**2 screens · 16 operations · 20 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `PLATFORM_CELL_MANAGE, PLATFORM_CELL_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `PLATFORM_CELL_MANAGE, PLATFORM_CELL_VIEW, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,5 +60,5 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-031` | Security & Compliance Dashboard | listDetail | 4 | 0 | — |
-| `ADM-032` | WAF & Security Policy View | listDetail | 9 | 1 | — |
+| `ADM-031` | Security & Compliance Dashboard | listDetail | 7 | 3 | — |
+| `ADM-032` | WAF & Security Policy View | listDetail | 9 | 4 | — |

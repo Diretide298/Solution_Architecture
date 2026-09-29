@@ -1,6 +1,6 @@
 # P02-marketing-01 — P02 · Marketing
 
-**1 screens · 4 operations · 8 schemas · 2 permissions**
+**1 screens · 4 operations · 9 schemas · 2 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-065` | Newsletter & Preferences | listDetail | 4 | 0 | — |
+| `GST-065` | Newsletter & Preferences | listDetail | 4 | 2 | — |
 
 ---
 
@@ -98,10 +98,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-065 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
@@ -119,7 +116,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every newsletter preferences",
+       "label": "Every consent purpose config",
        "bindsTo": "ConsentPurposeConfig",
        "columns": [
         "ConsentPurposeConfig.purpose",
@@ -141,7 +138,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected newsletter preferences",
+       "label": "The selected consent purpose config",
        "bindsTo": "ConsentPurposeConfig",
        "columns": [
         "ConsentPurposeConfig.purpose",
@@ -154,6 +151,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listConsentPurposes",
        "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The marketing subscription",
+       "bindsTo": "MarketingSubscription",
+       "columns": [
+        "MarketingSubscription.id",
+        "MarketingSubscription.subjectId",
+        "MarketingSubscription.channel",
+        "MarketingSubscription.listName",
+        "MarketingSubscription.isSubscribed",
+        "MarketingSubscription.source",
+        "MarketingSubscription.unsubscribeToken"
+       ],
+       "operation": "getMarketingSubscription",
+       "provenance": "contract marketing-crm.yaml GET /marketing-subscriptions"
       }
      ]
     },
@@ -163,23 +176,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Record",
+       "label": "Record consent",
        "operation": "recordConsent",
        "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "recordConsent",
-       "provenance": "carried from the previous definition"
+       "label": "Save marketing subscription",
+       "operation": "setMarketingSubscription",
+       "provenance": "contract marketing-crm.yaml PUT /marketing-subscriptions"
       }
      ]
     }
@@ -188,9 +193,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The newsletter preferences list.",
    "error": "Could not load. Names which read failed and leaves the newsletter preferences untouched.",
-   "emptyFirstRun": "No newsletter preferences yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the newsletter preferences are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No newsletter preferences yet. Offers Record consent (`recordConsent`).",
+   "emptyNoResults": "Never shown: `listConsentPurposes` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `listConsentPurposes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A consent change must reach the server to mean anything."
   },
   "apis": [
@@ -240,10 +245,66 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-065"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-065",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 3 → Newsletter & preferences"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetMarketingSubscription",
+    "component": "modal",
+    "trigger": "Save marketing subscription",
+    "body": "**Collects what `setMarketingSubscription` sends before it is called.** Required: `id`, `subjectId`, `channel`, `listName`, `isSubscribed`. Optional: `source`, `unsubscribeToken`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "MarketingSubscription",
+    "confirm": {
+     "label": "Save marketing subscription",
+     "operation": "setMarketingSubscription"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subjectId",
+      "channel",
+      "listName",
+      "isSubscribed",
+      "source",
+      "unsubscribeToken"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRecordConsent",
+    "component": "modal",
+    "trigger": "Record consent",
+    "body": "**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RecordConsentRequest",
+    "confirm": {
+     "label": "Record consent",
+     "operation": "recordConsent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "purpose",
+      "decision",
+      "noticeVersion",
+      "source",
+      "recordedAt",
+      "channels"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -319,7 +380,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "ConsentPurposeConfig"
+  "responds": "Page"
  },
  "recordConsent": {
   "method": "POST",
@@ -349,7 +410,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MarketingSubscription",
   "responds": "MarketingSubscription"
  }
@@ -382,7 +449,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "ConsentPurposeConfig": {
-  "x-ticvai-persistence": "marketing.consent_purpose",
+  "x-ticvai-persistence": "marketing.consent_purpose + marketing.consent_purpose_channel",
   "type": "object",
   "required": [
    "purpose",
@@ -429,8 +496,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "pos",
    "callCentre",
    "import",
-   "agentRecorded"
-  ]
+   "agentRecorded",
+   "cookieBanner",
+   "checkout"
+  ],
+  "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
  },
  "ConsentState": {
   "x-ticvai-persistence": "none — projection over consent_record",
@@ -487,18 +557,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "MarketingSubscription": {
   "type": "object",
   "x-ticvai-persistence": "marketing.subscription",
+  "x-ticvai-retired-columns": [
+   "guest_id",
+   "subscribed"
+  ],
   "description": "**Drafted 4 September.** What a guest asked to receive. **Deliberately separate from `marketing.consent`** - consent is what the law allows, a subscription is what the person wants, and a system that stores one and reports the other is the reason unsubscribe links stop working.",
   "required": [
-   "id"
+   "id",
+   "subjectId",
+   "channel",
+   "listName",
+   "isSubscribed"
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
-   "guestId": {
+   "subjectId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The guest — from the guest session, or from `unsubscribeToken` when there is no session."
    },
    "channel": {
     "type": "string",
@@ -511,7 +592,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "listName": {
     "type": "string"
    },
-   "subscribed": {
+   "isSubscribed": {
     "type": "boolean"
    },
    "source": {
@@ -519,10 +600,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Where the opt-in happened, because a regulator asks."
    },
    "unsubscribeToken": {
+    "writeOnly": true,
     "type": "string",
-    "description": "**Unsubscribe must work without a login.**"
+    "description": "**Unsubscribe must work without a login.** The link in a message carries the token and `setMarketingSubscription` accepts it in place of a session. **Write-only: never returned**, so a `MARKETING_VIEW` holder reading subscriptions cannot act as the guest."
    },
    "updatedAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    }
@@ -538,6 +621,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "inApp",
    "post"
   ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
  },
  "RecordConsentRequest": {
   "x-ticvai-persistence": "none — request only",

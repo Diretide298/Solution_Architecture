@@ -19,32 +19,17 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-043 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "Inventory cites `—` — no matching operation. Written before the contracts existed."
-  ],
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "**the screen's operations choose no pattern** — no list, no get, no write that groups. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -58,26 +43,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": []
-    }
-   ]
+   "regions": []
   },
   "states": {
    "loading": "The arabic rtl experience list.",
    "error": "Could not load. Names which read failed and leaves the arabic rtl experience untouched.",
-   "emptyFirstRun": "No arabic rtl experience yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the arabic rtl experience are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No arabic rtl experience yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [],
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-043"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-043",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 1 → Arabic / RTL experience; language button on home",
+    "differences": "Rev 3 decision: the basket stays on the right in Arabic by default (configurable)."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -131,29 +117,17 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-047 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
-  "notes": "Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two screens. Both had the same single operation and the same purpose.",
+  "notes": "Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two screens. Both had the same single operation and the same purpose. **Bound 28 September** to `getTenantAppStatus.minimumAppVersion` for the forced upgrade and to `availability` and `availabilityMessage` for sold out and closed (decided 28 September, audit R073 (b)(f)).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
@@ -167,7 +141,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected maintenance upgrade",
+       "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
        "columns": [
         "TenantAppStatus.isPublished",
@@ -181,9 +155,28 @@
         "TenantAppStatus.isInMaintenance",
         "TenantAppStatus.maintenanceMessage",
         "TenantAppStatus.expectedBackAt",
+        "TenantAppStatus.minimumAppVersion",
+        "TenantAppStatus.availability",
+        "TenantAppStatus.availabilityMessage",
         "TenantAppStatus.recentChanges"
        ],
        "operation": "getTenantAppStatus",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      },
+      {
+       "kind": "banner",
+       "label": "Update the app to continue",
+       "bindsTo": "TenantAppStatus.minimumAppVersion",
+       "operation": "getTenantAppStatus",
+       "notes": "**Forced upgrade** (decided 28 September, audit R073 (b)): when this app's version is below `minimumAppVersion` for its platform (`ios` or `android`), the screen shows the forcedUpgrade state with a button to the store and nothing else works until the guest updates. Set live from CMS-001 through `setMaintenanceMode`.",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      },
+      {
+       "kind": "banner",
+       "label": "Sold out or closed today",
+       "bindsTo": "TenantAppStatus.availabilityMessage",
+       "operation": "getTenantAppStatus",
+       "notes": "**From `getTenantAppStatus.availability`** (`open`, `soldOut`, `closed`) and its `availabilityMessage`, set live from CMS-001 through `setMaintenanceMode` (decided 28 September, audit R073 (f)). `soldOut` and `closed` read differently: sold out means come another day, closed means the venue is not open. Nothing shows while it is `open`.",
        "provenance": "contract white-label.yaml GET /tenant-config/status"
       }
      ]
@@ -191,12 +184,13 @@
    ]
   },
   "states": {
-   "loading": "The maintenance upgrade list.",
+   "loading": "The maintenance upgrade, read by `getTenantAppStatus`.",
    "error": "Could not load. Names which read failed and leaves the maintenance upgrade untouched.",
-   "emptyFirstRun": "No maintenance upgrade yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the maintenance upgrade are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down."
+   "emptyFirstRun": "No maintenance upgrade yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down.",
+   "forcedUpgrade": "**Update required.** The app's version is below `getTenantAppStatus.minimumAppVersion` for its platform; the screen offers only the store link, because an app too old to talk to the server cannot be trusted to book or pay (decided 28 September, audit R073 (b)).",
+   "soldOut": "**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)).",
+   "closed": "**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f))."
   },
   "apis": [
    {
@@ -208,8 +202,15 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-047"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-047",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 1 → Maintenance / upgrade"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {

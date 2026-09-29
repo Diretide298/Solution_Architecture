@@ -1898,6 +1898,13 @@
     "contract": "finance",
     "purpose": "Trial balance for a period",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getVatReturn",
+    "contract": "finance",
+    "purpose": "VAT return (FTA boxes) for a period",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1998,12 +2005,12 @@
     {
      "to": "BO-022",
      "trigger": "Order Detail",
-     "provenance": "derived — BO-022 declares entryState.params orderId and BO-101 holds none of them, so the edge carries nothing and BO-022 opens cold"
+     "provenance": "derived — BO-022 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them, so the edge carries nothing and BO-022 opens cold"
     },
     {
      "to": "BO-023",
      "trigger": "Refunds & Exchanges",
-     "provenance": "derived — BO-023 declares entryState.params orderId and BO-101 holds none of them, so the edge carries nothing and BO-023 opens cold"
+     "provenance": "derived — BO-023 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them, so the edge carries nothing and BO-023 opens cold"
     },
     {
      "to": "BO-024",
@@ -2016,7 +2023,7 @@
      "carries": [
       "settlementId"
      ],
-     "provenance": "derived — BO-025 declares entryState.params settlementId and BO-101 holds settlementId, so an edge into it carries them"
+     "provenance": "derived — BO-025 declares entryState.params chargebackId, settlementId and BO-101 holds settlementId, so an edge into it carries them"
     },
     {
      "to": "BO-026",
@@ -2089,7 +2096,7 @@
     {
      "to": "BO-065",
      "trigger": "Venue Configuration",
-     "provenance": "derived — BO-065 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-065 opens cold"
+     "provenance": "derived — BO-065 declares entryState.params locationId and BO-101 holds none of them, so the edge carries nothing and BO-065 opens cold"
     },
     {
      "to": "BO-074",

@@ -5,89 +5,188 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Booking Velocity & Time-to-Event Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "salesPerHour": {
+   "ruleId": {
     "type": "string",
-    "description": "Sales per Hour"
+    "description": "Rule ID; empty on create",
+    "nullable": true
    },
-   "salesPerDay": {
+   "strategyId": {
     "type": "string",
-    "description": "Sales per Day"
+    "description": "Strategy the rule belongs to"
    },
-   "salesPerWeek": {
+   "ruleName": {
     "type": "string",
-    "description": "Sales per Week"
+    "description": "Rule name"
    },
-   "currentBookingPace": {
+   "ruleKind": {
     "type": "string",
-    "description": "Current Booking Pace"
+    "enum": [
+     "bookingVelocity",
+     "earlyBird",
+     "lastMinute",
+     "combined",
+     "decayEscalation"
+    ],
+    "description": "Rule family (pack pp.80-81)"
    },
-   "expectedBookingPace": {
+   "expectedPaceSource": {
     "type": "string",
-    "description": "Expected Booking Pace"
+    "enum": [
+     "historicalBookingCurve",
+     "configuredTarget"
+    ],
+    "description": "What pace variance is measured against; defaults to configuredTarget until a historical curve exists (decided 29 September, readiness close-out)"
    },
-   "historicalBookingCurve": {
+   "expectedSalesPerDay": {
+    "type": "integer",
+    "description": "Expected sales per day when expectedPaceSource is configuredTarget",
+    "nullable": true
+   },
+   "conditions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "metric": {
+       "type": "string",
+       "enum": [
+        "salesPerHour",
+        "salesPerDay",
+        "salesPerWeek",
+        "currentBookingPace",
+        "paceVariancePercent",
+        "remainingInventory",
+        "daysToEvent",
+        "occupancyPercent"
+       ],
+       "description": "Input evaluated (pack p.80; daysToEvent 0 = same day)"
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "lt",
+        "lte",
+        "gt",
+        "gte",
+        "eq",
+        "between"
+       ],
+       "description": "Comparison"
+      },
+      "value": {
+       "type": "number",
+       "description": "Threshold value (percent for percentages, count for counts, days for time-to-event)"
+      },
+      "valueTo": {
+       "type": "number",
+       "description": "Upper value when operator is between",
+       "nullable": true
+      }
+     },
+     "description": "One condition; persisted as a PricingDynamicPriceCondition"
+    },
+    "description": "Conditions (all must hold unless conditionLogic is any)"
+   },
+   "conditionLogic": {
     "type": "string",
-    "description": "Historical Booking Curve"
+    "enum": [
+     "all",
+     "any"
+    ],
+    "description": "How conditions combine; defaults to all (decided 29 September, readiness close-out)"
    },
-   "paceVariance": {
-    "type": "number",
-    "description": "Pace Variance %"
+   "timeToEventSchedule": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "daysBefore": {
+       "type": "integer",
+       "description": "Days before the event/visit (T-180 ... T-1; 0 = same day); custom intervals allowed"
+      },
+      "action": {
+       "type": "object",
+       "properties": {
+        "actionType": {
+         "type": "string",
+         "enum": [
+          "percentAdjustment",
+          "fixedAmountAdjustment",
+          "moveToBand",
+          "returnToBase"
+         ],
+         "description": "What the rule does to the current price"
+        },
+        "percent": {
+         "type": "number",
+         "description": "Adjustment in percent (negative lowers the price) when actionType is percentAdjustment",
+         "nullable": true
+        },
+        "amount": {
+         "allOf": [
+          {
+           "$ref": "../shared/common.yaml#/components/schemas/Money"
+          }
+         ],
+         "description": "Signed amount when actionType is fixedAmountAdjustment",
+         "nullable": true
+        },
+        "bandCode": {
+         "type": "string",
+         "description": "Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand",
+         "nullable": true
+        }
+       },
+       "description": "The price action; the result still passes through the price ladder and the guardrails"
+      }
+     },
+     "description": "One time-to-event step, e.g. T-90 -> -15%"
+    },
+    "description": "Time-to-event steps (early-bird, decay/escalation); empty for condition-only rules"
    },
-   "remainingInventory": {
-    "type": "string",
-    "description": "Remaining Inventory"
+   "action": {
+    "type": "object",
+    "properties": {
+     "actionType": {
+      "type": "string",
+      "enum": [
+       "percentAdjustment",
+       "fixedAmountAdjustment",
+       "moveToBand",
+       "returnToBase"
+      ],
+      "description": "What the rule does to the current price"
+     },
+     "percent": {
+      "type": "number",
+      "description": "Adjustment in percent (negative lowers the price) when actionType is percentAdjustment",
+      "nullable": true
+     },
+     "amount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "Signed amount when actionType is fixedAmountAdjustment",
+      "nullable": true
+     },
+     "bandCode": {
+      "type": "string",
+      "description": "Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand",
+      "nullable": true
+     }
+    },
+    "description": "Action when the conditions hold (for condition rules)",
+    "nullable": true
    },
-   "t180": {
-    "type": "string",
-    "description": "T−180"
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the strategy; lower wins"
    },
-   "t90": {
-    "type": "string",
-    "description": "T−90"
-   },
-   "t60": {
-    "type": "string",
-    "description": "T−60"
-   },
-   "t30": {
-    "type": "string",
-    "description": "T−30"
-   },
-   "t14": {
-    "type": "string",
-    "description": "T−14"
-   },
-   "t7": {
-    "type": "string",
-    "description": "T−7"
-   },
-   "t3": {
-    "type": "string",
-    "description": "T−3"
-   },
-   "t1": {
-    "type": "string",
-    "description": "T−1"
-   },
-   "sameDay": {
-    "type": "string",
-    "description": "Same Day"
-   },
-   "orCustomIntervals": {
-    "type": "string",
-    "description": "or custom intervals"
-   },
-   "increaseCurrentPriceBy5": {
-    "type": "number",
-    "description": "Increase current price by 5%"
-   },
-   "t2Days": {
-    "type": "string",
-    "description": "T−2 Days"
-   },
-   "then15": {
-    "type": "number",
-    "description": "THEN +15%"
+   "enabled": {
+    "type": "boolean",
+    "description": "Enabled"
    }
   }
  },
@@ -97,93 +196,188 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Booking Velocity & Time-to-Event Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "salesPerHour": {
+   "ruleId": {
     "type": "string",
-    "description": "Sales per Hour"
+    "description": "Rule ID; empty on create",
+    "nullable": true
    },
-   "salesPerDay": {
+   "strategyId": {
     "type": "string",
-    "description": "Sales per Day"
+    "description": "Strategy the rule belongs to"
    },
-   "salesPerWeek": {
+   "ruleName": {
     "type": "string",
-    "description": "Sales per Week"
+    "description": "Rule name"
    },
-   "currentBookingPace": {
+   "ruleKind": {
     "type": "string",
-    "description": "Current Booking Pace"
+    "enum": [
+     "bookingVelocity",
+     "earlyBird",
+     "lastMinute",
+     "combined",
+     "decayEscalation"
+    ],
+    "description": "Rule family (pack pp.80-81)"
    },
-   "expectedBookingPace": {
+   "expectedPaceSource": {
     "type": "string",
-    "description": "Expected Booking Pace"
+    "enum": [
+     "historicalBookingCurve",
+     "configuredTarget"
+    ],
+    "description": "What pace variance is measured against; defaults to configuredTarget until a historical curve exists (decided 29 September, readiness close-out)"
    },
-   "historicalBookingCurve": {
+   "expectedSalesPerDay": {
+    "type": "integer",
+    "description": "Expected sales per day when expectedPaceSource is configuredTarget",
+    "nullable": true
+   },
+   "conditions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "metric": {
+       "type": "string",
+       "enum": [
+        "salesPerHour",
+        "salesPerDay",
+        "salesPerWeek",
+        "currentBookingPace",
+        "paceVariancePercent",
+        "remainingInventory",
+        "daysToEvent",
+        "occupancyPercent"
+       ],
+       "description": "Input evaluated (pack p.80; daysToEvent 0 = same day)"
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "lt",
+        "lte",
+        "gt",
+        "gte",
+        "eq",
+        "between"
+       ],
+       "description": "Comparison"
+      },
+      "value": {
+       "type": "number",
+       "description": "Threshold value (percent for percentages, count for counts, days for time-to-event)"
+      },
+      "valueTo": {
+       "type": "number",
+       "description": "Upper value when operator is between",
+       "nullable": true
+      }
+     },
+     "description": "One condition; persisted as a PricingDynamicPriceCondition"
+    },
+    "description": "Conditions (all must hold unless conditionLogic is any)"
+   },
+   "conditionLogic": {
     "type": "string",
-    "description": "Historical Booking Curve"
+    "enum": [
+     "all",
+     "any"
+    ],
+    "description": "How conditions combine; defaults to all (decided 29 September, readiness close-out)"
    },
-   "paceVariance": {
-    "type": "number",
-    "description": "Pace Variance %"
+   "timeToEventSchedule": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "daysBefore": {
+       "type": "integer",
+       "description": "Days before the event/visit (T-180 ... T-1; 0 = same day); custom intervals allowed"
+      },
+      "action": {
+       "type": "object",
+       "properties": {
+        "actionType": {
+         "type": "string",
+         "enum": [
+          "percentAdjustment",
+          "fixedAmountAdjustment",
+          "moveToBand",
+          "returnToBase"
+         ],
+         "description": "What the rule does to the current price"
+        },
+        "percent": {
+         "type": "number",
+         "description": "Adjustment in percent (negative lowers the price) when actionType is percentAdjustment",
+         "nullable": true
+        },
+        "amount": {
+         "allOf": [
+          {
+           "$ref": "../shared/common.yaml#/components/schemas/Money"
+          }
+         ],
+         "description": "Signed amount when actionType is fixedAmountAdjustment",
+         "nullable": true
+        },
+        "bandCode": {
+         "type": "string",
+         "description": "Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand",
+         "nullable": true
+        }
+       },
+       "description": "The price action; the result still passes through the price ladder and the guardrails"
+      }
+     },
+     "description": "One time-to-event step, e.g. T-90 -> -15%"
+    },
+    "description": "Time-to-event steps (early-bird, decay/escalation); empty for condition-only rules"
    },
-   "remainingInventory": {
-    "type": "string",
-    "description": "Remaining Inventory"
+   "action": {
+    "type": "object",
+    "properties": {
+     "actionType": {
+      "type": "string",
+      "enum": [
+       "percentAdjustment",
+       "fixedAmountAdjustment",
+       "moveToBand",
+       "returnToBase"
+      ],
+      "description": "What the rule does to the current price"
+     },
+     "percent": {
+      "type": "number",
+      "description": "Adjustment in percent (negative lowers the price) when actionType is percentAdjustment",
+      "nullable": true
+     },
+     "amount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "Signed amount when actionType is fixedAmountAdjustment",
+      "nullable": true
+     },
+     "bandCode": {
+      "type": "string",
+      "description": "Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand",
+      "nullable": true
+     }
+    },
+    "description": "Action when the conditions hold (for condition rules)",
+    "nullable": true
    },
-   "t180": {
-    "type": "string",
-    "description": "T−180"
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the strategy; lower wins"
    },
-   "t90": {
-    "type": "string",
-    "description": "T−90"
-   },
-   "t60": {
-    "type": "string",
-    "description": "T−60"
-   },
-   "t30": {
-    "type": "string",
-    "description": "T−30"
-   },
-   "t14": {
-    "type": "string",
-    "description": "T−14"
-   },
-   "t7": {
-    "type": "string",
-    "description": "T−7"
-   },
-   "t3": {
-    "type": "string",
-    "description": "T−3"
-   },
-   "t1": {
-    "type": "string",
-    "description": "T−1"
-   },
-   "sameDay": {
-    "type": "string",
-    "description": "Same Day"
-   },
-   "orCustomIntervals": {
-    "type": "string",
-    "description": "or custom intervals"
-   },
-   "velocity": {
-    "type": "string",
-    "description": "Velocity (the pack shows +45%)"
-   },
-   "increaseCurrentPriceBy5": {
-    "type": "number",
-    "description": "Increase current price by 5%"
-   },
-   "t2Days": {
-    "type": "string",
-    "description": "T−2 Days"
-   },
-   "then15": {
-    "type": "number",
-    "description": "THEN +15%"
+   "enabled": {
+    "type": "boolean",
+    "description": "Enabled"
    }
   }
  },
@@ -193,129 +387,89 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Channel, Customer Segment & Location Dynamic Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "b2c": {
+   "ruleId": {
     "type": "string",
-    "description": "B2C"
+    "description": "Rule ID"
    },
-   "mobileApp": {
+   "strategyId": {
     "type": "string",
-    "description": "Mobile App"
+    "description": "Strategy the rule belongs to; empty for a tenant-wide rule",
+    "nullable": true
    },
-   "pos": {
+   "dimension": {
     "type": "string",
-    "description": "POS"
+    "enum": [
+     "channel",
+     "customerSegment",
+     "location"
+    ],
+    "description": "Rule dimension"
    },
-   "kiosk": {
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
+    "description": "Channel (B2C = guestWeb, Mobile App = guestApp, Reseller = partner)"
+   },
+   "customerSegment": {
     "type": "string",
-    "description": "Kiosk"
+    "enum": [
+     "standardCustomer",
+     "member",
+     "loyaltyTier",
+     "resident",
+     "vip",
+     "corporate",
+     "group",
+     "b2b",
+     "customSegment"
+    ],
+    "description": "Customer segment (pack p.83)",
+    "nullable": true
    },
-   "callCenter": {
+   "segmentRef": {
     "type": "string",
-    "description": "Call Center"
+    "description": "Loyalty tier or custom segment ID",
+    "nullable": true
    },
-   "b2b": {
+   "locationLevel": {
     "type": "string",
-    "description": "B2B"
+    "enum": [
+     "country",
+     "market",
+     "venue",
+     "attraction",
+     "zone",
+     "eventLocation"
+    ],
+    "description": "Location level (pack pp.83-84)",
+    "nullable": true
    },
-   "reseller": {
+   "locationId": {
     "type": "string",
-    "description": "Reseller"
+    "description": "Country, market, venue, attraction, zone or event location ID",
+    "nullable": true
    },
-   "ota": {
-    "type": "string",
-    "description": "OTA"
+   "dynamicPricingEnabled": {
+    "type": "boolean",
+    "description": "Whether dynamic pricing applies in this context"
    },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "dynamicRange15": {
+   "rangeMinPercent": {
     "type": "number",
-    "description": "Dynamic range ±15%"
+    "description": "Lowest adjustment from base in percent",
+    "nullable": true
    },
-   "dynamicRange0To10": {
+   "rangeMaxPercent": {
     "type": "number",
-    "description": "Dynamic range +0% to +10%"
+    "description": "Highest adjustment from base in percent (maximum uplift)",
+    "nullable": true
    },
-   "standardCustomer": {
-    "type": "string",
-    "description": "Standard Customer"
-   },
-   "member": {
-    "type": "string",
-    "description": "Member"
-   },
-   "loyaltyTier": {
-    "type": "string",
-    "description": "Loyalty Tier"
-   },
-   "resident": {
-    "type": "string",
-    "description": "Resident"
-   },
-   "vip": {
-    "type": "string",
-    "description": "VIP"
-   },
-   "corporate": {
-    "type": "string",
-    "description": "Corporate"
-   },
-   "group": {
-    "type": "string",
-    "description": "Group"
-   },
-   "customSegment": {
-    "type": "string",
-    "description": "Custom Segment"
-   },
-   "country": {
-    "type": "string",
-    "description": "Country"
-   },
-   "market": {
-    "type": "string",
-    "description": "Market"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "attraction": {
-    "type": "string",
-    "description": "Attraction"
-   },
-   "zone": {
-    "type": "string",
-    "description": "Zone"
-   },
-   "eventLocation": {
-    "type": "string",
-    "description": "Event Location"
-   },
-   "maximumDynamicUplift20": {
-    "type": "number",
-    "description": "Maximum dynamic uplift +20%"
-   },
-   "maximum15": {
-    "type": "number",
-    "description": "Maximum +15%"
-   },
-   "partnerContractRates": {
-    "type": "string",
-    "description": "Partner Contract Rates"
-   },
-   "corporateAgreements": {
-    "type": "string",
-    "description": "Corporate Agreements"
-   },
-   "membershipGuarantees": {
-    "type": "string",
-    "description": "Membership Guarantees"
-   },
-   "fixedGroupRates": {
-    "type": "string",
-    "description": "Fixed Group Rates"
+   "protected": {
+    "type": "boolean",
+    "description": "Protected segment: always receives its protected rate and is excluded from dynamic adjustment"
    }
   }
  },
@@ -325,41 +479,121 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Demand, Occupancy & Availability Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "ticketsSold": {
+   "ruleId": {
     "type": "string",
-    "description": "Tickets Sold"
+    "description": "Rule ID; empty on create",
+    "nullable": true
    },
-   "currentDemand": {
+   "strategyId": {
     "type": "string",
-    "description": "Current Demand"
+    "description": "Strategy the rule belongs to"
    },
-   "occupancy": {
+   "ruleName": {
+    "type": "string",
+    "description": "Rule name"
+   },
+   "ruleKind": {
+    "type": "string",
+    "enum": [
+     "occupancy",
+     "inventory",
+     "availability",
+     "demand"
+    ],
+    "description": "Rule family (pack p.78-79)"
+   },
+   "inputMetric": {
+    "type": "string",
+    "enum": [
+     "ticketsSold",
+     "currentDemand",
+     "occupancyPercent",
+     "remainingCapacity",
+     "remainingInventory",
+     "availableSeats",
+     "capacityUtilization",
+     "salesPace"
+    ],
+    "description": "Supported Input evaluated (pack p.78)"
+   },
+   "tiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromValue": {
+       "type": "number",
+       "description": "From (inclusive)"
+      },
+      "toValue": {
+       "type": "number",
+       "description": "To (inclusive); empty for no upper bound",
+       "nullable": true
+      },
+      "action": {
+       "type": "object",
+       "properties": {
+        "actionType": {
+         "type": "string",
+         "enum": [
+          "percentAdjustment",
+          "fixedAmountAdjustment",
+          "moveToBand",
+          "returnToBase"
+         ],
+         "description": "What the rule does to the current price"
+        },
+        "percent": {
+         "type": "number",
+         "description": "Adjustment in percent (negative lowers the price) when actionType is percentAdjustment",
+         "nullable": true
+        },
+        "amount": {
+         "allOf": [
+          {
+           "$ref": "../shared/common.yaml#/components/schemas/Money"
+          }
+         ],
+         "description": "Signed amount when actionType is fixedAmountAdjustment",
+         "nullable": true
+        },
+        "bandCode": {
+         "type": "string",
+         "description": "Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand",
+         "nullable": true
+        }
+       },
+       "description": "The price action; the result still passes through the price ladder and the guardrails"
+      }
+     },
+     "description": "One step of the matrix, e.g. occupancy 81-90% -> +10%"
+    },
+    "description": "Threshold matrix; tiers must not overlap"
+   },
+   "demandIndexDefinition": {
+    "type": "string",
+    "description": "Required when inputMetric is currentDemand: how the demand index is calculated (the pack requires it to be explicitly configured and documented)",
+    "nullable": true
+   },
+   "exitThresholdOffset": {
+    "type": "number",
+    "description": "Exit threshold: how far the metric must fall back below a tier's entry before the price reverses; defaults to 2 (points or units of the metric) (decided 29 September, readiness close-out)"
+   },
+   "minimumDurationMinutes": {
     "type": "integer",
-    "description": "Occupancy %"
+    "description": "Minimum duration a threshold must hold before the price moves; defaults to 15 (decided 29 September, readiness close-out)"
    },
-   "remainingCapacity": {
+   "cooldownMinutes": {
     "type": "integer",
-    "description": "Remaining Capacity"
+    "description": "Cooldown after a movement before the next; defaults to 60 (decided 29 September, readiness close-out)"
    },
-   "remainingInventory": {
-    "type": "string",
-    "description": "Remaining Inventory"
-   },
-   "availableSeats": {
+   "priority": {
     "type": "integer",
-    "description": "Available Seats"
+    "description": "Priority within the strategy; lower wins"
    },
-   "capacityUtilization": {
-    "type": "integer",
-    "description": "Capacity Utilization"
-   },
-   "salesPace": {
-    "type": "string",
-    "description": "Sales Pace"
-   },
-   "cyAction": {
-    "type": "string",
-    "description": "cy Action"
+   "enabled": {
+    "type": "boolean",
+    "description": "Enabled"
    }
   }
  },
@@ -369,41 +603,289 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Demand, Occupancy & Availability Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "ticketsSold": {
+   "ruleId": {
     "type": "string",
-    "description": "Tickets Sold"
+    "description": "Rule ID; empty on create",
+    "nullable": true
    },
-   "currentDemand": {
+   "strategyId": {
     "type": "string",
-    "description": "Current Demand"
+    "description": "Strategy the rule belongs to"
    },
-   "occupancy": {
+   "ruleName": {
+    "type": "string",
+    "description": "Rule name"
+   },
+   "ruleKind": {
+    "type": "string",
+    "enum": [
+     "occupancy",
+     "inventory",
+     "availability",
+     "demand"
+    ],
+    "description": "Rule family (pack p.78-79)"
+   },
+   "inputMetric": {
+    "type": "string",
+    "enum": [
+     "ticketsSold",
+     "currentDemand",
+     "occupancyPercent",
+     "remainingCapacity",
+     "remainingInventory",
+     "availableSeats",
+     "capacityUtilization",
+     "salesPace"
+    ],
+    "description": "Supported Input evaluated (pack p.78)"
+   },
+   "tiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromValue": {
+       "type": "number",
+       "description": "From (inclusive)"
+      },
+      "toValue": {
+       "type": "number",
+       "description": "To (inclusive); empty for no upper bound",
+       "nullable": true
+      },
+      "action": {
+       "type": "object",
+       "properties": {
+        "actionType": {
+         "type": "string",
+         "enum": [
+          "percentAdjustment",
+          "fixedAmountAdjustment",
+          "moveToBand",
+          "returnToBase"
+         ],
+         "description": "What the rule does to the current price"
+        },
+        "percent": {
+         "type": "number",
+         "description": "Adjustment in percent (negative lowers the price) when actionType is percentAdjustment",
+         "nullable": true
+        },
+        "amount": {
+         "allOf": [
+          {
+           "$ref": "../shared/common.yaml#/components/schemas/Money"
+          }
+         ],
+         "description": "Signed amount when actionType is fixedAmountAdjustment",
+         "nullable": true
+        },
+        "bandCode": {
+         "type": "string",
+         "description": "Target band on the strategy's price ladder (listDynamicPriceBand) when actionType is moveToBand",
+         "nullable": true
+        }
+       },
+       "description": "The price action; the result still passes through the price ladder and the guardrails"
+      }
+     },
+     "description": "One step of the matrix, e.g. occupancy 81-90% -> +10%"
+    },
+    "description": "Threshold matrix; tiers must not overlap"
+   },
+   "demandIndexDefinition": {
+    "type": "string",
+    "description": "Required when inputMetric is currentDemand: how the demand index is calculated (the pack requires it to be explicitly configured and documented)",
+    "nullable": true
+   },
+   "exitThresholdOffset": {
+    "type": "number",
+    "description": "Exit threshold: how far the metric must fall back below a tier's entry before the price reverses; defaults to 2 (points or units of the metric) (decided 29 September, readiness close-out)"
+   },
+   "minimumDurationMinutes": {
     "type": "integer",
-    "description": "Occupancy %"
+    "description": "Minimum duration a threshold must hold before the price moves; defaults to 15 (decided 29 September, readiness close-out)"
    },
-   "remainingCapacity": {
+   "cooldownMinutes": {
     "type": "integer",
-    "description": "Remaining Capacity"
+    "description": "Cooldown after a movement before the next; defaults to 60 (decided 29 September, readiness close-out)"
    },
-   "remainingInventory": {
-    "type": "string",
-    "description": "Remaining Inventory"
-   },
-   "availableSeats": {
+   "priority": {
     "type": "integer",
-    "description": "Available Seats"
+    "description": "Priority within the strategy; lower wins"
    },
-   "capacityUtilization": {
-    "type": "integer",
-    "description": "Capacity Utilization"
-   },
-   "salesPace": {
+   "enabled": {
+    "type": "boolean",
+    "description": "Enabled"
+   }
+  }
+ },
+ "DemandSignal": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.demand_signal",
+  "description": "**An external or calendar signal that moves demand** (29 September, data model DM3). Merges weather (ADM-101), nearby events (ADM-102), competitor prices (ADM-103), tourism, holiday and market signals (ADM-104) and the tenant's special calendar (Ramadan, Eid, school breaks) used by temporal rules. `signalKind` says which; the readings specific to a kind are in `reading`, and a venue's sensitivity settings in `configuration`. A signal informs forecasts and recommendations; it never sets a price.",
+  "required": [
+   "id",
+   "scopePath",
+   "signalKind",
+   "source"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Sales Pace"
+    "format": "uuid",
+    "readOnly": true
    },
-   "cyAction": {
+   "scopePath": {
     "type": "string",
-    "description": "cy Action"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "signalKind": {
+    "type": "string",
+    "enum": [
+     "weather",
+     "nearbyEvent",
+     "competitorPrice",
+     "calendar",
+     "tourism",
+     "transport",
+     "market"
+    ]
+   },
+   "signalType": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "E.g. `publicHoliday`, `ramadan`, an event type, a weather condition."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "source": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "Provider, feed or `tenant` for manual entries."
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Competitor observations: the comparable TICVAI product."
+   },
+   "geography": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "periodStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "periodEnd": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "currentValue": {
+    "type": "number",
+    "nullable": true
+   },
+   "unit": {
+    "type": "string",
+    "maxLength": 20,
+    "nullable": true
+   },
+   "reading": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Kind-specific values: weather conditions and forecasts, event attendance and distance, competitor prices."
+   },
+   "configuration": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Weather: `{venueExposure, weatherSensitivity, conditionImpacts, forecastHorizon, dataFailurePolicy}`; events: `{monitoringRadiusKm}`."
+   },
+   "weight": {
+    "type": "number",
+    "nullable": true
+   },
+   "reliability": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1
+   },
+   "historicalCorrelation": {
+    "type": "number",
+    "nullable": true
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1
+   },
+   "impactMinPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "impactMaxPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "refreshFrequency": {
+    "type": "string",
+    "enum": [
+     "realTime",
+     "hourly",
+     "daily",
+     "weekly",
+     "manual",
+     null
+    ],
+    "nullable": true
+   },
+   "isApproved": {
+    "type": "boolean",
+    "default": false,
+    "description": "Competitor sources and comparability approved for use."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "observedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastUpdatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -413,95 +895,143 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Dynamic Price Bands, Ladders & Adjustment Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "p1": {
-    "type": "string",
-    "description": "P1"
-   },
-   "p2": {
-    "type": "string",
-    "description": "P2"
-   },
-   "p3": {
-    "type": "string",
-    "description": "P3"
-   },
-   "p4": {
-    "type": "string",
-    "description": "P4"
-   },
-   "p5": {
-    "type": "string",
-    "description": "P5"
-   },
-   "p6": {
-    "type": "string",
-    "description": "P6"
-   },
-   "p7": {
-    "type": "string",
-    "description": "P7"
-   },
-   "fixedPriceBands": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed Price Bands"
-   },
-   "percentageBands": {
-    "type": "number",
-    "description": "Percentage Bands"
-   },
-   "fixedAmountSteps": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed Amount Steps"
-   },
-   "derivedBands": {
-    "type": "string",
-    "description": "Derived Bands"
-   },
-   "continuousRangeWherePermitted": {
-    "type": "string",
-    "description": "Continuous Range where permitted"
-   },
    "maximumBandsPerMovement": {
-    "type": "string",
-    "description": "Maximum Bands per Movement"
+    "type": "integer",
+    "description": "Maximum bands per movement; defaults to 1 (decided 29 September, readiness close-out)"
    },
    "minimumTimeBetweenMovements": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Minimum Time Between Movements"
-   },
-   "upwardMovement": {
-    "type": "string",
-    "description": "Upward Movement"
-   },
-   "downwardMovement": {
-    "type": "string",
-    "description": "Downward Movement"
+    "type": "integer",
+    "description": "Minimum minutes between movements; defaults to 60 (decided 29 September, readiness close-out)"
    },
    "reversalRules": {
     "type": "string",
-    "description": "Reversal Rules"
+    "enum": [
+     "allowed",
+     "afterCooldown",
+     "notAllowed"
+    ],
+    "description": "Whether a movement may be reversed; defaults to afterCooldown (decided 29 September, readiness close-out)"
    },
    "cooldownPeriod": {
+    "type": "integer",
+    "description": "Cooldown in minutes after a movement; defaults to 60 (decided 29 September, readiness close-out)"
+   },
+   "ladderId": {
     "type": "string",
-    "format": "date-time",
-    "description": "Cooldown Period"
+    "description": "Ladder ID"
    },
-   "maximum5PerAdjustment": {
-    "type": "number",
-    "description": "Maximum +5% per adjustment"
+   "strategyId": {
+    "type": "string",
+    "description": "Strategy the ladder belongs to"
    },
-   "maximum10": {
-    "type": "number",
-    "description": "Maximum −10%"
+   "basePriceSource": {
+    "type": "string",
+    "description": "Board 1 rate the ladder is built around"
    },
-   "whereRequired": {
+   "adjustmentModel": {
+    "type": "string",
+    "enum": [
+     "fixedPriceBands",
+     "percentageBands",
+     "fixedAmountSteps",
+     "derivedBands",
+     "continuousRange"
+    ],
+    "description": "Adjustment Model (pack p.85)"
+   },
+   "bands": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "description": "Band code, e.g. P4"
+      },
+      "price": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "Band price (fixed and derived bands)",
+       "nullable": true
+      },
+      "percent": {
+       "type": "number",
+       "description": "Band offset from base in percent (percentage bands)",
+       "nullable": true
+      }
+     },
+     "description": "One band"
+    },
+    "description": "Bands, lowest first"
+   },
+   "baseBandCode": {
+    "type": "string",
+    "description": "Band holding the base price, e.g. P3"
+   },
+   "stepAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Step for fixedAmountSteps",
+    "nullable": true
+   },
+   "allowUpward": {
     "type": "boolean",
-    "description": "where required"
+    "description": "Upward movement allowed"
    },
-   "minimumBaseMaximum": {
-    "type": "string",
-    "description": "Minimum → Base → Maximum"
+   "allowDownward": {
+    "type": "boolean",
+    "description": "Downward movement allowed"
+   },
+   "maxIncreasePercentPerAdjustment": {
+    "type": "number",
+    "description": "Asymmetric movement: maximum increase per adjustment in percent",
+    "nullable": true
+   },
+   "maxDecreasePercentPerAdjustment": {
+    "type": "number",
+    "description": "Asymmetric movement: maximum decrease per adjustment in percent",
+    "nullable": true
+   },
+   "allowedEndpoints": {
+    "type": "array",
+    "items": {
+     "allOf": [
+      {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     ]
+    },
+    "description": "Psychological pricing: governed endpoints (e.g. AED 249, 259, 279) a price may land on"
+   },
+   "minimumPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Preview: lowest price on the ladder"
+   },
+   "basePrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Preview: base price"
+   },
+   "maximumPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Preview: highest price on the ladder"
    }
   }
  },
@@ -511,83 +1041,406 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Dynamic Pricing Automation Policy & Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "mode0Monitor": {
-    "type": "string",
-    "description": "Mode 0 — Monitor"
-   },
-   "mode1Recommend": {
-    "type": "string",
-    "description": "Mode 1 — Recommend"
-   },
-   "mode2PrepareChange": {
-    "type": "string",
-    "description": "Mode 2 — Prepare Change"
-   },
-   "nt": {
-    "type": "string",
-    "description": "nt"
-   },
-   "thresholdMet": {
-    "type": "integer",
-    "description": "threshold met"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "strategy": {
-    "type": "string",
-    "description": "Strategy"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "market": {
-    "type": "string",
-    "description": "Market"
-   },
    "maximumAutomaticChangesDay": {
-    "type": "string",
-    "description": "Maximum Automatic Changes / Day"
+    "type": "integer",
+    "description": "Maximum automatic changes per day; defaults to 4 (decided 29 September, readiness close-out)"
    },
    "minimumTimeBetweenChanges": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Minimum Time Between Changes"
+    "type": "integer",
+    "description": "Minimum minutes between automatic changes; defaults to 60 (decided 29 September, readiness close-out)"
    },
    "noChangeWindows": {
-    "type": "string",
-    "description": "No-Change Windows"
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "anchor": {
+       "type": "string",
+       "enum": [
+        "gatesOpening",
+        "eventStart",
+        "clockTime"
+       ],
+       "description": "What the window is measured from"
+      },
+      "minutesBefore": {
+       "type": "integer",
+       "description": "Minutes before the anchor",
+       "nullable": true
+      },
+      "minutesAfter": {
+       "type": "integer",
+       "description": "Minutes after the anchor",
+       "nullable": true
+      },
+      "clockFrom": {
+       "type": "string",
+       "description": "HH:mm when anchor is clockTime",
+       "nullable": true
+      },
+      "clockTo": {
+       "type": "string",
+       "description": "HH:mm",
+       "nullable": true
+      }
+     },
+     "description": "One window"
+    },
+    "description": "No-Change Windows, e.g. 30 minutes before gates open"
    },
-   "user": {
+   "policyId": {
     "type": "string",
-    "description": "User"
+    "description": "Policy ID"
    },
-   "reason": {
+   "scopeLevel": {
     "type": "string",
-    "description": "Reason"
+    "enum": [
+     "product",
+     "event",
+     "venue",
+     "strategy",
+     "channel",
+     "market"
+    ],
+    "description": "Automation Scope (pack p.88)"
    },
-   "start": {
+   "scopeId": {
     "type": "string",
-    "description": "Start"
+    "description": "ID of the product, event, venue, strategy, channel or market"
    },
-   "expiry": {
+   "automationMode": {
+    "type": "string",
+    "enum": [
+     "monitor",
+     "recommend",
+     "prepareChange",
+     "autoExecuteWithinGuardrails"
+    ],
+    "description": "Automation mode; defaults to recommend (decided 29 September, readiness close-out)"
+   },
+   "authorityTiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "maxAdjustmentPercent": {
+       "type": "number",
+       "description": "Applies to adjustments up to this percent (absolute)",
+       "nullable": true
+      },
+      "action": {
+       "type": "string",
+       "enum": [
+        "autoExecute",
+        "autoExecuteIfConfident",
+        "revenueManager",
+        "commercialDirector",
+        "board4Governance"
+       ],
+       "description": "Who acts"
+      },
+      "confidenceThreshold": {
+       "type": "number",
+       "description": "Confidence percent required for autoExecuteIfConfident",
+       "nullable": true
+      }
+     },
+     "description": "One tier"
+    },
+    "description": "Authority policy, smallest adjustment first; empty means every change needs a Revenue Manager (decided 29 September, readiness close-out)"
+   },
+   "safeFailureBehavior": {
+    "type": "string",
+    "enum": [
+     "holdLastPrice",
+     "returnToBase",
+     "freeze",
+     "requestReview"
+    ],
+    "description": "Safe Failure when inputs are unavailable; defaults to holdLastPrice (decided 29 September, readiness close-out)"
+   },
+   "activeOverride": {
+    "type": "object",
+    "properties": {
+     "user": {
+      "type": "string",
+      "description": "User"
+     },
+     "reason": {
+      "type": "string",
+      "description": "Reason"
+     },
+     "overridePrice": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "Override price"
+     },
+     "start": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Start"
+     },
+     "expiry": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Expiry"
+     },
+     "returnBehavior": {
+      "type": "string",
+      "enum": [
+       "resumeEngine",
+       "returnToBase",
+       "holdOverridePrice"
+      ],
+      "description": "What happens at expiry"
+     }
+    },
+    "description": "Manual override in force, if any",
+    "nullable": true
+   }
+  }
+ },
+ "DynamicPricingControl": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.dynamic_pricing_control",
+  "description": "**The limits and the autonomy of dynamic pricing at one scope** (29 September, data model DM3). Merges guardrails (ADM-093) and automation policy (ADM-094, ADM-113): both are per-scope controls a price change must pass, and they share the rate-of-change limits. The most specific scope wins; guardrails are re-checked at execution (`createLiveDynamicPrice`). `automationLevel` is the one vocabulary: the strategy screen's `monitor`/`recommend` read as `advisory`, `prepareChange` as `humanInTheLoop`, `autoExecuteWithinGuardrails` as `conditionalAutonomous`.",
+  "required": [
+   "id",
+   "scopePath",
+   "scopeLevel",
+   "automationLevel"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "global",
+     "market",
+     "venue",
+     "strategy",
+     "product",
+     "event",
+     "performance",
+     "channel"
+    ]
+   },
+   "scopeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null at `global`."
+   },
+   "absoluteMinimumPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "absoluteMaximumPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "minimumMarginPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "maximumUpliftPercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumReductionPercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumSingleChangePercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumDailyChangePercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumWeeklyChangePercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "minimumChangeIntervalMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumChangesPerDay": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "minimumInventory": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumOccupancyTriggerPercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100
+   },
+   "protectedRateTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "contractRates",
+      "membershipRates",
+      "corporateRates",
+      "promotionalLockedRates",
+      "regulatoryPrices",
+      "complimentaryRates"
+     ]
+    }
+   },
+   "isFrozen": {
+    "type": "boolean",
+    "default": false
+   },
+   "isKillSwitchActive": {
+    "type": "boolean",
+    "default": false,
+    "description": "Stops every automatic change in scope at once."
+   },
+   "automationLevel": {
+    "type": "string",
+    "enum": [
+     "advisory",
+     "humanInTheLoop",
+     "conditionalAutonomous",
+     "autonomous"
+    ],
+    "default": "advisory"
+   },
+   "authorityTiers": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`[{maxAdjustmentPercent, action, confidenceThreshold}]`."
+   },
+   "maxAdjustmentPercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "minAiConfidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1
+   },
+   "minRevenueUpliftPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "evaluationFrequencyMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1
+   },
+   "executionFrequencyMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1
+   },
+   "quietPeriodMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "noChangeWindows": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`[{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]`."
+   },
+   "circuitBreakers": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`[{trigger, threshold, enabled, tripped}]`."
+   },
+   "requireGuardrailsPassed": {
+    "type": "boolean",
+    "default": true
+   },
+   "excludeProtectedRates": {
+    "type": "boolean",
+    "default": true
+   },
+   "requireHealthyForecastData": {
+    "type": "boolean",
+    "default": true
+   },
+   "safeFailureBehavior": {
+    "type": "string",
+    "enum": [
+     "holdLastPrice",
+     "returnToBase",
+     "freeze",
+     "requestReview"
+    ],
+    "default": "holdLastPrice"
+   },
+   "activeOverride": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`{user, reason, overridePrice, start, expiry, returnBehavior}`."
+   },
+   "isPaused": {
+    "type": "boolean",
+    "default": false
+   },
+   "effectiveFrom": {
     "type": "string",
     "format": "date-time",
-    "description": "Expiry"
+    "nullable": true
    },
-   "returnBehavior": {
+   "effectiveTo": {
     "type": "string",
-    "description": "Return Behavior"
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -606,84 +1459,284 @@
     "description": "Absolute Maximum Price"
    },
    "minimumMargin": {
-    "type": "number",
-    "description": "Minimum Margin"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Minimum contribution margin per unit; the price never falls below cost plus this margin",
+    "nullable": true
    },
    "maximumUplift": {
     "type": "number",
-    "description": "Maximum Uplift %"
+    "description": "Maximum uplift from base in percent"
    },
    "maximumReduction": {
     "type": "number",
-    "description": "Maximum Reduction %"
+    "description": "Maximum reduction from base in percent"
    },
    "maximumSingleChange": {
-    "type": "string",
-    "description": "Maximum Single Change"
+    "type": "number",
+    "description": "Maximum single change in percent"
    },
    "maximumDailyChange": {
-    "type": "string",
-    "description": "Maximum Daily Change"
+    "type": "number",
+    "description": "Maximum change within 24 hours in percent"
    },
    "maximumWeeklyChange": {
-    "type": "string",
-    "description": "Maximum Weekly Change"
+    "type": "number",
+    "description": "Maximum change within 7 days in percent",
+    "nullable": true
    },
    "minimumChangeInterval": {
-    "type": "string",
-    "description": "Minimum Change Interval"
+    "type": "integer",
+    "description": "Minimum minutes between changes"
    },
    "maximumChangesPerDay": {
-    "type": "string",
-    "description": "Maximum Changes per Day"
+    "type": "integer",
+    "description": "Maximum changes per day"
    },
    "minimumInventory": {
-    "type": "string",
-    "description": "Minimum Inventory"
+    "type": "integer",
+    "description": "Below this remaining inventory no downward adjustment is made (decided 29 September, readiness close-out)",
+    "nullable": true
    },
    "maximumOccupancyTrigger": {
-    "type": "integer",
-    "description": "Maximum Occupancy Trigger"
+    "type": "number",
+    "description": "Occupancy percent above which no further uplift is triggered (decided 29 September, readiness close-out)",
+    "nullable": true
    },
-   "contractRates": {
+   "guardrailId": {
     "type": "string",
-    "description": "Contract Rates"
+    "description": "Guardrail set ID"
    },
-   "membershipRates": {
+   "scopeLevel": {
     "type": "string",
-    "description": "Membership Rates"
+    "enum": [
+     "global",
+     "strategy",
+     "venue",
+     "product",
+     "event",
+     "performance"
+    ],
+    "description": "Scope the guardrails apply to; the narrowest scope wins, and a narrower set can only tighten a wider one (decided 29 September, readiness close-out)"
    },
-   "corporateRates": {
+   "scopeId": {
     "type": "string",
-    "description": "Corporate Rates"
+    "description": "Strategy, venue, product, event or performance ID; empty for global",
+    "nullable": true
    },
-   "promotionalLockedRates": {
+   "protectedRateTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "contractRates",
+      "membershipRates",
+      "corporateRates",
+      "promotionalLockedRates",
+      "regulatoryPrices",
+      "complimentaryRates"
+     ]
+    },
+    "description": "Commercial Protection: rate types dynamic pricing never moves; all six by default (decided 29 September, readiness close-out)"
+   },
+   "frozen": {
+    "type": "boolean",
+    "description": "Frozen: the engine holds the current price in this scope"
+   },
+   "killSwitchActive": {
+    "type": "boolean",
+    "description": "Global kill switch: dynamic pricing suspended tenant-wide"
+   }
+  }
+ },
+ "DynamicPricingStrategy": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.dynamic_pricing_strategy",
+  "description": "**A dynamic pricing strategy: what it prices, from which base and how often** (29 September, data model DM3). ADM-088 and ADM-089. Its rules are `pricing.dynamic_price_rule` rows naming it; its ladder `catalogue.price_ladder`; its limits and automation `catalogue.dynamic_pricing_control`. **Rules-based now; AI factors inform, never replace, the rules** (MoM 19 Aug 2026).",
+  "required": [
+   "id",
+   "scopePath",
+   "code",
+   "name",
+   "strategyType",
+   "scopeType",
+   "status"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Promotional Locked Rates"
+    "format": "uuid",
+    "readOnly": true
    },
-   "regulatoryPrices": {
+   "scopePath": {
     "type": "string",
-    "description": "Regulatory Prices"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
    },
-   "complimentaryRates": {
+   "code": {
     "type": "string",
-    "description": "Complimentary Rates"
+    "maxLength": 40
    },
-   "alreadyPurchasedTickets": {
+   "name": {
     "type": "string",
-    "description": "Already Purchased Tickets"
+    "maxLength": 200
    },
-   "existingReservationsWhereApplicable": {
+   "description": {
     "type": "string",
-    "description": "Existing Reservations where applicable"
+    "nullable": true
    },
-   "returnToBasePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Return to Base Price"
-   },
-   "controlForCriticalIncidents": {
+   "strategyType": {
     "type": "string",
-    "description": "control for critical incidents"
+    "enum": [
+     "demandBased",
+     "occupancyBased",
+     "availabilityBased",
+     "inventoryBased",
+     "bookingVelocity",
+     "timeToEvent",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "channel",
+     "segment",
+     "location",
+     "hybrid"
+    ]
+   },
+   "scopeType": {
+    "type": "string",
+    "enum": [
+     "singleProduct",
+     "productFamily",
+     "event",
+     "multiplePerformances",
+     "venue",
+     "selectedTimeslots",
+     "selectedPriceCategories"
+    ]
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productFamily": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "performanceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "timeslotIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "priceCategoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "businessUnit": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "basePriceSource": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "The price list or rate the adjustments start from."
+   },
+   "evaluationFrequency": {
+    "type": "string",
+    "enum": [
+     "every15Minutes",
+     "every30Minutes",
+     "hourly",
+     "daily",
+     "onInventoryChange",
+     "onThresholdTrigger"
+    ],
+    "default": "hourly"
+   },
+   "combinationMode": {
+    "type": "string",
+    "enum": [
+     "independent",
+     "combinable",
+     "exclusive",
+     "fallback"
+    ],
+    "default": "independent"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "clonedFromStrategyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "paused",
+     "frozen",
+     "expired",
+     "retired"
+    ],
+    "default": "draft"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -707,6 +1760,21 @@
    },
    "strategyType": {
     "type": "string",
+    "enum": [
+     "demandBased",
+     "occupancyBased",
+     "availabilityBased",
+     "inventoryBased",
+     "bookingVelocity",
+     "timeToEvent",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "channel",
+     "segment",
+     "location",
+     "hybrid"
+    ],
     "description": "Strategy Type"
    },
    "owner": {
@@ -719,91 +1787,104 @@
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue",
+    "nullable": true
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product",
+    "nullable": true
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event",
+    "nullable": true
    },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
+   "performances": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Performances in scope (one or many)"
    },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
+   "timeslots": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Timeslots in scope; empty for all"
    },
-   "priceCategory": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Category"
+   "priceCategories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Price categories in scope; empty for all"
    },
    "basePriceSource": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Base Price Source"
+    "type": "string",
+    "description": "Board 1 price-list rate ID the strategy moves from; a strategy never holds its own base amount"
    },
    "effectiveFrom": {
     "type": "string",
-    "description": "Effective From"
+    "format": "date-time",
+    "description": "Effective from"
    },
    "effectiveTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date-time",
+    "description": "Effective to; empty for open-ended",
+    "nullable": true
    },
    "evaluationFrequency": {
     "type": "string",
-    "description": "Evaluation Frequency"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status"
-   },
-   "singleProduct": {
-    "type": "string",
-    "description": "Single Product"
+    "enum": [
+     "every15Minutes",
+     "every30Minutes",
+     "hourly",
+     "daily",
+     "onInventoryChange",
+     "onThresholdTrigger"
+    ],
+    "description": "Evaluation frequency; defaults to hourly (decided 29 September, readiness close-out)"
    },
    "productFamily": {
     "type": "string",
-    "description": "Product Family"
+    "description": "Product family (for scopeType productFamily)",
+    "nullable": true
    },
-   "multiplePerformances": {
+   "scopeType": {
     "type": "string",
-    "description": "Multiple Performances"
+    "enum": [
+     "singleProduct",
+     "productFamily",
+     "event",
+     "multiplePerformances",
+     "venue",
+     "selectedTimeslots",
+     "selectedPriceCategories"
+    ],
+    "description": "Scope Assignment (pack p.77)"
    },
-   "selectedTimeslots": {
+   "combinationMode": {
     "type": "string",
-    "description": "Selected Timeslots"
+    "enum": [
+     "independent",
+     "combinable",
+     "exclusive",
+     "fallback"
+    ],
+    "description": "Strategy Combination: independent, combinable with other strategies, exclusive control, or fallback; defaults to independent (decided 29 September, readiness close-out)"
    },
-   "selectedPriceCategories": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Selected Price Categories"
-   },
-   "operatesIndependently": {
+   "clonedFromStrategyId": {
     "type": "string",
-    "description": "Operates Independently"
-   },
-   "canCombineWithOtherStrategies": {
-    "type": "boolean",
-    "description": "Can Combine with Other Strategies"
-   },
-   "hasExclusiveControl": {
-    "type": "boolean",
-    "description": "Has Exclusive Control"
-   },
-   "actsAsFallback": {
-    "type": "string",
-    "description": "Acts as Fallback"
-   },
-   "canBecome": {
-    "type": "boolean",
-    "description": "can become"
+    "description": "Strategy this one was cloned from (inherits its rules)",
+    "nullable": true
    }
   }
  },
@@ -827,6 +1908,21 @@
    },
    "strategyType": {
     "type": "string",
+    "enum": [
+     "demandBased",
+     "occupancyBased",
+     "availabilityBased",
+     "inventoryBased",
+     "bookingVelocity",
+     "timeToEvent",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "channel",
+     "segment",
+     "location",
+     "hybrid"
+    ],
     "description": "Strategy Type"
    },
    "owner": {
@@ -839,99 +1935,116 @@
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue",
+    "nullable": true
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product",
+    "nullable": true
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event",
+    "nullable": true
    },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
+   "performances": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Performances in scope (one or many)"
    },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
+   "timeslots": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Timeslots in scope; empty for all"
    },
-   "priceCategory": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Category"
+   "priceCategories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Price categories in scope; empty for all"
    },
    "basePriceSource": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Base Price Source"
+    "type": "string",
+    "description": "Board 1 price-list rate ID the strategy moves from; a strategy never holds its own base amount"
    },
    "effectiveFrom": {
     "type": "string",
-    "description": "Effective From"
+    "format": "date-time",
+    "description": "Effective from"
    },
    "effectiveTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date-time",
+    "description": "Effective to; empty for open-ended",
+    "nullable": true
    },
    "evaluationFrequency": {
     "type": "string",
-    "description": "Evaluation Frequency"
+    "enum": [
+     "every15Minutes",
+     "every30Minutes",
+     "hourly",
+     "daily",
+     "onInventoryChange",
+     "onThresholdTrigger"
+    ],
+    "description": "Evaluation frequency; defaults to hourly (decided 29 September, readiness close-out)"
    },
    "status": {
     "type": "string",
-    "description": "Status"
-   },
-   "singleProduct": {
-    "type": "string",
-    "description": "Single Product"
+    "description": "Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired; draft on create"
    },
    "productFamily": {
     "type": "string",
-    "description": "Product Family"
+    "description": "Product family (for scopeType productFamily)",
+    "nullable": true
    },
-   "multiplePerformances": {
+   "scopeType": {
     "type": "string",
-    "description": "Multiple Performances"
+    "enum": [
+     "singleProduct",
+     "productFamily",
+     "event",
+     "multiplePerformances",
+     "venue",
+     "selectedTimeslots",
+     "selectedPriceCategories"
+    ],
+    "description": "Scope Assignment (pack p.77)"
    },
-   "selectedTimeslots": {
+   "combinationMode": {
     "type": "string",
-    "description": "Selected Timeslots"
+    "enum": [
+     "independent",
+     "combinable",
+     "exclusive",
+     "fallback"
+    ],
+    "description": "Strategy Combination: independent, combinable with other strategies, exclusive control, or fallback; defaults to independent (decided 29 September, readiness close-out)"
    },
-   "selectedPriceCategories": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Selected Price Categories"
-   },
-   "operatesIndependently": {
+   "clonedFromStrategyId": {
     "type": "string",
-    "description": "Operates Independently"
-   },
-   "canCombineWithOtherStrategies": {
-    "type": "boolean",
-    "description": "Can Combine with Other Strategies"
-   },
-   "hasExclusiveControl": {
-    "type": "boolean",
-    "description": "Has Exclusive Control"
-   },
-   "actsAsFallback": {
-    "type": "string",
-    "description": "Acts as Fallback"
-   },
-   "canBecome": {
-    "type": "boolean",
-    "description": "can become"
+    "description": "Strategy this one was cloned from (inherits its rules)",
+    "nullable": true
    }
   }
  },
- "DynamicPricingStrategyCommandCenterView": {
+ "DynamicPricingStrategyCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Dynamic Pricing Strategy Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Dynamic Pricing Strategy Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "activeStrategies": {
     "type": "integer",
@@ -942,15 +2055,15 @@
     "description": "Draft Strategies"
    },
    "productsUnderDynamicPricing": {
-    "type": "string",
+    "type": "integer",
     "description": "Products Under Dynamic Pricing"
    },
    "eventsUnderDynamicPricing": {
-    "type": "string",
+    "type": "integer",
     "description": "Events Under Dynamic Pricing"
    },
    "performancesUnderDynamicPricing": {
-    "type": "string",
+    "type": "integer",
     "description": "Performances Under Dynamic Pricing"
    },
    "rulesActive": {
@@ -962,11 +2075,11 @@
     "description": "Current Price Adjustments"
    },
    "pricesAtMaximumGuardrail": {
-    "type": "string",
+    "type": "integer",
     "description": "Prices at Maximum Guardrail"
    },
    "pricesAtMinimumGuardrail": {
-    "type": "string",
+    "type": "integer",
     "description": "Prices at Minimum Guardrail"
    },
    "ruleConflicts": {
@@ -979,8 +2092,23 @@
    },
    "upcomingActivations": {
     "type": "integer",
-    "description": "Upcoming Activations"
+    "description": "Upcoming Activations: strategies scheduled to activate within 7 days (decided 29 September, readiness close-out)"
    },
+   "operationalAlerts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Operational Alerts (pack p.76), e.g. performances at their upper band, strategies with unresolved conflicts, strategies activating within 48 hours"
+   }
+  }
+ },
+ "DynamicPricingStrategyCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Pricing Strategy Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "strategyId": {
     "type": "string",
     "description": "Strategy ID"
@@ -991,109 +2119,384 @@
    },
    "strategyType": {
     "type": "string",
-    "description": "Strategy Type"
+    "enum": [
+     "demandBased",
+     "occupancyBased",
+     "availabilityBased",
+     "inventoryBased",
+     "bookingVelocity",
+     "timeToEvent",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "channel",
+     "segment",
+     "location",
+     "hybrid"
+    ],
+    "description": "Strategy Type (pack pp.75-76)"
    },
    "productEvent": {
     "type": "string",
-    "description": "Product/Event"
+    "description": "Product or event the strategy controls"
    },
    "venue": {
     "type": "string",
     "description": "Venue"
    },
    "basePriceSource": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Base Price Source"
+    "type": "string",
+    "description": "Base price source: the Board 1 price list and rate the strategy moves from, e.g. UAE Standard Admission -> Adult"
    },
    "currentPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current Price"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Current resolved dynamic price (for a single-price scope)",
+    "nullable": true
    },
    "adjustmentRange": {
-    "type": "string",
-    "description": "Adjustment Range"
+    "type": "object",
+    "properties": {
+     "minPercent": {
+      "type": "number",
+      "description": "Lowest adjustment from base, percent"
+     },
+     "maxPercent": {
+      "type": "number",
+      "description": "Highest adjustment from base, percent"
+     }
+    },
+    "description": "Adjustment range allowed by the strategy"
    },
    "ruleCount": {
     "type": "integer",
     "description": "Rule Count"
    },
    "effectivePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Effective Period"
+    "type": "object",
+    "properties": {
+     "from": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Effective from"
+     },
+     "to": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Effective to; empty for open-ended",
+      "nullable": true
+     }
+    },
+    "description": "Effective period"
    },
    "automationMode": {
     "type": "string",
-    "description": "Automation Mode"
+    "enum": [
+     "monitor",
+     "recommend",
+     "prepareChange",
+     "autoExecuteWithinGuardrails"
+    ],
+    "description": "Automation mode from the automation policy (listDynamicPricingAutomation); recommend by default"
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
+    "type": "string",
+    "description": "Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired"
    },
    "owner": {
     "type": "string",
     "description": "Owner"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "demandBased": {
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PriceLadder": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.price_ladder",
+  "description": "**The bands a dynamic price may move between, and how fast** (29 September, data model DM3). ADM-092. A strategy's adjustment lands on a band, never between them.",
+  "required": [
+   "id",
+   "scopePath",
+   "dynamicPricingStrategyId",
+   "adjustmentModel"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Demand Based"
+    "format": "uuid",
+    "readOnly": true
    },
-   "occupancyBased": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "dynamicPricingStrategyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "basePriceSource": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "adjustmentModel": {
+    "type": "string",
+    "enum": [
+     "fixedPriceBands",
+     "percentageBands",
+     "fixedAmountSteps",
+     "derivedBands",
+     "continuousRange"
+    ]
+   },
+   "bands": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "`[{code, price, percent}]`, ascending."
+   },
+   "baseBandCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "stepAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "minimumPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "basePrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "maximumPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "allowUpward": {
+    "type": "boolean",
+    "default": true
+   },
+   "allowDownward": {
+    "type": "boolean",
+    "default": true
+   },
+   "maxIncreasePercentPerAdjustment": {
+    "type": "number",
+    "nullable": true
+   },
+   "maxDecreasePercentPerAdjustment": {
+    "type": "number",
+    "nullable": true
+   },
+   "maximumBandsPerMovement": {
     "type": "integer",
-    "description": "Occupancy Based"
+    "nullable": true,
+    "minimum": 1
    },
-   "availabilityBased": {
+   "minimumMinutesBetweenMovements": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "reversalRule": {
     "type": "string",
-    "description": "Availability Based"
+    "enum": [
+     "allowed",
+     "afterCooldown",
+     "notAllowed"
+    ],
+    "default": "afterCooldown"
    },
-   "inventoryBased": {
-    "type": "string",
-    "description": "Inventory Based"
+   "allowedEndpoints": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Psychological price endings, e.g. `.99`, `.00`."
    },
-   "bookingVelocity": {
-    "type": "string",
-    "description": "Booking Velocity"
-   },
-   "timeToEvent": {
+   "createdAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Time-to-Event"
+    "readOnly": true
    },
-   "seasonal": {
+   "updatedAt": {
     "type": "string",
-    "description": "Seasonal"
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "RulePriorityConflictInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the saved hierarchy and test cases are the rows listRulePriorityConflict reads",
+  "description": "What `setRulePriorityConflict` takes (decided 29 September, readiness close-out; VM close-out for BO-441 Reorder, Validate, Test, Save).",
+  "required": [
+   "mode"
+  ],
+  "properties": {
+   "orderedRuleIds": {
+    "type": "array",
+    "description": "The rules in priority order, highest first. Reorder is this list.",
+    "items": {
+     "type": "string"
+    }
    },
-   "dayOfWeek": {
+   "resolutionMethod": {
     "type": "string",
-    "description": "Day-of-Week"
+    "enum": [
+     "highestPriorityWins",
+     "mostSpecificRuleWins",
+     "cumulativeAdjustment",
+     "maximumAdjustmentWins",
+     "minimumAdjustmentWins",
+     "weightedCombination",
+     "stopProcessing",
+     "customGovernedResolution"
+    ],
+    "default": "highestPriorityWins",
+    "description": "How two applicable rules are resolved; the same vocabulary as `RulePriorityConflictResolutionDynamicPricingTestConsSummary.resolutionMethod`. Never lowest-price-wins by default (decided 29 September, readiness close-out)."
    },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
+   "priorityHierarchy": {
+    "type": "array",
+    "description": "The priority matrix, highest first; defaults to the pack's order.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "commercialProtection",
+      "contractMemberProtection",
+      "eventSpecificStrategy",
+      "inventoryOccupancy",
+      "bookingVelocity",
+      "timeToEvent",
+      "seasonDayTimeslot",
+      "basePrice"
+     ]
+    }
    },
-   "channel": {
+   "mode": {
     "type": "string",
-    "description": "Channel"
+    "enum": [
+     "save",
+     "validate",
+     "test"
+    ],
+    "description": "`validate` checks the order and returns conflicts without saving; `test` runs `testScenario` against the order and saves it as a test case; `save` stores the order and method, refused with `409` while a critical conflict is open."
    },
-   "segment": {
-    "type": "string",
-    "description": "Segment"
+   "testScenario": {
+    "$ref": "#/components/schemas/RulePriorityTestScenario"
+   }
+  }
+ },
+ "RulePriorityConflictResolutionDynamicPricingTestConsSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Rule Priority, Conflict Resolution & Dynamic Pricing Test Console.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "contradictoryRules": {
+    "type": "integer",
+    "description": "Open contradictoryRules conflicts detected across active and draft rules"
    },
-   "location": {
-    "type": "string",
-    "description": "Location"
+   "samePriority": {
+    "type": "integer",
+    "description": "Open samePriority conflicts detected across active and draft rules"
    },
-   "hybrid": {
-    "type": "string",
-    "description": "Hybrid"
+   "impossibleCondition": {
+    "type": "integer",
+    "description": "Open impossibleCondition conflicts detected across active and draft rules"
    },
-   "test": {
-    "type": "string",
-    "description": "Test"
+   "overlappingStrategy": {
+    "type": "integer",
+    "description": "Open overlappingStrategy conflicts detected across active and draft rules"
    },
-   "retire": {
+   "circularDependency": {
+    "type": "integer",
+    "description": "Open circularDependency conflicts detected across active and draft rules"
+   },
+   "missingFallback": {
+    "type": "integer",
+    "description": "Open missingFallback conflicts detected across active and draft rules"
+   },
+   "guardrailConflict": {
+    "type": "integer",
+    "description": "Open guardrailConflict conflicts detected across active and draft rules"
+   },
+   "resolutionMethod": {
     "type": "string",
-    "description": "Retire"
+    "enum": [
+     "highestPriorityWins",
+     "mostSpecificRuleWins",
+     "cumulativeAdjustment",
+     "maximumAdjustmentWins",
+     "minimumAdjustmentWins",
+     "weightedCombination",
+     "stopProcessing",
+     "customGovernedResolution"
+    ],
+    "description": "Resolution Method in force (pack p.89); defaults to highestPriorityWins (decided 29 September, readiness close-out)"
+   },
+   "priorityHierarchy": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "commercialProtection",
+      "contractMemberProtection",
+      "eventSpecificStrategy",
+      "inventoryOccupancy",
+      "bookingVelocity",
+      "timeToEvent",
+      "seasonDayTimeslot",
+      "basePrice"
+     ]
+    },
+    "description": "Priority Matrix, highest first; defaults to the pack's order (decided 29 September, readiness close-out)"
    }
   }
  },
@@ -1103,167 +2506,386 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Rule Priority, Conflict Resolution & Dynamic Pricing Test Console displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "basePriceAed250": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Base Price: AED 250"
-   },
-   "weekend5": {
-    "type": "number",
-    "description": "Weekend → +5%"
-   },
-   "occupancy8710": {
-    "type": "integer",
-    "description": "Occupancy 87% → +10%"
-   },
-   "bookingVelocity305": {
-    "type": "number",
-    "description": "Booking Velocity +30% → +5%"
-   },
-   "t3Days8": {
-    "type": "number",
-    "description": "T−3 Days → +8%"
-   },
-   "highestPriorityWins": {
-    "type": "string",
-    "description": "Highest Priority Wins"
-   },
-   "mostSpecificRuleWins": {
-    "type": "string",
-    "description": "Most Specific Rule Wins"
-   },
-   "cumulativeAdjustment": {
-    "type": "string",
-    "description": "Cumulative Adjustment"
-   },
-   "maximumAdjustmentWins": {
-    "type": "string",
-    "description": "Maximum Adjustment Wins"
-   },
-   "minimumAdjustmentWins": {
-    "type": "string",
-    "description": "Minimum Adjustment Wins"
-   },
-   "weightedCombination": {
-    "type": "string",
-    "description": "Weighted Combination"
-   },
-   "stopProcessing": {
-    "type": "string",
-    "description": "Stop Processing"
-   },
-   "customGovernedResolution": {
-    "type": "string",
-    "description": "Custom Governed Resolution"
-   },
-   "administratorsConfigureRuleHierarchy": {
-    "type": "string",
-    "description": "Administrators configure rule hierarchy"
-   },
-   "contradictoryRules": {
-    "type": "string",
-    "description": "Contradictory Rules"
-   },
-   "samePriority": {
-    "type": "string",
-    "description": "Same Priority"
-   },
-   "impossibleCondition": {
-    "type": "string",
-    "description": "Impossible Condition"
-   },
-   "overlappingStrategy": {
-    "type": "string",
-    "description": "Overlapping Strategy"
-   },
-   "circularDependency": {
-    "type": "string",
-    "description": "Circular Dependency"
-   },
-   "missingFallback": {
-    "type": "string",
-    "description": "Missing Fallback"
-   },
-   "guardrailConflict": {
-    "type": "string",
-    "description": "Guardrail Conflict"
-   },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Test input: product"
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Test input: event",
+    "nullable": true
    },
    "performance": {
     "type": "string",
-    "description": "Performance"
+    "description": "Test input: performance",
+    "nullable": true
    },
    "date": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date"
+    "format": "date",
+    "description": "Test input: visit/event date"
    },
    "timeslot": {
     "type": "string",
-    "description": "Timeslot"
+    "description": "Test input: timeslot",
+    "nullable": true
    },
    "channel": {
-    "type": "string",
-    "description": "Channel"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "description": "Test input: channel"
    },
    "customerSegment": {
     "type": "string",
-    "description": "Customer Segment"
+    "description": "Test input: customer segment"
    },
    "basePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Base Price"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Test input: base price"
    },
    "occupancy": {
-    "type": "integer",
-    "description": "Occupancy"
+    "type": "number",
+    "description": "Test input: occupancy percent"
    },
    "inventory": {
-    "type": "string",
-    "description": "Inventory"
+    "type": "integer",
+    "description": "Test input: remaining inventory"
    },
    "bookingVelocity": {
-    "type": "string",
-    "description": "Booking Velocity"
+    "type": "number",
+    "description": "Test input: booking velocity, percent against expected pace"
    },
    "timeToEvent": {
+    "type": "integer",
+    "description": "Test input: days to event (0 = same day)"
+   },
+   "calculationPath": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Explainability: the complete calculation path, one step per line"
+   },
+   "testCaseId": {
+    "type": "string",
+    "description": "Test case ID"
+   },
+   "caseName": {
+    "type": "string",
+    "description": "Test case name"
+   },
+   "caseType": {
+    "type": "string",
+    "enum": [
+     "lowDemand",
+     "highDemand",
+     "nearSellOut",
+     "earlyBird",
+     "lastMinute",
+     "weekendPeak",
+     "memberPurchase",
+     "b2bContract",
+     "custom"
+    ],
+    "description": "Test case type (pack p.91)"
+   },
+   "rulesMatched": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "ruleId": {
+       "type": "string",
+       "description": "Rule"
+      },
+      "ruleName": {
+       "type": "string",
+       "description": "Rule name"
+      },
+      "priorityLevel": {
+       "type": "string",
+       "enum": [
+        "commercialProtection",
+        "contractMemberProtection",
+        "eventSpecificStrategy",
+        "inventoryOccupancy",
+        "bookingVelocity",
+        "timeToEvent",
+        "seasonDayTimeslot",
+        "basePrice"
+       ],
+       "description": "Hierarchy level"
+      },
+      "adjustmentPercent": {
+       "type": "number",
+       "description": "Adjustment in percent",
+       "nullable": true
+      },
+      "applied": {
+       "type": "boolean",
+       "description": "Applied after resolution"
+      }
+     },
+     "description": "One matched rule"
+    },
+    "description": "Rules matched"
+   },
+   "rawCalculatedPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Raw calculated price"
+   },
+   "ladderPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Nearest allowed band"
+   },
+   "guardrailOutcome": {
+    "type": "string",
+    "enum": [
+     "passed",
+     "cappedAtMaximum",
+     "raisedToMinimum",
+     "protectedRateApplied"
+    ],
+    "description": "Guardrail result"
+   },
+   "finalPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Final dynamic price"
+   },
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "contradictoryRules",
+        "samePriority",
+        "impossibleCondition",
+        "overlappingStrategy",
+        "circularDependency",
+        "missingFallback",
+        "guardrailConflict"
+       ],
+       "description": "Conflict type (pack p.90)"
+      },
+      "message": {
+       "type": "string",
+       "description": "Message"
+      },
+      "ruleIds": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       },
+       "description": "Rules involved"
+      }
+     },
+     "description": "One conflict"
+    },
+    "description": "Conflicts met while resolving this case"
+   },
+   "lastRunAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Time-to-Event"
+    "description": "Last run"
    },
-   "occupancy10": {
-    "type": "integer",
-    "description": "Occupancy +10%"
+   "passed": {
+    "type": "boolean",
+    "description": "Final price matched the expected price saved with the case",
+    "nullable": true
    },
-   "velocity5": {
+   "expectedPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Expected final price for regression",
+    "nullable": true
+   }
+  }
+ },
+ "RulePriorityConflictView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over the saved priority order and test cases",
+  "description": "What `setRulePriorityConflict` returns: the order in force, the conflicts it has and, in `test` mode, the result.",
+  "properties": {
+   "mode": {
+    "type": "string",
+    "enum": [
+     "save",
+     "validate",
+     "test"
+    ]
+   },
+   "saved": {
+    "type": "boolean"
+   },
+   "orderedRuleIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "resolutionMethod": {
+    "type": "string"
+   },
+   "priorityHierarchy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "contradictoryRules",
+        "samePriority",
+        "impossibleCondition",
+        "overlappingStrategy",
+        "circularDependency",
+        "missingFallback",
+        "guardrailConflict"
+       ]
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "critical",
+        "warning"
+       ]
+      },
+      "ruleIds": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "testResult": {
+    "nullable": true,
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/RulePriorityConflictResolutionDynamicPricingTestConsView"
+     }
+    ],
+    "description": "The saved test case with its deterministic result, in `test` mode."
+   },
+   "savedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RulePriorityTestScenario": {
+  "type": "object",
+  "description": "A sample booking for the conflict test console (pack p.90), the same inputs as a saved test case.",
+  "properties": {
+   "caseName": {
+    "type": "string",
+    "maxLength": 120
+   },
+   "caseType": {
+    "type": "string",
+    "enum": [
+     "lowDemand",
+     "highDemand",
+     "nearSellOut",
+     "earlyBird",
+     "lastMinute",
+     "weekendPeak",
+     "memberPurchase",
+     "b2bContract",
+     "custom"
+    ]
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "date": {
+    "type": "string",
+    "format": "date"
+   },
+   "timeslot": {
+    "type": "string",
+    "nullable": true
+   },
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+   },
+   "customerSegment": {
+    "type": "string",
+    "nullable": true
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "occupancy": {
     "type": "number",
-    "description": "Velocity +5%"
+    "minimum": 0,
+    "maximum": 100
    },
-   "whyAed300": {
-    "type": "string",
-    "description": "Why AED 300?"
+   "inventory": {
+    "type": "integer",
+    "minimum": 0
    },
-   "withTheCompleteCalculationPath": {
-    "type": "string",
-    "description": "with the complete calculation path"
+   "bookingVelocity": {
+    "type": "number"
    },
-   "lowDemand": {
-    "type": "string",
-    "description": "Low Demand"
+   "timeToEvent": {
+    "type": "integer",
+    "minimum": 0
    },
-   "highDemand": {
-    "type": "string",
-    "description": "High Demand"
-   },
-   "nearSellOut": {
-    "type": "string",
-    "description": "Near Sell-Out"
+   "expectedPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
    }
   }
  },
@@ -1275,94 +2897,139 @@
   "properties": {
    "season": {
     "type": "string",
-    "description": "Season"
+    "description": "Season name (e.g. Low Season, Peak Season)",
+    "nullable": true
    },
    "month": {
-    "type": "string",
-    "description": "Month"
+    "type": "integer",
+    "description": "Month 1-12",
+    "nullable": true
    },
    "week": {
-    "type": "string",
-    "description": "Week"
+    "type": "integer",
+    "description": "ISO week 1-53",
+    "nullable": true
    },
    "dateRange": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date Range"
+    "type": "object",
+    "properties": {
+     "from": {
+      "type": "string",
+      "format": "date",
+      "description": "From"
+     },
+     "to": {
+      "type": "string",
+      "format": "date",
+      "description": "To"
+     }
+    },
+    "description": "Date range",
+    "nullable": true
    },
-   "publicHoliday": {
-    "type": "string",
-    "description": "Public Holiday"
-   },
-   "schoolHoliday": {
-    "type": "string",
-    "description": "School Holiday"
-   },
-   "dayOfWeek": {
-    "type": "string",
-    "description": "Day of Week"
-   },
-   "weekend": {
-    "type": "string",
-    "description": "Weekend"
+   "daysOfWeek": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday"
+     ]
+    },
+    "description": "Days of week; saturday+sunday for weekend"
    },
    "timeOfDay": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time of Day"
+    "type": "object",
+    "properties": {
+     "from": {
+      "type": "string",
+      "description": "From, HH:mm"
+     },
+     "to": {
+      "type": "string",
+      "description": "To, HH:mm"
+     }
+    },
+    "description": "Time-of-day window",
+    "nullable": true
    },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
+   "timeslotIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Timeslot IDs"
    },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
+   "performanceIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Performance IDs"
    },
-   "specialDate": {
+   "specialCalendarEntry": {
     "type": "string",
-    "format": "date-time",
-    "description": "Special Date"
+    "description": "Special-calendar entry (public/school holiday, Ramadan, Eid, custom), maintained as tenant data",
+    "nullable": true
    },
-   "base20": {
+   "ruleId": {
+    "type": "string",
+    "description": "Rule ID"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "Rule name"
+   },
+   "strategyId": {
+    "type": "string",
+    "description": "Strategy the rule belongs to"
+   },
+   "dimension": {
+    "type": "string",
+    "enum": [
+     "season",
+     "month",
+     "week",
+     "dateRange",
+     "publicHoliday",
+     "schoolHoliday",
+     "dayOfWeek",
+     "weekend",
+     "timeOfDay",
+     "timeslot",
+     "performance",
+     "specialDate"
+    ],
+    "description": "Supported Dimension (pack p.81)"
+   },
+   "dynamicRangeMinPercent": {
     "type": "number",
-    "description": "Base → +20%"
+    "description": "Dynamic range low end in percent of base, e.g. -15"
    },
-   "baseTo15": {
+   "dynamicRangeMaxPercent": {
     "type": "number",
-    "description": "Base to +15%"
+    "description": "Dynamic range high end in percent of base, e.g. +20"
    },
-   "baseTo20": {
-    "type": "number",
-    "description": "Base to +20%"
-   },
-   "ramadan": {
+   "assignedStrategyId": {
     "type": "string",
-    "description": "Ramadan"
+    "description": "Strategy applied in this window (Timeslot Rules: 09:00-12:00 -> Off-Peak Strategy)",
+    "nullable": true
    },
-   "eid": {
-    "type": "string",
-    "description": "Eid"
+   "overlapsWith": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Rule IDs this rule overlaps (Overlap Detection)"
    },
-   "christmas": {
-    "type": "string",
-    "description": "Christmas"
-   },
-   "newYear": {
-    "type": "integer",
-    "description": "New Year"
-   },
-   "schoolBreak": {
-    "type": "string",
-    "description": "School Break"
-   },
-   "nationalDay": {
-    "type": "string",
-    "description": "National Day"
-   },
-   "customCommercialCalendar": {
-    "type": "string",
-    "description": "Custom Commercial Calendar"
+   "enabled": {
+    "type": "boolean",
+    "description": "Enabled"
    }
   }
  }

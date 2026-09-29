@@ -227,6 +227,25 @@
   "requestBody": "CreateReportScheduleRequest",
   "responds": "ReportSchedule"
  },
+ "createVendorServiceRequest": {
+  "method": "POST",
+  "path": "/vendor-service-requests",
+  "contract": "maintenance",
+  "summary": "Engage an outside vendor on a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VendorServiceRequest",
+  "responds": "VendorServiceRequest"
+ },
  "createWebhookSubscription": {
   "method": "POST",
   "path": "/webhook-subscriptions",
@@ -464,6 +483,16 @@
     "name": "compareTo",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -479,6 +508,16 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "workstation",
   "parameters": [
+   {
+    "name": "sinceVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "validFrom",
     "in": "query",
@@ -643,7 +682,7 @@
   "summary": "Give the device an identity it can prove",
   "permission": "DEVICE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1229,6 +1268,45 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listVendorServiceRequests": {
+  "method": "GET",
+  "path": "/vendor-service-requests",
+  "contract": "maintenance",
+  "summary": "Requests sent to outside vendors",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workOrderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "supplierId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWebhookDeliveries": {
   "method": "GET",
   "path": "/webhook-subscriptions/{subscriptionId}/deliveries",
@@ -1293,6 +1371,21 @@
    },
    {
     "name": "overdueOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
     "in": "query",
     "required": null
    },
@@ -1527,7 +1620,7 @@
   "summary": "Cut a device off now",
   "permission": "DEVICE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1601,6 +1694,30 @@
   "requestBody": "AccessPointGeofence",
   "responds": "AccessPoint"
  },
+ "setDeliveryLocationOutletMapping": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/delivery-location-outlets",
+  "contract": "fnb",
+  "summary": "Set which outlets deliver to which delivery locations",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeliveryLocation"
+ },
  "setFnbDeliveryPolicy": {
   "method": "PUT",
   "path": "/fnb-delivery-policy",
@@ -1611,6 +1728,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -1672,6 +1794,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1714,6 +1841,30 @@
   ],
   "requestBody": null,
   "responds": "CorrectiveAction"
+ },
+ "suggestWorkOrderAssignee": {
+  "method": "GET",
+  "path": "/work-orders/{workOrderId}/assignee-suggestions",
+  "contract": "maintenance",
+  "summary": "Who should take this work order, ranked",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "syncScans": {
   "method": "POST",
@@ -1809,6 +1960,25 @@
   ],
   "requestBody": "CreateReportRequest",
   "responds": "ReportDefinition"
+ },
+ "updateVendorServiceRequest": {
+  "method": "PATCH",
+  "path": "/vendor-service-requests/{vendorServiceRequestId}",
+  "contract": "maintenance",
+  "summary": "Move a vendor request along",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VendorServiceRequest"
  },
  "updateWorkOrder": {
   "method": "PATCH",

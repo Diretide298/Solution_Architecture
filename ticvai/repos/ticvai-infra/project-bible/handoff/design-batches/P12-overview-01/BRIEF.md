@@ -1,6 +1,6 @@
 # P12-overview-01 — P12 · Overview
 
-**2 screens · 18 operations · 24 schemas · 4 permissions**
+**2 screens · 18 operations · 31 schemas · 4 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 4 permissions apply here:
   `CASE_MANAGE, CASE_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: addCaseMessage, createCase
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,5 +60,5 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SUP-002` | Agent Dashboard | listDetail | 9 | 0 | — |
-| `SUP-008` | Agent Performance & SLA View | listDetail | 10 | 1 | — |
+| `SUP-002` | Agent Dashboard | listDetail | 9 | 6 | — |
+| `SUP-008` | Agent Performance & SLA View | listDetail | 10 | 6 | — |

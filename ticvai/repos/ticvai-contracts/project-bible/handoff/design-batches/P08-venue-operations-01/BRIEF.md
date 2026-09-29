@@ -1,6 +1,6 @@
 # P08-venue-operations-01 — P08 · Venue Operations (1 of 2)
 
-**10 screens · 80 operations · 82 schemas · 33 permissions**
+**10 screens · 85 operations · 117 schemas · 33 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -61,12 +61,12 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-036` | Device Registry | listDetail | 12 | 4 | — |
-| `BO-044` | F&B Outlets | listDetail | 20 | 8 | — |
+| `BO-044` | F&B Outlets | listDetail | 21 | 8 | — |
 | `BO-058` | Reporting Home | listDetail | 11 | 7 | — |
 | `BO-060` | Attendance & Footfall | listDetail | 16 | 10 | — |
 | `BO-064` | Zones & Areas | listDetail | 10 | 6 | — |
 | `BO-067` | Integrations | commandCentre | 5 | 2 | — |
-| `BO-070` | Work Orders | listDetail | 9 | 7 | — |
+| `BO-070` | Work Orders | listDetail | 13 | 7 | — |
 | `BO-100` | Venue Home | listDetail | 3 | 0 | — |
 | `BO-108` | Venue Operations | listDetail | 5 | 0 | — |
 | `BO-128` | Live Workstation Health Monitor | listDetail | 3 | 1 | — |

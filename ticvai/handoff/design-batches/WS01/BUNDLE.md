@@ -1355,6 +1355,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "fields",
      "components": [
       {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "listOperatingCalendarSpecial",
+       "notes": "Operating days and special access days on the month view. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
+      {
        "kind": "selectField",
        "label": "normal operating days",
        "provenance": "pack Access Control Module_Reference.pdf, page 13 §Configure"

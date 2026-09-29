@@ -89,6 +89,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "ContentPage",
@@ -169,6 +174,25 @@
   ],
   "requestBody": null,
   "responds": "UploadTicket"
+ },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
  },
  "deleteBanner": {
   "method": "DELETE",
@@ -401,6 +425,19 @@
   "requestBody": null,
   "responds": "ModuleEnablement"
  },
+ "getNavigation": {
+  "method": "GET",
+  "path": "/tenant-config/navigation",
+  "contract": "white-label",
+  "summary": "Read navigation",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "NavigationConfig"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",
@@ -598,6 +635,25 @@
   "requestBody": null,
   "responds": "PromoBlock"
  },
+ "proposeMarketingContent": {
+  "method": "POST",
+  "path": "/ai/content-drafts",
+  "contract": "ai",
+  "summary": "Draft marketing content for a person to edit and apply",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "publishTenantConfig": {
   "method": "POST",
   "path": "/tenant-config/publish",
@@ -714,6 +770,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "semanticSearch": {
+  "method": "POST",
+  "path": "/search",
+  "contract": "ai",
+  "summary": "Search meaning, not words",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SearchResult"
+ },
  "setAppIcons": {
   "method": "PUT",
   "path": "/tenant-config/app-icons",
@@ -785,6 +860,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "FontConfig",
@@ -823,6 +903,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "HeaderConfig",
@@ -838,6 +923,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -880,6 +970,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -918,6 +1013,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "NavigationConfig",
@@ -933,6 +1033,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -1009,6 +1114,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

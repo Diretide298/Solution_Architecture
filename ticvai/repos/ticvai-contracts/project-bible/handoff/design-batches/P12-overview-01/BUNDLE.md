@@ -1,6 +1,6 @@
 # P12-overview-01 — P12 · Overview
 
-**2 screens · 18 operations · 24 schemas · 4 permissions**
+**2 screens · 18 operations · 31 schemas · 4 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 4 permissions apply here:
   `CASE_MANAGE, CASE_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: addCaseMessage, createCase
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,8 +60,8 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SUP-002` | Agent Dashboard | listDetail | 9 | 0 | — |
-| `SUP-008` | Agent Performance & SLA View | listDetail | 10 | 1 | — |
+| `SUP-002` | Agent Dashboard | listDetail | 9 | 6 | — |
+| `SUP-008` | Agent Performance & SLA View | listDetail | 10 | 6 | — |
 
 ---
 
@@ -99,10 +98,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-002 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     },
     {
      "to": "SUP-004",
@@ -111,7 +107,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "caseId",
       "conversationId"
      ],
-     "provenance": "derived — SUP-004 declares entryState.params caseId, conversationId, so an edge into it must carry them"
+     "provenance": "derived — SUP-004 declares entryState.params caseId, conversationId and SUP-002 holds caseId, conversationId, so an edge into it carries them"
     }
    ]
   },
@@ -123,13 +119,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
   "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
-  "gaps": [
-   {
-    "operation": "listConversations",
-    "why": "**1 declared operation reach no component on this screen**: listConversations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -138,8 +127,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listCases",
+       "notes": "Sends `?status=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Assigned to principal id",
+       "operation": "listCases",
+       "notes": "Sends `?assignedToPrincipalId=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "toggle",
+       "label": "Breached sla",
+       "operation": "listCases",
+       "notes": "Sends `?breachedSla=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Priority",
+       "operation": "listCases",
+       "notes": "Sends `?priority=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every agent",
+       "label": "Every case",
        "bindsTo": "Case",
        "columns": [
         "Case.id",
@@ -157,6 +174,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listCases",
        "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every conversation",
+       "bindsTo": "Conversation",
+       "columns": [
+        "Conversation.id",
+        "Conversation.telephony",
+        "Conversation.assistSessionId",
+        "Conversation.channel",
+        "Conversation.state",
+        "Conversation.subjectId",
+        "Conversation.venueId",
+        "Conversation.assignedPrincipalId",
+        "Conversation.queueId",
+        "Conversation.queuePosition",
+        "Conversation.estimatedWaitSeconds",
+        "Conversation.handoverReason"
+       ],
+       "operation": "listConversations",
+       "provenance": "contract marketing-crm.yaml GET /conversations"
       }
      ]
     },
@@ -166,7 +204,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected agent",
+       "label": "The selected case",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.kind",
+        "Case.channel",
+        "Case.recordedAt",
+        "Case.syncedAt",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority",
+        "Case.assignedToPrincipalId",
+        "Case.venueId",
+        "Case.relatedOrderId",
+        "Case.slaDueAt"
+       ],
+       "operation": "listCases",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The case",
        "bindsTo": "CaseDetail",
        "columns": [
         "CaseDetail.id",
@@ -174,17 +237,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "CaseDetail.subjectId",
         "CaseDetail.guestName",
         "CaseDetail.subject",
+        "CaseDetail.kind",
+        "CaseDetail.channel",
+        "CaseDetail.recordedAt",
+        "CaseDetail.syncedAt",
         "CaseDetail.categoryId",
         "CaseDetail.status",
         "CaseDetail.priority",
         "CaseDetail.assignedToPrincipalId",
         "CaseDetail.venueId",
         "CaseDetail.relatedOrderId",
-        "CaseDetail.slaDueAt",
-        "CaseDetail.isSlaBreached",
-        "CaseDetail.slaPausedSeconds",
-        "CaseDetail.escalationCount",
-        "CaseDetail.resolvedAt"
+        "CaseDetail.slaDueAt"
        ],
        "operation": "getCase",
        "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
@@ -197,37 +260,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add case message",
        "operation": "addCaseMessage",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create case",
        "operation": "createCase",
        "provenance": "contract marketing-crm.yaml POST /cases"
       },
       {
        "kind": "secondaryButton",
-       "label": "Escalate",
+       "label": "Escalate case",
        "operation": "escalateCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reopen",
+       "label": "Reopen case",
        "operation": "reopenCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save case",
        "operation": "updateCase",
        "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save agent availability",
        "operation": "setAgentAvailability",
        "provenance": "contract marketing-crm.yaml PUT /agent-availability"
       }
@@ -238,9 +301,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The agent list.",
    "error": "Could not load. Names which read failed and leaves the agent untouched.",
-   "emptyFirstRun": "No agent yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the agent are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No agent yet. Offers Add case message (`addCaseMessage`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the agent are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -280,7 +343,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getCase",
     "contract": "marketing-crm",
     "purpose": "Read a case with its thread",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "reopenCase",
@@ -325,20 +388,150 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `caseId`.",
    "preloaded": [
-    "CaseDetail.id",
-    "CaseDetail.caseNumber",
-    "CaseDetail.subjectId",
-    "CaseDetail.guestName",
-    "CaseDetail.subject"
+    "Case.id",
+    "Case.caseNumber",
+    "Case.subjectId",
+    "Case.guestName",
+    "Case.subject"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P12 Venue Support.dc.html#sup-002",
+   "derivedFrom": "wireframes/reference/Dashboards Board.dc.html",
    "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCaseMessage",
+    "component": "modal",
+    "trigger": "Add case message",
+    "body": "**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`, `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add case message",
+     "operation": "addCaseMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "body",
+      "isInternal",
+      "recordedAt",
+      "channel",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
+   },
+   {
+    "id": "formCreateCase",
+    "component": "modal",
+    "trigger": "Create case",
+    "body": "**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCaseRequest",
+    "confirm": {
+     "label": "Create case",
+     "operation": "createCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subject",
+      "description",
+      "channel",
+      "recordedAt",
+      "subjectId",
+      "categoryId",
+      "priority",
+      "kind",
+      "venueId",
+      "relatedOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases"
+   },
+   {
+    "id": "formEscalateCase",
+    "component": "modal",
+    "trigger": "Escalate case",
+    "body": "**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`, `newPriority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Escalate case",
+     "operation": "escalateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "assignToPrincipalId",
+      "newPriority"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
+   },
+   {
+    "id": "formReopenCase",
+    "component": "modal",
+    "trigger": "Reopen case",
+    "body": "**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reopen case",
+     "operation": "reopenCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
+   },
+   {
+    "id": "formUpdateCase",
+    "component": "modal",
+    "trigger": "Save case",
+    "body": "**Collects what `updateCase` sends before it is called.** Nothing in the body is required. Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save case",
+     "operation": "updateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "priority",
+      "assignedToPrincipalId",
+      "categoryId",
+      "resolutionNote"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
+   },
+   {
+    "id": "formSetAgentAvailability",
+    "component": "modal",
+    "trigger": "Save agent availability",
+    "body": "**Collects what `setAgentAvailability` sends before it is called.** Required: `state`. Optional: `maxConcurrent`, `queueIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save agent availability",
+     "operation": "setAgentAvailability"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "state",
+      "maxConcurrent",
+      "queueIds"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PUT /agent-availability"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -389,10 +582,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-008 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     },
     {
      "to": "SUP-002",
@@ -400,7 +590,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "caseId"
      ],
-     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+     "provenance": "derived — SUP-002 declares entryState.params caseId and SUP-008 holds caseId, so an edge into it carries them"
     }
    ]
   },
@@ -409,13 +599,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listReports` reads the population and `getFinancialReport` reads one of them — list, select, act",
   "purpose": "Produce agent performance & sla view for this venue.",
-  "gaps": [
-   {
-    "operation": "getReport",
-    "why": "**2 declared operations reach no component on this screen**: getReport, listConversations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -424,8 +607,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Category",
+       "operation": "listReports",
+       "notes": "Sends `?category=` to `listReports`.",
+       "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listReports",
+       "notes": "Sends `?search=` to `listReports`.",
+       "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every agent performance sla",
+       "label": "Every report definition",
        "bindsTo": "ReportDefinition",
        "columns": [
         "ReportDefinition.name",
@@ -443,6 +640,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listReports",
        "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every conversation",
+       "bindsTo": "Conversation",
+       "columns": [
+        "Conversation.id",
+        "Conversation.telephony",
+        "Conversation.assistSessionId",
+        "Conversation.channel",
+        "Conversation.state",
+        "Conversation.subjectId",
+        "Conversation.venueId",
+        "Conversation.assignedPrincipalId",
+        "Conversation.queueId",
+        "Conversation.queuePosition",
+        "Conversation.estimatedWaitSeconds",
+        "Conversation.handoverReason"
+       ],
+       "operation": "listConversations",
+       "provenance": "contract marketing-crm.yaml GET /conversations"
       }
      ]
     },
@@ -452,7 +670,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected agent performance sla",
+       "label": "The selected report definition",
+       "bindsTo": "ReportDefinition",
+       "columns": [
+        "ReportDefinition.name",
+        "ReportDefinition.description",
+        "ReportDefinition.category",
+        "ReportDefinition.dataSource",
+        "ReportDefinition.columns",
+        "ReportDefinition.filters",
+        "ReportDefinition.groupBy",
+        "ReportDefinition.parameters",
+        "ReportDefinition.requiredPermission",
+        "ReportDefinition.maxDateRangeDays",
+        "ReportDefinition.id",
+        "ReportDefinition.isSystem",
+        "ReportDefinition.isRetired",
+        "ReportDefinition.estimatedCost",
+        "ReportDefinition.createdByPrincipalId",
+        "ReportDefinition.lastRunAt"
+       ],
+       "operation": "getReport",
+       "provenance": "contract reporting.yaml GET /reports/{reportId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The financial report",
        "bindsTo": "FinancialReport",
        "columns": [
         "FinancialReport.report",
@@ -474,37 +717,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Ask",
+       "label": "Ask reporting question",
        "operation": "askReportingQuestion",
        "provenance": "contract reporting.yaml POST /reports/ask"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create report",
        "operation": "createReport",
        "provenance": "contract reporting.yaml POST /reports"
       },
       {
        "kind": "destructiveButton",
-       "label": "Delete",
+       "label": "Delete report",
        "operation": "deleteReport",
        "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save",
+       "label": "Save natural language query",
        "operation": "saveNaturalLanguageQuery",
        "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save report",
        "operation": "updateReport",
        "provenance": "contract reporting.yaml PUT /reports/{reportId}"
       }
@@ -516,24 +759,137 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmDeleteReport",
     "component": "confirmDialog",
-    "trigger": "Delete",
+    "trigger": "Delete report",
     "body": "**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than the verb. A agent performance sla this affects should be identified in the dialog, not just counted.",
     "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formAskReportingQuestion",
+    "component": "modal",
+    "trigger": "Ask reporting question",
+    "body": "**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional: `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ask reporting question",
+     "operation": "askReportingQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "question",
+      "conversationId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask"
+   },
+   {
+    "id": "formCreateReport",
+    "component": "modal",
+    "trigger": "Create report",
+    "body": "**Collects what `createReport` sends before it is called.** Required: `name`, `category`, `dataSource`, `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReportRequest",
+    "confirm": {
+     "label": "Create report",
+     "operation": "createReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category",
+      "dataSource",
+      "columns",
+      "requiredPermission",
+      "description",
+      "filters",
+      "groupBy",
+      "parameters",
+      "maxDateRangeDays"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports"
+   },
+   {
+    "id": "formSaveNaturalLanguageQuery",
+    "component": "modal",
+    "trigger": "Save natural language query",
+    "body": "**Collects what `saveNaturalLanguageQuery` sends before it is called.** Required: `name`. Optional: `category`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save natural language query",
+     "operation": "saveNaturalLanguageQuery"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
+   },
+   {
+    "id": "formUpdateReport",
+    "component": "modal",
+    "trigger": "Save report",
+    "body": "**Collects what `updateReport` sends before it is called.** Required: `name`, `category`, `dataSource`, `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReportRequest",
+    "confirm": {
+     "label": "Save report",
+     "operation": "updateReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category",
+      "dataSource",
+      "columns",
+      "requiredPermission",
+      "description",
+      "filters",
+      "groupBy",
+      "parameters",
+      "maxDateRangeDays"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /reports/{reportId}"
    }
   ],
   "states": {
    "loading": "The agent performance sla list.",
    "error": "Could not load. Names which read failed and leaves the agent performance sla untouched.",
-   "emptyFirstRun": "No agent performance sla yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the agent performance sla are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No agent performance sla yet. Offers Create report (`createReport`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on category, search and the agent performance sla are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "runReport",
     "contract": "reporting",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "askReportingQuestion",
@@ -572,7 +928,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getReport",
     "contract": "reporting",
     "purpose": "Read a report definition",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listReports",
@@ -618,11 +974,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
    "preloaded": [
-    "FinancialReport.report",
-    "FinancialReport.fiscalPeriodId",
-    "FinancialReport.legalEntityId",
-    "FinancialReport.currency",
-    "FinancialReport.currencyScale"
+    "ReportDefinition.name",
+    "ReportDefinition.description",
+    "ReportDefinition.category",
+    "ReportDefinition.dataSource",
+    "ReportDefinition.columns"
    ]
   },
   "wireframe": {
@@ -794,7 +1150,7 @@ Method, path, parameters, request and response for every operation these screens
   "method": "GET",
   "path": "/reports/financial",
   "contract": "finance",
-  "summary": "P&L, balance sheet or cash flow",
+  "summary": "Financial statements, revenue and tax summaries",
   "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -873,6 +1229,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "membershipId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -915,10 +1276,15 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "Conversation"
+  "responds": "Page"
  },
  "listReports": {
   "method": "GET",
@@ -971,7 +1337,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Case"
  },
  "runReport": {
   "method": "POST",
@@ -1028,7 +1394,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "AgentAvailability"
  },
  "updateCase": {
   "method": "PATCH",
@@ -1077,8 +1443,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AgentAvailability": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.agent_availability",
+  "required": [
+   "principalId",
+   "state"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The caller."
+   },
+   "state": {
+    "type": "string",
+    "enum": [
+     "available",
+     "busy",
+     "away",
+     "offline"
+    ]
+   },
+   "maxConcurrent": {
+    "type": "integer",
+    "nullable": true
+   },
+   "queueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When this state lapses on its own — **availability expires** rather than persisting through a closed laptop."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "Case": {
   "x-ticvai-persistence": "marketing.case",
+  "x-ticvai-retired-columns": [
+   "guest_name",
+   "subject",
+   "is_sla_breached"
+  ],
   "type": "object",
   "required": [
    "id",
@@ -1090,10 +1514,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID."
    },
    "caseNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"
    },
    "subjectId": {
     "type": "string",
@@ -1102,15 +1530,60 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "guestName": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"
    },
    "subject": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-column": "title",
+    "description": "**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CaseKind"
+     }
+    ],
+    "nullable": true,
+    "description": "What the guest said it was about, where the guest raised it."
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the case was raised — the start of the SLA clock."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the case arrived. Equal to `recordedAt` for a case raised online."
    },
    "categoryId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"
+   },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"
    },
    "status": {
     "$ref": "#/components/schemas/CaseStatus"
@@ -1138,7 +1611,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    },
    "isSlaBreached": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"
    },
    "slaPausedSeconds": {
     "type": "integer",
@@ -1184,6 +1660,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "CaseKind": {
+  "type": "string",
+  "description": "**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n",
+  "enum": [
+   "lostProperty",
+   "complaint",
+   "question",
+   "accessibility",
+   "refundRequest",
+   "other"
+  ]
+ },
  "CaseMessage": {
   "x-ticvai-persistence": "marketing.case_message",
   "type": "object",
@@ -1195,6 +1683,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "recordedAt"
   ],
   "properties": {
+   "resolution": {
+    "type": "string",
+    "description": "**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"
+   },
    "id": {
     "type": "string"
    },
@@ -1229,7 +1721,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "recordedAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "Device time — `addCaseMessage` is offline-capable."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the message arrived."
    }
   }
  },
@@ -1342,12 +1841,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "queuePosition": {
     "type": "integer",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). Null once claimed."
    },
    "estimatedWaitSeconds": {
     "type": "integer",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). Null once claimed."
    },
    "handoverReason": {
     "type": "string",
@@ -1439,7 +1942,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "ConversationMessage": {
   "type": "object",
-  "x-ticvai-persistence": "marketing.conversation_message",
+  "x-ticvai-persistence": "marketing.conversation_message + marketing.conversation_message_attachment",
   "required": [
    "id",
    "sender",
@@ -1553,6 +2056,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. Must belong to `subjectId` when both are given (422). (decided 29 September, coordinator decision DM4, writers pass)"
+   },
    "priority": {
     "allOf": [
      {
@@ -1560,6 +2069,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     ],
     "default": "normal"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CaseKind"
    },
    "channel": {
     "$ref": "#/components/schemas/MessageChannel"
@@ -1573,13 +2085,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "attachmentRefs": {
     "type": "array",
+    "description": "Stored on the opening `CaseMessage`, not on the case.",
     "items": {
      "type": "string"
     }
    },
    "recordedAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "Device time the case was raised. The server stamps `Case.syncedAt` on arrival."
    }
   }
  },
@@ -1634,19 +2148,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "requiredPermission": {
-    "type": "string",
-    "description": "Permission needed to run this report. **The author cannot assign one they do not hold** — otherwise a venue user could build themselves a tenant-wide view.\n"
+    "$ref": "../shared/permissions.yaml#/components/schemas/Permission",
+    "description": "Permission needed to run this report, from the shared `Permission` vocabulary. **The author cannot assign one they do not hold** — otherwise a venue user could build themselves a tenant-wide view.\n"
    },
    "maxDateRangeDays": {
     "type": "integer",
     "nullable": true,
-    "description": "Guards against a query spanning years of scan events."
+    "minimum": 1,
+    "default": 366,
+    "description": "Guards against a query spanning years of scan events. **When a report sets none, 366 days applies (decided 28 September, audit R158)**, so `runReport`'s date-range 400 always has a limit."
    }
   }
  },
  "DataSource": {
   "type": "string",
-  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n",
+  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n\n**`forecastPoints` added 29 September** (8.2.55, build pass, group G2): the points of published AI forecast versions; see `x-ticvai-forecast-points`.\n\n**Three accreditation sources added 29 September** (12.1.50, build pass): `accreditationApplications`, `accreditationHolders` and `accreditationCredentials`, over `accreditation.application`, `accreditation.holder` and `accreditation.credential`. They are what the accreditation KPIs and any accreditation report or export (`exportReportResult`, csv or xlsx) are built over. **All three name a person**, and `REPORT_EXPORT_PII` gates them as it gates `guests`.\n",
   "enum": [
    "orders",
    "orderLines",
@@ -1681,8 +2197,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "forms",
    "challenges",
    "wallets",
-   "resaleListings"
-  ]
+   "resaleListings",
+   "accreditationApplications",
+   "accreditationHolders",
+   "accreditationCredentials",
+   "forecastPoints"
+  ],
+  "x-ticvai-forecast-points": "**`forecastPoints` added 29 September (build pass, group G2; 8.2.55)**: one row per forecast point (`ai.forecast_point`) of a **published** forecast version (`ai.forecast_version` status `published`), with the definition it belongs to (`ai.forecast_definition`: subject, grain, unit), the period, the dimension key and the p10, p50 and p90 values. Draft, awaiting-approval and superseded versions are not reachable, and scenario points (`scenarioId` set) only with the scenario named as a filter: **a forecast leaves the platform as the one somebody published**. It is how a forecast is exported (`runReport` then `exportReportResult`, csv or xlsx), scheduled or put on a dashboard. Names no person, so `REPORT_EXPORT` is enough. Read from the reporting replica of the AI log database (design 2.4), never from the model service.\n"
  },
  "FieldType": {
   "type": "string",
@@ -1710,7 +2231,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "report": {
-    "type": "string"
+    "$ref": "#/components/schemas/FinancialReportKind"
    },
    "fiscalPeriodId": {
     "type": "string",
@@ -1761,7 +2282,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
           "$ref": "../shared/common.yaml#/components/schemas/Money"
          },
          "priorPeriodAmount": {
-          "$ref": "../shared/common.yaml#/components/schemas/Money"
+          "allOf": [
+           {
+            "$ref": "../shared/common.yaml#/components/schemas/Money"
+           }
+          ],
+          "description": "The same line for **the same period last year** (decided 28 September, audit R127 (3)). Absent where that period did not exist."
          }
         }
        }
@@ -1771,6 +2297,51 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "FinancialReportKind": {
+  "type": "string",
+  "description": "The report `getFinancialReport` returns. One vocabulary for the query and the response.",
+  "enum": [
+   "profitAndLoss",
+   "balanceSheet",
+   "cashFlow",
+   "revenueByVenue",
+   "revenueByProduct",
+   "taxSummary"
+  ]
+ },
+ "GeneratedQuery": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "The structured query a natural-language question produced — data source, columns, filters, grouping. Named on 26 September so the answer and the kept copy are one shape.\n",
+  "properties": {
+   "dataSource": {
+    "$ref": "#/components/schemas/DataSource"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportColumn"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportFilter"
+    }
+   },
+   "groupBy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "compiledSql": {
+    "type": "string",
+    "nullable": true,
+    "description": "The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"
    }
   }
  },
@@ -1793,7 +2364,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "question",
    "interpretation",
    "result",
-   "confidence"
+   "reliability"
   ],
   "properties": {
    "conversationId": {
@@ -1804,42 +2375,59 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "interpretation": {
     "type": "string",
-    "description": "What the question was understood to mean, in plain language."
+    "description": "What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."
+   },
+   "semanticSpec": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingSemanticQuerySpec"
+     }
+    ],
+    "nullable": true,
+    "description": "What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"
    },
    "generatedQuery": {
-    "type": "object",
-    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer.\n",
-    "properties": {
-     "dataSource": {
-      "$ref": "#/components/schemas/DataSource"
-     },
-     "columns": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/ReportColumn"
-      }
-     },
-     "filters": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/ReportFilter"
-      }
-     },
-     "groupBy": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/GeneratedQuery"
      }
-    }
+    ],
+    "nullable": true,
+    "description": "The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"
    },
    "result": {
-    "$ref": "#/components/schemas/ReportResult"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportResult"
+     }
+    ],
+    "nullable": true,
+    "description": "Null when the question is outside the semantic model."
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."
+   },
+   "reliability": {
+    "$ref": "#/components/schemas/ReportingAnswerReliability"
+   },
+   "unavailableReason": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingUnavailableReason"
+     }
+    ],
+    "nullable": true,
+    "description": "Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."
    },
    "confidence": {
     "type": "number",
     "minimum": 0,
-    "maximum": 1
+    "maximum": 1,
+    "deprecated": true,
+    "description": "Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."
    },
    "suggestedFollowUps": {
     "type": "array",
@@ -1953,11 +2541,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "format": "uuid"
      },
      "version": {
-      "type": "string"
+      "type": "string",
+      "description": "The current version. Assigned by the server on each publish; earlier ones are kept as `ReportDefinitionVersion`."
      },
      "isSystem": {
       "type": "boolean",
-      "description": "Shipped with the platform. Cannot be amended, only cloned."
+      "description": "Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). **Clone-only (decided 28 September, audit R096)**: `updateReport` and `deleteReport` refuse it with 409 `system-report`; a venue changes a copy made with `createReport`.\n"
      },
      "isRetired": {
       "type": "boolean"
@@ -2025,9 +2614,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "isNotNull"
     ]
    },
-   "value": {},
+   "value": {
+    "description": "**Open on purpose; its type is the field's.** One value, of the `FieldType` that `listReportFields` gives for `field` — a string, number, boolean, or a date, date-time or uuid as a string. Absent for `in`, `notIn`, `between`, `isNull` and `isNotNull`.\n"
+   },
    "values": {
     "type": "array",
+    "description": "The values for `in` and `notIn`, or exactly two (from, to) for `between`. Each of the field's `FieldType`, as `value`.",
     "items": {}
    },
    "isParameter": {
@@ -2059,7 +2651,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "isRequired": {
     "type": "boolean"
    },
-   "defaultValue": {}
+   "defaultValue": {
+    "description": "Open on purpose. A value of this parameter's `type`, used when a run supplies none."
+   }
   }
  },
  "ReportResult": {
@@ -2093,6 +2687,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "rows": {
     "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
     "items": {
      "type": "object",
      "additionalProperties": true
@@ -2100,7 +2695,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "totals": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
    },
    "rowCount": {
     "type": "integer"
@@ -2120,13 +2716,113 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ReportingAnswerReliability": {
+  "type": "string",
+  "description": "**How far an analytics answer can be relied on** (decided 29 September, AI system design 5.6): a category, never a bare percentage. `grounded`: every figure comes from a result of the compiled spec. `partial`: part of the question was answered and the rest was not modelled. `conflictingSources`: the result and a cited source disagree. `insufficientEvidence`: the question could not be answered, including \"not available yet\" outside the semantic model. The same four values as `ai.yaml`'s assistant answers.\n",
+  "enum": [
+   "grounded",
+   "partial",
+   "conflictingSources",
+   "insufficientEvidence"
+  ]
+ },
+ "ReportingSemanticQuerySpec": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "**A question in the semantic model's own vocabulary** (decided 29 September, AI system design 2.2 E and 5.7). What the model returns for a live-number question instead of SQL, and what `runSemanticQuery` takes. Every code is a `SemanticModel` field code or a KPI code; Reporting validates the spec against the published model and compiles it deterministically, so the same spec compiles to the same SQL for the same model version.\n",
+  "required": [
+   "metric",
+   "period"
+  ],
+  "properties": {
+   "metric": {
+    "type": "string",
+    "description": "A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The governed definition the dashboards use, so the number matches them."
+   },
+   "dimensions": {
+    "type": "array",
+    "maxItems": 5,
+    "description": "Field codes to group by. Each must be reachable from the metric's dataset through a relationship the semantic model declares.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "operator"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "description": "A `SemanticModel` field code."
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "equals",
+        "notEquals",
+        "greaterThan",
+        "lessThan",
+        "between",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+       ]
+      },
+      "values": {
+       "type": "array",
+       "description": "**Open on purpose; typed by the field.** One value for the comparison operators, exactly two (from, to) for `between`, any number for `in` and `notIn`, none for `isNull` and `isNotNull`.\n",
+       "items": {}
+      }
+     }
+    }
+   },
+   "period": {
+    "type": "string",
+    "description": "ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the form `explainMetricChange` takes."
+   },
+   "comparison": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `getKpiValues` `compareTo`. With one, each row carries the metric for the comparison beside the current value.",
+    "enum": [
+     "previousPeriod",
+     "samePeriodLastYear",
+     "target",
+     "benchmark"
+    ]
+   },
+   "semanticModelVersion": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "The `SemanticModel.version` the spec was validated and compiled against. Set by Reporting."
+   }
+  }
+ },
+ "ReportingUnavailableReason": {
+  "type": "string",
+  "description": "Which part of a question is outside the semantic model, so the answer is \"not available yet\" (design 5.7). A metric or field the caller may not see is reported as not modelled, so the reason does not reveal that it exists.",
+  "enum": [
+   "metricNotModelled",
+   "dimensionNotModelled",
+   "filterNotModelled",
+   "comparisonNotAvailable",
+   "periodOutsideHistory"
+  ]
+ },
  "RunReportRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
   "properties": {
    "parameters": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "**Open on purpose; its shape is the report's.** Keyed by `ReportParameter.key` of the definition being run, each value of that parameter's `type`. An `isRequired` parameter with no value here and no `defaultValue` is the `400` `runReport` lists.\n"
    },
    "venueId": {
     "type": "string",
@@ -2135,11 +2831,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dateFrom": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
    },
    "dateTo": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (audit R158)."
    },
    "forceAsync": {
     "type": "boolean",

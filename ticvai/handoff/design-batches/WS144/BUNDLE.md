@@ -1,6 +1,6 @@
 # WS144 — Marketing CRM Configuration Reference v1.0 board 10
 
-**10 screens · 12 operations · 13 schemas · 3 permissions**
+**10 screens · 14 operations · 19 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `GUEST_VIEW, MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `GUEST_VIEW, MARKETING_MANAGE, MARKETING_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -69,7 +69,7 @@ convincingly. It is never a caption.
 | `BO-830` | Referral & Streak Management | listDetail | 1 | 0 | — |
 | `BO-831` | Progress, Leaderboards & Hub | listDetail | 1 | 0 | — |
 | `BO-832` | AI Engagement Optimization | listDetail | 1 | 0 | — |
-| `BO-833` | Gamification Analytics & Audit | listDetail | 1 | 0 | — |
+| `BO-833` | Gamification Analytics & Audit | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -1496,6 +1496,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "derived": true,
        "impliedBy": "listLoyaltyProgrammes",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getDashboard",
+       "notes": "One record, read-only."
       }
      ]
     }
@@ -1515,6 +1521,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Gamification analytics",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Participation, loyalty/membership impact, retention",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Gamification analytics dashboard",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1523,6 +1543,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-833"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 51. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "dashboardId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1636,6 +1664,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "Referral",
   "responds": "Referral"
  },
+ "getDashboard": {
+  "method": "GET",
+  "path": "/dashboards/{dashboardId}",
+  "contract": "reporting",
+  "summary": "Read a dashboard with tile data",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "refresh",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DashboardData"
+ },
  "getGuestIntelligence": {
   "method": "GET",
   "path": "/guests/{guestId}/intelligence",
@@ -1648,6 +1695,55 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [],
   "requestBody": null,
   "responds": "GuestIntelligence"
+ },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
  },
  "getLoyaltyPosition": {
   "method": "GET",
@@ -1924,6 +2020,140 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ChallengeProgress": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.challenge_progress",
+  "description": "22.6.15. **Progress is shown, not just the outcome.** A guest two visits from a reward behaves differently from one who does not know how close they are, which is the entire mechanism.\n",
+  "required": [
+   "id",
+   "challengeId",
+   "subjectId",
+   "current",
+   "target"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "challengeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "portfolioId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a family or group challenge — where the shared progress accrues."
+   },
+   "current": {
+    "type": "number"
+   },
+   "target": {
+    "type": "number"
+   },
+   "streakCount": {
+    "type": "integer",
+    "nullable": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "rewardIssuedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Dashboard": {
+  "x-ticvai-persistence": "reporting.dashboard + reporting.dashboard_tile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateDashboardRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "ownerPrincipalId",
+     "aggregateCost",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "aggregateCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Combined refresh load of every tile."
+     },
+     "archivedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "DashboardData": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Dashboard"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "tileData": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "tileId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "result": {
+         "$ref": "#/components/schemas/ReportResult"
+        },
+        "isCached": {
+         "type": "boolean"
+        },
+        "error": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
  "GuestIntelligence": {
   "type": "object",
   "description": "Board 1.10. **Explainable, or an agent will ignore it or over-trust it.**",
@@ -2033,6 +2263,87 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "KpiValue": {
+  "type": "object",
+  "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
+  "properties": {
+   "kpiId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
+   },
+   "name": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "period": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "target": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "comparison": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "variancePercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "up",
+     "down",
+     "flat"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "green",
+     "amber",
+     "red",
+     "noTarget"
+    ]
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "stale": {
+    "type": "boolean",
+    "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
    }
   }
  },
@@ -2550,6 +2861,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2640,6 +2963,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "readOnly": true,
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
    }
   }
  }

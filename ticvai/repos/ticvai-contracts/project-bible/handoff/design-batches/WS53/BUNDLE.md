@@ -1,6 +1,6 @@
 # WS53 — Promotions   Bundles Management board 9
 
-**10 screens · 10 operations · 13 schemas · 2 permissions**
+**10 screens · 13 operations · 17 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,7 +61,7 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `ADM-218` | Campaign Governance & Budget Command Center | commandCentre | 1 | 0 | — |
-| `ADM-219` | Campaign Budget & Financial Limit Setup | configEditor | 1 | 0 | — |
+| `ADM-219` | Campaign Budget & Financial Limit Setup | configEditor | 4 | 2 | — |
 | `ADM-220` | Redemption, Discount & Exposure Limit Manager | configEditor | 1 | 0 | — |
 | `ADM-221` | Budget Consumption & Forecast Monitor | listDetail | 1 | 0 | — |
 | `ADM-222` | Threshold Actions & Automatic Suspension | listDetail | 1 | 4 | — |
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-218 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-219",
@@ -300,7 +296,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-218"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-218",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-218"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 125. 12 of 12 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -370,7 +367,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Total campaign budget. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Total campaign budget, Venue budget. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Support"
    }
   ],
@@ -430,6 +427,53 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "Funding source",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "textField",
+       "label": "Owner principal id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?q=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every commercial campaign",
+       "bindsTo": "CommercialCampaign",
+       "columns": [
+        "CommercialCampaign.id",
+        "CommercialCampaign.venueId",
+        "CommercialCampaign.code",
+        "CommercialCampaign.name",
+        "CommercialCampaign.description",
+        "CommercialCampaign.ownerPrincipalId",
+        "CommercialCampaign.legalEntityId",
+        "CommercialCampaign.validFrom",
+        "CommercialCampaign.validTo",
+        "CommercialCampaign.budgets"
+       ],
+       "operation": "listCommercialCampaigns",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
       }
      ]
     },
@@ -441,6 +485,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Total campaign budget",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue budget",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create commercial campaign",
+       "operation": "createCommercialCampaign",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "Creates the campaign header (`promotions.campaign`) without budget lines, so a promotion, coupon campaign or bundle can name it by `campaignId` before its budget is set.",
+       "provenance": "contract promotions.yaml POST /commercial-campaigns"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save commercial campaign",
+       "operation": "updateCommercialCampaign",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "Amends the campaign header (`promotions.campaign`): name, code, description, owner, business entity and dates.",
+       "provenance": "contract promotions.yaml PATCH /commercial-campaigns/{campaignId}"
       }
      ]
     }
@@ -457,18 +522,98 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setCampaignBudgetFinancial",
     "contract": "promotions",
     "purpose": "Campaign Budget & Financial Limit Setup",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listCommercialCampaigns",
+    "contract": "promotions",
+    "purpose": "List commercial campaigns",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCommercialCampaign",
+    "contract": "promotions",
+    "purpose": "Create a commercial campaign",
     "trigger": "onAction",
     "invalidates": [
-     "setCampaignBudgetFinancial"
+     "listCommercialCampaigns"
+    ]
+   },
+   {
+    "operationId": "updateCommercialCampaign",
+    "contract": "promotions",
+    "purpose": "Amend a commercial campaign",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCommercialCampaigns"
     ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-219"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-219",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-219"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 126. 0 of 0 labels bound to a contract property; 11 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 126. 0 of 0 labels bound to a contract property; 12 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateCommercialCampaign",
+    "component": "modal",
+    "trigger": "Create commercial campaign",
+    "body": "**Collects what `createCommercialCampaign` sends before it is called.** Required: `venueId`, `name`. Optional: `code`, `description`, `ownerPrincipalId`, `legalEntityId`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCommercialCampaignRequest",
+    "confirm": {
+     "label": "Create commercial campaign",
+     "operation": "createCommercialCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "name",
+      "code",
+      "description",
+      "ownerPrincipalId",
+      "legalEntityId",
+      "validFrom",
+      "validTo"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /commercial-campaigns"
+   },
+   {
+    "id": "formUpdateCommercialCampaign",
+    "component": "modal",
+    "trigger": "Save commercial campaign",
+    "body": "**Collects what `updateCommercialCampaign` sends before it is called.** Nothing in the body is required. Optional: `code`, `name`, `description`, `ownerPrincipalId`, `legalEntityId`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save commercial campaign",
+     "operation": "updateCommercialCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "description",
+      "ownerPrincipalId",
+      "legalEntityId",
+      "validFrom",
+      "validTo"
+     ]
+    },
+    "provenance": "contract promotions.yaml PATCH /commercial-campaigns/{campaignId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "campaignId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -593,7 +738,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-220"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-220",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-220"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 128. 0 of 0 labels bound to a contract property; 5 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -737,7 +883,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-221"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-221",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-221"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 129. 7 of 7 labels bound to a contract property; 7 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -923,17 +1070,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "ThresholdActionsAutomaticSuspensionView.warn",
-    "ThresholdActionsAutomaticSuspensionView.requireApproval",
-    "ThresholdActionsAutomaticSuspensionView.reduceAllocation",
-    "ThresholdActionsAutomaticSuspensionView.stopSpecificChannel",
-    "ThresholdActionsAutomaticSuspensionView.stopPartner"
+    "ThresholdActionsAutomaticSuspensionView.action"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-222"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-222",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-222"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 130. 0 of 0 labels bound to a contract property; 10 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1069,16 +1213,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "approveCampaignWorkflow",
     "contract": "promotions",
     "purpose": "Campaign Approval Workflow Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveCampaignWorkflow"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-223"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-223",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-223"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 131. 0 of 0 labels bound to a contract property; 5 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1229,10 +1371,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "approveDecision",
     "contract": "promotions",
     "purpose": "Approval Inbox & Decision Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveDecision"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1248,7 +1387,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-224"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-224",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-224"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 132. 13 of 13 labels bound to a contract property; 13 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1402,7 +1542,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-225"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-225",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-225"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 133. 12 of 12 labels bound to a contract property; 12 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1524,6 +1665,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 134 §Measure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "AI recommendation",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 134 §Support"
+      }
+     ]
     }
    ]
   },
@@ -1555,9 +1707,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-226"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-226",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-226"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 134. 8 of 8 labels bound to a contract property; 8 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 134. 8 of 8 labels bound to a contract property; 9 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1652,7 +1805,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-227"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-227",
+   "workshopBoard": "wireframes/WS114 Promotions   Bundles Management Board 9.dc.html#adm-227"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 136. 0 of 0 labels bound to a contract property; 2 of 102 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1697,7 +1851,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CampaignApprovalWorkflowDesignerInput",
   "responds": "CampaignApprovalWorkflowDesignerView"
  },
@@ -1710,9 +1870,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ApprovalInboxDecisionWorkspaceInput",
   "responds": "ApprovalInboxDecisionWorkspaceView"
+ },
+ "createCommercialCampaign": {
+  "method": "POST",
+  "path": "/commercial-campaigns",
+  "contract": "promotions",
+  "summary": "Create a commercial campaign",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCommercialCampaignRequest",
+  "responds": "CommercialCampaign"
  },
  "listBudgetConsumptionForecast": {
   "method": "GET",
@@ -1723,7 +1908,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BudgetConsumptionForecastMonitorView"
  },
@@ -1736,7 +1927,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CampaignExperimentABTestManagerView"
  },
@@ -1749,7 +1946,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CampaignFinancialCommercialSimulatorView"
  },
@@ -1762,9 +1965,59 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CampaignGovernanceBudgetCommandCenterView"
+ },
+ "listCommercialCampaigns": {
+  "method": "GET",
+  "path": "/commercial-campaigns",
+  "contract": "promotions",
+  "summary": "List commercial campaigns",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "q",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listGovernanceRiskLaunch": {
   "method": "GET",
@@ -1814,9 +2067,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CampaignBudgetFinancialLimitSetupInput",
   "responds": "CampaignBudgetFinancialLimitSetupView"
+ },
+ "updateCommercialCampaign": {
+  "method": "PATCH",
+  "path": "/commercial-campaigns/{campaignId}",
+  "contract": "promotions",
+  "summary": "Amend a commercial campaign",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CommercialCampaign"
  }
 }
 ```
@@ -1833,21 +2111,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Approval Inbox & Decision Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "aed500kAed750k": {
+   "decision": {
     "type": "string",
-    "description": "AED 500K → AED 750K"
+    "enum": [
+     "approve",
+     "reject",
+     "returnForChange",
+     "requestInformation",
+     "delegate"
+    ],
+    "description": "Approver decision"
    },
-   "returnForChange": {
+   "comment": {
     "type": "string",
-    "description": "Return for Change"
+    "description": "Approver comment"
    },
-   "requestInformation": {
+   "delegateTo": {
     "type": "string",
-    "description": "Request Information"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
+    "description": "Approver delegated to, for delegate"
    }
   }
  },
@@ -1910,29 +2191,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "AI forecast"
    },
-   "aed500kAed750k": {
+   "decision": {
     "type": "string",
-    "description": "AED 500K → AED 750K"
+    "enum": [
+     "approve",
+     "reject",
+     "returnForChange",
+     "requestInformation",
+     "delegate"
+    ],
+    "description": "Approver decision"
    },
-   "returnForChange": {
+   "comment": {
     "type": "string",
-    "description": "Return for Change"
-   },
-   "requestInformation": {
-    "type": "string",
-    "description": "Request Information"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
-   },
-   "marketing": {
-    "type": "string",
-    "description": "Marketing ✓"
-   },
-   "commercial": {
-    "type": "string",
-    "description": "Commercial ✓"
+    "description": "Approver comment"
    }
   }
  },
@@ -1969,10 +2241,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "dailyBurnRate": {
     "type": "number",
     "description": "Daily burn rate"
-   },
-   "completedTransaction": {
-    "type": "string",
-    "description": "Completed transaction"
    }
   }
  },
@@ -2022,10 +2290,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "financialExposure": {
     "type": "string",
     "description": "Financial exposure"
-   },
-   "discount1025": {
-    "type": "number",
-    "description": "Discount 10–25%"
    },
    "sequentialApproval": {
     "type": "string",
@@ -2104,10 +2368,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Financial exposure"
    },
-   "discount1025": {
-    "type": "number",
-    "description": "Discount 10–25%"
-   },
    "sequentialApproval": {
     "type": "string",
     "description": "Sequential approval"
@@ -2138,10 +2398,97 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CampaignBudget": {
+  "x-ticvai-persistence": "promotions.campaign_budget",
+  "type": "object",
+  "description": "One budget line of a commercial campaign (setCampaignBudgetFinancial): what kind of spend it caps, who funds it, what it covers, and what happens as it is consumed. **Consumed, committed and reserved are not stored**: consumed is the discount given on orders (`orders.discount`, `promotions.promotion.discount_given`), committed and reserved are priced carts not yet paid, all worked out on read so they cannot drift from the orders they summarise. (DM5, 29 September: data model for the agreed operations)",
+  "required": [
+   "budgetType",
+   "amount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "budgetType": {
+    "type": "string",
+    "enum": [
+     "total",
+     "discount",
+     "reward",
+     "freeProduct"
+    ],
+    "description": "The spend this line caps (total campaign, discount, reward or free-product budget)."
+   },
+   "fundingSource": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "venue",
+     "department",
+     "marketing",
+     "partner"
+    ],
+    "description": "Who pays for it; `partner` is a co-funded (e.g. bank or partner-funded) line."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scope": {
+    "type": "string",
+    "enum": [
+     "entireCampaign",
+     "promotion",
+     "product",
+     "channel",
+     "partner",
+     "customerSegment"
+    ],
+    "default": "entireCampaign",
+    "description": "What the line covers."
+   },
+   "scopeRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The promotion, product, partner or segment id, or the SalesChannel value, that `scope` names. Null for `entireCampaign`."
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The budget owner."
+   },
+   "costCentre": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true
+   },
+   "department": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "thresholdPolicy": {
+    "$ref": "#/components/schemas/BudgetThresholdPolicy"
+   }
+  }
+ },
  "CampaignBudgetFinancialLimitSetupInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; saved as the `promotions.campaign` header (campaign, budget owner, business entity, venue, effective dates) and its `promotions.campaign_budget` lines (one per budget amount given, with funding source, cost centre and scope) (DM5, 29 September: data model for the agreed operations)",
   "description": "**What Campaign Budget & Financial Limit Setup submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "totalCampaignBudget": {
@@ -2352,22 +2699,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Campaign Experiment & A/B Test Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "freeFBVoucher": {
-    "type": "string",
-    "description": "Free F&B voucher"
-   },
-   "a40": {
-    "type": "number",
-    "description": "A — 40%"
-   },
-   "b40": {
-    "type": "number",
-    "description": "B — 40%"
-   },
-   "control20": {
-    "type": "number",
-    "description": "Control — 20%"
-   },
    "discount": {
     "type": "number",
     "description": "Discount %"
@@ -2451,6 +2782,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "aiRecommendation": {
     "type": "string",
     "description": "AI recommendation"
+   },
+   "variantAllocation": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Audience allocation per variant, e.g. A 40%, B 40%, control 20%"
    }
   }
  },
@@ -2605,57 +2943,137 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Suspended Campaigns"
    },
-   "healthy": {
+   "budgetHealth": {
     "type": "string",
-    "description": "Healthy"
+    "enum": [
+     "healthy",
+     "monitor",
+     "warning",
+     "critical",
+     "budgetExhausted",
+     "suspended"
+    ],
+    "description": "Campaign budget health."
    },
-   "monitor": {
-    "type": "string",
-    "description": "Monitor"
-   },
-   "warning": {
-    "type": "string",
-    "description": "Warning"
-   },
-   "critical": {
-    "type": "string",
-    "description": "Critical"
-   },
-   "budgetExhausted": {
-    "type": "string",
-    "description": "Budget Exhausted"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "budgetAed500000": {
-    "type": "string",
-    "description": "Budget: AED 500,000"
-   },
-   "consumedAed387500": {
-    "type": "string",
-    "description": "Consumed: AED 387,500"
-   },
-   "remainingAed112500": {
-    "type": "string",
-    "description": "Remaining: AED 112,500"
-   },
-   "utilization775": {
+   "utilization": {
     "type": "number",
-    "description": "Utilization: 77.5%"
-   },
-   "revenueAed284m": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue: AED 2.84M"
-   },
-   "roi53x": {
+    "description": "Budget utilisation, percent"
+   }
+  }
+ },
+ "CommercialCampaign": {
+  "x-ticvai-persistence": "promotions.campaign + promotions.campaign_budget",
+  "type": "object",
+  "description": "A commercial campaign: the grouping of promotions, coupon campaigns and bundles that share an owner, a business entity, dates and a budget. **Not `marketing.campaign`**, which is the CRM send campaign in another service. The header is saved with its budget lines by setCampaignBudgetFinancial (the budget screen is where the pack captures campaign, owner, business entity and effective dates), and on its own by createCommercialCampaign and updateCommercialCampaign; listCommercialCampaigns lists it (decided 29 September, writers pass); promotions, coupon campaigns and bundles point at it by `campaignId`. No status of its own: a campaign is live while its promotions are, and a threshold action that stops it pauses them. (DM5, 29 September: data model for the agreed operations)",
+  "required": [
+   "id",
+   "venueId",
+   "name"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "ROI: 5.3x"
+    "format": "uuid",
+    "readOnly": true
    },
-   "statusHealthy": {
+   "venueId": {
     "type": "string",
-    "description": "Status: HEALTHY"
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The campaign (and budget) owner."
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The business entity that funds and books the campaign."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "budgets": {
+    "type": "array",
+    "description": "The rows of `promotions.campaign_budget`, one per budget line.",
+    "items": {
+     "$ref": "#/components/schemas/CampaignBudget"
+    }
+   }
+  }
+ },
+ "CreateCommercialCampaignRequest": {
+  "x-ticvai-persistence": "none — request only; saved as a `promotions.campaign` row (CommercialCampaign)",
+  "type": "object",
+  "description": "What createCommercialCampaign takes: the campaign header only. Budget lines are set by setCampaignBudgetFinancial. (decided 29 September, writers pass)",
+  "required": [
+   "venueId",
+   "name"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "Unique at the venue when given."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The campaign (and budget) owner."
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The business entity that funds and books the campaign."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -2748,82 +3166,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "campaignLaunch": {
     "type": "string",
     "description": "Campaign launch"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "level1Advisory": {
-    "type": "string",
-    "description": "Level 1 — Advisory"
+   "nextCursor": {
+    "type": "string"
    },
-   "aiRecommends": {
-    "type": "string",
-    "description": "AI recommends"
-   },
-   "humanDecides": {
-    "type": "string",
-    "description": "Human decides"
-   },
-   "level2GovernedAutomation": {
-    "type": "string",
-    "description": "Level 2 — Governed Automation"
-   },
-   "campaignOperationalStatus": {
-    "type": "string",
-    "description": "Campaign operational status"
-   },
-   "boards24PromotionMechanics": {
-    "type": "string",
-    "description": "Boards 2–4 — Promotion Mechanics"
-   },
-   "discountRewardExposure": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount/reward exposure"
-   },
-   "boards56Bundles": {
-    "type": "string",
-    "description": "Boards 5–6 — Bundles"
-   },
-   "bundleFinancialImpact": {
-    "type": "string",
-    "description": "Bundle financial impact"
-   },
-   "board7Targeting": {
-    "type": "string",
-    "description": "Board 7 — Targeting"
-   },
-   "audienceSize": {
-    "type": "string",
-    "description": "Audience size"
-   },
-   "board8Stacking": {
-    "type": "string",
-    "description": "Board 8 — Stacking"
-   },
-   "combinedDiscountExposure": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Combined discount exposure"
-   },
-   "priceAndMargin": {
-    "type": "number",
-    "description": "Price and margin"
-   },
-   "audienceAndHistoricalResponse": {
-    "type": "string",
-    "description": "Audience and historical response"
-   },
-   "budgetAccountingAndProfitability": {
-    "type": "string",
-    "description": "Budget, accounting and profitability"
-   },
-   "actualTransactionValues": {
-    "type": "string",
-    "description": "Actual transaction values"
-   },
-   "forecastsAndCampaignAnalytics": {
-    "type": "string",
-    "description": "Forecasts and campaign analytics"
-   },
-   "approvalAuthority": {
-    "type": "string",
-    "description": "Approval authority"
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -2860,10 +3221,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "dailyRedemptionLimit": {
     "type": "integer",
     "description": "Daily redemption limit (the pack shows 5,000)"
-   },
-   "orCustomThresholds": {
-    "type": "string",
-    "description": "or custom thresholds"
    }
   }
  },
@@ -2873,41 +3230,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Threshold Actions & Automatic Suspension displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "warn": {
+   "campaignId": {
     "type": "string",
-    "description": "Warn"
+    "description": "Campaign ID"
    },
-   "requireApproval": {
-    "type": "boolean",
-    "description": "Require approval"
+   "thresholdPercent": {
+    "type": "number",
+    "description": "Budget threshold, percent"
    },
-   "reduceAllocation": {
+   "action": {
     "type": "string",
-    "description": "Reduce allocation"
-   },
-   "stopSpecificChannel": {
-    "type": "string",
-    "description": "Stop specific channel"
-   },
-   "stopPartner": {
-    "type": "string",
-    "description": "Stop partner"
-   },
-   "stopPromotion": {
-    "type": "string",
-    "description": "Stop promotion"
-   },
-   "stopCampaign": {
-    "type": "string",
-    "description": "Stop campaign"
-   },
-   "allowGraceAmount": {
-    "type": "boolean",
-    "description": "Allow grace amount"
-   },
-   "continueWithExecutiveAuthorization": {
-    "type": "string",
-    "description": "Continue with executive authorization"
+    "enum": [
+     "warn",
+     "requireApproval",
+     "reduceAllocation",
+     "stopSpecificChannel",
+     "stopPartner",
+     "stopPromotion",
+     "stopCampaign",
+     "allowGraceAmount",
+     "continueWithExecutiveAuthorization"
+    ],
+    "description": "Configured action when the threshold is reached"
    }
   }
  }

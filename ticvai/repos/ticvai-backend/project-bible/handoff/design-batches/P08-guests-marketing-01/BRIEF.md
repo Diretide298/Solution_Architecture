@@ -1,6 +1,6 @@
 # P08-guests-marketing-01 — P08 · Guests & Marketing
 
-**4 screens · 14 operations · 17 schemas · 10 permissions**
+**4 screens · 18 operations · 32 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `AI_AUDIT_VIEW, AI_CONFIGURE, AUDIT_VIEW, CASE_MANAGE, CASE_VIEW, MARKETING_MANAGE, MARKETING_VIEW, PERMISSION_VIEW, REPORT_VIEW_VENUE, TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `AI_AUDIT_VIEW, AI_CONFIGURE, AI_USE, AUDIT_VIEW, CASE_MANAGE, CASE_VIEW, MARKETING_MANAGE, MARKETING_VIEW, PERMISSION_VIEW, REPORT_VIEW_VENUE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-068` | Audit Log | listDetail | 3 | 1 | — |
 | `BO-073` | Lost & Found Register | listDetail | 3 | 1 | — |
-| `BO-091` | AI Policy & Spend | listDetail | 4 | 1 | — |
+| `BO-091` | AI Policy & Spend | listDetail | 8 | 1 | — |
 | `BO-107` | Guests & Marketing | listDetail | 4 | 1 | — |
 
 ## Thin screens in this batch

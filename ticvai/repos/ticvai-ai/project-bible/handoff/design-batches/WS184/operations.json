@@ -1,0 +1,138 @@
+{
+ "explainRecommendationDecision": {
+  "method": "GET",
+  "path": "/recommendations/decisions/{decisionId}/explanation",
+  "contract": "ai",
+  "summary": "Why these recommendations",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "depth",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRecommendationExplanation"
+ },
+ "getCustomerRecommendationProfile": {
+  "method": "GET",
+  "path": "/recommendations/customers/{subjectId}/profile",
+  "contract": "ai",
+  "summary": "What the engine knows about a customer",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiCustomerRecommendationProfile"
+ },
+ "getGuestProfile": {
+  "method": "GET",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Read a guest profile",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
+ },
+ "getRecommendationPerformance": {
+  "method": "GET",
+  "path": "/recommendation-performance",
+  "contract": "promotions",
+  "summary": "Impressions, acceptance, revenue and incremental lift",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationPerformance"
+ },
+ "setRecommendationSuppression": {
+  "method": "PUT",
+  "path": "/recommendation-suppressions",
+  "contract": "promotions",
+  "summary": "Fatigue limits, frequency caps and hard exclusions",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecommendationSuppression",
+  "responds": "RecommendationSuppression"
+ },
+ "simulateRecommendationStrategy": {
+  "method": "POST",
+  "path": "/recommendation-simulations",
+  "contract": "promotions",
+  "summary": "Replay a strategy against history before it goes live",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationPerformance"
+ },
+ "updateRecommendationStrategy": {
+  "method": "PUT",
+  "path": "/recommendation-strategies/{strategyId}",
+  "contract": "promotions",
+  "summary": "Change a strategy",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecommendationStrategy",
+  "responds": "RecommendationStrategy"
+ }
+}

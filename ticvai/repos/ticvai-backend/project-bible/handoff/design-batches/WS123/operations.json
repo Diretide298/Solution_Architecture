@@ -1,0 +1,194 @@
+{
+ "explainRecommendationDecision": {
+  "method": "GET",
+  "path": "/recommendations/decisions/{decisionId}/explanation",
+  "contract": "ai",
+  "summary": "Why these recommendations",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "depth",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRecommendationExplanation"
+ },
+ "exportAiEvidencePackage": {
+  "method": "POST",
+  "path": "/evidence-packages",
+  "contract": "ai",
+  "summary": "Export an evidence package",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getActionPlan": {
+  "method": "GET",
+  "path": "/action-plans/{planId}",
+  "contract": "ai",
+  "summary": "A plan with its steps",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ },
+ "getAiDecisionTrace": {
+  "method": "GET",
+  "path": "/decision-records/{decisionRecordId}/trace",
+  "contract": "ai",
+  "summary": "The full trace of a decision",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "depth",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiDecisionTrace"
+ },
+ "listAiModels": {
+  "method": "GET",
+  "path": "/models",
+  "contract": "ai",
+  "summary": "The model catalogue",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "layer",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "producerType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "replayAiDecision": {
+  "method": "POST",
+  "path": "/decision-records/{decisionRecordId}/replay",
+  "contract": "ai",
+  "summary": "Re-simulate a decision",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiReplayResult"
+ },
+ "searchAiDecisions": {
+  "method": "GET",
+  "path": "/decision-records",
+  "contract": "ai",
+  "summary": "Find AI decisions",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "traceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "policyVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "modelVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ }
+}

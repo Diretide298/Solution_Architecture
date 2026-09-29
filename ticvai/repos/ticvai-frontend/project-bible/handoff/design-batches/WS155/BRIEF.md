@@ -1,6 +1,6 @@
 # WS155 — Resource Management Configuration board 1
 
-**10 screens · 26 operations · 17 schemas · 4 permissions**
+**10 screens · 28 operations · 21 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -63,7 +63,7 @@ convincingly. It is never a caption.
 | `BO-854` | Resource Management Command Center | configEditor | 3 | 0 | — |
 | `BO-855` | Resource Type Configuration | configEditor | 3 | 0 | — |
 | `BO-856` | Resource Category Management | configEditor | 3 | 0 | — |
-| `BO-857` | Resource Creation & Profile | configEditor | 5 | 0 | — |
+| `BO-857` | Resource Creation & Profile | configEditor | 7 | 0 | — |
 | `BO-858` | Configurable Attribute Builder | configEditor | 2 | 0 | — |
 | `BO-859` | Resource Hierarchy & Parent–Child Relationships | listDetail | 2 | 0 | — |
 | `BO-860` | Resource Dependency Rules | listDetail | 2 | 0 | — |

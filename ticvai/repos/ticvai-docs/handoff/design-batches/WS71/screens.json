@@ -17,11 +17,81 @@
    "component": "apps/venue-management-web/src/routes/analytics/BiAnalyticsAdministrationCommandCenter.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-062",
+    "ANL-063",
+    "ANL-064",
+    "ANL-065",
+    "ANL-066",
+    "ANL-067",
+    "ANL-068",
+    "ANL-069",
+    "ANL-070"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-001",
+     "trigger": "Back to Executive Command Center",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ANL-070",
+     "trigger": "Analytics Governance, Security & Audit Center",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-062",
+     "trigger": "Enterprise KPI Library",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-063",
+     "trigger": "KPI Targets, Thresholds & Scorecards",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-064",
+     "trigger": "Benchmark & Comparative Analytics Configuration",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-065",
+     "trigger": "Data Source & Integration Registry",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-066",
+     "trigger": "Semantic Model & Business Data Catalogue",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-067",
+     "trigger": "Data Refresh, Pipeline & Data Health Monitor",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-068",
+     "trigger": "Embedded BI, Workspace & Tenant Administration",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-069",
+     "trigger": "Analytics Performance, Usage & Cost Monitor",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026"
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Administrators can determine overall analytics-platform health without reviewing multiple technical systems.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each component shall show) — counts over a population, then the population",
   "purpose": "Provide administrators with one consolidated view of the health and governance of the TICVAI analytics platform.",
-  "purposeNote": "Administrators can determine overall analytics-platform health without reviewing multiple technical systems.",
   "gaps": [
    {
     "operation": null,
@@ -139,82 +209,28 @@
    "emptyNoResults": "The filter narrowed it and the analytics administration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getAnalyticsUsage",
+    "contract": "reporting",
+    "purpose": "Estate at a glance",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAnalyticsPipelines",
+    "contract": "reporting",
+    "purpose": "Data health",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-061"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-061",
+   "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-061"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 123. 0 of 1 labels bound to a contract property; 13 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-001"
-   ],
-   "exitTo": [
-    "ANL-001",
-    "ANL-062",
-    "ANL-063",
-    "ANL-064",
-    "ANL-065",
-    "ANL-066",
-    "ANL-067",
-    "ANL-068",
-    "ANL-069",
-    "ANL-070"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-001",
-     "trigger": "Back to Executive Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    },
-    {
-     "to": "ANL-070",
-     "trigger": "Analytics Governance, Security & Audit Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-062",
-     "trigger": "Enterprise KPI Library",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-063",
-     "trigger": "KPI Targets, Thresholds & Scorecards",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-064",
-     "trigger": "Benchmark & Comparative Analytics Configuration",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-065",
-     "trigger": "Data Source & Integration Registry",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-066",
-     "trigger": "Semantic Model & Business Data Catalogue",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-067",
-     "trigger": "Data Refresh, Pipeline & Data Health Monitor",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-068",
-     "trigger": "Embedded BI, Workspace & Tenant Administration",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-069",
-     "trigger": "Analytics Performance, Usage & Cost Monitor",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026"
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -255,6 +271,22 @@
    "route": "/analytics/enterprise-kpi-library-anl-062",
    "component": "apps/venue-management-web/src/routes/analytics/EnterpriseKpiLibrary.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-061"
+   ],
+   "exitTo": [
+    "ANL-061"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-061",
+     "trigger": "Back to BI & Analytics Administration Command Center",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "listDetail",
@@ -337,7 +369,26 @@
    "emptyNoResults": "The filter narrowed it and the enterprise kpi are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listKpis",
+    "contract": "reporting",
+    "purpose": "The enterprise library",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "createKpi",
+    "contract": "reporting",
+    "purpose": "Add a KPI",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listKpis",
+     "getKpiValues"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Executive",
@@ -350,25 +401,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-062"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-062",
+   "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-062"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 124. 0 of 14 labels bound to a contract property; 30 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -409,6 +445,22 @@
    "route": "/analytics/kpi-targets-thresholds-scorecards-anl-063",
    "component": "apps/venue-management-web/src/routes/analytics/KpiTargetsThresholdsScorecards.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-061"
+   ],
+   "exitTo": [
+    "ANL-061"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-061",
+     "trigger": "Back to BI & Analytics Administration Command Center",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "configEditor",
@@ -471,25 +523,36 @@
    "emptyFirstRun": "No kpi targets thresholds configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setKpiTargets",
+    "contract": "reporting",
+    "purpose": "Targets and scorecards",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getKpiValues"
+    ]
+   },
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Where they stand",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-063"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-063",
+   "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-063"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 125. 0 of 0 labels bound to a contract property; 8 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
+     "name": "kpiId",
+     "from": "navigation"
     }
    ]
   },
@@ -533,6 +596,22 @@
    "route": "/analytics/benchmark-comparative-analytics-configuration-anl-064",
    "component": "apps/venue-management-web/src/routes/analytics/BenchmarkComparativeAnalyticsConfiguration.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-061"
+   ],
+   "exitTo": [
+    "ANL-061"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-061",
+     "trigger": "Back to BI & Analytics Administration Command Center",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "commandCentre",
@@ -579,6 +658,58 @@
        "kind": "metricTile",
        "label": "Utilization %",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
+      },
+      {
+       "kind": "textField",
+       "label": "Scope path",
+       "operation": "listSiteNormalisationBases",
+       "notes": "Sends `?scopePath=` to `listSiteNormalisationBases`.",
+       "provenance": "contract reporting.yaml GET /site-normalisation-bases"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Period from",
+       "operation": "listSiteNormalisationBases",
+       "notes": "Sends `?periodFrom=` to `listSiteNormalisationBases`.",
+       "provenance": "contract reporting.yaml GET /site-normalisation-bases"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Period to",
+       "operation": "listSiteNormalisationBases",
+       "notes": "Sends `?periodTo=` to `listSiteNormalisationBases`.",
+       "provenance": "contract reporting.yaml GET /site-normalisation-bases"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every site normalisation basis",
+       "bindsTo": "SiteNormalisationBasis",
+       "columns": [
+        "SiteNormalisationBasis.id",
+        "SiteNormalisationBasis.scopePath",
+        "SiteNormalisationBasis.periodStart",
+        "SiteNormalisationBasis.periodEnd",
+        "SiteNormalisationBasis.visitors",
+        "SiteNormalisationBasis.operatingHours",
+        "SiteNormalisationBasis.staffedPositions",
+        "SiteNormalisationBasis.areaSquareMetres"
+       ],
+       "operation": "listSiteNormalisationBases",
+       "provenance": "contract reporting.yaml GET /site-normalisation-bases"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save site normalisation basis",
+       "operation": "setSiteNormalisationBasis",
+       "permission": "REPORT_MANAGE",
+       "notes": "**The writer of `reporting.site_normalisation_basis`** (decided 29 September, writers pass).",
+       "provenance": "contract reporting.yaml PUT /site-normalisation-bases"
       }
      ]
     }
@@ -591,7 +722,31 @@
    "emptyNoResults": "The filter narrowed it and the benchmark comparative analytics are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getAnalyticsBenchmark",
+    "contract": "reporting",
+    "purpose": "Configure the comparison basis",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listSiteNormalisationBases",
+    "contract": "reporting",
+    "purpose": "The denominators each site is benchmarked by",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setSiteNormalisationBasis",
+    "contract": "reporting",
+    "purpose": "Set the denominators a site is benchmarked by",
+    "trigger": "onAction",
+    "invalidates": [
+     "getAnalyticsBenchmark",
+     "listSiteNormalisationBases"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Revenue per Visitor",
@@ -604,25 +759,29 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-064"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-064",
+   "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-064"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 127. 0 of 0 labels bound to a contract property; 7 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
+  "overlays": [
+   {
+    "id": "formSetSiteNormalisationBasis",
+    "component": "modal",
+    "trigger": "Save site normalisation basis",
+    "body": "**Collects what `setSiteNormalisationBasis` sends before it is called.** Required: `bases`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save site normalisation basis",
+     "operation": "setSiteNormalisationBasis"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "bases"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /site-normalisation-bases"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -664,11 +823,27 @@
    "component": "apps/venue-management-web/src/routes/analytics/DataSourceIntegrationRegistry.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-061"
+   ],
+   "exitTo": [
+    "ANL-061"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-061",
+     "trigger": "Back to BI & Analytics Administration Command Center",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Administrators can identify every source feeding BI and understand its current status and ownership.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Maintain a centralized catalogue of data sources feeding the analytics platform.",
-  "purposeNote": "Administrators can identify every source feeding BI and understand its current status and ownership.",
   "gaps": [
    {
     "operation": null,
@@ -738,7 +913,15 @@
    "emptyNoResults": "The filter narrowed it and the data source integration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listAnalyticsPipelines",
+    "contract": "reporting",
+    "purpose": "Sources and integrations",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Source Name",
@@ -751,25 +934,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-065"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-065",
+   "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-065"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 128. 0 of 10 labels bound to a contract property; 10 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -811,11 +979,27 @@
    "component": "apps/venue-management-web/src/routes/analytics/SemanticModelBusinessDataCatalogue.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-061"
+   ],
+   "exitTo": [
+    "ANL-061"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-061",
+     "trigger": "Back to BI & Analytics Administration Command Center",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Dashboards, reports and AI operate against a consistent governed business-data model rather than independently querying raw tables.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
   "purpose": "Create the governed business layer between raw data and dashboards/AI. This is one of the most important technical screens in Board 10.",
-  "purposeNote": "Dashboards, reports and AI operate against a consistent governed business-data model rather than independently querying raw tables.",
   "gaps": [
    {
     "operation": null,
@@ -875,7 +1059,26 @@
    "emptyNoResults": "The filter narrowed it and the semantic model business are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getSemanticModel",
+    "contract": "reporting",
+    "purpose": "The catalogue",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setSemanticModel",
+    "contract": "reporting",
+    "purpose": "Publish it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getSemanticModel",
+     "listReportFields"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Missing relationships",
@@ -887,25 +1090,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-066"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-066",
+   "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-066"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 129. 0 of 5 labels bound to a contract property; 13 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1072,7 +1260,15 @@
    "emptyNoResults": "The filter narrowed it and the data refresh pipeline are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listAnalyticsPipelines",
+    "contract": "reporting",
+    "purpose": "Refresh and freshness",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Pipelines Running",
@@ -1085,7 +1281,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-067"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-067",
+   "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-067"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 130. 0 of 7 labels bound to a contract property; 14 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1129,11 +1326,27 @@
    "component": "apps/venue-management-web/src/routes/analytics/EmbeddedBiWorkspaceTenantAdministration.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-061"
+   ],
+   "exitTo": [
+    "ANL-061"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-061",
+     "trigger": "Back to BI & Analytics Administration Command Center",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "BI content can be securely embedded and governed across TICVAI tenants and environments.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure how BI technology is embedded inside TICVAI and separated across clients/tenants.",
-  "purposeNote": "BI content can be securely embedded and governed across TICVAI tenants and environments.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1186,28 +1399,21 @@
    "emptyFirstRun": "No embedded tenant administration configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listDashboards",
+    "contract": "reporting",
+    "purpose": "Workspaces and embedding",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-068"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-068",
+   "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-068"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 131. 0 of 0 labels bound to a contract property; 7 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1406,7 +1612,15 @@
    "emptyNoResults": "The filter narrowed it and the analytics performance usage are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getAnalyticsUsage",
+    "contract": "reporting",
+    "purpose": "Usage, runtime and cost",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Active Analytics Users",
@@ -1419,7 +1633,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-069"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-069",
+   "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-069"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 132. 0 of 6 labels bound to a contract property; 20 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1463,11 +1678,27 @@
    "component": "apps/venue-management-web/src/routes/analytics/AnalyticsGovernanceSecurityAuditCenter.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-061"
+   ],
+   "exitTo": [
+    "ANL-061"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-061",
+     "trigger": "Back to BI & Analytics Administration Command Center",
+     "provenance": "structural — pack board 10 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Critical Data Architecture for the Complete Module Board 10 should make the underlying architecture clear to Soft Labs.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Monitor; Show) and no metric row",
   "purpose": "Provide final governance over the entire BI and analytics environment.",
-  "purposeNote": "Critical Data Architecture for the Complete Module Board 10 should make the underlying architecture clear to Soft Labs.",
   "gaps": [
    {
     "operation": null,
@@ -1551,7 +1782,14 @@
    "emptyNoResults": "The filter narrowed it and the analytics governance security are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listSecurityDetectionGovernance",
+    "contract": "access",
+    "purpose": "Security Analytics, AI Detection & Governance",
+    "trigger": "onLoad"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Dashboard Permissions",
@@ -1564,25 +1802,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-070"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-070",
+   "workshopBoard": "wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-070"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 133. 0 of 17 labels bound to a contract property; 24 of 56 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-061"
-   ],
-   "exitTo": [
-    "ANL-061"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-061",
-     "trigger": "Back to BI & Analytics Administration Command Center",
-     "provenance": "structural — pack board 10 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",

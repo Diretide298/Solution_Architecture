@@ -1,6 +1,6 @@
 # P08-orders-money-03 — P08 · Orders & Money (3 of 3)
 
-**7 screens · 41 operations · 32 schemas · 8 permissions**
+**7 screens · 42 operations · 39 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -65,7 +65,7 @@ convincingly. It is never a caption.
 | `BO-076` | Revenue Recognition | listDetail | 5 | 2 | — |
 | `BO-077` | FX Rates & Variances | approvalInbox | 5 | 3 | — |
 | `BO-089` | Journal Entries | approvalInbox | 6 | 4 | — |
-| `BO-090` | Period Close | listDetail | 6 | 3 | — |
+| `BO-090` | Period Close | listDetail | 7 | 3 | — |
 | `BO-101` | Orders & Money | listDetail | 3 | 0 | — |
 
 ---
@@ -1975,6 +1975,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "finance",
     "purpose": "Trial balance for a period",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getVatReturn",
+    "contract": "finance",
+    "purpose": "VAT return (FTA boxes) for a period",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2075,12 +2082,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-022",
      "trigger": "Order Detail",
-     "provenance": "derived — BO-022 declares entryState.params orderId and BO-101 holds none of them, so the edge carries nothing and BO-022 opens cold"
+     "provenance": "derived — BO-022 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them, so the edge carries nothing and BO-022 opens cold"
     },
     {
      "to": "BO-023",
      "trigger": "Refunds & Exchanges",
-     "provenance": "derived — BO-023 declares entryState.params orderId and BO-101 holds none of them, so the edge carries nothing and BO-023 opens cold"
+     "provenance": "derived — BO-023 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them, so the edge carries nothing and BO-023 opens cold"
     },
     {
      "to": "BO-024",
@@ -2093,7 +2100,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "settlementId"
      ],
-     "provenance": "derived — BO-025 declares entryState.params settlementId and BO-101 holds settlementId, so an edge into it carries them"
+     "provenance": "derived — BO-025 declares entryState.params chargebackId, settlementId and BO-101 holds settlementId, so an edge into it carries them"
     },
     {
      "to": "BO-026",
@@ -2166,7 +2173,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-065",
      "trigger": "Venue Configuration",
-     "provenance": "derived — BO-065 declares entryState.params  and BO-101 holds none of them, so the edge carries nothing and BO-065 opens cold"
+     "provenance": "derived — BO-065 declares entryState.params locationId and BO-101 holds none of them, so the edge carries nothing and BO-065 opens cold"
     },
     {
      "to": "BO-074",
@@ -2707,6 +2714,40 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "TrialBalance"
+ },
+ "getVatReturn": {
+  "method": "GET",
+  "path": "/tax/vat-returns",
+  "contract": "finance",
+  "summary": "A legal entity's VAT return for a tax period, in the FTA's boxes",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "format",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FinVatReturn"
  },
  "getVenueSettings": {
   "method": "GET",
@@ -3759,6 +3800,97 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "FinVatReturn": {
+  "x-ticvai-persistence": "none — computed from ledger postings on the reporting replica",
+  "type": "object",
+  "description": "6.1.23. The FTA VAT 201 boxes for one legal entity and tax period.",
+  "required": [
+   "legalEntityId",
+   "periodFrom",
+   "periodTo",
+   "boxes",
+   "netTaxPayable"
+  ],
+  "properties": {
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "taxRegistrationNumber": {
+    "type": "string"
+   },
+   "periodFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "periodTo": {
+    "type": "string",
+    "format": "date"
+   },
+   "boxes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "box",
+      "amount",
+      "taxAmount"
+     ],
+     "properties": {
+      "box": {
+       "type": "string",
+       "description": "The form's box, e.g. `1a` (standard-rated supplies, Abu Dhabi) ... `1g`, `2` (tourist refunds), `3` (reverse charge), `4` (zero-rated), `5` (exempt), `6` and `7` (imports), `9` (standard-rated expenses), `10` (reverse charge inputs)."
+      },
+      "label": {
+       "type": "string"
+      },
+      "emirate": {
+       "type": "string",
+       "nullable": true
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "taxAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "adjustmentAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "taxCodeIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "postingCount": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "totalOutputTax": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalRecoverableTax": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netTaxPayable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "fileUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "description": "Set for `format` `csv` or `xlsx`; a short-lived link."
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "FiscalPeriod": {
   "x-ticvai-persistence": "ledger.fiscal_period + ledger.fiscal_period_event",
   "type": "object",
@@ -4126,7 +4258,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "settlement",
    "variance",
    "reversal",
-   "writeOff"
+   "writeOff",
+   "chargeback"
   ]
  },
  "JournalStatus": {
@@ -4201,6 +4334,95 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "readOnly": true,
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -4308,7 +4530,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "settlementFee",
    "settlementClearing",
    "gameCreditLoaded",
-   "pointsAccrued"
+   "pointsAccrued",
+   "chargebackDebit",
+   "chargebackReversal",
+   "chargebackFee"
   ]
  },
  "PriceVariance": {
@@ -4391,6 +4616,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time"
    }
   }
+ },
+ "ProductKind": {
+  "type": "string",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n",
+  "enum": [
+   "admission",
+   "timedAdmission",
+   "datedAdmission",
+   "openDated",
+   "seated",
+   "membership",
+   "bundle",
+   "fnb",
+   "retail",
+   "rental",
+   "addOn",
+   "giftCard"
+  ]
  },
  "RecognitionMethod": {
   "type": "string",
@@ -4561,6 +4804,116 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean"
    }
   }
+ },
+ "Settlement": {
+  "x-ticvai-persistence": "ledger.settlement",
+  "type": "object",
+  "required": [
+   "id",
+   "providerName",
+   "periodStart",
+   "periodEnd",
+   "status",
+   "ingestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "currencyCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "**A settlement has no account, so nothing else denominates it.** A posting takes its currency from `ledger.account.currency` and a payment from `tenderCurrency`, but a settlement is a provider file for a period: `providerGross`, `ledgerGross` and `difference` are bare amounts, and a provider file in one currency against a ledger in another computes a difference that means nothing. Added 20 September, when a venue became able to trade outside its region's currency.\n"
+   },
+   "providerName": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The venue this settlement is for. **Reconciled daily per venue** (decided 28 September, audit R110 (b)), so `periodStart` and `periodEnd` are the same day."
+   },
+   "periodStart": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "periodEnd": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "fileReference": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `MediaAsset` holding the provider file, as given to `ingestSettlementFile`. **Kept on the row because parsing is asynchronous**: the job that parses the file reads it from here.\n"
+   },
+   "format": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "csv",
+     "fixedWidth",
+     "xml",
+     "json"
+    ],
+    "description": "The file format given at ingest. Null when none was given."
+   },
+   "status": {
+    "$ref": "#/components/schemas/SettlementStatus"
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "matchedCount": {
+    "type": "integer"
+   },
+   "exceptionCount": {
+    "type": "integer"
+   },
+   "providerGross": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "providerFees": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "providerNet": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "ledgerGross": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "difference": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "ingestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `region` scope.**"
+   }
+  }
+ },
+ "SettlementStatus": {
+  "type": "string",
+  "enum": [
+   "ingesting",
+   "parsing",
+   "matching",
+   "matched",
+   "hasExceptions",
+   "resolved",
+   "failed"
+  ]
  },
  "TaxCode": {
   "x-ticvai-persistence": "ledger.tax_code",
@@ -4839,6 +5192,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "readOnly": true,
     "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
    "currencyCode": {
     "type": "string",

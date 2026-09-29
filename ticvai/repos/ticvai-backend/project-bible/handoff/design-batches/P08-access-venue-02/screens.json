@@ -1428,6 +1428,20 @@
        "provenance": "contract games.yaml POST /game-plays/sync"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Fault priority override",
+       "bindsTo": "Asset.priorityOverride",
+       "operation": "updateAsset",
+       "notes": "**\"If this goes down, raise this priority\"** (decided 17 September, M17-01). A fault raised on this asset takes this priority instead of the venue's score. Empty means the score decides.",
+       "provenance": "contract maintenance.yaml Asset.priorityOverride"
+      }
+     ]
     }
    ]
   },
@@ -1580,7 +1594,8 @@
       "linkedAccessPointId",
       "requiresInspectionToReturn",
       "documents",
-      "documentRefs"
+      "documentRefs",
+      "priorityOverride"
      ]
     },
     "provenance": "contract maintenance.yaml POST /assets"
@@ -1625,7 +1640,8 @@
       "warrantyExpiresAt",
       "supplierId",
       "documents",
-      "documentRefs"
+      "documentRefs",
+      "priorityOverride"
      ]
     },
     "provenance": "contract maintenance.yaml PATCH /assets/{assetId}"
@@ -2577,6 +2593,7 @@
        "kind": "secondaryButton",
        "label": "Propose venue labels",
        "operation": "proposeVenueLabels",
+       "notes": "**Block A, bound here** (decided 29 September, AI2 review finding on BO-093). No-data AI: it reads only the shapes the import extracted, proposes, and stops; `acceptVenueLabelProposals` is the human half. When AI is off the button is hidden and the operator labels by hand on BO-094.",
        "provenance": "contract ai.yaml POST /ai/venue-map/{mapId}/propose-labels"
       },
       {
@@ -2930,6 +2947,60 @@
        "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/resources"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Item description",
+       "bindsTo": "VenuePoint.description",
+       "operation": "setVenuePoint",
+       "notes": "**What the guest reads on Item Detail** (decided 29 September, MOB-4): rides, shows, restaurants and shops. Per language.",
+       "provenance": "agreed name venue-map VenuePoint.description (P29 brief)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Photos and video",
+       "bindsTo": "VenuePoint.media",
+       "operation": "searchMedia",
+       "notes": "From the asset library; the first is the gallery cover on GST-004 Item Detail (MOB-4).",
+       "provenance": "agreed name venue-map VenuePoint.media (P29 brief)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Featured offer",
+       "bindsTo": "VenuePoint.featuredOffer",
+       "operation": "listProducts",
+       "notes": "**The product or bundle the item detail proposes** (decided 29 September, MOB-4), on any kind of point, e.g. a restaurant's *meal combo with admission* (a bundle from BO-011). Products from `listProducts`, bundles from `listCatalogueBundles`.",
+       "provenance": "agreed name venue-map VenuePoint.featuredOffer (P29 brief)"
+      },
+      {
+       "kind": "numberField",
+       "label": "Typical visit (minutes)",
+       "bindsTo": "VenuePoint.typicalDurationMinutes",
+       "operation": "setVenuePoint",
+       "notes": "What the Plan tab's planner allows for this stop (MOB-6).",
+       "provenance": "agreed name venue-map VenuePoint.typicalDurationMinutes (P29 brief)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Interests",
+       "bindsTo": "VenuePoint.interestTags",
+       "operation": "setVenuePoint",
+       "notes": "Matched against the guest's interests on the Plan tab (MOB-6).",
+       "provenance": "agreed name venue-map VenuePoint.interestTags (P29 brief)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Cuisine",
+       "bindsTo": "VenuePoint.cuisineTags",
+       "operation": "setVenuePoint",
+       "notes": "For restaurants and kiosks; matched against the guest's cuisine choice on the Plan tab (MOB-6).",
+       "provenance": "agreed name venue-map VenuePoint.cuisineTags (P29 brief)"
+      }
+     ]
     }
    ]
   },
@@ -2940,6 +3011,27 @@
    "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "searchMedia",
+    "contract": "assets",
+    "purpose": "Pick an item's photos and video (MOB-4)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, MOB-4 (P29)"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "Products a point can feature (MOB-4)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, MOB-4 (P29)"
+   },
+   {
+    "operationId": "listCatalogueBundles",
+    "contract": "catalogue",
+    "purpose": "Bundles a point can feature, e.g. a meal combo (MOB-4)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, MOB-4 (P29)"
+   },
    {
     "operationId": "getVenueMap",
     "contract": "venue-map",
@@ -3012,7 +3104,7 @@
     "id": "formSetVenuePoint",
     "component": "modal",
     "trigger": "Save venue point",
-    "body": "**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "SetVenuePointRequest",
     "confirm": {
      "label": "Save venue point",
@@ -3036,7 +3128,13 @@
       "isActive",
       "isNavigable",
       "isDestination",
-      "pointId"
+      "pointId",
+      "description",
+      "media",
+      "featuredOffer",
+      "typicalDurationMinutes",
+      "interestTags",
+      "cuisineTags"
      ]
     },
     "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/points"

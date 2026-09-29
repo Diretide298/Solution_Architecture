@@ -1,0 +1,179 @@
+{
+ "answerConfigurationQuestion": {
+  "method": "POST",
+  "path": "/configuration-sessions/{sessionId}/answers",
+  "contract": "ai",
+  "summary": "Answer the current question",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiConfigurationTurn"
+ },
+ "attachConfigurationSource": {
+  "method": "POST",
+  "path": "/configuration-sessions/{sessionId}/sources",
+  "contract": "ai",
+  "summary": "Seed a configuration session from an uploaded document",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "buildConfigurationPlan": {
+  "method": "POST",
+  "path": "/configuration-sessions/{sessionId}/plan",
+  "contract": "ai",
+  "summary": "Compile the blueprint into a plan",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ },
+ "decideBlueprintRecommendation": {
+  "method": "POST",
+  "path": "/configuration-sessions/{sessionId}/decisions/{decisionKey}",
+  "contract": "ai",
+  "summary": "Accept, modify, reject or defer a blueprint decision",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiBlueprintDecision"
+ },
+ "getConfigurationBlueprint": {
+  "method": "GET",
+  "path": "/configuration-sessions/{sessionId}/blueprint",
+  "contract": "ai",
+  "summary": "The blueprint so far",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "decisionClass",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiBlueprintView"
+ },
+ "listConfigurationSessions": {
+  "method": "GET",
+  "path": "/configuration-sessions",
+  "contract": "ai",
+  "summary": "Configuration-assistant sessions",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "intent",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listConfigurationSources": {
+  "method": "GET",
+  "path": "/configuration-sessions/{sessionId}/sources",
+  "contract": "ai",
+  "summary": "Documents attached to a configuration session",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "startConfigurationSession": {
+  "method": "POST",
+  "path": "/configuration-sessions",
+  "contract": "ai",
+  "summary": "Start the configuration assistant",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiConfigurationSession"
+ }
+}

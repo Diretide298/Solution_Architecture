@@ -1,0 +1,706 @@
+{
+ "CreateRefundRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "amount",
+   "reason",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the refund, and its idempotency key — it must equal the `Idempotency-Key` header."
+   },
+   "lineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "description": "Omit to refund the whole order."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 500
+   },
+   "secondaryAuthorisation": {
+    "type": "object",
+    "description": "Required above the venue's `requiresSecondUserAbove`. A second user — cashier or supervisor — names themselves. This is dual-authorisation, not escalation.\n",
+    "required": [
+     "principalId",
+     "credential"
+    ],
+    "properties": {
+     "principalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "credential": {
+      "type": "string",
+      "maxLength": 512,
+      "description": "The second person's staff PIN, as they sign in at a till with it. **A PIN, never a password** (decided 28 September, audit R123 (7))."
+     }
+    }
+   },
+   "refundToOriginalTender": {
+    "type": "boolean",
+    "default": true
+   },
+   "alternateTender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "ExchangeRateDecimal": {
+  "type": "string",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
+ },
+ "FraudRule": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.fraud_rule",
+  "description": "BL-118. **Evaluated before the charge, and it holds rather than refuses.**\nA rule that declines outright turns a false positive into a lost sale with an angry guest. **A rule that flags for review turns it into a delay** — and at a gate, review means a supervisor rather than a rejection.\n",
+  "required": [
+   "id",
+   "name",
+   "condition",
+   "action",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "condition": {
+    "type": "object",
+    "description": "Velocity, amount, issuer country, device reuse, mismatched billing.",
+    "additionalProperties": true
+   },
+   "appliesTo": {
+    "type": "string",
+    "description": "**`refund` rules are evaluated on `createRefund` and `createRefundRequest`** (5.3.33, 29 September build pass), before the money moves: a hold sends the refund to approval rather than refusing it. `charge` rules are evaluated before a charge, as before.",
+    "enum": [
+     "charge",
+     "refund"
+    ],
+    "default": "charge"
+   },
+   "signal": {
+    "type": "string",
+    "nullable": true,
+    "description": "The measured signal where the rule is one of the named ones; `condition` carries anything else. **`refundCount`, `refundValue` and `refundRatio` detect excessive refunds by one guest** (or one payment card, per `subjectKey`) over `windowDays`: the number of refunds, their total value, or refunds as a share of what that guest bought in the window. **Counted over every sales channel** (5.3.33): tickets, F&B, retail (a retail return raises its refund here, `RetailReturn.refundId`) and every other line, because every refund is an `orders.refund` whichever channel sold it. The access `excessiveRefunds` signal is the gate-side view of ticket refunds only.",
+    "enum": [
+     "velocityCount",
+     "velocityAmount",
+     "issuerCountry",
+     "deviceReuse",
+     "billingMismatch",
+     "refundCount",
+     "refundValue",
+     "refundRatio"
+    ]
+   },
+   "subjectKey": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "paymentToken",
+     "device"
+    ],
+    "default": "guest"
+   },
+   "threshold": {
+    "type": "number",
+    "nullable": true
+   },
+   "windowDays": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "flagForReview",
+     "requireStepUp",
+     "hold",
+     "decline"
+    ]
+   },
+   "riskWeight": {
+    "type": "integer"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "FraudRuleSet": {
+  "type": "object",
+  "x-ticvai-persistence": "none — the whole set of orders.fraud_rule rows, in evaluation order",
+  "description": "**The whole set in one body**, as `setFraudRules` requires: a rule set edited one rule at a time spends time in states nobody intended. A rule left out of the set is deactivated, never deleted.\n",
+  "required": [
+   "rules"
+  ],
+  "properties": {
+   "rules": {
+    "type": "array",
+    "description": "In evaluation order.",
+    "items": {
+     "$ref": "#/components/schemas/FraudRule"
+    }
+   }
+  }
+ },
+ "OrderPaymentDetailTransactionLedgerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Order Payment Detail & Transaction Ledger displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "orderNumber": {
+    "type": "string",
+    "description": "Order Number"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "orderTotal": {
+    "type": "string",
+    "description": "Order Total"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "paid": {
+    "type": "string",
+    "description": "Paid"
+   },
+   "refunded": {
+    "type": "string",
+    "description": "Refunded"
+   },
+   "outstanding": {
+    "type": "string",
+    "description": "Outstanding"
+   },
+   "creditApplied": {
+    "type": "string",
+    "description": "Credit Applied"
+   },
+   "paymentStatus": {
+    "type": "integer",
+    "description": "Payment Status"
+   },
+   "settlementStatus": {
+    "type": "integer",
+    "description": "Settlement Status"
+   },
+   "transactions": {
+    "type": "array",
+    "description": "Every financial transaction on the order, one entry each",
+    "items": {
+     "type": "object",
+     "properties": {
+      "type": {
+       "type": "string",
+       "enum": [
+        "authorization",
+        "capture",
+        "payment",
+        "deposit",
+        "additionalCollection",
+        "partialRefund",
+        "reversal",
+        "walletCredit",
+        "voucher",
+        "creditNote",
+        "adjustment"
+       ],
+       "description": "Transaction type"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Amount"
+      },
+      "status": {
+       "type": "string",
+       "description": "Status"
+      },
+      "gateway": {
+       "type": "string",
+       "description": "Gateway"
+      },
+      "merchant": {
+       "type": "string",
+       "description": "Merchant"
+      },
+      "terminal": {
+       "type": "string",
+       "description": "Terminal"
+      },
+      "authorizationCode": {
+       "type": "string",
+       "description": "Authorization code"
+      },
+      "gatewayTransactionId": {
+       "type": "string",
+       "description": "Gateway transaction ID"
+      },
+      "settlementReference": {
+       "type": "string",
+       "description": "Settlement reference"
+      },
+      "externalReference": {
+       "type": "string",
+       "description": "External reference"
+      },
+      "occurredAt": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Payment": {
+  "x-ticvai-persistence": "orders.payment",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "status",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+   },
+   "fxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
+   },
+   "fxRateSource": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "manual",
+     "feed",
+     "cardScheme"
+    ],
+    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
+   },
+   "changeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "changeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "authorised",
+     "captured",
+     "pendingConfirmation",
+     "declined",
+     "failed",
+     "voided",
+     "refunded"
+    ]
+   },
+   "providerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
+   },
+   "lastInquiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Refund": {
+  "x-ticvai-persistence": "orders.refund",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "amount",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "batchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own."
+   },
+   "fxRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
+   },
+   "taxReversalEntryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A refund reverses the tax entry it created, and this is where that is stated rather than implied.** `reverseJournalEntry` and `calculateTax` both exist, so both halves were present and the obligation was assumed — **an implied obligation is one a developer can miss without failing anything.**\nNull only where the original sale carried no tax.\n"
+   },
+   "settleTo": {
+    "type": "string",
+    "enum": [
+     "originalTender",
+     "advanceBalance",
+     "wireTransfer",
+     "storeCredit"
+    ],
+    "default": "originalTender",
+    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
+   },
+   "fxVariance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedPercentage": {
+    "type": "number",
+    "description": "From the venue's time bands, or an approver override."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingApproval",
+     "pendingGateway",
+     "completed",
+     "declined",
+     "failed"
+    ]
+   },
+   "reason": {
+    "type": "string"
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "secondaryPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ledgerEntryId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Written before the gateway is called."
+   },
+   "gatewayReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RefundPolicy": {
+  "x-ticvai-persistence": "orders.refund_policy + orders.refund_policy_time_band",
+  "type": "object",
+  "description": "Venue-configured. Thresholds are policy, not permission scope — venues run different policies and the permission model should not encode commercial rules.\n**The three thresholds must ascend** (decided 28 September, audit R123 (6)): `selfAuthoriseLimit` <= `requiresSecondUserAbove` <= `requiresApprovalAbove`, where the second is set. `setRefundPolicy` refuses a policy that does not with 422 `refund-thresholds-not-ascending`.\n",
+  "required": [
+   "venueId",
+   "selfAuthoriseLimit",
+   "requiresApprovalAbove"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The venue in the path. Not taken from a `setRefundPolicy` body."
+   },
+   "selfAuthoriseLimit": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Up to this, a holder of ORDER_REFUND refunds alone. Zero means every refund needs a second authoriser.\n"
+   },
+   "requiresSecondUserAbove": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Above this, a second user — cashier OR supervisor — names themselves as audit control. Dual-authorisation, not escalation (2.12.3).\n"
+   },
+   "requiresApprovalAbove": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Above this, an ORDER_REFUND_APPROVE holder must approve."
+   },
+   "timeBands": {
+    "type": "array",
+    "description": "Refundable percentage by time before the performance. Evaluated most-specific first.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "hoursBefore",
+      "percentage"
+     ],
+     "properties": {
+      "hoursBefore": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "percentage": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      }
+     }
+    }
+   },
+   "allowPartial": {
+    "type": "boolean",
+    "default": true
+   },
+   "refundWindowDays": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "Days after purchase within which a refund may be made. 0 is allowed and means the day of purchase only; null means no window (decided 28 September, audit R123 (6))."
+   },
+   "varianceThreshold": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Price variance above this is an exception requiring review rather than a routine posting (CF-38). Venue-configured.\n**A venue setting with a tenant default** (decided 28 September, audit R094). **Proposed default, client to correct (audit R094): AED 5.00 per order line.**\n"
+   }
+  }
+ },
+ "TenderKind": {
+  "type": "string",
+  "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
+  "enum": [
+   "cash",
+   "card",
+   "wallet",
+   "voucher",
+   "bankTransfer",
+   "hotelCharge",
+   "installment",
+   "giftCard",
+   "complimentary"
+  ]
+ },
+ "WalletRefundPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.refund_policy",
+  "description": "Boards 7.4 and 7.5. **Restoration is to the lot, not to the balance.**",
+  "properties": {
+   "defaultDestination": {
+    "type": "string",
+    "enum": [
+     "originalTender",
+     "wallet",
+     "guestChoice"
+    ]
+   },
+   "walletRefundCreditTypeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "restoreToOriginalLots": {
+    "type": "boolean",
+    "default": true
+   },
+   "restoreOriginalExpiry": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Refunding into a new lot with a fresh expiry is a gift.** Sometimes intended, never by accident.\n"
+   },
+   "walletRefundBonusPercent": {
+    "type": "number",
+    "nullable": true,
+    "description": "An incentive to take the refund as credit rather than to a card."
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

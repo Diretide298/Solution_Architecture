@@ -1,0 +1,1547 @@
+[
+ {
+  "id": "ADM-539",
+  "name": "AI Explainability & Audit Command Center",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "3",
+   "number": "1",
+   "page": 55
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-explainability-audit-command-center-adm-539",
+   "component": "apps/ticvai-web/src/routes/platform/AiExplainabilityAuditCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-540",
+    "ADM-541",
+    "ADM-542",
+    "ADM-543",
+    "ADM-544",
+    "ADM-545",
+    "ADM-546",
+    "ADM-547",
+    "ADM-548"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to Platform Dashboard",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "ADM-540",
+     "trigger": "AI Decision Explorer & Search",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-541",
+     "trigger": "AI Decision Explanation Workspace",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-542",
+     "trigger": "Data, Feature & Evidence Provenance",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-543",
+     "trigger": "Candidate, Rule & Decision Path Trace",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-544",
+     "trigger": "Model, Provider & AI Runtime Trace",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-545",
+     "trigger": "Governance, Approval & Human Decision Trace",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-546",
+     "trigger": "Execution & Business Outcome Trace",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-547",
+     "trigger": "AI Audit Record & Evidence Package",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-548",
+     "trigger": "AI Trace Investigation & Replay Simulator",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide management, governance teams and authorized auditors with one central view of AI decisions, explanations, trace completeness and audit status across TICVAI.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search explainability audit",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Filters"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Tenant",
+        "Venue",
+        "Capability",
+        "Risk",
+        "Model",
+        "Provider",
+        "Human Involvement",
+        "Decision",
+        "Environment",
+        "Date"
+       ],
+       "notes": "The pack filters this screen by tenant, venue, capability, risk, model, provider and 4 more — which are present is a decision the pack already made.",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Filters"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "AI Decisions Today",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Governed AI Actions",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Automated Decisions",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Human-Reviewed Decisions",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Human Overrides",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Blocked Decisions",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Explainability Coverage",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Complete Decision Traces",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Incomplete Traces",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Audit Warnings",
+       "provenance": "pack AI_Governance_Reference.pdf, page 55 §Header KPIs"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The explainability audit list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the explainability audit untouched.",
+   "emptyFirstRun": "No explainability audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the explainability audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "searchAiDecisions",
+    "contract": "ai",
+    "purpose": "Find AI decisions",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-539",
+   "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-539"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 55. 0 of 10 labels bound to a contract property; 20 of 58 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-540",
+  "name": "AI Decision Explorer & Search",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "3",
+   "number": "2",
+   "page": 56
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-decision-explorer-search-adm-540",
+   "component": "apps/ticvai-web/src/routes/platform/AiDecisionExplorerSearch.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-539"
+   ],
+   "exitTo": [
+    "ADM-539"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-539",
+     "trigger": "Back to AI Explainability & Audit Command Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow authorized users to locate any AI decision or AI-driven action across TICVAI. This becomes the entry point when someone asks: “Why did TICVAI do this?” Search By Support: Decision ID Trace ID Approval ID Execution ID Transaction ID Customer Reference Session ID User Product Ticket Order Venue AI Capability Model Version Date / Time Example Search Transaction ORD-928410 Results: Time AI Capability Decision Related Object Result 13:42 Recommendation AI Fast Pass ORD-928410 Accepted 13:44 Recommendation AI Family Meal ORD-928410 Ignored 13:46 Fraud AI Risk Assessment ORD-928410 Low Risk Decision Card Selecting a decision displays: Decision ID DEC-49102 Capability Recommendation Engine Customer CUS-****821 Channel B2C Journey Stage Checkout Decision Recommend Fast Pass Rank #1 Confidence 87% Model REC-v3.2 Status Delivered Relationship Search Allow navigation: Customer → Session → Decision → Delivery → Transaction",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 56"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 56"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "searchAiDecisions",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getAiDecisionTrace",
+       "notes": "One record, read-only."
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "operation": "searchAiDecisions",
+       "notes": "Sent as `venueId` (18 September minutes, M18-03: searchable by venue).",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "searchField",
+       "label": "Customer",
+       "operation": "searchAiDecisions",
+       "notes": "Sent as `subjectRef`, the guest profile id (M18-03: searchable by customer).",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The decision search list.",
+   "error": "Could not load. Names which read failed and leaves the decision search untouched.",
+   "emptyFirstRun": "No decision search yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the decision search are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "searchAiDecisions",
+    "contract": "ai",
+    "purpose": "Find AI decisions",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-540",
+   "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-540"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 56. 0 of 0 labels bound to a contract property; 0 of 61 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-541",
+  "name": "AI Decision Explanation Workspace",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "3",
+   "number": "3",
+   "page": 58
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-decision-explanation-workspace-adm-541",
+   "component": "apps/ticvai-web/src/routes/platform/AiDecisionExplanationWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-539"
+   ],
+   "exitTo": [
+    "ADM-539"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-539",
+     "trigger": "Back to AI Explainability & Audit Command Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Explain a selected AI decision in a clear business-readable format.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 58"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 58"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getAiDecisionTrace",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The decision explanation list.",
+   "error": "Could not load. Names which read failed and leaves the decision explanation untouched.",
+   "emptyFirstRun": "No decision explanation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the decision explanation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-541",
+   "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-541"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 58. 0 of 0 labels bound to a contract property; 0 of 54 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-542",
+  "name": "Data, Feature & Evidence Provenance",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "3",
+   "number": "4",
+   "page": 60
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/data-feature-evidence-provenance-adm-542",
+   "component": "apps/ticvai-web/src/routes/platform/DataFeatureEvidenceProvenance.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-539"
+   ],
+   "exitTo": [
+    "ADM-539"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-539",
+     "trigger": "Back to AI Explainability & Audit Command Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Show exactly which data and evidence contributed to an AI decision and where each item originated. This is critical for trust.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 60"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 60"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getAiDecisionTrace",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The data feature evidence list.",
+   "error": "Could not load. Names which read failed and leaves the data feature evidence untouched.",
+   "emptyFirstRun": "No data feature evidence yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the data feature evidence are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-542",
+   "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-542"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 60. 0 of 0 labels bound to a contract property; 0 of 60 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-543",
+  "name": "Candidate, Rule & Decision Path Trace",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "3",
+   "number": "5",
+   "page": 62
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/candidate-rule-decision-path-trace-adm-543",
+   "component": "apps/ticvai-web/src/routes/platform/CandidateRuleDecisionPathTrace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-539"
+   ],
+   "exitTo": [
+    "ADM-539"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-539",
+     "trigger": "Back to AI Explainability & Audit Command Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Explain how TICVAI moved from all possible options to the final AI decision. This is particularly important for recommendation, fraud, pricing and configuration decisions. Example — Recommendation 48 Potential Products ↓ 42 Active 6 removed ↓ 35 Channel Eligible 7 removed ↓ 28 Date / Time Eligible 7 removed ↓ 22 Customer Eligible 6 removed ↓ 18 Capacity Available 4 removed ↓ 14 Passed Exclusions 4 removed ↓ 10 Passed Guardrails 4 removed ↓ 10 Ranked ↓ Fast Pass #1",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Governance_Reference.pdf, page 62 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every candidate rule decision",
+       "columns": [
+        "Rule",
+        "CAP-014",
+        "PASS",
+        "Exclusion Trace",
+        "VIP Tour",
+        "Remaining Capacity = 0"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Governance_Reference.pdf, page 62 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected candidate rule decision",
+       "bindsTo": null,
+       "columns": [
+        "Rule",
+        "CAP-014",
+        "PASS",
+        "Exclusion Trace",
+        "VIP Tour",
+        "Remaining Capacity = 0"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Candidate Table”, “Governance”, “Approval”, “Signals”.",
+       "provenance": "pack AI_Governance_Reference.pdf, page 62 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The candidate rule decision list.",
+   "error": "Could not load. Names which read failed and leaves the candidate rule decision untouched.",
+   "emptyFirstRun": "No candidate rule decision yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the candidate rule decision are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "explainRecommendationDecision",
+    "contract": "ai",
+    "purpose": "Why these recommendations",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Rule",
+    "CAP-014",
+    "PASS",
+    "Exclusion Trace",
+    "VIP Tour",
+    "Remaining Capacity = 0"
+   ],
+   "params": [
+    {
+     "name": "decisionId",
+     "from": "navigation"
+    },
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-543",
+   "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-543"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 62. 0 of 6 labels bound to a contract property; 11 of 62 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-544",
+  "name": "Model, Provider & AI Runtime Trace",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "3",
+   "number": "6",
+   "page": 64
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/model-provider-ai-runtime-trace-adm-544",
+   "component": "apps/ticvai-web/src/routes/platform/ModelProviderAiRuntimeTrace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-539"
+   ],
+   "exitTo": [
+    "ADM-539"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-539",
+     "trigger": "Back to AI Explainability & Audit Command Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Record which AI technology produced or contributed to the decision. This gives TICVAI provider and model traceability without duplicating AI Platform configuration.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Governance_Reference.pdf, page 64 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every model provider runtime",
+       "columns": [
+        "AI Capability",
+        "Engine",
+        "Provider",
+        "Model",
+        "Model Version",
+        "Deployment Reference",
+        "Prompt / Template Version Reference",
+        "Rule Engine Version",
+        "Feature Set Version",
+        "Knowledge Source Version",
+        "Request Timestamp",
+        "Response Timestamp",
+        "Latency",
+        "Tokens / Compute where applicable",
+        "Provider Request Reference",
+        "Fallback Used",
+        "Retry Count",
+        "Primary Provider",
+        "↓",
+        "Timeout",
+        "Fallback Provider",
+        "Success"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Governance_Reference.pdf, page 64 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected model provider runtime",
+       "bindsTo": null,
+       "columns": [
+        "AI Capability",
+        "Engine",
+        "Provider",
+        "Model",
+        "Model Version",
+        "Deployment Reference",
+        "Prompt / Template Version Reference",
+        "Rule Engine Version",
+        "Feature Set Version",
+        "Knowledge Source Version",
+        "Request Timestamp",
+        "Response Timestamp",
+        "Latency",
+        "Tokens / Compute where applicable",
+        "Provider Request Reference",
+        "Fallback Used",
+        "Retry Count",
+        "Primary Provider",
+        "↓",
+        "Timeout",
+        "Fallback Provider",
+        "Success"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Prompt Template”, “Latency”, “Version Traceability”, “Important Boundary”.",
+       "provenance": "pack AI_Governance_Reference.pdf, page 64 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The model provider runtime list.",
+   "error": "Could not load. Names which read failed and leaves the model provider runtime untouched.",
+   "emptyFirstRun": "No model provider runtime yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the model provider runtime are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAiModels",
+    "contract": "ai",
+    "purpose": "The model catalogue",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "AI Capability",
+    "Engine",
+    "Provider",
+    "Model",
+    "Model Version",
+    "Deployment Reference"
+   ],
+   "params": [
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-544",
+   "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-544"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 64. 0 of 22 labels bound to a contract property; 22 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-545",
+  "name": "Governance, Approval & Human Decision Trace",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "3",
+   "number": "7",
+   "page": 66
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/governance-approval-human-decision-trace-adm-545",
+   "component": "apps/ticvai-web/src/routes/platform/GovernanceApprovalHumanDecisionTrace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-539"
+   ],
+   "exitTo": [
+    "ADM-539"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-539",
+     "trigger": "Back to AI Explainability & Audit Command Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Connect Board 1 and Board 2 governance activity to the AI decision.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 66"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 66"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getAiDecisionTrace",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The governance approval human list.",
+   "error": "Could not load. Names which read failed and leaves the governance approval human untouched.",
+   "emptyFirstRun": "No governance approval human yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the governance approval human are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-545",
+   "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-545"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 0 of 65 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-546",
+  "name": "Execution & Business Outcome Trace",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "3",
+   "number": "8",
+   "page": 68
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/execution-business-outcome-trace-adm-546",
+   "component": "apps/ticvai-web/src/routes/platform/ExecutionBusinessOutcomeTrace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-539"
+   ],
+   "exitTo": [
+    "ADM-539"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-539",
+     "trigger": "Back to AI Explainability & Audit Command Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Connect the AI decision to what actually happened in TICVAI. A good AI audit cannot stop at: “AI recommended X.” It needs to know: Was X actually executed, and what was the outcome? Execution Trace Example: AI Proposal Change Adult Weekend Price ↓ Approved AED 150 ↓ Execution Authorization AUTH-9281 ↓ Pricing API Update Pricing Profile ↓ Execution Result SUCCESS Before / After Before Adult Weekend = AED 140 After Adult Weekend = AED 150 Execution Metadata Execution ID Owning Module API / Service Start Time Completion Time Result Retry Failure Rollback Final State",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 68"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 68"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getActionPlan",
+       "notes": "One record, read-only."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The execution business outcome list.",
+   "error": "Could not load. Names which read failed and leaves the execution business outcome untouched.",
+   "emptyFirstRun": "No execution business outcome yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the execution business outcome are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-546",
+   "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-546"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 68. 0 of 0 labels bound to a contract property; 0 of 65 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    },
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-547",
+  "name": "AI Audit Record & Evidence Package",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "3",
+   "number": "9",
+   "page": 70
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-audit-record-evidence-package-adm-547",
+   "component": "apps/ticvai-web/src/routes/platform/AiAuditRecordEvidencePackage.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-539"
+   ],
+   "exitTo": [
+    "ADM-539"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-539",
+     "trigger": "Back to AI Explainability & Audit Command Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create a complete, tamper-evident audit package for an AI decision or group of decisions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved: Single Decision, Customer Journey, AI Capability, Incident, Model Version, Governance Policy. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack AI_Governance_Reference.pdf, page 70 §Allow"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 70"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 70"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Single Decision",
+       "provenance": "pack AI_Governance_Reference.pdf, page 70 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Customer Journey",
+       "provenance": "pack AI_Governance_Reference.pdf, page 70 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "AI Capability",
+       "provenance": "pack AI_Governance_Reference.pdf, page 70 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Incident",
+       "provenance": "pack AI_Governance_Reference.pdf, page 70 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Model Version",
+       "provenance": "pack AI_Governance_Reference.pdf, page 70 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Governance Policy",
+       "provenance": "pack AI_Governance_Reference.pdf, page 70 §Allow"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The audit record evidence list.",
+   "error": "Could not load. Names which read failed and leaves the audit record evidence untouched.",
+   "emptyFirstRun": "No audit record evidence yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the audit record evidence are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "searchAiDecisions",
+    "contract": "ai",
+    "purpose": "Find AI decisions",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "exportAiEvidencePackage",
+    "contract": "ai",
+    "purpose": "Export an evidence package",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-547",
+   "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-547"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 70. 0 of 0 labels bound to a contract property; 6 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-548",
+  "name": "AI Trace Investigation & Replay Simulator",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "3",
+   "number": "10",
+   "page": 71
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-trace-investigation-replay-simulator-adm-548",
+   "component": "apps/ticvai-web/src/routes/platform/AiTraceInvestigationReplaySimulator.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-539"
+   ],
+   "exitTo": [
+    "ADM-539"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-539",
+     "trigger": "Back to AI Explainability & Audit Command Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Compare) and no metric row",
+  "purpose": "Allow authorized governance/technical teams to reconstruct an AI decision and understand whether the same conditions would produce the same or a different outcome. This should be a powerful investigation tool.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Governance_Reference.pdf, page 71 §Compare"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every trace investigation replay",
+       "columns": [
+        "Model v3.2",
+        "Model v3.3",
+        "Alternative Policy Replay",
+        "Governance v1.4",
+        "Governance v1.5",
+        "Comparison"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Governance_Reference.pdf, page 71 §Compare"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected trace investigation replay",
+       "bindsTo": null,
+       "columns": [
+        "Model v3.2",
+        "Model v3.3",
+        "Alternative Policy Replay",
+        "Governance v1.4",
+        "Governance v1.5",
+        "Comparison"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Original Time”, “Result”, “Exact Historical Replay”, “Element Original Replay”, “Eligibility Same Same”, “Authorized investigator can record”.",
+       "provenance": "pack AI_Governance_Reference.pdf, page 71 §Compare"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The trace investigation replay list.",
+   "error": "Could not load. Names which read failed and leaves the trace investigation replay untouched.",
+   "emptyFirstRun": "No trace investigation replay yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the trace investigation replay are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "replayAiDecision",
+    "contract": "ai",
+    "purpose": "Re-simulate a decision",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Model v3.2",
+    "Model v3.3",
+    "Alternative Policy Replay",
+    "Governance v1.4",
+    "Governance v1.5",
+    "Comparison"
+   ],
+   "params": [
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-548",
+   "workshopBoard": "wireframes/WS16 AI Governance Board 3.dc.html#adm-548"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 71. 0 of 6 labels bound to a contract property; 6 of 259 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

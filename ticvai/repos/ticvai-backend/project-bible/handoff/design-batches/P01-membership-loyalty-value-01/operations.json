@@ -18,6 +18,25 @@
   "requestBody": null,
   "responds": "Wishlist"
  },
+ "createInstalmentPlan": {
+  "method": "POST",
+  "path": "/instalment-plans",
+  "contract": "payments",
+  "summary": "Split an order's payment into scheduled instalments on a stored card",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PayInstalmentPlan"
+ },
  "createReferral": {
   "method": "POST",
   "path": "/referrals",
@@ -36,6 +55,25 @@
   ],
   "requestBody": "Referral",
   "responds": "Referral"
+ },
+ "decideRecommendations": {
+  "method": "POST",
+  "path": "/recommendations/decide",
+  "contract": "ai",
+  "summary": "Fill a recommendation slot",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRecommendationResult"
  },
  "deleteGuestAccount": {
   "method": "DELETE",
@@ -56,15 +94,15 @@
   "requestBody": null,
   "responds": null
  },
- "evaluatePromotions": {
+ "enrolMfaMethod": {
   "method": "POST",
-  "path": "/promotions/evaluate",
-  "contract": "promotions",
-  "summary": "Evaluate promotions against a cart",
-  "permission": "PRICE_VIEW",
-  "offlineCapable": true,
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrol an MFA method",
+  "permission": null,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -72,8 +110,8 @@
     "required": null
    }
   ],
-  "requestBody": "EvaluatePromotionsRequest",
-  "responds": "PromotionEvaluation"
+  "requestBody": null,
+  "responds": "MfaEnrolment"
  },
  "exportSubjectData": {
   "method": "POST",
@@ -93,6 +131,98 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "getBillingStatement": {
+  "method": "GET",
+  "path": "/billing-statements/{statementId}",
+  "contract": "orders",
+  "summary": "One statement, with its lines",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "statementId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": "format",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "BillingStatement"
+ },
+ "getCookieConsentRuntime": {
+  "method": "GET",
+  "path": "/storefront/cookie-consent",
+  "contract": "marketing-crm",
+  "summary": "What the page must show and what it may load",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "X-Consent-Key",
+    "in": "header",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "CookieConsentRuntime"
+ },
+ "getDeviceConsentHistory": {
+  "method": "GET",
+  "path": "/consent/device/history",
+  "contract": "marketing-crm",
+  "summary": "A visitor's own cookie decisions, oldest first",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "X-Consent-Key",
+    "in": "header",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "getFacePassEnrolment": {
   "method": "GET",
@@ -123,9 +253,9 @@
  "getGiftCard": {
   "method": "GET",
   "path": "/gift-cards/{cardCode}",
-  "contract": "retail",
+  "contract": "wallet",
   "summary": "Check a gift card balance",
-  "permission": "ORDER_VIEW",
+  "permission": "WALLET_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -155,7 +285,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "programmeId",
+    "in": "query",
+    "required": true
+   }
+  ],
   "requestBody": null,
   "responds": null
  },
@@ -213,15 +349,47 @@
  "getWallet": {
   "method": "GET",
   "path": "/wallets/{subjectId}",
-  "contract": "retail",
+  "contract": "wallet",
   "summary": "Read a guest wallet",
-  "permission": "ORDER_VIEW",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "getWalletAutoReloadSetting": {
+  "method": "GET",
+  "path": "/wallets/{walletId}/auto-reload",
+  "contract": "wallet",
+  "summary": "A wallet's own auto top-up, if the holder set one",
+  "permission": "WALLET_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "Wallet"
+  "responds": "WalletAutoReloadSetting"
+ },
+ "getWalletExitBalance": {
+  "method": "GET",
+  "path": "/wallets/{walletId}/exit-balance",
+  "contract": "wallet",
+  "summary": "What the holder owes or is owed on leaving",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletExitBalance"
  },
  "getWishlist": {
   "method": "GET",
@@ -255,6 +423,40 @@
   "requestBody": null,
   "responds": "DelegatedAccess"
  },
+ "listBillingStatements": {
+  "method": "GET",
+  "path": "/billing-statements",
+  "contract": "orders",
+  "summary": "What was charged, when, and against which agreement",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listDelegations": {
   "method": "GET",
   "path": "/guests/{subjectId}/delegations",
@@ -277,7 +479,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Page"
  },
  "listGuestDevices": {
   "method": "GET",
@@ -301,7 +503,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "GuestDevice"
+  "responds": "Page"
  },
  "listGuestMemberships": {
   "method": "GET",
@@ -330,7 +532,41 @@
    }
   ],
   "requestBody": null,
-  "responds": "GuestMembership"
+  "responds": "Page"
+ },
+ "listInstalmentPlans": {
+  "method": "GET",
+  "path": "/instalment-plans",
+  "contract": "payments",
+  "summary": "Instalment plans and their schedules",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listLoyaltyProgrammes": {
   "method": "GET",
@@ -354,7 +590,44 @@
    }
   ],
   "requestBody": null,
-  "responds": "LoyaltyProgramme"
+  "responds": "Page"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listMyPaymentIssues": {
+  "method": "GET",
+  "path": "/guests/me/payment-issues",
+  "contract": "payments",
+  "summary": "A guest's own failed recurring payments",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPaymentTokens": {
   "method": "GET",
@@ -378,7 +651,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "PaymentToken"
+  "responds": "Page"
  },
  "listProducts": {
   "method": "GET",
@@ -402,6 +675,21 @@
    },
    {
     "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
     "in": "query",
     "required": null
    },
@@ -458,16 +746,55 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listPublishedTrackingTechnologies": {
+  "method": "GET",
+  "path": "/storefront/cookie-consent/technologies",
+  "contract": "marketing-crm",
+  "summary": "The approved cookie registry, as the preference centre shows it",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWalletTransactions": {
   "method": "GET",
   "path": "/wallets/{subjectId}/transactions",
-  "contract": "retail",
+  "contract": "wallet",
   "summary": "Wallet transaction history",
-  "permission": "ORDER_VIEW",
+  "permission": "WALLET_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -500,6 +827,44 @@
   ],
   "requestBody": "RecordConsentRequest",
   "responds": "ConsentState"
+ },
+ "recordDeviceConsent": {
+  "method": "POST",
+  "path": "/consent/device",
+  "contract": "marketing-crm",
+  "summary": "Record a visitor's cookie decision, before anyone is known",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordDeviceConsentRequest",
+  "responds": "DeviceConsent"
+ },
+ "recordRecommendationEvents": {
+  "method": "POST",
+  "path": "/recommendations/events",
+  "contract": "ai",
+  "summary": "Report what happened to recommended items",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "redeemLoyaltyPoints": {
   "method": "POST",
@@ -558,6 +923,49 @@
   "requestBody": null,
   "responds": null
  },
+ "removeMfaMethod": {
+  "method": "DELETE",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Remove an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "retryMyDunningPayment": {
+  "method": "POST",
+  "path": "/dunning-cases/{caseId}/retry",
+  "contract": "payments",
+  "summary": "Retry a declined membership payment now",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "caseId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": "RetryDunningPaymentRequest",
+  "responds": "DunningCase"
+ },
  "revokeFacePass": {
   "method": "DELETE",
   "path": "/face-pass/enrolments/{enrolmentId}",
@@ -595,6 +1003,49 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "setWalletAutoReloadSetting": {
+  "method": "PUT",
+  "path": "/wallets/{walletId}/auto-reload",
+  "contract": "wallet",
+  "summary": "Top the wallet up automatically from a stored card when it runs low",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletAutoReloadSetting",
+  "responds": "WalletAutoReloadSetting"
+ },
+ "settleWalletAtExit": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/exit-settlement",
+  "contract": "wallet",
+  "summary": "Settle a short balance, or refund a credit, when the holder leaves",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletExitSettlement"
  },
  "storePaymentToken": {
   "method": "POST",
@@ -637,9 +1088,9 @@
  "transferWalletBalance": {
   "method": "POST",
   "path": "/wallets/{walletId}/transfer",
-  "contract": "retail",
+  "contract": "wallet",
   "summary": "Send balance to another guest",
-  "permission": "ORDER_MODIFY",
+  "permission": "WALLET_OPERATE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -651,6 +1102,25 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "WalletTransaction"
+ },
+ "verifyMfaEnrolment": {
+  "method": "POST",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Complete enrolment",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaMethod"
  }
 }

@@ -17,7 +17,7 @@
     "GST-039"
    ],
    "entryFrom": [
-    "GST-008"
+    "GST-019"
    ],
    "inferred": false,
    "notes": "**Reached from GST-008** — a refund starts from the ticket being refunded. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
@@ -28,7 +28,7 @@
      "carries": [
       "subjectId"
      ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-067 holds subjectId, so an edge into it carries them"
     }
    ]
   },
@@ -41,8 +41,8 @@
   "gaps": [
    {
     "operation": "getWaiverStatus",
-    "why": "**1 declared operation reach no component on this screen**: getWaiverStatus. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getWaiverStatus` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract marketing-crm.yaml GET /guests/{subjectId}/waiver-status"
    }
   ],
   "layout": {
@@ -54,13 +54,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create refund request",
        "operation": "createRefundRequest",
        "provenance": "contract orders.yaml POST /refund-requests"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create resale listing",
        "operation": "createResaleListing",
        "provenance": "contract orders.yaml POST /resale-listings"
       }
@@ -68,7 +68,15 @@
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Waiver status",
+       "operation": "getWaiverStatus",
+       "notes": "Shows `isSatisfied`, `missingFormIds`, `expiringWithinDays` from `getWaiverStatus`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/waiver-status"
+      }
+     ]
     }
    ]
   },
@@ -77,7 +85,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**No refunds or listings yet.** The venue's policy is shown regardless, so a guest knows the answer before they need it.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getWaiverStatus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** Refunds and resale listings need the server — a queued refund request is a promise nobody made."
   },
   "apis": [
@@ -112,10 +120,58 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-067"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-067",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Refunds & resale"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateRefundRequest",
+    "component": "modal",
+    "trigger": "Create refund request",
+    "body": "**Collects what `createRefundRequest` sends before it is called.** Required: `orderId`, `reason`. Optional: `lineIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create refund request",
+     "operation": "createRefundRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "orderId",
+      "reason",
+      "lineIds"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formCreateResaleListing",
+    "component": "modal",
+    "trigger": "Create resale listing",
+    "body": "**Collects what `createResaleListing` sends before it is called.** Required: `entitlementId`, `askPrice`. Optional: `sellerSubjectId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateResaleListingRequest",
+    "confirm": {
+     "label": "Create resale listing",
+     "operation": "createResaleListing"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "entitlementId",
+      "askPrice",
+      "sellerSubjectId"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -176,11 +232,11 @@
      "carries": [
       "subjectId"
      ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-069 holds subjectId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else operating the screen.\n\n**`pii.subject_biometric` is separate from contact and document precisely so consent and erasure differ per kind.** Revocation sits beside enrolment for the same reason — a face a guest cannot withdraw is a face they did not really consent to.",
+  "notes": "🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else operating the screen.\n\n**`pii.subject_biometric` is separate from contact and document precisely so consent and erasure differ per kind.** Revocation sits beside enrolment for the same reason — a face a guest cannot withdraw is a face they did not really consent to.\n\n**Who is this for** (decided 28 September, audit R205): the signed-in adult enrols themselves or a linked child, and is recorded as guardian by the server. The age below which a subject is a minor is an open value client counsel sets.",
   "density": "comfortable",
   "offline": false,
   "pattern": "statusTracker",
@@ -194,8 +250,20 @@
      "slot": "record",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Who is this for",
+       "bindsTo": "DelegatedAccess",
+       "columns": [
+        "DelegatedAccess.overSubjectId",
+        "DelegatedAccess.delegationKind"
+       ],
+       "operation": "listDelegations",
+       "notes": "**The first step of enrolment** (decided 28 September, audit R205): the signed-in guest, then each child linked to them — the `heldByThisGuest` grants whose `delegationKind` is `familyMember` or `primaryHolder`. The chosen person's id is the `subjectId` that `enrolFacePass` sends. **No guardian field is collected**: the server records the caller as guardian.",
+       "provenance": "contract identity.yaml GET /guests/{subjectId}/delegations"
+      },
+      {
        "kind": "detailPanel",
-       "label": "The selected face pass",
+       "label": "The face pass enrolment",
        "bindsTo": "FacePassEnrolment",
        "columns": [
         "FacePassEnrolment.id",
@@ -220,13 +288,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Enrol",
+       "label": "Enrol face pass",
        "operation": "enrolFacePass",
        "provenance": "contract access.yaml POST /face-pass/enrolments"
       },
       {
        "kind": "destructiveButton",
-       "label": "Revoke",
+       "label": "Revoke face pass",
        "operation": "revokeFacePass",
        "provenance": "contract access.yaml DELETE /face-pass/enrolments/{enrolmentId}"
       }
@@ -238,9 +306,31 @@
    {
     "id": "confirmRevokeFacePass",
     "component": "confirmDialog",
-    "trigger": "Revoke",
+    "trigger": "Revoke face pass",
     "body": "**Names what `revokeFacePass` changes and what it leaves alone**, in the consequence rather than the verb. A face pass this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract access.yaml DELETE /face-pass/enrolments/{enrolmentId}"
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formEnrolFacePass",
+    "component": "modal",
+    "trigger": "Enrol face pass",
+    "body": "**Collects what `enrolFacePass` sends before it is called.** Required: `subjectId`, `entitlementId`, `template`, `capturedAt`, `source`, `consent`. `subjectId` is the person picked in **Who is this for** (the guest or a linked child), not typed; **no guardian is asked for** — the server sets `consent.guardianSubjectId` to the signed-in guest (decided 28 September, audit R205). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Enrol face pass",
+     "operation": "enrolFacePass"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "entitlementId",
+      "template",
+      "capturedAt",
+      "source",
+      "consent"
+     ]
+    },
+    "provenance": "client-verified"
    }
   ],
   "states": {
@@ -248,10 +338,17 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Not enrolled.** What a face pass is for, where it works, and what withdrawing it does — **before** the camera opens.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads."
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getFacePassEnrolment` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads.",
+   "subjectNotLinked": "**Refused: that person is not linked to you** (403 `subject-not-linked`). A guest may enrol only themselves or a child linked to them by a family-member or primary-holder delegation; the screen says so and returns to **Who is this for**, which is refreshed in case the link was just removed (decided 28 September, audit R205)."
   },
   "apis": [
+   {
+    "operationId": "listDelegations",
+    "contract": "identity",
+    "purpose": "Who this guest may enrol — themselves and the children linked to them (heldByThisGuest, familyMember or primaryHolder) (decided 28 September, audit R205)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "enrolFacePass",
     "contract": "access",
@@ -286,8 +383,15 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-069"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-069",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Face Pass (also Account → Face Pass)"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -350,7 +454,7 @@
      "carries": [
       "subjectId"
      ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-071 holds subjectId, so an edge into it carries them"
     }
    ]
   },
@@ -369,7 +473,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every payment methods",
+       "label": "Every payment token",
        "bindsTo": "PaymentToken",
        "columns": [
         "PaymentToken.id",
@@ -393,7 +497,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected payment methods",
+       "label": "The selected payment token",
        "bindsTo": "PaymentToken",
        "columns": [
         "PaymentToken.id",
@@ -408,6 +512,24 @@
        ],
        "operation": "listPaymentTokens",
        "provenance": "contract orders.yaml GET /payment-tokens"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The gift card",
+       "bindsTo": "GiftCard",
+       "columns": [
+        "GiftCard.cardCode",
+        "GiftCard.kind",
+        "GiftCard.faceValue",
+        "GiftCard.balance",
+        "GiftCard.status",
+        "GiftCard.blockedReason",
+        "GiftCard.issuedAt",
+        "GiftCard.activatedAt",
+        "GiftCard.expiresAt"
+       ],
+       "operation": "getGiftCard",
+       "provenance": "contract wallet.yaml GET /gift-cards/{cardCode}"
       }
      ]
     },
@@ -417,19 +539,19 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Store",
+       "label": "Store payment token",
        "operation": "storePaymentToken",
        "provenance": "contract orders.yaml POST /payment-tokens"
       },
       {
        "kind": "secondaryButton",
-       "label": "Transfer",
+       "label": "Transfer wallet balance",
        "operation": "transferWalletBalance",
        "provenance": "contract retail.yaml POST /wallets/{walletId}/transfer"
       },
       {
        "kind": "secondaryButton",
-       "label": "Redeem",
+       "label": "Redeem loyalty points",
        "operation": "redeemLoyaltyPoints",
        "provenance": "contract marketing-crm.yaml POST /loyalty/redemptions"
       }
@@ -442,7 +564,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**No stored cards.** A guest arrives here after a first purchase, so the empty state is the common one.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "apis": [
@@ -463,7 +585,7 @@
    },
    {
     "operationId": "transferWalletBalance",
-    "contract": "retail",
+    "contract": "wallet",
     "purpose": "Send balance to another guest",
     "trigger": "onAction",
     "invalidates": [
@@ -481,9 +603,9 @@
    },
    {
     "operationId": "getGiftCard",
-    "contract": "retail",
+    "contract": "wallet",
     "purpose": "Balance on a gift card",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -512,10 +634,81 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-071"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-071",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Payment methods",
+    "differences": "The Account → \"Payment methods\" row opens Engine settings instead of this screen."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formStorePaymentToken",
+    "component": "modal",
+    "trigger": "Store payment token",
+    "body": "**Collects what `storePaymentToken` sends before it is called.** Required: `providerId`, `providerToken`, `consentPurposeId`. Optional: `setDefault`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Store payment token",
+     "operation": "storePaymentToken"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "providerId",
+      "providerToken",
+      "consentPurposeId",
+      "setDefault"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formTransferWalletBalance",
+    "component": "modal",
+    "trigger": "Transfer wallet balance",
+    "body": "**Collects what `transferWalletBalance` sends before it is called.** Required: `amount`. Optional: `toSubjectId`, `toWalletId`, `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer wallet balance",
+     "operation": "transferWalletBalance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "amount",
+      "toSubjectId",
+      "toWalletId",
+      "message"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRedeemLoyaltyPoints",
+    "component": "modal",
+    "trigger": "Redeem loyalty points",
+    "body": "**Collects what `redeemLoyaltyPoints` sends before it is called.** Required: `subjectId`, `programmeId`, `points`. Optional: `rewardId`, `orderId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Redeem loyalty points",
+     "operation": "redeemLoyaltyPoints"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "programmeId",
+      "points",
+      "rewardId",
+      "orderId"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -576,23 +769,16 @@
      "carries": [
       "subjectId"
      ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-073 holds subjectId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "**A guest could enrol a second factor and not manage it.** Small screen, and it is the one a guest reaches after losing a phone.",
+  "notes": "**A guest could enrol a second factor and not manage it.** Small screen, and it is the one a guest reaches after losing a phone. **Two-step verification, per venue** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, which had removed it on 28 September): a guest may enrol a method on their account (`listMfaMethods`, `enrolMfaMethod`, `verifyMfaEnrolment`, `removeMfaMethod`; an authenticator, with an email code as fallback), **offered only when at least one venue of the tenant has `VenueSettings.identity.guestTwoStep.enabled` on** — when none has, the section is not shown. The code is then asked only when signing in or acting at a venue that has it on (step-up before that venue's `guestTwoStep.stepUpActions`: `createMfaChallenge`, `verifyMfaChallenge`). No enterprise SSO for guests (R167, first part, stands). What the screen offers instead: the sign-in methods linked to the account (`GuestSession.identityProviders`), confirming the email that recovers it (`verifyGuestEmail`), the devices that hold its credentials and signing a lost one out (`listGuestDevices`, `revokeGuestDevice`), and signing out here (`guestLogout`). The contract has no guest operation that lists sessions, so \"your sessions\" is the device list.",
   "density": "comfortable",
   "offline": false,
   "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`createMfaChallenge`) and no read of a population — it is settings, not a list",
-  "purpose": "**A guest could enrol a second factor and not manage it.** Small screen, and it is the one a guest reaches after losing a phone.",
-  "gaps": [
-   {
-    "operation": "createMfaChallenge",
-    "why": "**`createMfaChallenge` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract identity.yaml POST /auth/mfa/challenge"
-   }
-  ],
+  "patternReason": "settings for the guest's own sign-in — the linked sign-in methods (`getGuestSession`) and the devices that hold the account (`listGuestDevices`), each with one act; not a list to browse",
+  "purpose": "**How this guest signs in, and where.** The sign-in methods linked to the account, the email that recovers it, and the devices signed in, with a way to sign a lost phone out. Small screen, and it is the one a guest reaches after losing a phone. Two-step verification where a venue of the tenant enabled it (decided 29 September, rev 3 GAP-B1, per venue).",
   "layout": {
    "template": "form",
    "regions": [
@@ -601,10 +787,34 @@
      "slot": "publish",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createMfaChallenge",
-       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
+       "kind": "secondaryButton",
+       "label": "Sign out on this device",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register guest device",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke guest device",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify guest email",
+       "operation": "verifyGuestEmail",
+       "provenance": "contract identity.yaml POST /auth/guest/verify-email"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Set up two-step verification",
+       "operation": "enrolMfaMethod",
+       "provenance": "decided 29 September, rev 3 GAP-B1"
       }
      ]
     },
@@ -613,23 +823,44 @@
      "components": [
       {
        "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listGuestDevices",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "label": "Every guest device",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.tokenRef",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
       },
       {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "revokeGuestDevice",
-       "label": "Revoke guest device",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not."
+       "kind": "detailPanel",
+       "label": "How you sign in",
+       "bindsTo": "GuestSession",
+       "columns": [
+        "GuestSession.displayName",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders"
+       ],
+       "operation": "getGuestSession",
+       "notes": "The sign-in methods linked to this account (code, password, Apple, Google, UAE Pass) and whether its contact is verified. A second factor is listed only when a venue of the tenant enabled guest two-step verification (decided 29 September, rev 3 GAP-B1, per venue).",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createMfaChallenge"
+       "kind": "cardList",
+       "label": "Two-step verification",
+       "notes": "Enrol, verify, remove. **Shown only when a venue of the tenant has guest two-step verification on.**",
+       "operation": "listMfaMethods",
+       "provenance": "decided 29 September, rev 3 GAP-B1 (per venue)"
       }
      ]
     }
@@ -638,15 +869,21 @@
   "states": {
    "loading": "Content loads.",
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
-   "emptyFirstRun": "**No second factor enrolled.** Explains what one protects before asking for a phone number.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a second factor set up offline is not a second factor."
+   "emptyFirstRun": "**Only this device is signed in.** The device list holds one row, this one, and the screen says that signing in elsewhere will add a row here.",
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `verifyGuestEmail` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in."
   },
   "apis": [
    {
-    "operationId": "createMfaChallenge",
+    "operationId": "getGuestSession",
     "contract": "identity",
-    "purpose": "Step-up authentication for a sensitive action",
+    "purpose": "The sign-in methods linked to the account and whether it is verified",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "Sign out on this device",
     "trigger": "onAction"
    },
    {
@@ -672,6 +909,65 @@
     "contract": "identity",
     "purpose": "Confirm the address before it can recover an account",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "The guest's enrolled methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an authenticator (email code as fallback)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Confirm the enrolment with a first code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove a method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Step-up before a sensitive act at a venue that has it on",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Check the step-up code",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getMyIdentityVerification",
+    "contract": "identity",
+    "purpose": "Show the guest's ID verification status",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "submitGuestIdentityDocument",
+    "contract": "identity",
+    "purpose": "Upload an ID document for verification",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -683,16 +979,98 @@
     {
      "name": "deviceId",
      "from": "session"
+    },
+    {
+     "name": "challengeId",
+     "from": "navigation"
+    },
+    {
+     "name": "methodId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-073"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-073",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Account → All screens → Wave 2 → Security & sign-in",
+    "differences": "Prototype offers two-step verification and a trusted-device skip, but the YAML says guests have no second factor (R167). Either remove the toggle from the prototype or reopen the decision."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRegisterGuestDevice",
+    "component": "modal",
+    "trigger": "Register guest device",
+    "body": "**Collects what `registerGuestDevice` sends before it is called.** Required: `platform`, `token`. Optional: `appVersion`, `osVersion`, `deviceModel`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Register guest device",
+     "operation": "registerGuestDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "platform",
+      "token",
+      "appVersion",
+      "osVersion",
+      "deviceModel",
+      "locale"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke guest device",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A security sign-in this affects should be identified in the dialog, not just counted.",
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formVerifyGuestEmail",
+    "component": "modal",
+    "trigger": "Verify guest email",
+    "body": "**Collects what `verifyGuestEmail` sends before it is called.** Required: `mode`. Optional: `token`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Verify guest email",
+     "operation": "verifyGuestEmail"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "mode",
+      "token"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formEnrolMfaMethod",
+    "component": "modal",
+    "trigger": "Set up two-step verification",
+    "body": "**Collects what `enrolMfaMethod` sends**, then asks for the first code (`verifyMfaEnrolment`). The guest is told the code will be asked only at venues that turned it on. Dismissing enrols nothing.",
+    "confirm": {
+     "label": "Turn on",
+     "operation": "verifyMfaEnrolment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "methodId"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",

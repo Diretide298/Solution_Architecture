@@ -1,4 +1,23 @@
 {
+ "cloneAccreditationProgramme": {
+  "method": "POST",
+  "path": "/accreditation-programmes/{programmeId}/clone",
+  "contract": "accreditation",
+  "summary": "Start a programme from a template or last season's programme",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationProgramme"
+ },
  "createAccreditationApplication": {
   "method": "POST",
   "path": "/accreditation-applications",
@@ -6,7 +25,7 @@
   "summary": "Apply, or apply on behalf of somebody",
   "permission": "ACCREDITATION_APPLY",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -25,7 +44,7 @@
   "summary": "Define a programme, its categories and its window",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -128,7 +147,13 @@
   "offlineCapable": null,
   "conflictPolicy": null,
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "isTemplate",
+    "in": "query",
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AccreditationProgramme"
  },
@@ -139,7 +164,7 @@
   "summary": "What each applicant type must supply and pass",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -150,5 +175,81 @@
   ],
   "requestBody": "AccreditationRequirements",
   "responds": "AccreditationRequirements"
+ },
+ "submitAccreditationApplication": {
+  "method": "POST",
+  "path": "/accreditation-applications/{applicationId}/submit",
+  "contract": "accreditation",
+  "summary": "Send a draft for review",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
+ "updateAccreditationApplication": {
+  "method": "PUT",
+  "path": "/accreditation-applications/{applicationId}",
+  "contract": "accreditation",
+  "summary": "Save a draft, or amend an application returned for information",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationApplication",
+  "responds": "AccreditationApplication"
+ },
+ "updateAccreditationProgramme": {
+  "method": "PUT",
+  "path": "/accreditation-programmes/{programmeId}",
+  "contract": "accreditation",
+  "summary": "Amend a programme, link its registration form, or mark it a template",
+  "permission": "ACCREDITATION_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationProgramme",
+  "responds": "AccreditationProgramme"
+ },
+ "withdrawAccreditationApplication": {
+  "method": "POST",
+  "path": "/accreditation-applications/{applicationId}/withdraw",
+  "contract": "accreditation",
+  "summary": "Withdraw an application before it is decided",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
  }
 }

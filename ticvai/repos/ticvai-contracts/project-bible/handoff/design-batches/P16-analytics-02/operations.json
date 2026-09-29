@@ -1,0 +1,124 @@
+{
+ "getAiVenueSettings": {
+  "method": "GET",
+  "path": "/venues/{venueId}/ai-settings",
+  "contract": "ai",
+  "summary": "The venue AI profile the baselines stand on",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiVenueSettings"
+ },
+ "getVenueHistoryImport": {
+  "method": "GET",
+  "path": "/history-imports/{importId}",
+  "contract": "ai",
+  "summary": "One history import, with its findings",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiHistoryImport"
+ },
+ "importVenueHistory": {
+  "method": "POST",
+  "path": "/venues/{venueId}/history-imports",
+  "contract": "ai",
+  "summary": "Import the venue's own historical exports for the AI baselines",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listAiCapabilityMaturity": {
+  "method": "GET",
+  "path": "/capability-maturity",
+  "contract": "ai",
+  "summary": "Where each AI answer stands on the way from baseline to learned",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "stage",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listVenueHistoryImports": {
+  "method": "GET",
+  "path": "/venues/{venueId}/history-imports",
+  "contract": "ai",
+  "summary": "The venue's history imports",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setAiVenueSettings": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/ai-settings",
+  "contract": "ai",
+  "summary": "Set the venue AI profile",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiVenueSettings",
+  "responds": "AiVenueSettings"
+ }
+}

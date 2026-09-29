@@ -1,6 +1,6 @@
 # P08-venue-operations-02 — P08 · Venue Operations (2 of 2)
 
-**5 screens · 18 operations · 36 schemas · 11 permissions**
+**5 screens · 21 operations · 40 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-129` | Software, Configuration & Version Management | listDetail | 9 | 4 | — |
+| `BO-129` | Software, Configuration & Version Management | listDetail | 12 | 4 | — |
 | `BO-130` | Offline Policy & Rules Configuration | listDetail | 4 | 3 | — |
 | `BO-131` | Connectivity & Auto-Switch Settings | configEditor | 1 | 0 | — |
 | `BO-132` | Offline Transaction Monitor & Sync Queue | listDetail | 2 | 1 | — |

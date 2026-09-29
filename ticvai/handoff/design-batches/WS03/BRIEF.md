@@ -1,6 +1,6 @@
 # WS03 — Access Control board 3
 
-**10 screens · 17 operations · 18 schemas · 5 permissions**
+**10 screens · 17 operations · 24 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

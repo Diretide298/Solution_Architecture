@@ -1,6 +1,6 @@
 # P01-engagement-support-01 — P01 · Engagement & Support
 
-**6 screens · 21 operations · 34 schemas · 4 permissions**
+**6 screens · 24 operations · 43 schemas · 4 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -61,13 +61,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-025` | Help Centre / FAQ | statusTracker | 3 | 0 | — |
+| `WEB-025` | Help Centre / FAQ | statusTracker | 3 | 1 | — |
 | `WEB-026` | Survey & Feedback | configEditor | 1 | 0 | — |
-| `WEB-027` | Newsletter Subscription | listDetail | 9 | 2 | — |
+| `WEB-027` | Newsletter Subscription | listDetail | 9 | 6 | — |
 | `WEB-028` | Contact & Venue Information | statusTracker | 1 | 0 | — |
-| `WEB-044` | AI Concierge – Home | statusTracker | 7 | 0 | — |
-| `WEB-046` | In-Venue Notifications | configEditor | 1 | 0 | — |
+| `WEB-044` | AI Concierge – Home | statusTracker | 8 | 5 | — |
+| `WEB-046` | In-Venue Notifications | configEditor | 3 | 0 | — |
 
 ## Thin screens in this batch
 
-**WEB-028, WEB-046 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**WEB-028 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

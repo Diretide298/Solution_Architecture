@@ -21,7 +21,6 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-031"
    ],
    "fromFlows": true,
@@ -29,45 +28,23 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-030 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
      "to": "GST-031",
      "trigger": "AI Concierge – Home",
      "carries": [
-      "conversationId",
       "outletId"
      ],
-     "provenance": "derived — GST-031 declares entryState.params conversationId, outletId, so an edge into it must carry them"
+     "provenance": "derived — GST-031 declares entryState.params conversationId, outletId and GST-030 holds outletId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "Inventory cites `GET /notifications` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Back in the first release** (decided 29 September, rev 3 GAP-C1): the notifications feed is needed in the first release, which reverses audit R242's deferral of this screen. The `deferred` block is removed and the screen returns to `wave: 2`, where it sat before R242. Queue calls and order status still also show on the queue and order screens, which poll.",
   "density": "comfortable",
   "pattern": "configEditor",
-  "patternReason": "the screen declares only writes (`claimLocationSession`) and no read of a population — it is settings, not a list",
+  "patternReason": "`listMyNotifications` reads the feed (decided 29 September, rev 3 GAP-C1); the location-session claim stays a form on the same screen, so the pattern is kept until the screen is redrawn",
   "purpose": "Work with in-venue notifications for this venue.",
-  "gaps": [
-   {
-    "operation": "claimLocationSession",
-    "why": "**`claimLocationSession` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract fnb.yaml POST /location-sessions"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -77,9 +54,16 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Claim",
+       "label": "Claim location session",
        "operation": "claimLocationSession",
        "provenance": "contract fnb.yaml POST /location-sessions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Mark all as read",
+       "operation": "markMyNotificationsRead",
+       "notes": "Sends `{all: true}`. Only the guest's own notifications are marked.",
+       "provenance": "contract marketing-crm.yaml POST /me/notifications/read"
       }
      ]
     },
@@ -87,35 +71,81 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "claimLocationSession"
+       "kind": "textField",
+       "label": "Location code",
+       "operation": "claimLocationSession",
+       "provenance": "contract fnb.yaml POST /location-sessions"
+      },
+      {
+       "kind": "textField",
+       "label": "Seat reference",
+       "operation": "claimLocationSession",
+       "provenance": "contract fnb.yaml POST /location-sessions"
+      },
+      {
+       "kind": "numberField",
+       "label": "Party size",
+       "operation": "claimLocationSession",
+       "provenance": "contract fnb.yaml POST /location-sessions"
+      },
+      {
+       "kind": "cardList",
+       "label": "Notifications",
+       "bindsTo": "GuestNotification",
+       "operation": "listMyNotifications",
+       "notes": "**Newest first, unread ones marked.** Each card shows the kind, title, body and when it was queued; tapping one opens its `deepLink` (an order, a queue ticket, a booking) and marks it read. `unreadCount` is the badge on the tab. Sends `?venueId=` for the venue the guest picked.",
+       "provenance": "contract marketing-crm.yaml GET /me/notifications (decided 29 September, rev 3 GAP-C1)"
+      },
+      {
+       "kind": "toggle",
+       "label": "Unread only",
+       "operation": "listMyNotifications",
+       "notes": "Sends `?unreadOnly=` to `listMyNotifications`.",
+       "provenance": "contract marketing-crm.yaml GET /me/notifications"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The saved in-venue notifications.",
+   "loading": "The notification feed.",
    "error": "Could not load. Names which read failed and leaves the in-venue notifications untouched.",
-   "emptyFirstRun": "No in-venue notifications configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late."
+   "emptyFirstRun": "**No notifications yet.** Queue calls, order updates and venue notices appear here as the venue sends them.",
+   "offline": "**The offline banner shows.** Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late.",
+   "emptyNoResults": "**No unread notifications.** Names the Unread only filter and offers to show all; the read ones are still there."
   },
   "apis": [
    {
     "operationId": "claimLocationSession",
     "contract": "fnb",
     "purpose": "From the flow it appears in",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listMyNotifications",
+    "contract": "marketing-crm",
+    "purpose": "The guest's notification feed, newest first: queue calls, order ready, booking changes, venue alerts (decided 29 September, rev 3 GAP-C1)",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "markMyNotificationsRead",
+    "contract": "marketing-crm",
+    "purpose": "Mark the opened notifications, or all of them, read",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-030"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-030",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "DEFERRED (R242), still in the prototype: Account → All screens → Wave 2 → In-venue notifications; At-venue tab → Alerts",
+    "differences": "The YAML defers this (no in-app notification feed in the first release), but the prototype still shows a feed and an Alerts tab, so the client will expect it."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -170,7 +200,6 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-032"
    ],
    "fromFlows": true,
@@ -178,35 +207,19 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-031 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
      "to": "GST-032",
      "trigger": "AI Concierge – Chat",
      "carries": [
-      "cartId",
-      "conversationId",
-      "orderId"
+      "conversationId"
      ],
-     "provenance": "derived — GST-032 declares entryState.params cartId, conversationId, orderId, so an edge into it must carry them"
+     "provenance": "derived — GST-032 declares entryState.params conversationId, messageId, orderId and GST-031 holds conversationId, so an edge into it carries them"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. **Cross-surface parity, 31 August**: added createAiConversation, handoverToAgent, requestSuggestion. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
-  "openQuestions": [
-   "Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. **Cross-surface parity, 31 August**: added createAiConversation, handoverToAgent, requestSuggestion. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** The concierge shows as mascot art when `BookingFlowConfig.conciergeMascot` is on (default), otherwise a plain button (CFG-5).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getGuestMenu` reads one record and nothing reads a population — the screen is about that one thing",
@@ -220,7 +233,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected concierge home",
+       "label": "The guest menu",
        "bindsTo": "GuestMenu",
        "columns": [
         "GuestMenu.outletId",
@@ -242,25 +255,25 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Send",
+       "label": "Send AI message",
        "operation": "sendAiMessage",
        "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create AI conversation",
        "operation": "createAiConversation",
        "provenance": "contract ai.yaml POST /conversations"
       },
       {
        "kind": "secondaryButton",
-       "label": "Handover",
+       "label": "Handover to agent",
        "operation": "handoverToAgent",
        "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
       },
       {
        "kind": "secondaryButton",
-       "label": "Request",
+       "label": "Request suggestion",
        "operation": "requestSuggestion",
        "provenance": "contract ai.yaml POST /ai/suggestions"
       }
@@ -269,11 +282,10 @@
    ]
   },
   "states": {
-   "loading": "The concierge home list.",
+   "loading": "The concierge home, read by `getGuestMenu`.",
    "error": "Could not load. Names which read failed and leaves the concierge home untouched.",
-   "emptyFirstRun": "No concierge home yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the concierge home are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No concierge home yet. Offers Create AI conversation (`createAiConversation`).",
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "apis": [
@@ -304,7 +316,7 @@
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
-    "purpose": "requestSuggestion",
+    "purpose": "A suggestion of kind prepPlan, upsell or waitTime from the concierge; an itinerary (guest-allowed since 29 September) is asked on the Plan tab (GST-054), not here",
     "trigger": "onAction"
    }
   ],
@@ -323,10 +335,94 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-031"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-031",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → AI concierge – home"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSendAiMessage",
+    "component": "modal",
+    "trigger": "Send AI message",
+    "body": "**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional: `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Send AI message",
+     "operation": "sendAiMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "content",
+      "collectionIds"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formCreateAiConversation",
+    "component": "modal",
+    "trigger": "Create AI conversation",
+    "body": "**Collects what `createAiConversation` sends before it is called.** Required: `module`. Optional: `locale`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create AI conversation",
+     "operation": "createAiConversation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "module",
+      "locale"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formHandoverToAgent",
+    "component": "modal",
+    "trigger": "Handover to agent",
+    "body": "**Collects what `handoverToAgent` sends before it is called.** Required: `reason`. Optional: `summary`, `preferredQueueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Handover to agent",
+     "operation": "handoverToAgent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "summary",
+      "preferredQueueId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRequestSuggestion",
+    "component": "modal",
+    "trigger": "Request suggestion",
+    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`, offered as `prepPlan`, `upsell` or `waitTime` only — no `scenario`; an itinerary is asked on the Plan tab (GST-054, since 29 September). Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request suggestion",
+     "operation": "requestSuggestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "subjectRef",
+      "horizon",
+      "context"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -379,7 +475,6 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-033"
    ],
    "fromFlows": true,
@@ -387,18 +482,7 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-032 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
      "to": "GST-033",
@@ -406,25 +490,15 @@
      "carries": [
       "conversationId"
      ],
-     "provenance": "derived — GST-033 declares entryState.params conversationId, so an edge into it must carry them"
+     "provenance": "derived — GST-033 declares entryState.params conversationId and GST-032 holds conversationId, so an edge into it carries them"
     }
    ]
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error.",
-  "openQuestions": [
-   "Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed."
-  ],
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Add ai concierge – chat for this venue.",
-  "gaps": [
-   {
-    "operation": "getCart",
-    "why": "**1 declared operation reach no component on this screen**: getCart. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -434,7 +508,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected concierge chat",
+       "label": "The guest order status",
        "bindsTo": "GuestOrderStatus",
        "columns": [
         "GuestOrderStatus.orderId",
@@ -446,6 +520,31 @@
        ],
        "operation": "getGuestOrderStatus",
        "provenance": "contract fnb.yaml GET /guest-orders/{orderId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cart",
+       "bindsTo": "Cart",
+       "columns": [
+        "Cart.id",
+        "Cart.token",
+        "Cart.venueId",
+        "Cart.channel",
+        "Cart.subjectId",
+        "Cart.status",
+        "Cart.lines",
+        "Cart.conflicts",
+        "Cart.subtotal",
+        "Cart.discountTotal",
+        "Cart.taxTotal",
+        "Cart.total",
+        "Cart.appliedPromotionIds",
+        "Cart.expiresAt",
+        "Cart.extensionsUsed",
+        "Cart.maxExtensions"
+       ],
+       "operation": "getCart",
+       "provenance": "contract orders.yaml GET /carts/{cartId}"
       }
      ]
     },
@@ -455,37 +554,37 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create guest F&B order",
        "operation": "createGuestFnbOrder",
        "provenance": "contract fnb.yaml POST /guest-orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       },
       {
        "kind": "secondaryButton",
-       "label": "Checkout",
+       "label": "Checkout cart",
        "operation": "checkoutCart",
        "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
       },
       {
        "kind": "secondaryButton",
-       "label": "Send",
+       "label": "Send AI message",
        "operation": "sendAiMessage",
        "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Send",
+       "label": "Send conversation message",
        "operation": "sendConversationMessage",
        "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/messages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Handover",
+       "label": "Handover to agent",
        "operation": "handoverToAgent",
        "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
       }
@@ -494,11 +593,10 @@
    ]
   },
   "states": {
-   "loading": "The concierge chat list.",
+   "loading": "The concierge chat, read by `getGuestOrderStatus`.",
    "error": "Could not load. Names which read failed and leaves the concierge chat untouched.",
-   "emptyFirstRun": "No concierge chat yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the concierge chat are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No concierge chat yet. Offers Create guest F&B order (`createGuestFnbOrder`).",
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "apis": [
@@ -506,7 +604,7 @@
     "operationId": "createGuestFnbOrder",
     "contract": "fnb",
     "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getGuestOrderStatus",
@@ -549,6 +647,13 @@
     "contract": "marketing-crm",
     "purpose": "Pass an assistant conversation to a person",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "recordAnswerFeedback",
+    "contract": "ai",
+    "purpose": "Say whether an answer helped",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -564,16 +669,150 @@
     {
      "name": "orderId",
      "from": "deepLink"
+    },
+    {
+     "name": "messageId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom. **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-032"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-032",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → AI concierge – chat"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateGuestFnbOrder",
+    "component": "modal",
+    "trigger": "Create guest F&B order",
+    "body": "**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`, `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateGuestOrderRequest",
+    "confirm": {
+     "label": "Create guest F&B order",
+     "operation": "createGuestFnbOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "quotedTotal",
+      "recordedAt",
+      "locationSessionId",
+      "outletId",
+      "fulfilment",
+      "paymentMethod"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formCheckoutCart",
+    "component": "modal",
+    "trigger": "Checkout cart",
+    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Checkout cart",
+     "operation": "checkoutCart"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "attendees"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formSendAiMessage",
+    "component": "modal",
+    "trigger": "Send AI message",
+    "body": "**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional: `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Send AI message",
+     "operation": "sendAiMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "content",
+      "collectionIds"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formSendConversationMessage",
+    "component": "modal",
+    "trigger": "Send conversation message",
+    "body": "**Collects what `sendConversationMessage` sends before it is called.** Required: `body`. Optional: `attachments`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Send conversation message",
+     "operation": "sendConversationMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "body",
+      "attachments"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formHandoverToAgent",
+    "component": "modal",
+    "trigger": "Handover to agent",
+    "body": "**Collects what `handoverToAgent` sends before it is called.** Required: `reason`. Optional: `summary`, `preferredQueueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Handover to agent",
+     "operation": "handoverToAgent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "summary",
+      "preferredQueueId"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -625,44 +864,22 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "fromFlows": true,
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-033 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
   "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. **createPayment removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class). **Navigation repointed to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client board was adopted. **Cross-platform navigation removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
-  "openQuestions": [
-   "Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed."
-  ],
   "density": "comfortable",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`sendAiMessage`) and no read of a population — it is settings, not a list",
   "purpose": "Answer a question without needing a person.",
-  "gaps": [
-   {
-    "operation": "sendAiMessage",
-    "why": "**`sendAiMessage` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract ai.yaml POST /conversations/{conversationId}/messages"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -672,7 +889,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Send",
+       "label": "Send AI message",
        "operation": "sendAiMessage",
        "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
       }
@@ -682,11 +899,17 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "sendAiMessage"
+       "kind": "textField",
+       "label": "Content",
+       "operation": "sendAiMessage",
+       "notes": "Required.",
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Collection ids",
+       "operation": "sendAiMessage",
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
       }
      ]
     }
@@ -695,8 +918,8 @@
   "states": {
    "loading": "The saved concierge contextual help.",
    "error": "Could not load. Names which read failed and leaves the concierge contextual help untouched.",
-   "emptyFirstRun": "No concierge contextual help configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No concierge contextual help configured. The form opens empty and `sendAiMessage` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "apis": [
@@ -718,8 +941,15 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-033"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-033",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → AI concierge – contextual help"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -773,25 +1003,13 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-035 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
@@ -863,13 +1081,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Submit",
+       "label": "Submit review",
        "operation": "submitReview",
        "provenance": "contract marketing-crm.yaml POST /reviews"
       },
       {
        "kind": "secondaryButton",
-       "label": "Raise",
+       "label": "Raise my case",
        "operation": "raiseMyCase",
        "provenance": "contract marketing-crm.yaml POST /my/cases"
       }
@@ -880,8 +1098,7 @@
   "states": {
    "loading": "The saved feedback ratings.",
    "error": "Could not load. Names which read failed and leaves the feedback ratings untouched.",
-   "emptyFirstRun": "No feedback ratings configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No feedback ratings configured. The form opens empty and `submitReview` saves the first one; it says what the platform does in the meantime.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -889,7 +1106,7 @@
     "operationId": "submitReview",
     "contract": "marketing-crm",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "raiseMyCase",
@@ -900,10 +1117,42 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-035"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-035",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 3 → Feedback & ratings"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRaiseMyCase",
+    "component": "modal",
+    "trigger": "Raise my case",
+    "body": "**Collects what `raiseMyCase` sends before it is called.** Required: `id`, `kind`, `summary`, `recordedAt`. Optional: `detail`, `venueId`, `orderRef`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Raise my case",
+     "operation": "raiseMyCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "summary",
+      "recordedAt",
+      "detail",
+      "venueId",
+      "orderRef"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -955,39 +1204,27 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-040 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
      "to": "WEB-034",
      "trigger": "They report something lost",
      "provenance": "flow F54 step 2→3",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "caseId"
+     ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest case operations wired 24 August.** **No case operation was guest-callable** — a guest could raise nothing and read nothing, and `check-screens` refused the staff-permissioned ones on a guest surface. `listMyCases`, `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered by a subject parameter.",
-  "openQuestions": [
-   "Inventory cites `GET /support` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest case operations wired 24 August.** **No case operation was guest-callable** — a guest could raise nothing and read nothing, and `check-screens` refused the staff-permissioned ones on a guest surface. `listMyCases`, `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered by a subject parameter.\n\n**Rev 3 (decided 29 September).** The Help screen shows app status and a public *What's new* (GAP-B2).",
   "density": "comfortable",
   "pattern": "commandCentre",
   "patternReason": "3 independent reads and no read of one record — the screen watches a population rather than working one",
@@ -1019,16 +1256,10 @@
        "bindsTo": "Case",
        "operation": "listMyCases",
        "provenance": "contract marketing-crm.yaml GET /my/cases"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
+      },
       {
        "kind": "dataTable",
-       "label": "Every help support",
+       "label": "Every faq category",
        "bindsTo": "FaqCategory",
        "columns": [
         "FaqCategory.code",
@@ -1039,6 +1270,13 @@
        ],
        "operation": "listFaqs",
        "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+      },
+      {
+       "kind": "cardList",
+       "label": "What's new",
+       "notes": "Public, localised release notes from `getTenantAppStatus` `whatsNew`, newest first, at most 10; the staff-only `recentChanges` stays staff only.",
+       "operation": "getTenantAppStatus",
+       "provenance": "decided 29 September, rev 3 GAP-B2"
       }
      ]
     },
@@ -1048,13 +1286,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Raise",
+       "label": "Raise my case",
        "operation": "raiseMyCase",
        "provenance": "contract marketing-crm.yaml POST /my/cases"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reply",
+       "label": "Reply to my case",
        "operation": "replyToMyCase",
        "provenance": "contract marketing-crm.yaml POST /my/cases/{caseId}/messages"
       }
@@ -1063,12 +1301,12 @@
    ]
   },
   "states": {
-   "loading": "The help support list.",
+   "loading": "The help support figures; each tile loads on its own.",
    "error": "Could not load. Names which read failed and leaves the help support untouched.",
-   "emptyFirstRun": "No help support yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the help support are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "emptyFirstRun": "No help support yet. Offers Raise my case (`raiseMyCase`).",
+   "emptyNoResults": "Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising a case is disabled offline** — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff."
   },
   "apis": [
    {
@@ -1106,6 +1344,12 @@
     "invalidates": [
      "listFaqs"
     ]
+   },
+   {
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "App status and the public *What's new*",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1120,10 +1364,59 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-040"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-040",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Help & support"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRaiseMyCase",
+    "component": "modal",
+    "trigger": "Raise my case",
+    "body": "**Collects what `raiseMyCase` sends before it is called.** Required: `id`, `kind`, `summary`, `recordedAt`. Optional: `detail`, `venueId`, `orderRef`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Raise my case",
+     "operation": "raiseMyCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "summary",
+      "recordedAt",
+      "detail",
+      "venueId",
+      "orderRef"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formReplyToMyCase",
+    "component": "modal",
+    "trigger": "Reply to my case",
+    "body": "**Collects what `replyToMyCase` sends before it is called.** Required: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reply to my case",
+     "operation": "replyToMyCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "message"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1157,10 +1450,10 @@
  },
  {
   "id": "GST-051",
-  "name": "Plan Your Adventure – Start",
+  "name": "Plan",
   "module": "Engagement & Support",
-  "requiresModule": "queue",
-  "wave": 3,
+  "requiresModule": "ticketing",
+  "wave": 1,
   "capability": "AI-35",
   "implementation": {
    "app": "guest-app",
@@ -1169,112 +1462,147 @@
    "status": "notStarted"
   },
   "navigation": {
-   "entryFrom": [
-    "GST-001"
+   "isEntryPoint": true,
+   "inferred": false,
+   "uses": [
+    "appTabs"
    ],
-   "inferred": true,
-   "exitTo": [
+   "entryFrom": [
     "GST-001",
-    "GST-002",
-    "GST-003",
-    "GST-052"
+    "GST-053"
+   ],
+   "exitTo": [
+    "GST-053",
+    "GST-052",
+    "GST-001"
    ],
    "transitions": [
     {
+     "to": "GST-053",
+     "trigger": "Make my plan",
+     "control": "primaryButton#makeMyPlan",
+     "operation": "generateVisitPlan",
+     "carries": [
+      "planId"
+     ],
+     "onFailure": [
+      {
+       "when": "nothing suits the party",
+       "to": "GST-051",
+       "note": "Says which answer ruled everything out."
+      }
+     ],
+     "provenance": "decided 29 September 2026 (P29), MOB-6; v4 prototype plan → planResult"
+    },
+    {
      "to": "GST-052",
-     "trigger": "Suggested itineraries are offered",
-     "provenance": "flow F49 step 1→2",
-     "operation": "listProducts"
+     "trigger": "Take a ready-made plan",
+     "provenance": "decided 29 September 2026 (P29), MOB-6"
     },
     {
      "to": "GST-001",
-     "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "trigger": "Home tab",
+     "provenance": "decided 29 September 2026 (P29), MOB-1"
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal visit profile.",
-  "openQuestions": [
-   "Inventory cites `POST /ai/itinerary` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal visit profile. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): the Plan tab root, \"Plan\".** Inputs: party size, heights (or ages), dates, pace (packed, balanced or relaxed), interests and cuisine. The rules planner (`generateVisitPlan`) runs with no AI. The tab is hidden when the venue turns module `visitPlanner` off.",
   "density": "comfortable",
-  "pattern": "listDetail",
-  "patternReason": "`listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act",
-  "purpose": "Start a plan for the visit — which attractions, in what order — before arriving.",
+  "pattern": "multiStepForm",
+  "patternReason": "The v4 prototype asks six questions one at a time (who, heights, days, pace, likes, food) and ends on *Make my plan*",
+  "purpose": "The Plan tab: tell the venue who is coming, when, at what pace and what you like, and get a day-by-day plan.",
   "layout": {
-   "template": "split",
+   "template": "wizard",
    "regions": [
     {
-     "name": "contentBody",
-     "slot": "collection",
+     "name": "progress",
+     "slot": "progress",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every plan your adventure",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
-       ],
-       "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
+       "kind": "progressIndicator",
+       "label": "Plan your visit · n of 6",
+       "notes": "Six questions; Heights is skipped when no children are coming.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
       }
      ]
     },
     {
-     "name": "contextPanel",
-     "slot": "selection",
+     "name": "fields",
+     "slot": "fields",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The selected plan your adventure",
-       "bindsTo": "WaitTime",
-       "columns": [
-        "WaitTime.queueId",
-        "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.status",
-        "WaitTime.waitMinutes",
-        "WaitTime.source",
-        "WaitTime.isStale",
-        "WaitTime.heightRequirementCm",
-        "WaitTime.zone",
-        "WaitTime.asOf"
-       ],
-       "operation": "getWaitTimes",
-       "provenance": "contract queue.yaml GET /queues/wait-times"
+       "kind": "numberField",
+       "label": "Adults",
+       "notes": "Age 12 and over, at least 1, at most 8.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "numberField",
+       "label": "Children",
+       "notes": "Age 3 to 11, 0-8.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "selectField",
+       "label": "How tall are the children?",
+       "operation": "listProducts",
+       "notes": "Per child: under 1.0 m, 1.0-1.2 m, 1.2-1.4 m, 1.4 m and over (or an age where the venue sets age rules). Rides over a child's limit are left out, from `ProductEligibilityRule`.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Which days are you visiting?",
+       "notes": "Up to three days; each day gets its own park at a multi-park venue.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "selectField",
+       "label": "How busy should each day be?",
+       "notes": "Packed, Balanced or Relaxed.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "What are you most interested in?",
+       "operation": "listProducts",
+       "notes": "Interest tags from the venue's points (`VenuePoint.interestTags`): thrill rides, family rides, shows, water, shopping.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "selectField",
+       "label": "What would you like for lunch?",
+       "notes": "Cuisines from the outlets (`VenuePoint.cuisineTags`); lunch is planned at a restaurant that serves it.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      }
+     ]
+    },
+    {
+     "name": "submit",
+     "slot": "submit",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Make my plan",
+       "operation": "generateVisitPlan",
+       "notes": "Calls `generateVisitPlan`: the rules planner, no AI. Opens Your Plan (GST-053).",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Take a ready-made plan",
+       "notes": "Opens Suggested Itineraries (GST-052).",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The plan your adventure list.",
-   "error": "Could not load. Names which read failed and leaves the plan your adventure untouched.",
-   "emptyFirstRun": "No plan your adventure yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the plan your adventure are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "loading": "The plan builds in place; the inputs stay on screen.",
+   "error": "Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.",
+   "emptyFirstRun": "No plan yet: the first question is shown. Nothing is saved until *Make my plan*.",
+   "emptyNoResults": "Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers.",
+   "emptyNoAccess": "A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -1289,21 +1617,35 @@
     "contract": "catalogue",
     "purpose": "List products",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "generateVisitPlan",
+    "contract": "venue-map",
+    "purpose": "Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)",
+    "trigger": "onAction",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "WaitTime.queueId",
-    "WaitTime.queueName",
-    "WaitTime.attractionProductId",
-    "WaitTime.status",
-    "WaitTime.waitMinutes"
-   ]
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "The Plan tab; a cold arrival is the ordinary case and starts at the first question."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-051"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-051",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "exact",
+    "view": "Plan tab (Plan your visit · 1 of 6 … 6 of 6)"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1341,8 +1683,8 @@
   "id": "GST-052",
   "name": "Suggested Itineraries",
   "module": "Engagement & Support",
-  "requiresModule": "ai",
-  "wave": 3,
+  "requiresModule": "ticketing",
+  "wave": 1,
   "capability": "AI-35",
   "implementation": {
    "app": "guest-app",
@@ -1351,57 +1693,43 @@
    "status": "notStarted"
   },
   "navigation": {
+   "inferred": false,
    "entryFrom": [
     "GST-001",
     "GST-051"
    ],
-   "inferred": true,
    "exitTo": [
-    "GST-001",
-    "GST-002",
-    "GST-003",
-    "GST-053"
+    "GST-053",
+    "GST-051",
+    "GST-001"
    ],
    "transitions": [
     {
      "to": "GST-053",
-     "trigger": "They build their own instead",
-     "provenance": "flow F49 step 2→3",
-     "operation": "listProducts"
+     "trigger": "Use this plan",
+     "operation": "generateVisitPlan",
+     "carries": [
+      "planId"
+     ],
+     "provenance": "decided 29 September 2026 (P29), MOB-6"
+    },
+    {
+     "to": "GST-051",
+     "trigger": "Make my own",
+     "provenance": "decided 29 September 2026 (P29), MOB-6"
     },
     {
      "to": "GST-001",
-     "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "trigger": "Home tab",
+     "provenance": "decided 29 September 2026 (P29), MOB-1"
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared.",
-  "openQuestions": [
-   "Inventory cites `GET /itineraries/suggested` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "Minuted 10 Aug §4.9. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it. **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner is deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): ready-made day plans per venue** the guest can take; each is rules-built by `generateVisitPlan` from preset inputs, then edited on GST-053.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Curated plans a guest can take rather than build.",
-  "gaps": [
-   {
-    "operation": "listCatalogueBundles",
-    "why": "**1 declared operation reach no component on this screen**: listCatalogueBundles. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "purpose": "Ready-made day plans for this venue that a guest can take instead of answering questions.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1410,25 +1738,18 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every suggested itineraries",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
-       ],
+       "kind": "cardList",
+       "label": "Ready-made plans",
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
+       "notes": "The venue's preset plans (e.g. *Thrill day*, *Family day*, *Relaxed day*), each a set of planner inputs; **Use this plan** runs `generateVisitPlan` with those inputs and the guest's party size and date. Rules-built, not AI: seeded, not learned, on day one.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every bundle",
+       "operation": "listCatalogueBundles",
+       "notes": "Bundles a preset plan can include (e.g. Fast Track).",
+       "provenance": "contract catalogue.yaml GET /catalogue/bundles"
       }
      ]
     },
@@ -1437,52 +1758,22 @@
      "slot": "selection",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The selected suggested itineraries",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo",
-        "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.hasVariants",
-        "Product.variantCount"
-       ],
-       "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
        "kind": "primaryButton",
-       "label": "Request",
-       "operation": "requestSuggestion",
-       "provenance": "contract ai.yaml POST /ai/suggestions"
+       "label": "Use this plan",
+       "operation": "generateVisitPlan",
+       "notes": "Opens Your Plan (GST-053).",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The suggested itineraries list.",
-   "error": "Could not load. Names which read failed and leaves the suggested itineraries untouched.",
-   "emptyFirstRun": "No suggested itineraries yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the suggested itineraries are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "loading": "The plan builds in place; the inputs stay on screen.",
+   "error": "Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.",
+   "emptyFirstRun": "The venue has no ready-made plans: says so and offers *Make my own* (GST-051).",
+   "emptyNoResults": "Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers.",
+   "emptyNoAccess": "A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -1499,36 +1790,34 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "requestSuggestion",
-    "contract": "ai",
-    "purpose": "",
+    "operationId": "generateVisitPlan",
+    "contract": "venue-map",
+    "purpose": "Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)",
     "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "suggestionId",
-     "from": "deepLink",
-     "optional": true
+     "name": "venueId",
+     "from": "session"
     }
    ],
-   "coldEntry": "A suggestion opened from a saved plan.",
-   "preloaded": [
-    "Product.id",
-    "Product.code",
-    "Product.name",
-    "Product.description",
-    "Product.kind"
-   ]
+   "coldEntry": "Lists the venue's ready-made plans; nothing is needed upstream."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-052"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-052",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 3 → Suggested itineraries",
+    "differences": "Mobile v4 draws no ready-made plans list: its Plan tab goes straight to the questions. Built from this definition in the v4 style."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1564,10 +1853,10 @@
  },
  {
   "id": "GST-053",
-  "name": "Build Your Own Itinerary",
+  "name": "Your Plan",
   "module": "Engagement & Support",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C02",
   "implementation": {
    "app": "guest-app",
@@ -1576,57 +1865,79 @@
    "status": "notStarted"
   },
   "navigation": {
+   "inferred": false,
    "entryFrom": [
-    "GST-001",
-    "GST-052"
-   ],
-   "inferred": true,
-   "exitTo": [
-    "GST-001",
-    "GST-002",
-    "GST-003",
+    "GST-051",
+    "GST-052",
     "GST-054"
+   ],
+   "exitTo": [
+    "GST-041",
+    "GST-054",
+    "GST-051",
+    "GST-048",
+    "GST-059",
+    "GST-001"
    ],
    "transitions": [
     {
+     "to": "GST-041",
+     "trigger": "Book this plan",
+     "control": "primaryButton#bookThisPlan",
+     "operation": "bookVisitPlan",
+     "carries": [
+      "cartId"
+     ],
+     "onFailure": [
+      {
+       "when": "an item sold out since the plan was made",
+       "to": "GST-053",
+       "note": "Names it and offers a swap; the rest of the plan is kept."
+      }
+     ],
+     "provenance": "decided 29 September 2026 (P29), MOB-6; v4 prototype Book this plan"
+    },
+    {
      "to": "GST-054",
-     "trigger": "An optimised order is proposed",
-     "provenance": "flow F49 step 3→4",
-     "operation": "listProducts"
+     "trigger": "Refine with the AI planner",
+     "carries": [
+      "planId"
+     ],
+     "provenance": "decided 29 September 2026 (P29), MOB-6"
+    },
+    {
+     "to": "GST-051",
+     "trigger": "Change answers",
+     "provenance": "decided 29 September 2026 (P29), MOB-6"
+    },
+    {
+     "to": "GST-048",
+     "trigger": "More add-ons",
+     "carries": [
+      "cartId"
+     ],
+     "provenance": "decided 29 September 2026 (P29), MOB-6"
+    },
+    {
+     "to": "GST-059",
+     "trigger": "On the day: follow the plan",
+     "carries": [
+      "planId"
+     ],
+     "provenance": "decided 29 September 2026 (P29), MOB-6"
     },
     {
      "to": "GST-001",
-     "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "trigger": "Home tab",
+     "provenance": "decided 29 September 2026 (P29), MOB-1"
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary (Chinmay raised, Qossai confirmed).",
-  "openQuestions": [
-   "Inventory cites `POST /itineraries` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary (Chinmay raised, Qossai confirmed). **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"Your Plan\".** Per-day itinerary with swap, remove, add and undo (`updateVisitPlan` is versioned), add-ons such as Fast Track, and **Book this plan** → GST-041.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getCart` reads one of them — list, select, act",
-  "purpose": "Choose the attractions and the order yourself.",
-  "gaps": [
-   {
-    "operation": "getWaitTimes",
-    "why": "**1 declared operation reach no component on this screen**: getWaitTimes. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "purpose": "The plan, day by day: swap, remove or add items, undo, add Fast Track, then book the whole plan.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1635,25 +1946,55 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every build your own",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
-       ],
-       "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
+       "kind": "selectField",
+       "label": "Day tabs",
+       "bindsTo": "VisitPlan",
+       "operation": "getVisitPlan",
+       "notes": "Day 1 · Fri 2 Oct · Summit Peaks … one tab per chosen day.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "timeline",
+       "label": "The day",
+       "bindsTo": "VisitPlanItem",
+       "operation": "getVisitPlan",
+       "notes": "Arrive, then each timed item (ride, show, lunch at a restaurant serving the chosen cuisine) with its place and zone; Fast Track marked on the rides it covers.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Swap",
+       "operation": "listVisitPlanAlternatives",
+       "notes": "Opens the swap sheet of candidates that suit everyone (`listVisitPlanAlternatives`); choosing one saves a new version.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "updateVisitPlan",
+       "notes": "Removes the item (not arrival or lunch); a new version, so Undo brings it back.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "+ Add something",
+       "operation": "listVisitPlanAlternatives",
+       "notes": "The same sheet, adding to the day.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Undo changes",
+       "operation": "updateVisitPlan",
+       "notes": "Returns the day to the previous version of the plan.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "banner",
+       "label": "Left out for your group",
+       "operation": "getVisitPlan",
+       "notes": "Items left out because of a child's height, with the limit (e.g. *Freefall Tower (needs 1.40 m)*).",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
       }
      ]
     },
@@ -1662,29 +2003,25 @@
      "slot": "selection",
      "components": [
       {
+       "kind": "toggle",
+       "label": "Add Fast Track",
+       "operation": "updateVisitPlan",
+       "notes": "An add-on from the plan's `addOnSuggestions` (the product GST-048 sells), priced per guest, with the queuing time it saves.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
        "kind": "detailPanel",
-       "label": "The selected build your own",
-       "bindsTo": "Cart",
-       "columns": [
-        "Cart.id",
-        "Cart.token",
-        "Cart.venueId",
-        "Cart.channel",
-        "Cart.subjectId",
-        "Cart.status",
-        "Cart.lines",
-        "Cart.conflicts",
-        "Cart.subtotal",
-        "Cart.discountTotal",
-        "Cart.taxTotal",
-        "Cart.total",
-        "Cart.appliedPromotionIds",
-        "Cart.expiresAt",
-        "Cart.extensionsUsed",
-        "Cart.maxExtensions"
-       ],
-       "operation": "getCart",
-       "provenance": "contract orders.yaml GET /carts/{cartId}"
+       "label": "Estimated total",
+       "operation": "getVisitPlan",
+       "notes": "Estimated price for the group and days; the guest confirms dates and tickets in the basket.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
+       "operation": "getWaitTimes",
+       "notes": "Live waits beside the rides on today's plan.",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
       }
      ]
     },
@@ -1694,32 +2031,36 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
-       "operation": "addCartLine",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+       "label": "Book this plan",
+       "operation": "bookVisitPlan",
+       "notes": "`bookVisitPlan` turns the plan and add-ons into cart lines and returns the cart; lands on the basket (GST-041).",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refine with the AI planner",
+       "notes": "Opens GST-054 when the venue has AI on.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Change answers",
+       "notes": "Back to the questions (GST-051).",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The build your own list.",
-   "error": "Could not load. Names which read failed and leaves the build your own untouched.",
-   "emptyFirstRun": "No build your own yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the build your own are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "loading": "The plan builds in place; the inputs stay on screen.",
+   "error": "Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.",
+   "emptyFirstRun": "No plan yet: offers the questions (GST-051) or a ready-made plan (GST-052).",
+   "emptyNoResults": "Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers.",
+   "emptyNoAccess": "A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
-   {
-    "operationId": "addCartLine",
-    "contract": "orders",
-    "purpose": "Add something",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
    {
     "operationId": "getCart",
     "contract": "orders",
@@ -1737,28 +2078,70 @@
     "contract": "queue",
     "purpose": "Wait times across a venue",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getVisitPlan",
+    "contract": "venue-map",
+    "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
+   },
+   {
+    "operationId": "updateVisitPlan",
+    "contract": "venue-map",
+    "purpose": "Swap, remove, add or undo: each change is a new version, so undo goes back one",
+    "trigger": "onAction",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
+   },
+   {
+    "operationId": "listVisitPlanAlternatives",
+    "contract": "venue-map",
+    "purpose": "Swap candidates for one item that suit everyone in the party",
+    "trigger": "onAction",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
+   },
+   {
+    "operationId": "bookVisitPlan",
+    "contract": "venue-map",
+    "purpose": "Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart",
+    "trigger": "onAction",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
    }
   ],
   "entryState": {
    "params": [
     {
+     "name": "planId",
+     "from": "GST-051",
+     "optional": false
+    },
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "itemId",
+     "from": "navigation",
+     "optional": true
+    },
+    {
      "name": "cartId",
      "from": "session"
     }
    ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
-   "preloaded": [
-    "Cart.id",
-    "Cart.token",
-    "Cart.venueId",
-    "Cart.channel",
-    "Cart.subjectId"
-   ]
+   "coldEntry": "A saved plan opened from a link or the Plan tab. A plan whose dates have passed says so and offers to plan again; a plan that is not this guest's is refused without saying whose it is. `itemId` is the plan item the guest taps Swap on, picked on this screen."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-053"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-053",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "exact",
+    "view": "Plan tab → answer the six questions → Make my plan (Your plan)"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1794,10 +2177,10 @@
  },
  {
   "id": "GST-054",
-  "name": "AI Optimized Itinerary",
+  "name": "AI Planner",
   "module": "Engagement & Support",
   "requiresModule": "ai",
-  "wave": 3,
+  "wave": 1,
   "capability": "AI-35",
   "implementation": {
    "app": "guest-app",
@@ -1806,50 +2189,44 @@
    "status": "notStarted"
   },
   "navigation": {
+   "inferred": false,
    "entryFrom": [
-    "GST-001",
     "GST-053"
    ],
-   "inferred": true,
    "exitTo": [
-    "GST-001",
-    "GST-002",
-    "GST-003",
-    "GST-059"
+    "GST-053",
+    "GST-059",
+    "GST-001"
    ],
    "transitions": [
     {
+     "to": "GST-053",
+     "trigger": "Back to your plan",
+     "carries": [
+      "planId"
+     ],
+     "provenance": "decided 29 September 2026 (P29), MOB-6"
+    },
+    {
      "to": "GST-059",
      "trigger": "They follow it through the day",
-     "provenance": "flow F49 step 4→5",
-     "operation": "requestSuggestion"
+     "carries": [
+      "planId"
+     ],
+     "provenance": "decided 29 September 2026 (P29), MOB-6"
     },
     {
      "to": "GST-001",
-     "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "trigger": "Home tab",
+     "provenance": "decided 29 September 2026 (P29), MOB-1"
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. **The AI half is Wave 2** — the manual planner must work without it (CF-41). **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared.",
-  "openQuestions": [
-   "Inventory cites `POST /ai/itinerary/optimise` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "Minuted 10 Aug §4.9. **The AI half is Wave 2** — the manual planner must work without it (CF-41). **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it. **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner is deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"AI Planner\".** The agent refines the rules plan by chat; its tools are the plan operations, and `requestSuggestion` gains the guest-allowed kind `itinerary` (what R209 said to add if the planner ships). AI writes only `ai.*` stores; the plan change itself is `updateVisitPlan`. **The rules plan never fails over to an error**: with AI off, not licensed or failing, the guest keeps the rules plan and the Plan tab works in full.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act",
-  "purpose": "Let the assistant order the day around waits and opening times.",
+  "purpose": "Ask the planner in your own words to change the plan; it refines the rules plan, and the rules plan stays if AI is unavailable.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1858,25 +2235,19 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every optimized itinerary",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
-       ],
-       "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
+       "kind": "timeline",
+       "label": "Your plan",
+       "bindsTo": "VisitPlanItem",
+       "operation": "getVisitPlan",
+       "notes": "The current plan version, updated as the agent changes it.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
+       "kind": "assistantPanel",
+       "label": "Ask the planner",
+       "operation": "sendAiMessage",
+       "notes": "e.g. *More shows, fewer coasters on day 2*. The agent calls `requestSuggestion` kind `itinerary` and applies the result with `updateVisitPlan`; Undo on GST-053 reverts it.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
       }
      ]
     },
@@ -1885,22 +2256,17 @@
      "slot": "selection",
      "components": [
       {
+       "kind": "banner",
+       "label": "Planner unavailable",
+       "operation": "getVisitPlan",
+       "notes": "**The rules plan never fails over to an error**: with AI off, not licensed or failing, the guest keeps the rules plan and the Plan tab works in full. Shown when AI is off for the venue, the tenant has no AI licence, or the call fails or times out.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
+      },
+      {
        "kind": "detailPanel",
-       "label": "The selected optimized itinerary",
-       "bindsTo": "WaitTime",
-       "columns": [
-        "WaitTime.queueId",
-        "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.status",
-        "WaitTime.waitMinutes",
-        "WaitTime.source",
-        "WaitTime.isStale",
-        "WaitTime.heightRequirementCm",
-        "WaitTime.zone",
-        "WaitTime.asOf"
-       ],
+       "label": "The wait time",
        "operation": "getWaitTimes",
+       "notes": "Live waits the agent plans around.",
        "provenance": "contract queue.yaml GET /queues/wait-times"
       }
      ]
@@ -1911,27 +2277,29 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Send",
-       "operation": "sendAiMessage",
-       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+       "label": "Apply this change",
+       "operation": "updateVisitPlan",
+       "notes": "Saves the agent's proposal as a new plan version.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
       },
       {
        "kind": "secondaryButton",
-       "label": "Request",
-       "operation": "requestSuggestion",
-       "provenance": "contract ai.yaml POST /ai/suggestions"
+       "label": "Back to your plan",
+       "notes": "GST-053.",
+       "provenance": "decided 29 September 2026 (P29), MOB-6"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The optimized itinerary list.",
-   "error": "Could not load. Names which read failed and leaves the optimized itinerary untouched.",
-   "emptyFirstRun": "No optimized itinerary yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the optimized itinerary are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
+   "loading": "The plan builds in place; the inputs stay on screen.",
+   "error": "Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.",
+   "emptyFirstRun": "No conversation yet: the plan is shown with example requests.",
+   "emptyNoResults": "Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers.",
+   "emptyNoAccess": "A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing.",
+   "aiUnavailable": "**Falls back to the rules plan, never to an error** (MOB-6): the plan from `getVisitPlan` stays on screen with a short note, and the guest carries on editing it on GST-053."
   },
   "apis": [
    {
@@ -1941,57 +2309,131 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "listProducts",
-    "contract": "catalogue",
-    "purpose": "List products",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "sendAiMessage",
     "contract": "ai",
-    "purpose": "Ask",
+    "purpose": "Chat with the planner agent; its tools are the plan operations, so a change it makes is a new plan version",
     "trigger": "onAction",
     "invalidates": [
      "listProducts"
     ]
+   },
+   {
+    "operationId": "getVisitPlan",
+    "contract": "venue-map",
+    "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
+   },
+   {
+    "operationId": "updateVisitPlan",
+    "contract": "venue-map",
+    "purpose": "Swap, remove, add or undo: each change is a new version, so undo goes back one",
+    "trigger": "onAction",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
+   },
+   {
+    "operationId": "createAiConversation",
+    "contract": "ai",
+    "purpose": "Open the planner conversation for this plan",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
    },
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
-    "purpose": "",
+    "purpose": "A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent's proposal for the plan, applied through `updateVisitPlan`",
     "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
+    "provenance": "decided 29 September 2026 (P29), MOB-6"
    }
   ],
   "entryState": {
    "params": [
     {
-     "name": "conversationId",
-     "from": "deepLink"
+     "name": "planId",
+     "from": "GST-053"
     },
     {
-     "name": "suggestionId",
+     "name": "conversationId",
      "from": "deepLink",
      "optional": true
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
-   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom. A suggestion opened from a saved plan.",
-   "preloaded": [
-    "WaitTime.queueId",
-    "WaitTime.queueName",
-    "WaitTime.attractionProductId",
-    "WaitTime.status",
-    "WaitTime.waitMinutes"
-   ]
+   "coldEntry": "A planner link from a notification: opens the plan and its conversation, or the plan alone if the conversation was closed."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-054"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-054",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "partial",
+    "view": "Plan tab → Your plan; Chat with the assistant (Assistant screen)",
+    "differences": "v4 draws the rules plan and a general assistant chat; it has no plan-specific chat. Built from this definition."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "machine": {
+   "key": "plannerMode",
+   "initial": "rulesPlan",
+   "provenance": "decided 29 September 2026 (P29), MOB-6; BRIEF decision 1: the rules planner with the AI planner agent on top",
+   "states": {
+    "rulesPlan": {
+     "operation": "getVisitPlan",
+     "note": "The rules plan is shown; the chat is open."
+    },
+    "refining": {
+     "operation": "sendAiMessage",
+     "note": "The agent is working on a request."
+    },
+    "proposed": {
+     "operation": "requestSuggestion",
+     "note": "A change is proposed, not yet saved."
+    },
+    "aiUnavailable": {
+     "note": "**The rules plan never fails over to an error**: with AI off, not licensed or failing, the guest keeps the rules plan and the Plan tab works in full.",
+     "retryTo": "rulesPlan"
+    }
+   },
+   "transitions": [
+    {
+     "from": "rulesPlan",
+     "on": "Send",
+     "to": "refining"
+    },
+    {
+     "from": "refining",
+     "on": "proposal returned",
+     "to": "proposed"
+    },
+    {
+     "from": "proposed",
+     "on": "Apply this change",
+     "to": "rulesPlan",
+     "note": "updateVisitPlan saves a new version."
+    },
+    {
+     "from": "proposed",
+     "on": "Discard",
+     "to": "rulesPlan"
+    },
+    {
+     "from": "refining",
+     "on": "AI off, refused or timed out",
+     "to": "aiUnavailable"
+    },
+    {
+     "from": "rulesPlan",
+     "on": "AI off for the venue",
+     "to": "aiUnavailable"
+    }
+   ]
+  },
   "_platform": {
    "code": "P02",
    "audience": "guest",

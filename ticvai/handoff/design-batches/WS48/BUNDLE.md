@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-168` | Advanced Offer Command Center | commandCentre | 1 | 0 | — |
+| `ADM-168` | Advanced Offer Command Center | commandCentre | 2 | 0 | — |
 | `ADM-169` | Buy X Get Y / BOGO Rule Builder | configEditor | 1 | 0 | — |
 | `ADM-170` | Multi-Buy & Quantity Offer Configurator | configEditor | 1 | 0 | — |
 | `ADM-171` | Cheapest / Lowest-Value Item Promotion | configEditor | 1 | 0 | — |
@@ -74,7 +73,7 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**ADM-170, ADM-174, ADM-175, ADM-177 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-170, ADM-174, ADM-175 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-168 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-169",
@@ -316,6 +312,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "promotions",
     "purpose": "Advanced Offer Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAdvancedOfferGuardrail",
+    "contract": "promotions",
+    "purpose": "Advanced Offer Guardrails & Conflict Controls",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -331,7 +333,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-168"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-168",
+   "workshopBoard": "wireframes/WS109 Promotions   Bundles Management Board 4.dc.html#adm-168"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 50. 12 of 24 labels bound to a contract property; 33 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -506,16 +509,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setBuyGetBogo",
     "contract": "promotions",
     "purpose": "Buy X Get Y / BOGO Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setBuyGetBogo"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-169"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-169",
+   "workshopBoard": "wireframes/WS109 Promotions   Bundles Management Board 4.dc.html#adm-169"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 15 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -632,7 +633,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-170"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-170",
+   "workshopBoard": "wireframes/WS109 Promotions   Bundles Management Board 4.dc.html#adm-170"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 3 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -742,6 +744,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Configuration"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Cheapest item free",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cheapest item 50% off",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Support"
+      }
+     ]
     }
    ]
   },
@@ -762,9 +780,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-171"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-171",
+   "workshopBoard": "wireframes/WS109 Promotions   Bundles Management Board 4.dc.html#adm-171"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 7 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 9 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -902,16 +921,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setFixedPriceOffer",
     "contract": "promotions",
     "purpose": "Fixed-Price & “N for X” Offer Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setFixedPriceOffer"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-172"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-172",
+   "workshopBoard": "wireframes/WS109 Promotions   Bundles Management Board 4.dc.html#adm-172"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1045,7 +1062,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-173"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-173",
+   "workshopBoard": "wireframes/WS109 Promotions   Bundles Management Board 4.dc.html#adm-173"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 55. 0 of 0 labels bound to a contract property; 5 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1164,16 +1182,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setCrossCategoryPromotion",
     "contract": "promotions",
     "purpose": "Cross-Category Promotion Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setCrossCategoryPromotion"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-174"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-174",
+   "workshopBoard": "wireframes/WS109 Promotions   Bundles Management Board 4.dc.html#adm-174"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 56. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1284,15 +1300,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "RewardSelectionSubstitutionCustomerChoiceView.guestSelectsFromConfiguredOptions",
-    "RewardSelectionSubstitutionCustomerChoiceView.posCallCenterOperatorSelects"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-175"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-175",
+   "workshopBoard": "wireframes/WS109 Promotions   Bundles Management Board 4.dc.html#adm-175"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 57. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1417,7 +1431,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-176"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-176",
+   "workshopBoard": "wireframes/WS109 Promotions   Bundles Management Board 4.dc.html#adm-176"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 58. 0 of 0 labels bound to a contract property; 6 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1479,7 +1494,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Sample customer segment, Forecast simulation, Bulk scenario testing. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Single transaction, Historical transaction replay, Sample customer segment, Forecast simulation, Bulk scenario testing. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Promotions___Bundles_Management_Reference.pdf, page 59 §Allow"
    },
    {
@@ -1502,6 +1517,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Single transaction",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 59 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Historical transaction replay",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 59 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Sample customer segment",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 59 §Allow"
       },
@@ -1540,19 +1565,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "OfferSimulationBasketTraceAiOptimizationView.yPrice",
-    "OfferSimulationBasketTraceAiOptimizationView.adult",
-    "OfferSimulationBasketTraceAiOptimizationView.child",
-    "OfferSimulationBasketTraceAiOptimizationView.subtotalAed750",
-    "OfferSimulationBasketTraceAiOptimizationView.originalTotalAed750"
+    "OfferSimulationBasketTraceAiOptimizationView.originalTotal"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-177"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-177",
+   "workshopBoard": "wireframes/WS109 Promotions   Bundles Management Board 4.dc.html#adm-177"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 59. 0 of 0 labels bound to a contract property; 3 of 71 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 59. 0 of 0 labels bound to a contract property; 5 of 71 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1597,6 +1619,11 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "buyXGetX",
     "in": "query",
     "required": false
@@ -1633,6 +1660,26 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "fixedBundlePrice",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "giftWithPurchase",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "addedValue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "crossCategoryReward",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "upgradeOffer",
     "in": "query",
     "required": false
    }
@@ -1688,7 +1735,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "mode",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "OfferSimulationBasketTraceAiOptimizationView"
  },
@@ -1714,7 +1767,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BuyXGetYBogoRuleBuilderInput",
   "responds": "BuyXGetYBogoRuleBuilderView"
  },
@@ -1727,7 +1786,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CrossCategoryPromotionBuilderInput",
   "responds": "CrossCategoryPromotionBuilderView"
  },
@@ -1740,7 +1805,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "FixedPriceNForXOfferBuilderInput",
   "responds": "FixedPriceNForXOfferBuilderView"
  },
@@ -1753,7 +1824,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "GiftFreeProductAddedValueOfferBuilderInput",
   "responds": "GiftFreeProductAddedValueOfferBuilderView"
  }
@@ -1905,21 +1982,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Inventory requirement"
    },
-   "canCombine": {
-    "type": "boolean",
-    "description": "Can combine"
-   },
-   "cannotCombine": {
+   "combinationBehavior": {
     "type": "string",
-    "description": "Cannot combine"
-   },
-   "exclusive": {
-    "type": "string",
-    "description": "Exclusive"
-   },
-   "deferToCentralStackingEngine": {
-    "type": "string",
-    "description": "Defer to central stacking engine"
+    "enum": [
+     "canCombine",
+     "cannotCombine",
+     "exclusive",
+     "deferToCentralStackingEngine"
+    ],
+    "description": "Preliminary combination behaviour; the central stacking engine has the final say."
    }
   }
  },
@@ -2067,14 +2138,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Cheapest / Lowest-Value Item Promotion displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "e100": {
-    "type": "string",
-    "description": "e 100"
-   },
-   "buy4CheapestFree": {
-    "type": "string",
-    "description": "Buy 4 → Cheapest Free"
-   },
    "eligibleProducts": {
     "type": "string",
     "description": "Eligible products"
@@ -2106,10 +2169,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cheapestItemFree": {
     "type": "string",
     "description": "Cheapest item free"
-   },
-   "cheapestItem50Off": {
-    "type": "number",
-    "description": "Cheapest item 50% off"
    },
    "nCheapestItemsFree": {
     "type": "string",
@@ -2250,30 +2309,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "minimumMaximumProductValues": {
     "type": "string",
     "description": "Minimum/maximum product values"
-   },
-   "for": {
-    "type": "string",
-    "description": "for"
-   },
-   "refunds": {
-    "type": "string",
-    "description": "Refunds"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "revenueRecognition": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue recognition"
-   },
-   "partnerSettlement": {
-    "type": "string",
-    "description": "Partner settlement"
-   },
-   "reporting": {
-    "type": "string",
-    "description": "Reporting"
    }
   }
  },
@@ -2314,30 +2349,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "minimumMaximumProductValues": {
     "type": "string",
     "description": "Minimum/maximum product values"
-   },
-   "for": {
-    "type": "string",
-    "description": "for"
-   },
-   "refunds": {
-    "type": "string",
-    "description": "Refunds"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "revenueRecognition": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue recognition"
-   },
-   "partnerSettlement": {
-    "type": "string",
-    "description": "Partner settlement"
-   },
-   "reporting": {
-    "type": "string",
-    "description": "Reporting"
    }
   }
  },
@@ -2557,133 +2568,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Offer Simulation, Basket Trace & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "yPrice": {
+   "basketLines": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Basket lines evaluated"
+   },
+   "qualifiers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Qualifier conditions met"
+   },
+   "rewards": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Rewards granted"
+   },
+   "guardrailsPassed": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Guardrails checked and passed"
+   },
+   "originalTotal": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "y Price"
+    "description": "Original total"
    },
-   "adult": {
-    "type": "string",
-    "description": "Adult (the pack shows 2 AED 200)"
-   },
-   "child": {
-    "type": "string",
-    "description": "Child (the pack shows 2 AED 150)"
-   },
-   "subtotalAed750": {
+   "promotionAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Subtotal: AED 750"
+    "description": "Promotion amount"
    },
-   "originalTotalAed750": {
-    "type": "string",
-    "description": "Original Total: AED 750"
-   },
-   "promotionAed150": {
-    "type": "string",
-    "description": "Promotion: −AED 150"
-   },
-   "finalTotalAed600": {
-    "type": "string",
-    "description": "Final Total: AED 600"
-   },
-   "eligibleVenue": {
-    "type": "string",
-    "description": "Eligible venue ✓"
-   },
-   "eligibleChannel": {
-    "type": "string",
-    "description": "Eligible channel ✓"
-   },
-   "cheapestAdmissionSelected": {
-    "type": "string",
-    "description": "Cheapest admission selected ✓"
-   },
-   "childTicketAed150": {
-    "type": "string",
-    "description": "Child Ticket AED 150 ✓"
-   },
-   "maximumRewardAed200": {
-    "type": "string",
-    "description": "Maximum reward AED 200 ✓"
-   },
-   "marginFloorMaintained": {
-    "type": "number",
-    "description": "Margin floor maintained ✓"
-   },
-   "singleTransaction": {
-    "type": "string",
-    "description": "Single transaction"
-   },
-   "historicalTransactionReplay": {
-    "type": "string",
-    "description": "Historical transaction replay"
-   },
-   "sampleCustomerSegment": {
-    "type": "string",
-    "description": "Sample customer segment"
-   },
-   "forecastSimulation": {
-    "type": "string",
-    "description": "Forecast simulation"
-   },
-   "bulkScenarioTesting": {
-    "type": "string",
-    "description": "Bulk scenario testing"
-   },
-   "qualifierAndRewardTicketProducts": {
-    "type": "string",
-    "description": "Qualifier and reward ticket products"
-   },
-   "couponEngineBoard3": {
-    "type": "string",
-    "description": "Coupon Engine — Board 3"
-   },
-   "codeTriggeredAdvancedOffers": {
-    "type": "string",
-    "description": "Code-triggered advanced offers"
-   },
-   "menuProductsPricesAndInventory": {
-    "type": "string",
-    "description": "Menu products, prices and inventory"
-   },
-   "retailProductsAndStockAvailability": {
-    "type": "string",
-    "description": "Retail products and stock availability"
-   },
-   "freeProductAvailabilityAndSubstitution": {
-    "type": "string",
-    "description": "Free-product availability and substitution"
-   },
-   "memberEligibilityAndBenefits": {
-    "type": "string",
-    "description": "Member eligibility and benefits"
-   },
-   "customerSegmentationAndPersonalization": {
-    "type": "string",
-    "description": "Customer segmentation and personalization"
-   },
-   "priceBasisAndMarginProtection": {
-    "type": "number",
-    "description": "Price basis and margin protection"
-   },
-   "revenueAllocationAndPromotionalCost": {
+   "finalTotal": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue allocation and promotional cost"
-   },
-   "finalTransactionAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Final transaction amount"
-   },
-   "board4AdvancedMechanics": {
-    "type": "string",
-    "description": "Board 4 — Advanced Mechanics"
-   },
-   "whatProductToProductRewardRelationshipOccurs": {
-    "type": "string",
-    "description": "What product-to-product reward relationship occurs?"
-   },
-   "matrixCoverageBoard4": {
-    "type": "string",
-    "description": "Matrix Coverage — Board 4"
+    "description": "Final total"
    }
   }
  },
@@ -2693,13 +2616,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Reward Selection, Substitution & Customer Choice displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "guestSelectsFromConfiguredOptions": {
+   "offerId": {
     "type": "string",
-    "description": "Guest selects from configured options"
+    "description": "Offer ID"
    },
-   "posCallCenterOperatorSelects": {
+   "rewardOptions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Rewards the guest may choose ONE of"
+   },
+   "selectionModel": {
     "type": "string",
-    "description": "POS/call-center operator selects"
+    "enum": [
+     "automatic",
+     "customerChoice",
+     "operatorChoice",
+     "aiRecommended"
+    ],
+    "description": "Who picks the reward: the system, the guest from configured options, the POS or call-centre operator, or an AI recommendation"
+   },
+   "substitutes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Ordered substitutes when a reward is unavailable"
+   },
+   "maximumSubstituteValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Value protection: the most a substitute may be worth"
    }
   }
  }

@@ -1,1 +1,413 @@
-{}
+{
+ "createWebhookSubscription": {
+  "method": "POST",
+  "path": "/webhook-subscriptions",
+  "contract": "public-api",
+  "summary": "Subscribe to business events",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WebhookSubscription",
+  "responds": "WebhookSubscription"
+ },
+ "listAccessPolicies": {
+  "method": "GET",
+  "path": "/access-policies",
+  "contract": "identity",
+  "summary": "Attribute-based access policies",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPolicy"
+ },
+ "listApiClients": {
+  "method": "GET",
+  "path": "/api-clients",
+  "contract": "public-api",
+  "summary": "Registered clients for this developer",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApiClient"
+ },
+ "listApprovalExternalDispatches": {
+  "method": "GET",
+  "path": "/approval-external-dispatches",
+  "contract": "approvals",
+  "summary": "What was sent to external workflow systems, and what came back",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "providerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listApprovalExternalProviders": {
+  "method": "GET",
+  "path": "/approval-external-providers",
+  "contract": "approvals",
+  "summary": "The external workflow systems approval levels may be sent to",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listApprovalRequests": {
+  "method": "GET",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Requests awaiting a decision, or already decided",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sort",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCrossModuleOrchestration": {
+  "method": "GET",
+  "path": "/cross-module-orchestration",
+  "contract": "approvals",
+  "summary": "Cross-Module Orchestration Monitor",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "correlationId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWebhookEventTypes": {
+  "method": "GET",
+  "path": "/webhook-event-types",
+  "contract": "public-api",
+  "summary": "The events a webhook may subscribe to",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "publisher",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWebhookSubscriptions": {
+  "method": "GET",
+  "path": "/webhook-subscriptions",
+  "contract": "public-api",
+  "summary": "The tenant's webhook subscriptions, filterable by API client",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "clientId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "WebhookSubscription"
+ },
+ "listWorkflowExceptionFailure": {
+  "method": "GET",
+  "path": "/workflow-exception-failure",
+  "contract": "approvals",
+  "summary": "Workflow Exception, Failure & Recovery Center",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "errorType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWorkflowProcessPerformance": {
+  "method": "GET",
+  "path": "/workflow-process-performance",
+  "contract": "approvals",
+  "summary": "Workflow Analytics & Process Performance",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workflow",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "businessProcess",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "department",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approver",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "user",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "minTransactionValue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "maxTransactionValue",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkflowAnalyticsProcessPerformanceView"
+ },
+ "setApprovalExternalProvider": {
+  "method": "PUT",
+  "path": "/approval-external-providers",
+  "contract": "approvals",
+  "summary": "Register a third-party workflow system as an approver",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalExternalProvider",
+  "responds": "ApprovalExternalProvider"
+ },
+ "setTriggerActionCross": {
+  "method": "PUT",
+  "path": "/trigger-action-cross",
+  "contract": "approvals",
+  "summary": "Trigger, Action & Cross-Module Orchestration Configuration",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TriggerActionCrossModuleOrchestrationConfigurationInput",
+  "responds": "TriggerActionCrossModuleOrchestrationConfigurationView"
+ }
+}

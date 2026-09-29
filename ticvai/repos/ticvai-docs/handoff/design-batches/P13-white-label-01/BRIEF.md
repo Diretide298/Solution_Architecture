@@ -1,6 +1,6 @@
-# P13-white-label-01 — P13 · White Label (1 of 2)
+# P13-white-label-01 — P13 · White Label (1 of 3)
 
-**10 screens · 54 operations · 54 schemas · 8 permissions**
+**10 screens · 58 operations · 59 schemas · 9 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 8 permissions apply here:
-  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ORDER_CREATE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 9 permissions apply here:
+  `AI_USE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ORDER_CREATE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -66,10 +66,10 @@ convincingly. It is never a caption.
 | `CMS-004` | Logo & Assets | statusTracker | 4 | 2 | — |
 | `CMS-005` | Theme Editor | statusTracker | 2 | 1 | — |
 | `CMS-006` | Component Preview | listDetail | 5 | 2 | — |
-| `CMS-007` | Page Builder | statusTracker | 9 | 4 | — |
-| `CMS-008` | Content Blocks | listDetail | 8 | 5 | — |
-| `CMS-009` | Navigation & Menus | listDetail | 6 | 3 | — |
-| `CMS-010` | Media Library | listDetail | 12 | 9 | — |
+| `CMS-007` | Page Builder | statusTracker | 11 | 4 | — |
+| `CMS-008` | Content Blocks | listDetail | 10 | 5 | — |
+| `CMS-009` | Navigation & Menus | listDetail | 7 | 4 | — |
+| `CMS-010` | Media Library | listDetail | 13 | 9 | — |
 
 ## Thin screens in this batch
 

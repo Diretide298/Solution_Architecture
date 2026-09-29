@@ -1,6 +1,6 @@
 # P08-food-beverage-01 — P08 · Food & Beverage
 
-**8 screens · 34 operations · 31 schemas · 9 permissions**
+**8 screens · 34 operations · 40 schemas · 9 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -2673,6 +2673,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -2711,6 +2716,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -2742,7 +2752,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Cancel an order",
   "permission": "ORDER_MODIFY",
   "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2869,6 +2879,16 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "compareTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
     "in": "query",
     "required": null
    }
@@ -3268,6 +3288,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "KitchenSla",
@@ -3283,6 +3308,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "outletId",
     "in": "query",
@@ -3330,6 +3360,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -3364,6 +3399,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -3500,6 +3540,39 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CatalogueState": {
+  "x-ticvai-persistence": "none — computed from workstation bundle_version",
+  "type": "object",
+  "description": "The workstation's local catalogue position. A terminal beyond `staleAfter` must refuse to trade rather than transact against stale prices.\n",
+  "required": [
+   "appliedBundleVersion",
+   "appliedAt",
+   "staleAfter",
+   "isStale"
+  ],
+  "properties": {
+   "appliedBundleVersion": {
+    "type": "string"
+   },
+   "appliedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "staleAfter": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Beyond this the terminal refuses to trade."
+   },
+   "isStale": {
+    "type": "boolean"
+   },
+   "pendingBundleVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "Published but not yet applied."
+   }
+  }
+ },
  "CoursingPolicy": {
   "type": "string",
   "description": "How a ticket's courses are fired. `fireAndForget` sends every course at once, which is no coursing; `holdAndFire` waits for a server to call each course; `timed` fires on a clock; `phased` staggers by course. **One vocabulary for the ticket (`KitchenTicket.coursing`) and the outlet default (`CourseRules.defaultCoursing`)** — the default said `none` for `fireAndForget` and had no `delayed` until 26 September, so a default could not be copied onto the field it defaults.\n",
@@ -3553,6 +3626,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "Course grouping, so the kitchen fires in sequence."
+   },
+   "redeemEntitlementId": {
+    "type": "string",
+    "nullable": true,
+    "x-ticvai-references": "access.entitlement",
+    "description": "**A meal combo redeemed at the till or by a scan** (29 September, MOB-4; applied 30 September). The entitlement a bundle's `fnbMenuItem` component issued (promotions `BundleComponent.componentKind: fnbMenuItem`, `menuItemId`, `redeemAtOutletIds`). The line is priced at zero against it, `menuItemId` must be the component's menu item and the outlet one of `redeemAtOutletIds` (or any outlet with the item on a live menu when that list is empty), and the entitlement is marked used in the same step through access `validateAccess` at the outlet. An entitlement already used, for another item or outlet, or not yet valid is refused 409 `entitlementNotRedeemable`; a till that is offline queues the redemption like any sale and the replay is refused the same way if it was used meanwhile."
    }
   }
  },
@@ -3591,6 +3670,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "$ref": "#/components/schemas/CreateFnbOrderLine"
     }
    },
+   "salesOrderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The `orders.sales_order` this F&B order fulfils (SD-046, 29 September). A POS sale sends the order it took payment on; the commercial order is the sales order and this is its fulfilment."
+   },
    "recordedAt": {
     "type": "string",
     "format": "date-time"
@@ -3620,6 +3705,42 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "availability": {
     "$ref": "#/components/schemas/MenuAvailability"
+   }
+  }
+ },
+ "DeploymentProfile": {
+  "type": "string",
+  "description": "How this workstation obtains catalogue and inventory (ADR-0013).\n- `terminalLocal` — own SQLite, leases direct from the cell. Small venues, 4G sites - `venueEdge` — own SQLite, distributed via the venue edge node which holds the\n  venue lease and sub-leases to terminals. Mid and large venues, stadium gates\n- `thin` — no local catalogue, server reads. Non-transactional surfaces only\n",
+  "enum": [
+   "terminalLocal",
+   "venueEdge",
+   "thin"
+  ]
+ },
+ "DeviceBinding": {
+  "x-ticvai-persistence": "platform.device",
+  "type": "object",
+  "required": [
+   "kind",
+   "driver"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/DeviceKind"
+   },
+   "driver": {
+    "type": "string",
+    "description": "Driver identifier. Adding a vendor is a driver plus configuration, never a core change — every venue arrives with hardware not previously seen.\n"
+   },
+   "identifier": {
+    "type": "string",
+    "description": "Serial",
+    "port or network address.": null
+   },
+   "isRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "When true, the workstation refuses to open a shift if the device is absent.\n"
    }
   }
  },
@@ -3685,9 +3806,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "salesOrderId": {
     "type": "string",
-    "format": "uuid",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true,
-    "description": "**Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"
+    "x-ticvai-references": "orders.sales_order",
+    "description": "**Retyped 29 September (SD-046)**: `orders.sales_order.id` is a ULID, so a uuid here could never join. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"
    },
    "updatedAt": {
     "type": "string",
@@ -3705,6 +3827,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
+   },
+   "kitchenTickets": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The kitchen tickets this order created, one per station (SD-046). Returned, not stored here; they are `fnb.kitchen_ticket` rows.",
+    "items": {
+     "$ref": "#/components/schemas/KitchenTicket"
+    }
    },
    "estimatedReadyAt": {
     "type": "string",
@@ -4063,6 +4194,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "code": {
     "type": "string"
    },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
+   },
    "name": {
     "type": "string"
    },
@@ -4231,6 +4373,54 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "MenuActionSelector": {
+  "type": "object",
+  "description": "**Which items a bulk action touches.** At least one criterion; several narrow each other. *Reprice all* and *reprice all in this section* are different selectors on purpose, and the preview says how many items each one reaches.\n",
+  "minProperties": 1,
+  "properties": {
+   "menuItemIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "sectionCodes": {
+    "type": "array",
+    "description": "`MenuSection.code` values on this menu.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allItems": {
+    "type": "boolean",
+    "description": "Every item on the menu. Stated rather than implied by an empty selector."
+   }
+  }
+ },
+ "MenuActionValue": {
+  "type": "object",
+  "description": "What the action sets. **One field per kind**: `reprice` takes `percentChange` or `price`; `moveSection` takes `toSectionCode`; `setAvailability` takes `isAvailable`; `setTax` takes `taxCode`; `retire` and `activate` take none.\n",
+  "properties": {
+   "percentChange": {
+    "type": "number",
+    "description": "Signed. `-5` is five per cent off."
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "toSectionCode": {
+    "type": "string"
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "taxCode": {
+    "type": "string",
+    "description": "A tax code from the finance tax engine."
    }
   }
  },
@@ -4817,6 +5007,77 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ProductionRun": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.production_run",
+  "description": "BL-129. **A central kitchen makes 400 portions at 6am for four outlets**, and nothing modelled that — orders consume stock and no operation produced any.\n**Production converts ingredients into a sellable item**, which is a stock movement in both directions at once, and treating it as two unrelated adjustments loses the yield.\n",
+  "required": [
+   "id",
+   "recipeId",
+   "plannedQuantity",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recipeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productionPlanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The plan whose release created this run. Null for a run planned directly."
+   },
+   "stationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The station whose prep list this run is on.** Copied from the plan line on release, where runs are grouped by station (audit R125 (7)).\n"
+   },
+   "producingOutletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "forOutletIds": {
+    "type": "array",
+    "description": "**Where it goes.** A central kitchen produces for outlets that did not make it.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "plannedQuantity": {
+    "type": "number"
+   },
+   "actualQuantity": {
+    "type": "number",
+    "nullable": true,
+    "description": "BL-126. **Theoretical against actual is the whole point of recording this.** A recipe says 400 portions from the ingredients issued; the run says how many were made, and the gap is waste, theft or a recipe that is wrong.\n"
+   },
+   "scheduledFor": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "planned",
+     "inProgress",
+     "completed",
+     "cancelled"
+    ]
+   },
+   "varianceReason": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
  "RefireReason": {
   "type": "string",
   "description": "Why a line was made again (`refireItem`). The reasons are the data.",
@@ -4829,6 +5090,31 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "allergyRisk",
    "guestChangedMind",
    "lateAdd"
+  ]
+ },
+ "SaleBoardKind": {
+  "type": "string",
+  "enum": [
+   "ticketing",
+   "fnb",
+   "retail",
+   "mixed"
+  ]
+ },
+ "SalesChannel": {
+  "type": "string",
+  "description": "**Where a sale came from.** Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing at nothing.\n**Not interchangeable with the local `Channel` enums.** `catalogue.Channel` and `orders.Channel` are byte-identical duplicates of each other listing `pos, kiosk, web, mobile, b2b, ota, callCentre`; `orders.OrderChannel` lists `guestApp, guestWeb, partner, api, backOffice` on top. **Pointing the nine at a local enum would silently narrow them** — and the duplication between the two `Channel` enums is the reason a shared one existed in the first place.\n**This is the reporting dimension**: attribution, promotion eligibility and settlement all group by it, which is why it has to mean the same thing in `orders`, `catalogue`, `subscription` and `marketing-crm` rather than four things that nearly line up.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice",
+   "b2b",
+   "ota"
   ]
  },
  "ServiceMode": {
@@ -4857,6 +5143,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "readOnly": true,
     "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
    "currencyCode": {
     "type": "string",
@@ -5399,6 +5693,133 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "Workstation": {
+  "x-ticvai-persistence": "platform.workstation",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "regionId",
+   "scopePath",
+   "saleBoard",
+   "currency",
+   "currencyScale",
+   "timeZone"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "saleBoard": {
+    "type": "object",
+    "description": "Determines which front end loads. Bound to the workstation, not the role — the F&B terminal opens the F&B board. What the operator may then DO within it is governed by their permissions.\n",
+    "required": [
+     "id",
+     "kind"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "kind": {
+      "$ref": "#/components/schemas/SaleBoardKind"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Inherited from the workstation, never selected by the operator. Null where the workstation is not at an access point.\n"
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/DeviceBinding"
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "timeZone": {
+    "type": "string"
+   },
+   "deploymentProfile": {
+    "$ref": "#/components/schemas/DeploymentProfile"
+   },
+   "edgeNodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Present when `deploymentProfile` is `venueEdge`."
+   },
+   "healthScore": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "readOnly": true,
+    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.**\n"
+   },
+   "configurationProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Which profile this workstation runs, and at which version. **The client's board shows a fleet split four ways — 72% latest, 18.8% one behind, 6.1% outdated** — and the package had a firmware version field and no profile.\n**A profile is what a venue changes; a version is what it deploys.** Conflating them means a venue cannot say *roll the ticketing counters back and leave the kiosks*.\n"
+   },
+   "catalogueState": {
+    "$ref": "#/components/schemas/CatalogueState"
+   },
+   "offlineCapable": {
+    "type": "boolean",
+    "description": "Derived from `deploymentProfile`. False only for `thin`. Under local-first, catalogue READS are always local on transactional surfaces; this flag governs whether WRITES can be queued.\n"
+   },
+   "isActive": {
+    "type": "boolean"
    }
   }
  }

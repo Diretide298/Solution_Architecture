@@ -1,0 +1,611 @@
+{
+ "FxRateValue": {
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "type": "string",
+  "pattern": "^\\d+(\\.\\d{1,6})?$",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one (naming-and-style 5.1). Up to six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly — and stored as `numeric(18,6)` so the six places the wire carries survive the database.\n"
+ },
+ "InterEntityObligation": {
+  "type": "object",
+  "x-ticvai-persistence": "ledger.inter_entity_obligation",
+  "required": [
+   "id",
+   "fromLegalEntityId",
+   "toLegalEntityId",
+   "arisingAmount",
+   "arisingAt",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Server-created when the obligation arises, so a UUID, as the `obligationId` path parameter types it."
+   },
+   "fromLegalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The selling entity. Holds the liability, and therefore the FX exposure."
+   },
+   "toLegalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The consuming entity, which provided the service at redemption."
+   },
+   "entitlementId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "arisingAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "In the **consuming** entity's base currency, at the rate in force on the redemption date. Neither entity ever holds a balance in a currency that is not its own.\n"
+   },
+   "rateApplied": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateValue"
+     }
+    ]
+   },
+   "arisingAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Redemption. Not sale — the obligation exists when the service is given."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "outstanding",
+     "settled",
+     "disputed"
+    ]
+   },
+   "settledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "settlementRate": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/FxRateValue"
+     }
+    ],
+    "nullable": true
+   },
+   "fxMovement": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Rate movement between arising and settling. Posts to FX gain and loss on the selling entity, which carried the balance.\n"
+   }
+  }
+ },
+ "MerchantAccount": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.merchant_account",
+  "description": "Board 7.7. **Which legal entity gets the money, and when.**",
+  "required": [
+   "code"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018). Region-scoped and not overridable below it, so a row in a UAE region is AED and cannot be anything else. Kept on the wire, removed from the table.\n"
+   },
+   "settlementCalendar": {
+    "type": "string",
+    "enum": [
+     "daily",
+     "weekly",
+     "monthly",
+     "custom"
+    ]
+   },
+   "settlementDelayDays": {
+    "type": "integer",
+    "default": 1
+   },
+   "bankAccountReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ProviderEconomics": {
+  "type": "object",
+  "description": "Board 2.9. **Cost per transaction is a routing input.**",
+  "properties": {
+   "connectionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "providerName": {
+    "type": "string"
+   },
+   "transactions": {
+    "type": "integer"
+   },
+   "grossVolume": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "schemeFees": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "interchange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "acquirerMargin": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "fxSpread": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "chargebackCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "effectiveRatePercent": {
+    "type": "number"
+   }
+  }
+ },
+ "ReconciliationMatchingRules": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.matching_rules",
+  "description": "Board 7.3. **Exact matching was never enough.**",
+  "properties": {
+   "primaryKey": {
+    "type": "string",
+    "enum": [
+     "providerReference",
+     "platformReference",
+     "authorisationCode",
+     "retrievalReference"
+    ]
+   },
+   "fallbackKeys": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "amountToleranceMinor": {
+    "type": "integer",
+    "default": 0
+   },
+   "dateWindowDays": {
+    "type": "integer",
+    "default": 2,
+    "description": "**Acquirers batch across midnight.** A same-day-only match manufactures exceptions every night.\n"
+   },
+   "netOfFees": {
+    "type": "boolean",
+    "default": true
+   },
+   "autoResolveBelowMinor": {
+    "type": "integer",
+    "default": 0,
+    "description": "**Rounding differences of a fil are not worth a person.** Above this they are."
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ReconciliationSource": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.reconciliation_source",
+  "description": "Board 7.2. **A file that did not arrive looks like a day with no settlements.**",
+  "required": [
+   "code"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "connectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "transport": {
+    "type": "string",
+    "enum": [
+     "sftp",
+     "api",
+     "email",
+     "manualUpload"
+    ]
+   },
+   "format": {
+    "type": "string",
+    "enum": [
+     "csv",
+     "fixedWidth",
+     "json",
+     "xml",
+     "camt053"
+    ]
+   },
+   "expectedSchedule": {
+    "type": "string",
+    "nullable": true,
+    "default": "daily",
+    "description": "How often a file is expected. **Daily by default, one per venue per trading day** (decided 28 September, audit R110 (b)), because settlement is reconciled daily per venue (`finance.ingestSettlementFile`)."
+   },
+   "expectedByTime": {
+    "type": "string",
+    "nullable": true
+   },
+   "alertIfMissing": {
+    "type": "boolean",
+    "default": true
+   },
+   "fieldMapping": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Settlement": {
+  "x-ticvai-persistence": "ledger.settlement",
+  "type": "object",
+  "required": [
+   "id",
+   "providerName",
+   "periodStart",
+   "periodEnd",
+   "status",
+   "ingestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "currencyCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "**A settlement has no account, so nothing else denominates it.** A posting takes its currency from `ledger.account.currency` and a payment from `tenderCurrency`, but a settlement is a provider file for a period: `providerGross`, `ledgerGross` and `difference` are bare amounts, and a provider file in one currency against a ledger in another computes a difference that means nothing. Added 20 September, when a venue became able to trade outside its region's currency.\n"
+   },
+   "providerName": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The venue this settlement is for. **Reconciled daily per venue** (decided 28 September, audit R110 (b)), so `periodStart` and `periodEnd` are the same day."
+   },
+   "periodStart": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "periodEnd": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "fileReference": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `MediaAsset` holding the provider file, as given to `ingestSettlementFile`. **Kept on the row because parsing is asynchronous**: the job that parses the file reads it from here.\n"
+   },
+   "format": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "csv",
+     "fixedWidth",
+     "xml",
+     "json"
+    ],
+    "description": "The file format given at ingest. Null when none was given."
+   },
+   "status": {
+    "$ref": "#/components/schemas/SettlementStatus"
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "matchedCount": {
+    "type": "integer"
+   },
+   "exceptionCount": {
+    "type": "integer"
+   },
+   "providerGross": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "providerFees": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "providerNet": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "ledgerGross": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "difference": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "ingestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `region` scope.**"
+   }
+  }
+ },
+ "SettlementException": {
+  "x-ticvai-persistence": "ledger.settlement_exception",
+  "type": "object",
+  "required": [
+   "id",
+   "settlementId",
+   "kind",
+   "providerReference",
+   "amount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Server-created when parsing finds the exception, so a UUID (naming-and-style 4)."
+   },
+   "settlementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "unmatchedInProvider",
+     "unmatchedInLedger",
+     "amountMismatch",
+     "duplicateInProvider",
+     "feeUnexplained"
+    ]
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "paymentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "expectedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "resolution": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/SettlementResolution"
+     }
+    ],
+    "nullable": true,
+    "description": "Null while the exception is open."
+   },
+   "note": {
+    "type": "string",
+    "nullable": true,
+    "description": "The `note` given to `resolveSettlementException`, stored with the resolution."
+   },
+   "resolvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "SettlementResolution": {
+  "type": "string",
+  "description": "How a settlement exception was explained. One vocabulary for the request and the stored exception.",
+  "enum": [
+   "matchedManually",
+   "writeOff",
+   "disputeRaised",
+   "providerError",
+   "timingDifference"
+  ]
+ },
+ "SettlementStatus": {
+  "type": "string",
+  "enum": [
+   "ingesting",
+   "parsing",
+   "matching",
+   "matched",
+   "hasExceptions",
+   "resolved",
+   "failed"
+  ]
+ },
+ "UnifiedReconciliation": {
+  "type": "object",
+  "description": "4.2.19. **Four sources and the variances between them.** A view showing each balanced against itself has not reconciled anything.\n",
+  "properties": {
+   "from": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "to": {
+    "type": "string",
+    "format": "date",
+    "description": "A day in the region's time zone, local midnight to local midnight."
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "source": {
+       "type": "string",
+       "enum": [
+        "pos",
+        "gateway",
+        "bank",
+        "wallet",
+        "ledger"
+       ]
+      },
+      "providerName": {
+       "type": "string",
+       "nullable": true
+      },
+      "total": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "transactionCount": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "variances": {
+    "type": "array",
+    "description": "**Where two sources disagree, named.** A discrepancy is usually the gap between two of them rather than inside one, and *\"out by 240\"* without saying between what is not actionable.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "between": {
+       "type": "array",
+       "description": "The two sources that disagree, as named in `sources[].source`.",
+       "minItems": 2,
+       "maxItems": 2,
+       "items": {
+        "type": "string",
+        "enum": [
+         "pos",
+         "gateway",
+         "bank",
+         "wallet",
+         "ledger"
+        ]
+       }
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "likelyCause": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ }
+}

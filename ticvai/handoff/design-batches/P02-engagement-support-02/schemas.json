@@ -21,7 +21,7 @@
     "type": "string"
    },
    "module": {
-    "type": "string"
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
    },
    "locale": {
     "type": "string"
@@ -41,6 +41,11 @@
  },
  "Case": {
   "x-ticvai-persistence": "marketing.case",
+  "x-ticvai-retired-columns": [
+   "guest_name",
+   "subject",
+   "is_sla_breached"
+  ],
   "type": "object",
   "required": [
    "id",
@@ -52,10 +57,14 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID."
    },
    "caseNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"
    },
    "subjectId": {
     "type": "string",
@@ -64,15 +73,60 @@
    },
    "guestName": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"
    },
    "subject": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-column": "title",
+    "description": "**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CaseKind"
+     }
+    ],
+    "nullable": true,
+    "description": "What the guest said it was about, where the guest raised it."
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the case was raised — the start of the SLA clock."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the case arrived. Equal to `recordedAt` for a case raised online."
    },
    "categoryId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"
+   },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"
    },
    "status": {
     "$ref": "#/components/schemas/CaseStatus"
@@ -100,7 +154,10 @@
     "nullable": true
    },
    "isSlaBreached": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"
    },
    "slaPausedSeconds": {
     "type": "integer",
@@ -119,6 +176,18 @@
     "nullable": true
    }
   }
+ },
+ "CaseKind": {
+  "type": "string",
+  "description": "**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n",
+  "enum": [
+   "lostProperty",
+   "complaint",
+   "question",
+   "accessibility",
+   "refundRequest",
+   "other"
+  ]
  },
  "CasePriority": {
   "type": "string",
@@ -171,6 +240,12 @@
     "type": "string",
     "format": "uuid"
    },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. Must belong to `subjectId` when both are given (422). (decided 29 September, coordinator decision DM4, writers pass)"
+   },
    "priority": {
     "allOf": [
      {
@@ -178,6 +253,9 @@
      }
     ],
     "default": "normal"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CaseKind"
    },
    "channel": {
     "$ref": "#/components/schemas/MessageChannel"
@@ -191,13 +269,15 @@
    },
    "attachmentRefs": {
     "type": "array",
+    "description": "Stored on the opening `CaseMessage`, not on the case.",
     "items": {
      "type": "string"
     }
    },
    "recordedAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "Device time the case was raised. The server stamps `Case.syncedAt` on arrival."
    }
   }
  },
@@ -247,101 +327,530 @@
    "atCapacity"
   ]
  },
- "Suggestion": {
+ "VisitPlan": {
   "type": "object",
-  "x-ticvai-persistence": "ai.suggestion",
-  "description": "One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n",
+  "x-ticvai-persistence": "venuemap.visit_plan",
+  "description": "**A guest's visit plan** (29 September, MOB-6): the Plan tab. One row per plan; its items are `venuemap.visit_plan_item` rows carrying the version they belong to, so every earlier version stays readable and undo is a new version equal to an old one. **Owned by the guest session**, like a cart: `subjectId` when signed in, `sessionRef` for an anonymous device session, claimed on sign-in.\n",
   "required": [
    "id",
-   "kind",
-   "basis",
-   "producedAt"
+   "venueId",
+   "status",
+   "version",
+   "days"
   ],
   "properties": {
    "id": {
     "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
     "format": "uuid"
    },
-   "kind": {
-    "$ref": "#/components/schemas/SuggestionKind"
-   },
-   "basis": {
-    "$ref": "#/components/schemas/SuggestionBasis"
-   },
    "scopePath": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "Derived from `venueId`."
    },
-   "subjectRef": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "marketing.guest_profile",
+    "description": "The signed-in guest. From the session, never from the body."
+   },
+   "sessionRef": {
     "type": "string",
     "nullable": true,
-    "description": "What it is about — a product, an outlet, an item, a party."
+    "readOnly": true,
+    "description": "The anonymous device session that owns the plan until sign-in."
    },
-   "value": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "The suggestion itself. Shape depends on `kind`."
-   },
-   "confidence": {
-    "type": "number",
-    "nullable": true,
-    "minimum": 0,
-    "maximum": 1,
-    "description": "**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"
-   },
-   "explanation": {
+   "status": {
     "type": "string",
-    "description": "**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"
+    "enum": [
+     "draft",
+     "booked",
+     "archived"
+    ],
+    "readOnly": true,
+    "description": "`booked` after `bookVisitPlan`; a booked plan is read-only. `archived` after its last date."
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true,
+    "description": "The current version. Every `updateVisitPlan` adds one."
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "rules",
+     "preset",
+     "aiAgent"
+    ],
+    "readOnly": true,
+    "description": "What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. **The guest sees which**, as every AI answer says what it is based on.\n"
    },
    "inputs": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"
+    "$ref": "#/components/schemas/VisitPlanRequest"
    },
-   "producerRef": {
+   "mapVersion": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "The published map version the plan was laid out on."
+   },
+   "cartId": {
     "type": "string",
-    "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "orders.cart",
+    "description": "The cart `bookVisitPlan` filled."
    },
-   "producedAt": {
-    "type": "string",
-    "format": "date-time"
+   "excluded": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**What was left out and why**, e.g. a coaster excluded because one of the party is under its 120 cm minimum. Shown on GST-053, so the planner never looks as if it forgot.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "pointId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "productId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "heightRule",
+        "ageRule",
+        "closedOnDate",
+        "notInInterests",
+        "noTime"
+       ]
+      }
+     }
+    }
    },
-   "expiresAt": {
+   "days": {
+    "type": "array",
+    "readOnly": true,
+    "description": "One per date, in order. The items of the version read.",
+    "items": {
+     "type": "object",
+     "required": [
+      "date",
+      "items"
+     ],
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "opensAt": {
+       "type": "string",
+       "nullable": true
+      },
+      "closesAt": {
+       "type": "string",
+       "nullable": true
+      },
+      "items": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/VisitPlanItem"
+       }
+      }
+     }
+    }
+   },
+   "createdAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true,
-    "description": "**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
- "SuggestionBasis": {
-  "type": "string",
-  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
-  "enum": [
-   "heuristic",
-   "statistical",
-   "model",
-   "hybrid",
-   "manual"
-  ]
+ "VisitPlanAlternative": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed on read",
+  "description": "One candidate for a swap (29 September, MOB-6).",
+  "required": [
+   "kind",
+   "startsAt",
+   "reason"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "attraction",
+     "show",
+     "meal",
+     "shop",
+     "rest"
+    ]
+   },
+   "pointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "name": {
+    "type": "string"
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "durationMinutes": {
+    "type": "integer"
+   },
+   "walkMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "expectedWaitMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "matchedInterests": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "reason": {
+    "type": "string",
+    "description": "Why it is offered, in words the sheet shows, e.g. *Same thrill level, 4 minutes closer*."
+   }
+  }
  },
- "SuggestionKind": {
-  "type": "string",
-  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n",
-  "enum": [
-   "price",
-   "replenishment",
-   "requisition",
-   "demandForecast",
-   "prepPlan",
-   "menuEngineering",
-   "staffing",
-   "slaTarget",
-   "waitTime",
-   "upsell",
-   "segmentation",
-   "anomaly",
-   "scenario"
-  ]
+ "VisitPlanItem": {
+  "type": "object",
+  "x-ticvai-persistence": "venuemap.visit_plan_item",
+  "description": "**One timed stop on a plan day** (29 September, MOB-6). Rows are kept per `planVersion`: a change writes the day's items again under the new version, and an older version's rows are never updated.\n",
+  "required": [
+   "id",
+   "planId",
+   "planVersion",
+   "date",
+   "sequence",
+   "kind",
+   "startsAt",
+   "endsAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "venuemap.visit_plan"
+   },
+   "planVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true
+   },
+   "date": {
+    "type": "string",
+    "format": "date"
+   },
+   "sequence": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "attraction",
+     "show",
+     "meal",
+     "shop",
+     "rest",
+     "travel"
+    ]
+   },
+   "pointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "venuemap.point"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "catalogue.product",
+    "description": "What is bought for this stop, where it is bought. Null for a free stop."
+   },
+   "bundleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "promotions.bundle",
+    "description": "A meal combo or package, from the point's `featuredOffer`."
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "catalogue.performance"
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "walkMinutesBefore": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "expectedWaitMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "The typical wait at that hour when the plan was laid out; GST-059 replaces it with the live one."
+   },
+   "addOnSuggestion": {
+    "type": "object",
+    "nullable": true,
+    "description": "A suggested add-on for this stop, e.g. Fast Track where the wait is long. Never added by itself.",
+    "properties": {
+     "productId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "reason": {
+      "type": "string"
+     }
+    }
+   },
+   "addOnAccepted": {
+    "type": "boolean",
+    "default": false
+   },
+   "pinned": {
+    "type": "boolean",
+    "default": false,
+    "description": "The guest fixed this stop; a re-lay moves other stops around it."
+   },
+   "note": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 200
+   }
+  }
+ },
+ "VisitPlanRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; kept as `inputs` on venuemap.visit_plan",
+  "description": "What `generateVisitPlan` takes (29 September, MOB-6): the Plan tab's form on GST-051 and WEB-050.\n",
+  "required": [
+   "venueId",
+   "dates",
+   "party"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dates": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 7,
+    "items": {
+     "type": "string",
+     "format": "date"
+    }
+   },
+   "party": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 20,
+    "description": "One entry per person. **Height where the guest knows it, age otherwise**: height is what ride eligibility rules test, and an age band is the fallback the rule may also state. Nothing here identifies a person.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "heightCm": {
+       "type": "integer",
+       "minimum": 40,
+       "maximum": 230,
+       "nullable": true
+      },
+      "ageYears": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 120,
+       "nullable": true
+      }
+     }
+    }
+   },
+   "pace": {
+    "type": "string",
+    "enum": [
+     "packed",
+     "relaxed"
+    ],
+    "default": "relaxed"
+   },
+   "interestTags": {
+    "type": "array",
+    "maxItems": 12,
+    "description": "The same closed list as `VenuePoint.interestTags`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "cuisineTags": {
+    "type": "array",
+    "maxItems": 8,
+    "items": {
+     "type": "string"
+    }
+   },
+   "mustIncludePointIds": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "preset": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "highlights",
+     "family",
+     "thrillSeeker",
+     "waterDay",
+     "relaxed",
+     "showsAndDining"
+    ],
+    "description": "A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and the pace, and the party still decides eligibility.\n"
+   },
+   "presetKey": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 64,
+    "pattern": "^[a-z][a-zA-Z0-9]*$",
+    "description": "The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the built-in `preset` keys above, or a key of a ready-made plan the venue defines. **The same rules planner runs**: the preset only supplies interests, pace and must-include points, and the party still decides eligibility. When both `preset` and `presetKey` are sent they must name the same plan; `presetKey` is the field new clients send. An unknown key is refused 422 `unknown-preset`.\n"
+   },
+   "startTime": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "description": "When the party arrives. Null means opening time."
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "VisitPlanUpdate": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; lands as a new version of venuemap.visit_plan_item rows",
+  "description": "What `updateVisitPlan` takes (29 September, MOB-6).",
+  "required": [
+   "baseVersion",
+   "changes"
+  ],
+  "properties": {
+   "baseVersion": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "changes": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 20,
+    "items": {
+     "type": "object",
+     "required": [
+      "op"
+     ],
+     "properties": {
+      "op": {
+       "type": "string",
+       "enum": [
+        "swap",
+        "remove",
+        "add",
+        "move",
+        "pin",
+        "acceptAddOn",
+        "declineAddOn",
+        "revertTo"
+       ]
+      },
+      "itemId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "date": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "pointId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "startsAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "version": {
+       "type": "integer",
+       "nullable": true,
+       "description": "For `revertTo`, the earlier version to restore (undo)."
+      }
+     }
+    }
+   }
+  }
  },
  "WaitTime": {
   "x-ticvai-persistence": "none — computed from readings and throughput",
@@ -366,6 +875,12 @@
     "format": "uuid",
     "nullable": true
    },
+   "attractionCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. Read from catalogue, not stored here.\n"
+   },
    "status": {
     "$ref": "#/components/schemas/QueueStatus"
    },
@@ -379,7 +894,7 @@
    },
    "isStale": {
     "type": "boolean",
-    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current.\n"
+    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current, and it is not hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with its `asOf` and a stale marker.\n"
    },
    "heightRequirementCm": {
     "type": "integer",
@@ -391,7 +906,8 @@
    },
    "asOf": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "When the figure was produced — the queue's `waitTimeAsOf`."
    }
   }
  },

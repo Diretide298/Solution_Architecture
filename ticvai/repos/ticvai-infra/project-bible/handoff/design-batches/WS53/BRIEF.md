@@ -1,6 +1,6 @@
 # WS53 — Promotions   Bundles Management board 9
 
-**10 screens · 10 operations · 13 schemas · 2 permissions**
+**10 screens · 13 operations · 17 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,7 +61,7 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `ADM-218` | Campaign Governance & Budget Command Center | commandCentre | 1 | 0 | — |
-| `ADM-219` | Campaign Budget & Financial Limit Setup | configEditor | 1 | 0 | — |
+| `ADM-219` | Campaign Budget & Financial Limit Setup | configEditor | 4 | 2 | — |
 | `ADM-220` | Redemption, Discount & Exposure Limit Manager | configEditor | 1 | 0 | — |
 | `ADM-221` | Budget Consumption & Forecast Monitor | listDetail | 1 | 0 | — |
 | `ADM-222` | Threshold Actions & Automatic Suspension | listDetail | 1 | 4 | — |

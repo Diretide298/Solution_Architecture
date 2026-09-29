@@ -21,7 +21,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CodeSecurityFraudExceptionCenterView"
  },
@@ -37,6 +43,11 @@
   "parameters": [
    {
     "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "batchId",
     "in": "query",
     "required": null
    },
@@ -64,6 +75,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "campaign",
     "in": "query",
@@ -117,7 +133,58 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "promoCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "couponId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "batchId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "transaction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "booking",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "campaign",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerAccountReference",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "RedemptionMonitorCodeLookupView"
  },
@@ -143,7 +210,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "UsageCapacityFrequencyControlView"
  },
@@ -169,7 +242,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CodeDistributionAssignmentManagerInput",
   "responds": "CodeDistributionAssignmentManagerView"
  },
@@ -182,7 +261,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CouponPromoCodeBuilderInput",
   "responds": "CouponPromoCodeBuilderView"
  }

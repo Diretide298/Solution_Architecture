@@ -1,6 +1,6 @@
 # P10-booking-quotes-01 — P10 · Booking & Quotes
 
-**4 screens · 32 operations · 40 schemas · 14 permissions**
+**4 screens · 32 operations · 49 schemas · 14 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 14 permissions apply here:
   `CAPACITY_CONFIGURE, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID, PARTNER_MANAGE, PARTNER_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **11 of these operations work offline**: applyManualDiscount, createOrder, evaluatePromotions, getOrder, getPromotion, holdOrder, listOrderRefunds, listOrders
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,11 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-008` | Booking Creation | listDetail | 14 | 1 | — |
-| `PTR-009` | Group / Bulk Booking | listDetail | 4 | 0 | — |
-| `PTR-010` | Cart & Quote | listDetail | 10 | 1 | — |
-| `PTR-011` | Quote Management | listDetail | 4 | 0 | — |
-
-## Thin screens in this batch
-
-**PTR-011 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `PTR-008` | Booking Creation | listDetail | 14 | 9 | — |
+| `PTR-009` | Group / Bulk Booking | listDetail | 4 | 3 | — |
+| `PTR-010` | Cart & Quote | listDetail | 10 | 5 | — |
+| `PTR-011` | Quote Management | listDetail | 4 | 1 | — |

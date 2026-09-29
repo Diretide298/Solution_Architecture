@@ -1,6 +1,6 @@
 # WS05 — Access Control board 5
 
-**10 screens · 15 operations · 15 schemas · 4 permissions**
+**10 screens · 16 operations · 21 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, GUEST_MANAGE, SCOPE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AUDIT_VIEW, GUEST_MANAGE, SCOPE_VIEW, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -68,7 +68,7 @@ convincingly. It is never a caption.
 | `BO-189` | Face Matching & Verification Thresholds | configEditor | 2 | 0 | — |
 | `BO-190` | Face Change, Re-enrollment & Identity Protection | listDetail | 2 | 1 | — |
 | `BO-191` | Biometric Validation at Gate | listDetail | 2 | 0 | — |
-| `BO-192` | Biometric Lifecycle, Retention & Deletion | configEditor | 2 | 0 | — |
+| `BO-192` | Biometric Lifecycle, Retention & Deletion | configEditor | 3 | 0 | — |
 | `BO-193` | Biometric Simulation, Audit & Publication | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch

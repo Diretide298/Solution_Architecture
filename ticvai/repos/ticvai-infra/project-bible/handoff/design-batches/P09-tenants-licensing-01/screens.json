@@ -27,39 +27,40 @@
    "fromFlows": true,
    "transitions": [
     {
-     "to": "ADM-012",
-     "trigger": "Provisions or assigns a cell",
-     "provenance": "flow F16 step 1→2"
-    },
-    {
-     "to": "ADM-008",
-     "trigger": "Subscription & Plan Management",
-     "provenance": "flow F96 step 1→2"
-    },
-    {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-005 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-005 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-005 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-008",
+     "trigger": "Subscription & Plan Management",
+     "provenance": "flow F96 step 1→2",
+     "carries": [
+      "planId",
+      "tenantId"
+     ]
+    },
+    {
+     "to": "ADM-012",
+     "trigger": "Provisions or assigns a cell",
+     "provenance": "flow F16 step 1→2",
+     "carries": [
+      "cellId",
+      "tenantId"
+     ]
     }
    ]
   },
@@ -68,13 +69,6 @@
   "pattern": "listDetail",
   "patternReason": "`listTenants` reads the population and `getEntitlementUsage` reads one of them — list, select, act",
   "purpose": "Find the right one quickly, and act on it without opening it.",
-  "gaps": [
-   {
-    "operation": "getSsoConfig",
-    "why": "**4 declared operations reach no component on this screen**: getSsoConfig, getTenant, getTenantLicences, listTenantCells. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -82,6 +76,44 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.id",
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "openPlatformStaffGrant",
+       "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listTenants",
+       "notes": "Sends `?status=` to `listTenants`.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "textField",
+       "label": "Plan id",
+       "operation": "listTenants",
+       "notes": "Sends `?planId=` to `listTenants`.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
       {
        "kind": "dataTable",
        "label": "Every tenant",
@@ -102,6 +134,27 @@
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every cell",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
       }
      ]
     },
@@ -112,6 +165,88 @@
       {
        "kind": "detailPanel",
        "label": "The selected tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.suspensionEffectiveAt",
+        "Tenant.suspensionNoticeMessage",
+        "Tenant.terminationScheduledAt",
+        "Tenant.terminationRetentionUntil",
+        "Tenant.terminationReason",
+        "Tenant.terminationRequestedByPrincipalId",
+        "Tenant.planId",
+        "Tenant.planName",
+        "Tenant.cellCount",
+        "Tenant.venueCount"
+       ],
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The SSO provider config",
+       "bindsTo": "SsoProviderConfig",
+       "columns": [
+        "SsoProviderConfig.id",
+        "SsoProviderConfig.displayName",
+        "SsoProviderConfig.protocol",
+        "SsoProviderConfig.metadataUrl",
+        "SsoProviderConfig.issuer",
+        "SsoProviderConfig.clientId",
+        "SsoProviderConfig.clientSecretRef",
+        "SsoProviderConfig.groupMappings",
+        "SsoProviderConfig.autoProvisionPrincipals",
+        "SsoProviderConfig.isEnforced",
+        "SsoProviderConfig.isActive"
+       ],
+       "operation": "getSsoConfig",
+       "provenance": "contract identity.yaml GET /tenants/sso-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant",
+       "bindsTo": "TenantDetail",
+       "columns": [
+        "TenantDetail.id",
+        "TenantDetail.code",
+        "TenantDetail.name",
+        "TenantDetail.status",
+        "TenantDetail.suspensionMode",
+        "TenantDetail.suspensionReason",
+        "TenantDetail.suspensionEffectiveAt",
+        "TenantDetail.suspensionNoticeMessage",
+        "TenantDetail.terminationScheduledAt",
+        "TenantDetail.terminationRetentionUntil",
+        "TenantDetail.terminationReason",
+        "TenantDetail.terminationRequestedByPrincipalId",
+        "TenantDetail.planId",
+        "TenantDetail.planName",
+        "TenantDetail.cellCount",
+        "TenantDetail.venueCount"
+       ],
+       "operation": "getTenant",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The licence position",
+       "bindsTo": "LicencePosition",
+       "columns": [
+        "LicencePosition.planId",
+        "LicencePosition.licensedModules",
+        "LicencePosition.limits"
+       ],
+       "operation": "getTenantLicences",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The entitlement usage",
        "bindsTo": "EntitlementUsage",
        "columns": [
         "EntitlementUsage.metrics",
@@ -128,55 +263,55 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add licence add on",
        "operation": "addLicenceAddOn",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/licences/add-ons"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create tenant",
        "operation": "createTenant",
        "provenance": "contract subscription.yaml POST /tenants"
       },
       {
        "kind": "secondaryButton",
-       "label": "Provision",
+       "label": "Provision cell",
        "operation": "provisionCell",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/cells"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reactivate",
+       "label": "Reactivate tenant",
        "operation": "reactivateTenant",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/reactivate"
       },
       {
        "kind": "destructiveButton",
-       "label": "Remove",
+       "label": "Remove licence add on",
        "operation": "removeLicenceAddOn",
        "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save SSO config",
        "operation": "setSsoConfig",
        "provenance": "contract identity.yaml PUT /tenants/sso-config"
       },
       {
        "kind": "destructiveButton",
-       "label": "Suspend",
+       "label": "Suspend tenant",
        "operation": "suspendTenant",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/suspend"
       },
       {
        "kind": "destructiveButton",
-       "label": "Terminate",
+       "label": "Terminate tenant",
        "operation": "terminateTenant",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/terminate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save tenant",
        "operation": "updateTenant",
        "provenance": "contract subscription.yaml PATCH /tenants/{tenantId}"
       }
@@ -186,35 +321,179 @@
   },
   "overlays": [
    {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
     "id": "confirmRemoveLicenceAddOn",
     "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
+    "trigger": "Remove licence add on",
+    "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted. **Collects what `removeLicenceAddOn` sends before it is called.** Required: `moduleKey`, `reason`.",
     "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
    },
    {
     "id": "confirmSuspendTenant",
     "component": "confirmDialog",
-    "trigger": "Suspend",
-    "body": "**Names what `suspendTenant` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
+    "trigger": "Suspend tenant",
+    "body": "**Names what `suspendTenant` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted. **Collects what `suspendTenant` sends before it is called.** Required: `mode`, `reason`. Optional: `effectiveAt`, `noticeMessage`.",
     "provenance": "contract subscription.yaml POST /tenants/{tenantId}/suspend"
    },
    {
     "id": "confirmTerminateTenant",
     "component": "confirmDialog",
-    "trigger": "Terminate",
-    "body": "**Names what `terminateTenant` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted.",
+    "trigger": "Terminate tenant",
+    "body": "**Names what `terminateTenant` changes and what it leaves alone**, in the consequence rather than the verb. A tenant this affects should be identified in the dialog, not just counted. **Collects what `terminateTenant` sends before it is called.** Required: `reason`, `retentionDays`, `confirmTenantCode`.",
     "provenance": "contract subscription.yaml POST /tenants/{tenantId}/terminate"
+   },
+   {
+    "id": "formAddLicenceAddOn",
+    "component": "modal",
+    "trigger": "Add licence add on",
+    "body": "**Collects what `addLicenceAddOn` sends before it is called.** Required: `moduleKey`. Optional: `limitOverrides`, `price`, `validFrom`, `validTo`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "LicenceAddOn",
+    "confirm": {
+     "label": "Add licence add on",
+     "operation": "addLicenceAddOn"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "moduleKey",
+      "limitOverrides",
+      "price",
+      "validFrom",
+      "validTo",
+      "note"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/licences/add-ons"
+   },
+   {
+    "id": "formCreateTenant",
+    "component": "modal",
+    "trigger": "Create tenant",
+    "body": "**Collects what `createTenant` sends before it is called.** Required: `code`, `name`, `billingEmail`. Optional: `billingAddress`, `accountManagerPrincipalId`, `planId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateTenantRequest",
+    "confirm": {
+     "label": "Create tenant",
+     "operation": "createTenant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "billingEmail",
+      "billingAddress",
+      "accountManagerPrincipalId",
+      "planId"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /tenants"
+   },
+   {
+    "id": "formProvisionCell",
+    "component": "modal",
+    "trigger": "Provision cell",
+    "body": "**Collects what `provisionCell` sends before it is called.** Required: `regionId`, `countryCode`, `tier`. Optional: `cloudProvider`, `cloudRegion`, `clientHostedEndpoint`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ProvisionCellRequest",
+    "confirm": {
+     "label": "Provision cell",
+     "operation": "provisionCell"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "regionId",
+      "countryCode",
+      "tier",
+      "cloudProvider",
+      "cloudRegion",
+      "clientHostedEndpoint"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/cells"
+   },
+   {
+    "id": "formSetSsoConfig",
+    "component": "modal",
+    "trigger": "Save SSO config",
+    "body": "**Collects what `setSsoConfig` sends before it is called.** Required: `id`, `displayName`, `protocol`, `groupMappings`. Optional: `metadataUrl`, `issuer`, `clientId`, `clientSecretRef`, `autoProvisionPrincipals`, `isEnforced`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SsoProviderConfig",
+    "confirm": {
+     "label": "Save SSO config",
+     "operation": "setSsoConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "displayName",
+      "protocol",
+      "groupMappings",
+      "metadataUrl",
+      "issuer",
+      "clientId",
+      "clientSecretRef",
+      "autoProvisionPrincipals",
+      "isEnforced",
+      "isActive"
+     ]
+    },
+    "provenance": "contract identity.yaml PUT /tenants/sso-config"
+   },
+   {
+    "id": "formUpdateTenant",
+    "component": "modal",
+    "trigger": "Save tenant",
+    "body": "**Collects what `updateTenant` sends before it is called.** Nothing in the body is required. Optional: `name`, `billingEmail`, `billingAddress`, `accountManagerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save tenant",
+     "operation": "updateTenant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "billingEmail",
+      "billingAddress",
+      "accountManagerPrincipalId"
+     ]
+    },
+    "provenance": "contract subscription.yaml PATCH /tenants/{tenantId}"
    }
   ],
   "states": {
    "loading": "The tenant list.",
    "error": "Could not load. Names which read failed and leaves the tenant untouched.",
-   "emptyFirstRun": "No tenant yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the tenant are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No tenant yet. Offers Add licence add on (`addLicenceAddOn`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, planId and the tenant are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098)",
+    "trigger": "onAction"
+   },
    {
     "operationId": "listTenants",
     "contract": "subscription",
@@ -342,8 +621,11 @@
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "EntitlementUsage.metrics",
-    "EntitlementUsage.asAt"
+    "Tenant.id",
+    "Tenant.code",
+    "Tenant.name",
+    "Tenant.status",
+    "Tenant.suspensionMode"
    ]
   },
   "wireframe": {
@@ -403,34 +685,30 @@
    "fromFlows": true,
    "transitions": [
     {
-     "to": "ADM-007",
-     "trigger": "Enables the modules the tenant bought",
-     "provenance": "flow F16 step 3→4"
-    },
-    {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-006 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-006 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-006 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-007",
+     "trigger": "Enables the modules the tenant bought",
+     "provenance": "flow F16 step 3→4",
+     "carries": [
+      "tenantId"
+     ]
     }
    ]
   },
@@ -439,13 +717,6 @@
   "pattern": "listDetail",
   "patternReason": "`listTenants` reads the population and `getSsoConfig` reads one of them — list, select, act",
   "purpose": "See tenant hierarchy explorer for this venue.",
-  "gaps": [
-   {
-    "operation": "getEntitlementUsage",
-    "why": "**5 declared operations reach no component on this screen**: getEntitlementUsage, getTenant, getTenantLicences, listTenantCells, listOrgUnits. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -454,8 +725,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listTenants",
+       "notes": "Sends `?status=` to `listTenants`.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "textField",
+       "label": "Plan id",
+       "operation": "listTenants",
+       "notes": "Sends `?planId=` to `listTenants`.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every tenant hierarchy",
+       "label": "Every tenant",
        "bindsTo": "Tenant",
        "columns": [
         "Tenant.id",
@@ -473,6 +758,44 @@
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every cell",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every org unit",
+       "bindsTo": "OrgUnit",
+       "columns": [
+        "OrgUnit.id",
+        "OrgUnit.level",
+        "OrgUnit.parentId",
+        "OrgUnit.path",
+        "OrgUnit.code",
+        "OrgUnit.name",
+        "OrgUnit.isActive",
+        "OrgUnit.childCount"
+       ],
+       "operation": "listOrgUnits",
+       "provenance": "contract tenancy.yaml GET /org-units"
       }
      ]
     },
@@ -482,7 +805,80 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected tenant hierarchy",
+       "label": "The selected tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.suspensionEffectiveAt",
+        "Tenant.suspensionNoticeMessage",
+        "Tenant.terminationScheduledAt",
+        "Tenant.terminationRetentionUntil",
+        "Tenant.terminationReason",
+        "Tenant.terminationRequestedByPrincipalId",
+        "Tenant.planId",
+        "Tenant.planName",
+        "Tenant.cellCount",
+        "Tenant.venueCount"
+       ],
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The entitlement usage",
+       "bindsTo": "EntitlementUsage",
+       "columns": [
+        "EntitlementUsage.metrics",
+        "EntitlementUsage.asAt"
+       ],
+       "operation": "getEntitlementUsage",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/entitlement-usage"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant",
+       "bindsTo": "TenantDetail",
+       "columns": [
+        "TenantDetail.id",
+        "TenantDetail.code",
+        "TenantDetail.name",
+        "TenantDetail.status",
+        "TenantDetail.suspensionMode",
+        "TenantDetail.suspensionReason",
+        "TenantDetail.suspensionEffectiveAt",
+        "TenantDetail.suspensionNoticeMessage",
+        "TenantDetail.terminationScheduledAt",
+        "TenantDetail.terminationRetentionUntil",
+        "TenantDetail.terminationReason",
+        "TenantDetail.terminationRequestedByPrincipalId",
+        "TenantDetail.planId",
+        "TenantDetail.planName",
+        "TenantDetail.cellCount",
+        "TenantDetail.venueCount"
+       ],
+       "operation": "getTenant",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The licence position",
+       "bindsTo": "LicencePosition",
+       "columns": [
+        "LicencePosition.planId",
+        "LicencePosition.licensedModules",
+        "LicencePosition.limits"
+       ],
+       "operation": "getTenantLicences",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The SSO provider config",
        "bindsTo": "SsoProviderConfig",
        "columns": [
         "SsoProviderConfig.id",
@@ -508,13 +904,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save tenant",
        "operation": "updateTenant",
        "provenance": "contract subscription.yaml PATCH /tenants/{tenantId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create org unit",
        "operation": "createOrgUnit",
        "provenance": "contract tenancy.yaml POST /org-units"
       }
@@ -525,9 +921,9 @@
   "states": {
    "loading": "The tenant hierarchy list.",
    "error": "Could not load. Names which read failed and leaves the tenant hierarchy untouched.",
-   "emptyFirstRun": "No tenant hierarchy yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the tenant hierarchy are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No tenant hierarchy yet. Offers Create org unit (`createOrgUnit`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, planId and the tenant hierarchy are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `USER_MANAGE`, which `getSsoConfig` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -600,11 +996,11 @@
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "SsoProviderConfig.id",
-    "SsoProviderConfig.displayName",
-    "SsoProviderConfig.protocol",
-    "SsoProviderConfig.metadataUrl",
-    "SsoProviderConfig.issuer"
+    "Tenant.id",
+    "Tenant.code",
+    "Tenant.name",
+    "Tenant.status",
+    "Tenant.suspensionMode"
    ]
   },
   "wireframe": {
@@ -613,6 +1009,49 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-006"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formUpdateTenant",
+    "component": "modal",
+    "trigger": "Save tenant",
+    "body": "**Collects what `updateTenant` sends before it is called.** Nothing in the body is required. Optional: `name`, `billingEmail`, `billingAddress`, `accountManagerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save tenant",
+     "operation": "updateTenant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "billingEmail",
+      "billingAddress",
+      "accountManagerPrincipalId"
+     ]
+    },
+    "provenance": "contract subscription.yaml PATCH /tenants/{tenantId}"
+   },
+   {
+    "id": "formCreateOrgUnit",
+    "component": "modal",
+    "trigger": "Create org unit",
+    "body": "**Collects what `createOrgUnit` sends before it is called.** Required: `level`, `parentId`, `code`, `name`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateScopeNodeRequest",
+    "confirm": {
+     "label": "Create org unit",
+     "operation": "createOrgUnit"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "level",
+      "parentId",
+      "code",
+      "name"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /org-units"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -665,34 +1104,22 @@
    "fromFlows": true,
    "transitions": [
     {
-     "to": "ADM-012",
-     "trigger": "Tenant Isolation & Resource Pool",
-     "provenance": "flow F96 step 4→5"
-    },
-    {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-007 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-007 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-007 holds cellId, so an edge into it carries them"
     },
     {
      "to": "BO-074",
@@ -701,6 +1128,15 @@
      "operation": "getTenantLicences",
      "crossesDevice": true,
      "back": false
+    },
+    {
+     "to": "ADM-012",
+     "trigger": "Tenant Isolation & Resource Pool",
+     "provenance": "flow F96 step 4→5",
+     "carries": [
+      "cellId",
+      "tenantId"
+     ]
     }
    ]
   },
@@ -709,13 +1145,6 @@
   "pattern": "listDetail",
   "patternReason": "`listTenantCells` reads the population and `getTenantLicences` reads one of them — list, select, act",
   "purpose": "See module & feature entitlement for this venue.",
-  "gaps": [
-   {
-    "operation": "getEntitlementUsage",
-    "why": "**5 declared operations reach no component on this screen**: getEntitlementUsage, getSsoConfig, getSubscription, getTenant, listTenants. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -725,7 +1154,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every module feature entitlement",
+       "label": "Every cell",
        "bindsTo": "Cell",
        "columns": [
         "Cell.id",
@@ -743,6 +1172,34 @@
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.suspensionEffectiveAt",
+        "Tenant.suspensionNoticeMessage",
+        "Tenant.terminationScheduledAt",
+        "Tenant.terminationRetentionUntil",
+        "Tenant.terminationReason",
+        "Tenant.terminationRequestedByPrincipalId"
+       ],
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -752,7 +1209,106 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected module feature entitlement",
+       "label": "The selected cell",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier",
+        "Cell.status",
+        "Cell.cloudProvider",
+        "Cell.cloudRegion",
+        "Cell.apiEndpoint"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The entitlement usage",
+       "bindsTo": "EntitlementUsage",
+       "columns": [
+        "EntitlementUsage.metrics",
+        "EntitlementUsage.asAt"
+       ],
+       "operation": "getEntitlementUsage",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/entitlement-usage"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The SSO provider config",
+       "bindsTo": "SsoProviderConfig",
+       "columns": [
+        "SsoProviderConfig.id",
+        "SsoProviderConfig.displayName",
+        "SsoProviderConfig.protocol",
+        "SsoProviderConfig.metadataUrl",
+        "SsoProviderConfig.issuer",
+        "SsoProviderConfig.clientId",
+        "SsoProviderConfig.clientSecretRef",
+        "SsoProviderConfig.groupMappings",
+        "SsoProviderConfig.autoProvisionPrincipals",
+        "SsoProviderConfig.isEnforced",
+        "SsoProviderConfig.isActive"
+       ],
+       "operation": "getSsoConfig",
+       "provenance": "contract identity.yaml GET /tenants/sso-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The subscription",
+       "bindsTo": "Subscription",
+       "columns": [
+        "Subscription.planId",
+        "Subscription.planName",
+        "Subscription.planVersion",
+        "Subscription.status",
+        "Subscription.startsAt",
+        "Subscription.renewsAt",
+        "Subscription.cancelledAt",
+        "Subscription.currentPrice",
+        "Subscription.billingPeriod"
+       ],
+       "operation": "getSubscription",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/subscription"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant",
+       "bindsTo": "TenantDetail",
+       "columns": [
+        "TenantDetail.id",
+        "TenantDetail.code",
+        "TenantDetail.name",
+        "TenantDetail.status",
+        "TenantDetail.suspensionMode",
+        "TenantDetail.suspensionReason",
+        "TenantDetail.suspensionEffectiveAt",
+        "TenantDetail.suspensionNoticeMessage",
+        "TenantDetail.terminationScheduledAt",
+        "TenantDetail.terminationRetentionUntil",
+        "TenantDetail.terminationReason",
+        "TenantDetail.terminationRequestedByPrincipalId",
+        "TenantDetail.planId",
+        "TenantDetail.planName",
+        "TenantDetail.cellCount",
+        "TenantDetail.venueCount"
+       ],
+       "operation": "getTenant",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The licence position",
        "bindsTo": "LicencePosition",
        "columns": [
         "LicencePosition.planId",
@@ -770,58 +1326,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add licence add on",
        "operation": "addLicenceAddOn",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/licences/add-ons"
       },
       {
        "kind": "destructiveButton",
-       "label": "Remove",
+       "label": "Remove licence add on",
        "operation": "removeLicenceAddOn",
        "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "addLicenceAddOn",
-       "label": "Add licence add on",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listTenantCells",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "removeLicenceAddOn",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "label": "Remove licence add on",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "addLicenceAddOn",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -831,17 +1344,40 @@
    {
     "id": "confirmRemoveLicenceAddOn",
     "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A module feature entitlement this affects should be identified in the dialog, not just counted.",
+    "trigger": "Remove licence add on",
+    "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A module feature entitlement this affects should be identified in the dialog, not just counted. **Collects what `removeLicenceAddOn` sends before it is called.** Required: `moduleKey`, `reason`.",
     "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
+   },
+   {
+    "id": "formAddLicenceAddOn",
+    "component": "modal",
+    "trigger": "Add licence add on",
+    "body": "**Collects what `addLicenceAddOn` sends before it is called.** Required: `moduleKey`. Optional: `limitOverrides`, `price`, `validFrom`, `validTo`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "LicenceAddOn",
+    "confirm": {
+     "label": "Add licence add on",
+     "operation": "addLicenceAddOn"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "moduleKey",
+      "limitOverrides",
+      "price",
+      "validFrom",
+      "validTo",
+      "note"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/licences/add-ons"
    }
   ],
   "states": {
    "loading": "The module feature entitlement list.",
    "error": "Could not load. Names which read failed and leaves the module feature entitlement untouched.",
-   "emptyFirstRun": "No module feature entitlement yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the module feature entitlement are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No module feature entitlement yet. Offers Add licence add on (`addLicenceAddOn`).",
+   "emptyNoResults": "Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -914,9 +1450,11 @@
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "LicencePosition.planId",
-    "LicencePosition.licensedModules",
-    "LicencePosition.limits"
+    "Cell.id",
+    "Cell.name",
+    "Cell.kind",
+    "Cell.clusterId",
+    "Cell.isReachable"
    ]
   },
   "wireframe": {
@@ -976,34 +1514,30 @@
    ],
    "transitions": [
     {
-     "to": "ADM-011",
-     "trigger": "Licence & Seat Management",
-     "provenance": "flow F96 step 2→3"
-    },
-    {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-008 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-008 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-008 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-011",
+     "trigger": "Licence & Seat Management",
+     "provenance": "flow F96 step 2→3",
+     "carries": [
+      "tenantId"
+     ]
     }
    ]
   },
@@ -1012,13 +1546,6 @@
   "pattern": "listDetail",
   "patternReason": "`listPlans` reads the population and `getEntitlementUsage` reads one of them — list, select, act",
   "purpose": "Find subscription & plan management for this venue.",
-  "gaps": [
-   {
-    "operation": "getPlan",
-    "why": "**10 declared operations reach no component on this screen**: getPlan, getSsoConfig, getSubscription, getTenant, getTenantLicences, getUsageMetering, listSubscriptionInvoices, listTenantCells. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1028,7 +1555,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every subscription plan",
+       "label": "Every plan",
        "bindsTo": "Plan",
        "columns": [
         "Plan.code",
@@ -1046,6 +1573,90 @@
        ],
        "operation": "listPlans",
        "provenance": "contract subscription.yaml GET /plans"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every subscription invoice",
+       "bindsTo": "SubscriptionInvoice",
+       "columns": [
+        "SubscriptionInvoice.id",
+        "SubscriptionInvoice.invoiceNumber",
+        "SubscriptionInvoice.periodStart",
+        "SubscriptionInvoice.periodEnd",
+        "SubscriptionInvoice.status",
+        "SubscriptionInvoice.lines",
+        "SubscriptionInvoice.subtotal",
+        "SubscriptionInvoice.taxAmount",
+        "SubscriptionInvoice.total",
+        "SubscriptionInvoice.planVersionUsed",
+        "SubscriptionInvoice.issuedAt",
+        "SubscriptionInvoice.dueAt"
+       ],
+       "operation": "listSubscriptionInvoices",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/invoices"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every cell",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.suspensionEffectiveAt",
+        "Tenant.suspensionNoticeMessage",
+        "Tenant.terminationScheduledAt",
+        "Tenant.terminationRetentionUntil",
+        "Tenant.terminationReason",
+        "Tenant.terminationRequestedByPrincipalId"
+       ],
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every partner agreement",
+       "bindsTo": "PartnerAgreement",
+       "columns": [
+        "PartnerAgreement.id",
+        "PartnerAgreement.partnerId",
+        "PartnerAgreement.partnerName",
+        "PartnerAgreement.status",
+        "PartnerAgreement.rateMode",
+        "PartnerAgreement.commissionPercent",
+        "PartnerAgreement.volumeTiers",
+        "PartnerAgreement.volumeWindow",
+        "PartnerAgreement.seasonalRates",
+        "PartnerAgreement.segmentTier",
+        "PartnerAgreement.brandingAssetId",
+        "PartnerAgreement.storefrontSubdomain"
+       ],
+       "operation": "listPartnerAgreements",
+       "provenance": "contract subscription.yaml GET /partner-agreements"
       }
      ]
     },
@@ -1055,7 +1666,117 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected subscription plan",
+       "label": "The selected plan",
+       "bindsTo": "Plan",
+       "columns": [
+        "Plan.code",
+        "Plan.name",
+        "Plan.description",
+        "Plan.cellTier",
+        "Plan.licensedModules",
+        "Plan.limits",
+        "Plan.basePrice",
+        "Plan.billingPeriod",
+        "Plan.includesBrandedApp",
+        "Plan.includedAiTokens",
+        "Plan.id",
+        "Plan.isActive",
+        "Plan.subscriberCount",
+        "Plan.publishedAt"
+       ],
+       "operation": "getPlan",
+       "provenance": "contract subscription.yaml GET /plans/{planId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The SSO provider config",
+       "bindsTo": "SsoProviderConfig",
+       "columns": [
+        "SsoProviderConfig.id",
+        "SsoProviderConfig.displayName",
+        "SsoProviderConfig.protocol",
+        "SsoProviderConfig.metadataUrl",
+        "SsoProviderConfig.issuer",
+        "SsoProviderConfig.clientId",
+        "SsoProviderConfig.clientSecretRef",
+        "SsoProviderConfig.groupMappings",
+        "SsoProviderConfig.autoProvisionPrincipals",
+        "SsoProviderConfig.isEnforced",
+        "SsoProviderConfig.isActive"
+       ],
+       "operation": "getSsoConfig",
+       "provenance": "contract identity.yaml GET /tenants/sso-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The subscription",
+       "bindsTo": "Subscription",
+       "columns": [
+        "Subscription.planId",
+        "Subscription.planName",
+        "Subscription.planVersion",
+        "Subscription.status",
+        "Subscription.startsAt",
+        "Subscription.renewsAt",
+        "Subscription.cancelledAt",
+        "Subscription.currentPrice",
+        "Subscription.billingPeriod"
+       ],
+       "operation": "getSubscription",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/subscription"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant",
+       "bindsTo": "TenantDetail",
+       "columns": [
+        "TenantDetail.id",
+        "TenantDetail.code",
+        "TenantDetail.name",
+        "TenantDetail.status",
+        "TenantDetail.suspensionMode",
+        "TenantDetail.suspensionReason",
+        "TenantDetail.suspensionEffectiveAt",
+        "TenantDetail.suspensionNoticeMessage",
+        "TenantDetail.terminationScheduledAt",
+        "TenantDetail.terminationRetentionUntil",
+        "TenantDetail.terminationReason",
+        "TenantDetail.terminationRequestedByPrincipalId",
+        "TenantDetail.planId",
+        "TenantDetail.planName",
+        "TenantDetail.cellCount",
+        "TenantDetail.venueCount"
+       ],
+       "operation": "getTenant",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The licence position",
+       "bindsTo": "LicencePosition",
+       "columns": [
+        "LicencePosition.planId",
+        "LicencePosition.licensedModules",
+        "LicencePosition.limits"
+       ],
+       "operation": "getTenantLicences",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The usage report",
+       "bindsTo": "UsageReport",
+       "columns": [
+        "UsageReport.periodStart",
+        "UsageReport.periodEnd",
+        "UsageReport.metrics"
+       ],
+       "operation": "getUsageMetering",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/usage"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The entitlement usage",
        "bindsTo": "EntitlementUsage",
        "columns": [
         "EntitlementUsage.metrics",
@@ -1072,43 +1793,43 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save subscription",
        "operation": "setSubscription",
        "provenance": "contract subscription.yaml PUT /tenants/{tenantId}/subscription"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create plan",
        "operation": "createPlan",
        "provenance": "contract subscription.yaml POST /plans"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create plan version",
        "operation": "createPlanVersion",
        "provenance": "contract subscription.yaml POST /plans/{planId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Generate",
+       "label": "Generate invoice",
        "operation": "generateInvoice",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/invoices"
       },
       {
        "kind": "secondaryButton",
-       "label": "Preview",
+       "label": "Preview subscription change",
        "operation": "previewSubscriptionChange",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/subscription/preview"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create partner agreement",
        "operation": "createPartnerAgreement",
        "provenance": "contract subscription.yaml POST /partner-agreements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save partner agreement",
        "operation": "updatePartnerAgreement",
        "provenance": "contract subscription.yaml PATCH /partner-agreements/{agreementId}"
       }
@@ -1119,9 +1840,9 @@
   "states": {
    "loading": "The subscription plan list.",
    "error": "Could not load. Names which read failed and leaves the subscription plan untouched.",
-   "emptyFirstRun": "No subscription plan yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the subscription plan are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No subscription plan yet. Offers Create plan (`createPlan`).",
+   "emptyNoResults": "Never shown: `listPlans` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1134,7 +1855,7 @@
     "operationId": "setSubscription",
     "contract": "subscription",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createPlan",
@@ -1173,7 +1894,7 @@
     "operationId": "getPlan",
     "contract": "subscription",
     "purpose": "Read a plan",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getSsoConfig",
@@ -1274,8 +1995,11 @@
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `agreementId`, `planId`.",
    "preloaded": [
-    "EntitlementUsage.metrics",
-    "EntitlementUsage.asAt"
+    "Plan.code",
+    "Plan.name",
+    "Plan.description",
+    "Plan.cellTier",
+    "Plan.licensedModules"
    ]
   },
   "wireframe": {
@@ -1284,6 +2008,195 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-008"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetSubscription",
+    "component": "modal",
+    "trigger": "Save subscription",
+    "body": "**Collects what `setSubscription` sends before it is called.** Required: `planId`. Optional: `planVersion`, `effectiveFrom`, `prorate`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SetSubscriptionRequest",
+    "confirm": {
+     "label": "Save subscription",
+     "operation": "setSubscription"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "planId",
+      "planVersion",
+      "effectiveFrom",
+      "prorate",
+      "note"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /tenants/{tenantId}/subscription"
+   },
+   {
+    "id": "formCreatePlan",
+    "component": "modal",
+    "trigger": "Create plan",
+    "body": "**Collects what `createPlan` sends before it is called.** Required: `code`, `name`, `cellTier`, `licensedModules`, `limits`, `basePrice`. Optional: `description`, `billingPeriod`, `includesBrandedApp`, `includedAiTokens`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePlanRequest",
+    "confirm": {
+     "label": "Create plan",
+     "operation": "createPlan"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "cellTier",
+      "licensedModules",
+      "limits",
+      "basePrice",
+      "description",
+      "billingPeriod",
+      "includesBrandedApp",
+      "includedAiTokens"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /plans"
+   },
+   {
+    "id": "formCreatePlanVersion",
+    "component": "modal",
+    "trigger": "Create plan version",
+    "body": "**Collects what `createPlanVersion` sends before it is called.** Required: `code`, `name`, `cellTier`, `licensedModules`, `limits`, `basePrice`. Optional: `description`, `billingPeriod`, `includesBrandedApp`, `includedAiTokens`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePlanRequest",
+    "confirm": {
+     "label": "Create plan version",
+     "operation": "createPlanVersion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "cellTier",
+      "licensedModules",
+      "limits",
+      "basePrice",
+      "description",
+      "billingPeriod",
+      "includesBrandedApp",
+      "includedAiTokens"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /plans/{planId}"
+   },
+   {
+    "id": "formGenerateInvoice",
+    "component": "modal",
+    "trigger": "Generate invoice",
+    "body": "**Collects what `generateInvoice` sends before it is called.** Required: `periodStart`, `periodEnd`. Optional: `dryRun`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Generate invoice",
+     "operation": "generateInvoice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "periodStart",
+      "periodEnd",
+      "dryRun"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/invoices"
+   },
+   {
+    "id": "formPreviewSubscriptionChange",
+    "component": "modal",
+    "trigger": "Preview subscription change",
+    "body": "**Collects what `previewSubscriptionChange` sends before it is called.** Required: `planId`. Optional: `planVersion`, `effectiveFrom`, `prorate`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SetSubscriptionRequest",
+    "confirm": {
+     "label": "Preview subscription change",
+     "operation": "previewSubscriptionChange"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "planId",
+      "planVersion",
+      "effectiveFrom",
+      "prorate",
+      "note"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/subscription/preview"
+   },
+   {
+    "id": "formCreatePartnerAgreement",
+    "component": "modal",
+    "trigger": "Create partner agreement",
+    "body": "**Collects what `createPartnerAgreement` sends before it is called.** Required: `partnerId`, `rateMode`, `validFrom`. Optional: `id`, `partnerName`, `status`, `commissionPercent`, `volumeTiers`, `volumeWindow`, `seasonalRates`, `segmentTier`, `brandingAssetId`, `storefrontSubdomain`, `sponsorship`, `netRates` and 17 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerAgreement",
+    "confirm": {
+     "label": "Create partner agreement",
+     "operation": "createPartnerAgreement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partnerId",
+      "rateMode",
+      "validFrom",
+      "id",
+      "partnerName",
+      "status",
+      "commissionPercent",
+      "volumeTiers",
+      "volumeWindow",
+      "seasonalRates",
+      "segmentTier",
+      "brandingAssetId",
+      "storefrontSubdomain",
+      "sponsorship",
+      "netRates",
+      "creditTermDays",
+      "acceptedByPrincipalId",
+      "acceptedVersion"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-agreements"
+   },
+   {
+    "id": "formUpdatePartnerAgreement",
+    "component": "modal",
+    "trigger": "Save partner agreement",
+    "body": "**Collects what `updatePartnerAgreement` sends before it is called.** Required: `partnerId`, `rateMode`, `validFrom`. Optional: `id`, `partnerName`, `status`, `commissionPercent`, `volumeTiers`, `volumeWindow`, `seasonalRates`, `segmentTier`, `brandingAssetId`, `storefrontSubdomain`, `sponsorship`, `netRates` and 17 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerAgreement",
+    "confirm": {
+     "label": "Save partner agreement",
+     "operation": "updatePartnerAgreement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partnerId",
+      "rateMode",
+      "validFrom",
+      "id",
+      "partnerName",
+      "status",
+      "commissionPercent",
+      "volumeTiers",
+      "volumeWindow",
+      "seasonalRates",
+      "segmentTier",
+      "brandingAssetId",
+      "storefrontSubdomain",
+      "sponsorship",
+      "netRates",
+      "creditTermDays",
+      "acceptedByPrincipalId",
+      "acceptedVersion"
+     ]
+    },
+    "provenance": "contract subscription.yaml PATCH /partner-agreements/{agreementId}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1335,27 +2248,20 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-009 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-009 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-009 holds cellId, so an edge into it carries them"
     }
    ]
   },
@@ -1364,13 +2270,6 @@
   "pattern": "listDetail",
   "patternReason": "`listSubscriptionInvoices` reads the population and `getEntitlementUsage` reads one of them — list, select, act",
   "purpose": "Find tenant billing & invoicing for this venue.",
-  "gaps": [
-   {
-    "operation": "getSsoConfig",
-    "why": "**6 declared operations reach no component on this screen**: getSsoConfig, getSubscription, getTenant, getTenantLicences, listTenantCells, listTenants. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1379,8 +2278,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listSubscriptionInvoices",
+       "notes": "Sends `?status=` to `listSubscriptionInvoices`.",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/invoices"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every tenant billing invoicing",
+       "label": "Every subscription invoice",
        "bindsTo": "SubscriptionInvoice",
        "columns": [
         "SubscriptionInvoice.id",
@@ -1398,6 +2304,48 @@
        ],
        "operation": "listSubscriptionInvoices",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/invoices"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every cell",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.suspensionEffectiveAt",
+        "Tenant.suspensionNoticeMessage",
+        "Tenant.terminationScheduledAt",
+        "Tenant.terminationRetentionUntil",
+        "Tenant.terminationReason",
+        "Tenant.terminationRequestedByPrincipalId"
+       ],
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
       }
      ]
     },
@@ -1407,7 +2355,104 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected tenant billing invoicing",
+       "label": "The selected subscription invoice",
+       "bindsTo": "SubscriptionInvoice",
+       "columns": [
+        "SubscriptionInvoice.id",
+        "SubscriptionInvoice.invoiceNumber",
+        "SubscriptionInvoice.periodStart",
+        "SubscriptionInvoice.periodEnd",
+        "SubscriptionInvoice.status",
+        "SubscriptionInvoice.lines",
+        "SubscriptionInvoice.subtotal",
+        "SubscriptionInvoice.taxAmount",
+        "SubscriptionInvoice.total",
+        "SubscriptionInvoice.planVersionUsed",
+        "SubscriptionInvoice.issuedAt",
+        "SubscriptionInvoice.dueAt",
+        "SubscriptionInvoice.paidAt"
+       ],
+       "operation": "listSubscriptionInvoices",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/invoices"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The SSO provider config",
+       "bindsTo": "SsoProviderConfig",
+       "columns": [
+        "SsoProviderConfig.id",
+        "SsoProviderConfig.displayName",
+        "SsoProviderConfig.protocol",
+        "SsoProviderConfig.metadataUrl",
+        "SsoProviderConfig.issuer",
+        "SsoProviderConfig.clientId",
+        "SsoProviderConfig.clientSecretRef",
+        "SsoProviderConfig.groupMappings",
+        "SsoProviderConfig.autoProvisionPrincipals",
+        "SsoProviderConfig.isEnforced",
+        "SsoProviderConfig.isActive"
+       ],
+       "operation": "getSsoConfig",
+       "provenance": "contract identity.yaml GET /tenants/sso-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The subscription",
+       "bindsTo": "Subscription",
+       "columns": [
+        "Subscription.planId",
+        "Subscription.planName",
+        "Subscription.planVersion",
+        "Subscription.status",
+        "Subscription.startsAt",
+        "Subscription.renewsAt",
+        "Subscription.cancelledAt",
+        "Subscription.currentPrice",
+        "Subscription.billingPeriod"
+       ],
+       "operation": "getSubscription",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/subscription"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant",
+       "bindsTo": "TenantDetail",
+       "columns": [
+        "TenantDetail.id",
+        "TenantDetail.code",
+        "TenantDetail.name",
+        "TenantDetail.status",
+        "TenantDetail.suspensionMode",
+        "TenantDetail.suspensionReason",
+        "TenantDetail.suspensionEffectiveAt",
+        "TenantDetail.suspensionNoticeMessage",
+        "TenantDetail.terminationScheduledAt",
+        "TenantDetail.terminationRetentionUntil",
+        "TenantDetail.terminationReason",
+        "TenantDetail.terminationRequestedByPrincipalId",
+        "TenantDetail.planId",
+        "TenantDetail.planName",
+        "TenantDetail.cellCount",
+        "TenantDetail.venueCount"
+       ],
+       "operation": "getTenant",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The licence position",
+       "bindsTo": "LicencePosition",
+       "columns": [
+        "LicencePosition.planId",
+        "LicencePosition.licensedModules",
+        "LicencePosition.limits"
+       ],
+       "operation": "getTenantLicences",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The entitlement usage",
        "bindsTo": "EntitlementUsage",
        "columns": [
         "EntitlementUsage.metrics",
@@ -1424,30 +2469,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Generate",
+       "label": "Generate invoice",
        "operation": "generateInvoice",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/invoices"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSubscriptionInvoices",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "generateInvoice",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1456,9 +2480,9 @@
   "states": {
    "loading": "The tenant billing invoicing list.",
    "error": "Could not load. Names which read failed and leaves the tenant billing invoicing untouched.",
-   "emptyFirstRun": "No tenant billing invoicing yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the tenant billing invoicing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No tenant billing invoicing yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on status and the tenant billing invoicing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_BILLING_VIEW`, which `listSubscriptionInvoices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1517,6 +2541,13 @@
     "contract": "subscription",
     "purpose": "List tenants",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCreditNotes",
+    "contract": "subscription",
+    "purpose": "Credit notes beside the invoices",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1528,8 +2559,11 @@
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "EntitlementUsage.metrics",
-    "EntitlementUsage.asAt"
+    "SubscriptionInvoice.id",
+    "SubscriptionInvoice.invoiceNumber",
+    "SubscriptionInvoice.periodStart",
+    "SubscriptionInvoice.periodEnd",
+    "SubscriptionInvoice.status"
    ]
   },
   "wireframe": {
@@ -1538,6 +2572,27 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-009"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formGenerateInvoice",
+    "component": "modal",
+    "trigger": "Generate invoice",
+    "body": "**Collects what `generateInvoice` sends before it is called.** Required: `periodStart`, `periodEnd`. Optional: `dryRun`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Generate invoice",
+     "operation": "generateInvoice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "periodStart",
+      "periodEnd",
+      "dryRun"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/invoices"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1589,27 +2644,20 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-010 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-010 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-010 holds cellId, so an edge into it carries them"
     }
    ]
   },
@@ -1618,13 +2666,6 @@
   "pattern": "listDetail",
   "patternReason": "`listTenantCells` reads the population and `getUsageMetering` reads one of them — list, select, act",
   "purpose": "See usage metering for this venue.",
-  "gaps": [
-   {
-    "operation": "getEntitlementUsage",
-    "why": "**5 declared operations reach no component on this screen**: getEntitlementUsage, getSsoConfig, getTenant, getTenantLicences, listTenants. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1634,7 +2675,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every usage metering",
+       "label": "Every cell",
        "bindsTo": "Cell",
        "columns": [
         "Cell.id",
@@ -1652,6 +2693,27 @@
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.suspensionEffectiveAt",
+        "Tenant.suspensionNoticeMessage",
+        "Tenant.terminationScheduledAt",
+        "Tenant.terminationRetentionUntil",
+        "Tenant.terminationReason",
+        "Tenant.terminationRequestedByPrincipalId"
+       ],
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
       }
      ]
     },
@@ -1661,7 +2723,100 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected usage metering",
+       "label": "The selected cell",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier",
+        "Cell.status",
+        "Cell.cloudProvider",
+        "Cell.cloudRegion",
+        "Cell.apiEndpoint"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The entitlement usage",
+       "bindsTo": "EntitlementUsage",
+       "columns": [
+        "EntitlementUsage.metrics",
+        "EntitlementUsage.asAt"
+       ],
+       "operation": "getEntitlementUsage",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/entitlement-usage"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The SSO provider config",
+       "bindsTo": "SsoProviderConfig",
+       "columns": [
+        "SsoProviderConfig.id",
+        "SsoProviderConfig.displayName",
+        "SsoProviderConfig.protocol",
+        "SsoProviderConfig.metadataUrl",
+        "SsoProviderConfig.issuer",
+        "SsoProviderConfig.clientId",
+        "SsoProviderConfig.clientSecretRef",
+        "SsoProviderConfig.groupMappings",
+        "SsoProviderConfig.autoProvisionPrincipals",
+        "SsoProviderConfig.isEnforced",
+        "SsoProviderConfig.isActive"
+       ],
+       "operation": "getSsoConfig",
+       "provenance": "contract identity.yaml GET /tenants/sso-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant",
+       "bindsTo": "TenantDetail",
+       "columns": [
+        "TenantDetail.id",
+        "TenantDetail.code",
+        "TenantDetail.name",
+        "TenantDetail.status",
+        "TenantDetail.suspensionMode",
+        "TenantDetail.suspensionReason",
+        "TenantDetail.suspensionEffectiveAt",
+        "TenantDetail.suspensionNoticeMessage",
+        "TenantDetail.terminationScheduledAt",
+        "TenantDetail.terminationRetentionUntil",
+        "TenantDetail.terminationReason",
+        "TenantDetail.terminationRequestedByPrincipalId",
+        "TenantDetail.planId",
+        "TenantDetail.planName",
+        "TenantDetail.cellCount",
+        "TenantDetail.venueCount"
+       ],
+       "operation": "getTenant",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The licence position",
+       "bindsTo": "LicencePosition",
+       "columns": [
+        "LicencePosition.planId",
+        "LicencePosition.licensedModules",
+        "LicencePosition.limits"
+       ],
+       "operation": "getTenantLicences",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The usage report",
        "bindsTo": "UsageReport",
        "columns": [
         "UsageReport.periodStart",
@@ -1672,28 +2827,15 @@
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/usage"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listTenantCells",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The usage metering list.",
    "error": "Could not load. Names which read failed and leaves the usage metering untouched.",
-   "emptyFirstRun": "No usage metering yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the usage metering are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No usage metering yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getUsageMetering` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1748,9 +2890,11 @@
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "UsageReport.periodStart",
-    "UsageReport.periodEnd",
-    "UsageReport.metrics"
+    "Cell.id",
+    "Cell.name",
+    "Cell.kind",
+    "Cell.clusterId",
+    "Cell.isReachable"
    ]
   },
   "wireframe": {
@@ -1811,34 +2955,22 @@
    ],
    "transitions": [
     {
-     "to": "ADM-007",
-     "trigger": "Module & Feature Entitlement",
-     "provenance": "flow F96 step 3→4"
-    },
-    {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-011 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-011 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-011 holds cellId, so an edge into it carries them"
     },
     {
      "to": "PTR-020",
@@ -1846,6 +2978,14 @@
      "provenance": "flow F105 step 2→3",
      "crossesDevice": true,
      "back": false
+    },
+    {
+     "to": "ADM-007",
+     "trigger": "Module & Feature Entitlement",
+     "provenance": "flow F96 step 3→4",
+     "carries": [
+      "tenantId"
+     ]
     }
    ]
   },
@@ -1854,13 +2994,6 @@
   "pattern": "listDetail",
   "patternReason": "`listTenantCells` reads the population and `getEntitlementUsage` reads one of them — list, select, act",
   "purpose": "See licence & seat management for this venue.",
-  "gaps": [
-   {
-    "operation": "getSsoConfig",
-    "why": "**5 declared operations reach no component on this screen**: getSsoConfig, getSubscription, getTenant, getTenantLicences, listTenants. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1870,7 +3003,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every licence seat",
+       "label": "Every cell",
        "bindsTo": "Cell",
        "columns": [
         "Cell.id",
@@ -1888,6 +3021,27 @@
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.suspensionEffectiveAt",
+        "Tenant.suspensionNoticeMessage",
+        "Tenant.terminationScheduledAt",
+        "Tenant.terminationRetentionUntil",
+        "Tenant.terminationReason",
+        "Tenant.terminationRequestedByPrincipalId"
+       ],
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
       }
      ]
     },
@@ -1897,7 +3051,107 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected licence seat",
+       "label": "The selected cell",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier",
+        "Cell.status",
+        "Cell.cloudProvider",
+        "Cell.cloudRegion",
+        "Cell.apiEndpoint"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The SSO provider config",
+       "bindsTo": "SsoProviderConfig",
+       "columns": [
+        "SsoProviderConfig.id",
+        "SsoProviderConfig.displayName",
+        "SsoProviderConfig.protocol",
+        "SsoProviderConfig.metadataUrl",
+        "SsoProviderConfig.issuer",
+        "SsoProviderConfig.clientId",
+        "SsoProviderConfig.clientSecretRef",
+        "SsoProviderConfig.groupMappings",
+        "SsoProviderConfig.autoProvisionPrincipals",
+        "SsoProviderConfig.isEnforced",
+        "SsoProviderConfig.isActive"
+       ],
+       "operation": "getSsoConfig",
+       "provenance": "contract identity.yaml GET /tenants/sso-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The subscription",
+       "bindsTo": "Subscription",
+       "columns": [
+        "Subscription.planId",
+        "Subscription.planName",
+        "Subscription.planVersion",
+        "Subscription.status",
+        "Subscription.startsAt",
+        "Subscription.renewsAt",
+        "Subscription.cancelledAt",
+        "Subscription.currentPrice",
+        "Subscription.billingPeriod"
+       ],
+       "operation": "getSubscription",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/subscription"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant",
+       "bindsTo": "TenantDetail",
+       "columns": [
+        "TenantDetail.id",
+        "TenantDetail.code",
+        "TenantDetail.name",
+        "TenantDetail.status",
+        "TenantDetail.suspensionMode",
+        "TenantDetail.suspensionReason",
+        "TenantDetail.suspensionEffectiveAt",
+        "TenantDetail.suspensionNoticeMessage",
+        "TenantDetail.terminationScheduledAt",
+        "TenantDetail.terminationRetentionUntil",
+        "TenantDetail.terminationReason",
+        "TenantDetail.terminationRequestedByPrincipalId",
+        "TenantDetail.planId",
+        "TenantDetail.planName",
+        "TenantDetail.cellCount",
+        "TenantDetail.venueCount"
+       ],
+       "operation": "getTenant",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The licence position",
+       "bindsTo": "LicencePosition",
+       "columns": [
+        "LicencePosition.planId",
+        "LicencePosition.licensedModules",
+        "LicencePosition.limits"
+       ],
+       "operation": "getTenantLicences",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The entitlement usage",
        "bindsTo": "EntitlementUsage",
        "columns": [
         "EntitlementUsage.metrics",
@@ -1914,25 +3168,25 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add licence add on",
        "operation": "addLicenceAddOn",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/licences/add-ons"
       },
       {
        "kind": "secondaryButton",
-       "label": "Preview",
+       "label": "Preview subscription change",
        "operation": "previewSubscriptionChange",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/subscription/preview"
       },
       {
        "kind": "destructiveButton",
-       "label": "Remove",
+       "label": "Remove licence add on",
        "operation": "removeLicenceAddOn",
        "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save subscription",
        "operation": "setSubscription",
        "provenance": "contract subscription.yaml PUT /tenants/{tenantId}/subscription"
       }
@@ -1944,17 +3198,84 @@
    {
     "id": "confirmRemoveLicenceAddOn",
     "component": "confirmDialog",
-    "trigger": "Remove",
-    "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A licence seat this affects should be identified in the dialog, not just counted.",
+    "trigger": "Remove licence add on",
+    "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A licence seat this affects should be identified in the dialog, not just counted. **Collects what `removeLicenceAddOn` sends before it is called.** Required: `moduleKey`, `reason`.",
     "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
+   },
+   {
+    "id": "formAddLicenceAddOn",
+    "component": "modal",
+    "trigger": "Add licence add on",
+    "body": "**Collects what `addLicenceAddOn` sends before it is called.** Required: `moduleKey`. Optional: `limitOverrides`, `price`, `validFrom`, `validTo`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "LicenceAddOn",
+    "confirm": {
+     "label": "Add licence add on",
+     "operation": "addLicenceAddOn"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "moduleKey",
+      "limitOverrides",
+      "price",
+      "validFrom",
+      "validTo",
+      "note"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/licences/add-ons"
+   },
+   {
+    "id": "formPreviewSubscriptionChange",
+    "component": "modal",
+    "trigger": "Preview subscription change",
+    "body": "**Collects what `previewSubscriptionChange` sends before it is called.** Required: `planId`. Optional: `planVersion`, `effectiveFrom`, `prorate`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SetSubscriptionRequest",
+    "confirm": {
+     "label": "Preview subscription change",
+     "operation": "previewSubscriptionChange"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "planId",
+      "planVersion",
+      "effectiveFrom",
+      "prorate",
+      "note"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/subscription/preview"
+   },
+   {
+    "id": "formSetSubscription",
+    "component": "modal",
+    "trigger": "Save subscription",
+    "body": "**Collects what `setSubscription` sends before it is called.** Required: `planId`. Optional: `planVersion`, `effectiveFrom`, `prorate`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SetSubscriptionRequest",
+    "confirm": {
+     "label": "Save subscription",
+     "operation": "setSubscription"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "planId",
+      "planVersion",
+      "effectiveFrom",
+      "prorate",
+      "note"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /tenants/{tenantId}/subscription"
    }
   ],
   "states": {
    "loading": "The licence seat list.",
    "error": "Could not load. Names which read failed and leaves the licence seat untouched.",
-   "emptyFirstRun": "No licence seat yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the licence seat are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No licence seat yet. Offers Add licence add on (`addLicenceAddOn`).",
+   "emptyNoResults": "Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2045,8 +3366,11 @@
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "EntitlementUsage.metrics",
-    "EntitlementUsage.asAt"
+    "Cell.id",
+    "Cell.name",
+    "Cell.kind",
+    "Cell.clusterId",
+    "Cell.isReachable"
    ]
   },
   "wireframe": {
@@ -2108,39 +3432,38 @@
    "fromFlows": true,
    "transitions": [
     {
-     "to": "ADM-006",
-     "trigger": "Builds the scope tree",
-     "provenance": "flow F16 step 2→3"
-    },
-    {
-     "to": "ADM-013",
-     "trigger": "Tenant Performance Monitor",
-     "provenance": "flow F97 step 1→2"
-    },
-    {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-012 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-012 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-012 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-006",
+     "trigger": "Builds the scope tree",
+     "provenance": "flow F16 step 2→3",
+     "carries": [
+      "tenantId"
+     ]
+    },
+    {
+     "to": "ADM-013",
+     "trigger": "Tenant Performance Monitor",
+     "provenance": "flow F97 step 1→2",
+     "carries": [
+      "cellId"
+     ]
     }
    ]
   },
@@ -2149,13 +3472,6 @@
   "pattern": "listDetail",
   "patternReason": "`listTenantCells` reads the population and `getEntitlementUsage` reads one of them — list, select, act",
   "purpose": "Work with tenant isolation & resource pool for this venue.",
-  "gaps": [
-   {
-    "operation": "getSsoConfig",
-    "why": "**5 declared operations reach no component on this screen**: getSsoConfig, getTenant, getTenantLicences, listTenants, getCellCapacity. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2165,7 +3481,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every tenant isolation resource",
+       "label": "Every cell",
        "bindsTo": "Cell",
        "columns": [
         "Cell.id",
@@ -2183,6 +3499,27 @@
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.suspensionEffectiveAt",
+        "Tenant.suspensionNoticeMessage",
+        "Tenant.terminationScheduledAt",
+        "Tenant.terminationRetentionUntil",
+        "Tenant.terminationReason",
+        "Tenant.terminationRequestedByPrincipalId"
+       ],
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
       }
      ]
     },
@@ -2192,7 +3529,105 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected tenant isolation resource",
+       "label": "The selected cell",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier",
+        "Cell.status",
+        "Cell.cloudProvider",
+        "Cell.cloudRegion",
+        "Cell.apiEndpoint"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The SSO provider config",
+       "bindsTo": "SsoProviderConfig",
+       "columns": [
+        "SsoProviderConfig.id",
+        "SsoProviderConfig.displayName",
+        "SsoProviderConfig.protocol",
+        "SsoProviderConfig.metadataUrl",
+        "SsoProviderConfig.issuer",
+        "SsoProviderConfig.clientId",
+        "SsoProviderConfig.clientSecretRef",
+        "SsoProviderConfig.groupMappings",
+        "SsoProviderConfig.autoProvisionPrincipals",
+        "SsoProviderConfig.isEnforced",
+        "SsoProviderConfig.isActive"
+       ],
+       "operation": "getSsoConfig",
+       "provenance": "contract identity.yaml GET /tenants/sso-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant",
+       "bindsTo": "TenantDetail",
+       "columns": [
+        "TenantDetail.id",
+        "TenantDetail.code",
+        "TenantDetail.name",
+        "TenantDetail.status",
+        "TenantDetail.suspensionMode",
+        "TenantDetail.suspensionReason",
+        "TenantDetail.suspensionEffectiveAt",
+        "TenantDetail.suspensionNoticeMessage",
+        "TenantDetail.terminationScheduledAt",
+        "TenantDetail.terminationRetentionUntil",
+        "TenantDetail.terminationReason",
+        "TenantDetail.terminationRequestedByPrincipalId",
+        "TenantDetail.planId",
+        "TenantDetail.planName",
+        "TenantDetail.cellCount",
+        "TenantDetail.venueCount"
+       ],
+       "operation": "getTenant",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The licence position",
+       "bindsTo": "LicencePosition",
+       "columns": [
+        "LicencePosition.planId",
+        "LicencePosition.licensedModules",
+        "LicencePosition.limits"
+       ],
+       "operation": "getTenantLicences",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell capacity",
+       "bindsTo": "CellCapacity",
+       "columns": [
+        "CellCapacity.kind",
+        "CellCapacity.tenantCount",
+        "CellCapacity.isConstrained",
+        "CellCapacity.constrainedDimension",
+        "CellCapacity.dimensions",
+        "CellCapacity.forecastBreachAt",
+        "CellCapacity.measuredAt"
+       ],
+       "operation": "getCellCapacity",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/capacity"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The entitlement usage",
        "bindsTo": "EntitlementUsage",
        "columns": [
         "EntitlementUsage.metrics",
@@ -2209,30 +3644,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Provision",
+       "label": "Provision cell",
        "operation": "provisionCell",
        "provenance": "contract subscription.yaml POST /tenants/{tenantId}/cells"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listTenantCells",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "provisionCell",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2241,16 +3655,16 @@
   "states": {
    "loading": "The tenant isolation resource list.",
    "error": "Could not load. Names which read failed and leaves the tenant isolation resource untouched.",
-   "emptyFirstRun": "No tenant isolation resource yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the tenant isolation resource are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No tenant isolation resource yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "provisionCell",
     "contract": "subscription",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getEntitlementUsage",
@@ -2308,8 +3722,11 @@
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
    "preloaded": [
-    "EntitlementUsage.metrics",
-    "EntitlementUsage.asAt"
+    "Cell.id",
+    "Cell.name",
+    "Cell.kind",
+    "Cell.clusterId",
+    "Cell.isReachable"
    ]
   },
   "wireframe": {
@@ -2318,6 +3735,31 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-012"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formProvisionCell",
+    "component": "modal",
+    "trigger": "Provision cell",
+    "body": "**Collects what `provisionCell` sends before it is called.** Required: `regionId`, `countryCode`, `tier`. Optional: `cloudProvider`, `cloudRegion`, `clientHostedEndpoint`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ProvisionCellRequest",
+    "confirm": {
+     "label": "Provision cell",
+     "operation": "provisionCell"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "regionId",
+      "countryCode",
+      "tier",
+      "cloudProvider",
+      "cloudRegion",
+      "clientHostedEndpoint"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /tenants/{tenantId}/cells"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -2367,34 +3809,30 @@
    ],
    "transitions": [
     {
-     "to": "ADM-011",
-     "trigger": "Licence & Seat Management",
-     "provenance": "flow F105 step 1→2"
-    },
-    {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-015 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-015 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-015 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-011",
+     "trigger": "Licence & Seat Management",
+     "provenance": "flow F105 step 1→2",
+     "carries": [
+      "tenantId"
+     ]
     }
    ]
   },
@@ -2406,13 +3844,6 @@
   "pattern": "listDetail",
   "patternReason": "`listTenantCells` reads the population and `getTenantLicences` reads one of them — list, select, act",
   "purpose": "See api rate limit & quota management for this venue.",
-  "gaps": [
-   {
-    "operation": "getEntitlementUsage",
-    "why": "**6 declared operations reach no component on this screen**: getEntitlementUsage, getSsoConfig, getTenant, listTenants, getApiUsage, listApiClients. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2422,7 +3853,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every api rate limit",
+       "label": "Every cell",
        "bindsTo": "Cell",
        "columns": [
         "Cell.id",
@@ -2440,6 +3871,80 @@
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.suspensionEffectiveAt",
+        "Tenant.suspensionNoticeMessage",
+        "Tenant.terminationScheduledAt",
+        "Tenant.terminationRetentionUntil",
+        "Tenant.terminationReason",
+        "Tenant.terminationRequestedByPrincipalId"
+       ],
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every API client",
+       "bindsTo": "ApiClient",
+       "columns": [
+        "ApiClient.id",
+        "ApiClient.developerId",
+        "ApiClient.name",
+        "ApiClient.clientId",
+        "ApiClient.environment",
+        "ApiClient.scopes",
+        "ApiClient.allowedTenantIds",
+        "ApiClient.ipAllowList",
+        "ApiClient.status",
+        "ApiClient.lastUsedAt"
+       ],
+       "operation": "listApiClients",
+       "provenance": "contract public-api.yaml GET /api-clients"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Production access requests, pending first",
+       "bindsTo": "ProductionAccessRequest",
+       "columns": [
+        "ProductionAccessRequest.developerId",
+        "ProductionAccessRequest.listingId",
+        "ProductionAccessRequest.scopes",
+        "ProductionAccessRequest.allowedTenantIds",
+        "ProductionAccessRequest.ipAllowList",
+        "ProductionAccessRequest.status",
+        "ProductionAccessRequest.requestedAt"
+       ],
+       "operation": "listProductionAccessRequests",
+       "notes": "**Production keys only after certification** (17 September minutes, M17-06). The queue a TICVAI administrator works: each request names the certified integration, the tenants, the module scopes and the IP allow-list. Approving issues a new production client; the sandbox key is never promoted.",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Flagged API traffic",
+       "bindsTo": "ApiAnomaly",
+       "columns": [
+        "ApiAnomaly.clientId",
+        "ApiAnomaly.ruleKey",
+        "ApiAnomaly.measure",
+        "ApiAnomaly.observed",
+        "ApiAnomaly.baseline",
+        "ApiAnomaly.actionTaken",
+        "ApiAnomaly.detectedAt"
+       ],
+       "operation": "listApiAnomalies",
+       "notes": "**Abnormal volume is flagged, not only throttled** (M17-07): calls above the client's own baseline, refusals from outside the allow-list, calls to operations it never uses.",
+       "provenance": "29 September pass (P29 group A)"
       }
      ]
     },
@@ -2449,7 +3954,106 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected api rate limit",
+       "label": "The selected cell",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier",
+        "Cell.status",
+        "Cell.cloudProvider",
+        "Cell.cloudRegion",
+        "Cell.apiEndpoint"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The entitlement usage",
+       "bindsTo": "EntitlementUsage",
+       "columns": [
+        "EntitlementUsage.metrics",
+        "EntitlementUsage.asAt"
+       ],
+       "operation": "getEntitlementUsage",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/entitlement-usage"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The SSO provider config",
+       "bindsTo": "SsoProviderConfig",
+       "columns": [
+        "SsoProviderConfig.id",
+        "SsoProviderConfig.displayName",
+        "SsoProviderConfig.protocol",
+        "SsoProviderConfig.metadataUrl",
+        "SsoProviderConfig.issuer",
+        "SsoProviderConfig.clientId",
+        "SsoProviderConfig.clientSecretRef",
+        "SsoProviderConfig.groupMappings",
+        "SsoProviderConfig.autoProvisionPrincipals",
+        "SsoProviderConfig.isEnforced",
+        "SsoProviderConfig.isActive"
+       ],
+       "operation": "getSsoConfig",
+       "provenance": "contract identity.yaml GET /tenants/sso-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant",
+       "bindsTo": "TenantDetail",
+       "columns": [
+        "TenantDetail.id",
+        "TenantDetail.code",
+        "TenantDetail.name",
+        "TenantDetail.status",
+        "TenantDetail.suspensionMode",
+        "TenantDetail.suspensionReason",
+        "TenantDetail.suspensionEffectiveAt",
+        "TenantDetail.suspensionNoticeMessage",
+        "TenantDetail.terminationScheduledAt",
+        "TenantDetail.terminationRetentionUntil",
+        "TenantDetail.terminationReason",
+        "TenantDetail.terminationRequestedByPrincipalId",
+        "TenantDetail.planId",
+        "TenantDetail.planName",
+        "TenantDetail.cellCount",
+        "TenantDetail.venueCount"
+       ],
+       "operation": "getTenant",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The API usage",
+       "bindsTo": "ApiUsageSummary",
+       "columns": [
+        "ApiUsageSummary.totalCalls",
+        "ApiUsageSummary.successRate",
+        "ApiUsageSummary.clientErrorRate",
+        "ApiUsageSummary.serverErrorRate",
+        "ApiUsageSummary.p50LatencyMs",
+        "ApiUsageSummary.p95LatencyMs",
+        "ApiUsageSummary.p99LatencyMs",
+        "ApiUsageSummary.quotaBreaches",
+        "ApiUsageSummary.byOperation"
+       ],
+       "operation": "getApiUsage",
+       "provenance": "contract public-api.yaml GET /api-usage"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The licence position",
        "bindsTo": "LicencePosition",
        "columns": [
         "LicencePosition.planId",
@@ -2467,9 +4071,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save API quota",
        "operation": "setApiQuota",
        "provenance": "contract public-api.yaml PUT /api-quotas"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Decide production access",
+       "operation": "decideProductionAccess",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save anomaly rule",
+       "operation": "setApiAnomalyRule",
+       "provenance": "29 September pass (P29 group A)"
       }
      ]
     }
@@ -2478,9 +4094,9 @@
   "states": {
    "loading": "The api rate limit list.",
    "error": "Could not load. Names which read failed and leaves the api rate limit untouched.",
-   "emptyFirstRun": "No api rate limit yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the api rate limit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No api rate limit yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -2539,6 +4155,41 @@
     "contract": "public-api",
     "purpose": "Registered clients for this developer",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductionAccessRequests",
+    "contract": "public-api",
+    "purpose": "The production key approval queue",
+    "trigger": "onLoad",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "decideProductionAccess",
+    "contract": "public-api",
+    "purpose": "Approve or reject production keys for a certified integration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductionAccessRequests",
+     "listApiClients"
+    ],
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "listApiAnomalies",
+    "contract": "public-api",
+    "purpose": "Flagged abnormal API traffic",
+    "trigger": "onLoad",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "setApiAnomalyRule",
+    "contract": "public-api",
+    "purpose": "When traffic is flagged, throttled or suspended",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApiAnomalies"
+    ],
+    "provenance": "29 September pass (P29 group A)"
    }
   ],
   "entryState": {
@@ -2546,13 +4197,19 @@
     {
      "name": "tenantId",
      "from": "ADM-002"
+    },
+    {
+     "name": "requestId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "LicencePosition.planId",
-    "LicencePosition.licensedModules",
-    "LicencePosition.limits"
+    "Cell.id",
+    "Cell.name",
+    "Cell.kind",
+    "Cell.clusterId",
+    "Cell.isReachable"
    ]
   },
   "wireframe": {
@@ -2561,6 +4218,77 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-015"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetApiQuota",
+    "component": "modal",
+    "trigger": "Save API quota",
+    "body": "**Collects what `setApiQuota` sends before it is called.** Required: `clientId`, `sustainedPerMinute`. Optional: `id`, `burstPerSecond`, `dailyCap`, `perOperationOverrides`, `onBreach`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApiQuota",
+    "confirm": {
+     "label": "Save API quota",
+     "operation": "setApiQuota"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "clientId",
+      "sustainedPerMinute",
+      "id",
+      "burstPerSecond",
+      "dailyCap",
+      "perOperationOverrides",
+      "onBreach"
+     ]
+    },
+    "provenance": "contract public-api.yaml PUT /api-quotas"
+   },
+   {
+    "id": "formDecideProductionAccess",
+    "component": "modal",
+    "trigger": "Decide production access",
+    "body": "**Collects what `decideProductionAccess` sends before it is called.** Required: `decision`. Optional: `reason` (required to reject, in words the developer can act on), `scopes` (narrow only), `credentialTtlDays`. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Decide production access",
+     "operation": "decideProductionAccess"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "reason",
+      "scopes",
+      "credentialTtlDays"
+     ]
+    },
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "id": "formSetApiAnomalyRule",
+    "component": "modal",
+    "trigger": "Save anomaly rule",
+    "body": "**Collects what `setApiAnomalyRule` sends before it is called.** Required: `ruleKey`, `measure`, `comparison`, `threshold`, `action`. Optional: `clientId`, `windowMinutes`, `isActive`. A `suspend` action is named in the form: it stops the client until someone reactivates it.",
+    "bindsTo": "ApiAnomalyRule",
+    "confirm": {
+     "label": "Save anomaly rule",
+     "operation": "setApiAnomalyRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "ruleKey",
+      "clientId",
+      "measure",
+      "comparison",
+      "threshold",
+      "windowMinutes",
+      "action",
+      "isActive"
+     ]
+    },
+    "provenance": "29 September pass (P29 group A)"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

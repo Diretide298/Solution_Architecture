@@ -1,1 +1,1156 @@
-{}
+{
+ "AiEvidenceItem": {
+  "type": "object",
+  "x-ticvai-persistence": "none — held in jsonb on ai.decision_record.evidence, through AiEvidenceItemList",
+  "description": "One piece of evidence behind a decision, **labelled by origin** (AIC-197): read from a source system, derived by a rule or feature, or inferred by a model. An explanation is built from these, never from a model's chain of thought (AIC-192).",
+  "required": [
+   "label",
+   "kind"
+  ],
+  "properties": {
+   "label": {
+    "type": "string",
+    "enum": [
+     "source",
+     "derived",
+     "modelInferred"
+    ]
+   },
+   "kind": {
+    "type": "string",
+    "description": "What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`."
+   },
+   "ref": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where it came from: a table and id, a document chunk, a metric key."
+   },
+   "name": {
+    "type": "string"
+   },
+   "value": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "observedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "AiEvidenceItemList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "The evidence of one decision record, stored with it.",
+  "items": {
+   "$ref": "#/components/schemas/AiEvidenceItem"
+  }
+ },
+ "AiInsight": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.insight",
+  "description": "**An insight with a lifecycle** (AIP-181): new, reviewed, accepted or rejected, actioned, measured. Anomalies, forecast deviations, trends and opportunities land here; the narrative binds numbers to results, so a figure can only come from a query (design 8, 5.10).",
+  "required": [
+   "kind",
+   "title",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "anomaly",
+     "forecastDeviation",
+     "trend",
+     "opportunity",
+     "executiveSummary",
+     "rootCause",
+     "forecastThreshold",
+     "marketingRecommendation"
+    ]
+   },
+   "detectorId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.anomaly_detector"
+   },
+   "metricKey": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "campaign",
+     "journey",
+     "forecastDefinition",
+     "venue"
+    ],
+    "description": "What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for `marketingRecommendation`, a forecast definition for `forecastThreshold`."
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "recommendedAction": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "For `marketingRecommendation`: `{recommendation, parameters}` as `AiMarketingRecommendation`. Applied by a person in the owning module, never here."
+   },
+   "expectedImpact": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "A range on a named metric (`metric`, `low`, `high`), never a single number (design 5.6)."
+   },
+   "title": {
+    "type": "string"
+   },
+   "narrative": {
+    "type": "string",
+    "nullable": true
+   },
+   "evidence": {
+    "$ref": "#/components/schemas/AiEvidenceItemList"
+   },
+   "magnitude": {
+    "type": "number",
+    "nullable": true
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "correlationKey": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "new",
+     "reviewed",
+     "accepted",
+     "rejected",
+     "actioned",
+     "measured"
+    ],
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "actionRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "measuredImpact": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiMetricChangeExplanation": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed; written as an ai.insight of kind rootCause when kept",
+  "description": "**Why a metric changed** (AIP-176..180, ANL-056): drivers with their contribution, computed from the semantic layer. The narrative binds every figure to a result placeholder (design 8, 5.10).",
+  "required": [
+   "metricKey",
+   "change",
+   "drivers"
+  ],
+  "properties": {
+   "metricKey": {
+    "type": "string"
+   },
+   "period": {
+    "type": "string"
+   },
+   "comparison": {
+    "type": "string"
+   },
+   "change": {
+    "type": "number"
+   },
+   "changePercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "drivers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string"
+      },
+      "member": {
+       "type": "string"
+      },
+      "contribution": {
+       "type": "number"
+      },
+      "evidence": {
+       "$ref": "#/components/schemas/AiEvidenceItem"
+      }
+     }
+    }
+   },
+   "narrative": {
+    "type": "string",
+    "nullable": true
+   },
+   "reliability": {
+    "type": "string",
+    "enum": [
+     "grounded",
+     "partial",
+     "conflictingSources",
+     "insufficientEvidence"
+    ]
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Alert": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.alert",
+  "description": "A raised alert. **Acknowledged rather than dismissed** — CF-134 asked for it markable, and the difference is that an acknowledgement records who saw it.\n",
+  "required": [
+   "id",
+   "ruleId",
+   "raisedAt",
+   "severity",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ruleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "`AlertRule.name` as it stood when the alert was raised. **The line a person reads** — a list of rule ids is not an alert panel, and a screen should not need `listAlertRules` to label one.\n"
+   },
+   "metric": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricSource"
+     }
+    ],
+    "description": "The rule's metric, carried so the alert says what went out of range."
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "severity": {
+    "$ref": "#/components/schemas/AlertSeverity"
+   },
+   "status": {
+    "$ref": "#/components/schemas/AlertStatus"
+   },
+   "observedValue": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "threshold": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The workstation the reading was taken for, where the metric is measured per workstation (`salesByWorkstation`). Null otherwise. `listAlerts` filters on it."
+   },
+   "shiftId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. Null otherwise. `listAlerts` filters on it."
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The inventory item the reading is about, where the metric is measured per item (`stockAgeing`, `stockTurnover`, `wastageRate`, `inventoryValuation`). Null otherwise. **What a replenishment screen prefills a requisition from.**\n"
+   },
+   "acknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "acknowledgementNote": {
+    "type": "string",
+    "maxLength": 300,
+    "nullable": true,
+    "description": "The `note` given to `acknowledgeAlert`. Kept, because an acknowledgement that says what is being done about it is the one escalation can skip."
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Set when the metric returns to range, automatically.** An alert that only a person can close is an alert list that only grows.\n"
+   },
+   "escalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. **A critical alert nobody acknowledged is the case escalation exists for.**\n"
+   }
+  }
+ },
+ "AlertSeverity": {
+  "type": "string",
+  "description": "How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter.",
+  "enum": [
+   "info",
+   "warning",
+   "critical"
+  ]
+ },
+ "AlertStatus": {
+  "type": "string",
+  "description": "Where a raised alert is. Shared by `Alert` and the `listAlerts` filter.",
+  "enum": [
+   "raised",
+   "acknowledged",
+   "resolved",
+   "expired"
+  ]
+ },
+ "AnalyticsAnomaly": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.anomaly",
+  "description": "BI boards 9.5 and 9.6. **A departure from the series' own behaviour**, which catches what no threshold was set for.\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kpiId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "metric": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "observed": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "expected": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "deviationSigma": {
+    "type": "number",
+    "nullable": true
+   },
+   "severity": {
+    "$ref": "#/components/schemas/AnomalySeverity"
+   },
+   "candidateCauses": {
+    "type": "array",
+    "description": "**The beginning of the question, not the end of it.**",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string"
+      },
+      "value": {
+       "type": "string"
+      },
+      "contribution": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "acknowledgedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "AnomalySeverity": {
+  "type": "string",
+  "description": "Shared by `AnalyticsAnomaly` and the `listAnalyticsAnomalies` filter.",
+  "enum": [
+   "low",
+   "medium",
+   "high"
+  ]
+ },
+ "BenchmarkNormalisation": {
+  "type": "string",
+  "description": "The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`.",
+  "enum": [
+   "none",
+   "perVisitor",
+   "perOperatingHour",
+   "perStaffedPosition",
+   "perSquareMetre"
+  ]
+ },
+ "BenchmarkRow": {
+  "type": "object",
+  "description": "BI board 10.4. **The normalisation travels with the comparison.**",
+  "properties": {
+   "scopePath": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "normalisedValue": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "normaliseBy": {
+    "$ref": "#/components/schemas/BenchmarkNormalisation"
+   },
+   "rank": {
+    "type": "integer"
+   },
+   "percentile": {
+    "type": "number",
+    "nullable": true
+   }
+  }
+ },
+ "Dashboard": {
+  "x-ticvai-persistence": "reporting.dashboard + reporting.dashboard_tile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateDashboardRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "ownerPrincipalId",
+     "aggregateCost",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "aggregateCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Combined refresh load of every tile."
+     },
+     "archivedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "DashboardData": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Dashboard"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "tileData": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "tileId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "result": {
+         "$ref": "#/components/schemas/ReportResult"
+        },
+        "isCached": {
+         "type": "boolean"
+        },
+        "error": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
+ "GeneratedQuery": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "The structured query a natural-language question produced — data source, columns, filters, grouping. Named on 26 September so the answer and the kept copy are one shape.\n",
+  "properties": {
+   "dataSource": {
+    "$ref": "#/components/schemas/DataSource"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportColumn"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportFilter"
+    }
+   },
+   "groupBy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "compiledSql": {
+    "type": "string",
+    "nullable": true,
+    "description": "The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"
+   }
+  }
+ },
+ "KpiValue": {
+  "type": "object",
+  "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
+  "properties": {
+   "kpiId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
+   },
+   "name": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "period": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "target": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "comparison": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "variancePercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "up",
+     "down",
+     "flat"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "green",
+     "amber",
+     "red",
+     "noTarget"
+    ]
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "stale": {
+    "type": "boolean",
+    "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
+   }
+  }
+ },
+ "MetricSource": {
+  "type": "string",
+  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
+  "enum": [
+   "occupancy",
+   "capacityUtilisation",
+   "admissionRate",
+   "noShowRate",
+   "conversion",
+   "salesByOperator",
+   "salesByWorkstation",
+   "waitTime",
+   "throughput",
+   "abandonmentRate",
+   "inventoryValuation",
+   "stockTurnover",
+   "stockAgeing",
+   "wastageRate",
+   "resaleVolume",
+   "resaleCommission",
+   "salesByInstructor",
+   "resourceUtilisation",
+   "allocationUtilisation",
+   "channelAllocationBurn",
+   "membershipChurn",
+   "membershipRenewalRate",
+   "supplierDeliveryPerformance",
+   "revenuePerEntitlement",
+   "revenuePerVisitor",
+   "assetDowntime",
+   "meanTimeToRepair",
+   "challengeCompletionRate",
+   "attributedRevenue",
+   "loyaltyActiveMembers",
+   "loyaltyTierDistribution",
+   "loyaltyPointsLiability",
+   "loyaltyBreakageRate",
+   "loyaltyMemberRetention",
+   "challengeParticipationRate",
+   "gamificationLoyaltyImpact",
+   "gamificationMembershipImpact",
+   "gamificationRetention",
+   "accreditationApplications",
+   "accreditationTimeToDecision",
+   "accreditationCredentialsIssued",
+   "accreditationActiveHolders",
+   "accreditationRenewalsDue",
+   "staffingShortfall"
+  ],
+  "x-ticvai-money-valued": [
+   "inventoryValuation",
+   "resaleCommission",
+   "revenuePerEntitlement",
+   "revenuePerVisitor",
+   "attributedRevenue",
+   "loyaltyPointsLiability"
+  ],
+  "x-ticvai-extended-29-september": "**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n",
+  "x-ticvai-money-valued-note": "**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n",
+  "x-ticvai-extended": "18 August 2026",
+  "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"
+ },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
+ },
+ "NaturalLanguageAnswer": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "conversationId",
+   "question",
+   "interpretation",
+   "result",
+   "reliability"
+  ],
+  "properties": {
+   "conversationId": {
+    "type": "string"
+   },
+   "question": {
+    "type": "string"
+   },
+   "interpretation": {
+    "type": "string",
+    "description": "What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."
+   },
+   "semanticSpec": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingSemanticQuerySpec"
+     }
+    ],
+    "nullable": true,
+    "description": "What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"
+   },
+   "generatedQuery": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/GeneratedQuery"
+     }
+    ],
+    "nullable": true,
+    "description": "The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"
+   },
+   "result": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportResult"
+     }
+    ],
+    "nullable": true,
+    "description": "Null when the question is outside the semantic model."
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."
+   },
+   "reliability": {
+    "$ref": "#/components/schemas/ReportingAnswerReliability"
+   },
+   "unavailableReason": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingUnavailableReason"
+     }
+    ],
+    "nullable": true,
+    "description": "Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."
+   },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "deprecated": true,
+    "description": "Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."
+   },
+   "suggestedFollowUps": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "modelVersion": {
+    "type": "string"
+   },
+   "tokensUsed": {
+    "type": "integer"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PromotionAlertsExceptionCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Alerts & Exception Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "alertType": {
+    "type": "string",
+    "enum": [
+     "missingProduct",
+     "missingEligibility",
+     "invalidDates",
+     "invalidDiscount",
+     "invalidCode",
+     "missingApproval",
+     "budgetNearLimit",
+     "budgetExceeded",
+     "marginBelowThreshold",
+     "excessiveDiscountExposure",
+     "promotionFailedToPublish",
+     "productUnavailable",
+     "bundleComponentUnavailable",
+     "channelSynchronizationFailure",
+     "lowConversion",
+     "lowRedemption",
+     "unexpectedHighRedemption",
+     "campaignUnderperforming",
+     "abnormalCouponUsage",
+     "excessiveRepeatRedemption",
+     "suspiciousCustomerBehavior",
+     "promoCodeLeakage"
+    ],
+    "description": "What the alert is about."
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "information",
+     "warning",
+     "critical"
+    ],
+    "description": "Alert severity."
+   },
+   "alertId": {
+    "type": "string",
+    "description": "Alert ID"
+   },
+   "promotionId": {
+    "type": "string",
+    "description": "Promotion ID"
+   },
+   "alertCategory": {
+    "type": "string",
+    "enum": [
+     "configuration",
+     "financial",
+     "operational",
+     "commercial",
+     "fraudRisk"
+    ],
+    "description": "The pack's alert group."
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the alert was raised"
+   }
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "ReportingAnswerReliability": {
+  "type": "string",
+  "description": "**How far an analytics answer can be relied on** (decided 29 September, AI system design 5.6): a category, never a bare percentage. `grounded`: every figure comes from a result of the compiled spec. `partial`: part of the question was answered and the rest was not modelled. `conflictingSources`: the result and a cited source disagree. `insufficientEvidence`: the question could not be answered, including \"not available yet\" outside the semantic model. The same four values as `ai.yaml`'s assistant answers.\n",
+  "enum": [
+   "grounded",
+   "partial",
+   "conflictingSources",
+   "insufficientEvidence"
+  ]
+ },
+ "ReportingSemanticQuerySpec": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "**A question in the semantic model's own vocabulary** (decided 29 September, AI system design 2.2 E and 5.7). What the model returns for a live-number question instead of SQL, and what `runSemanticQuery` takes. Every code is a `SemanticModel` field code or a KPI code; Reporting validates the spec against the published model and compiles it deterministically, so the same spec compiles to the same SQL for the same model version.\n",
+  "required": [
+   "metric",
+   "period"
+  ],
+  "properties": {
+   "metric": {
+    "type": "string",
+    "description": "A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The governed definition the dashboards use, so the number matches them."
+   },
+   "dimensions": {
+    "type": "array",
+    "maxItems": 5,
+    "description": "Field codes to group by. Each must be reachable from the metric's dataset through a relationship the semantic model declares.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "operator"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "description": "A `SemanticModel` field code."
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "equals",
+        "notEquals",
+        "greaterThan",
+        "lessThan",
+        "between",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+       ]
+      },
+      "values": {
+       "type": "array",
+       "description": "**Open on purpose; typed by the field.** One value for the comparison operators, exactly two (from, to) for `between`, any number for `in` and `notIn`, none for `isNull` and `isNotNull`.\n",
+       "items": {}
+      }
+     }
+    }
+   },
+   "period": {
+    "type": "string",
+    "description": "ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the form `explainMetricChange` takes."
+   },
+   "comparison": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `getKpiValues` `compareTo`. With one, each row carries the metric for the comparison beside the current value.",
+    "enum": [
+     "previousPeriod",
+     "samePeriodLastYear",
+     "target",
+     "benchmark"
+    ]
+   },
+   "semanticModelVersion": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "The `SemanticModel.version` the spec was validated and compiled against. Set by Reporting."
+   }
+  }
+ },
+ "ReportingUnavailableReason": {
+  "type": "string",
+  "description": "Which part of a question is outside the semantic model, so the answer is \"not available yet\" (design 5.7). A metric or field the caller may not see is reported as not modelled, so the reason does not reveal that it exists.",
+  "enum": [
+   "metricNotModelled",
+   "dimensionNotModelled",
+   "filterNotModelled",
+   "comparisonNotAvailable",
+   "periodOutsideHistory"
+  ]
+ },
+ "SiteNormalisationBasis": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.site_normalisation_basis",
+  "description": "BI boards 7.9 and 10.4. **The denominators a benchmark divides by**, per site and period: visitors, operating hours, staffed positions and area, one for each `BenchmarkNormalisation` other than `none`. Read by `getAnalyticsBenchmark` for the period that covers the benchmark (data model, 29 September).\n",
+  "required": [
+   "scopePath",
+   "periodStart",
+   "periodEnd"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The site (venue scope) the basis applies to."
+   },
+   "periodStart": {
+    "type": "string",
+    "format": "date"
+   },
+   "periodEnd": {
+    "type": "string",
+    "format": "date"
+   },
+   "visitors": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "`perVisitor`."
+   },
+   "operatingHours": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "description": "`perOperatingHour`."
+   },
+   "staffedPositions": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "description": "`perStaffedPosition`. Average positions staffed over the period."
+   },
+   "areaSquareMetres": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "description": "`perSquareMetre`. Operated area."
+   }
+  }
+ }
+}

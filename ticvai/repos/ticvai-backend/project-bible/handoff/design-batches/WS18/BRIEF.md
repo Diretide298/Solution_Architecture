@@ -1,6 +1,6 @@
 # WS18 — Approval Workflows and Governance board 6
 
-**10 screens · 3 operations · 4 schemas · 1 permissions**
+**10 screens · 16 operations · 16 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `APPROVAL_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW, ROLE_MANAGE, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-339` | Governance & Compliance Command Center | commandCentre | 0 | 0 | — |
-| `ADM-340` | Segregation of Duties Policy Manager | configEditor | 0 | 0 | — |
-| `ADM-341` | Four-Eyes & Dual-Control Policy | configEditor | 0 | 0 | — |
-| `ADM-342` | Authentication & MFA Policy Manager | listDetail | 3 | 0 | — |
-| `ADM-343` | Sensitive Action Confirmation | configEditor | 0 | 0 | — |
-| `ADM-344` | Digital Signature Management | configEditor | 0 | 0 | — |
-| `ADM-345` | Immutable Approval Record & Tamper Detection | listDetail | 0 | 0 | — |
-| `ADM-346` | Approval Record Retention Policy | configEditor | 0 | 0 | — |
-| `ADM-347` | Regulatory Audit & Evidence Center | listDetail | 0 | 0 | — |
-| `ADM-348` | Governance Risk & AI Compliance Advisor | listDetail | 0 | 0 | — |
+| `ADM-339` | Governance & Compliance Command Center | commandCentre | 2 | 0 | — |
+| `ADM-340` | Segregation of Duties Policy Manager | configEditor | 1 | 0 | — |
+| `ADM-341` | Four-Eyes & Dual-Control Policy | configEditor | 2 | 0 | — |
+| `ADM-342` | Authentication & MFA Policy Manager | listDetail | 6 | 0 | — |
+| `ADM-343` | Sensitive Action Confirmation | configEditor | 2 | 0 | — |
+| `ADM-344` | Digital Signature Management | configEditor | 1 | 0 | — |
+| `ADM-345` | Immutable Approval Record & Tamper Detection | listDetail | 1 | 0 | — |
+| `ADM-346` | Approval Record Retention Policy | configEditor | 3 | 0 | — |
+| `ADM-347` | Regulatory Audit & Evidence Center | listDetail | 1 | 0 | — |
+| `ADM-348` | Governance Risk & AI Compliance Advisor | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-340, ADM-342, ADM-345, ADM-347, ADM-348 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-340, ADM-345, ADM-347, ADM-348 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

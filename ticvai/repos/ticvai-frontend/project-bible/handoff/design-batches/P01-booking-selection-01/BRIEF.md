@@ -1,6 +1,6 @@
 # P01-booking-selection-01 — P01 · Booking & Selection
 
-**5 screens · 15 operations · 23 schemas · 3 permissions**
+**7 screens · 32 operations · 65 schemas · 7 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ORDER_CREATE, PRICE_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `AI_USE, ORDER_CREATE, ORDER_VIEW, PRICE_VIEW, PRODUCT_VIEW, RESOURCE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
@@ -61,8 +61,10 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-005` | Ticket Type Selection | listDetail | 2 | 0 | — |
-| `WEB-006` | Date & Session Selection | statusTracker | 3 | 0 | — |
-| `WEB-007` | Interactive Seat Selection | statusTracker | 3 | 0 | — |
-| `WEB-008` | Add-ons & Upsell | statusTracker | 4 | 0 | — |
-| `WEB-009` | Wishlist | statusTracker | 3 | 1 | — |
+| `WEB-005` | Ticket Type Selection | listDetail | 6 | 3 | — |
+| `WEB-006` | Date & Performance Selection | statusTracker | 8 | 3 | — |
+| `WEB-007` | Interactive Seat Selection | statusTracker | 6 | 3 | — |
+| `WEB-008` | Add-ons & Upsell | statusTracker | 6 | 1 | — |
+| `WEB-009` | Wishlist | statusTracker | 3 | 2 | — |
+| `WEB-047` | Map Booking — Cabanas & Spots | listDetail | 8 | 1 | — |
+| `WEB-048` | Book a Space by the Hour | multiStepForm | 4 | 0 | — |

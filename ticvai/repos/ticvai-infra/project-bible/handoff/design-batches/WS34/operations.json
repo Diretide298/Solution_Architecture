@@ -1,4 +1,17 @@
 {
+ "listBundlePricingCommercial": {
+  "method": "GET",
+  "path": "/bundle-pricing-commercial",
+  "contract": "promotions",
+  "summary": "Bundle Pricing & Commercial Model",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BundlePricingCommercialModelView"
+ },
  "listCommercialPricing": {
   "method": "GET",
   "path": "/commercial-pricing",
@@ -23,10 +36,55 @@
     "name": "priceListType",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "CommercialPricingCommandCenterView"
+  "responds": "Page"
  },
  "listCommercialPricingStructure": {
   "method": "GET",
@@ -37,9 +95,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "severity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceListId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CommercialPricingStructureValidationView"
+  "responds": "Page"
  },
  "listMarketVenueCurrency": {
   "method": "GET",
@@ -50,9 +134,89 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "hierarchyLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "legalEntity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MarketVenueCurrencyPricingStructureView"
+  "responds": "Page"
+ },
+ "listMembershipCommercialPricing": {
+  "method": "GET",
+  "path": "/membership-commercial-pricing",
+  "contract": "subscription",
+  "summary": "Membership Commercial, Pricing & Channel Association",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "membershipCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "salesPeriod",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPackageBundleAdd": {
   "method": "GET",
@@ -63,9 +227,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "recordKind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "pricingModel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PackageBundleAddOnPricingView"
+  "responds": "Page"
  },
  "listPriceCategoryRate": {
   "method": "GET",
@@ -76,9 +271,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "entryKind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "categoryFamily",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "active",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PriceCategoryRateTypeLibraryView"
+  "responds": "Page"
  },
  "listPriceListTemplate": {
   "method": "GET",
@@ -89,9 +315,111 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "templateType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PriceListTemplatesCloneReuseView"
+  "responds": "Page"
+ },
+ "setConfigurationTemplate": {
+  "method": "PUT",
+  "path": "/configuration-templates",
+  "contract": "catalogue",
+  "summary": "Create or update a product or price-list template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConfigurationTemplate",
+  "responds": "ConfigurationTemplate"
+ },
+ "setMarketPricingConfiguration": {
+  "method": "PUT",
+  "path": "/pricing-markets",
+  "contract": "catalogue",
+  "summary": "Create or update a node of the market pricing structure",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PricingMarket",
+  "responds": "PricingMarket"
+ },
+ "setPackagePricingDefinition": {
+  "method": "PUT",
+  "path": "/package-pricing",
+  "contract": "catalogue",
+  "summary": "Set how a package, bundle or add-on is priced",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PackagePricing",
+  "responds": "PackagePricing"
+ },
+ "setPriceCategoryRateType": {
+  "method": "PUT",
+  "path": "/price-categories",
+  "contract": "catalogue",
+  "summary": "Create or update a price category or rate type",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PriceCategory",
+  "responds": "PriceCategory"
  },
  "setPriceHierarchyInheritance": {
   "method": "PUT",
@@ -102,7 +430,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PriceHierarchyInheritanceConfigurationInput",
   "responds": "PriceHierarchyInheritanceConfigurationView"
  },
@@ -115,7 +449,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PriceListMasterConfigurationInput",
   "responds": "PriceListMasterConfigurationView"
  },
@@ -128,7 +468,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ProductServicePriceAssignmentInput",
   "responds": "ProductServicePriceAssignmentView"
  },
@@ -141,7 +487,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RateStructureBuilderInput",
   "responds": "RateStructureBuilderView"
  }

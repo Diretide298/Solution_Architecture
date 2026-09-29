@@ -1,0 +1,690 @@
+{
+ "AiActionPlan": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_plan",
+  "description": "**A plan: plan, validate, simulate, approve, execute, with rollback** (design 2.2 D, 3.8; AIC-086..107). Independent of any conversation (AIC-102). Its steps are `ai.action_step`; the change set is hashed so what was approved is what runs (AIC-181).",
+  "required": [
+   "origin",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "origin": {
+    "type": "string",
+    "enum": [
+     "configurationSession",
+     "generateConfiguration",
+     "assistant",
+     "riskCase",
+     "operationalRequirement",
+     "rollback"
+    ]
+   },
+   "originRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "validated",
+     "simulated",
+     "awaitingApproval",
+     "approved",
+     "executing",
+     "paused",
+     "completed",
+     "partiallyCompleted",
+     "failed",
+     "compensated",
+     "cancelled",
+     "rolledBack"
+    ],
+    "readOnly": true
+   },
+   "autonomyLevel": {
+    "$ref": "#/components/schemas/AiAutonomyLevel"
+   },
+   "approvalTier": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). Not an autonomy level."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request, where tier 2 or the matrix caught the plan."
+   },
+   "proposedActionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.proposed_action",
+    "description": "The `ai.proposed_action` the plan is presented as for a decision."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "governanceOutcome": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiGovernanceOutcome"
+     }
+    ],
+    "readOnly": true
+   },
+   "policyVersionRef": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The governance policy version that decided it."
+   },
+   "simulation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4)."
+   },
+   "partialCompletionAllowed": {
+    "type": "boolean",
+    "default": false,
+    "description": "Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134)."
+   },
+   "rollbackOfPlanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiActionPlanDetail": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.action_plan with its ai.action_step rows",
+  "description": "A plan with its steps in DAG order.",
+  "required": [
+   "plan",
+   "steps"
+  ],
+  "properties": {
+   "plan": {
+    "$ref": "#/components/schemas/AiActionPlan"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiActionStep"
+    }
+   }
+  }
+ },
+ "AiActionStep": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_step",
+  "description": "One step of a plan: a registered tool against `targetContract.targetOperation` at a contract version (AIC-095), with payload, provenance, compensation and the idempotency key `plan:{id}:step:{n}`. **Scoped through its plan** (`platform.apply_parent_rls`). Each step records its target object's version; drift pauses the plan (AIC-182).",
+  "required": [
+   "planId",
+   "stepNumber",
+   "toolKey",
+   "targetContract",
+   "targetOperation",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "stepNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "dependsOn": {
+    "type": "array",
+    "items": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "description": "Step numbers that must succeed first. The plan is a DAG."
+   },
+   "toolKey": {
+    "type": "string"
+   },
+   "targetContract": {
+    "type": "string"
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "contractVersion": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body of `targetOperation`, validated against it before the plan is approved."
+   },
+   "provenance": {
+    "$ref": "#/components/schemas/AiProvenance"
+   },
+   "idempotencyKey": {
+    "type": "string",
+    "readOnly": true
+   },
+   "targetObjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "targetObjectVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The version the step was planned against. A different version at execution is drift."
+   },
+   "reversible": {
+    "type": "boolean"
+   },
+   "compensation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "validated",
+     "running",
+     "succeeded",
+     "failed",
+     "compensated",
+     "skipped",
+     "paused"
+    ],
+    "readOnly": true
+   },
+   "attempts": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 3,
+    "readOnly": true,
+    "description": "Bounded at 3 (AIC-135)."
+   },
+   "lastError": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resultRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The owning service's response: success is its answer, not a model's judgement (AIC-097)."
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "AiBlueprintDecision": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.blueprint_decision",
+  "description": "One decision in a blueprint and what the administrator did with it. **Scoped through its blueprint** (`platform.apply_parent_rls`).",
+  "required": [
+   "blueprintId",
+   "decisionKey",
+   "decisionClass",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "blueprintId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.blueprint"
+   },
+   "decisionKey": {
+    "type": "string"
+   },
+   "module": {
+    "type": "string"
+   },
+   "decisionClass": {
+    "type": "string",
+    "enum": [
+     "required",
+     "recommended",
+     "optional"
+    ]
+   },
+   "question": {
+    "type": "string",
+    "nullable": true
+   },
+   "value": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "provenance": {
+    "$ref": "#/components/schemas/AiProvenance"
+   },
+   "sourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.config_source",
+    "description": "The attached document the value was extracted from (29 September, build; `attachConfigurationSource`)."
+   },
+   "sourceCitation": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 200,
+    "description": "Where in it, e.g. `page 4`, `sheet Prices!B7`, `logo region`."
+   },
+   "recommendation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "What the assistant recommends and why (ADM-491): mandatory configuration and best practice kept apart."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "accepted",
+     "modified",
+     "rejected",
+     "deferred"
+    ]
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "AiBlueprintView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.blueprint with its ai.blueprint_decision rows",
+  "description": "A blueprint with its decisions.",
+  "required": [
+   "blueprint",
+   "decisions"
+  ],
+  "properties": {
+   "blueprint": {
+    "$ref": "#/components/schemas/AiConfigurationBlueprint"
+   },
+   "decisions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiBlueprintDecision"
+    }
+   }
+  }
+ },
+ "AiConfigurationBlueprint": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.blueprint",
+  "description": "**The blueprint** (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. **Never `ready` while a required decision is deferred** (AIC-115).",
+  "required": [
+   "sessionId",
+   "version",
+   "readiness"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "sessionId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.config_session"
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "readiness": {
+    "type": "string",
+    "enum": [
+     "notReady",
+     "readyWithWarnings",
+     "ready"
+    ],
+    "readOnly": true
+   },
+   "requiredOpen": {
+    "type": "integer",
+    "minimum": 0,
+    "readOnly": true,
+    "description": "Required decisions not yet accepted or modified."
+   },
+   "issues": {
+    "$ref": "#/components/schemas/AiBlueprintIssueList"
+   },
+   "dependencyMap": {
+    "type": "object",
+    "additionalProperties": true,
+    "readOnly": true,
+    "description": "Configuration objects and the order they depend on each other, by module."
+   },
+   "summary": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiProvenance": {
+  "type": "string",
+  "enum": [
+   "confirmed",
+   "aiRecommended",
+   "inferred",
+   "unknown"
+  ],
+  "description": "**Where a configuration value came from** (design 2.2 D, AIC-111): said by the administrator, recommended by the assistant, inferred from other answers, or not known yet. Shown beside every value; no confidence number is shown for configuration (design 5.6)."
+ },
+ "ChannelPricingCommercialProfileAssignmentInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.price_list at 6%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Channel Pricing & Commercial Profile Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each assignment* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
+  "properties": {
+   "priceProfile": {
+    "type": "string",
+    "description": "Price Profile: the ID of the approved price list or profile consumed (the Pricing Engine calculates the price)"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue ID",
+    "nullable": true
+   },
+   "event": {
+    "type": "string",
+    "description": "Event ID",
+    "nullable": true
+   },
+   "product": {
+    "type": "string",
+    "description": "Product ID",
+    "nullable": true
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment ID",
+    "nullable": true
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Priority: when several assignments match, the lower number wins",
+    "minimum": 1
+   },
+   "channelId": {
+    "type": "string",
+    "description": "Channel ID"
+   },
+   "pricingSource": {
+    "type": "string",
+    "enum": [
+     "standardPriceList",
+     "channelPriceList",
+     "b2bRate",
+     "resellerRate",
+     "otaRate",
+     "posPrice",
+     "promotionalPriceProfile",
+     "dynamicPricingProfile"
+    ],
+    "description": "Pricing Association (pack p.8): which kind of approved pricing this assignment consumes"
+   },
+   "overridePermission": {
+    "type": "string",
+    "description": "Override Permission: the permission a user needs to override price on this channel",
+    "nullable": true
+   },
+   "fixedPriceOnly": {
+    "type": "boolean",
+    "description": "Price Override Governance: use fixed price only"
+   },
+   "promotionAllowed": {
+    "type": "boolean",
+    "description": "Price Override Governance: apply promotion"
+   },
+   "discountAllowed": {
+    "type": "boolean",
+    "description": "Price Override Governance: apply discount"
+   },
+   "priceOverrideAllowed": {
+    "type": "boolean",
+    "description": "Price Override Governance: override price"
+   },
+   "overrideRequiresApproval": {
+    "type": "boolean",
+    "description": "Price Override Governance: require approval for override"
+   },
+   "dynamicPricingAllowed": {
+    "type": "boolean",
+    "description": "Price Override Governance: use dynamic pricing"
+   }
+  },
+  "x-ticvai-record-definition": "For each assignment"
+ },
+ "ChannelPricingCommercialProfileAssignmentView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Pricing & Commercial Profile Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "priceProfile": {
+    "type": "string",
+    "description": "Price Profile: the ID of the approved price list or profile consumed (the Pricing Engine calculates the price)"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue ID",
+    "nullable": true
+   },
+   "event": {
+    "type": "string",
+    "description": "Event ID",
+    "nullable": true
+   },
+   "product": {
+    "type": "string",
+    "description": "Product ID",
+    "nullable": true
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment ID",
+    "nullable": true
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Priority: when several assignments match, the lower number wins",
+    "minimum": 1
+   },
+   "channelId": {
+    "type": "string",
+    "description": "Channel ID"
+   },
+   "pricingSource": {
+    "type": "string",
+    "enum": [
+     "standardPriceList",
+     "channelPriceList",
+     "b2bRate",
+     "resellerRate",
+     "otaRate",
+     "posPrice",
+     "promotionalPriceProfile",
+     "dynamicPricingProfile"
+    ],
+    "description": "Pricing Association (pack p.8): which kind of approved pricing this assignment consumes"
+   },
+   "overridePermission": {
+    "type": "string",
+    "description": "Override Permission: the permission a user needs to override price on this channel",
+    "nullable": true
+   },
+   "fixedPriceOnly": {
+    "type": "boolean",
+    "description": "Price Override Governance: use fixed price only"
+   },
+   "promotionAllowed": {
+    "type": "boolean",
+    "description": "Price Override Governance: apply promotion"
+   },
+   "discountAllowed": {
+    "type": "boolean",
+    "description": "Price Override Governance: apply discount"
+   },
+   "priceOverrideAllowed": {
+    "type": "boolean",
+    "description": "Price Override Governance: override price"
+   },
+   "overrideRequiresApproval": {
+    "type": "boolean",
+    "description": "Price Override Governance: require approval for override"
+   },
+   "dynamicPricingAllowed": {
+    "type": "boolean",
+    "description": "Price Override Governance: use dynamic pricing"
+   },
+   "validationIssues": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "missingPrice",
+        "expiredPrice",
+        "currencyMismatch",
+        "conflictingProfiles",
+        "invalidOverride"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Price Validation (pack p.9)"
+   }
+  }
+ }
+}

@@ -18,6 +18,44 @@
   "requestBody": "AddCartLineRequest",
   "responds": "Cart"
  },
+ "checkoutCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/checkout",
+  "contract": "orders",
+  "summary": "Turn the cart into an order",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "createPayment": {
+  "method": "POST",
+  "path": "/payments",
+  "contract": "orders",
+  "summary": "Take a payment against an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePaymentRequest",
+  "responds": "Payment"
+ },
  "listMerchandise": {
   "method": "GET",
   "path": "/merchandise",
@@ -86,6 +124,11 @@
     "name": "includeSiblingOutlets",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -119,24 +162,5 @@
   ],
   "requestBody": null,
   "responds": "ShopAndDrop"
- },
- "reserveMerchandise": {
-  "method": "POST",
-  "path": "/outlets/{outletId}/reserve",
-  "contract": "retail",
-  "summary": "Reserve an item for collection",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MerchandiseReservation"
  }
 }

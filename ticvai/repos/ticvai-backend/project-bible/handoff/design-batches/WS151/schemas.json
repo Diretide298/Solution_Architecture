@@ -1,0 +1,858 @@
+{
+ "B2bCreditAccount": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.credit_account",
+  "description": "Board 5.4. **Exposure includes unbilled bookings, not just unpaid invoices.**",
+  "required": [
+   "organisationId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "organisationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accountCode": {
+    "type": "string"
+   },
+   "creditLimit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "outstandingInvoiced": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "outstandingUnbilled": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "availableCredit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "onHold",
+     "suspended",
+     "closed"
+    ]
+   },
+   "overLimit": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "B2bPaymentTerms": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.payment_terms",
+  "description": "Board 5.5. **What happens at the limit is the decision.**",
+  "properties": {
+   "accountId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "creditLimit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "paymentTermDays": {
+    "type": "integer",
+    "default": 30
+   },
+   "billingCycle": {
+    "type": "string",
+    "enum": [
+     "perBooking",
+     "weekly",
+     "fortnightly",
+     "monthly"
+    ]
+   },
+   "purchaseOrderRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "depositPercent": {
+    "type": "number",
+    "nullable": true,
+    "description": "1 September: *\"partial payment/deposit is supported for bulk bookings such as schools and corporates — e.g. a 20–30% deposit upfront with the balance due on or before arrival.\"*\n"
+   },
+   "balanceDue": {
+    "type": "string",
+    "enum": [
+     "onArrival",
+     "beforeArrival",
+     "onTerms"
+    ],
+    "default": "beforeArrival"
+   },
+   "atLimit": {
+    "type": "string",
+    "enum": [
+     "refuse",
+     "warn",
+     "allowWithOverride"
+    ],
+    "default": "allowWithOverride"
+   },
+   "overrideApprovalRole": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "CreditConsumptionPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.consumption_policy",
+  "description": "Boards 3.5 and 3.7. **There is no neutral default**, which is why this is configuration.\n",
+  "properties": {
+   "strategy": {
+    "type": "string",
+    "enum": [
+     "expiringFirst",
+     "typePriority",
+     "nonRefundableFirst",
+     "manual"
+    ],
+    "default": "expiringFirst",
+    "description": "**`expiringFirst` is the default because it is the one that does not quietly profit from the guest forgetting.**\n"
+   },
+   "typeOrder": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "withinTypeOrder": {
+    "type": "string",
+    "enum": [
+     "fefo",
+     "fifo",
+     "lifo"
+    ],
+    "default": "fefo"
+   },
+   "allowSplitTender": {
+    "type": "boolean",
+    "default": true
+   },
+   "allowGuestChoice": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Whether a guest may override the order at the till.** Rarely enabled, and the venues that want it want it badly.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "DeclineClass": {
+  "type": "string",
+  "description": "BL-100. **Whether a failed charge may be tried again at all**, and the distinction is a merchant-account risk rather than a courtesy.\n`soft` — insufficient funds, a temporary hold, an issuer timeout. **Worth another attempt on another day**, and the whole reason a dunning schedule exists.\n`hard` — closed account, stolen card, do-not-honour, invalid number. **Never retried.** A hard decline put on a timetable is how a merchant ID gets flagged by the scheme, and the venue finds out when its acquirer calls.\n`unknown` — the provider gave no usable code. **Treated as `hard`**, because guessing `soft` optimises for one more attempt and risks the thing that cannot be undone.\n",
+  "enum": [
+   "soft",
+   "hard",
+   "unknown"
+  ]
+ },
+ "DunningCase": {
+  "x-ticvai-persistence": "payments.dunning_case",
+  "type": "object",
+  "description": "BL-100. **One recurring charge being chased**, and the row a venue works from.\n",
+  "required": [
+   "id",
+   "state",
+   "attemptsMade",
+   "firstFailedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "description": "The order whose renewal failed."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "state": {
+    "$ref": "#/components/schemas/DunningState"
+   },
+   "declineClass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/DeclineClass"
+     }
+    ],
+    "description": "**From the most recent attempt.** A case that begins `soft` and turns `hard` stops immediately rather than finishing its schedule — the card changed underneath it.\n"
+   },
+   "attemptsMade": {
+    "type": "integer"
+   },
+   "nextAttemptAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Null where the case has ended or the decline is hard.** A scheduled time on a case nothing will act on is the field that makes a queue untrustworthy.\n"
+   },
+   "firstFailedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "resolution": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "paidByOtherMeans",
+     "cardReplaced",
+     "writeOff",
+     "cancelledByGuest",
+     null
+    ]
+   },
+   "resolutionNote": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 500,
+    "description": "**What `resolveDunningCase` was told, which had nowhere to land until now.** The enum above tells `writeOff` from `cardReplaced`; **which invoice, whose phone call and on what authority is the sentence beside it**, and the operation's own reasoning — that these reasons must be told apart afterwards — only works if the sentence survives.\n**Same shape as `marketing.case.resolution_note`**, which is a RAG source for exactly this reason: a resolution note is the most useful free text a support record holds.\n"
+   },
+   "resolvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who closed it.** A write-off with no name against it is the one resolution nobody can follow up, and it is also the one that moves money.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Written at `venue` scope.\n"
+   }
+  }
+ },
+ "DunningPolicy": {
+  "x-ticvai-persistence": "payments.dunning_policy",
+  "type": "object",
+  "description": "2.14.19-2.14.23, BL-100. **How a failed recurring charge is chased, as a tenant policy rather than a platform constant.** A season pass at AED 300 a month and a locker subscription at AED 15 do not deserve the same number of attempts.\n",
+  "required": [
+   "maxAttempts",
+   "terminalAction"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "maxAttempts": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 8,
+    "default": 4,
+    "description": "**Capped at eight and defaulted to four.** The ceiling is not arbitrary: past a handful of attempts the recovery rate is close to nothing and the cost is a guest watching their bank app light up repeatedly for a charge they already know failed.\n"
+   },
+   "attemptOffsetDays": {
+    "type": "array",
+    "items": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "default": [
+     0,
+     3,
+     7,
+     14
+    ],
+    "description": "**Days after the first failure, and the spacing is the part that matters.** Retrying at the same hour each day hits the same daily limit on the same card and tells the venue nothing it did not already know — **attempts spaced across the month straddle a payday**, which is the single thing that changes the answer for a soft decline.\n**Must be non-decreasing and no longer than `maxAttempts`**, enforced with 422 rather than by silently truncating a list somebody meant.\n"
+   },
+   "minimumHoursBetweenAttempts": {
+    "type": "integer",
+    "default": 24,
+    "description": "**A floor under the offsets, because a schedule is edited by hand.** Two offsets on the same day are a typo that reads as a policy.\n"
+   },
+   "retryableDeclineClasses": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/DeclineClass"
+    },
+    "default": [
+     "soft"
+    ],
+    "description": "**`soft` alone, and widening it is a deliberate act.** The field exists rather than being implied so that a venue that adds `unknown` has chosen to, and so an auditor can see that it did.\n"
+   },
+   "notifyGuestOnEachAttempt": {
+    "type": "boolean",
+    "default": false,
+    "description": "**False by default.** A guest told four times about one failed renewal reads it as four failures. The first and the last are the ones that mean something — the first because they can fix it, the last because their pass is about to change.\n"
+   },
+   "terminalAction": {
+    "type": "string",
+    "enum": [
+     "suspendBilling",
+     "cancelRenewal"
+    ],
+    "default": "suspendBilling",
+    "description": "**What happens when the attempts run out, and it deliberately stops short of admission.** `suspendBilling` stops charging and leaves the entitlement as it is; `cancelRenewal` also stops the next term. **Neither revokes entry.**\n`graceDays` on the renewal model already governs how long a pass keeps working, and the failure this separation prevents is concrete: **a guest at a gate on a family day out, refused because a card expired and a retry ran at 3am.** Ending somebody's access stays a staff decision with a name on it.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Written at `tenant` scope.\n"
+   }
+  }
+ },
+ "DunningState": {
+  "type": "string",
+  "enum": [
+   "scheduled",
+   "inProgress",
+   "exhausted",
+   "recovered",
+   "resolvedManually"
+  ],
+  "description": "BL-100. **`exhausted` and `recovered` are both endings and only one of them is a failure.** A schedule with a single terminal state cannot tell a venue whether dunning is working, which is the only question a venue asks of it.\n"
+ },
+ "MixedTenderRules": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.mixed_tender_rules",
+  "description": "Boards 5.2 and 5.7. **Sequence is not cosmetic.**",
+  "properties": {
+   "splitPaymentAllowed": {
+    "type": "boolean",
+    "default": true
+   },
+   "maximumTenders": {
+    "type": "integer",
+    "default": 3
+   },
+   "tenderOrder": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "**Across tender kinds.** `wallet` decides the order within stored value."
+   },
+   "allowedCombinations": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "methodKinds": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "allowed": {
+       "type": "boolean"
+      },
+      "reason": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "partialPaymentAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "onPartialFailure": {
+    "type": "string",
+    "enum": [
+     "reverseAll",
+     "keepAndRetry",
+     "keepAndHold"
+    ],
+    "default": "reverseAll",
+    "description": "**Three tenders in, the fourth fails.** Reversing all of it is the only answer that leaves the guest and the ledger in a state anybody can explain.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "MultiPaymentSplitTenderPaymentAllocationConfiguratioInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; lands in `orders.payment_allocation_rule` (DM5, 29 September)",
+  "description": "**What Multi-Payment, Split Tender & Payment Allocation Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "terminal": {
+    "type": "string",
+    "description": "Terminal"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "orderType": {
+    "type": "string",
+    "description": "Order Type"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "allocationLevel": {
+    "type": "string",
+    "enum": [
+     "orderLevel",
+     "orderLineLevel",
+     "productLevel",
+     "taxFeeComponent",
+     "specificTicket",
+     "deposit"
+    ],
+    "description": "What a payment is allocated against."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true,
+    "description": "False retires the rule for this match key (decided 29 September, writers pass)."
+   }
+  }
+ },
+ "MultiPaymentSplitTenderPaymentAllocationConfiguratioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Multi-Payment, Split Tender & Payment Allocation Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "terminal": {
+    "type": "string",
+    "description": "Terminal"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "orderType": {
+    "type": "string",
+    "description": "Order Type"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "allocationLevel": {
+    "type": "string",
+    "enum": [
+     "orderLevel",
+     "orderLineLevel",
+     "productLevel",
+     "taxFeeComponent",
+     "specificTicket",
+     "deposit"
+    ],
+    "description": "What a payment is allocated against."
+   }
+  }
+ },
+ "OrderPaymentDetailTransactionLedgerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Order Payment Detail & Transaction Ledger displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "orderNumber": {
+    "type": "string",
+    "description": "Order Number"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "orderTotal": {
+    "type": "string",
+    "description": "Order Total"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "paid": {
+    "type": "string",
+    "description": "Paid"
+   },
+   "refunded": {
+    "type": "string",
+    "description": "Refunded"
+   },
+   "outstanding": {
+    "type": "string",
+    "description": "Outstanding"
+   },
+   "creditApplied": {
+    "type": "string",
+    "description": "Credit Applied"
+   },
+   "paymentStatus": {
+    "type": "integer",
+    "description": "Payment Status"
+   },
+   "settlementStatus": {
+    "type": "integer",
+    "description": "Settlement Status"
+   },
+   "transactions": {
+    "type": "array",
+    "description": "Every financial transaction on the order, one entry each",
+    "items": {
+     "type": "object",
+     "properties": {
+      "type": {
+       "type": "string",
+       "enum": [
+        "authorization",
+        "capture",
+        "payment",
+        "deposit",
+        "additionalCollection",
+        "partialRefund",
+        "reversal",
+        "walletCredit",
+        "voucher",
+        "creditNote",
+        "adjustment"
+       ],
+       "description": "Transaction type"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Amount"
+      },
+      "status": {
+       "type": "string",
+       "description": "Status"
+      },
+      "gateway": {
+       "type": "string",
+       "description": "Gateway"
+      },
+      "merchant": {
+       "type": "string",
+       "description": "Merchant"
+      },
+      "terminal": {
+       "type": "string",
+       "description": "Terminal"
+      },
+      "authorizationCode": {
+       "type": "string",
+       "description": "Authorization code"
+      },
+      "gatewayTransactionId": {
+       "type": "string",
+       "description": "Gateway transaction ID"
+      },
+      "settlementReference": {
+       "type": "string",
+       "description": "Settlement reference"
+      },
+      "externalReference": {
+       "type": "string",
+       "description": "External reference"
+      },
+      "occurredAt": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PayInstalmentPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.instalment_policy",
+  "description": "4.2.17, 2.14.19. Also the `setInstalmentPolicy` body.",
+  "properties": {
+   "enabled": {
+    "type": "boolean",
+    "default": false
+   },
+   "eligibleProductKinds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "membership",
+      "annualPass",
+      "seasonPass",
+      "groupBooking",
+      "event"
+     ]
+    }
+   },
+   "minimumOrderValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "allowedFrequencies": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "monthly",
+      "quarterly",
+      "custom"
+     ]
+    }
+   },
+   "maximumInstalments": {
+    "type": "integer",
+    "minimum": 2
+   },
+   "dueAtPurchasePercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "instalmentFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "requireStoredCard": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `tenant` scope."
+   }
+  }
+ },
+ "PaymentAllocationRule": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.payment_allocation_rule",
+  "description": "**At what level a split-tender payment is allocated, per channel, terminal, product, order type or customer type** (DM5, 29 September: data model for the agreed operations; written by `setMultiPaymentSplit`). The tender limits themselves stay in `payments.mixed_tender_rules`; this row says what each tender is allocated against. Narrowest match wins; a row naming nothing is the venue default.",
+  "required": [
+   "id",
+   "allocationLevel",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "channel": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderType": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "customerType": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "allocationLevel": {
+    "type": "string",
+    "enum": [
+     "orderLevel",
+     "orderLineLevel",
+     "productLevel",
+     "taxFeeComponent",
+     "specificTicket",
+     "deposit"
+    ]
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "PaymentConfigurationSimulation": {
+  "type": "object",
+  "description": "Boards 1.10 and 5.10. **Eight boards of configuration that compose, silently.**",
+  "properties": {
+   "offeredMethods": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "methodId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "routesTo": {
+       "type": "string",
+       "nullable": true
+      },
+      "estimatedCost": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "surcharge": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "suppressedMethods": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "methodId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "reason": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "severity": {
+       "type": "string",
+       "enum": [
+        "blocking",
+        "warning"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "RoutingContext": {
+  "type": "object",
+  "required": [
+   "amount"
+  ],
+  "properties": {
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "methodId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "type": "string",
+    "nullable": true
+   },
+   "cardScheme": {
+    "type": "string",
+    "nullable": true
+   },
+   "cardIssuerCountry": {
+    "type": "string",
+    "nullable": true
+   },
+   "cardPresent": {
+    "type": "boolean",
+    "default": false
+   },
+   "customerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ }
+}

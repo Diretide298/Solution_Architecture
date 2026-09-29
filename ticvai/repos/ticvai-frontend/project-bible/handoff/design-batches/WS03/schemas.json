@@ -852,6 +852,158 @@
    "revocationAction"
   ]
  },
+ "CredentialSecurityAuditOperationalEvidenceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Security, Audit & Operational Evidence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "virtualTicket": {
+    "type": "string",
+    "description": "Virtual Ticket"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "media": {
+    "type": "string",
+    "description": "Media"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "credentialRequested",
+     "generated",
+     "bound",
+     "delivered",
+     "activated",
+     "updated",
+     "presented",
+     "suspended",
+     "reactivated",
+     "replaced",
+     "revoked",
+     "expired",
+     "rebound",
+     "regenerated",
+     "deleted"
+    ],
+    "description": "Lifecycle action recorded"
+   },
+   "before": {
+    "type": "string",
+    "description": "Before"
+   },
+   "after": {
+    "type": "string",
+    "description": "After"
+   },
+   "actor": {
+    "type": "string",
+    "description": "Actor"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "device": {
+    "type": "string",
+    "description": "Device"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "providerReference": {
+    "type": "string",
+    "description": "Provider reference"
+   },
+   "relatedTransaction": {
+    "type": "string",
+    "description": "Related transaction"
+   },
+   "anomalyFlags": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "excessiveRegeneration",
+      "repeatedReplacement",
+      "suspiciousRebinding",
+      "multipleCredentialAssignments",
+      "unexpectedProviderTokenChanges",
+      "unauthorizedAdministrativeActions"
+     ]
+    },
+    "description": "Suspicious patterns flagged on this entry"
+   }
+  }
+ },
+ "CredentialSecuritySimulationAuditPublicationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Security Simulation, Audit & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "guestAccountReference": {
+    "type": "string",
+    "description": "Guest/account reference"
+   },
+   "device": {
+    "type": "string",
+    "description": "Device"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "operator": {
+    "type": "string",
+    "description": "Operator"
+   },
+   "eventType": {
+    "type": "string",
+    "enum": [
+     "activation",
+     "refresh",
+     "validation",
+     "transfer",
+     "revocation"
+    ]
+   },
+   "resultReasonCode": {
+    "type": "string",
+    "description": "result/reason code"
+   }
+  }
+ },
  "CredentialTransferRebindingView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -939,6 +1091,180 @@
      "supervisorApprovalRequired"
     ],
     "default": "otpVerificationRequired"
+   }
+  }
+ },
+ "DeviceBindingSessionSecurityView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Device Binding & Session Security displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "deviceId": {
+    "type": "string",
+    "description": "Device ID"
+   },
+   "deviceReference": {
+    "type": "string",
+    "description": "Device reference"
+   },
+   "appInstallation": {
+    "type": "string",
+    "description": "App installation"
+   },
+   "os": {
+    "type": "string",
+    "description": "OS"
+   },
+   "registrationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Registration date"
+   },
+   "lastActivation": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last activation"
+   },
+   "lastKnownVenue": {
+    "type": "string",
+    "description": "Last known venue"
+   },
+   "securityStatus": {
+    "type": "string",
+    "enum": [
+     "normal",
+     "suspicious",
+     "blocked"
+    ],
+    "description": "Security status"
+   }
+  }
+ },
+ "DeviceBindingSessionSecurityViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "maximumActiveDevices": {
+    "type": "integer",
+    "description": "Maximum Active Devices (the pack shows 1)"
+   },
+   "concurrentSessions": {
+    "type": "integer",
+    "description": "Concurrent Sessions (the pack shows 1)"
+   },
+   "deviceChangePolicy": {
+    "type": "string",
+    "enum": [
+     "notAllowed",
+     "allowedBeforeFirstUse",
+     "otpVerificationRequired",
+     "operatorApprovalRequired",
+     "supervisorApprovalRequired"
+    ]
+   }
+  }
+ },
+ "DigitalCredentialSecurityCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Digital Credential Security Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "credentialType": {
+    "type": "string",
+    "enum": [
+     "dynamicQrTicket",
+     "membership",
+     "annualPass",
+     "mobileWallet",
+     "loyalty",
+     "digitalPass",
+     "event"
+    ]
+   },
+   "profileId": {
+    "type": "string"
+   },
+   "profileName": {
+    "type": "string",
+    "description": "Credential profile, e.g. Day Ticket"
+   },
+   "dynamic": {
+    "type": "boolean"
+   },
+   "deviceBound": {
+    "type": "string",
+    "enum": [
+     "required",
+     "optional",
+     "off"
+    ]
+   },
+   "locationScope": {
+    "type": "string",
+    "description": "gate, venue, event or none"
+   },
+   "offlineReady": {
+    "type": "boolean"
+   },
+   "securityLevel": {
+    "type": "string",
+    "enum": [
+     "strong",
+     "standard"
+    ]
+   }
+  }
+ },
+ "DigitalCredentialSecurityCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "activeDigitalCredentials": {
+    "type": "integer",
+    "description": "Active Digital Credentials"
+   },
+   "dynamicQrEnabled": {
+    "type": "integer",
+    "description": "Credentials with dynamic QR enabled"
+   },
+   "deviceBoundCredentials": {
+    "type": "integer",
+    "description": "Device-Bound Credentials"
+   },
+   "locationProtectedCredentials": {
+    "type": "integer",
+    "description": "Location-Protected Credentials"
+   },
+   "offlineReadyCredentials": {
+    "type": "integer",
+    "description": "Offline-Ready Credentials"
+   },
+   "credentialsRevokedToday": {
+    "type": "integer",
+    "description": "Credentials Revoked Today"
+   },
+   "transferEvents": {
+    "type": "integer"
+   },
+   "securityAlerts": {
+    "type": "integer",
+    "description": "Security Alerts"
+   },
+   "suspiciousSessions": {
+    "type": "integer",
+    "description": "Suspicious Sessions"
    }
   }
  },

@@ -179,7 +179,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "AiConversation"
+  "responds": "Page"
  },
  "listCases": {
   "method": "GET",
@@ -208,6 +208,11 @@
    },
    {
     "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "membershipId",
     "in": "query",
     "required": null
    },
@@ -247,7 +252,79 @@
    }
   ],
   "requestBody": null,
-  "responds": "GuestDevice"
+  "responds": "Page"
+ },
+ "listMyNotifications": {
+  "method": "GET",
+  "path": "/me/notifications",
+  "contract": "marketing-crm",
+  "summary": "The signed-in guest's notification feed",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "unreadOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "markMyNotificationsRead": {
+  "method": "POST",
+  "path": "/me/notifications/read",
+  "contract": "marketing-crm",
+  "summary": "Mark the signed-in guest's notifications read",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "recordAnswerFeedback": {
+  "method": "POST",
+  "path": "/messages/{messageId}/feedback",
+  "contract": "ai",
+  "summary": "Say whether an answer helped",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiAnswerFeedback"
  },
  "recordConsent": {
   "method": "POST",
@@ -391,7 +468,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MarketingSubscription",
   "responds": "MarketingSubscription"
  },

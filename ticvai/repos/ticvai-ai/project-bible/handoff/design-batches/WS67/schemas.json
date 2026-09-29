@@ -1,1 +1,606 @@
-{}
+{
+ "Aggregation": {
+  "type": "string",
+  "enum": [
+   "none",
+   "count",
+   "countDistinct",
+   "sum",
+   "average",
+   "min",
+   "max"
+  ]
+ },
+ "AnalyticsPipeline": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.pipeline",
+  "description": "BI board 10.7. **Freshness decides whether a dashboard can be trusted.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "sourceKind": {
+    "type": "string"
+   },
+   "datasets": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "schedule": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastRunAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastSuccessAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "freshnessMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "expectedFreshnessMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "degraded",
+     "stale",
+     "failed",
+     "paused"
+    ]
+   },
+   "lastError": {
+    "type": "string",
+    "nullable": true
+   },
+   "rowsLastRun": {
+    "type": "integer",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "CreateDashboardRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "module",
+   "tiles"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "module": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey",
+    "description": "**Which module this dashboard belongs to, and therefore who may see it.** Added 22 September for the command centre: one shell that shows each login the dashboards of the modules it is entitled to. **A dashboard with no module could not be placed in that shell at all** — the field the whole design hangs on did not exist.\n**Required, and `core` is the answer for a dashboard that belongs to no optional module.** An empty field and *belongs everywhere* look identical, and only one of them is a decision — the rule `ModuleKey` already states for screens.\n**Creating one is gated twice**, by `REPORT_MANAGE` and by the module: a principal cannot build a dashboard for a module the tenant has not licensed or that the principal holds no permission in. The server refuses with `409`; a client that hides the option has not enforced anything.\n"
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Narrows every tile to one venue. Omitting it shows each viewer everything their own scope permits — it can never show a viewer beyond that. The same rule as `RunReportRequest.venueId`.\n"
+   },
+   "isShared": {
+    "type": "boolean",
+    "default": false
+   },
+   "tiles": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 24,
+    "items": {
+     "$ref": "#/components/schemas/DashboardTile"
+    }
+   }
+  }
+ },
+ "Dashboard": {
+  "x-ticvai-persistence": "reporting.dashboard + reporting.dashboard_tile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateDashboardRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "ownerPrincipalId",
+     "aggregateCost",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "aggregateCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Combined refresh load of every tile."
+     },
+     "archivedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "DashboardData": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Dashboard"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "tileData": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "tileId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "result": {
+         "$ref": "#/components/schemas/ReportResult"
+        },
+        "isCached": {
+         "type": "boolean"
+        },
+        "error": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
+ "DashboardTile": {
+  "x-ticvai-persistence": "reporting.dashboard_tile",
+  "type": "object",
+  "required": [
+   "id",
+   "reportId",
+   "visualisation",
+   "position"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "title": {
+    "type": "string"
+   },
+   "reportId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "visualisation": {
+    "type": "string",
+    "description": "**Extended 22 September from eight marks to twenty** against `Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf`, which names eighteen components and marks every one MVP. Nine were genuinely missing — `combo`, `matrix`, `funnel`, `waterfall`, `treemap`, `scatter`, `map`, `ribbon`, `decompositionTree` — and three are layout variants of marks already here: `area` beside `line`, `donut` beside `pie`, `stackedBar100` beside `stackedBar`.\n**`number` is the source's KPI / card.** Its comparison, variance, trend sparkline and status icon are tile parameters rather than separate marks.\n**Two of the eighteen are deliberately not here** — see `x-ticvai-refuses`. The source lists them as components; the platform already models each of them elsewhere, and a second model of either is the drift this enum exists to prevent.\n",
+    "enum": [
+     "number",
+     "line",
+     "area",
+     "bar",
+     "stackedBar",
+     "stackedBar100",
+     "combo",
+     "pie",
+     "donut",
+     "table",
+     "matrix",
+     "gauge",
+     "heatmap",
+     "funnel",
+     "waterfall",
+     "treemap",
+     "scatter",
+     "map",
+     "ribbon",
+     "decompositionTree"
+    ],
+    "x-ticvai-refuses": {
+     "slicer": "**A control, not a mark.** The source's slicer / filter is already `ReportFilter.isParameter` plus `ReportParameter` — a run-time prompt bound to the report. A slicer on the canvas places that parameter; it does not render a result, so it is not a visualisation and a second filter model beside `ReportFilter` would be one somebody keeps in step by hand.",
+     "narrative": "**Generated prose belongs with `ai.Suggestion`.** The source's narrative / insight text (*\"Admissions are 12% above last Tuesday\"*) is model output with traceability requirements, not a way of drawing a query result.",
+     "cohort": "**Not one of the eighteen.** It appears once in the source as a *usage* — *\"the Customer & Membership dashboard shall use cards, cohort and trend charts\"* — never as a specified component. A cohort view is a `matrix` or `heatmap` over a cohort dimension."
+    },
+    "x-ticvai-note": "**These marks cannot yet bind data.** `ReportColumn` carries `field`, `label`, `aggregation` and `format` and **no encoding role** — no axis, series, size or colour. A `number` needs none and an eight-mark enum survived without one; a `scatter` needs x, y, size and colour, and a `combo` needs a secondary axis with stated units. **Adding `ReportColumn.role` is the harder half of this decision and is deliberately not made here** — it is the field-wells model the source's builder specifies, and it belongs with the engine and semantic-layer split that needs an ADR first.\n"
+   },
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**Open on purpose, and not yet specified.** Holds the tile's run parameters (keyed by the report's `ReportParameter.key`, as `RunReportRequest.parameters`) and its display settings — for `number`, the comparison, variance, sparkline and status icon. The per-visualisation display shape waits on the field-wells decision in `visualisation`'s `x-ticvai-note`.\n"
+   },
+   "refreshSeconds": {
+    "type": "integer",
+    "minimum": 30,
+    "description": "Minimum thirty seconds. A tile refreshing every second is a load problem wearing a convenience costume.\n"
+   },
+   "position": {
+    "type": "object",
+    "required": [
+     "row",
+     "column",
+     "width",
+     "height"
+    ],
+    "properties": {
+     "row": {
+      "type": "integer"
+     },
+     "column": {
+      "type": "integer"
+     },
+     "width": {
+      "type": "integer"
+     },
+     "height": {
+      "type": "integer"
+     }
+    }
+   }
+  }
+ },
+ "FieldType": {
+  "type": "string",
+  "enum": [
+   "string",
+   "integer",
+   "decimal",
+   "money",
+   "boolean",
+   "date",
+   "dateTime",
+   "uuid",
+   "enum"
+  ]
+ },
+ "KpiDefinition": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.kpi_definition",
+  "description": "BI boards 2.5 and 10.2. **One definition, referenced everywhere** — otherwise *revenue* means two things in the same meeting.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "description": "`takings` and `admissions` are seeded for every tenant as system KPIs (decided 28 September, audit R283), and the five accreditation KPIs for every tenant with the accreditation module (29 September, build pass). The seeded codes are `ReportingSystemKpi`.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "domain": {
+    "type": "string",
+    "nullable": true
+   },
+   "formula": {
+    "type": "string",
+    "description": "**Expressed against the semantic model, not against tables.** A KPI written in SQL is a KPI that breaks when the warehouse is reshaped.\n"
+   },
+   "unit": {
+    "type": "string",
+    "enum": [
+     "currency",
+     "count",
+     "percentage",
+     "duration",
+     "ratio",
+     "score"
+    ]
+   },
+   "higherIsBetter": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Refund rate and revenue both go up.** Without this the status colour is a coin toss.\n"
+   },
+   "defaultPeriod": {
+    "type": "string",
+    "nullable": true
+   },
+   "owner": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "KpiTarget": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.kpi_target",
+  "description": "BI board 2.6. **The threshold is what turns a number into a status.**",
+  "required": [
+   "scopePath",
+   "period",
+   "target"
+  ],
+  "properties": {
+   "kpiId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The scope this target applies to. With `period`, the key `setKpiTargets` matches on."
+   },
+   "period": {
+    "type": "string"
+   },
+   "target": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "amberAt": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "redAt": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   },
+   "stretch": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true
+   }
+  }
+ },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "SemanticModel": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.semantic_model",
+  "description": "BI boards 3.3 and 10.6. **A vocabulary, not a schema.** Exposing joins to report authors produces reports that are wrong invisibly.\n",
+  "properties": {
+   "version": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "Assigned by the server on each publish."
+   },
+   "domains": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "description": {
+       "type": "string",
+       "nullable": true
+      },
+      "datasets": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "code": {
+          "type": "string"
+         },
+         "name": {
+          "type": "string"
+         },
+         "grain": {
+          "type": "string",
+          "description": "**What one row means.** The single most common cause of a wrong report is a join that silently multiplied the grain.\n"
+         },
+         "fields": {
+          "type": "array",
+          "items": {
+           "type": "object",
+           "properties": {
+            "code": {
+             "type": "string"
+            },
+            "label": {
+             "type": "string"
+            },
+            "dataType": {
+             "$ref": "#/components/schemas/FieldType"
+            },
+            "aggregation": {
+             "allOf": [
+              {
+               "$ref": "#/components/schemas/Aggregation"
+              }
+             ],
+             "nullable": true,
+             "description": "The default aggregation for the field, where it has one."
+            },
+            "sensitive": {
+             "type": "boolean",
+             "default": false
+            },
+            "description": {
+             "type": "string",
+             "nullable": true
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "relationships": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromDataset": {
+       "type": "string"
+      },
+      "toDataset": {
+       "type": "string"
+      },
+      "cardinality": {
+       "type": "string",
+       "enum": [
+        "oneToOne",
+        "oneToMany",
+        "manyToOne",
+        "manyToMany"
+       ]
+      }
+     }
+    }
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ }
+}

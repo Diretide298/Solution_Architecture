@@ -61,7 +61,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-015` | Branded Queue / Waiting Room | statusTracker | 3 | 0 | — |
+| `WEB-015` | Branded Queue / Waiting Room | statusTracker | 3 | 1 | — |
 
 ## Thin screens in this batch
 
@@ -104,13 +104,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "statusTracker",
   "patternReason": "`getWaitingGuest` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Virtual Waiting Room — the screen a person opens when they need to deal with virtual waiting room.",
-  "gaps": [
-   {
-    "operation": "getWaitTimes",
-    "why": "**1 declared operation reach no component on this screen**: getWaitTimes. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -120,7 +113,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected branded queue waiting",
+       "label": "The waiting guest",
        "bindsTo": "WaitingGuest",
        "columns": [
         "WaitingGuest.id",
@@ -142,6 +135,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getWaitingGuest",
        "provenance": "contract queue.yaml GET /waiting-guests/{entryId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
       }
      ]
     },
@@ -151,23 +164,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Join",
+       "label": "Join queue",
        "operation": "joinQueue",
        "provenance": "contract queue.yaml POST /waiting-guests"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "joinQueue",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -177,8 +176,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "Position in the queue, updating",
    "error": "**Lost the queue position.** The worst failure on this screen: it re-queues rather than silently admitting, and says so, because a guest who thinks they lost their place will open a second tab and make it worse",
    "emptyFirstRun": "—",
-   "emptyNoResults": "The filter narrowed it and the branded queue waiting are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The last known position stays on screen with its age. Joining, leaving and being admitted all need the connection."
   },
   "apis": [
@@ -191,8 +189,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "getWaitingGuest",
     "contract": "queue",
-    "purpose": "Read a queue entry",
-    "trigger": "onLoad"
+    "purpose": "The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242)",
+    "trigger": "onInterval"
    },
    {
     "operationId": "getWaitTimes",
@@ -211,11 +209,44 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `entryId`."
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-015"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-015",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Only when the host tweak 'waitingRoom' is on; it is not in the Config drawer lists, so a reviewer cannot switch it on from the page",
+    "differences": "Drawn but unreachable from the Config drawer. The prototype holds the place by keeping the page open ('refreshing puts you at the back'); YAML getWaitingGuest implies a resumable place."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formJoinQueue",
+    "component": "modal",
+    "trigger": "Join queue",
+    "body": "**Collects what `joinQueue` sends before it is called.** Required: `id`, `queueId`, `partySize`, `recordedAt`. Optional: `entitlementId`, `partyHeightsCm`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "JoinQueueRequest",
+    "confirm": {
+     "label": "Join queue",
+     "operation": "joinQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "queueId",
+      "partySize",
+      "recordedAt",
+      "entitlementId",
+      "partyHeightsCm"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -355,6 +386,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "integer"
     }
    },
+   "accessibilityNeedDeclared": {
+    "type": "boolean",
+    "default": false,
+    "description": "The party declares an accessibility need (5.6.7; decided 29 September, build pass). Grants priority only on a lane whose `QueueFastPass.accessibilityPriority` is on, and is recorded on the entry either way.\n"
+   },
+   "promotionCode": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "A promotion code the guest holds, checked against the lane's `QueueFastPass.promotionIds` (5.6.34). A code for a promotion the lane does not list grants nothing and is not an error.\n"
+   },
    "recordedAt": {
     "type": "string",
     "format": "date-time"
@@ -412,6 +454,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "nullable": true
    },
+   "attractionCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. Read from catalogue, not stored here.\n"
+   },
    "status": {
     "$ref": "#/components/schemas/QueueStatus"
    },
@@ -425,7 +473,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isStale": {
     "type": "boolean",
-    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current.\n"
+    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current, and it is not hidden (decided 28 September, audit R080 (b)): the screen shows `waitMinutes` with its `asOf` and a stale marker.\n"
    },
    "heightRequirementCm": {
     "type": "integer",
@@ -437,7 +485,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "asOf": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "When the figure was produced — the queue's `waitTimeAsOf`."
    }
   }
  },
@@ -452,7 +501,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "WaitingGuest": {
-  "x-ticvai-persistence": "queue.waiting_guest",
+  "x-ticvai-persistence": "queue.entry",
   "type": "object",
   "required": [
    "id",
@@ -464,7 +513,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client-generated ULID from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
    },
    "queueId": {
     "type": "string",
@@ -503,6 +554,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isFastPass": {
     "type": "boolean"
+   },
+   "priorityBasis": {
+    "type": "string",
+    "enum": [
+     "none",
+     "entitlement",
+     "loyaltyTier",
+     "promotion",
+     "accessibility"
+    ],
+    "default": "none",
+    "description": "Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first `QueueFastPass` criterion met at join, in the order entitlement, loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not `none`. Kept on the entry so a disputed priority can be explained afterwards.\n"
+   },
+   "priorityTierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`."
+   },
+   "priorityPromotionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The promotion that granted priority, where `priorityBasis` is `promotion`."
+   },
+   "accessibilityNeedDeclared": {
+    "type": "boolean",
+    "default": false,
+    "description": "What the party declared at join, shown to the operator at the front."
    },
    "entitlementId": {
     "type": "string",

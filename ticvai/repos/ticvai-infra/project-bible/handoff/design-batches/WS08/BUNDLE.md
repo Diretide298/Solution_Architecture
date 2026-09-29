@@ -1,6 +1,6 @@
 # WS08 — Access Control board 8
 
-**10 screens · 22 operations · 24 schemas · 5 permissions**
+**10 screens · 22 operations · 33 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -3183,6 +3183,62 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "profileId"
   ]
  },
+ "GroupAttendancePartialEntryManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Group Attendance & Partial Entry Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "waveId": {
+    "type": "string",
+    "description": "Admission wave identifier"
+   },
+   "remaining": {
+    "type": "integer",
+    "description": "Guests still to arrive after this wave"
+   },
+   "totalEntered": {
+    "type": "integer",
+    "description": "Total Entered (the pack shows 48)"
+   },
+   "group": {
+    "type": "string",
+    "description": "Group"
+   },
+   "leader": {
+    "type": "string",
+    "description": "Leader"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "operator": {
+    "type": "string",
+    "description": "Operator"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "device": {
+    "type": "string",
+    "description": "Device"
+   },
+   "purchased": {
+    "type": "integer",
+    "description": "Guests purchased on the group booking"
+   }
+  },
+  "required": [
+   "waveId"
+  ]
+ },
  "GroupB2bAdmissionProfileBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -3314,6 +3370,57 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "profileId",
    "venueId",
    "name"
+  ]
+ },
+ "GroupLeaderFastB2bValidationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Group Leader & Fast B2B Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "groupBookingId": {
+    "type": "string",
+    "description": "Group booking"
+   },
+   "attendance": {
+    "type": "integer",
+    "description": "Attendance (the pack shows +112)"
+   },
+   "remaining": {
+    "type": "integer",
+    "description": "Guests not yet admitted"
+   },
+   "payment": {
+    "type": "boolean",
+    "description": "Payment check passed"
+   },
+   "booking": {
+    "type": "boolean",
+    "description": "Booking check passed"
+   },
+   "groupProduct": {
+    "type": "boolean",
+    "description": "Group product check passed"
+   },
+   "accessRules": {
+    "type": "boolean",
+    "description": "Access rules check passed"
+   },
+   "manifest": {
+    "type": "boolean",
+    "description": "Manifest check passed"
+   },
+   "bookedGuests": {
+    "type": "integer",
+    "description": "Guests booked"
+   },
+   "visitDateValid": {
+    "type": "boolean",
+    "description": "Visit date check passed"
+   }
+  },
+  "required": [
+   "groupBookingId"
   ]
  },
  "GuestCompanionEligibilityRulesInput": {
@@ -3461,6 +3568,92 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "guestCategory"
   ]
  },
+ "GuestJourneyCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Guest Journey Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "journeyProfileId": {
+    "type": "string",
+    "description": "Journey profile identifier"
+   },
+   "journeyName": {
+    "type": "string",
+    "description": "Journey, e.g. School Group Entry"
+   },
+   "journeyType": {
+    "type": "string",
+    "description": "Journey type, e.g. B2B group, family"
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue or all parks"
+   },
+   "credentialType": {
+    "type": "string",
+    "description": "Credential used, e.g. group QR, mixed"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "description": "Status"
+   }
+  },
+  "required": [
+   "journeyProfileId"
+  ]
+ },
+ "GuestJourneyCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "activeJourneyProfiles": {
+    "type": "integer",
+    "description": "Active Journey Profiles"
+   },
+   "groupArrivalsToday": {
+    "type": "integer",
+    "description": "Group Arrivals Today"
+   },
+   "guestsViaGroupAdmission": {
+    "type": "integer",
+    "description": "Guests via Group Admission"
+   },
+   "familyJourneys": {
+    "type": "integer",
+    "description": "Family Journeys"
+   },
+   "reEntryGuests": {
+    "type": "integer",
+    "description": "Re-entry Guests"
+   },
+   "crossoversToday": {
+    "type": "integer",
+    "description": "Crossovers Today"
+   },
+   "fastPassValidations": {
+    "type": "integer",
+    "description": "Fast Pass Validations"
+   },
+   "specialEventAdmissions": {
+    "type": "integer",
+    "description": "Special Event Admissions"
+   },
+   "vipAdmissions": {
+    "type": "integer",
+    "description": "VIP Admissions"
+   },
+   "journeyExceptions": {
+    "type": "integer",
+    "description": "Journey Exceptions"
+   }
+  }
+ },
  "GuestJourneySimulationInput": {
   "type": "object",
   "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
@@ -3586,6 +3779,273 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    }
   }
+ },
+ "Journey": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.journey + marketing.journey_step",
+  "description": "22.3.1b to 22.3.10b, CF-137. **A journey is a sequence with branches; a `MessageTrigger` is one step of it.** The trigger already handles *\"send this when that happens\"* — a journey is what you need when the next message depends on what the guest did about the last one.\nFive of the ten requirements are named lifecycles — abandoned cart, membership, loyalty, wallet, birthday. **They are not five features.** Each is a journey with a different entry event and a different set of steps, which is why this is one entity and a template library rather than five contracts.\n**Consent is checked at every send, not at entry.** A guest who opts out mid-journey stops receiving, and the journey does not need to know — the same rule `MessageTrigger` follows and the one PDPL Article 17(1) makes unconditional.\n",
+  "required": [
+   "id",
+   "name",
+   "entryEvent",
+   "status",
+   "steps"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "templateKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "abandonedCart",
+     "membershipLifecycle",
+     "loyaltyLifecycle",
+     "walletLifecycle",
+     "birthday",
+     "onboarding",
+     "winBack",
+     "custom"
+    ],
+    "description": "Which named lifecycle this implements. **Set for reporting and for the library**, not for behaviour — the steps decide what happens.\n"
+   },
+   "entryEvent": {
+    "type": "string",
+    "description": "22.3.2b. From the event catalogue, so a journey cannot enter on something nothing publishes.\n"
+   },
+   "entryConditions": {
+    "type": "object",
+    "nullable": true,
+    "description": "Narrows entry — a segment, a tier, a venue. **Evaluated once at entry**, unlike step conditions.\n"
+   },
+   "steps": {
+    "type": "array",
+    "description": "22.3.1b. What the builder produces. **The visual builder is a frontend over this** — the contract holds the graph and the canvas is a rendering of it.\n",
+    "items": {
+     "$ref": "#/components/schemas/JourneyStep"
+    }
+   },
+   "status": {
+    "readOnly": true,
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "paused",
+     "archived"
+    ]
+   },
+   "maxDurationDays": {
+    "type": "integer",
+    "default": 30,
+    "description": "**A journey with no end is a guest who never leaves it.** After this, entrants exit wherever they are.\n"
+   },
+   "reentryPolicy": {
+    "type": "string",
+    "enum": [
+     "never",
+     "afterCompletion",
+     "always"
+    ],
+    "default": "afterCompletion",
+    "description": "22.3.6b. **Abandoned cart is the case that needs this.** A guest who abandons three carts in an hour should not get three recovery sequences, and `never` is wrong too — they may genuinely abandon one next month.\n"
+   },
+   "scopePath": {
+    "readOnly": true,
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "JourneyStep": {
+  "type": "object",
+  "description": "One node. **A step either sends, waits, or branches** — three kinds rather than a general graph, because a marketing user drawing an arbitrary graph draws a loop.\n",
+  "required": [
+   "id",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "x-ticvai-column": "type",
+    "enum": [
+     "send",
+     "wait",
+     "branch",
+     "exit",
+     "goal"
+    ]
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-column": "message_template_id",
+    "description": "For `send`. Channel is resolved from the guest's preference at the moment of sending."
+   },
+   "sendTimeMode": {
+    "type": "string",
+    "enum": [
+     "fixed",
+     "optimised"
+    ],
+    "default": "fixed",
+    "description": "For `send` (29 September, build pass, group G2; 22.3.19). `optimised` delays the send, after the step is reached, to the recipient's suggested hour from `ai.requestSuggestion` (kind `sendTime`) within the next 24 hours and inside `waitUntil`; no suggestion or AI off sends at once, as `fixed`."
+   },
+   "channelMode": {
+    "type": "string",
+    "enum": [
+     "preference",
+     "optimised"
+    ],
+    "default": "preference",
+    "description": "For `send`. `optimised` tries first the consented channel the send-time suggestion names, then `channelPreference` in order (22.9.16)."
+   },
+   "channelPreference": {
+    "type": "array",
+    "nullable": true,
+    "description": "22.3.3b. Ordered fallback — email, then SMS, then push. **A guest with no email address does not get an email step**, and the step does not fail, it moves down the list.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "email",
+      "sms",
+      "whatsapp",
+      "push",
+      "inApp"
+     ]
+    }
+   },
+   "waitMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "waitUntil": {
+    "type": "object",
+    "nullable": true,
+    "description": "22.3.5b. **Business hours, time zone and blackout windows** — a wallet low-balance alert at 3am is a complaint, and the venue's quiet hours are venue configuration rather than a property of this step.\n",
+    "properties": {
+     "businessHoursOnly": {
+      "type": "boolean",
+      "default": false
+     },
+     "timezone": {
+      "type": "string",
+      "nullable": true
+     },
+     "respectQuietHours": {
+      "type": "boolean",
+      "default": true
+     },
+     "notBefore": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "condition": {
+    "type": "object",
+    "nullable": true,
+    "description": "22.3.4b. IF/THEN over guest profile, behaviour and prior steps. **The most common condition is whether the previous message worked** — a recovery sequence must stop when the guest buys.\n",
+    "properties": {
+     "field": {
+      "type": "string"
+     },
+     "operator": {
+      "type": "string",
+      "enum": [
+       "eq",
+       "neq",
+       "gt",
+       "lt",
+       "contains",
+       "exists",
+       "notExists"
+      ]
+     },
+     "value": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "onTrue": {
+    "type": "string",
+    "nullable": true,
+    "description": "Next step id."
+   },
+   "onFalse": {
+    "type": "string",
+    "nullable": true
+   },
+   "next": {
+    "type": "string",
+    "nullable": true,
+    "x-ticvai-column": "next_journey_step_id"
+   },
+   "goalEvent": {
+    "type": "string",
+    "nullable": true,
+    "description": "For `goal`. **The event that means this journey worked and the guest should leave it** — a purchase for abandoned cart, a renewal for membership. **Reaching a goal exits immediately**, which is what stops a recovered cart from being chased.\n"
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "MultiParkCrossoverJourneyOrchestratorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Multi-Park & Crossover Journey Orchestrator displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "eventId": {
+    "type": "string",
+    "description": "Journey event identifier"
+   },
+   "eventType": {
+    "type": "string",
+    "enum": [
+     "normalEntry",
+     "reEntry",
+     "crossover"
+    ],
+    "description": "Kind of admission, tracked separately"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "fromParkId": {
+    "type": "string",
+    "description": "Park the guest left"
+   },
+   "toParkId": {
+    "type": "string",
+    "description": "Park entered"
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When it happened"
+   }
+  },
+  "required": [
+   "eventId"
+  ]
  },
  "MultiParkCrossoverRulesView": {
   "type": "object",
@@ -3785,6 +4245,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    }
   ]
+ },
+ "QueueFastPass": {
+  "x-ticvai-persistence": "queue.queue",
+  "type": "object",
+  "description": "**Which Fast Pass entitlements this lane accepts, and how** (decided 29 September, VM close-out; pack 'Access Control Module' p.109, BO-221 Fast Pass & Attraction Access Journey). Fast Pass stays an entitlement owned by Product & Entitlement; this block is the lane's side of it: which products it honours, the return window, a per-guest daily cap and the access points that redeem it. Stored on the queue row. Only meaningful where `kind` is `fastPass` or `fastPassAllocationPercent` is above 0.\n**Four ways into priority, not one** (decided 29 September, build pass; 5.6.7 and 5.6.34). A guest joins this lane as priority when they hold an entitlement from `entitlementProductIds` (VIP, annual pass, premium package), are a member of a tier in `loyaltyTierIds`, qualify for a live promotion in `promotionIds`, or declare an accessibility need where `accessibilityPriority` is on. The first criterion met is recorded on the entry as `WaitingGuest.priorityBasis`. Every criterion is resolved by the server at join time; nothing the request asserts about a tier or a promotion is trusted. All four draw on the same reserved `fastPassAllocationPercent`, so widening who qualifies never widens the share of the ride they take.\n",
+  "required": [
+   "entitlementProductIds"
+  ],
+  "properties": {
+   "entitlementProductIds": {
+    "type": "array",
+    "description": "Catalogue products whose entitlement admits to this lane. May be empty where priority comes only from a tier, a promotion or an accessibility need.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "loyaltyTierIds": {
+    "type": "array",
+    "description": "5.6.7 and 5.6.34 (decided 29 September, build pass). Loyalty programme tiers (`marketing.programme_tier`) whose members join this lane as priority. Read from the guest's own loyalty position at join time, never from the request, so a guest cannot claim a tier they do not hold. Empty: tier grants nothing on this lane.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "promotionIds": {
+    "type": "array",
+    "description": "5.6.34 (decided 29 September, build pass). Promotions that grant queue privilege on this lane while they are live. A guest qualifies when the promotion's conditions hold for them at join (the evaluation `promotions` already makes for a price), or by presenting its code in `JoinQueueRequest.promotionCode`. A paused or expired promotion grants nothing.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "accessibilityPriority": {
+    "type": "boolean",
+    "default": false,
+    "description": "5.6.7 (decided 29 September, build pass). A party that declares an accessibility need (`JoinQueueRequest.accessibilityNeedDeclared`) joins as priority. **Taken on trust**, because asking for proof at a ride entrance is worse than the occasional abuse; the declaration is on the entry, so the operator at the front sees it (`listQueueEntries`). A venue that wants proof sells or issues an accessibility pass and lists it in `entitlementProductIds` instead. **Not the `accessible` lane**: that is where a guest who cannot stand in a switchback waits; this moves them ahead in the lane they chose.\n"
+   },
+   "returnWindowMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 240,
+    "default": 60,
+    "description": "How long after the booked return time a Fast Pass holder may still enter. Proposed, our build plan.\n"
+   },
+   "maxPerGuestPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Fast Pass redemptions one guest may make on this lane per day; null is no cap."
+   },
+   "allowedAccessPointIds": {
+    "type": "array",
+    "description": "Access points that redeem Fast Pass for this lane; empty is the queue's own.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
  },
  "QueueStatus": {
   "type": "string",

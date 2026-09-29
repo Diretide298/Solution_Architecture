@@ -20,37 +20,23 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-011"
    ],
    "transitions": [
     {
-     "to": "GST-011",
-     "trigger": "Their wallet shows stored value",
-     "provenance": "flow F53 step 3→4"
-    },
-    {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-037 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "to": "GST-011",
+     "trigger": "Their wallet shows stored value",
+     "provenance": "flow F53 step 3→4",
+     "operation": "listPromotions"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "Inventory cites `GET /offers` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Pull audit, 27 September** — the Evaluate button and evaluatePromotions removed. That operation evaluates a cart — `EvaluatePromotionsRequest` requires venueId, channel and at least one line — and this screen arrives with only promotionId and code, no cart. Promotions are evaluated where the cart is.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
@@ -63,8 +49,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listPromotions",
+       "notes": "Sends `?venueId=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listPromotions",
+       "notes": "Sends `?status=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listPromotions",
+       "notes": "Sends `?activeAt=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every offers promotions",
+       "label": "Every promotion",
        "bindsTo": "Promotion",
        "columns": [
         "Promotion.code",
@@ -91,7 +98,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected offers promotions",
+       "label": "The selected promotion",
        "bindsTo": "Promotion",
        "columns": [
         "Promotion.code",
@@ -113,18 +120,29 @@
        ],
        "operation": "getPromotion",
        "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
+      },
       {
-       "kind": "primaryButton",
-       "label": "Evaluate",
-       "operation": "evaluatePromotions",
-       "provenance": "contract promotions.yaml POST /promotions/evaluate"
+       "kind": "detailPanel",
+       "label": "The coupon code",
+       "bindsTo": "CouponCode",
+       "columns": [
+        "CouponCode.code",
+        "CouponCode.campaignId",
+        "CouponCode.batchId",
+        "CouponCode.status",
+        "CouponCode.assignedSubjectId",
+        "CouponCode.redemptionCount",
+        "CouponCode.maxRedemptions",
+        "CouponCode.discount",
+        "CouponCode.invalidReason",
+        "CouponCode.validFrom",
+        "CouponCode.validTo",
+        "CouponCode.redeemedAt",
+        "CouponCode.redeemedOrderId",
+        "CouponCode.scopePath"
+       ],
+       "operation": "getCouponCode",
+       "provenance": "contract promotions.yaml GET /coupon-codes/{code}"
       }
      ]
     }
@@ -133,9 +151,9 @@
   "states": {
    "loading": "The offers promotions list.",
    "error": "Could not load. Names which read failed and leaves the offers promotions untouched.",
-   "emptyFirstRun": "No offers promotions yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the offers promotions are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No offers promotions yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, status, activeAt and the offers promotions are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -149,22 +167,13 @@
     "operationId": "getPromotion",
     "contract": "promotions",
     "purpose": "Read a promotion",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "evaluatePromotions",
-    "contract": "promotions",
-    "purpose": "Evaluate promotions against a cart",
-    "trigger": "onAction",
-    "invalidates": [
-     "listPromotions"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "getCouponCode",
     "contract": "promotions",
     "purpose": "Resolve a code the guest typed",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -189,8 +198,16 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-037"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-037",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Offers & promotions",
+    "differences": "Promo code entry is here in the prototype; the YAML puts applyCartPromoCode on GST-041."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {

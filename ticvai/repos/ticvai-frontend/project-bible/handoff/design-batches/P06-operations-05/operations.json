@@ -317,7 +317,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ScanSyncResult"
  },

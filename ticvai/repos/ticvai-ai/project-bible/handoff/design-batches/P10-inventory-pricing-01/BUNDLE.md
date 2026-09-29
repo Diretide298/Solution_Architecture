@@ -1,6 +1,6 @@
 # P10-inventory-pricing-01 — P10 · Inventory & Pricing
 
-**3 screens · 37 operations · 30 schemas · 13 permissions**
+**3 screens · 25 operations · 38 schemas · 11 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 13 permissions apply here:
-  `CAPACITY_CONFIGURE, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `CAPACITY_CONFIGURE, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID, PRICE_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **11 of these operations work offline**: applyManualDiscount, createOrder, getOrder, getProduct, holdOrder, listOrderRefunds, listOrders, listProductVariants
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,8 +60,8 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-005` | Inventory & Allocation View | listDetail | 19 | 1 | — |
-| `PTR-006` | Product Catalog (B2B Pricing) | listDetail | 17 | 0 | — |
+| `PTR-005` | Inventory & Allocation View | listDetail | 16 | 9 | — |
+| `PTR-006` | Product Catalog (B2B Pricing) | listDetail | 8 | 0 | — |
 | `PTR-007` | Availability Search | statusTracker | 1 | 0 | — |
 
 ## Thin screens in this batch
@@ -96,7 +95,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
     "PTR-002",
     "PTR-003",
     "PTR-008"
@@ -104,51 +102,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "fromFlows": true,
    "transitions": [
     {
-     "to": "PTR-008",
-     "trigger": "Receives vouchers",
-     "provenance": "flow F10 step 2→3",
-     "operation": "createOrder"
-    },
-    {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-002",
      "trigger": "Partner Dashboard",
      "carries": [
-      "accountId",
       "orderId"
      ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId and PTR-005 holds orderId, so an edge into it carries them"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-005 holds none of them, so the edge carries nothing and PTR-003 opens cold"
+    },
+    {
+     "to": "PTR-008",
+     "trigger": "Receives vouchers",
+     "provenance": "flow F10 step 2→3",
+     "operation": "createOrder",
      "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+      "orderId"
+     ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class).",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class). **Capacity writes removed 29 September** (M17-04); a partner no longer creates or amends a capacity envelope or sets channel allocations; it reads them and may still return its own unsold allocation (`relinquishChannelAllocation`).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act",
   "purpose": "See inventory & allocation view for this venue.",
-  "gaps": [
-   {
-    "operation": "getOrder",
-    "why": "**4 declared operations reach no component on this screen**: getOrder, getOrderStatement, listOrderRefunds, listOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -157,8 +138,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Performance id",
+       "operation": "listChannelCapacities",
+       "notes": "Sends `?performanceId=` to `listChannelCapacities`.",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every inventory allocation",
+       "label": "Every channel capacity",
        "bindsTo": "ChannelCapacity",
        "columns": [
         "ChannelCapacity.id",
@@ -176,6 +164,53 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listChannelCapacities",
        "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every refund",
+       "bindsTo": "Refund",
+       "columns": [
+        "Refund.id",
+        "Refund.orderId",
+        "Refund.batchId",
+        "Refund.fxRate",
+        "Refund.taxReversalEntryId",
+        "Refund.settleTo",
+        "Refund.fxVariance",
+        "Refund.amount",
+        "Refund.appliedPercentage",
+        "Refund.status",
+        "Refund.reason",
+        "Refund.requestedByPrincipalId"
+       ],
+       "operation": "listOrderRefunds",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -185,7 +220,70 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected inventory allocation",
+       "label": "The selected channel capacity",
+       "bindsTo": "ChannelCapacity",
+       "columns": [
+        "ChannelCapacity.id",
+        "ChannelCapacity.performanceId",
+        "ChannelCapacity.name",
+        "ChannelCapacity.seatCategoryId",
+        "ChannelCapacity.oversellAllowance",
+        "ChannelCapacity.oversellBasis",
+        "ChannelCapacity.capacity",
+        "ChannelCapacity.sold",
+        "ChannelCapacity.leased",
+        "ChannelCapacity.remaining",
+        "ChannelCapacity.hasChannelAllocations",
+        "ChannelCapacity.isSeated"
+       ],
+       "operation": "listChannelCapacities",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order statement",
+       "bindsTo": "OrderStatement",
+       "columns": [
+        "OrderStatement.orderId",
+        "OrderStatement.orderNumber",
+        "OrderStatement.currency",
+        "OrderStatement.currencyScale",
+        "OrderStatement.entries",
+        "OrderStatement.totalPaid",
+        "OrderStatement.totalRefunded",
+        "OrderStatement.currentBalance"
+       ],
+       "operation": "getOrderStatement",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/statement"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The channel allocation set",
        "bindsTo": "ChannelAllocationSet",
        "columns": [
         "ChannelAllocationSet.channelCapacityId",
@@ -206,124 +304,63 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Apply",
+       "label": "Apply manual discount",
        "operation": "applyManualDiscount",
        "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createChannelCapacity",
-       "provenance": "contract catalogue.yaml POST /channel-capacities"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Exchange",
+       "label": "Exchange order lines",
        "operation": "exchangeOrderLines",
        "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
       },
       {
        "kind": "secondaryButton",
-       "label": "Hold",
+       "label": "Hold order",
        "operation": "holdOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
       },
       {
        "kind": "secondaryButton",
-       "label": "Modify",
+       "label": "Modify order",
        "operation": "modifyOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
       },
       {
        "kind": "secondaryButton",
-       "label": "Release hold",
+       "label": "Release channel allocation",
        "operation": "relinquishChannelAllocation",
        "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reprint",
+       "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reschedule",
+       "label": "Reschedule order",
        "operation": "rescheduleOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
+       "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setChannelAllocations",
-       "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateChannelCapacity",
-       "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
-      },
-      {
        "kind": "destructiveButton",
-       "label": "Void",
+       "label": "Void order",
        "operation": "voidOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "label": "Create order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listChannelCapacities",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidOrder",
-       "label": "Void order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -333,44 +370,210 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmVoidOrder",
     "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A inventory allocation this affects should be identified in the dialog, not just counted.",
+    "trigger": "Void order",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A inventory allocation this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.",
     "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders"
+   },
+   {
+    "id": "formApplyManualDiscount",
+    "component": "modal",
+    "trigger": "Apply manual discount",
+    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ManualDiscountRequest",
+    "confirm": {
+     "label": "Apply manual discount",
+     "operation": "applyManualDiscount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "lineId",
+      "amount",
+      "percentage",
+      "reasonCode",
+      "approverPrincipalId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+   },
+   {
+    "id": "formExchangeOrderLines",
+    "component": "modal",
+    "trigger": "Exchange order lines",
+    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ExchangeOrderRequest",
+    "confirm": {
+     "label": "Exchange order lines",
+     "operation": "exchangeOrderLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outgoingLineIds",
+      "incomingLines",
+      "recordedAt",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+   },
+   {
+    "id": "formHoldOrder",
+    "component": "modal",
+    "trigger": "Hold order",
+    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold order",
+     "operation": "holdOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "label",
+      "holdUntil"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+   },
+   {
+    "id": "formModifyOrder",
+    "component": "modal",
+    "trigger": "Modify order",
+    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ModifyOrderRequest",
+    "confirm": {
+     "label": "Modify order",
+     "operation": "modifyOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "recordedAt",
+      "addLines",
+      "removeLineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+   },
+   {
+    "id": "formRelinquishChannelAllocation",
+    "component": "modal",
+    "trigger": "Release channel allocation",
+    "body": "**Collects what `relinquishChannelAllocation` sends before it is called.** Required: `channels`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release channel allocation",
+     "operation": "relinquishChannelAllocation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "channels",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
+   },
+   {
+    "id": "formReprintOrder",
+    "component": "modal",
+    "trigger": "Reprint order",
+    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reprint order",
+     "operation": "reprintOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "recordedAt",
+      "destination",
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+   },
+   {
+    "id": "formRescheduleOrder",
+    "component": "modal",
+    "trigger": "Reschedule order",
+    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reschedule order",
+     "operation": "rescheduleOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetPerformanceId",
+      "recordedAt",
+      "lineIds",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
    }
   ],
   "states": {
    "loading": "The inventory allocation list.",
    "error": "Could not load. Names which read failed and leaves the inventory allocation untouched.",
-   "emptyFirstRun": "No inventory allocation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the inventory allocation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No inventory allocation yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on performanceId and the inventory allocation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "getChannelAllocations",
     "contract": "catalogue",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createOrder",
     "contract": "orders",
     "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "applyManualDiscount",
     "contract": "orders",
     "purpose": "Apply a discount a cashier chose",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "createChannelCapacity",
-    "contract": "catalogue",
-    "purpose": "Create a capacity envelope",
     "trigger": "onAction",
     "invalidates": [
      "listChannelCapacities"
@@ -389,13 +592,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getOrder",
     "contract": "orders",
     "purpose": "Read an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getOrderStatement",
     "contract": "orders",
     "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "holdOrder",
@@ -416,7 +619,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "listOrderRefunds",
     "contract": "orders",
     "purpose": "List refunds against an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listOrders",
@@ -470,24 +673,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     ]
    },
    {
-    "operationId": "setChannelAllocations",
-    "contract": "catalogue",
-    "purpose": "Allocate envelope capacity across channels",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
-    "operationId": "updateChannelCapacity",
-    "contract": "catalogue",
-    "purpose": "Amend an envelope",
-    "trigger": "onAction",
-    "invalidates": [
-     "listChannelCapacities"
-    ]
-   },
-   {
     "operationId": "voidOrder",
     "contract": "orders",
     "purpose": "Void an order",
@@ -510,11 +695,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "ChannelAllocationSet.channelCapacityId",
-    "ChannelAllocationSet.capacity",
-    "ChannelAllocationSet.allocations",
-    "ChannelAllocationSet.generalPoolUnits",
-    "ChannelAllocationSet.totalSold"
+    "ChannelCapacity.id",
+    "ChannelCapacity.performanceId",
+    "ChannelCapacity.name",
+    "ChannelCapacity.seatCategoryId",
+    "ChannelCapacity.oversellAllowance"
    ]
   },
   "wireframe": {
@@ -566,51 +751,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-002",
     "PTR-003"
    ],
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-006 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Read only since 29 September** (decided 17 September, M17-04; applied 29 September, P29). Partners never create products, prices or performances through the API or this portal; product configuration stays in the venue back office (BO-007, BO-008, BO-009), and a partner reads the products assigned to its channel (`listProducts`, `getProduct`, `listProductVariants`) and its partner price lists (`listPriceLists`, `getPriceList`, `listPrices`). The create, set, copy, transition and update actions were removed with the partner audience on those catalogue writes.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getPriceList` reads one of them — list, select, act",
-  "purpose": "Find product catalog (b2b pricing) for this venue.",
-  "gaps": [
-   {
-    "operation": "getProduct",
-    "why": "**5 declared operations reach no component on this screen**: getProduct, listAlternativeCodes, listPriceLists, listPrices, listProductVariants. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "purpose": "See the products assigned to this partner and the partner prices, read only.",
   "layout": {
    "template": "split",
    "regions": [
@@ -619,8 +774,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every product catalog (b2b",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -638,6 +814,70 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every alternative code",
+       "bindsTo": "AlternativeCode",
+       "columns": [
+        "AlternativeCode.code",
+        "AlternativeCode.partnerId",
+        "AlternativeCode.partnerName",
+        "AlternativeCode.variantId",
+        "AlternativeCode.note"
+       ],
+       "operation": "listAlternativeCodes",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/alternative-codes"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every price list",
+       "bindsTo": "PriceList",
+       "columns": [
+        "PriceList.id",
+        "PriceList.code",
+        "PriceList.name",
+        "PriceList.venueId",
+        "PriceList.currency",
+        "PriceList.currencyScale",
+        "PriceList.channels",
+        "PriceList.validFrom",
+        "PriceList.validTo",
+        "PriceList.priority"
+       ],
+       "operation": "listPriceLists",
+       "provenance": "contract catalogue.yaml GET /price-lists"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every price",
+       "bindsTo": "Price",
+       "columns": [
+        "Price.id",
+        "Price.priceListId",
+        "Price.variantId",
+        "Price.amount",
+        "Price.taxCodeId"
+       ],
+       "operation": "listPrices",
+       "provenance": "contract catalogue.yaml GET /price-lists/{priceListId}/prices"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every product variant",
+       "bindsTo": "ProductVariant",
+       "columns": [
+        "ProductVariant.id",
+        "ProductVariant.productId",
+        "ProductVariant.sku",
+        "ProductVariant.axisValues",
+        "ProductVariant.name",
+        "ProductVariant.barcode",
+        "ProductVariant.isDefault",
+        "ProductVariant.isActive"
+       ],
+       "operation": "listProductVariants",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
       }
      ]
     },
@@ -647,7 +887,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected product catalog (b2b",
+       "label": "The selected product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.categoryId",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.isStockTracked"
+       ],
+       "operation": "getProduct",
+       "provenance": "contract catalogue.yaml GET /products/{productId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The price list",
        "bindsTo": "PriceList",
        "columns": [
         "PriceList.id",
@@ -672,63 +937,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Copy",
-       "operation": "copyPriceList",
-       "provenance": "contract catalogue.yaml POST /price-lists/{priceListId}/copy"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createPriceList",
-       "provenance": "contract catalogue.yaml POST /price-lists"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createProduct",
-       "provenance": "contract catalogue.yaml POST /products"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resolve",
+       "label": "Resolve product by code",
        "operation": "resolveProductByCode",
        "provenance": "contract catalogue.yaml GET /products/resolve"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setAlternativeCodes",
-       "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setPrices",
-       "provenance": "contract catalogue.yaml PUT /price-lists/{priceListId}/prices"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setProductAttributes",
-       "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Transition",
-       "operation": "transitionProductLifecycle",
-       "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updatePriceList",
-       "provenance": "contract catalogue.yaml PATCH /price-lists/{priceListId}"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateProduct",
-       "provenance": "contract catalogue.yaml PATCH /products/{productId}"
       }
      ]
     }
@@ -737,9 +948,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The product catalog (b2b list.",
    "error": "Could not load. Names which read failed and leaves the product catalog (b2b untouched.",
-   "emptyFirstRun": "No product catalog (b2b yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the product catalog (b2b are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No product is assigned to this partner yet. **Offers no create action** — a partner never creates products or prices (M17-04); it says to ask the venue to assign products and a partner price list.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the product catalog (b2b are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -752,46 +963,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getPriceList",
     "contract": "catalogue",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "copyPriceList",
-    "contract": "catalogue",
-    "purpose": "Copy a price list, optionally with an adjustment",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "createPriceList",
-    "contract": "catalogue",
-    "purpose": "Create a price list",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "createProduct",
-    "contract": "catalogue",
-    "purpose": "Create a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
+    "trigger": "onAction"
    },
    {
     "operationId": "getProduct",
     "contract": "catalogue",
     "purpose": "Read a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listAlternativeCodes",
     "contract": "catalogue",
     "purpose": "External identifiers for a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listPriceLists",
@@ -803,73 +987,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "listPrices",
     "contract": "catalogue",
     "purpose": "List prices in a list",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listProductVariants",
     "contract": "catalogue",
     "purpose": "List generated variants",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "resolveProductByCode",
     "contract": "catalogue",
     "purpose": "Resolve a partner code to a product",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "setAlternativeCodes",
-    "contract": "catalogue",
-    "purpose": "Set external identifiers",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "setPrices",
-    "contract": "catalogue",
-    "purpose": "Set prices in bulk",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "setProductAttributes",
-    "contract": "catalogue",
-    "purpose": "Set the attribute axes for a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "transitionProductLifecycle",
-    "contract": "catalogue",
-    "purpose": "Move a product through its lifecycle",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "updatePriceList",
-    "contract": "catalogue",
-    "purpose": "Amend a price list",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
-   },
-   {
-    "operationId": "updateProduct",
-    "contract": "catalogue",
-    "purpose": "Update a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "listProducts"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -885,11 +1015,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A shared product link after the product retired.** Shows what replaced it where a successor exists, and the catalogue where none does.",
    "preloaded": [
-    "PriceList.id",
-    "PriceList.code",
-    "PriceList.name",
-    "PriceList.venueId",
-    "PriceList.currency"
+    "Product.id",
+    "Product.code",
+    "Product.name",
+    "Product.description",
+    "Product.kind"
    ]
   },
   "wireframe": {
@@ -942,8 +1072,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-002",
     "PTR-003",
     "PTR-008"
    ],
@@ -956,30 +1084,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "getAvailability"
     },
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-007 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -991,8 +1098,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": "getAvailability",
-    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getAvailability` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract catalogue.yaml GET /availability"
    }
   ],
   "layout": {
@@ -1000,16 +1107,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Availability",
+       "operation": "getAvailability",
+       "notes": "Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract catalogue.yaml GET /availability"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The availability search list.",
    "error": "Could not load. Names which read failed and leaves the availability search untouched.",
-   "emptyFirstRun": "No availability search yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the availability search are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No availability search yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1077,44 +1191,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "ManualDiscountRequest",
   "responds": "Order"
  },
- "copyPriceList": {
-  "method": "POST",
-  "path": "/price-lists/{priceListId}/copy",
-  "contract": "catalogue",
-  "summary": "Copy a price list, optionally with an adjustment",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "createChannelCapacity": {
-  "method": "POST",
-  "path": "/channel-capacities",
-  "contract": "catalogue",
-  "summary": "Create a capacity envelope",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateEnvelopeRequest",
-  "responds": "ChannelCapacity"
- },
  "createOrder": {
   "method": "POST",
   "path": "/orders",
@@ -1133,44 +1209,6 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "CreateOrderRequest",
   "responds": "Order"
- },
- "createPriceList": {
-  "method": "POST",
-  "path": "/price-lists",
-  "contract": "catalogue",
-  "summary": "Create a price list",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreatePriceListRequest",
-  "responds": "PriceList"
- },
- "createProduct": {
-  "method": "POST",
-  "path": "/products",
-  "contract": "catalogue",
-  "summary": "Create a product",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "CreateProductRequest",
-  "responds": "Product"
  },
  "exchangeOrderLines": {
   "method": "POST",
@@ -1210,10 +1248,35 @@ Method, path, parameters, request and response for every operation these screens
     "name": "channelCapacityId",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PerformanceAvailabilityPage"
  },
  "getChannelAllocations": {
   "method": "GET",
@@ -1237,7 +1300,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
  },
@@ -1316,7 +1385,7 @@ Method, path, parameters, request and response for every operation these screens
   "method": "GET",
   "path": "/channel-capacities",
   "contract": "catalogue",
-  "summary": "List capacity envelopes",
+  "summary": "List channel capacities",
   "permission": "PRODUCT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -1363,7 +1432,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Refund"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -1522,6 +1591,21 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -1654,158 +1738,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "OrderResumeResult"
  },
- "setAlternativeCodes": {
-  "method": "PUT",
-  "path": "/products/{productId}/alternative-codes",
-  "contract": "catalogue",
-  "summary": "Set external identifiers",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AlternativeCode"
- },
- "setChannelAllocations": {
-  "method": "PUT",
-  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
-  "contract": "catalogue",
-  "summary": "Allocate envelope capacity across channels",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ChannelAllocationSet"
- },
- "setPrices": {
-  "method": "PUT",
-  "path": "/price-lists/{priceListId}/prices",
-  "contract": "catalogue",
-  "summary": "Set prices in bulk",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "setProductAttributes": {
-  "method": "PUT",
-  "path": "/products/{productId}/attributes",
-  "contract": "catalogue",
-  "summary": "Set the attribute axes for a product",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "transitionProductLifecycle": {
-  "method": "POST",
-  "path": "/products/{productId}/lifecycle",
-  "contract": "catalogue",
-  "summary": "Move a product through its lifecycle",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Product"
- },
- "updateChannelCapacity": {
-  "method": "PATCH",
-  "path": "/channel-capacities/{channelCapacityId}",
-  "contract": "catalogue",
-  "summary": "Amend an envelope",
-  "permission": "CAPACITY_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ChannelCapacity"
- },
- "updatePriceList": {
-  "method": "PATCH",
-  "path": "/price-lists/{priceListId}",
-  "contract": "catalogue",
-  "summary": "Amend a price list",
-  "permission": "PRICE_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "PriceList"
- },
- "updateProduct": {
-  "method": "PATCH",
-  "path": "/products/{productId}",
-  "contract": "catalogue",
-  "summary": "Update a product",
-  "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "UpdateProductRequest",
-  "responds": "Product"
- },
  "voidOrder": {
   "method": "POST",
   "path": "/orders/{orderId}/voids",
@@ -1863,6 +1795,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CatalogueConfigStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "active",
+   "inactive",
+   "retired"
+  ],
+  "description": "**The status of a catalogue configuration record** (29 September, data model DM3): price lists, rates, fees and fee rules, tax profiles and rules, calculation and rounding profiles, package pricing and templates. `draft` is being prepared and is never used by a calculation; `active` is in use from its effective date; `inactive` is switched off and may be switched back; `retired` is kept for history only. A record already used by a live price becomes `active` through a published change request, not by an edit."
+ },
  "Channel": {
   "type": "string",
   "enum": [
@@ -1914,6 +1856,75 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "nullable": true,
     "description": "Unsold units return to the general pool at this time. How distribution holds are freed close to a performance without someone remembering to do it.\n"
+   },
+   "salesChannelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The channel profile (`catalogue.sales_channel`) this allocation serves (29 September, data model DM3)."
+   },
+   "allocationType": {
+    "type": "string",
+    "enum": [
+     "sharedPool",
+     "dedicated",
+     "percentage",
+     "dynamic"
+    ],
+    "default": "dedicated",
+    "description": "How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row."
+   },
+   "minimumUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "replenishmentRule": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`{sourceChannelId, trigger, thresholdUnits, sharePercent, units}`."
+   },
+   "waitlistBehavior": {
+    "type": "string",
+    "enum": [
+     "none",
+     "joinWaitlist",
+     "notifyOnRelease"
+    ],
+    "default": "none"
+   },
+   "releaseThresholdUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "releaseHoursBeforeEvent": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "Alternative to `releaseAt`, relative to the performance start."
+   },
+   "contractualUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "Units a partner agreement guarantees; rebalancing never goes below it."
+   },
+   "minimumGuaranteedUnits": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "isFrozen": {
+    "type": "boolean",
+    "default": false,
+    "description": "Excluded from rebalancing."
    }
   }
  },
@@ -2000,13 +2011,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "minimum": 0
    },
    "sold": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Units sold. **Maintained on write** (decided 29 September, SD-023): raised by `convertInventoryHold` in the order transaction and by consumption a workstation reports on `renewInventoryHold` or `relinquishInventoryHold`, lowered when a refund or cancellation returns the units. Always `capacity + oversellAllowance = sold + leased + remaining`.\n"
    },
    "leased": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023)."
    },
    "remaining": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "What can still be held. **Decremented at the hold with a guarded statement** (`remaining >= n`) under the row lock, never at the sale, so two buyers cannot both take the last unit (SD-023, 29 September).\n"
    },
    "hasChannelAllocations": {
     "type": "boolean",
@@ -2015,32 +2035,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "isSeated": {
     "type": "boolean",
     "description": "Seated envelopes cannot be leased and are blocked offline. A seat map is not a count.\n"
-   }
-  }
- },
- "CreateEnvelopeRequest": {
-  "type": "object",
-  "required": [
-   "performanceId",
-   "name",
-   "capacity"
-  ],
-  "properties": {
-   "performanceId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "seatCategoryId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "capacity": {
-    "type": "integer",
-    "minimum": 0
    }
   }
  },
@@ -2056,31 +2050,90 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
     "type": "string",
     "format": "uuid"
    },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Carried from the cart line at checkout; stored on `orders.order_line` and sent in `order.completed` lines.\n"
+   },
    "performanceId": {
     "type": "string",
     "format": "uuid"
    },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
    "inventoryHoldId": {
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
    },
    "seatIds": {
     "type": "array",
+    "maxItems": 50,
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     },
-    "description": "Seated products only. Not available offline."
+    "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."
+   },
+   "attributes": {
+    "$ref": "#/components/schemas/OrderLineAttributes"
    },
    "quantity": {
     "type": "integer",
     "minimum": 1
+   },
+   "eligibilityDeclaration": {
+    "type": "array",
+    "nullable": true,
+    "x-ticvai-note": "One row per declared guest in `orders.order_line_eligibility` (named on `OrderLine`), because an array of objects is a child table's rows, not a column.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "ageBand": {
+       "type": "string",
+       "enum": [
+        "infant",
+        "child",
+        "junior",
+        "adult",
+        "senior"
+       ],
+       "description": "Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+."
+      },
+      "ageYears": {
+       "type": "integer",
+       "nullable": true
+      },
+      "heightBandIndex": {
+       "type": "integer",
+       "nullable": true
+      },
+      "confidentSwimmer": {
+       "type": "boolean",
+       "nullable": true,
+       "description": "**Derived, kept for the gate check** (decided 29 September, rev 3 REV3-26). The swim question is a consent: the answer is a `marketing.BookingConsentRecord` of kind `swim`, and this is filled from it (true for a `yes` covering this person, whether answered for them or once for the booking). A value sent that contradicts the record is ignored and the record wins. No longer the place a swim answer is captured.\n"
+      },
+      "guardianSigned": {
+       "type": "boolean"
+      }
+     }
+    },
+    "description": "What was declared for each guest on this line, kept as the record staff check at the gate."
    },
    "quotedUnitPrice": {
     "allOf": [
@@ -2096,7 +2149,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dataMaskValues": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "**Deliberately open.** Custom fields keyed by the venue's data mask: the field definitions travel in the catalogue bundle (`catalogue.CatalogueBundle.payload`), so the keys are the venue's to define, as on `catalogue`'s own `dataMaskValues`.\n"
    }
   }
  },
@@ -2113,7 +2167,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id": {
     "type": "string",
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key."
+    "description": "Client-generated ULID. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
    },
    "venueId": {
     "type": "string",
@@ -2123,7 +2177,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "#/components/schemas/Channel"
    },
    "shiftId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "subjectId": {
     "type": "string",
@@ -2153,92 +2208,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "CreatePriceListRequest": {
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "venueId",
-   "channels"
-  ],
-  "properties": {
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "channels": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "$ref": "#/components/schemas/Channel"
-    }
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "priority": {
-    "type": "integer",
-    "default": 0
-   }
-  }
- },
- "CreateProductRequest": {
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "kind",
-   "venueId"
-  ],
-  "properties": {
-   "code": {
-    "type": "string",
-    "maxLength": 64,
-    "pattern": "^[A-Za-z0-9_-]+$"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/ProductKind"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/Channel"
-    }
-   },
-   "entitlementTemplateId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "dataMaskValues": {
-    "type": "object",
-    "additionalProperties": true
-   }
-  }
- },
  "ExchangeOrderRequest": {
   "type": "object",
   "required": [
@@ -2250,13 +2219,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of this exchange, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "outgoingLineIds": {
     "type": "array",
     "minItems": 1,
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "incomingLines": {
@@ -2280,6 +2251,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ExchangeRateDecimal": {
+  "type": "string",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
+ },
+ "GuestListing": {
+  "type": "string",
+  "enum": [
+   "bookable",
+   "infoOnly",
+   "hidden"
+  ],
+  "default": "bookable",
+  "description": "**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
  "ManualDiscountRequest": {
   "type": "object",
   "x-ticvai-persistence": "none — request only",
@@ -2291,10 +2286,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of this discount, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "lineId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true,
     "description": "Omit to discount the order rather than a line."
    },
@@ -2338,7 +2335,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID **of this modification, not of the order** — the order is the path's `orderId`. It is the modification's idempotency key and must equal the `Idempotency-Key` header.\n"
    },
    "addLines": {
     "type": "array",
@@ -2349,7 +2347,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "removeLineIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "reason": {
@@ -2382,10 +2381,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client ULID from `CreateOrderRequest.id`."
    },
    "orderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
    },
    "channel": {
     "allOf": [
@@ -2430,6 +2433,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "droppedPromotions": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "budgetCapReached"
+       ]
+      }
+     }
+    }
+   },
    "totalPriceVariance": {
     "allOf": [
      {
@@ -2460,12 +2490,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "subjectId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "holdLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -2507,7 +2552,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "outgoingValue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2529,25 +2575,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "newLineIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "revokedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "issuedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    }
   }
  },
  "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-retired-columns": [
+   "promotion_id",
+   "name",
+   "reason"
+  ],
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateOrderLine"
@@ -2588,8 +2642,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "entitlementIds": {
       "type": "array",
+      "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       }
      },
      "crossRegionRightIds": {
@@ -2598,6 +2654,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "string"
       },
       "description": "Redemption rights propagated to other cells for this line."
+     },
+     "reprintCount": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "readOnly": true,
+      "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
+     },
+     "venueId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "discounts": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.",
+      "items": {
+       "$ref": "#/components/schemas/OrderLineDiscount"
+      }
      }
     }
    }
@@ -2630,18 +2707,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "refundId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "revokedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "issuedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    }
   }
@@ -2678,7 +2758,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        ]
       },
       "lineId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       },
       "detail": {
        "type": "string"
@@ -2706,7 +2787,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderNumber": {
     "type": "string"
@@ -2804,6 +2886,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
  },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2836,10 +2978,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -2858,7 +3002,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "The amount in `tenderCurrency`, at that currency's own scale."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
    },
@@ -2902,7 +3050,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",
@@ -2916,6 +3102,123 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "syncedAt": {
     "type": "string",
     "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "PerformanceAvailability": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed on read from catalogue.channel_capacity and live leases",
+  "description": "Remaining capacity of one channel capacity of one performance (rev 3 REV3-1).",
+  "required": [
+   "channelCapacityId",
+   "performanceId",
+   "capacity",
+   "sold",
+   "leased",
+   "remaining"
+  ],
+  "properties": {
+   "channelCapacityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The performance this channel capacity belongs to (`ChannelCapacity.performanceId`), so rows for several performances can be told apart."
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "The performance's start, so a time tile and its day part (morning, afternoon, evening, split at the venue's `BookingFlowConfig.dayPartBoundaries`) come from this one call (rev 3 REV3-1)."
+   },
+   "capacity": {
+    "type": "integer"
+   },
+   "sold": {
+    "type": "integer"
+   },
+   "leased": {
+    "type": "integer",
+    "description": "Held by terminals but not yet sold."
+   },
+   "remaining": {
+    "type": "integer"
+   },
+   "byChannel": {
+    "type": "array",
+    "description": "Per-channel position. A guest seeing sold out online while units remain at the counter is correct behaviour, not a defect.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "channel": {
+       "$ref": "#/components/schemas/Channel"
+      },
+      "allocated": {
+       "type": "integer"
+      },
+      "sold": {
+       "type": "integer"
+      },
+      "remaining": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
+ "PerformanceAvailabilityPage": {
+  "x-ticvai-persistence": "none — computed on read",
+  "description": "The `getAvailability` answer (named 29 September, rev 3 REV3-1).",
+  "allOf": [
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Page"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "items": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/PerformanceAvailability"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "Price": {
+  "x-ticvai-persistence": "catalogue.price",
+  "type": "object",
+  "required": [
+   "priceListId",
+   "variantId",
+   "amount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "priceListId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid",
     "nullable": true
    }
   }
@@ -2951,14 +3254,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "pattern": "^[A-Z]{3}$",
     "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire, removed from the table** — a client should not walk a hierarchy to read a figure, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`.\n"
    },
    "currencyScale": {
     "type": "integer",
     "minimum": 0,
     "maximum": 4,
     "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else — storing it per row is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a client reading a figure should not walk a hierarchy to know what it means, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a workstation with its own currency is a misconfiguration.**\n"
    },
    "channels": {
     "type": "array",
@@ -2979,6 +3282,129 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "priority": {
     "type": "integer",
     "description": "Where lists overlap, higher priority wins."
+   },
+   "description": {
+    "type": "string",
+    "nullable": true,
+    "description": "Price list master fields (29 September, data model DM3), set with `setPriceListMaster` (ADM-058)."
+   },
+   "priceListType": {
+    "type": "string",
+    "enum": [
+     "standardRetail",
+     "venue",
+     "attraction",
+     "event",
+     "membership",
+     "group",
+     "corporate",
+     "b2b",
+     "reseller",
+     "ota",
+     "internal",
+     "specialMarket"
+    ],
+    "default": "standardRetail"
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CatalogueConfigStatus"
+     }
+    ],
+    "default": "active"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "brand": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "businessUnit": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "countryCode": {
+    "type": "string",
+    "maxLength": 2,
+    "nullable": true,
+    "pattern": "^[A-Z]{2}$"
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "global",
+     "country",
+     "market",
+     "brand",
+     "venue",
+     "event",
+     "businessUnit"
+    ],
+    "default": "venue"
+   },
+   "defaultPriceCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roundingProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "priceResolutionPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "allowOverrides": {
+    "type": "boolean",
+    "default": false
+   },
+   "allowInheritance": {
+    "type": "boolean",
+    "default": true
+   },
+   "allowMultipleCurrencies": {
+    "type": "boolean",
+    "default": false
+   },
+   "allowProductSpecificRates": {
+    "type": "boolean",
+    "default": true
+   },
+   "clonedFromPriceListId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "currentVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The active `catalogue.price_list_version`."
    }
   }
  },
@@ -3003,6 +3429,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "code": {
     "type": "string",
     "maxLength": 64
+   },
+   "familyKey": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[A-Za-z0-9_-]+$",
+    "nullable": true,
+    "x-ticvai-unique": "venue",
+    "description": "**The same product at another location** (decided 29 September, rev 3 REV3-18). Optional. A tenant that sells one attraction at several venues gives each venue's product the same key, e.g. `aquarium-entry`; the key names the family across the tenant and each venue has at most one product in it, so a second product at the same venue with the key is refused with `409 duplicate-code`. **What it is for:** when a guest changes location on the booking screen (the 'Booking at' switcher, `BookingFlowConfig.locationSwitcher`), lines whose product shares a `familyKey` with a product at the new venue are carried over to that product, with times and prices refreshed; every other line is cleared. Null means the product belongs to no family and its lines always clear on a switch. Compared case-insensitively, like `code`.\n"
    },
    "name": {
     "type": "string",
@@ -3051,12 +3485,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
    },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Taken from their `fnb.product` and `retail.product`, 20 September.** `catalogue.product_category` has existed since 20 August with two operations and nothing could be filed under it — a merchandise hierarchy with a tree and no leaves. Their per-domain product tables both carried this column and ours did not.\n"
+   },
    "lifecycleState": {
     "$ref": "#/components/schemas/ProductLifecycleState"
    },
    "isSellable": {
     "type": "boolean",
-    "description": "True only when live **and** carried by a published bundle. Approval and publication are different acts.\n"
+    "readOnly": true,
+    "description": "True only when live **and** carried by a published bundle. Approval and publication are different acts.\n**Derived, never set.** It changes when `transitionProductLifecycle` moves the product and when `publishBundle` carries it, so `updateProduct` does not take it — `withdraw` is how a product stops selling.\n"
+   },
+   "isStockTracked": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Taken from their `fnb.product`, 20 September.** Whether a sale decrements stock, which is not what `isSellable` asks. A ticket is sellable and tracks no stock; a bottle of water is both. Without it, an F&B sale cannot tell inventory whether to move.\n"
    },
    "hasVariants": {
     "type": "boolean"
@@ -3066,7 +3512,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "segmentTags": {
     "type": "array",
-    "description": "7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n",
+    "description": "7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n**A level is a tag under `level/`** (decided 29 September, rev 3 REV3-19): `level/beginner`, `level/intermediate`, `level/advanced`, `level/expert` (proposed codes, client to correct). A guest screen filters on it with `listProducts` `segmentTag`, and the words a guest reads beside each option come from `ProductCategory.description`, not from the tag.\n",
     "items": {
      "type": "string"
     }
@@ -3096,12 +3542,160 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "object",
     "additionalProperties": true,
     "description": "Custom fields. JSONB-backed, defined by the venue's data mask."
+   },
+   "guestListing": {
+    "$ref": "#/components/schemas/GuestListing"
+   },
+   "notBookableLabel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 REV3-14). Each value at most 60 characters. Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.\n"
+   },
+   "salesContact": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductSalesContact"
+     }
+    ],
+    "nullable": true,
+    "description": "**Who a guest contacts to book a view-only product** (decided 29 September, W3), e.g. a training course listed with full details and no Book button. Shown as *Call sales* and *Email sales* on an `infoOnly` product. Null means the venue's own contact (white-label `getTenantAppStatus.contact`). Ignored unless `guestListing` is `infoOnly`.\n"
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+   },
+   "displayTags": {
+    "type": "array",
+    "maxItems": 6,
+    "items": {
+     "$ref": "#/components/schemas/ProductDisplayTag"
+    },
+    "description": "**Short facts a guest reads on the ticket card and under *Read more***: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). Not `segmentTags`, which are for reporting and segmentation and which a guest never reads.\n**Derived on read when none are set.** When the venue has written no tags, a read returns tags derived from the product's duration (`clock`), entitlement validity (`calendar`) and the eligibility rule's `minHeightCm` (`height`), each marked `derived: true`; they are never stored. Once the venue writes any tag, only what it wrote is returned. Whether the guest screen shows them is `BookingFlowConfig.ticketTags` (white-label).\n"
+   },
+   "media": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "$ref": "#/components/schemas/ProductMedia"
+    },
+    "description": "**The product's own photos and video** (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each product's primary image, so two tickets in one category no longer share the category's picture (`ProductCategory.imageAssetId`).\nEvery `assetId` names an asset of the asset library (`assets.yaml` `MediaAsset`) in status `ready` whose kind matches `kind`; anything else is a `422`. **Exactly one item is `isPrimary`** when the list is not empty, and an `assetId` appears once; otherwise `400`. Setting the list records each reference as asset usage (`MediaUsage` with `surface: product`, `referenceId` the product id, `isLive` true while the product is listed to guests), which is what stops a used asset being archived from under the product.\n"
+   },
+   "consentQuestionIds": {
+    "type": "array",
+    "maxItems": 10,
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
+   },
+   "requiresTimeWindow": {
+    "type": "boolean",
+    "default": false,
+    "description": "**True for a space sold by the hour**, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). The product is the room type (*focus pod*, *majlis*, *boardroom*, *auditorium*), never a named room; its lengths are a `length` axis (`setProductAttributes`) whose values carry `durationMinutes`, and each length is a variant priced on its own in the price list, so price is the room rate for that length. The cart line carries the booked start and end (orders), the end being the start plus the chosen variant's `durationMinutes`; `resources.listProductStartTimes` supplies the start times for a variant and a date and `allocateResources` picks the room from the product's resource requirements (`setExperienceResourceRequirements`) at checkout. True requires every active variant to have a `durationMinutes`; otherwise `422`.\n"
+   },
+   "productOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The product owner (29 September, data model DM3), set with `setProductContextOwnership`. `responsibleDepartmentId` is the owning department."
+   },
+   "operationalContact": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "A principal id or a name, as the context screen takes it."
+   },
+   "businessUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `ledger.legal_entity`, read through finance."
+   },
+   "attractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "siteId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The brand, as the context screen names it (a catalogue brand category)."
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "salesTerritory": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   }
+  }
+ },
+ "ProductDisplayTag": {
+  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
+  "type": "object",
+  "required": [
+   "kind",
+   "label"
+  ],
+  "description": "One short fact on a ticket card (decided 29 September, 23SEP-3). `kind` picks the icon.",
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "clock",
+     "height",
+     "free",
+     "calendar",
+     "id"
+    ],
+    "description": "`clock` a duration, `height` a height rule, `free` something included free, `calendar` a validity, `id` a document the guest must bring."
+   },
+   "label": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
+   },
+   "derived": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "True on a tag the server derived on read because the venue set none. Never sent."
    }
   }
  },
  "ProductKind": {
   "type": "string",
-  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n",
   "enum": [
    "admission",
    "timedAdmission",
@@ -3127,6 +3721,75 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "withdrawn",
    "archived"
   ]
+ },
+ "ProductMedia": {
+  "x-ticvai-persistence": "catalogue.product_media",
+  "type": "object",
+  "required": [
+   "assetId",
+   "kind",
+   "isPrimary"
+  ],
+  "description": "One photo or video of a product, referencing the asset library (decided 29 September, 23SEP-4). One row per product and asset, so the asset library can answer which products use an asset.\n",
+  "properties": {
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "image",
+     "video"
+    ]
+   },
+   "isPrimary": {
+    "type": "boolean",
+    "default": false,
+    "description": "The item *Read more* opens on and a listing shows. Exactly one per product."
+   },
+   "displayOrder": {
+    "type": "integer",
+    "default": 100
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   }
+  }
+ },
+ "ProductSalesContact": {
+  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
+  "type": "object",
+  "description": "Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n",
+  "minProperties": 1,
+  "properties": {
+   "phone": {
+    "type": "string",
+    "maxLength": 32,
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "maxLength": 254,
+    "nullable": true
+   },
+   "note": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."
+   }
+  }
  },
  "ProductVariant": {
   "x-ticvai-persistence": "catalogue.variant",
@@ -3156,9 +3819,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "string"
     }
    },
+   "name": {
+    "type": "string",
+    "maxLength": 150,
+    "nullable": true,
+    "description": "**Taken from their variant tables, 20 September.** `axisValues` gives `{size: L}` and no string a guest can read. A menu showing *Large* needs somewhere for the word to live.\n"
+   },
+   "barcode": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "**Taken from their variant tables, 20 September.** `catalogue.alternative_code` is a partner's own code for a variant and **requires `partnerId`**, so a manufacturer's EAN had nowhere to go. One per variant against many per variant is a different cardinality and belongs in a different place — and a POS scan should be an indexed column lookup, not a join.\n"
+   },
+   "isDefault": {
+    "type": "boolean",
+    "default": false,
+    "description": "Taken from their variant tables. Which variant a product page opens on. Ours had no way to say, so a three-size drink opened on whichever row sorted first.\n"
+   },
    "isActive": {
     "type": "boolean",
     "description": "False when retired. Retired variants are never deleted — orders reference them."
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**Who this ticket type is for and what it includes**, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). Each language value at most 300 characters; longer is a `400`. Set with `updateProductVariant`. Whether the guest screen shows it is `BookingFlowConfig.cardInfo` (white-label).\n"
    }
   }
  },
@@ -3174,13 +3863,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "batchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "readOnly": true,
     "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
@@ -3265,31 +3967,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "UpdateProductRequest": {
-  "type": "object",
-  "minProperties": 1,
-  "properties": {
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "description": {
-    "type": "string"
-   },
-   "isSellable": {
-    "type": "boolean"
-   },
-   "channels": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/Channel"
-    }
-   },
-   "dataMaskValues": {
-    "type": "object",
-    "additionalProperties": true
-   }
-  }
+ "VoidReason": {
+  "type": "string",
+  "description": "**The void reason list** (decided 28 September, audit R125 (4)): the one list `voidOrder` takes, and the list `fnb.amendFnbOrder` and `fnb.cancelFnbOrder` point to. `other` requires a note (audit R222), and the notes are reviewed quarterly to add real reasons. Proposed, client to correct.\n",
+  "enum": [
+   "guestChangedMind",
+   "enteredInError",
+   "itemUnavailable",
+   "qualityIssue",
+   "duplicate",
+   "other"
+  ]
  }
 }
 ```

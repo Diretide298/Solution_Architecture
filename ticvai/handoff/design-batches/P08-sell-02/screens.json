@@ -1331,6 +1331,13 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "listPerformances",
+       "notes": "Opening days and performances placed in the venue calendar. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window as `from`/`to` and the category filter as `categoryId`.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
+      {
        "kind": "datePicker",
        "label": "From",
        "operation": "listPerformances",
@@ -1886,10 +1893,7 @@
     {
      "to": "BO-011",
      "trigger": "Packages & Bundles",
-     "carries": [
-      "bundleId"
-     ],
-     "provenance": "derived — BO-011 declares entryState.params bundleId, comboId, productId, version and BO-102 holds bundleId, so an edge into it carries them"
+     "provenance": "derived — BO-011 declares entryState.params bundleId, comboId, productId, version and BO-102 holds none of them, so the edge carries nothing and BO-011 opens cold"
     },
     {
      "to": "BO-012",
@@ -1994,10 +1998,7 @@
     {
      "to": "BO-119",
      "trigger": "Cross-Sell, Upsell & Recommendation Rules",
-     "carries": [
-      "ruleId"
-     ],
-     "provenance": "derived — BO-119 declares entryState.params ruleId and BO-102 holds ruleId, so an edge into it carries them"
+     "provenance": "derived — BO-119 declares entryState.params ruleId and BO-102 holds none of them, so the edge carries nothing and BO-119 opens cold"
     },
     {
      "to": "BO-120",
@@ -2192,10 +2193,18 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "getUpsellSuggestions",
-    "contract": "promotions",
-    "purpose": "What to offer this basket",
-    "trigger": "onLoad"
+    "operationId": "decideRecommendations",
+    "contract": "ai",
+    "purpose": "Fill a recommendation slot",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordRecommendationEvents",
+    "contract": "ai",
+    "purpose": "Report what happened to recommended items",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {

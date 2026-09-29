@@ -263,6 +263,27 @@
      "listWorkstations",
      "listDeviceFirmware"
     ]
+   },
+   {
+    "operationId": "createDeviceFirmware",
+    "contract": "tenancy",
+    "purpose": "Register a firmware release",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getDeviceFirmware",
+    "contract": "tenancy",
+    "purpose": "Open a release",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setDeviceFirmwareStatus",
+    "contract": "tenancy",
+    "purpose": "Release, deprecate or withdraw",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -281,6 +302,10 @@
     },
     {
      "name": "rolloutId",
+     "from": "navigation"
+    },
+    {
+     "name": "firmwareId",
      "from": "navigation"
     }
    ],

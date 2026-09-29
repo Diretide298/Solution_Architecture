@@ -1,6 +1,6 @@
 # WS102 — Subscription Licensing AI Self Service board 5
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 10 operations · 23 schemas · 7 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ACCOUNT_CONFIGURE, PLATFORM_CELL_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-409` | Purchase / Trial Journey Selection | listDetail | 0 | 0 | — |
-| `ADM-410` | Contract & Billing Cycle Selection | listDetail | 0 | 0 | — |
-| `ADM-411` | Billing & Legal Entity Information | listDetail | 0 | 0 | — |
-| `ADM-412` | Payment Method & Settlement Setup | listDetail | 0 | 0 | — |
-| `ADM-413` | Trial Configuration & Conversion Rules | configEditor | 0 | 0 | — |
-| `ADM-414` | Order & Commercial Pricing Review | listDetail | 0 | 0 | — |
-| `ADM-415` | Commercial Agreement, Billable Definition & Customer Acceptance | listDetail | 0 | 0 | — |
-| `ADM-416` | Payment, Contract & Commercial Validation | listDetail | 0 | 0 | — |
-| `ADM-417` | Subscription Confirmation & Commercial Activation | listDetail | 0 | 0 | — |
-| `ADM-418` | Subscription Lifecycle & Trial-to-Paid Handoff | listDetail | 0 | 0 | — |
+| `ADM-409` | Purchase / Trial Journey Selection | listDetail | 1 | 0 | — |
+| `ADM-410` | Contract & Billing Cycle Selection | listDetail | 1 | 0 | — |
+| `ADM-411` | Billing & Legal Entity Information | listDetail | 1 | 0 | — |
+| `ADM-412` | Payment Method & Settlement Setup | listDetail | 3 | 1 | — |
+| `ADM-413` | Trial Configuration & Conversion Rules | configEditor | 1 | 0 | — |
+| `ADM-414` | Order & Commercial Pricing Review | listDetail | 1 | 0 | — |
+| `ADM-415` | Commercial Agreement, Billable Definition & Customer Acceptance | listDetail | 1 | 0 | — |
+| `ADM-416` | Payment, Contract & Commercial Validation | listDetail | 1 | 0 | — |
+| `ADM-417` | Subscription Confirmation & Commercial Activation | listDetail | 1 | 0 | — |
+| `ADM-418` | Subscription Lifecycle & Trial-to-Paid Handoff | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-409, ADM-410, ADM-411, ADM-412, ADM-414, ADM-415, ADM-416, ADM-417 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-409, ADM-410, ADM-411, ADM-414, ADM-415, ADM-416, ADM-417 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

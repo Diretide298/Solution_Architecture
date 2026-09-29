@@ -282,6 +282,40 @@
   "requestBody": null,
   "responds": "TrialBalance"
  },
+ "getVatReturn": {
+  "method": "GET",
+  "path": "/tax/vat-returns",
+  "contract": "finance",
+  "summary": "A legal entity's VAT return for a tax period, in the FTA's boxes",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "format",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FinVatReturn"
+ },
  "getVenueSettings": {
   "method": "GET",
   "path": "/venues/{venueId}/settings",

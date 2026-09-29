@@ -1,6 +1,6 @@
 # P10-booking-quotes-01 — P10 · Booking & Quotes
 
-**4 screens · 32 operations · 40 schemas · 14 permissions**
+**4 screens · 32 operations · 49 schemas · 14 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 14 permissions apply here:
   `CAPACITY_CONFIGURE, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT, ORDER_RESCHEDULE, ORDER_VIEW, ORDER_VOID, PARTNER_MANAGE, PARTNER_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **11 of these operations work offline**: applyManualDiscount, createOrder, evaluatePromotions, getOrder, getPromotion, holdOrder, listOrderRefunds, listOrders
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,14 +60,10 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-008` | Booking Creation | listDetail | 14 | 1 | — |
-| `PTR-009` | Group / Bulk Booking | listDetail | 4 | 0 | — |
-| `PTR-010` | Cart & Quote | listDetail | 10 | 1 | — |
-| `PTR-011` | Quote Management | listDetail | 4 | 0 | — |
-
-## Thin screens in this batch
-
-**PTR-011 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `PTR-008` | Booking Creation | listDetail | 14 | 9 | — |
+| `PTR-009` | Group / Bulk Booking | listDetail | 4 | 3 | — |
+| `PTR-010` | Cart & Quote | listDetail | 10 | 5 | — |
+| `PTR-011` | Quote Management | listDetail | 4 | 1 | — |
 
 ---
 
@@ -98,7 +93,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
     "PTR-002",
     "PTR-003",
     "PTR-016"
@@ -107,36 +101,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "fromFlows": true,
    "transitions": [
     {
-     "to": "PTR-016",
-     "trigger": "Downloads vouchers",
-     "provenance": "flow F03 step 3→4",
-     "operation": "createOrder"
-    },
-    {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-002",
      "trigger": "Partner Dashboard",
      "carries": [
-      "accountId",
       "orderId"
      ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId and PTR-008 holds orderId, so an edge into it carries them"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-008 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     },
     {
      "to": "SCN-003",
@@ -145,6 +120,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "listOrders",
      "crossesDevice": true,
      "back": false
+    },
+    {
+     "to": "PTR-016",
+     "trigger": "Downloads vouchers",
+     "provenance": "flow F03 step 3→4",
+     "operation": "createOrder",
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
@@ -153,13 +137,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
   "purpose": "Add booking creation for this venue.",
-  "gaps": [
-   {
-    "operation": "getOrderStatement",
-    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -168,8 +145,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every booking creation",
+       "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -182,6 +201,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listOrders",
        "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every refund",
+       "bindsTo": "Refund",
+       "columns": [
+        "Refund.id",
+        "Refund.orderId",
+        "Refund.batchId",
+        "Refund.fxRate",
+        "Refund.taxReversalEntryId",
+        "Refund.settleTo",
+        "Refund.fxVariance",
+        "Refund.amount",
+        "Refund.appliedPercentage",
+        "Refund.status",
+        "Refund.reason",
+        "Refund.requestedByPrincipalId"
+       ],
+       "operation": "listOrderRefunds",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
       }
      ]
     },
@@ -191,7 +231,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected booking creation",
+       "label": "The selected order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order statement",
+       "bindsTo": "OrderStatement",
+       "columns": [
+        "OrderStatement.orderId",
+        "OrderStatement.orderNumber",
+        "OrderStatement.currency",
+        "OrderStatement.currencyScale",
+        "OrderStatement.entries",
+        "OrderStatement.totalPaid",
+        "OrderStatement.totalRefunded",
+        "OrderStatement.currentBalance"
+       ],
+       "operation": "getOrderStatement",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/statement"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -222,61 +298,61 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Apply",
+       "label": "Apply manual discount",
        "operation": "applyManualDiscount",
        "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create refund",
        "operation": "createRefund",
        "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
       },
       {
        "kind": "secondaryButton",
-       "label": "Exchange",
+       "label": "Exchange order lines",
        "operation": "exchangeOrderLines",
        "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
       },
       {
        "kind": "secondaryButton",
-       "label": "Hold",
+       "label": "Hold order",
        "operation": "holdOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
       },
       {
        "kind": "secondaryButton",
-       "label": "Modify",
+       "label": "Modify order",
        "operation": "modifyOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reprint",
+       "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reschedule",
+       "label": "Reschedule order",
        "operation": "rescheduleOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
+       "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
       },
       {
        "kind": "destructiveButton",
-       "label": "Void",
+       "label": "Void order",
        "operation": "voidOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
       }
@@ -288,24 +364,206 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmVoidOrder",
     "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A booking creation this affects should be identified in the dialog, not just counted.",
+    "trigger": "Void order",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A booking creation this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`.",
     "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders"
+   },
+   {
+    "id": "formApplyManualDiscount",
+    "component": "modal",
+    "trigger": "Apply manual discount",
+    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ManualDiscountRequest",
+    "confirm": {
+     "label": "Apply manual discount",
+     "operation": "applyManualDiscount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "lineId",
+      "amount",
+      "percentage",
+      "reasonCode",
+      "approverPrincipalId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+   },
+   {
+    "id": "formCreateRefund",
+    "component": "modal",
+    "trigger": "Create refund",
+    "body": "**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`, `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateRefundRequest",
+    "confirm": {
+     "label": "Create refund",
+     "operation": "createRefund"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "amount",
+      "reason",
+      "recordedAt",
+      "lineIds",
+      "secondaryAuthorisation",
+      "refundToOriginalTender",
+      "alternateTender"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
+   },
+   {
+    "id": "formExchangeOrderLines",
+    "component": "modal",
+    "trigger": "Exchange order lines",
+    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ExchangeOrderRequest",
+    "confirm": {
+     "label": "Exchange order lines",
+     "operation": "exchangeOrderLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outgoingLineIds",
+      "incomingLines",
+      "recordedAt",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+   },
+   {
+    "id": "formHoldOrder",
+    "component": "modal",
+    "trigger": "Hold order",
+    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold order",
+     "operation": "holdOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "label",
+      "holdUntil"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+   },
+   {
+    "id": "formModifyOrder",
+    "component": "modal",
+    "trigger": "Modify order",
+    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ModifyOrderRequest",
+    "confirm": {
+     "label": "Modify order",
+     "operation": "modifyOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "recordedAt",
+      "addLines",
+      "removeLineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+   },
+   {
+    "id": "formReprintOrder",
+    "component": "modal",
+    "trigger": "Reprint order",
+    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reprint order",
+     "operation": "reprintOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "recordedAt",
+      "destination",
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+   },
+   {
+    "id": "formRescheduleOrder",
+    "component": "modal",
+    "trigger": "Reschedule order",
+    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reschedule order",
+     "operation": "rescheduleOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetPerformanceId",
+      "recordedAt",
+      "lineIds",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
    }
   ],
   "states": {
    "loading": "The booking creation list.",
    "error": "Could not load. Names which read failed and leaves the booking creation untouched.",
-   "emptyFirstRun": "No booking creation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the booking creation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No booking creation yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the booking creation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "createOrder",
     "contract": "orders",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listOrders",
@@ -344,13 +602,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getOrder",
     "contract": "orders",
     "purpose": "Read an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getOrderStatement",
     "contract": "orders",
     "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "holdOrder",
@@ -365,7 +623,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "listOrderRefunds",
     "contract": "orders",
     "purpose": "List refunds against an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "modifyOrder",
@@ -422,11 +680,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
    "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
+    "OrderSummary.id",
+    "OrderSummary.orderNumber",
+    "OrderSummary.status",
+    "OrderSummary.grossAmount",
+    "OrderSummary.refundedAmount"
    ]
   },
   "wireframe": {
@@ -478,36 +736,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-002",
     "PTR-003"
    ],
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-009 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -527,8 +762,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Performance id",
+       "operation": "listSeatBlocks",
+       "notes": "Sends `?performanceId=` to `listSeatBlocks`.",
+       "provenance": "contract seating.yaml GET /seat-blocks"
+      },
+      {
+       "kind": "textField",
+       "label": "Reason",
+       "operation": "listSeatBlocks",
+       "notes": "Sends `?reason=` to `listSeatBlocks`.",
+       "provenance": "contract seating.yaml GET /seat-blocks"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every group bulk booking",
+       "label": "Every seat block",
        "bindsTo": "SeatBlock",
        "columns": [
         "SeatBlock.id",
@@ -543,6 +792,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSeatBlocks",
        "provenance": "contract seating.yaml GET /seat-blocks"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -552,7 +808,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected group bulk booking",
+       "label": "The selected seat block",
        "bindsTo": "SeatBlock",
        "columns": [
         "SeatBlock.id",
@@ -576,57 +832,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Allocate",
+       "label": "Allocate blocked seats",
        "operation": "allocateBlockedSeats",
        "provenance": "contract seating.yaml POST /seat-blocks/{blockId}/allocate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create seat block",
        "operation": "createSeatBlock",
        "provenance": "contract seating.yaml POST /seat-blocks"
       },
       {
        "kind": "secondaryButton",
-       "label": "Release hold",
+       "label": "Release seat block",
        "operation": "relinquishSeatBlock",
        "provenance": "contract seating.yaml DELETE /seat-blocks/{blockId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSeatBlocks",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "relinquishSeatBlock",
-       "label": "Release seat block",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "allocateBlockedSeats",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -635,16 +855,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The group bulk booking list.",
    "error": "Could not load. Names which read failed and leaves the group bulk booking untouched.",
-   "emptyFirstRun": "No group bulk booking yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the group bulk booking are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No group bulk booking yet. Offers Create seat block (`createSeatBlock`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on performanceId, reason and the group bulk booking are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatBlocks` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "allocateBlockedSeats",
     "contract": "seating",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createSeatBlock",
@@ -691,9 +911,70 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-009",
+   "derivedFrom": "wireframes/reference/Seat Board 3.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAllocateBlockedSeats",
+    "component": "modal",
+    "trigger": "Allocate blocked seats",
+    "body": "**Collects what `allocateBlockedSeats` sends before it is called.** Required: `seatIds`. Optional: `subjectId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Allocate blocked seats",
+     "operation": "allocateBlockedSeats"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "seatIds",
+      "subjectId",
+      "note"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /seat-blocks/{blockId}/allocate"
+   },
+   {
+    "id": "formCreateSeatBlock",
+    "component": "modal",
+    "trigger": "Create seat block",
+    "body": "**Collects what `createSeatBlock` sends before it is called.** Required: `performanceId`, `seatIds`, `reason`, `note`. Optional: `releaseAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateSeatBlockRequest",
+    "confirm": {
+     "label": "Create seat block",
+     "operation": "createSeatBlock"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "performanceId",
+      "seatIds",
+      "reason",
+      "note",
+      "releaseAt"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /seat-blocks"
+   },
+   {
+    "id": "formRelinquishSeatBlock",
+    "component": "modal",
+    "trigger": "Release seat block",
+    "body": "**Collects what `relinquishSeatBlock` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release seat block",
+     "operation": "relinquishSeatBlock"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract seating.yaml DELETE /seat-blocks/{blockId}"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -737,36 +1018,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
     "PTR-002",
     "PTR-003"
    ],
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-002",
      "trigger": "Partner Dashboard",
      "carries": [
-      "accountId",
       "orderId"
      ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId and PTR-010 holds orderId, so an edge into it carries them"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-010 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -775,13 +1042,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
   "purpose": "Work with cart & quote for this venue.",
-  "gaps": [
-   {
-    "operation": "getPromotionUsage",
-    "why": "**2 declared operations reach no component on this screen**: getPromotionUsage, getCart. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -790,8 +1050,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listPromotions",
+       "notes": "Sends `?venueId=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listPromotions",
+       "notes": "Sends `?status=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listPromotions",
+       "notes": "Sends `?activeAt=` to `listPromotions`.",
+       "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every cart quote",
+       "label": "Every promotion",
        "bindsTo": "Promotion",
        "columns": [
         "Promotion.code",
@@ -809,6 +1090,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listPromotions",
        "provenance": "contract promotions.yaml GET /promotions"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -818,7 +1106,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected cart quote",
+       "label": "The selected promotion",
        "bindsTo": "Promotion",
        "columns": [
         "Promotion.code",
@@ -840,6 +1128,47 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getPromotion",
        "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The promotion usage",
+       "bindsTo": "PromotionUsage",
+       "columns": [
+        "PromotionUsage.promotionId",
+        "PromotionUsage.redemptionCount",
+        "PromotionUsage.discountGiven",
+        "PromotionUsage.budgetCap",
+        "PromotionUsage.budgetRemaining",
+        "PromotionUsage.isBudgetExhausted",
+        "PromotionUsage.byChannel"
+       ],
+       "operation": "getPromotionUsage",
+       "provenance": "contract promotions.yaml GET /promotions/{promotionId}/usage"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cart",
+       "bindsTo": "Cart",
+       "columns": [
+        "Cart.id",
+        "Cart.token",
+        "Cart.venueId",
+        "Cart.channel",
+        "Cart.subjectId",
+        "Cart.status",
+        "Cart.lines",
+        "Cart.conflicts",
+        "Cart.subtotal",
+        "Cart.discountTotal",
+        "Cart.taxTotal",
+        "Cart.total",
+        "Cart.appliedPromotionIds",
+        "Cart.expiresAt",
+        "Cart.extensionsUsed",
+        "Cart.maxExtensions"
+       ],
+       "operation": "getCart",
+       "provenance": "contract orders.yaml GET /carts/{cartId}"
       }
      ]
     },
@@ -849,75 +1178,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Evaluate",
+       "label": "Evaluate promotions",
        "operation": "evaluatePromotions",
        "provenance": "contract promotions.yaml POST /promotions/evaluate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Analyse",
+       "label": "Analyse promotion conflicts",
        "operation": "analysePromotionConflicts",
        "provenance": "contract promotions.yaml GET /promotions/{promotionId}/conflicts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save cart line",
        "operation": "updateCartLine",
        "provenance": "contract orders.yaml PATCH /carts/{cartId}/lines/{lineId}"
       },
       {
        "kind": "destructiveButton",
-       "label": "Remove",
+       "label": "Remove cart line",
        "operation": "removeCartLine",
        "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Checkout",
+       "label": "Checkout cart",
        "operation": "checkoutCart",
        "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPromotions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "removeCartLine",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "label": "Remove cart line",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "evaluatePromotions",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -927,17 +1220,99 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmRemoveCartLine",
     "component": "confirmDialog",
-    "trigger": "Remove",
+    "trigger": "Remove cart line",
     "body": "**Names what `removeCartLine` changes and what it leaves alone**, in the consequence rather than the verb. A cart quote this affects should be identified in the dialog, not just counted.",
     "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
+   },
+   {
+    "id": "formEvaluatePromotions",
+    "component": "modal",
+    "trigger": "Evaluate promotions",
+    "body": "**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "EvaluatePromotionsRequest",
+    "confirm": {
+     "label": "Evaluate promotions",
+     "operation": "evaluatePromotions"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "channel",
+      "lines",
+      "subjectId",
+      "membershipTierId",
+      "couponCodes",
+      "evaluateAt"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /promotions/evaluate"
+   },
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+   },
+   {
+    "id": "formUpdateCartLine",
+    "component": "modal",
+    "trigger": "Save cart line",
+    "body": "**Collects what `updateCartLine` sends before it is called.** Required: `quantity`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save cart line",
+     "operation": "updateCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "quantity"
+     ]
+    },
+    "provenance": "contract orders.yaml PATCH /carts/{cartId}/lines/{lineId}"
+   },
+   {
+    "id": "formCheckoutCart",
+    "component": "modal",
+    "trigger": "Checkout cart",
+    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Checkout cart",
+     "operation": "checkoutCart"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "attendees"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
    }
   ],
   "states": {
    "loading": "The cart quote list.",
    "error": "Could not load. Names which read failed and leaves the cart quote untouched.",
-   "emptyFirstRun": "No cart quote yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the cart quote are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No cart quote yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, status, activeAt and the cart quote are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `getPromotion` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -950,19 +1325,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "analysePromotionConflicts",
     "contract": "promotions",
     "purpose": "Analyse stacking against live promotions",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getPromotion",
     "contract": "promotions",
     "purpose": "Read a promotion",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getPromotionUsage",
     "contract": "promotions",
     "purpose": "Redemption count and discount given",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listPromotions",
@@ -1085,36 +1460,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-002",
     "PTR-003"
    ],
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-011 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -1126,13 +1478,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listPartnerAgreements` reads the population and `getCommissionStatement` reads one of them — list, select, act",
   "purpose": "Find quote management for this venue.",
-  "gaps": [
-   {
-    "operation": "listPartnerQuotes",
-    "why": "**1 declared operation reach no component on this screen**: listPartnerQuotes. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1141,8 +1486,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "numberField",
+       "label": "Expiring within days",
+       "operation": "listPartnerAgreements",
+       "notes": "Sends `?expiringWithinDays=` to `listPartnerAgreements`.",
+       "provenance": "contract subscription.yaml GET /partner-agreements"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listPartnerAgreements",
+       "notes": "Sends `?status=` to `listPartnerAgreements`.",
+       "provenance": "contract subscription.yaml GET /partner-agreements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every quote",
+       "label": "Every partner agreement",
        "bindsTo": "PartnerAgreement",
        "columns": [
         "PartnerAgreement.id",
@@ -1160,6 +1519,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listPartnerAgreements",
        "provenance": "contract subscription.yaml GET /partner-agreements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every partner quote",
+       "bindsTo": "PartnerQuote",
+       "columns": [
+        "PartnerQuote.id",
+        "PartnerQuote.partnerId",
+        "PartnerQuote.agreementId",
+        "PartnerQuote.currency",
+        "PartnerQuote.totalMinor",
+        "PartnerQuote.state",
+        "PartnerQuote.validUntil"
+       ],
+       "operation": "listPartnerQuotes",
+       "provenance": "contract subscription.yaml GET /partner-quotes"
       }
      ]
     },
@@ -1169,7 +1544,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected quote",
+       "label": "The selected partner agreement",
+       "bindsTo": "PartnerAgreement",
+       "columns": [
+        "PartnerAgreement.id",
+        "PartnerAgreement.partnerId",
+        "PartnerAgreement.partnerName",
+        "PartnerAgreement.status",
+        "PartnerAgreement.rateMode",
+        "PartnerAgreement.commissionPercent",
+        "PartnerAgreement.volumeTiers",
+        "PartnerAgreement.volumeWindow",
+        "PartnerAgreement.seasonalRates",
+        "PartnerAgreement.segmentTier",
+        "PartnerAgreement.brandingAssetId",
+        "PartnerAgreement.storefrontSubdomain",
+        "PartnerAgreement.sponsorship",
+        "PartnerAgreement.netRates",
+        "PartnerAgreement.creditTermDays",
+        "PartnerAgreement.acceptedByPrincipalId"
+       ],
+       "operation": "listPartnerAgreements",
+       "provenance": "contract subscription.yaml GET /partner-agreements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The commission statement",
        "bindsTo": "CommissionStatement",
        "columns": [
         "CommissionStatement.agreementId",
@@ -1195,7 +1595,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create partner quote",
        "operation": "createPartnerQuote",
        "provenance": "contract subscription.yaml POST /partner-quotes"
       }
@@ -1206,9 +1606,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The quote list.",
    "error": "Could not load. Names which read failed and leaves the quote untouched.",
-   "emptyFirstRun": "No quote yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the quote are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No quote yet. Offers Create partner quote (`createPartnerQuote`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on expiringWithinDays, status and the quote are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PARTNER_MANAGE`, which `listPartnerAgreements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1221,7 +1621,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getCommissionStatement",
     "contract": "subscription",
     "purpose": "What the partner earned and what is owed",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listPartnerQuotes",
@@ -1248,11 +1648,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `agreementId`.",
    "preloaded": [
-    "CommissionStatement.agreementId",
-    "CommissionStatement.partnerName",
-    "CommissionStatement.from",
-    "CommissionStatement.to",
-    "CommissionStatement.currency"
+    "PartnerAgreement.id",
+    "PartnerAgreement.partnerId",
+    "PartnerAgreement.partnerName",
+    "PartnerAgreement.status",
+    "PartnerAgreement.rateMode"
    ]
   },
   "wireframe": {
@@ -1261,6 +1661,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P10 Partner Web.dc.html#ptr-011"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreatePartnerQuote",
+    "component": "modal",
+    "trigger": "Create partner quote",
+    "body": "**Collects what `createPartnerQuote` sends before it is called.** Required: `id`. Optional: `partnerId`, `agreementId`, `currency`, `totalMinor`, `state`, `validUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerQuote",
+    "confirm": {
+     "label": "Create partner quote",
+     "operation": "createPartnerQuote"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "partnerId",
+      "agreementId",
+      "currency",
+      "totalMinor",
+      "state",
+      "validUntil"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-quotes"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1411,7 +1837,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PartnerQuote",
   "responds": "PartnerQuote"
  },
@@ -1500,7 +1932,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Cart"
  },
@@ -1537,7 +1975,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
  },
@@ -1621,7 +2065,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "Refund"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -1915,6 +2359,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1968,12 +2417,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Optional; sent by a page or till that shows the engine's recommendations. Not validated against the engine: an unknown id only fails to attribute.\n"
+   },
+   "tableReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A table deposit line (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` in `awaitingDeposit` this pays for, sent with `variantId` set to the booking's `deposit.variantId` and `quantity` 1. The price is the booking's `deposit.amount`. A booking that is not awaiting a deposit is refused 422 `depositNotDue`.\n"
+   },
    "seatIds": {
     "type": "array",
+    "maxItems": 50,
+    "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
     "items": {
      "type": "string",
-     "format": "uuid"
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
    },
    "parentLineId": {
     "type": "string",
@@ -1982,13 +2454,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "For an add-on attaching to a ticket already in the cart. **Removing the parent removes the child** — a locker with no admission is not a sale.\n"
    },
    "attributes": {
-    "type": "object",
-    "additionalProperties": true
+    "$ref": "#/components/schemas/OrderLineAttributes"
    }
   }
  },
  "BlockReason": {
   "type": "string",
+  "description": "`other` is allowed only with a note (decided 28 September, audit R222). Every block already requires `note`, so an `other` block always says why; the notes are reviewed quarterly to add the real reasons they reveal.\n",
   "enum": [
    "productionHold",
    "houseSeats",
@@ -1998,6 +2470,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "distancing",
    "other"
   ]
+ },
+ "BookedWindow": {
+  "type": "object",
+  "nullable": true,
+  "x-ticvai-persistence": "none — embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+  "description": "**The booked time window of an hourly product, such as a meeting room** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). The guest picks a date, a length and a start time from `resources.listProductStartTimes`; the length is the product's `length` variant (1 hour, 2 hours, half day, full day), priced per variant, so the price is the variant's. **`endsAt` minus `startsAt` must equal the chosen variant's length** (its `length` dimension value's `durationMinutes`), or the line is refused 422 `windowLengthMismatch`. Required on a product with `catalogue.Product.requiresTimeWindow` true and refused on any other (`windowRequired`, `windowNotAllowed`). The room itself is not named here: the window holds capacity of the room type, and `resources.allocateResources` picks the room at checkout (26 August minute: a guest books a meeting room product, never a raw room).\n",
+  "required": [
+   "startsAt",
+   "endsAt"
+  ],
+  "properties": {
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "After `startsAt`, on the same venue day."
+   }
+  }
  },
  "Cart": {
   "type": "object",
@@ -2047,7 +2540,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "$ref": "#/components/schemas/CartConflict"
     }
    },
+   "consentQuestions": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
+    "items": {
+     "allOf": [
+      {
+       "$ref": "../satellite/marketing-crm.yaml#/components/schemas/ConsentQuestion"
+      },
+      {
+       "type": "object",
+       "properties": {
+        "lineIds": {
+         "type": "array",
+         "description": "The cart lines that ask it. Empty for a question the flow asks.",
+         "items": {
+          "type": "string",
+          "format": "uuid"
+         }
+        },
+        "answered": {
+         "type": "boolean",
+         "description": "Every person (for `perPerson`) or the booking (for `perBooking`) has an answer."
+        }
+       }
+      }
+     ]
+    }
+   },
    "subtotal": {
+    "x-ticvai-column": "net_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "discountTotal": {
@@ -2057,6 +2580,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "total": {
+    "x-ticvai-column": "gross_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "appliedPromotionIds": {
@@ -2065,6 +2589,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "type": "string",
      "format": "uuid"
+    }
+   },
+   "couponCodes": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The promo codes the guest entered through `applyCartPromoCode` (decided 28 September, audit R073 (e)). **Sent as `couponCodes` on every promotions evaluation of this cart**, so a code is re-checked on each read like any promotion; a code that stops qualifying stays listed here and its promotion drops out of `appliedPromotionIds`.\n",
+    "items": {
+     "type": "string",
+     "maxLength": 100
     }
    },
    "expiresAt": {
@@ -2104,7 +2637,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "overlappingTime",
      "sameSessionDifferentVenue",
      "exceedsPartySize",
-     "requiresPrerequisite"
+     "requiresPrerequisite",
+     "consentBlocksBooking"
     ]
    },
    "lineIds": {
@@ -2119,7 +2653,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isBlocking": {
     "type": "boolean",
-    "description": "Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold.\n"
+    "description": "Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold. So is `consentBlocksBooking`: a consent question answered with the answer the venue set to block the booking (decided 29 September, rev 3 REV3-26).\n"
    }
   }
  },
@@ -2153,12 +2687,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "nullable": true
    },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Set from `addCartLine`; checkout copies it to the order line.\n"
+   },
+   "tableReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` this line secures. Priced from the deposit the booking snapshotted, not from the variant. Becomes an `orders.deposit` row at checkout, not revenue. A table booking with no deposit never has a line (rev 3 REV3-8).\n"
+   },
    "seatIds": {
     "type": "array",
+    "maxItems": 50,
     "items": {
      "type": "string",
-     "format": "uuid"
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."
+   },
+   "attributes": {
+    "$ref": "#/components/schemas/OrderLineAttributes"
+   },
+   "parentLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The line this add-on is attached to, from `AddCartLineRequest.parentLineId`. Kept on the line because **removing the parent removes the child**, and `removeCartLine` has to be able to find the children.\n"
    },
    "overridePrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2197,9 +2762,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inventoryHoldId": {
     "type": "string",
-    "format": "uuid",
     "nullable": true,
-    "description": "The capacity held for this line. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
+    "description": "The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
    },
    "leaseExpiresAt": {
     "type": "string",
@@ -2354,7 +2918,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "isBlocking": {
        "type": "boolean",
-       "description": "True where the combination would produce a negative or near-zero price."
+       "description": "True where the combination would produce a line price of zero or below (decided 28 September, audit R101)."
+      },
+      "isNearZero": {
+       "type": "boolean",
+       "description": "True where the combination leaves a net line price above zero but below the venue setting `promotions.nearZeroLinePrice` (proposed AED 1.00; decided 28 September, audit R096 (5)). A warning, not a refusal."
       }
      }
     }
@@ -2377,31 +2945,90 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
     "type": "string",
     "format": "uuid"
    },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Carried from the cart line at checkout; stored on `orders.order_line` and sent in `order.completed` lines.\n"
+   },
    "performanceId": {
     "type": "string",
     "format": "uuid"
    },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
    "inventoryHoldId": {
     "type": "string",
     "nullable": true,
-    "description": "Lease the units were drawn from. Absent for uncontended products."
+    "description": "Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."
    },
    "seatIds": {
     "type": "array",
+    "maxItems": 50,
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     },
-    "description": "Seated products only. Not available offline."
+    "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."
+   },
+   "attributes": {
+    "$ref": "#/components/schemas/OrderLineAttributes"
    },
    "quantity": {
     "type": "integer",
     "minimum": 1
+   },
+   "eligibilityDeclaration": {
+    "type": "array",
+    "nullable": true,
+    "x-ticvai-note": "One row per declared guest in `orders.order_line_eligibility` (named on `OrderLine`), because an array of objects is a child table's rows, not a column.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "ageBand": {
+       "type": "string",
+       "enum": [
+        "infant",
+        "child",
+        "junior",
+        "adult",
+        "senior"
+       ],
+       "description": "Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+."
+      },
+      "ageYears": {
+       "type": "integer",
+       "nullable": true
+      },
+      "heightBandIndex": {
+       "type": "integer",
+       "nullable": true
+      },
+      "confidentSwimmer": {
+       "type": "boolean",
+       "nullable": true,
+       "description": "**Derived, kept for the gate check** (decided 29 September, rev 3 REV3-26). The swim question is a consent: the answer is a `marketing.BookingConsentRecord` of kind `swim`, and this is filled from it (true for a `yes` covering this person, whether answered for them or once for the booking). A value sent that contradicts the record is ignored and the record wins. No longer the place a swim answer is captured.\n"
+      },
+      "guardianSigned": {
+       "type": "boolean"
+      }
+     }
+    },
+    "description": "What was declared for each guest on this line, kept as the record staff check at the gate."
    },
    "quotedUnitPrice": {
     "allOf": [
@@ -2417,7 +3044,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dataMaskValues": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "**Deliberately open.** Custom fields keyed by the venue's data mask: the field definitions travel in the catalogue bundle (`catalogue.CatalogueBundle.payload`), so the keys are the venue's to define, as on `catalogue`'s own `dataMaskValues`.\n"
    }
   }
  },
@@ -2434,7 +3062,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id": {
     "type": "string",
     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key."
+    "description": "Client-generated ULID. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
    },
    "venueId": {
     "type": "string",
@@ -2444,7 +3072,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "#/components/schemas/Channel"
    },
    "shiftId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "subjectId": {
     "type": "string",
@@ -2547,7 +3176,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Total discount value after which the promotion stops automatically."
+    "description": "Total discount value after which the promotion stops automatically. **Enforced at checkout**, where an order whose discount would take the total past the cap does not receive the promotion (decided 28 September, audit R101)."
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The commercial campaign (`promotions.campaign`) this promotion belongs to; null for a promotion run on its own. The directory, calendar and campaign budget screens group by it. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "recommendable": {
+    "type": "boolean",
+    "default": false,
+    "description": "**May the recommendation engine show this offer to a guest** (8.6.30 to 8.6.36; 29 September, build pass, group G2, from group G1's handoff). False keeps a promotion to the basket, where `evaluatePromotions` applies it as before. True makes a live promotion a candidate item of kind `offer` in `ai.decideRecommendations` for the guests its conditions and `recommendableSegmentIds` admit: while it is live, `promotions.recommendationStrategyPublished` (kind `offers`) keeps the engine's candidate cache current, and it leaves the cache when it is paused, ends or expires. **The engine shows the offer; the discount is still computed here at the basket**, never by ai."
+   },
+   "recommendableSegmentIds": {
+    "type": "array",
+    "nullable": true,
+    "description": "The marketing-crm segments the offer may be recommended to; null means every guest its own conditions admit.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    }
   }
  },
@@ -2562,12 +3211,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the refund, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "lineIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     },
     "description": "Omit to refund the whole order."
    },
@@ -2593,7 +3244,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "credential": {
       "type": "string",
-      "maxLength": 512
+      "maxLength": 512,
+      "description": "The second person's staff PIN, as they sign in at a till with it. **A PIN, never a password** (decided 28 September, audit R123 (7))."
      }
     }
    },
@@ -2646,6 +3298,88 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Discount": {
+  "x-ticvai-persistence": "none — embedded in promotion",
+  "type": "object",
+  "required": [
+   "kind"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/DiscountKind"
+   },
+   "percentage": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "fixedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "buyQuantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "getQuantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "getDiscountPercentage": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "description": "100 makes the free items actually free; lower values give a partial discount."
+   },
+   "tiers": {
+    "type": "array",
+    "description": "For `tieredPercentage` — more units, larger discount.",
+    "items": {
+     "type": "object",
+     "required": [
+      "minQuantity",
+      "percentage"
+     ],
+     "properties": {
+      "minQuantity": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "percentage": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      }
+     }
+    }
+   },
+   "maxDiscountAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Cap on a percentage discount. Prevents an unbounded discount on a large basket."
+   },
+   "rewardVariantIds": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (setGiftFreeProduct, setBuyGetBogo). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"
+   },
+   "maxApplicationsPerBasket": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (setFixedPriceOffer). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"
+   }
+  }
+ },
  "EvaluatePromotionsRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -2660,7 +3394,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid"
    },
    "channel": {
-    "type": "string"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "description": "Where the sale is being made. Matched against `PromotionConditions.channels`, so both sides use the one shared vocabulary.\n"
    },
    "subjectId": {
     "type": "string",
@@ -2680,6 +3419,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "description": "For back-office testing of a rule before publishing."
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The order (`orders.sales_order`) being priced for payment. Sent only by the order service when it confirms an order; when present the evaluation writes one `promotions.promotion_evaluation_trace` row for it. (decided 29 September, writers pass)"
    },
    "lines": {
     "type": "array",
@@ -2727,13 +3472,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of this exchange, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "outgoingLineIds": {
     "type": "array",
     "minItems": 1,
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "incomingLines": {
@@ -2757,6 +3504,62 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ExchangeRateDecimal": {
+  "type": "string",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
+ },
+ "GuestPromotion": {
+  "x-ticvai-persistence": "none — guest projection of promotions.promotion",
+  "type": "object",
+  "description": "**What a guest may see of a promotion.** `Promotion` carries the commercial internals (`budgetCap`, `maxRedemptions`, `redemptionCount`, `discountGiven`, `precedence`, `stackingGroup`), and `listPromotions` and `getPromotion` are guest-audience. A guest caller receives this shape instead. `additionalProperties: false` is the point: a server that adds an internal field to it fails validation instead of publishing the field.\n",
+  "additionalProperties": false,
+  "required": [
+   "id",
+   "code",
+   "name",
+   "discount",
+   "validFrom"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "discount": {
+    "$ref": "#/components/schemas/Discount"
+   },
+   "conditions": {
+    "$ref": "#/components/schemas/PromotionConditions"
+   },
+   "stackingMode": {
+    "$ref": "#/components/schemas/StackingMode"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "maxRedemptionsPerGuest": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
  "ManualDiscountRequest": {
   "type": "object",
   "x-ticvai-persistence": "none — request only",
@@ -2768,10 +3571,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of this discount, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "lineId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true,
     "description": "Omit to discount the order rather than a line."
    },
@@ -2815,7 +3620,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID **of this modification, not of the order** — the order is the path's `orderId`. It is the modification's idempotency key and must equal the `Idempotency-Key` header.\n"
    },
    "addLines": {
     "type": "array",
@@ -2826,7 +3632,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "removeLineIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "reason": {
@@ -2859,10 +3666,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client ULID from `CreateOrderRequest.id`."
    },
    "orderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
    },
    "channel": {
     "allOf": [
@@ -2907,6 +3718,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "droppedPromotions": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "budgetCapReached"
+       ]
+      }
+     }
+    }
+   },
    "totalPriceVariance": {
     "allOf": [
      {
@@ -2937,12 +3775,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "subjectId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "holdLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -2984,7 +3837,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "outgoingValue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -3006,25 +3860,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "newLineIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "revokedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "issuedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    }
   }
  },
  "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-retired-columns": [
+   "promotion_id",
+   "name",
+   "reason"
+  ],
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateOrderLine"
@@ -3065,8 +3927,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "entitlementIds": {
       "type": "array",
+      "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       }
      },
      "crossRegionRightIds": {
@@ -3075,10 +3939,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "string"
       },
       "description": "Redemption rights propagated to other cells for this line."
+     },
+     "reprintCount": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "readOnly": true,
+      "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
+     },
+     "venueId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "discounts": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.",
+      "items": {
+       "$ref": "#/components/schemas/OrderLineDiscount"
+      }
      }
     }
    }
   ]
+ },
+ "OrderLineAttributes": {
+  "type": "object",
+  "nullable": true,
+  "additionalProperties": true,
+  "x-ticvai-persistence": "none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.\n",
+  "properties": {
+   "transport": {
+    "$ref": "#/components/schemas/TransportLineAttributes"
+   }
+  }
  },
  "OrderModificationResult": {
   "x-ticvai-persistence": "none — computed",
@@ -3107,18 +4004,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "refundId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "revokedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    },
    "issuedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
     }
    }
   }
@@ -3155,7 +4055,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        ]
       },
       "lineId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       },
       "detail": {
        "type": "string"
@@ -3183,7 +4084,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderNumber": {
     "type": "string"
@@ -3281,6 +4183,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
  },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -3303,6 +4265,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "PartnerAgreement": {
   "type": "object",
   "x-ticvai-persistence": "control.partner_agreement",
+  "x-ticvai-retired-columns": [
+   "partner_name"
+  ],
   "required": [
    "partnerId",
    "rateMode",
@@ -3315,12 +4280,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "readOnly": true
    },
    "partnerId": {
+    "x-ticvai-references": "control.partner",
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The partner (control.partner) this agreement is with. The agreement carries the terms; control.partner carries who the partner is and whether it may trade. **Resolves to control.partner**, not to platform.tenant as the naming convention guessed before the partner master existed (decided 29 September, writers pass; DM4)"
    },
    "partnerName": {
     "type": "string",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The partner's trading name, **read from control.partner.trading_name** (Partner.tradingName) when the agreement is returned and never stored on the agreement, so a renamed partner cannot show two names (decided 29 September, writers pass; DM4)"
    },
    "version": {
     "type": "integer",
@@ -3339,7 +4308,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "volumeTiers": {
     "type": "array",
-    "description": "2.7.57. **A tier that changes at a threshold needs the sale to look back at cumulative volume, and nothing did.** Flat net rates and per-channel price lists cover the simple case and stop there.\n**The window is the argument, not the tier.** A partner who sells 400 in January and 400 in February is either a 400-tier partner twice or an 800-tier partner once, and the two are different money. `volumeWindow` says which.\n",
+    "deprecated": true,
+    "x-ticvai-persisted": false,
+    "description": "**Retired: the tiers are rows of control.partner_rate_volume_band** (`PartnerRate.volumeBands`, written by setPartnerRateNet), one set per rate row, so a tier can differ by product, venue or channel. Accepted and ignored on write; not returned once the bands exist. `volumeWindow` below still says over which window the bands count (decided 29 September, writers pass; DM4).\n\n2.7.57. **A tier that changes at a threshold needs the sale to look back at cumulative volume, and nothing did.** Flat net rates and per-channel price lists cover the simple case and stop there.\n**The window is the argument, not the tier.** A partner who sells 400 in January and 400 in February is either a 400-tier partner twice or an 800-tier partner once, and the two are different money. `volumeWindow` says which.\n",
     "items": {
      "type": "object",
      "required": [
@@ -3374,7 +4345,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "seasonalRates": {
     "type": "array",
-    "description": "Rates that change by date range. **Separate from the volume tier because they compound** — a peak-season rate at a high volume tier is both, and a single rate table cannot say so.\n",
+    "deprecated": true,
+    "x-ticvai-persisted": false,
+    "description": "**Retired: a seasonal rate is a control.partner_rate row** with `seasonalRate: true` and its own `effectiveFrom`/`effectiveTo` (`PartnerRate`, written by setPartnerRateNet); the most specific row in force wins. Accepted and ignored on write (decided 29 September, writers pass; DM4).\n\nRates that change by date range. **Separate from the volume tier because they compound** — a peak-season rate at a high volume tier is both, and a single rate table cannot say so.\n",
     "items": {
      "type": "object",
      "properties": {
@@ -3453,7 +4426,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "netRates": {
     "type": "array",
-    "description": "Per product or category. Absent means the commission applies across the catalogue.",
+    "deprecated": true,
+    "x-ticvai-persisted": false,
+    "description": "**Retired: net rates are rows of control.partner_rate** (`PartnerRate` with `pricingModel: netRate`, `netRate` and the `maxDiscountPercent` guardrail), written by setPartnerRateNet. Per product or category; absent means the commission applies across the catalogue. Accepted and ignored on write (decided 29 September, writers pass; DM4)",
     "items": {
      "type": "object",
      "properties": {
@@ -3503,7 +4478,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "corporateAllocations": {
     "type": "array",
-    "description": "BL-035. **`PartnerAgreement` covered commercial terms and not allocations.** A corporate account with fifty places for its staff is the same structure as a reseller with fifty to sell, and **the difference is that a corporate member does not pay.**\n",
+    "deprecated": true,
+    "x-ticvai-persisted": false,
+    "description": "**Retired: allocations are rows of control.partner_allocation** (`PartnerAllocation`, written by setPartnerAllocations and read by listCommercialAllocationQuota); used quantity is counted from orders against the row, not stored. Accepted and ignored on write (decided 29 September, writers pass; DM4).\n\nBL-035. **`PartnerAgreement` covered commercial terms and not allocations.** A corporate account with fifty places for its staff is the same structure as a reseller with fifty to sell, and **the difference is that a corporate member does not pay.**\n",
     "items": {
      "type": "object",
      "properties": {
@@ -3596,6 +4573,159 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "notes": {
     "type": "string"
+   },
+   "agreementName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Agreement name (decided 29 September, data model DM4)"
+   },
+   "agreementType": {
+    "type": "string",
+    "nullable": true,
+    "description": "Agreement type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) (decided 29 September, data model DM4)"
+   },
+   "contractReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "Contract reference (decided 29 September, data model DM4)"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The contracting legal entity (ledger.legal_entity) (decided 29 September, data model DM4)"
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Brand the agreement covers; empty for every brand of the tenant (decided 29 September, data model DM4)"
+   },
+   "territory": {
+    "type": "string",
+    "nullable": true,
+    "description": "Territory (decided 29 September, data model DM4)"
+   },
+   "commercialOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Commercial owner, a staff principal (decided 29 September, data model DM4)"
+   },
+   "financeOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Finance owner, a staff principal (decided 29 September, data model DM4)"
+   },
+   "pricingBasis": {
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "nullable": true,
+    "description": "Pricing basis (pack p.27 pricing models); the rows are `control.partner_rate` (decided 29 September, data model DM4)"
+   },
+   "paymentModel": {
+    "type": "string",
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "nullable": true,
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale). Held here once; the billing screen reads and sets this column (decided 29 September, data model DM4)"
+   },
+   "renewalType": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "auto"
+    ],
+    "nullable": true,
+    "description": "Renewal type (decided 29 September, data model DM4)"
+   },
+   "renewalNoticeDays": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Renewal notice period in days (decided 29 September, data model DM4)"
+   },
+   "renegotiationRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "Renegotiation required before renewal (decided 29 September, data model DM4)"
+   },
+   "renewalRequiresApproval": {
+    "type": "boolean",
+    "description": "Renewal needs approval (decided 29 September, data model DM4)"
+   },
+   "minimumCommitment": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Minimum commitment: tickets over the agreement term (decided 29 September, data model DM4)"
+   },
+   "salesTarget": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Sales target over the agreement term (decided 29 September, data model DM4)"
+   },
+   "agreementValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Agreement value (MoM 31 Aug 4.4: each agreement captures term/value) (decided 29 September, data model DM4)"
+   },
+   "commissionTerms": {
+    "type": "string",
+    "nullable": true,
+    "description": "Commission terms as written in the contract; the rules that compute it are `control.partner_commission_rule` (decided 29 September, data model DM4)"
+   },
+   "creditTerms": {
+    "type": "string",
+    "nullable": true,
+    "description": "Credit terms as written in the contract (decided 29 September, data model DM4)"
+   },
+   "allocationTerms": {
+    "type": "string",
+    "nullable": true,
+    "description": "Allocation terms as written in the contract; the allocations are `control.partner_allocation` (decided 29 September, data model DM4)"
+   },
+   "cancellationConditions": {
+    "type": "string",
+    "nullable": true,
+    "description": "Cancellation conditions (decided 29 September, data model DM4)"
+   },
+   "refundConditions": {
+    "type": "string",
+    "nullable": true,
+    "description": "Refund conditions (pack p.26) (decided 29 September, data model DM4)"
+   },
+   "bookingRestrictions": {
+    "type": "string",
+    "nullable": true,
+    "description": "Booking restrictions as written in the contract; the enforced limits are `control.partner_booking_limit` (decided 29 September, data model DM4)"
+   },
+   "settlementTerms": {
+    "type": "string",
+    "nullable": true,
+    "description": "Settlement terms (decided 29 September, data model DM4)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope, as every control.partner_* row carries it, so row-level security scopes the agreement the same way (decided 29 September, writers pass; DM4)"
    }
   }
  },
@@ -3680,10 +4810,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -3702,7 +4834,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "The amount in `tenderCurrency`, at that currency's own scale."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
    },
@@ -3746,7 +4882,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",
@@ -3797,18 +4971,146 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "type": "string",
       "format": "date-time",
       "nullable": true
+     },
+     "version": {
+      "type": "integer",
+      "minimum": 1,
+      "readOnly": true,
+      "description": "Starts at 1 and goes up by one on every saved change. The version the directory, the audit history (`promotions.promotion_audit`) and the channel publication monitor (`promotions.promotion_channel_publication`) name. (DM5, 29 September: data model for the agreed operations)"
      }
     }
    }
   ]
  },
+ "PromotionConditions": {
+  "x-ticvai-persistence": "none — embedded in promotion",
+  "type": "object",
+  "description": "All conditions must hold. An empty object matches everything.",
+  "properties": {
+   "variantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "productKinds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "categoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "minQuantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "minBasketValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channels": {
+    "type": "array",
+    "description": "Empty or absent matches every channel.",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+    }
+   },
+   "purchaseGate": {
+    "type": "boolean",
+    "default": false,
+    "description": "BL-037. **`evaluatePromotions` gates a price and nothing gated a sale.** A non-member could buy a member-only product at the member price refused, which is a discount failure rather than an eligibility one.\nTrue makes these conditions a **precondition of purchase**: fail them and the line cannot be added, not merely charged more. **Evaluated at add-to-cart**, because a guest told at payment has already entered a card.\n"
+   },
+   "paymentMethod": {
+    "type": "array",
+    "nullable": true,
+    "description": "BL-113. **Card-issuer and payment-type promotions** — *10% with a Network International card* is a real campaign a bank co-funds, and it was unexpressible.\n**Evaluated at payment, not at cart**, which is the awkward part: the discount appears after the tender is chosen, and the basket total must be allowed to move at that point.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "issuerBins": {
+    "type": "array",
+    "nullable": true,
+    "description": "Card BIN ranges, where the campaign is issuer-specific rather than scheme-specific. **The bank supplies these and they change**, so they are data rather than configuration.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "componentRedemption": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "allTogether",
+     "independently",
+     "sequenced"
+    ],
+    "description": "BL-112. **Per-component redemption inside a bundle was unstated.** A park-plus-lunch bundle where lunch may be used another day behaves differently from one where both must be used on the same visit, and **the difference is revenue recognition, not just convenience.**\n"
+   },
+   "daysOfWeek": {
+    "type": "array",
+    "items": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 6
+    }
+   },
+   "startTime": {
+    "type": "string",
+    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+   },
+   "endTime": {
+    "type": "string",
+    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+   },
+   "membershipTierIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "requiresCoupon": {
+    "type": "boolean",
+    "default": false
+   },
+   "firstPurchaseOnly": {
+    "type": "boolean",
+    "default": false
+   },
+   "performanceIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "advanceDaysMin": {
+    "type": "integer",
+    "description": "Early-bird — booked at least this many days ahead."
+   },
+   "advanceDaysMax": {
+    "type": "integer",
+    "description": "Last-minute — booked no more than this many days ahead."
+   },
+   "eligibilityRuleIds": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Reusable eligibility rules (`promotions.promotion_rule` rows of `ruleType: eligibility` with no promotion of their own, saved by setEligibilityRule) that must also hold. Each is evaluated with its own `effect`. (DM5, 29 September: data model for the agreed operations)"
+   }
+  }
+ },
  "PromotionEvaluation": {
   "x-ticvai-persistence": "none — computed",
-  "parameters": [
-   {
-    "$ref": "../shared/common.yaml#/components/parameters/IdempotencyKey"
-   }
-  ],
   "type": "object",
   "required": [
    "totalDiscount",
@@ -3966,7 +5268,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "object",
      "properties": {
       "channel": {
-       "type": "string"
+       "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
       },
       "redemptionCount": {
        "type": "integer"
@@ -3991,13 +5293,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "batchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "readOnly": true,
     "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
@@ -4179,6 +5494,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ]
    },
    "totalPrice": {
+    "x-ticvai-column": "gross_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "heldByPrincipalId": {
@@ -4204,8 +5520,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "StackingMode": {
+  "type": "string",
+  "description": "How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine into a free ticket.\n",
+  "enum": [
+   "exclusive",
+   "stackable",
+   "bestOnly",
+   "stackWithGroup"
+  ]
+ },
  "TenderKind": {
   "type": "string",
+  "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
   "enum": [
    "cash",
    "card",
@@ -4216,6 +5543,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "installment",
    "giftCard",
    "complimentary"
+  ]
+ },
+ "VoidReason": {
+  "type": "string",
+  "description": "**The void reason list** (decided 28 September, audit R125 (4)): the one list `voidOrder` takes, and the list `fnb.amendFnbOrder` and `fnb.cancelFnbOrder` point to. `other` requires a note (audit R222), and the notes are reviewed quarterly to add real reasons. Proposed, client to correct.\n",
+  "enum": [
+   "guestChangedMind",
+   "enteredInError",
+   "itemUnavailable",
+   "qualityIssue",
+   "duplicate",
+   "other"
   ]
  }
 }

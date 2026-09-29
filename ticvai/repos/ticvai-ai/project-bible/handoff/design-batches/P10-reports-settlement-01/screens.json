@@ -18,36 +18,13 @@
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-002",
     "PTR-003"
    ],
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-014 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -56,13 +33,6 @@
   "pattern": "listDetail",
   "patternReason": "`listSettlements` reads the population and `getSettlement` reads one of them — list, select, act",
   "purpose": "Take the money, and be unambiguous about whether it worked.",
-  "gaps": [
-   {
-    "operation": "listSettlementExceptions",
-    "why": "**1 declared operation reach no component on this screen**: listSettlementExceptions. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -71,8 +41,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Provider name",
+       "operation": "listSettlements",
+       "notes": "Sends `?providerName=` to `listSettlements`.",
+       "provenance": "contract finance.yaml GET /settlements"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listSettlements",
+       "notes": "Sends `?status=` to `listSettlements`.",
+       "provenance": "contract finance.yaml GET /settlements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every settlement payment history",
+       "label": "Every settlement",
        "bindsTo": "Settlement",
        "columns": [
         "Settlement.id",
@@ -90,6 +74,26 @@
        ],
        "operation": "listSettlements",
        "provenance": "contract finance.yaml GET /settlements"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every settlement exception",
+       "bindsTo": "SettlementException",
+       "columns": [
+        "SettlementException.id",
+        "SettlementException.settlementId",
+        "SettlementException.kind",
+        "SettlementException.providerReference",
+        "SettlementException.paymentId",
+        "SettlementException.amount",
+        "SettlementException.expectedAmount",
+        "SettlementException.resolution",
+        "SettlementException.note",
+        "SettlementException.resolvedByPrincipalId",
+        "SettlementException.resolvedAt"
+       ],
+       "operation": "listSettlementExceptions",
+       "provenance": "contract finance.yaml GET /settlements/{settlementId}/exceptions"
       }
      ]
     },
@@ -99,7 +103,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected settlement payment history",
+       "label": "The selected settlement",
        "bindsTo": "Settlement",
        "columns": [
         "Settlement.id",
@@ -130,13 +134,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Ingest",
+       "label": "Ingest settlement file",
        "operation": "ingestSettlementFile",
        "provenance": "contract finance.yaml POST /settlements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resolve",
+       "label": "Resolve settlement exception",
        "operation": "resolveSettlementException",
        "provenance": "contract finance.yaml POST /settlements/{settlementId}/exceptions"
       }
@@ -147,9 +151,9 @@
   "states": {
    "loading": "The settlement payment history list.",
    "error": "Could not load. Names which read failed and leaves the settlement payment history untouched.",
-   "emptyFirstRun": "No settlement payment history yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the settlement payment history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No settlement payment history yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on providerName, status and the settlement payment history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -162,7 +166,7 @@
     "operationId": "getSettlement",
     "contract": "finance",
     "purpose": "Settlement detail with match results",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "ingestSettlementFile",
@@ -177,7 +181,7 @@
     "operationId": "listSettlementExceptions",
     "contract": "finance",
     "purpose": "Unmatched or mismatched settlement lines",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "resolveSettlementException",
@@ -211,6 +215,49 @@
    "board": "wireframes/P10 Partner Web.dc.html#ptr-014"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formIngestSettlementFile",
+    "component": "modal",
+    "trigger": "Ingest settlement file",
+    "body": "**Collects what `ingestSettlementFile` sends before it is called.** Required: `providerName`, `periodStart`, `periodEnd`, `fileReference`. Optional: `format`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ingest settlement file",
+     "operation": "ingestSettlementFile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "providerName",
+      "periodStart",
+      "periodEnd",
+      "fileReference",
+      "format"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /settlements"
+   },
+   {
+    "id": "formResolveSettlementException",
+    "component": "modal",
+    "trigger": "Resolve settlement exception",
+    "body": "**Collects what `resolveSettlementException` sends before it is called.** Required: `exceptionId`, `resolution`, `note`. Optional: `matchedPaymentId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Resolve settlement exception",
+     "operation": "resolveSettlementException"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "exceptionId",
+      "resolution",
+      "note",
+      "matchedPaymentId"
+     ]
+    },
+    "provenance": "contract finance.yaml POST /settlements/{settlementId}/exceptions"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -253,36 +300,13 @@
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-002",
     "PTR-003"
    ],
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-017 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -302,8 +326,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "numberField",
+       "label": "Expiring within days",
+       "operation": "listPartnerAgreements",
+       "notes": "Sends `?expiringWithinDays=` to `listPartnerAgreements`.",
+       "provenance": "contract subscription.yaml GET /partner-agreements"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listPartnerAgreements",
+       "notes": "Sends `?status=` to `listPartnerAgreements`.",
+       "provenance": "contract subscription.yaml GET /partner-agreements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every commission statement",
+       "label": "Every partner agreement",
        "bindsTo": "PartnerAgreement",
        "columns": [
         "PartnerAgreement.id",
@@ -330,7 +368,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected commission statement",
+       "label": "The selected partner agreement",
+       "bindsTo": "PartnerAgreement",
+       "columns": [
+        "PartnerAgreement.id",
+        "PartnerAgreement.partnerId",
+        "PartnerAgreement.partnerName",
+        "PartnerAgreement.status",
+        "PartnerAgreement.rateMode",
+        "PartnerAgreement.commissionPercent",
+        "PartnerAgreement.volumeTiers",
+        "PartnerAgreement.volumeWindow",
+        "PartnerAgreement.seasonalRates",
+        "PartnerAgreement.segmentTier",
+        "PartnerAgreement.brandingAssetId",
+        "PartnerAgreement.storefrontSubdomain",
+        "PartnerAgreement.sponsorship",
+        "PartnerAgreement.netRates",
+        "PartnerAgreement.creditTermDays",
+        "PartnerAgreement.acceptedByPrincipalId"
+       ],
+       "operation": "listPartnerAgreements",
+       "provenance": "contract subscription.yaml GET /partner-agreements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The commission statement",
        "bindsTo": "CommissionStatement",
        "columns": [
         "CommissionStatement.agreementId",
@@ -349,35 +412,22 @@
        "provenance": "contract subscription.yaml GET /partner-agreements/{agreementId}/commission-statement"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPartnerAgreements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The commission statement list.",
    "error": "Could not load. Names which read failed and leaves the commission statement untouched.",
-   "emptyFirstRun": "No commission statement yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the commission statement are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No commission statement yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on expiringWithinDays, status and the commission statement are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PARTNER_VIEW`, which `getCommissionStatement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "getCommissionStatement",
     "contract": "subscription",
     "purpose": "What the partner earned and what is owed",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listPartnerAgreements",
@@ -395,11 +445,11 @@
    ],
    "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `agreementId`.",
    "preloaded": [
-    "CommissionStatement.agreementId",
-    "CommissionStatement.partnerName",
-    "CommissionStatement.from",
-    "CommissionStatement.to",
-    "CommissionStatement.currency"
+    "PartnerAgreement.id",
+    "PartnerAgreement.partnerId",
+    "PartnerAgreement.partnerName",
+    "PartnerAgreement.status",
+    "PartnerAgreement.rateMode"
    ]
   },
   "wireframe": {
@@ -451,36 +501,13 @@
    ],
    "inferred": true,
    "exitTo": [
-    "PTR-001",
-    "PTR-002",
     "PTR-003"
    ],
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-018 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -489,13 +516,6 @@
   "pattern": "listDetail",
   "patternReason": "`listReports` reads the population and `getFinancialReport` reads one of them — list, select, act",
   "purpose": "Answer a question about reports with numbers someone can check.",
-  "gaps": [
-   {
-    "operation": "getReport",
-    "why": "**1 declared operation reach no component on this screen**: getReport. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -504,8 +524,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Category",
+       "operation": "listReports",
+       "notes": "Sends `?category=` to `listReports`.",
+       "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listReports",
+       "notes": "Sends `?search=` to `listReports`.",
+       "provenance": "contract reporting.yaml GET /reports"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every reports sales performance",
+       "label": "Every report definition",
        "bindsTo": "ReportDefinition",
        "columns": [
         "ReportDefinition.name",
@@ -532,7 +566,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected reports sales performance",
+       "label": "The selected report definition",
+       "bindsTo": "ReportDefinition",
+       "columns": [
+        "ReportDefinition.name",
+        "ReportDefinition.description",
+        "ReportDefinition.category",
+        "ReportDefinition.dataSource",
+        "ReportDefinition.columns",
+        "ReportDefinition.filters",
+        "ReportDefinition.groupBy",
+        "ReportDefinition.parameters",
+        "ReportDefinition.requiredPermission",
+        "ReportDefinition.maxDateRangeDays",
+        "ReportDefinition.id",
+        "ReportDefinition.isSystem",
+        "ReportDefinition.isRetired",
+        "ReportDefinition.estimatedCost",
+        "ReportDefinition.createdByPrincipalId",
+        "ReportDefinition.lastRunAt"
+       ],
+       "operation": "getReport",
+       "provenance": "contract reporting.yaml GET /reports/{reportId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The financial report",
        "bindsTo": "FinancialReport",
        "columns": [
         "FinancialReport.report",
@@ -554,37 +613,37 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Ask",
+       "label": "Ask reporting question",
        "operation": "askReportingQuestion",
        "provenance": "contract reporting.yaml POST /reports/ask"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create report",
        "operation": "createReport",
        "provenance": "contract reporting.yaml POST /reports"
       },
       {
        "kind": "destructiveButton",
-       "label": "Delete",
+       "label": "Delete report",
        "operation": "deleteReport",
        "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save",
+       "label": "Save natural language query",
        "operation": "saveNaturalLanguageQuery",
        "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save report",
        "operation": "updateReport",
        "provenance": "contract reporting.yaml PUT /reports/{reportId}"
       }
@@ -596,24 +655,137 @@
    {
     "id": "confirmDeleteReport",
     "component": "confirmDialog",
-    "trigger": "Delete",
+    "trigger": "Delete report",
     "body": "**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than the verb. A reports sales performance this affects should be identified in the dialog, not just counted.",
     "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formAskReportingQuestion",
+    "component": "modal",
+    "trigger": "Ask reporting question",
+    "body": "**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional: `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ask reporting question",
+     "operation": "askReportingQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "question",
+      "conversationId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask"
+   },
+   {
+    "id": "formCreateReport",
+    "component": "modal",
+    "trigger": "Create report",
+    "body": "**Collects what `createReport` sends before it is called.** Required: `name`, `category`, `dataSource`, `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReportRequest",
+    "confirm": {
+     "label": "Create report",
+     "operation": "createReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category",
+      "dataSource",
+      "columns",
+      "requiredPermission",
+      "description",
+      "filters",
+      "groupBy",
+      "parameters",
+      "maxDateRangeDays"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports"
+   },
+   {
+    "id": "formSaveNaturalLanguageQuery",
+    "component": "modal",
+    "trigger": "Save natural language query",
+    "body": "**Collects what `saveNaturalLanguageQuery` sends before it is called.** Required: `name`. Optional: `category`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save natural language query",
+     "operation": "saveNaturalLanguageQuery"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
+   },
+   {
+    "id": "formUpdateReport",
+    "component": "modal",
+    "trigger": "Save report",
+    "body": "**Collects what `updateReport` sends before it is called.** Required: `name`, `category`, `dataSource`, `columns`, `requiredPermission`. Optional: `description`, `filters`, `groupBy`, `parameters`, `maxDateRangeDays`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReportRequest",
+    "confirm": {
+     "label": "Save report",
+     "operation": "updateReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "category",
+      "dataSource",
+      "columns",
+      "requiredPermission",
+      "description",
+      "filters",
+      "groupBy",
+      "parameters",
+      "maxDateRangeDays"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /reports/{reportId}"
    }
   ],
   "states": {
    "loading": "The reports sales performance list.",
    "error": "Could not load. Names which read failed and leaves the reports sales performance untouched.",
-   "emptyFirstRun": "No reports sales performance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reports sales performance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No reports sales performance yet. Offers Create report (`createReport`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on category, search and the reports sales performance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "runReport",
     "contract": "reporting",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "askReportingQuestion",
@@ -652,7 +824,7 @@
     "operationId": "getReport",
     "contract": "reporting",
     "purpose": "Read a report definition",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listReports",
@@ -692,11 +864,11 @@
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
    "preloaded": [
-    "FinancialReport.report",
-    "FinancialReport.fiscalPeriodId",
-    "FinancialReport.legalEntityId",
-    "FinancialReport.currency",
-    "FinancialReport.currencyScale"
+    "ReportDefinition.name",
+    "ReportDefinition.description",
+    "ReportDefinition.category",
+    "ReportDefinition.dataSource",
+    "ReportDefinition.columns"
    ]
   },
   "wireframe": {

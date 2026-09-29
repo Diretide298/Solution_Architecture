@@ -1,6 +1,6 @@
 # P10-reports-settlement-01 — P10 · Reports & Settlement
 
-**3 screens · 16 operations · 20 schemas · 6 permissions**
+**3 screens · 16 operations · 26 schemas · 6 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 6 permissions apply here:
   `PARTNER_MANAGE, PARTNER_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, SETTLEMENT_RECONCILE, SETTLEMENT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,10 +60,6 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-014` | Settlement & Payment History | listDetail | 5 | 0 | — |
+| `PTR-014` | Settlement & Payment History | listDetail | 5 | 2 | — |
 | `PTR-017` | Commission Statement | listDetail | 2 | 0 | — |
-| `PTR-018` | Reports & Sales Performance | listDetail | 9 | 1 | — |
-
-## Thin screens in this batch
-
-**PTR-017 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `PTR-018` | Reports & Sales Performance | listDetail | 9 | 6 | — |

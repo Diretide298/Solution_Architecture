@@ -18,6 +18,25 @@
   "requestBody": "CreateCaseRequest",
   "responds": "Case"
  },
+ "getVisitPlan": {
+  "method": "GET",
+  "path": "/visit-plans/{planId}",
+  "contract": "venue-map",
+  "summary": "A visit plan, at its current version or an earlier one",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VisitPlan"
+ },
  "getWaitTimes": {
   "method": "GET",
   "path": "/queues/wait-times",
@@ -64,7 +83,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "AiConversation"
+  "responds": "Page"
  },
  "listCases": {
   "method": "GET",
@@ -97,6 +116,11 @@
     "required": null
    },
    {
+    "name": "membershipId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -110,32 +134,22 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listProducts": {
+ "listVisitPlanAlternatives": {
   "method": "GET",
-  "path": "/products",
-  "contract": "catalogue",
-  "summary": "List products",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
+  "path": "/visit-plans/{planId}/items/{itemId}/alternatives",
+  "contract": "venue-map",
+  "summary": "What could take this item's place",
+  "permission": null,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": null
-   },
    {
     "name": "kind",
     "in": "query",
     "required": null
    },
    {
-    "name": "isSellable",
-    "in": "query",
-    "required": null
-   },
-   {
     "name": null,
     "in": null,
     "required": null
@@ -149,12 +163,12 @@
   "requestBody": null,
   "responds": "Page"
  },
- "requestSuggestion": {
-  "method": "POST",
-  "path": "/ai/suggestions",
-  "contract": "ai",
-  "summary": "Ask for an answer, however it is currently produced",
-  "permission": "AI_USE",
+ "updateVisitPlan": {
+  "method": "PUT",
+  "path": "/visit-plans/{planId}",
+  "contract": "venue-map",
+  "summary": "Swap, remove, add, move or undo, as a new version",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -165,7 +179,7 @@
     "required": null
    }
   ],
-  "requestBody": null,
-  "responds": "Suggestion"
+  "requestBody": "VisitPlanUpdate",
+  "responds": "VisitPlan"
  }
 }

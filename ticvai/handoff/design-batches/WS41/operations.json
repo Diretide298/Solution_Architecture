@@ -57,6 +57,59 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listCookieScanPolicies": {
+  "method": "GET",
+  "path": "/cookie-scan-policy",
+  "contract": "marketing-crm",
+  "summary": "Scan schedules per channel",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCookieScans": {
+  "method": "GET",
+  "path": "/cookie-tracking-digital/scans",
+  "contract": "marketing-crm",
+  "summary": "Scan runs and what each found",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listCookieTrackingDigital": {
   "method": "GET",
   "path": "/cookie-tracking-digital",
@@ -277,6 +330,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "recordCookieScan": {
+  "method": "POST",
+  "path": "/cookie-tracking-digital/scans",
+  "contract": "marketing-crm",
+  "summary": "Take in the result of a site or app scan",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordCookieScanRequest",
+  "responds": null
+ },
  "setCommunicationPreferenceMarketing": {
   "method": "PUT",
   "path": "/communication-preference-marketing",
@@ -334,6 +406,44 @@
   "requestBody": null,
   "responds": "ConsentPurposeConfig"
  },
+ "setCookieBannerDesign": {
+  "method": "PUT",
+  "path": "/cookie-banner-preference",
+  "contract": "marketing-crm",
+  "summary": "Save a cookie banner design as a new version",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CookieBannerPreferenceCenterDesignerView",
+  "responds": "CookieBannerPreferenceCenterDesignerView"
+ },
+ "setCookieScanPolicy": {
+  "method": "PUT",
+  "path": "/cookie-scan-policy",
+  "contract": "marketing-crm",
+  "summary": "Set how often a channel is scanned and who is alerted",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CookieScanPolicy",
+  "responds": "CookieScanPolicy"
+ },
  "setMinorGuardianAge": {
   "method": "PUT",
   "path": "/minor-guardian-age",
@@ -371,5 +481,24 @@
   ],
   "requestBody": "PrivacyNoticeGovernance",
   "responds": "PrivacyNoticeGovernance"
+ },
+ "setTrackingTechnology": {
+  "method": "PUT",
+  "path": "/cookie-tracking-digital",
+  "contract": "marketing-crm",
+  "summary": "Add, classify or retire a tracking technology",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CookieTrackingDigitalTechnologyRegistryView",
+  "responds": "CookieTrackingDigitalTechnologyRegistryView"
  }
 }

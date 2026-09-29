@@ -1,6 +1,6 @@
 # WS82 — Game and Ride board 5
 
-**10 screens · 8 operations · 13 schemas · 4 permissions**
+**10 screens · 8 operations · 16 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -1875,6 +1875,169 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiPricingIntelligenceCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on AI Pricing Intelligence Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "activeAiRecommendations": {
+    "type": "integer",
+    "description": "Active AI Recommendations"
+   },
+   "highPriorityOpportunities": {
+    "type": "integer",
+    "description": "High-Priority Opportunities"
+   },
+   "estimatedRevenueOpportunity": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Estimated Revenue Opportunity"
+   },
+   "demandSurgesDetected": {
+    "type": "integer",
+    "description": "Demand Surges Detected: granules forecast materially above baseline"
+   },
+   "demandRisksDetected": {
+    "type": "integer",
+    "description": "Demand Risks Detected: granules forecast materially below baseline"
+   },
+   "externalSignalsActive": {
+    "type": "integer",
+    "description": "External Signals Active"
+   },
+   "nearbyEventsDetected": {
+    "type": "integer",
+    "description": "Nearby Events Detected within the configured monitoring radius"
+   },
+   "weatherImpacts": {
+    "type": "integer",
+    "description": "Weather Impacts"
+   },
+   "competitorMovements": {
+    "type": "integer",
+    "description": "Competitor Movements"
+   },
+   "forecastAccuracy": {
+    "type": "number",
+    "description": "Forecast Accuracy (100 - MAPE over the last 30 days (decided 29 September, readiness close-out)), percent"
+   },
+   "averageAiConfidence": {
+    "type": "number",
+    "description": "Average AI Confidence across active recommendations, percent"
+   },
+   "dataQualityIssues": {
+    "type": "integer",
+    "description": "Data Quality Issues"
+   },
+   "aiSummary": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Summary (pack p.95), e.g. demand forecast 19% above baseline and its drivers. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "AiPricingIntelligenceCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Pricing Intelligence Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "productEvent": {
+    "type": "string",
+    "description": "Product/Event name the opportunity applies to"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue name"
+   },
+   "currentPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Current Price"
+   },
+   "recommendedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Recommended Price"
+   },
+   "adjustment": {
+    "type": "number",
+    "description": "Adjustment % from current to recommended price, percent"
+   },
+   "demandForecast": {
+    "type": "integer",
+    "description": "Demand Forecast: forecast demand (admissions) for the period"
+   },
+   "revenueOpportunity": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Opportunity"
+   },
+   "confidence": {
+    "type": "number",
+    "description": "AI confidence in the recommendation, 0-100, percent"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk of acting on the recommendation",
+    "enum": [
+     "low",
+     "medium",
+     "high"
+    ]
+   },
+   "urgency": {
+    "type": "string",
+    "description": "Urgency (time to event and velocity)",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "recommendationId": {
+    "type": "string",
+    "description": "Recommendation id; drill-down key into listPricingRecommendationExplainability"
+   },
+   "drivers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "signal": {
+       "type": "string",
+       "enum": [
+        "internalSales",
+        "bookingVelocity",
+        "occupancy",
+        "historicalEvents",
+        "nearbyEvent",
+        "weather",
+        "marketTourism",
+        "competitor",
+        "priceElasticity",
+        "other"
+       ],
+       "description": "Signal category behind the driver"
+      },
+      "direction": {
+       "type": "string",
+       "enum": [
+        "up",
+        "down"
+       ],
+       "description": "Whether the driver pushes the price up or down"
+      },
+      "explanation": {
+       "type": "string",
+       "description": "Business-language evidence, e.g. booking velocity 31% above forecast"
+      }
+     }
+    },
+    "description": "Primary drivers of the recommendation (pack's up/down driver list); explanatory, not literal model weights"
+   }
+  }
+ },
  "DynamicPriceRuleDetail": {
   "type": "object",
   "x-ticvai-persistence": "none — composed from a rule, its conditions and its actions",
@@ -2547,6 +2710,73 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "testScenario": {
     "$ref": "#/components/schemas/RulePriorityTestScenario"
+   }
+  }
+ },
+ "RulePriorityConflictResolutionDynamicPricingTestConsSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Rule Priority, Conflict Resolution & Dynamic Pricing Test Console.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "contradictoryRules": {
+    "type": "integer",
+    "description": "Open contradictoryRules conflicts detected across active and draft rules"
+   },
+   "samePriority": {
+    "type": "integer",
+    "description": "Open samePriority conflicts detected across active and draft rules"
+   },
+   "impossibleCondition": {
+    "type": "integer",
+    "description": "Open impossibleCondition conflicts detected across active and draft rules"
+   },
+   "overlappingStrategy": {
+    "type": "integer",
+    "description": "Open overlappingStrategy conflicts detected across active and draft rules"
+   },
+   "circularDependency": {
+    "type": "integer",
+    "description": "Open circularDependency conflicts detected across active and draft rules"
+   },
+   "missingFallback": {
+    "type": "integer",
+    "description": "Open missingFallback conflicts detected across active and draft rules"
+   },
+   "guardrailConflict": {
+    "type": "integer",
+    "description": "Open guardrailConflict conflicts detected across active and draft rules"
+   },
+   "resolutionMethod": {
+    "type": "string",
+    "enum": [
+     "highestPriorityWins",
+     "mostSpecificRuleWins",
+     "cumulativeAdjustment",
+     "maximumAdjustmentWins",
+     "minimumAdjustmentWins",
+     "weightedCombination",
+     "stopProcessing",
+     "customGovernedResolution"
+    ],
+    "description": "Resolution Method in force (pack p.89); defaults to highestPriorityWins (decided 29 September, readiness close-out)"
+   },
+   "priorityHierarchy": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "commercialProtection",
+      "contractMemberProtection",
+      "eventSpecificStrategy",
+      "inventoryOccupancy",
+      "bookingVelocity",
+      "timeToEvent",
+      "seasonDayTimeslot",
+      "basePrice"
+     ]
+    },
+    "description": "Priority Matrix, highest first; defaults to the pack's order (decided 29 September, readiness close-out)"
    }
   }
  },

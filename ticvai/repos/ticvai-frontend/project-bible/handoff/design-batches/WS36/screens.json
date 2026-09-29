@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-068 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-069",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can understand the complete status and health of TICVAI tax, fee and price-calculation configuration from one workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide Finance, Commercial and Pricing administrators with one central view of TICVAI's price-calculation configuration.",
-  "purposeNote": "Authorized administrators can understand the complete status and health of TICVAI tax, fee and price-calculation configuration from one workspace.",
   "gaps": [
    {
     "operation": null,
@@ -143,24 +140,102 @@
     },
     {
      "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Tax Profiles",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.activeTaxProfiles",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Tax Jurisdictions",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.taxJurisdictions",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Fee Profiles",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.activeFeeProfiles",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Surcharges",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.activeSurcharges",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Exemption Rules",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.exemptionRules",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Calculation Profiles",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.calculationProfiles",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products missing tax",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.productsMissingTax",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products Missing Calculation Profile",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.productsMissingCalculationProfile",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Configuration Conflicts",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.configurationConflicts",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Upcoming Tax Changes",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.upcomingTaxChanges",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Validation Issues",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.validationIssues",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Recently modified rules",
+       "bindsTo": "TaxFeeCalculationCommandCenterSummary.recentlyModifiedRules",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
        "label": "Every tax fee calculation",
        "columns": [
-        "TaxFeeCalculationCommandCenterView.activeTaxProfiles",
-        "TaxFeeCalculationCommandCenterView.taxJurisdictions",
-        "TaxFeeCalculationCommandCenterView.activeFeeProfiles",
-        "TaxFeeCalculationCommandCenterView.activeSurcharges",
-        "TaxFeeCalculationCommandCenterView.exemptionRules",
-        "TaxFeeCalculationCommandCenterView.calculationProfiles",
-        "TaxFeeCalculationCommandCenterView.productsMissingTax",
-        "TaxFeeCalculationCommandCenterView.productsMissingCalculationProfile",
-        "TaxFeeCalculationCommandCenterView.configurationConflicts",
-        "TaxFeeCalculationCommandCenterView.upcomingTaxChanges",
-        "TaxFeeCalculationCommandCenterView.validationIssues",
-        "TaxFeeCalculationCommandCenterView.recentlyModifiedRules",
         "TaxFeeCalculationCommandCenterView.profileName",
         "TaxFeeCalculationCommandCenterView.type",
         "TaxFeeCalculationCommandCenterView.country",
@@ -168,7 +243,6 @@
         "TaxFeeCalculationCommandCenterView.market",
         "TaxFeeCalculationCommandCenterView.currency",
         "TaxFeeCalculationCommandCenterView.productScope",
-        "TaxFeeCalculationCommandCenterView.effectivePeriod",
         "TaxFeeCalculationCommandCenterView.status",
         "TaxFeeCalculationCommandCenterView.owner"
        ],
@@ -187,18 +261,6 @@
        "label": "The selected tax fee calculation",
        "bindsTo": "TaxFeeCalculationCommandCenterView",
        "columns": [
-        "TaxFeeCalculationCommandCenterView.activeTaxProfiles",
-        "TaxFeeCalculationCommandCenterView.taxJurisdictions",
-        "TaxFeeCalculationCommandCenterView.activeFeeProfiles",
-        "TaxFeeCalculationCommandCenterView.activeSurcharges",
-        "TaxFeeCalculationCommandCenterView.exemptionRules",
-        "TaxFeeCalculationCommandCenterView.calculationProfiles",
-        "TaxFeeCalculationCommandCenterView.productsMissingTax",
-        "TaxFeeCalculationCommandCenterView.productsMissingCalculationProfile",
-        "TaxFeeCalculationCommandCenterView.configurationConflicts",
-        "TaxFeeCalculationCommandCenterView.upcomingTaxChanges",
-        "TaxFeeCalculationCommandCenterView.validationIssues",
-        "TaxFeeCalculationCommandCenterView.recentlyModifiedRules",
         "TaxFeeCalculationCommandCenterView.profileName",
         "TaxFeeCalculationCommandCenterView.type",
         "TaxFeeCalculationCommandCenterView.country",
@@ -206,7 +268,6 @@
         "TaxFeeCalculationCommandCenterView.market",
         "TaxFeeCalculationCommandCenterView.currency",
         "TaxFeeCalculationCommandCenterView.productScope",
-        "TaxFeeCalculationCommandCenterView.effectivePeriod",
         "TaxFeeCalculationCommandCenterView.status",
         "TaxFeeCalculationCommandCenterView.owner"
        ],
@@ -266,22 +327,37 @@
     "contract": "catalogue",
     "purpose": "Tax, Fee & Calculation Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTaxInvoices",
+    "contract": "finance",
+    "purpose": "List tax invoices",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getVatReturn",
+    "contract": "finance",
+    "purpose": "VAT return (FTA boxes) for a period",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
    "preloaded": [
-    "TaxFeeCalculationCommandCenterView.activeTaxProfiles",
-    "TaxFeeCalculationCommandCenterView.taxJurisdictions",
-    "TaxFeeCalculationCommandCenterView.activeFeeProfiles",
-    "TaxFeeCalculationCommandCenterView.activeSurcharges",
-    "TaxFeeCalculationCommandCenterView.exemptionRules",
-    "TaxFeeCalculationCommandCenterView.calculationProfiles"
+    "TaxFeeCalculationCommandCenterSummary.activeTaxProfiles",
+    "TaxFeeCalculationCommandCenterSummary.taxJurisdictions",
+    "TaxFeeCalculationCommandCenterSummary.activeFeeProfiles",
+    "TaxFeeCalculationCommandCenterSummary.activeSurcharges",
+    "TaxFeeCalculationCommandCenterSummary.exemptionRules",
+    "TaxFeeCalculationCommandCenterSummary.calculationProfiles"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-068"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-068",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-068"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 39. 22 of 29 labels bound to a contract property; 35 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -345,10 +421,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "jurisdictions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define reusable tax profiles according to legal entity, country, jurisdiction and commercial context.",
-  "purposeNote": "jurisdictions.",
   "gaps": [
    {
     "operation": null,
@@ -469,16 +545,42 @@
     "operationId": "setTaxProfileJurisdiction",
     "contract": "catalogue",
     "purpose": "Tax Profile & Jurisdiction Configuration",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listTaxInvoiceTemplates",
+    "contract": "finance",
+    "purpose": "Show invoice templates and number series",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setTaxInvoiceTemplate",
+    "contract": "finance",
+    "purpose": "Edit an invoice template and series",
     "trigger": "onAction",
-    "invalidates": [
-     "setTaxProfileJurisdiction"
-    ]
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listEInvoicingProviders",
+    "contract": "finance",
+    "purpose": "Show the e-invoicing provider connection",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setEInvoicingProvider",
+    "contract": "finance",
+    "purpose": "Configure the e-invoicing provider",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-069"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-069",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-069"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 40. 0 of 0 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -542,14 +644,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "taxable commercial transaction.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define how taxes are applied to products and transactions.",
-  "purposeNote": "taxable commercial transaction.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Fixed Tax. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Out of Scope, Fixed Tax. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 41 §Support"
    },
    {
@@ -587,6 +689,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Out of Scope",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 41 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Fixed Tax",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 41 §Support"
       }
@@ -610,18 +717,16 @@
     "operationId": "setTaxRuleTreatment",
     "contract": "catalogue",
     "purpose": "Tax Rule & Treatment Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setTaxRuleTreatment"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-070"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-070",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-070"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 4 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 5 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -683,14 +788,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "than defining them separately within sales channels.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure whether the fee is) and no display directory — it is settings, not a population",
   "purpose": "Create standardized reusable non-base-price charges.",
-  "purposeNote": "than defining them separately within sales channels.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 16 actions on this screen and the screen declares 1 operation.** Unserved: Booking Fee, Transaction Fee, Service Fee, Convenience Fee, Delivery Fee, Handling Fee, Modification Fee, Rescheduling Fee …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 18 actions on this screen; 8 are served since the writers pass (29 September): Booking Fee, Transaction Fee, Service Fee, Convenience Fee, Delivery Fee, Handling Fee, Modification Fee, Rescheduling Fee by `setFeeDefinition`.** Still unserved: the rest of the pack list past the eight shown here. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
    }
   ],
@@ -821,6 +926,14 @@
        "kind": "secondaryButton",
        "label": "Rescheduling Fee",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save fee definition",
+       "operation": "setFeeDefinition",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The fee and surcharge library** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /fees"
       }
      ]
     }
@@ -838,14 +951,60 @@
     "contract": "catalogue",
     "purpose": "Fee & Surcharge Library",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setFeeDefinition",
+    "contract": "catalogue",
+    "purpose": "Create or update a fee or surcharge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFeeSurcharge"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-071"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-071",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-071"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 31 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 33 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetFeeDefinition",
+    "component": "modal",
+    "trigger": "Save fee definition",
+    "body": "**Collects what `setFeeDefinition` sends before it is called.** Required: `id`, `scopePath`, `code`, `name`, `feeType`, `valueType`, `chargeBasis`, `status`. Optional: `description`, `amount`, `percentage`, `tiers`, `taxTreatment`, `refundability`, `visibility`, `effectiveFrom`, `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PricingFee",
+    "confirm": {
+     "label": "Save fee definition",
+     "operation": "setFeeDefinition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "code",
+      "name",
+      "feeType",
+      "valueType",
+      "chargeBasis",
+      "status",
+      "description",
+      "amount",
+      "percentage",
+      "tiers",
+      "taxTreatment",
+      "refundability",
+      "visibility",
+      "effectiveFrom",
+      "effectiveTo"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /fees"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -907,14 +1066,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "satisfied.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure whether fees can) and no display directory — it is settings, not a population",
   "purpose": "Determine when a fee or surcharge should apply. Screen 10.3.4 defines the fee. Screen 10.3.5 defines the conditions that trigger it.",
-  "purposeNote": "satisfied.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Channel, Customer Type, Membership, Delivery Method, Order Value, Rule Priority, Stop Processing, Continue Processing. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 16 actions on this screen and the screen declares 1 operation.** Unserved: Product, Product Category, Channel, Venue, Event, Customer Type, Membership, Transaction Type …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
    }
   ],
@@ -958,7 +1117,27 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Product",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Product Category",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Channel",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
       },
       {
@@ -973,42 +1152,13 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Delivery Method",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Order Value",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Rule Priority",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Stop Processing",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Continue Processing",
+       "label": "Transaction Type",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmStopProcessing",
-    "component": "confirmDialog",
-    "trigger": "Stop Processing",
-    "body": "**Stop Processing on a fee applicability charging is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
-   }
-  ],
   "states": {
    "loading": "The fee applicability charging configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the fee applicability charging untouched.",
@@ -1020,18 +1170,16 @@
     "operationId": "setFeeApplicabilityCharging",
     "contract": "catalogue",
     "purpose": "Fee Applicability & Charging Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setFeeApplicabilityCharging"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-072"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-072",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-072"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 13 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 21 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1093,14 +1241,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Fees and taxes can only be waived or exempted through explicitly authorized rules or governed manual exceptions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population",
   "purpose": "Govern circumstances under which a normally applicable tax or fee may be reduced, waived or exempted.",
-  "purposeNote": "Fees and taxes can only be waived or exempted through explicitly authorized rules or governed manual exceptions.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Zero-Rated Tax, Operational Waiver, Contractual Waiver. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Zero-Rated Tax, Complimentary Transaction, Operational Waiver, Contractual Waiver. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
    }
   ],
@@ -1194,6 +1342,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Complimentary Transaction",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Operational Waiver",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
       },
@@ -1223,9 +1376,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-073"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-073",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-073"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 17 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 18 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1287,10 +1441,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "The system can deterministically calculate the final payable amount using a governed and traceable sequence of commercial components.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Each step should define) and no display directory — it is settings, not a population",
   "purpose": "Define the exact sequence TICVAI follows to calculate the final payable amount. This is the heart of Board 3.",
-  "purposeNote": "The system can deterministically calculate the final payable amount using a governed and traceable sequence of commercial components.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1334,6 +1488,20 @@
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 47 §Each step should define"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save price calculation policy",
+       "operation": "setPriceCalculationPolicy",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The ordered steps that turn a rate into a payable amount** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /calculation-profiles"
+      }
+     ]
     }
    ]
   },
@@ -1349,14 +1517,52 @@
     "contract": "catalogue",
     "purpose": "Price Calculation Sequence & Formula Engine",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPriceCalculationPolicy",
+    "contract": "catalogue",
+    "purpose": "Save a price calculation sequence, whole",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPriceCalculationSequence"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-074"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-074",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-074"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 47. 0 of 0 labels bound to a contract property; 7 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPriceCalculationPolicy",
+    "component": "modal",
+    "trigger": "Save price calculation policy",
+    "body": "**Collects what `setPriceCalculationPolicy` sends before it is called.** Required: `id`, `scopePath`, `code`, `name`, `status`. Optional: `isDefault`, `effectiveFrom`, `effectiveTo`, `steps`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CalculationProfile",
+    "confirm": {
+     "label": "Save price calculation policy",
+     "operation": "setPriceCalculationPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "code",
+      "name",
+      "status",
+      "isDefault",
+      "effectiveFrom",
+      "effectiveTo",
+      "steps"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /calculation-profiles"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1418,10 +1624,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "currency precision and rounding rules.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Ensure monetary calculations remain consistent across countries, currencies, channels and payment systems.",
-  "purposeNote": "currency precision and rounding rules.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1456,6 +1662,25 @@
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 49 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Round Down",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 49 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save currency rounding rule",
+       "operation": "setCurrencyRoundingRule",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**One rounding profile per currency the tenant sells in** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /rounding-profiles"
+      }
+     ]
     }
    ]
   },
@@ -1472,6 +1697,15 @@
     "contract": "catalogue",
     "purpose": "Currency Precision, Rounding & Monetary Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setCurrencyRoundingRule",
+    "contract": "catalogue",
+    "purpose": "Set precision and rounding for a currency",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCurrencyPrecisionRounding"
+    ]
    }
   ],
   "entryState": {
@@ -1482,9 +1716,42 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-075"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-075",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-075"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 49. 0 of 1 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 49. 0 of 1 labels bound to a contract property; 13 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetCurrencyRoundingRule",
+    "component": "modal",
+    "trigger": "Save currency rounding rule",
+    "body": "**Collects what `setCurrencyRoundingRule` sends before it is called.** Required: `id`, `scopePath`, `currency`, `decimalPlaces`, `roundingMethod`, `roundingStage`, `status`. Optional: `code`, `name`, `minimumMonetaryUnit`, `displayPrecision`, `calculationPrecision`, `cashRoundingIncrement`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RoundingProfile",
+    "confirm": {
+     "label": "Save currency rounding rule",
+     "operation": "setCurrencyRoundingRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "currency",
+      "decimalPlaces",
+      "roundingMethod",
+      "roundingStage",
+      "status",
+      "code",
+      "name",
+      "minimumMonetaryUnit",
+      "displayPrecision",
+      "calculationPrecision",
+      "cashRoundingIncrement"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /rounding-profiles"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1546,10 +1813,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can reproduce and explain every monetary component contributing to the final payable amount before configuration goes live.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
   "purpose": "Allow administrators to test the complete calculation before releasing configuration into production.",
-  "purposeNote": "Authorized users can reproduce and explain every monetary component contributing to the final payable amount before configuration goes live.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1648,16 +1915,14 @@
     "operationId": "simulatePriceBreakdownCalculation",
     "contract": "catalogue",
     "purpose": "Price Breakdown, Calculation Simulation & Explainability",
-    "trigger": "onAction",
-    "invalidates": [
-     "simulatePriceBreakdownCalculation"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-076"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-076",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-076"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 50. 0 of 0 labels bound to a contract property; 13 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1713,10 +1978,10 @@
    "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "The calculation engine passes configured reconciliation and regression tests and exposes one authoritative calculation service to all TICVAI sales and operational modules. Board 3 — Final Screen Register # Backend Screen Core Responsibility 10.3. Calculation configuration Tax, Fee & Calculation Command Center 1 health 10.3. Tax Profile & Jurisdiction Configuration Tax master configuration 2 10.3. Tax Rule & Treatment Builder Tax applicability/calculation 3 10.3. Fee & Surcharge Library Reusable fee definitions 4 10.3. Fee Applicability & Charging Rule Builder Fee conditions 5 10.3. Fee Waiver,",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide final technical and commercial validation of the pricing calculation engine and define how other TICVAI modules consume it. Boards 1–3 established the commercial and calculation engines: Board 1: What prices exist? Board 2: Which price applies? Board 3: How is the final payable amount calculated?",
-  "purposeNote": "The calculation engine passes configured reconciliation and regression tests and exposes one authoritative calculation service to all TICVAI sales and operational modules. Board 3 — Final Screen Register # Backend Screen Core Responsibility 10.3. Calculation configuration Tax, Fee & Calculation Command Center 1 health 10.3. Tax Profile & Jurisdiction Configuration Tax master configuration 2 10.3. Tax Rule & Treatment Builder Tax applicability/calculation 3 10.3. Fee & Surcharge Library Reusable fee definitions 4 10.3. Fee Applicability & Charging Rule Builder Fee conditions 5 10.3. Fee Waiver,",
   "gaps": [
    {
     "operation": null,
@@ -1740,6 +2005,19 @@
        "derived": true,
        "impliedBy": "listCalculationValidationReconciliation",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "transmitEInvoices",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "transmitEInvoices"
       }
      ]
     }
@@ -1758,21 +2036,39 @@
     "contract": "catalogue",
     "purpose": "Calculation Validation, Reconciliation & Service Interface",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEInvoicingProviders",
+    "contract": "finance",
+    "purpose": "Show the e-invoicing provider connection",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listEInvoiceTransmissions",
+    "contract": "finance",
+    "purpose": "E-invoicing transmission log and failures",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "transmitEInvoices",
+    "contract": "finance",
+    "purpose": "Send / resend documents to e-invoicing",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
    "preloaded": [
-    "CalculationValidationReconciliationServiceInterfaceView.missingProfile",
-    "CalculationValidationReconciliationServiceInterfaceView.invalidRate",
-    "CalculationValidationReconciliationServiceInterfaceView.expiredRule",
-    "CalculationValidationReconciliationServiceInterfaceView.overlappingRule",
-    "CalculationValidationReconciliationServiceInterfaceView.conflictingRule"
+    "CalculationValidationReconciliationServiceInterfaceView.code"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-077"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-077",
+   "workshopBoard": "wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-077"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 121 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

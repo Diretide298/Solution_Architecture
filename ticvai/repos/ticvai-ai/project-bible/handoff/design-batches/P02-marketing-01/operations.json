@@ -34,7 +34,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "ConsentPurposeConfig"
+  "responds": "Page"
  },
  "recordConsent": {
   "method": "POST",
@@ -64,7 +64,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "MarketingSubscription",
   "responds": "MarketingSubscription"
  }

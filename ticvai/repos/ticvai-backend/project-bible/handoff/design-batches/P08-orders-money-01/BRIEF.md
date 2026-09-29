@@ -1,6 +1,6 @@
 # P08-orders-money-01 — P08 · Orders & Money (1 of 3)
 
-**10 screens · 69 operations · 78 schemas · 29 permissions**
+**10 screens · 80 operations · 113 schemas · 32 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 29 permissions apply here:
-  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, CASH_LIFT, CASH_NO_SALE, GUEST_VIEW, LEDGER_POST, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND, ORDER_REPRINT`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 32 permissions apply here:
+  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, CASH_LIFT, CASH_NO_SALE, GUEST_VIEW, LEDGER_POST, LEDGER_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,11 +60,11 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-008` | Product Detail & Variants | listDetail | 11 | 3 | — |
-| `BO-022` | Order Detail | listDetail | 14 | 9 | — |
-| `BO-023` | Refunds & Exchanges | listDetail | 15 | 9 | — |
+| `BO-008` | Product Detail & Variants | listDetail | 12 | 3 | — |
+| `BO-022` | Order Detail | listDetail | 19 | 9 | — |
+| `BO-023` | Refunds & Exchanges | listDetail | 18 | 9 | — |
 | `BO-024` | Payment Exceptions | configEditor | 6 | 4 | — |
-| `BO-025` | Chargebacks & Disputes | listDetail | 5 | 2 | — |
+| `BO-025` | Chargebacks & Disputes | listDetail | 10 | 2 | — |
 | `BO-026` | Group Bookings | listDetail | 17 | 11 | — |
 | `BO-027` | Reissue & Media Replacement | statusTracker | 6 | 2 | — |
 | `BO-028` | Refund Approval Queue | configEditor | 1 | 0 | — |

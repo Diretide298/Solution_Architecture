@@ -489,6 +489,97 @@
    }
   }
  },
+ "AiMaturity": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "required": [
+   "stage",
+   "basedOn"
+  ],
+  "properties": {
+   "stage": {
+    "type": "string",
+    "enum": [
+     "starting",
+     "learning",
+     "established",
+     "learned"
+    ],
+    "description": "`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."
+   },
+   "basedOn": {
+    "type": "string",
+    "description": "The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "source"
+     ],
+     "properties": {
+      "source": {
+       "type": "string",
+       "enum": [
+        "venueSettings",
+        "startingPattern",
+        "calendar",
+        "weather",
+        "bookingsOnHand",
+        "ownHistory",
+        "importedHistory",
+        "configuration",
+        "trainedModel"
+       ]
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true,
+       "description": "e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."
+      },
+      "observations": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "ownDataShare": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."
+   },
+   "limitedHistory": {
+    "type": "boolean"
+   },
+   "nextStage": {
+    "type": "object",
+    "nullable": true,
+    "description": "What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.",
+    "properties": {
+     "stage": {
+      "type": "string",
+      "enum": [
+       "learning",
+       "established",
+       "learned"
+      ]
+     },
+     "needs": {
+      "type": "string"
+     },
+     "expectedBy": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     }
+    }
+   }
+  }
+ },
  "Asset": {
   "x-ticvai-persistence": "maintenance.asset",
   "allOf": [
@@ -706,6 +797,57 @@
    },
    "kind": {
     "$ref": "#/components/schemas/AssetDocumentKind"
+   }
+  }
+ },
+ "AssetDocumentKind": {
+  "type": "string",
+  "enum": [
+   "manual",
+   "sop",
+   "certificate",
+   "warranty",
+   "drawing",
+   "riskAssessment"
+  ]
+ },
+ "AssetHistoryEntry": {
+  "x-ticvai-persistence": "none — union view over work orders, inspections, incidents and asset status changes",
+  "type": "object",
+  "description": "**Every kind has a source.** `workOrder` is a work-order row, `inspection` an inspection, `incident` an incident, `statusChange` a `maintenance.asset_status_change` row. `partReplaced` is a completed work order whose `resolutionCode` is `partReplaced`, and `planCompleted` a completed work order with a `sourcePlanId` — both read from `maintenance.work_order`, not stored twice.\n",
+  "required": [
+   "kind",
+   "occurredAt",
+   "summary"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "workOrder",
+     "inspection",
+     "incident",
+     "statusChange",
+     "partReplaced",
+     "planCompleted"
+    ]
+   },
+   "referenceId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The source row's id: a work-order, inspection or incident ULID, or an `asset_status_change` id.\n"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -994,6 +1136,44 @@
     "type": "integer",
     "minimum": 1,
     "description": "The window these figures were attributed over, from `VenueSettings.marketing.attributionWindowDays` (proposed default 7, audit R094)."
+   },
+   "variants": {
+    "type": "array",
+    "description": "Per variant of an A/B campaign, from `MessageDispatch.campaignVariantId` (29 September, build pass, group G2; 22.1.17). Empty for a single-content campaign.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "label": {
+       "type": "string"
+      },
+      "sent": {
+       "type": "integer"
+      },
+      "opened": {
+       "type": "integer"
+      },
+      "clicked": {
+       "type": "integer"
+      },
+      "attributedOrders": {
+       "type": "integer"
+      },
+      "attributedRevenue": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "isWinner": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "sendTimeOptimisedCount": {
+    "type": "integer",
+    "description": "Messages sent at a per-recipient optimised hour rather than the scheduled time."
    }
   }
  },
@@ -1022,8 +1202,10 @@
      "birthday",
      "abandonedCart",
      "firstVisit",
-     "inactivity"
-    ]
+     "inactivity",
+     "entitlementExpiring"
+    ],
+    "description": "`entitlementExpiring` (29 September, build pass, group G2; 5.5.30) fires on `entitlement.expiringSoon`: a ticket or pass the guest still holds comes within its template's `expiryNoticeDays` of `validTo`. The notice period is set on the template, so `delayHours` shifts the send within it rather than setting it. An entitlement belonging to a membership is left to `membershipExpiring`, so a member is not told twice."
    },
    "delayHours": {
     "type": "integer"
@@ -1081,6 +1263,15 @@
    },
    "criticality": {
     "$ref": "#/components/schemas/AssetCriticality"
+   },
+   "priorityOverride": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "nullable": true,
+    "description": "**\"If this device goes down, raise this priority\"** (decided 17 September, M17-01). A corrective work order raised on this asset takes this priority instead of the score. Null means the score decides.\n"
    },
    "manufacturer": {
     "type": "string",
@@ -1201,6 +1392,79 @@
      },
      "timeZone": {
       "type": "string"
+     }
+    }
+   },
+   "sendTimeMode": {
+    "type": "string",
+    "enum": [
+     "fixed",
+     "optimised"
+    ],
+    "default": "fixed",
+    "description": "`optimised` sends each recipient at the hour `ai.requestSuggestion` (kind `sendTime`) gives for them, inside `sendWindow` (29 September, build pass, group G2; 22.3.19). `fixed` is the behaviour before. Falls back to `scheduledFor` per recipient where there is no suggestion or AI is off."
+   },
+   "optimiseChannel": {
+    "type": "boolean",
+    "default": false,
+    "description": "With `sendTimeMode` `optimised`, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). Off keeps `channel`."
+   },
+   "variants": {
+    "type": "array",
+    "maxItems": 5,
+    "nullable": true,
+    "description": "**A/B (or up to five-way) content and subject variants** (29 September, build pass, group G2; 22.1.17, BO-772). Each is a subject override and optionally a different template, written by a person or taken from an AI draft (`ai.proposeMarketingContent`, `source` `aiDraft`). Held as rows of `marketing.campaign_variant`. Null or empty is a single-content campaign.",
+    "items": {
+     "$ref": "#/components/schemas/MarketingCampaignVariant"
+    }
+   },
+   "abTest": {
+    "type": "object",
+    "nullable": true,
+    "description": "How the variants are tested. Required when `variants` has two or more.",
+    "properties": {
+     "testPercent": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 100,
+      "default": 20,
+      "description": "Share of the audience the variants are tested on; 100 splits everyone and picks no winner."
+     },
+     "successMetric": {
+      "type": "string",
+      "enum": [
+       "openRate",
+       "clickRate",
+       "conversionRate",
+       "attributedRevenue"
+      ],
+      "default": "clickRate"
+     },
+     "decideAfterHours": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 168,
+      "default": 4
+     },
+     "winnerRule": {
+      "type": "string",
+      "enum": [
+       "automatic",
+       "manual"
+      ],
+      "default": "automatic"
+     },
+     "minimumSamplePerVariant": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 500,
+      "description": "Below this many sends per variant no winner is declared automatically; a person picks."
+     },
+     "winningVariantId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "Set by the automatic rule, or by a person through `updateCampaign`."
      }
     }
    }
@@ -1460,7 +1724,6 @@
    "id",
    "title",
    "venueId",
-   "priority",
    "recordedAt"
   ],
   "properties": {
@@ -1497,7 +1760,23 @@
     "default": "corrective"
    },
    "priority": {
-    "$ref": "#/components/schemas/WorkOrderPriority"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "description": "**Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the fault.\n"
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13)."
    },
    "categoryId": {
     "type": "string",
@@ -1697,6 +1976,17 @@
    "code": {
     "type": "string"
    },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
+   },
    "name": {
     "type": "string"
    },
@@ -1850,6 +2140,76 @@
    },
    "isActive": {
     "type": "boolean"
+   }
+  }
+ },
+ "MarketingCampaignVariant": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.campaign_variant",
+  "description": "One content or subject variant of a campaign, for an A/B test (22.1.17; 29 September, build pass, group G2, from group G1's handoff). Written with its campaign by `createCampaign` and `updateCampaign`.",
+  "required": [
+   "label"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "marketing.campaign"
+   },
+   "label": {
+    "type": "string",
+    "maxLength": 20,
+    "description": "A, B, C..."
+   },
+   "subjectOverride": {
+    "type": "object",
+    "nullable": true,
+    "description": "Subject line by locale.",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A different template for this variant; null uses the campaign's `content.templateId`."
+   },
+   "splitPercent": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Share of the test group; null splits evenly."
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "aiDraft"
+    ],
+    "default": "manual"
+   },
+   "aiDecisionRecordId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The decision record of the `ai.proposeMarketingContent` draft it came from, for `aiDraft`."
+   },
+   "isWinner": {
+    "type": "boolean",
+    "default": false,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005), the campaign's."
    }
   }
  },
@@ -2252,22 +2612,54 @@
    }
   ]
  },
+ "QueueEntryStatus": {
+  "type": "string",
+  "enum": [
+   "waiting",
+   "called",
+   "redeemed",
+   "expired",
+   "noShow",
+   "cancelled",
+   "released"
+  ]
+ },
  "QueueFastPass": {
   "x-ticvai-persistence": "queue.queue",
   "type": "object",
-  "description": "**Which Fast Pass entitlements this lane accepts, and how** (decided 29 September, VM close-out; pack 'Access Control Module' p.109, BO-221 Fast Pass & Attraction Access Journey). Fast Pass stays an entitlement owned by Product & Entitlement; this block is the lane's side of it: which products it honours, the return window, a per-guest daily cap and the access points that redeem it. Stored on the queue row. Only meaningful where `kind` is `fastPass` or `fastPassAllocationPercent` is above 0.\n",
+  "description": "**Which Fast Pass entitlements this lane accepts, and how** (decided 29 September, VM close-out; pack 'Access Control Module' p.109, BO-221 Fast Pass & Attraction Access Journey). Fast Pass stays an entitlement owned by Product & Entitlement; this block is the lane's side of it: which products it honours, the return window, a per-guest daily cap and the access points that redeem it. Stored on the queue row. Only meaningful where `kind` is `fastPass` or `fastPassAllocationPercent` is above 0.\n**Four ways into priority, not one** (decided 29 September, build pass; 5.6.7 and 5.6.34). A guest joins this lane as priority when they hold an entitlement from `entitlementProductIds` (VIP, annual pass, premium package), are a member of a tier in `loyaltyTierIds`, qualify for a live promotion in `promotionIds`, or declare an accessibility need where `accessibilityPriority` is on. The first criterion met is recorded on the entry as `WaitingGuest.priorityBasis`. Every criterion is resolved by the server at join time; nothing the request asserts about a tier or a promotion is trusted. All four draw on the same reserved `fastPassAllocationPercent`, so widening who qualifies never widens the share of the ride they take.\n",
   "required": [
    "entitlementProductIds"
   ],
   "properties": {
    "entitlementProductIds": {
     "type": "array",
-    "minItems": 1,
-    "description": "Catalogue products whose entitlement admits to this lane.",
+    "description": "Catalogue products whose entitlement admits to this lane. May be empty where priority comes only from a tier, a promotion or an accessibility need.\n",
     "items": {
      "type": "string",
      "format": "uuid"
     }
+   },
+   "loyaltyTierIds": {
+    "type": "array",
+    "description": "5.6.7 and 5.6.34 (decided 29 September, build pass). Loyalty programme tiers (`marketing.programme_tier`) whose members join this lane as priority. Read from the guest's own loyalty position at join time, never from the request, so a guest cannot claim a tier they do not hold. Empty: tier grants nothing on this lane.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "promotionIds": {
+    "type": "array",
+    "description": "5.6.34 (decided 29 September, build pass). Promotions that grant queue privilege on this lane while they are live. A guest qualifies when the promotion's conditions hold for them at join (the evaluation `promotions` already makes for a price), or by presenting its code in `JoinQueueRequest.promotionCode`. A paused or expired promotion grants nothing.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "accessibilityPriority": {
+    "type": "boolean",
+    "default": false,
+    "description": "5.6.7 (decided 29 September, build pass). A party that declares an accessibility need (`JoinQueueRequest.accessibilityNeedDeclared`) joins as priority. **Taken on trust**, because asking for proof at a ride entrance is worse than the occasional abuse; the declaration is on the entry, so the operator at the front sees it (`listQueueEntries`). A venue that wants proof sells or issues an accessibility pass and lists it in `entitlementProductIds` instead. **Not the `accessible` lane**: that is where a guest who cannot stand in a switchback waits; this moves them ahead in the lane they chose.\n"
    },
    "returnWindowMinutes": {
     "type": "integer",
@@ -2790,6 +3182,48 @@
    }
   }
  },
+ "SeatRecommendation": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "seatIds",
+   "totalPrice",
+   "isContiguous",
+   "rank"
+  ],
+  "properties": {
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "displayLabels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "totalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isContiguous": {
+    "type": "boolean"
+   },
+   "rank": {
+    "type": "integer",
+    "description": "Best first."
+   },
+   "rationale": {
+    "type": "string",
+    "description": "Why this option was chosen — closest to stage, best value in category, only contiguous block remaining. Shown to a call-centre agent, not the guest.\n"
+   }
+  }
+ },
  "SeatRecommendationRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -2882,6 +3316,131 @@
    }
   }
  },
+ "Suggestion": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.suggestion",
+  "description": "One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n",
+  "required": [
+   "id",
+   "kind",
+   "basis",
+   "maturity",
+   "producedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/SuggestionKind"
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "What it is about — a product, an outlet, an item, a party."
+   },
+   "value": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The suggestion itself. Shape depends on `kind`."
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1,
+    "description": "**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"
+   },
+   "explanation": {
+    "type": "string",
+    "description": "**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"
+   },
+   "inputs": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"
+   },
+   "producerRef": {
+    "type": "string",
+    "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
+   },
+   "maturity": {
+    "$ref": "#/components/schemas/AiMaturity"
+   },
+   "producedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"
+   }
+  }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
+ },
+ "SuggestionKind": {
+  "type": "string",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline.\n",
+  "enum": [
+   "price",
+   "replenishment",
+   "requisition",
+   "demandForecast",
+   "prepPlan",
+   "menuEngineering",
+   "staffing",
+   "slaTarget",
+   "waitTime",
+   "upsell",
+   "segmentation",
+   "anomaly",
+   "scenario",
+   "sendTime",
+   "wasteRisk",
+   "queueBalancing",
+   "itinerary"
+  ]
+ },
+ "SupervisorStepUp": {
+  "type": "object",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "required": [
+   "principalId",
+   "credential"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The supervisor signing. Recorded against the act."
+   },
+   "credential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
+   }
+  }
+ },
  "TurnstileMode": {
   "type": "string",
   "description": "**Reduced to two values — decided 28 September, audit R221.** Entry, exit, re-entry and crossover were the access point's `Direction` under another name, and two fields that could disagree left the gate to guess. Direction is fixed per access point; within `normal` or `podium` operation the turnstile may only be let spin free or held closed.\n",
@@ -2958,6 +3517,124 @@
    "manual",
    "unavailable"
   ]
+ },
+ "WaitingGuest": {
+  "x-ticvai-persistence": "queue.entry",
+  "type": "object",
+  "required": [
+   "id",
+   "queueId",
+   "partyNumber",
+   "partySize",
+   "status",
+   "joinedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The client-generated ULID from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "queueName": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "partyNumber": {
+    "type": "integer",
+    "description": "What the guest sees and what appears on signage."
+   },
+   "partySize": {
+    "type": "integer"
+   },
+   "status": {
+    "$ref": "#/components/schemas/QueueEntryStatus"
+   },
+   "positionInQueue": {
+    "type": "integer",
+    "nullable": true
+   },
+   "partiesAhead": {
+    "type": "integer",
+    "nullable": true
+   },
+   "estimatedCallAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isFastPass": {
+    "type": "boolean"
+   },
+   "priorityBasis": {
+    "type": "string",
+    "enum": [
+     "none",
+     "entitlement",
+     "loyaltyTier",
+     "promotion",
+     "accessibility"
+    ],
+    "default": "none",
+    "description": "Why this party is priority, when it is (decided 29 September, build pass; 5.6.7, 5.6.34): the first `QueueFastPass` criterion met at join, in the order entitlement, loyalty tier, promotion, accessibility. `isFastPass` is true whenever this is not `none`. Kept on the entry so a disputed priority can be explained afterwards.\n"
+   },
+   "priorityTierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The loyalty tier that granted priority, where `priorityBasis` is `loyaltyTier`."
+   },
+   "priorityPromotionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The promotion that granted priority, where `priorityBasis` is `promotion`."
+   },
+   "accessibilityNeedDeclared": {
+    "type": "boolean",
+    "default": false,
+    "description": "What the party declared at join, shown to the operator at the front."
+   },
+   "entitlementId": {
+    "type": "string",
+    "nullable": true
+   },
+   "calledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnWindowEndsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "redeemedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "admittedCount": {
+    "type": "integer",
+    "nullable": true
+   },
+   "joinedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
  },
  "WorkOrder": {
   "x-ticvai-persistence": "maintenance.work_order",
@@ -3046,6 +3723,34 @@
    },
    "priority": {
     "$ref": "#/components/schemas/WorkOrderPriority"
+   },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."
+   },
+   "prioritySource": {
+    "type": "string",
+    "enum": [
+     "scored",
+     "assetOverride",
+     "manual"
+    ],
+    "readOnly": true,
+    "description": "Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs (M17-13)."
    },
    "kind": {
     "$ref": "#/components/schemas/WorkOrderKind"
@@ -3260,6 +3965,10 @@
         "quantity": {
          "type": "number"
         },
+        "reservedQuantity": {
+         "type": "number",
+         "description": "Still reserved for this work order and not yet issued (M17-02)."
+        },
         "cost": {
          "$ref": "../shared/common.yaml#/components/schemas/Money"
         }
@@ -3376,6 +4085,26 @@
     }
    }
   ]
+ },
+ "WorkOrderFaultAssessment": {
+  "x-ticvai-persistence": "none — columns on maintenance.work_order",
+  "type": "object",
+  "description": "What the person raising a fault says about it, which the priority score reads (M17-01).",
+  "properties": {
+   "safetyRisk": {
+    "type": "boolean",
+    "default": false
+   },
+   "guestImpact": {
+    "type": "string",
+    "enum": [
+     "none",
+     "degraded",
+     "closed"
+    ],
+    "default": "none"
+   }
+  }
  },
  "WorkOrderKind": {
   "type": "string",

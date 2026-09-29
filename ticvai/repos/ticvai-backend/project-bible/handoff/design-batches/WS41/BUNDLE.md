@@ -1,6 +1,6 @@
 # WS41 — Privacy  Consent   Preference Management board 1
 
-**10 screens · 12 operations · 17 schemas · 3 permissions**
+**10 screens · 18 operations · 25 schemas · 3 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -64,8 +64,8 @@ convincingly. It is never a caption.
 | `CMS-022` | Data Processing Purpose & Lawful Basis Registry | listDetail | 1 | 0 | — |
 | `CMS-023` | Consent Purpose & Consent Type Builder | configEditor | 1 | 0 | — |
 | `CMS-024` | Communication Preference & Marketing Permission Configuration | configEditor | 1 | 0 | — |
-| `CMS-025` | Cookie, Tracking & Digital Technology Registry | listDetail | 1 | 0 | — |
-| `CMS-026` | Cookie Banner & Preference Center Designer | configEditor | 1 | 0 | — |
+| `CMS-025` | Cookie, Tracking & Digital Technology Registry | listDetail | 6 | 0 | — |
+| `CMS-026` | Cookie Banner & Preference Center Designer | configEditor | 2 | 0 | — |
 | `CMS-027` | Consent Capture Point & Customer Journey Configuration | configEditor | 1 | 0 | — |
 | `CMS-028` | Privacy Notice, Policy & Terms Version Management | listDetail | 2 | 1 | — |
 | `CMS-029` | Minor, Guardian & Age-Based Privacy Configuration | configEditor | 1 | 0 | — |
@@ -995,6 +995,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Cookie, Tracking & Digital Technology Registry",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setTrackingTechnology",
+    "contract": "marketing-crm",
+    "purpose": "Add, classify, approve or retire a technology",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "recordCookieScan",
+    "contract": "marketing-crm",
+    "purpose": "Upload or take in a scan result",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listCookieScans",
+    "contract": "marketing-crm",
+    "purpose": "Scan runs and what each found",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listCookieScanPolicies",
+    "contract": "marketing-crm",
+    "purpose": "Scan schedules per channel",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setCookieScanPolicy",
+    "contract": "marketing-crm",
+    "purpose": "Set a scan schedule and alert recipients",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1169,6 +1204,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Cookie Banner & Preference Center Designer",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setCookieBannerDesign",
+    "contract": "marketing-crm",
+    "purpose": "Save a banner design as a new draft version",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -2164,6 +2206,59 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listCookieScanPolicies": {
+  "method": "GET",
+  "path": "/cookie-scan-policy",
+  "contract": "marketing-crm",
+  "summary": "Scan schedules per channel",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCookieScans": {
+  "method": "GET",
+  "path": "/cookie-tracking-digital/scans",
+  "contract": "marketing-crm",
+  "summary": "Scan runs and what each found",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listCookieTrackingDigital": {
   "method": "GET",
   "path": "/cookie-tracking-digital",
@@ -2384,6 +2479,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "recordCookieScan": {
+  "method": "POST",
+  "path": "/cookie-tracking-digital/scans",
+  "contract": "marketing-crm",
+  "summary": "Take in the result of a site or app scan",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordCookieScanRequest",
+  "responds": null
+ },
  "setCommunicationPreferenceMarketing": {
   "method": "PUT",
   "path": "/communication-preference-marketing",
@@ -2441,6 +2555,44 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "ConsentPurposeConfig"
  },
+ "setCookieBannerDesign": {
+  "method": "PUT",
+  "path": "/cookie-banner-preference",
+  "contract": "marketing-crm",
+  "summary": "Save a cookie banner design as a new version",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CookieBannerPreferenceCenterDesignerView",
+  "responds": "CookieBannerPreferenceCenterDesignerView"
+ },
+ "setCookieScanPolicy": {
+  "method": "PUT",
+  "path": "/cookie-scan-policy",
+  "contract": "marketing-crm",
+  "summary": "Set how often a channel is scanned and who is alerted",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CookieScanPolicy",
+  "responds": "CookieScanPolicy"
+ },
  "setMinorGuardianAge": {
   "method": "PUT",
   "path": "/minor-guardian-age",
@@ -2478,6 +2630,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "PrivacyNoticeGovernance",
   "responds": "PrivacyNoticeGovernance"
+ },
+ "setTrackingTechnology": {
+  "method": "PUT",
+  "path": "/cookie-tracking-digital",
+  "contract": "marketing-crm",
+  "summary": "Add, classify or retire a tracking technology",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CookieTrackingDigitalTechnologyRegistryView",
+  "responds": "CookieTrackingDigitalTechnologyRegistryView"
  }
 }
 ```
@@ -2898,8 +3069,541 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "pos",
    "callCentre",
    "import",
-   "agentRecorded"
-  ]
+   "agentRecorded",
+   "cookieBanner",
+   "checkout"
+  ],
+  "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
+ },
+ "CookieBannerPreferenceCenterDesignerView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.cookie_banner_design",
+  "description": "One version of a cookie banner and preference-centre design (pack 17.1.6).",
+  "required": [
+   "channel",
+   "position",
+   "languages",
+   "rejectIsOneClick",
+   "categories"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null for the corporate design every brand inherits."
+   },
+   "inheritsFromId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "b2cWebsite",
+     "customerPortal",
+     "mobileApp",
+     "embeddedCheckout",
+     "whiteLabelSite",
+     "partnerMicrosite"
+    ]
+   },
+   "logoAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "position": {
+    "type": "string",
+    "enum": [
+     "top",
+     "bottom",
+     "popup",
+     "modal"
+    ]
+   },
+   "themeId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The white-label theme it takes colours and fonts from."
+   },
+   "buttons": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "action"
+     ],
+     "properties": {
+      "action": {
+       "type": "string",
+       "enum": [
+        "acceptAll",
+        "rejectNonEssential",
+        "managePreferences",
+        "savePreferences",
+        "doNotSellOrShare"
+       ]
+      },
+      "label": {
+       "$ref": "#/components/schemas/LocalisedText"
+      }
+     }
+    }
+   },
+   "rejectIsOneClick": {
+    "type": "boolean",
+    "default": true,
+    "description": "Must be true."
+   },
+   "links": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "label",
+      "policyKind"
+     ],
+     "properties": {
+      "label": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "policyKind": {
+       "type": "string",
+       "enum": [
+        "privacy",
+        "cookie",
+        "termsAndConditions"
+       ]
+      }
+     }
+    }
+   },
+   "categories": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "defaultOn"
+     ],
+     "properties": {
+      "category": {
+       "type": "string",
+       "enum": [
+        "strictlyNecessary",
+        "functional",
+        "analytics",
+        "personalisation",
+        "marketing"
+       ]
+      },
+      "description": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "defaultOn": {
+       "type": "boolean",
+       "description": "True only for `strictlyNecessary`, which is always active."
+      }
+     }
+    }
+   },
+   "languages": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "string",
+     "maxLength": 10
+    },
+    "description": "Every language the storefront serves; Arabic renders right to left."
+   },
+   "regulatoryRegimes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "gdpr",
+      "ePrivacy",
+      "ccpaCpra",
+      "lgpd",
+      "uaePdpl",
+      "saudiPdpl"
+     ]
+    },
+    "description": "2.6.60 (29 September, build). **The laws this design is published to satisfy**, so compliance is stated rather than assumed. The strictest posture (opt-in, one-click reject, every non-essential category off) already meets GDPR/ePrivacy, LGPD and both PDPLs; `ccpaCpra` adds the \"Do not sell or share\" button (`doNotSellOrShare`) and honours a Global Privacy Control signal as that opt-out."
+   },
+   "recordIpAddress": {
+    "type": "boolean",
+    "default": false,
+    "description": "2.6.55, \"if legally permitted\" (29 September, build). On, `recordDeviceConsent` writes the IP address and user agent to `pii.consent_identifier`; off, they are not kept anywhere. Off by default."
+   },
+   "noticeVersion": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Moves with the cookie policy (white-label `setPolicy`, kind `cookie`)."
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "superseded"
+    ],
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "CookieConsentChannel": {
+  "type": "string",
+  "enum": [
+   "b2cWebsite",
+   "customerPortal",
+   "mobileApp",
+   "embeddedCheckout",
+   "whiteLabelSite",
+   "partnerMicrosite"
+  ],
+  "description": "The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6)."
+ },
+ "CookieScanPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.cookie_scan_policy",
+  "description": "How often one channel's domain or app is scanned and who is alerted (2.6.64).",
+  "required": [
+   "channel",
+   "frequency"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "channel": {
+    "$ref": "#/components/schemas/CookieConsentChannel"
+   },
+   "domainApplication": {
+    "type": "string",
+    "maxLength": 255,
+    "nullable": true
+   },
+   "frequency": {
+    "type": "string",
+    "enum": [
+     "daily",
+     "weekly",
+     "monthly",
+     false
+    ]
+   },
+   "dayOfWeek": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 7,
+    "nullable": true,
+    "description": "ISO day, for `weekly`."
+   },
+   "dayOfMonth": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 28,
+    "nullable": true,
+    "description": "For `monthly`."
+   },
+   "alertRecipientPrincipalIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "lastRunAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "nextRunAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "CookieScanRun": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.cookie_scan_run",
+  "description": "One scan taken in by `recordCookieScan` (2.6.57).",
+  "required": [
+   "channel",
+   "scannedAt",
+   "source",
+   "findingsCount",
+   "newlyDetectedCount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "channel": {
+    "$ref": "#/components/schemas/CookieConsentChannel"
+   },
+   "domainApplication": {
+    "type": "string",
+    "maxLength": 255,
+    "nullable": true
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "boughtScanner",
+     "ownCrawler",
+     "manualUpload"
+    ]
+   },
+   "scannerRef": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "scannedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "findingsCount": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "newlyDetectedCount": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "What the administrator alert is raised from."
+   },
+   "missingCount": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Registry entries for this channel the scan did not see."
+   },
+   "alertedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   }
+  }
+ },
+ "CookieTrackingDigitalTechnologyRegistryView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.tracking_technology",
+  "description": "One governed tracking technology (pack 17.1.5 Registry Fields; BL-073 §4a).",
+  "required": [
+   "name",
+   "provider",
+   "technologyType",
+   "isThirdParty",
+   "channels",
+   "status"
+  ],
+  "properties": {
+   "technologyId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "The cookie, SDK, pixel or storage key as it appears on the device."
+   },
+   "provider": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "domainApplication": {
+    "type": "string",
+    "maxLength": 255,
+    "nullable": true,
+    "description": "The domain, or the app and version, it was found on."
+   },
+   "technologyType": {
+    "type": "string",
+    "enum": [
+     "firstPartyCookie",
+     "thirdPartyCookie",
+     "mobileSdk",
+     "analyticsTracker",
+     "advertisingPixel",
+     "sessionTechnology",
+     "personalisationTechnology",
+     "embeddedService",
+     "localStorageItem",
+     "other"
+    ]
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "strictlyNecessary",
+     "functional",
+     "analytics",
+     "personalisation",
+     "marketing",
+     "other"
+    ],
+    "nullable": true,
+    "description": "Null until an administrator classifies it."
+   },
+   "otherCategoryLabel": {
+    "type": "string",
+    "maxLength": 80,
+    "nullable": true,
+    "description": "The organisation-defined category, when `category` is `other`."
+   },
+   "purpose": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "dataCollected": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "durationDays": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Null for session storage."
+   },
+   "isThirdParty": {
+    "type": "boolean"
+   },
+   "channels": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2cWebsite",
+      "customerPortal",
+      "mobileApp",
+      "embeddedCheckout",
+      "whiteLabelSite",
+      "partnerMicrosite"
+     ]
+    }
+   },
+   "countries": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{2}$"
+    },
+    "description": "Empty means every country."
+   },
+   "processingPurposeCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "The `DataProcessingPurposeLawfulBasisRegistryView.purposeCode` it serves."
+   },
+   "consentRequired": {
+    "type": "boolean",
+    "default": true,
+    "description": "False only for `strictlyNecessary`."
+   },
+   "privacyInformation": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "description": "What the preference centre tells the guest about it."
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "scan"
+    ],
+    "default": "manual",
+    "readOnly": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "detected",
+     "approved",
+     "blocked",
+     "retired"
+    ],
+    "description": "`detected` is treated as `blocked` until approved."
+   },
+   "firstDetectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "lastSeenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
  },
  "CustomerPrivacyConsentPreference360View": {
   "type": "object",
@@ -3247,6 +3951,198 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "DataProcessingPurposeLawfulBasisRegistryView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.processing_purpose",
+  "description": "One processing purpose in the tenant's register (pack 17.1.2). The lawful basis is the privacy administrator's classification, never the platform's.",
+  "required": [
+   "purposeCode",
+   "purposeName",
+   "lawfulBasis",
+   "status"
+  ],
+  "properties": {
+   "purposeId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "purposeCode": {
+    "type": "string",
+    "maxLength": 60,
+    "description": "The natural key, e.g. `ticketPurchase`, `marketingCommunication`."
+   },
+   "purposeName": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true
+   },
+   "businessOwner": {
+    "type": "string",
+    "maxLength": 150,
+    "nullable": true,
+    "description": "The accountable team or person."
+   },
+   "dataControllerApplicableOrganization": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The legal entity acting as controller for this purpose."
+   },
+   "dataCategories": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "maxLength": 80
+    },
+    "description": "e.g. contact details, payment, date of birth, images."
+   },
+   "dataSubjectCategories": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "guest",
+      "member",
+      "minor",
+      "guardian",
+      "partner",
+      "employee",
+      "other"
+     ]
+    }
+   },
+   "processingActivities": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "maxLength": 150
+    }
+   },
+   "systemsModules": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+    }
+   },
+   "countriesJurisdictions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{2}$"
+    }
+   },
+   "lawfulBasis": {
+    "type": "string",
+    "enum": [
+     "consent",
+     "contractualNecessity",
+     "legalObligation",
+     "legitimateInterest",
+     "vitalInterest",
+     "publicInterest",
+     "other",
+     "unclassified"
+    ],
+    "default": "unclassified",
+    "description": "Set by the privacy administrator. `unclassified` is flagged, never assumed."
+   },
+   "lawfulBasisNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Required when `lawfulBasis` is `other`."
+   },
+   "sensitiveCategories": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "biometrics",
+      "childrensData",
+      "identityDocuments",
+      "preciseLocation",
+      "health",
+      "other"
+     ]
+    }
+   },
+   "consentPurposes": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ConsentPurpose"
+    },
+    "description": "The consent purposes that rely on this processing purpose."
+   },
+   "policyIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Notices and policies that describe it (white-label `listPolicies`)."
+   },
+   "capturePointIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "retentionPolicyCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "`DataRetentionPolicy.code` values that govern its data."
+   },
+   "thirdPartyProcessors": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "maxLength": 150
+    }
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "retired"
+    ],
+    "default": "draft"
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -3993,6 +4889,184 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "readOnly": true
+   }
+  }
+ },
+ "PrivacyNoticePolicyTermsVersionManagementView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over whitelabel.policy (read through white-label listPolicies), marketing.privacy_notice_governance and marketing.consent_record",
+  "description": "One version of one privacy document, with its governance (pack 17.1.8 Version Information).",
+  "required": [
+   "documentId",
+   "documentType",
+   "version",
+   "status"
+  ],
+  "properties": {
+   "documentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "documentType": {
+    "type": "string",
+    "enum": [
+     "privacyPolicy",
+     "privacyNotice",
+     "cookieNotice",
+     "marketingNotice",
+     "biometricPrivacyNotice",
+     "childrensPrivacyNotice",
+     "locationServicesNotice",
+     "other"
+    ]
+   },
+   "title": {
+    "type": "string"
+   },
+   "version": {
+    "type": "string"
+   },
+   "language": {
+    "type": "string",
+    "maxLength": 10
+   },
+   "owner": {
+    "type": "string",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "review",
+     "approved",
+     "scheduled",
+     "published",
+     "superseded",
+     "archived"
+    ]
+   },
+   "changeClassification": {
+    "type": "string",
+    "enum": [
+     "minor",
+     "material"
+    ],
+    "nullable": true,
+    "description": "Set by an authorised user, never by AI."
+   },
+   "requiresReAcceptance": {
+    "type": "boolean",
+    "description": "Guests are asked to accept this version at their next capture point."
+   },
+   "requiresNotification": {
+    "type": "boolean",
+    "description": "Guests are told of the change by a transactional message."
+   },
+   "acceptedCount": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Guests whose recorded acceptance is of this version."
+   }
+  }
+ },
+ "RecordCookieScanRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "scannedAt",
+   "channel",
+   "findings"
+  ],
+  "properties": {
+   "scannedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/CookieConsentChannel"
+   },
+   "domainApplication": {
+    "type": "string",
+    "maxLength": 255,
+    "nullable": true,
+    "description": "The domain, or the app and version, scanned."
+   },
+   "scannerRef": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The vendor and scan id where the scanner is bought; null for ours or a manual upload."
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "name",
+      "provider",
+      "technologyType",
+      "isThirdParty"
+     ],
+     "properties": {
+      "name": {
+       "type": "string",
+       "maxLength": 200
+      },
+      "provider": {
+       "type": "string",
+       "maxLength": 150
+      },
+      "technologyType": {
+       "type": "string",
+       "enum": [
+        "firstPartyCookie",
+        "thirdPartyCookie",
+        "mobileSdk",
+        "analyticsTracker",
+        "advertisingPixel",
+        "sessionTechnology",
+        "personalisationTechnology",
+        "embeddedService",
+        "localStorageItem",
+        "other"
+       ]
+      },
+      "isThirdParty": {
+       "type": "boolean"
+      },
+      "durationDays": {
+       "type": "integer",
+       "minimum": 0,
+       "nullable": true
+      },
+      "domainApplication": {
+       "type": "string",
+       "maxLength": 255,
+       "nullable": true
+      }
+     }
+    }
    }
   }
  }

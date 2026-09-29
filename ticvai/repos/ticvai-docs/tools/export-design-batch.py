@@ -35,6 +35,7 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
+import re
 import sys
 
 import yaml
@@ -102,6 +103,15 @@ def contracts() -> tuple[dict, dict]:
                     "requestBody": _schema_ref(op.get("requestBody")),
                     "responds": _schema_ref((op.get("responses") or {}).get("200")
                                             or (op.get("responses") or {}).get("201")),
+                    # **Every schema the request or response names, however deep.** A paged list
+                    # is `allOf: [Page, {items: {$ref: X}}]`, and `_schema_ref` stops at `Page` --
+                    # so `listBookingFlowTypes` shipped without `BookingFlowType`, the one schema
+                    # that holds the 16-type catalogue (found 30 September). Not written out.
+                    "_refs": sorted(set(re.findall(
+                        r"#/components/schemas/([A-Za-z0-9_]+)",
+                        json.dumps([op.get("requestBody"),
+                                    (op.get("responses") or {}).get("200"),
+                                    (op.get("responses") or {}).get("201")], default=str)))),
                 }
     return ops, schemas
 
@@ -210,24 +220,26 @@ def main() -> int:
                 if t.get("operation"):
                     used_ops.add(t["operation"])
 
-    op_defs = {o: ops[o] for o in sorted(used_ops) if o in ops}
+    op_defs = {o: {k: v for k, v in ops[o].items() if k != "_refs"} for o in sorted(used_ops) if o in ops}
+    deep_refs = {r for o in used_ops if o in ops for r in ops[o].get("_refs", [])}
     want_schemas = {v.get("requestBody") for v in op_defs.values()} | \
                    {v.get("responds") for v in op_defs.values()}
+    want_schemas |= deep_refs
     want_schemas.discard(None)
     # one level deeper: whatever those schemas point at
     for name in list(want_schemas):
-        blob = json.dumps(schemas.get(name, {}))
+        blob = json.dumps(schemas.get(name, {}), default=str)
         for ref in set(__import__("re").findall(r'"#/components/schemas/([A-Za-z0-9_]+)"', blob)):
             want_schemas.add(ref)
     sch_defs = {n: schemas[n] for n in sorted(want_schemas) if n in schemas}
 
     d = OUT / b["id"]
     d.mkdir(parents=True, exist_ok=True)
-    (d / "screens.json").write_text(json.dumps(screens, indent=1, ensure_ascii=False),
+    (d / "screens.json").write_text(json.dumps(screens, indent=1, ensure_ascii=False, default=str),
                                     encoding="utf-8")
-    (d / "operations.json").write_text(json.dumps(op_defs, indent=1, ensure_ascii=False),
+    (d / "operations.json").write_text(json.dumps(op_defs, indent=1, ensure_ascii=False, default=str),
                                        encoding="utf-8")
-    (d / "schemas.json").write_text(json.dumps(sch_defs, indent=1, ensure_ascii=False),
+    (d / "schemas.json").write_text(json.dumps(sch_defs, indent=1, ensure_ascii=False, default=str),
                                     encoding="utf-8")
 
     perms = sorted({v["permission"] for v in op_defs.values() if v.get("permission")})

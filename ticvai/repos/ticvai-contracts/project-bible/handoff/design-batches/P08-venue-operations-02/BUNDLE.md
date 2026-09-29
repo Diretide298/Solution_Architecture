@@ -1,6 +1,6 @@
 # P08-venue-operations-02 — P08 · Venue Operations (2 of 2)
 
-**5 screens · 18 operations · 36 schemas · 11 permissions**
+**5 screens · 21 operations · 40 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-129` | Software, Configuration & Version Management | listDetail | 9 | 4 | — |
+| `BO-129` | Software, Configuration & Version Management | listDetail | 12 | 4 | — |
 | `BO-130` | Offline Policy & Rules Configuration | listDetail | 4 | 3 | — |
 | `BO-131` | Connectivity & Auto-Switch Settings | configEditor | 1 | 0 | — |
 | `BO-132` | Offline Transaction Monitor & Sync Queue | listDetail | 2 | 1 | — |
@@ -338,6 +338,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "listWorkstations",
      "listDeviceFirmware"
     ]
+   },
+   {
+    "operationId": "createDeviceFirmware",
+    "contract": "tenancy",
+    "purpose": "Register a firmware release",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getDeviceFirmware",
+    "contract": "tenancy",
+    "purpose": "Open a release",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setDeviceFirmwareStatus",
+    "contract": "tenancy",
+    "purpose": "Release, deprecate or withdraw",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -356,6 +377,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     },
     {
      "name": "rolloutId",
+     "from": "navigation"
+    },
+    {
+     "name": "firmwareId",
      "from": "navigation"
     }
    ],
@@ -1588,6 +1613,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "ConfigureWorkstationRequest",
   "responds": "Workstation"
  },
+ "createDeviceFirmware": {
+  "method": "POST",
+  "path": "/device-firmware",
+  "contract": "tenancy",
+  "summary": "Register a firmware or software release before it is deployed",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceFirmware",
+  "responds": "DeviceFirmware"
+ },
  "createOrder": {
   "method": "POST",
   "path": "/orders",
@@ -1644,6 +1688,19 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "ProfileDeployment",
   "responds": null
+ },
+ "getDeviceFirmware": {
+  "method": "GET",
+  "path": "/device-firmware/{firmwareId}",
+  "contract": "tenancy",
+  "summary": "Read one firmware release, and how much of the fleet is on it",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DeviceFirmware"
  },
  "getWorkstationHealth": {
   "method": "GET",
@@ -1865,7 +1922,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Put the fleet back on the previous version",
   "permission": "DEVICE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -1953,6 +2010,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "ConnectivityPolicy",
   "responds": "ConnectivityPolicy"
  },
+ "setDeviceFirmwareStatus": {
+  "method": "POST",
+  "path": "/device-firmware/{firmwareId}/status",
+  "contract": "tenancy",
+  "summary": "Release, deprecate or withdraw a firmware release",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeviceFirmware"
+ },
  "setOfflinePolicy": {
   "method": "PUT",
   "path": "/offline-policy",
@@ -1979,7 +2055,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Push an update to a fleet, in waves",
   "permission": "DEVICE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -2187,9 +2263,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "dashboardPanel",
       "email",
       "whatsapp",
-      "sms"
+      "sms",
+      "push"
      ]
-    }
+    },
+    "x-ticvai-push-note": "**`push` added 29 September** (6.1.56, 18.1.5, build pass): delivered to every staff-app handset registered for a recipient (tenancy `RegisteredDevice`, kind `mobileHandset`, with a push token). It is how a daily revenue alert reaches a manager's phone, which a panel on a web dashboard does not.\n"
    },
    "recipientRoleIds": {
     "type": "array",
@@ -2486,6 +2564,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "aiAssessment": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
+    "properties": {
+     "riskScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "riskBand": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "critical"
+      ]
+     },
+     "priorityScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "escalationSuggestion": {
+      "type": "object",
+      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
+      "properties": {
+       "action": {
+        "type": "string",
+        "enum": [
+         "escalate",
+         "addBackupApprover",
+         "none"
+        ]
+       },
+       "reason": {
+        "type": "string",
+        "nullable": true
+       }
+      }
+     },
+     "signals": {
+      "type": "array",
+      "maxItems": 10,
+      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "code": {
+         "type": "string"
+        },
+        "contribution": {
+         "type": "number"
+        },
+        "detail": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     },
+     "scoreId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
+     },
+     "decisionRecordId": {
+      "type": "string",
+      "description": "The ai decision record, for the audit of what the AI said and why."
+     },
+     "assessedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    }
   }
  },
@@ -2503,6 +2659,60 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "expired",
    "cancelled"
   ]
+ },
+ "AuditRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.audit_record",
+  "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
+  "required": [
+   "id",
+   "action",
+   "occurredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Who acted."
+   },
+   "orgUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The scope node the action happened in."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The workstation it was done from, where there was one."
+   },
+   "action": {
+    "type": "string",
+    "description": "What was done, as the writing operation names it."
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The thing acted on** — a profile, a shift, an order. The same value the `subjectRef` filter matches.\n"
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When. The list is ordered by this, most recent first."
+   },
+   "platformStaffGrantId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"
+   }
+  }
  },
  "CatalogueState": {
   "x-ticvai-persistence": "none — computed from workstation bundle_version",
@@ -2772,6 +2982,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Carried from the cart line at checkout; stored on `orders.order_line` and sent in `order.completed` lines.\n"
+   },
    "performanceId": {
     "type": "string",
     "format": "uuid"
@@ -2917,6 +3133,79 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CreatePaymentRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
+   },
+   "walletAuthorisationId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
+   },
+   "returnUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "DeploymentProfile": {
   "type": "string",
   "description": "How this workstation obtains catalogue and inventory (ADR-0013).\n- `terminalLocal` — own SQLite, leases direct from the cell. Small venues, 4G sites - `venueEdge` — own SQLite, distributed via the venue edge node which holds the\n  venue lease and sub-leases to terminals. Mid and large venues, stadium gates\n- `thin` — no local catalogue, server reads. Non-transactional surfaces only\n",
@@ -2956,17 +3245,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "DeviceFirmware": {
   "type": "object",
   "x-ticvai-persistence": "tenancy.device_firmware",
-  "description": "16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.**",
+  "description": "16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.** Written by `createDeviceFirmware` and moved through its life by `setDeviceFirmwareStatus` (29 September, build pass); `startDeviceFirmwareRollout` deploys only a `released` one.\n",
+  "required": [
+   "deviceKind",
+   "version"
+  ],
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "deviceKind": {
     "type": "string"
    },
    "version": {
     "type": "string"
+   },
+   "vendor": {
+    "type": "string",
+    "nullable": true,
+    "description": "Who built the image, as the device's driver names its maker."
+   },
+   "checksumAlgorithm": {
+    "type": "string",
+    "enum": [
+     "sha256",
+     "sha512"
+    ],
+    "default": "sha256"
    },
    "releaseNotes": {
     "type": "string",
@@ -2989,7 +3296,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "releasedAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "description": "Set when `setDeviceFirmwareStatus` first makes the release `released`."
    },
    "installedCount": {
     "type": "integer",
@@ -2997,12 +3306,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "status": {
     "type": "string",
+    "readOnly": true,
+    "default": "draft",
     "enum": [
      "draft",
      "released",
      "deprecated",
      "withdrawn"
     ]
+   },
+   "statusReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `reason` given when the release was deprecated or withdrawn."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The tenant the release belongs to. Releases are tenant-wide; rollouts narrow them."
    }
   }
  },
@@ -3148,15 +3470,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "assetDowntime",
    "meanTimeToRepair",
    "challengeCompletionRate",
-   "attributedRevenue"
+   "attributedRevenue",
+   "loyaltyActiveMembers",
+   "loyaltyTierDistribution",
+   "loyaltyPointsLiability",
+   "loyaltyBreakageRate",
+   "loyaltyMemberRetention",
+   "challengeParticipationRate",
+   "gamificationLoyaltyImpact",
+   "gamificationMembershipImpact",
+   "gamificationRetention",
+   "accreditationApplications",
+   "accreditationTimeToDecision",
+   "accreditationCredentialsIssued",
+   "accreditationActiveHolders",
+   "accreditationRenewalsDue",
+   "staffingShortfall"
   ],
   "x-ticvai-money-valued": [
    "inventoryValuation",
    "resaleCommission",
    "revenuePerEntitlement",
    "revenuePerVisitor",
-   "attributedRevenue"
+   "attributedRevenue",
+   "loyaltyPointsLiability"
   ],
+  "x-ticvai-extended-29-september": "**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n",
   "x-ticvai-money-valued-note": "**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n",
   "x-ticvai-extended": "18 August 2026",
   "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"
@@ -3170,6 +3509,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
+ },
+ "OfflineOrder": {
+  "x-ticvai-persistence": "none — client-side journal, not server storage",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateOrderRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "sequence",
+     "payments"
+    ],
+    "properties": {
+     "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per device. Processed in this order."
+     },
+     "payments": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CreatePaymentRequest"
+      }
+     }
+    }
    }
   ]
  },
@@ -3430,7 +3797,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility",
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-retired-columns": [
+   "promotion_id",
+   "name",
+   "reason"
+  ],
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateOrderLine"
@@ -3490,6 +3862,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "default": 0,
       "readOnly": true,
       "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
+     },
+     "venueId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "discounts": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.",
+      "items": {
+       "$ref": "#/components/schemas/OrderLineDiscount"
+      }
      }
     }
    }
@@ -3524,7 +3910,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "stoppedAtSequence": {
     "type": "integer",
     "nullable": true,
-    "description": "First entry that could not be processed. Null when the batch succeeded. The client retries from here and never past it.\n"
+    "description": "First entry that hit a **transient** failure (SD-028, 29 September): a refusal on the merits no longer stops the batch. Null when every entry was accepted, duplicate or quarantined. The client retries from here and never past it.\n"
    },
    "results": {
     "type": "array",
@@ -3549,8 +3935,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "enum": [
         "accepted",
         "duplicate",
-        "rejected"
-       ]
+        "rejected",
+        "blockedByRejection"
+       ],
+       "description": "`rejected`: refused on its merits and quarantined in `sync.rejection`; the batch continues. `blockedByRejection`: depends on a rejected entry for the same order (a void, a refund, a later payment) and is quarantined with it (SD-028, 29 September)."
       },
       "orderNumber": {
        "type": "string",
@@ -3567,6 +3955,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "varianceExceedsThreshold": {
        "type": "boolean",
        "description": "True when review is required per the venue's variance threshold."
+      },
+      "rejectionId": {
+       "type": "string",
+       "nullable": true,
+       "description": "For a `rejected` or `blockedByRejection` entry, the `sync.rejection` row it was quarantined into (SD-028). The batch carried on past it."
       },
       "error": {
        "$ref": "../shared/common.yaml#/components/schemas/Problem"
@@ -3680,7 +4073,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",
@@ -3907,6 +4338,83 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "retail",
    "mixed"
   ]
+ },
+ "SyncRejection": {
+  "x-ticvai-persistence": "sync.rejection",
+  "type": "object",
+  "required": [
+   "id",
+   "workstationId",
+   "kind",
+   "rejectedAt",
+   "problem"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "order",
+     "payment",
+     "refund",
+     "void",
+     "scan"
+    ]
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "rejectedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "problem": {
+    "$ref": "../shared/common.yaml#/components/schemas/Problem"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**Deliberately open: the journal entry exactly as the till sent it.** Its shape is the request schema for `kind` — an `OfflineOrder` for `order`, a `CreatePaymentRequest` for `payment` — kept verbatim so the supervisor resolves what was actually recorded, not a re-typed copy.\n"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolution": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "posted",
+     "voided",
+     "refunded"
+    ],
+    "description": "What `resolveSyncRejection` recorded. Null while the rejection waits."
+   },
+   "resolvedRecordId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The order, void or refund the resolution produced — what stops the entry being posted twice."
+   }
+  }
  },
  "Workstation": {
   "x-ticvai-persistence": "platform.workstation",

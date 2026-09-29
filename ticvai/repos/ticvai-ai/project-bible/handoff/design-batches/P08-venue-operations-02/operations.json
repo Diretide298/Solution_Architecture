@@ -18,6 +18,25 @@
   "requestBody": "ConfigureWorkstationRequest",
   "responds": "Workstation"
  },
+ "createDeviceFirmware": {
+  "method": "POST",
+  "path": "/device-firmware",
+  "contract": "tenancy",
+  "summary": "Register a firmware or software release before it is deployed",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeviceFirmware",
+  "responds": "DeviceFirmware"
+ },
  "createOrder": {
   "method": "POST",
   "path": "/orders",
@@ -74,6 +93,19 @@
   ],
   "requestBody": "ProfileDeployment",
   "responds": null
+ },
+ "getDeviceFirmware": {
+  "method": "GET",
+  "path": "/device-firmware/{firmwareId}",
+  "contract": "tenancy",
+  "summary": "Read one firmware release, and how much of the fleet is on it",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DeviceFirmware"
  },
  "getWorkstationHealth": {
   "method": "GET",
@@ -295,7 +327,7 @@
   "summary": "Put the fleet back on the previous version",
   "permission": "DEVICE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -383,6 +415,25 @@
   "requestBody": "ConnectivityPolicy",
   "responds": "ConnectivityPolicy"
  },
+ "setDeviceFirmwareStatus": {
+  "method": "POST",
+  "path": "/device-firmware/{firmwareId}/status",
+  "contract": "tenancy",
+  "summary": "Release, deprecate or withdraw a firmware release",
+  "permission": "DEVICE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeviceFirmware"
+ },
  "setOfflinePolicy": {
   "method": "PUT",
   "path": "/offline-policy",
@@ -409,7 +460,7 @@
   "summary": "Push an update to a fleet, in waves",
   "permission": "DEVICE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {

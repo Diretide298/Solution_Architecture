@@ -14,13 +14,13 @@
   },
   "navigation": {
    "entryFrom": [
-    "GST-001"
+    "GST-001",
+    "GST-038"
    ],
    "inferred": true,
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-022"
    ],
    "transitions": [
@@ -32,18 +32,7 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-021 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
      "to": "BO-096",
@@ -55,10 +44,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired to the venue map 18 August (CF-123).** The whole map arrives in one call and the client filters locally — which is also what makes it work with no signal in the middle of a park. **Routing happens on the device.** The platform guarantees the graph — connected, versioned, with step-free marked — and the client walks it, because a phone with the graph cached routes with no signal and a server round-trip per step does not. **The version is how a stale route is caught**: a guest holding a route across a path that closed this morning gets told, rather than walking into a barrier. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
-  "openQuestions": [
-   "Inventory cites `GET /venue-map` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired to the venue map 18 August (CF-123).** The whole map arrives in one call and the client filters locally — which is also what makes it work with no signal in the middle of a park. **Routing happens on the device.** The platform guarantees the graph — connected, versioned, with step-free marked — and the client walks it, because a phone with the graph cached routes with no signal and a server round-trip per step does not. **The version is how a stale route is caught**: a guest holding a route across a path that closed this morning gets told, rather than walking into a barrier. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**Mobile v4 (decided 29 September, MOB-1).** The **Map** view of GST-038 At the Venue: **one implementation with GST-038, the ids kept** (as GAP-D3).",
   "density": "comfortable",
   "boardFrames": [
    "Seat Board 4.dc.html#seat-4b"
@@ -66,13 +52,6 @@
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act",
   "purpose": "See where things are in relation to each other.",
-  "gaps": [
-   {
-    "operation": "getVenueMap",
-    "why": "**2 declared operations reach no component on this screen**: getVenueMap, getVenueMapGraph. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -81,8 +60,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every interactive map",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -109,12 +109,64 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected interactive map",
+       "label": "The selected product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.categoryId",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.isStockTracked"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue map",
+       "bindsTo": "VenueMapDetail",
+       "columns": [
+        "VenueMapDetail.map",
+        "VenueMapDetail.points",
+        "VenueMapDetail.paths"
+       ],
+       "operation": "getVenueMap",
+       "provenance": "contract venue-map.yaml GET /venue-maps/{mapId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue map graph",
+       "bindsTo": "VenueMapGraph",
+       "columns": [
+        "VenueMapGraph.mapId",
+        "VenueMapGraph.generatedAt",
+        "VenueMapGraph.nodes",
+        "VenueMapGraph.edges",
+        "VenueMapGraph.components"
+       ],
+       "operation": "getVenueMapGraph",
+       "provenance": "contract venue-map.yaml GET /venue-maps/{mapId}/graph"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
         "WaitTime.queueId",
         "WaitTime.queueName",
         "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
         "WaitTime.source",
@@ -127,35 +179,15 @@
        "provenance": "contract queue.yaml GET /queues/wait-times"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listProducts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "detailPanel",
-       "derived": true,
-       "impliedBy": "getVenueMap",
-       "notes": "One record, read-only.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The interactive map list.",
    "error": "Could not load. Names which read failed and leaves the interactive map untouched.",
-   "emptyFirstRun": "No interactive map yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the interactive map are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No interactive map yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the interactive map are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect."
   },
   "apis": [
@@ -202,8 +234,16 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
+   "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-021",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "exact",
+    "view": "At the venue → Map"
+   },
+   "derivedFrom": "wireframes/reference/Seat Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -254,7 +294,8 @@
   "navigation": {
    "entryFrom": [
     "GST-001",
-    "GST-021"
+    "GST-021",
+    "GST-038"
    ],
    "inferred": true,
    "exitTo": [
@@ -281,25 +322,16 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-022 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
      "to": "GST-059",
      "trigger": "Plan My Day – In Progress",
-     "carries": [
-      "suggestionId"
-     ],
-     "provenance": "derived — GST-059 declares entryState.params suggestionId, so an edge into it must carry them"
+     "provenance": "derived — GST-059 declares entryState.params itemId, planId and GST-022 holds none of them, so the edge carries nothing and GST-059 opens cold"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101) with the queue platform F21 runs on.",
-  "openQuestions": [
-   "Inventory cites `GET /queue/wait-times` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101) with the queue platform F21 runs on.\n\n**Mobile v4 (decided 29 September, MOB-1).** The **Waits** view of GST-038 At the Venue: **one implementation with GST-038, the ids kept** (as GAP-D3).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getWaitTimes` reads one record and nothing reads a population — the screen is about that one thing",
@@ -313,7 +345,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected attraction wait times",
+       "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
         "WaitTime.queueId",
@@ -328,6 +360,7 @@
         "WaitTime.asOf"
        ],
        "operation": "getWaitTimes",
+       "notes": "**A stale wait time is shown with a caveat, never hidden** (decided 28 September, audit R080 (b)): where `WaitTime.isStale` is true the minutes stay on screen marked out of date with their `asOf` time, as queue.yaml says.",
        "provenance": "contract queue.yaml GET /queues/wait-times"
       }
      ]
@@ -335,11 +368,9 @@
    ]
   },
   "states": {
-   "loading": "The attraction wait times list.",
+   "loading": "The attraction wait times, read by `getWaitTimes`.",
    "error": "Could not load. Names which read failed and leaves the attraction wait times untouched.",
-   "emptyFirstRun": "No attraction wait times yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the attraction wait times are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No attraction wait times yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect."
   },
   "apis": [
@@ -352,8 +383,15 @@
   ],
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-022"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-022",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "exact",
+    "view": "At the venue → Waits"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -403,13 +441,13 @@
   "navigation": {
    "entryFrom": [
     "GST-001",
-    "GST-022"
+    "GST-022",
+    "GST-025"
    ],
    "inferred": true,
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-024"
    ],
    "transitions": [
@@ -421,33 +459,15 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-023 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Renamed 31 August** from *Virtual Queue / Join Queue*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Renamed 31 August** from *Virtual Queue / Join Queue*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (GAP-D2, open).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getWaitingGuest` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Find the right one quickly, and act on it without opening it.",
-  "gaps": [
-   {
-    "operation": "getWaitTimes",
-    "why": "**1 declared operation reach no component on this screen**: getWaitTimes. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -457,7 +477,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected virtual queue",
+       "label": "The waiting guest",
        "bindsTo": "WaitingGuest",
        "columns": [
         "WaitingGuest.id",
@@ -479,6 +499,47 @@
        ],
        "operation": "getWaitingGuest",
        "provenance": "contract queue.yaml GET /waiting-guests/{entryId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every queue",
+       "bindsTo": "Queue",
+       "columns": [
+        "Queue.code",
+        "Queue.name",
+        "Queue.venueId",
+        "Queue.attractionProductId",
+        "Queue.assetId",
+        "Queue.accessPointId",
+        "Queue.kind",
+        "Queue.operatingWindows",
+        "Queue.parentQueueId",
+        "Queue.loadBalanceWithQueueIds",
+        "Queue.inQueueOfferEnabled",
+        "Queue.notifyBeforeCallMinutes"
+       ],
+       "operation": "listQueues",
+       "provenance": "contract queue.yaml GET /queues"
       }
      ]
     },
@@ -488,13 +549,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Join",
+       "label": "Join queue",
        "operation": "joinQueue",
        "provenance": "contract queue.yaml POST /waiting-guests"
       },
       {
        "kind": "secondaryButton",
-       "label": "Leave",
+       "label": "Leave queue",
        "operation": "leaveQueue",
        "provenance": "contract queue.yaml DELETE /waiting-guests/{entryId}"
       }
@@ -503,11 +564,10 @@
    ]
   },
   "states": {
-   "loading": "The virtual queue list.",
+   "loading": "The virtual queue, read by `getWaitingGuest`.",
    "error": "Could not load. Names which read failed and leaves the virtual queue untouched.",
-   "emptyFirstRun": "No virtual queue yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the virtual queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No virtual queue yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection — a place taken offline is a place nobody else can see."
   },
   "apis": [
@@ -515,13 +575,13 @@
     "operationId": "joinQueue",
     "contract": "queue",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getWaitingGuest",
     "contract": "queue",
-    "purpose": "Read a queue entry",
-    "trigger": "onLoad"
+    "purpose": "The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242)",
+    "trigger": "onInterval"
    },
    {
     "operationId": "leaveQueue",
@@ -553,10 +613,43 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-023"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-023",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 3 → Virtual queue; also At-venue card \"Desert Coaster · queued\"",
+    "differences": "Prototype allows two queues at once; the YAML states no limit."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formJoinQueue",
+    "component": "modal",
+    "trigger": "Join queue",
+    "body": "**Collects what `joinQueue` sends before it is called.** Required: `id`, `queueId`, `partySize`, `recordedAt`. Optional: `entitlementId`, `partyHeightsCm`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "JoinQueueRequest",
+    "confirm": {
+     "label": "Join queue",
+     "operation": "joinQueue"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "queueId",
+      "partySize",
+      "recordedAt",
+      "entitlementId",
+      "partyHeightsCm"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -610,53 +703,40 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-009",
     "GST-025"
    ],
    "fromFlows": true,
    "transitions": [
     {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "provenance": "derived — GST-001 declares entryState.params  and GST-024 holds none of them, so the edge carries nothing and GST-001 opens cold"
+    },
+    {
      "to": "GST-009",
      "trigger": "Pays",
      "provenance": "flow F11 step 3→4",
-     "operation": "createGuestFnbOrder"
+     "operation": "createGuestFnbOrder",
+     "carries": [
+      "orderId"
+     ]
     },
     {
      "to": "GST-025",
      "trigger": "They watch the order progress",
-     "provenance": "flow F48 step 4→5"
-    },
-    {
-     "to": "GST-001",
-     "trigger": "Home – Default",
+     "provenance": "flow F48 step 4→5",
      "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+      "orderId"
+     ]
     }
    ]
   },
-  "notes": "The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana or a seat uses the same claimLocationSession as a table (4.6.26). States derived from the screen pattern on 17 August, not individually considered. **Cross-surface parity, 31 August**: added claimTableSession, listModifierGroups. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "notes": "The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana or a seat uses the same claimLocationSession as a table (4.6.26). States derived from the screen pattern on 17 August, not individually considered. **Cross-surface parity, 31 August**: added claimTableSession, listModifierGroups. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.\n\n**Rev 3 (decided 29 September).** Add on an item with modifier groups opens the modifier side panel (GST-061, REV3-9); delivery fee, minimum, area and full slots are unchanged (DG-5).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listDiningOutlets` reads the population and `getGuestMenu` reads one of them — list, select, act",
   "purpose": "Order food to where the guest is sitting, or for collection.",
-  "gaps": [
-   {
-    "operation": "getGuestOrderStatus",
-    "why": "**3 declared operations reach no component on this screen**: getGuestOrderStatus, listDeliveryLocations, listModifierGroups. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -684,6 +764,66 @@
        ],
        "operation": "listDiningOutlets",
        "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mode",
+       "operation": "listFulfilmentSlots",
+       "notes": "Sends `?mode=` to `listFulfilmentSlots`.",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Date",
+       "operation": "listFulfilmentSlots",
+       "notes": "Sends `?date=` to `listFulfilmentSlots`.",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every fulfilment slots",
+       "bindsTo": "FulfilmentSlots",
+       "columns": [
+        "FulfilmentSlots.slots"
+       ],
+       "operation": "listFulfilmentSlots",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every delivery location",
+       "bindsTo": "DeliveryLocation",
+       "columns": [
+        "DeliveryLocation.id",
+        "DeliveryLocation.venueId",
+        "DeliveryLocation.kind",
+        "DeliveryLocation.label",
+        "DeliveryLocation.zone",
+        "DeliveryLocation.tableId",
+        "DeliveryLocation.seatId",
+        "DeliveryLocation.servingOutletIds",
+        "DeliveryLocation.isServiceable",
+        "DeliveryLocation.unserviceableReason",
+        "DeliveryLocation.walkTimeMinutes"
+       ],
+       "operation": "listDeliveryLocations",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/delivery-locations"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every modifier group",
+       "bindsTo": "ModifierGroup",
+       "columns": [
+        "ModifierGroup.id",
+        "ModifierGroup.code",
+        "ModifierGroup.name",
+        "ModifierGroup.minSelections",
+        "ModifierGroup.maxSelections",
+        "ModifierGroup.options",
+        "ModifierGroup.scopePath"
+       ],
+       "operation": "listModifierGroups",
+       "provenance": "contract fnb.yaml GET /modifier-groups"
       }
      ]
     },
@@ -693,7 +833,57 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected browse order",
+       "label": "The selected fulfilment slots",
+       "bindsTo": "FulfilmentSlots",
+       "columns": [
+        "FulfilmentSlots.slots"
+       ],
+       "operation": "listFulfilmentSlots",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/fulfilment-slots"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The F&B delivery policy",
+       "bindsTo": "FnbDeliveryPolicy",
+       "columns": [
+        "FnbDeliveryPolicy.id",
+        "FnbDeliveryPolicy.outletId",
+        "FnbDeliveryPolicy.collectionEnabled",
+        "FnbDeliveryPolicy.deliveryEnabled",
+        "FnbDeliveryPolicy.collectionPoint",
+        "FnbDeliveryPolicy.collectionHoldMinutes",
+        "FnbDeliveryPolicy.asapCollectionMinutes",
+        "FnbDeliveryPolicy.asapDeliveryMinutes",
+        "FnbDeliveryPolicy.slotMinutes",
+        "FnbDeliveryPolicy.minimumOrder",
+        "FnbDeliveryPolicy.deliveryFee",
+        "FnbDeliveryPolicy.freeDeliveryAbove",
+        "FnbDeliveryPolicy.radiusKm",
+        "FnbDeliveryPolicy.emiratesServed",
+        "FnbDeliveryPolicy.cutleryOptIn",
+        "FnbDeliveryPolicy.scopePath"
+       ],
+       "operation": "getFnbDeliveryPolicy",
+       "provenance": "contract fnb.yaml GET /fnb-delivery-policy"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The guest order status",
+       "bindsTo": "GuestOrderStatus",
+       "columns": [
+        "GuestOrderStatus.orderId",
+        "GuestOrderStatus.orderNumber",
+        "GuestOrderStatus.status",
+        "GuestOrderStatus.estimatedReadyAt",
+        "GuestOrderStatus.isReadyForCollection",
+        "GuestOrderStatus.lines"
+       ],
+       "operation": "getGuestOrderStatus",
+       "provenance": "contract fnb.yaml GET /guest-orders/{orderId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The guest menu",
        "bindsTo": "GuestMenu",
        "columns": [
         "GuestMenu.outletId",
@@ -715,19 +905,19 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Claim",
+       "label": "Claim location session",
        "operation": "claimLocationSession",
        "provenance": "contract fnb.yaml POST /location-sessions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create guest F&B order",
        "operation": "createGuestFnbOrder",
        "provenance": "contract fnb.yaml POST /guest-orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Claim",
+       "label": "Claim table session",
        "operation": "claimTableSession",
        "provenance": "contract fnb.yaml POST /table-sessions"
       }
@@ -738,12 +928,24 @@
   "states": {
    "loading": "The browse order list.",
    "error": "Could not load. Names which read failed and leaves the browse order untouched.",
-   "emptyFirstRun": "No browse order yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the browse order are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No browse order yet. Offers Create guest F&B order (`createGuestFnbOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on mode, date and the browse order are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getFnbDeliveryPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection — an order placed offline is food nobody is making."
   },
   "apis": [
+   {
+    "operationId": "getFnbDeliveryPolicy",
+    "contract": "fnb",
+    "purpose": "Minimum order, delivery fee and area",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listFulfilmentSlots",
+    "contract": "fnb",
+    "purpose": "Collection times or delivery windows still open",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "listDiningOutlets",
     "contract": "fnb",
@@ -760,13 +962,13 @@
     "operationId": "claimLocationSession",
     "contract": "fnb",
     "purpose": "Scan the table, cabana or sunbed code",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createGuestFnbOrder",
     "contract": "fnb",
     "purpose": "Place the order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getGuestOrderStatus",
@@ -811,21 +1013,88 @@
      "from": "session"
     }
    ],
-   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error. **`venueId` is the venue the guest picked on the home screen** (WEB-001 on the web, GST-001 in the app), remembered on the device and changeable there; it is not read from the sign-in (decided 28 September, audit R267).",
    "preloaded": [
-    "GuestMenu.outletId",
-    "GuestMenu.menuId",
-    "GuestMenu.name",
-    "GuestMenu.inForceUntil",
-    "GuestMenu.currency"
+    "FulfilmentSlots.slots"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-024"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-024",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → F&B – browse & order"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formClaimLocationSession",
+    "component": "modal",
+    "trigger": "Claim location session",
+    "body": "**Collects what `claimLocationSession` sends before it is called.** Nothing in the body is required. Optional: `locationCode`, `seatReference`, `partySize`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Claim location session",
+     "operation": "claimLocationSession"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "locationCode",
+      "seatReference",
+      "partySize"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formCreateGuestFnbOrder",
+    "component": "modal",
+    "trigger": "Create guest F&B order",
+    "body": "**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`, `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateGuestOrderRequest",
+    "confirm": {
+     "label": "Create guest F&B order",
+     "operation": "createGuestFnbOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "quotedTotal",
+      "recordedAt",
+      "locationSessionId",
+      "outletId",
+      "fulfilment",
+      "paymentMethod"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formClaimTableSession",
+    "component": "modal",
+    "trigger": "Claim table session",
+    "body": "**Collects what `claimTableSession` sends before it is called.** Required: `tableCode`. Optional: `partySize`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Claim table session",
+     "operation": "claimTableSession"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tableCode",
+      "partySize"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -879,7 +1148,7 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
+    "GST-023",
     "GST-030"
    ],
    "fromFlows": true,
@@ -892,18 +1161,12 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-025 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "to": "GST-023",
+     "trigger": "Their queue place comes up and the queue screen shows it",
+     "provenance": "flow F48 step 5→6"
     },
     {
      "to": "BO-021",
@@ -911,7 +1174,10 @@
      "provenance": "flow F11 step 6→7",
      "operation": "getGuestOrderStatus",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
@@ -920,13 +1186,6 @@
   "pattern": "statusTracker",
   "patternReason": "`getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Track an order to the point it reaches the guest.",
-  "gaps": [
-   {
-    "operation": "getGuestBill",
-    "why": "**1 declared operation reach no component on this screen**: getGuestBill. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -936,7 +1195,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected order tracking",
+       "label": "The guest order status",
        "bindsTo": "GuestOrderStatus",
        "columns": [
         "GuestOrderStatus.orderId",
@@ -948,6 +1207,23 @@
        ],
        "operation": "getGuestOrderStatus",
        "provenance": "contract fnb.yaml GET /guest-orders/{orderId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The bill",
+       "bindsTo": "Bill",
+       "columns": [
+        "Bill.visitId",
+        "Bill.covers",
+        "Bill.lines",
+        "Bill.subtotal",
+        "Bill.serviceCharge",
+        "Bill.taxAmount",
+        "Bill.discountAmount",
+        "Bill.total"
+       ],
+       "operation": "getGuestBill",
+       "provenance": "contract fnb.yaml GET /table-sessions/{sessionId}/bill"
       }
      ]
     },
@@ -957,7 +1233,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Claim",
+       "label": "Claim table session",
        "operation": "claimTableSession",
        "provenance": "contract fnb.yaml POST /table-sessions"
       }
@@ -969,16 +1245,14 @@
    "loading": "Availability is live, never cached",
    "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "emptyNoResults": "The filter narrowed it and the order tracking are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The last status stays on screen with its age and is never presented as current. Settling the bill waits for the connection."
   },
   "apis": [
    {
     "operationId": "getGuestOrderStatus",
     "contract": "fnb",
-    "purpose": "Ordered → accepted → in preparation → ready → served, collected or delivered",
-    "trigger": "onLoad"
+    "purpose": "The order's status (ordered, accepted, in preparation, ready, served, collected or delivered), read on entry and polled while the screen is open; order updates show here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242)",
+    "trigger": "onInterval"
    },
    {
     "operationId": "getGuestBill",
@@ -1008,10 +1282,38 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-025"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-025",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → F&B – order tracking",
+    "differences": "The YAML states come from an availability template (\"Selection is blocked\") and do not fit order tracking."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formClaimTableSession",
+    "component": "modal",
+    "trigger": "Claim table session",
+    "body": "**Collects what `claimTableSession` sends before it is called.** Required: `tableCode`. Optional: `partySize`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Claim table session",
+     "operation": "claimTableSession"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tableCode",
+      "partySize"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1064,38 +1366,25 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-028"
    ],
    "transitions": [
     {
-     "to": "GST-028",
-     "trigger": "It is confirmed with a facility and a bay type",
-     "provenance": "flow F50 step 1→2",
-     "operation": "createParkingEntitlement"
-    },
-    {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-027 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
+     "to": "GST-028",
+     "trigger": "It is confirmed with a facility",
+     "provenance": "flow F50 step 2→3",
      "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+      "orderId"
+     ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement` is declared `service` audience and this is a guest screen.** Either the guest calls it — in which case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an act it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already `guest`, which makes the asymmetry look like an omission rather than a design. **Cross-surface parity, 31 August**: added listParkingFacilities. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
-  "openQuestions": [
-   "Inventory cites `POST /parking-reservations` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement` is declared `service` audience and this is a guest screen.** Either the guest calls it — in which case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an act it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already `guest`, which makes the asymmetry look like an omission rather than a design. **Cross-surface parity, 31 August**: added listParkingFacilities. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate. **Rebound 28 September** (decided 28 September, audit R166): parking is sold through the normal cart and checkout (`addCartLine`, `checkoutCart`, `createPayment`), so the entitlement gets its `orderId`; the guest no longer calls `createParkingEntitlement`, which the order service issues at payment. No live availability; a full car park is the `soldOutForDay` refusal.\n\n**Rev 3 (decided 29 September).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (GAP-D2, open).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listParkingFacilities` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1108,8 +1397,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listParkingFacilities",
+       "notes": "Sends `?venueId=` to `listParkingFacilities`.",
+       "provenance": "contract access.yaml GET /parking-facilities"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every parking reserve pay",
+       "label": "Every parking facility",
        "bindsTo": "ParkingFacility",
        "columns": [
         "ParkingFacility.id",
@@ -1136,7 +1432,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected parking reserve pay",
+       "label": "The selected parking facility",
        "bindsTo": "ParkingFacility",
        "columns": [
         "ParkingFacility.id",
@@ -1164,13 +1460,26 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createParkingEntitlement",
-       "provenance": "contract access.yaml POST /parking-entitlements"
+       "label": "Add parking to my cart",
+       "operation": "addCartLine",
+       "notes": "**Parking is sold through the normal cart** (decided 28 September, audit R166): the car park's parking product goes in as a cart line, then checkout and payment as for a ticket, and the parking entitlement is issued at payment carrying the order's id — the guest never creates it. No live space count: a car park at capacity refuses the line with `soldOutForDay`.",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Check out",
+       "operation": "checkoutCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Pay",
+       "operation": "createPayment",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save parking entitlement",
        "operation": "updateParkingEntitlement",
        "provenance": "contract access.yaml PATCH /parking-entitlements/{entitlementId}"
       }
@@ -1182,19 +1491,29 @@
    "loading": "Terminal or gateway state, shown plainly",
    "error": "**Declined reads differently from unresolved.** An unresolved payment inquires rather than retries, and nothing is issued until it resolves",
    "emptyFirstRun": "—",
-   "emptyNoResults": "The filter narrowed it and the parking reserve pay are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection."
+   "emptyNoResults": "Nothing matches the filter on venueId and the parking reserve pay are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection.",
+   "soldOutForDay": "**The car park is full.** `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then — there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166)."
   },
   "apis": [
    {
-    "operationId": "createParkingEntitlement",
-    "contract": "access",
-    "purpose": "A guest bought parking",
-    "trigger": "onAction",
-    "invalidates": [
-     "listParkingFacilities"
-    ]
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Put the car park's parking product in the cart; refused `soldOutForDay` when the car park is at capacity (decided 28 September, audit R166)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "checkoutCart",
+    "contract": "orders",
+    "purpose": "Turn the cart into an order",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createPayment",
+    "contract": "orders",
+    "purpose": "Pay for it; the parking entitlement is issued at payment with the order's id (audit R166)",
+    "trigger": "onAction"
    },
    {
     "operationId": "updateParkingEntitlement",
@@ -1217,6 +1536,10 @@
     {
      "name": "entitlementId",
      "from": "deepLink"
+    },
+    {
+     "name": "cartId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer.",
@@ -1230,10 +1553,59 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-027"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-027",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 3 → Parking – reserve & pay"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add parking to my cart",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId` (the car park's parking product), `quantity`. Optional: `performanceId`, `attributes` (the plate). A 409 `soldOutForDay` is shown as **the car park is full** for that day — capacity reached, not a live count (decided 28 September, audit R166). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add to cart",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formUpdateParkingEntitlement",
+    "component": "modal",
+    "trigger": "Save parking entitlement",
+    "body": "**Collects what `updateParkingEntitlement` sends before it is called.** Nothing in the body is required. Optional: `plateNumber`, `plateCountry`, `status`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "UpdateParkingEntitlementRequest",
+    "confirm": {
+     "label": "Save parking entitlement",
+     "operation": "updateParkingEntitlement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "plateNumber",
+      "plateCountry",
+      "status"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1287,37 +1659,25 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-012"
    ],
    "transitions": [
     {
-     "to": "GST-012",
-     "trigger": "They open their tickets",
-     "provenance": "flow F50 step 2→3"
-    },
-    {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-028 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
+     "to": "GST-012",
+     "trigger": "They open their tickets",
+     "provenance": "flow F50 step 3→4",
      "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+      "orderId"
+     ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement` is declared `service` audience and this is a guest screen.** Either the guest calls it — in which case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an act it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already `guest`, which makes the asymmetry look like an omission rather than a design.",
-  "openQuestions": [
-   "Inventory cites `GET /parking-reservations/{id}` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement` is declared `service` audience and this is a guest screen.** Either the guest calls it — in which case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an act it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already `guest`, which makes the asymmetry look like an omission rather than a design. **Rebound 28 September** (decided 28 September, audit R166): the guest no longer creates the parking entitlement; it is issued at payment of the cart order, and this screen reads that order (`getOrder`).\n\n**Rev 3 (decided 29 September).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (GAP-D2, open).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listParkingFacilities` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1330,8 +1690,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listParkingFacilities",
+       "notes": "Sends `?venueId=` to `listParkingFacilities`.",
+       "provenance": "contract access.yaml GET /parking-facilities"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every parking reservation confirmed",
+       "label": "Every parking facility",
        "bindsTo": "ParkingFacility",
        "columns": [
         "ParkingFacility.id",
@@ -1358,7 +1725,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected parking reservation confirmed",
+       "label": "The selected parking facility",
        "bindsTo": "ParkingFacility",
        "columns": [
         "ParkingFacility.id",
@@ -1385,10 +1752,16 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createParkingEntitlement",
-       "provenance": "contract access.yaml POST /parking-entitlements"
+       "kind": "detailPanel",
+       "label": "The order the parking was paid on",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.status"
+       ],
+       "operation": "getOrder",
+       "notes": "**The parking entitlement is issued at payment, carrying this order's id** (decided 28 September, audit R166); this screen confirms the order and shows the car park and plate from it, and never creates the entitlement itself.",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
       }
      ]
     }
@@ -1397,20 +1770,17 @@
   "states": {
    "loading": "The parking reservation confirmed list.",
    "error": "Could not load. Names which read failed and leaves the parking reservation confirmed untouched.",
-   "emptyFirstRun": "No parking reservation confirmed yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the parking reservation confirmed are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "**Paid, entitlement not yet shown.** The order is paid and the entitlement is issued at payment; until it appears the screen shows the order and says the car park pass follows (audit R166).",
+   "emptyNoResults": "Nothing matches the filter on venueId and the parking reservation confirmed are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection."
   },
   "apis": [
    {
-    "operationId": "createParkingEntitlement",
-    "contract": "access",
-    "purpose": "A guest bought parking",
-    "trigger": "onAction",
-    "invalidates": [
-     "listParkingFacilities"
-    ]
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "The paid order that carries the parking entitlement (audit R166)",
+    "trigger": "onLoad"
    },
    {
     "operationId": "listParkingFacilities",
@@ -1420,6 +1790,13 @@
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "previousScreen"
+    }
+   ],
+   "coldEntry": "**Opened cold, it needs the order.** Without `orderId` it sends the guest to their orders rather than showing an empty confirmation.",
    "preloaded": [
     "ParkingFacility.id",
     "ParkingFacility.name",
@@ -1430,8 +1807,15 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-028"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-028",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 3 → Parking – reservation confirmed"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1485,43 +1869,21 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-029 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
-  "openQuestions": [
-   "Inventory cites `GET /venue-info` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Contact added 28 September** from `getTenantAppStatus.contact`, as on the web's WEB-028 (decided 28 September, audit R073 (f)).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listDiningOutlets` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "See venue info & services for this venue.",
-  "gaps": [
-   {
-    "operation": "listDeliveryLocations",
-    "why": "**1 declared operation reach no component on this screen**: listDeliveryLocations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1530,8 +1892,37 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "detailPanel",
+       "label": "How to reach the venue",
+       "bindsTo": "VenueContact",
+       "columns": [
+        "VenueContact.phone",
+        "VenueContact.email",
+        "VenueContact.whatsapp",
+        "VenueContact.address",
+        "VenueContact.openingHours"
+       ],
+       "operation": "getTenantAppStatus",
+       "notes": "**From `getTenantAppStatus.contact`** (decided 28 September, audit R073 (f)): phone, email, WhatsApp, address and opening hours, set from CMS-001 through `setMaintenanceMode`. Each is optional and a missing one is left out rather than shown blank.",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      },
+      {
+       "kind": "toggle",
+       "label": "Open now",
+       "operation": "listDiningOutlets",
+       "notes": "Sends `?openNow=` to `listDiningOutlets`.",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "textField",
+       "label": "Ordering method",
+       "operation": "listDiningOutlets",
+       "notes": "Sends `?orderingMethod=` to `listDiningOutlets`.",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every venue info services",
+       "label": "Every dining outlet",
        "bindsTo": "DiningOutlet",
        "columns": [
         "DiningOutlet.outletId",
@@ -1549,6 +1940,26 @@
        ],
        "operation": "listDiningOutlets",
        "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every delivery location",
+       "bindsTo": "DeliveryLocation",
+       "columns": [
+        "DeliveryLocation.id",
+        "DeliveryLocation.venueId",
+        "DeliveryLocation.kind",
+        "DeliveryLocation.label",
+        "DeliveryLocation.zone",
+        "DeliveryLocation.tableId",
+        "DeliveryLocation.seatId",
+        "DeliveryLocation.servingOutletIds",
+        "DeliveryLocation.isServiceable",
+        "DeliveryLocation.unserviceableReason",
+        "DeliveryLocation.walkTimeMinutes"
+       ],
+       "operation": "listDeliveryLocations",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/delivery-locations"
       }
      ]
     },
@@ -1558,7 +1969,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected venue info services",
+       "label": "The selected dining outlet",
        "bindsTo": "DiningOutlet",
        "columns": [
         "DiningOutlet.outletId",
@@ -1584,12 +1995,17 @@
   "states": {
    "loading": "The venue info services list.",
    "error": "Could not load. Names which read failed and leaves the venue info services untouched.",
-   "emptyFirstRun": "No venue info services yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the venue info services are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No venue info services yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on openNow, orderingMethod and the venue info services are still there. Names the active filter and offers to clear it.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
+   {
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "How to reach the venue — phone, email, WhatsApp, address, opening hours (decided 28 September, audit R073 (f))",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "listDiningOutlets",
     "contract": "fnb",
@@ -1610,7 +2026,7 @@
      "from": "session"
     }
    ],
-   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case. **`venueId` is the venue the guest picked on the home screen** (WEB-001 on the web, GST-001 in the app), remembered on the device and changeable there; it is not read from the sign-in (decided 28 September, audit R267).",
    "preloaded": [
     "DiningOutlet.outletId",
     "DiningOutlet.name",
@@ -1621,8 +2037,16 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-029"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-029",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Venue info & services",
+    "differences": "Prototype shows only dining and delivery points, no other venue services."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1658,7 +2082,7 @@
  },
  {
   "id": "GST-038",
-  "name": "Digital Companion Mode",
+  "name": "At the Venue",
   "module": "In-venue Services",
   "requiresModule": "queue",
   "wave": 3,
@@ -1677,39 +2101,59 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003"
+    "GST-021",
+    "GST-022",
+    "GST-024",
+    "GST-026",
+    "GST-029",
+    "GST-023"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-038 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "to": "GST-021",
+     "trigger": "Map view",
+     "provenance": "decided 29 September 2026 (P29), MOB-1"
+    },
+    {
+     "to": "GST-022",
+     "trigger": "Waits view",
+     "provenance": "decided 29 September 2026 (P29), MOB-1"
+    },
+    {
+     "to": "GST-024",
+     "trigger": "Food",
+     "provenance": "decided 29 September 2026 (P29), MOB-1"
+    },
+    {
+     "to": "GST-026",
+     "trigger": "Shop",
+     "provenance": "decided 29 September 2026 (P29), MOB-1"
+    },
+    {
+     "to": "GST-029",
+     "trigger": "Services",
+     "provenance": "decided 29 September 2026 (P29), MOB-1"
+    },
+    {
+     "to": "GST-023",
+     "trigger": "Join a virtual queue",
+     "provenance": "decided 29 September 2026 (P29), MOB-1"
     }
+   ],
+   "uses": [
+    "appTabs"
    ]
   },
-  "notes": "**Not minuted and not in the matrix.** The only unsourced screen of the eight audited on 17 August — it reads as a framing for the in-venue capabilities rather than a capability of its own, and CF-92 asks whether it is a real screen or a name for a mode.",
+  "notes": "**Mobile v4 (decided 29 September, MOB-1).** Retitled **At the Venue**, the in-venue mode and the optional Map tab: views Map, Waits, Food, Shows, Shop and Services, plus a *Happening now* panel (live orders and queues). **GST-021 Interactive Map and GST-022 Attraction Wait Times are its Map and Waits views: one implementation, three ids** (as GAP-D3). Food opens GST-024, Shop GST-026, Services GST-029, a queue GST-023. This answers CF-92: it is a real screen. (Was: *Not minuted and not in the matrix* — the only unsourced screen of the eight audited on 17 August.)",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getTenantAppStatus` reads one of them — list, select, act",
-  "purpose": "The in-venue home: your tickets, the map, and what is near you.",
-  "gaps": [
-   {
-    "operation": "getWaitTimes",
-    "why": "**1 declared operation reach no component on this screen**: getWaitTimes. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
+  "purpose": "Everything live at the venue in one place: map, waits, food, shows, shop and services, with what is happening now.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1718,8 +2162,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every digital companion mode",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -1737,6 +2202,19 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "selectField",
+       "label": "Map · Waits · Food · Shows · Shop · Services",
+       "notes": "The view switcher. Map and Waits are GST-021 and GST-022 rendered in place.",
+       "provenance": "decided 29 September 2026 (P29), MOB-1"
+      },
+      {
+       "kind": "banner",
+       "label": "Happening now",
+       "operation": "getWaitTimes",
+       "notes": "Live orders, queue calls and the next show, from the guest's own orders and queues.",
+       "provenance": "decided 29 September 2026 (P29), MOB-1"
       }
      ]
     },
@@ -1746,7 +2224,52 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected digital companion mode",
+       "label": "The selected product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.categoryId",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.isStockTracked"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
        "columns": [
         "TenantAppStatus.isPublished",
@@ -1772,9 +2295,9 @@
   "states": {
    "loading": "The digital companion mode list.",
    "error": "Could not load. Names which read failed and leaves the digital companion mode untouched.",
-   "emptyFirstRun": "No digital companion mode yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the digital companion mode are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No digital companion mode yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the digital companion mode are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -1799,17 +2322,24 @@
   ],
   "entryState": {
    "preloaded": [
-    "TenantAppStatus.isPublished",
-    "TenantAppStatus.publishedVersion",
-    "TenantAppStatus.publishedAt",
-    "TenantAppStatus.draftVersion",
-    "TenantAppStatus.hasUnpublishedChanges"
+    "Product.id",
+    "Product.code",
+    "Product.name",
+    "Product.description",
+    "Product.kind"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-038"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-038",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "mobile v4 (29 September build)",
+    "verified": "2026-09-29",
+    "match": "exact",
+    "view": "At the venue (Home → At the venue, or the Map tab where the venue shows it)"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1845,7 +2375,7 @@
  },
  {
   "id": "GST-070",
-  "name": "Reserve a Table or Cabana",
+  "name": "Reserve a Table",
   "module": "In-venue Services",
   "requiresModule": "core",
   "wave": 2,
@@ -1858,7 +2388,8 @@
   },
   "navigation": {
    "exitTo": [
-    "GST-039"
+    "GST-039",
+    "GST-041"
    ],
    "entryFrom": [
     "GST-001"
@@ -1872,74 +2403,67 @@
      "carries": [
       "subjectId"
      ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-070 holds subjectId, so an edge into it carries them"
+    },
+    {
+     "to": "GST-041",
+     "trigger": "Pay the deposit (only when the venue requires one)",
+     "operation": "addCartLine",
+     "carries": [
+      "cartId"
+     ],
+     "precondition": "the reservation is awaitingDeposit",
+     "provenance": "decided 29 September, rev 3 REV3-8b: `createTableReservation` answered `awaitingDeposit`"
     }
    ]
   },
-  "notes": "**Staff could book a table and a guest could not.** Seven guest-callable operations with no guest surface — reservations, cabanas, and both waitlists.\n\n**Leaving a waitlist matters as much as joining one.** A guest who has given up and walked away still holds a place, and a queue full of people who left is a queue nobody trusts.",
+  "notes": "**Staff could book a table and a guest could not.** Seven guest-callable operations with no guest surface — reservations, cabanas, and both waitlists. **Table-only since 28 September** (decided 28 September, audit R073 (c)): the cabana wording, the `bookResource` button and `getResourceAvailability` left and the screen was renamed from *Reserve a Table or Cabana*. **R073 (c) is superseded on 29 September for resources on a venue map** (rev 3 REV3-15 and GAP-C2): guests pick a specific cabana, lounger or other spot — including non-dining tables placed on the map, sold like cabanas — on the map booking screen GST-074 and buy it. This screen stays the restaurant table reservation, the F&B flow. **Leave waitlist** is `leaveRestaurantWaitlist` (audit R073 (d)). **A table deposit is a venue option, off by default** (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a)): with it off, no card is needed and cancelling is free; with it on, the venue's `DepositPolicy.dining` sets the amount, the basis and the late-cancel and no-show terms.\n\n**Leaving a waitlist matters as much as joining one.** A guest who has given up and walked away still holds a place, and a queue full of people who left is a queue nobody trusts.\n\n**Rev 3 (decided 29 September).** **No basket without a deposit (REV3-8):** a table reservation and a waitlist place confirm straight after `createTableReservation` / `joinRestaurantWaitlist` with a *No card needed* confirmation; the prototype's basket line is prototype-only. **Deposit (REV3-8b):** when the venue enabled one, `createTableReservation` answers `awaitingDeposit`; the screen shows `deposit.amount` and basis, adds it to the cart (`addCartLine` with `deposit.variantId` and `tableReservationId`), pays through checkout (GST-041), and shows `deposit.refundableUntil` and the late-cancel and no-show terms. Never a hard-coded amount. Leaving a waitlist is unchanged (audit R073 (d)).",
   "density": "comfortable",
   "offline": false,
-  "pattern": "statusTracker",
-  "patternReason": "`getResourceAvailability` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "**Staff could book a table and a guest could not.** Seven guest-callable operations with no guest surface — reservations, cabanas, and both waitlists.",
+  "pattern": "form",
+  "patternReason": "A booking form (outlet, party size, time) and the restaurant waitlist, each one act; no guest-callable read of table availability exists, so `createTableReservation` is what says a time is full. Changed from `statusTracker` on 28 September when the cabana availability read left (audit R073 (c)); cabanas and other spots on a venue map are booked on GST-074 since 29 September (rev 3 REV3-15).",
+  "purpose": "**Book a restaurant table, or wait for one.** A guest reserves a table ahead, changes or cancels it, or joins and leaves a restaurant's waitlist. Tables only: cabanas, loungers and other spots on a venue map are booked on GST-074 (decided 29 September, rev 3 REV3-15 and GAP-C2, superseding audit R073 (c)). A deposit only where the venue enabled one (rev 3 REV3-8b, superseding audit R077 (a)).",
   "layout": {
-   "template": "detail",
+   "template": "form",
    "regions": [
-    {
-     "name": "contentBody",
-     "slot": "record",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected reserve table cabana",
-       "bindsTo": "ResourceAvailability",
-       "columns": [
-        "ResourceAvailability.resourceId",
-        "ResourceAvailability.freeWindows",
-        "ResourceAvailability.blockedWindows"
-       ],
-       "operation": "getResourceAvailability",
-       "provenance": "contract resources.yaml GET /resources/{resourceId}/availability"
-      }
-     ]
-    },
     {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create table reservation",
        "operation": "createTableReservation",
        "provenance": "contract fnb.yaml POST /table-reservations"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save table reservation",
        "operation": "updateTableReservation",
        "provenance": "contract fnb.yaml PATCH /table-reservations/{reservationId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Book",
-       "operation": "bookResource",
-       "provenance": "contract resources.yaml POST /resource-bookings"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Join",
+       "label": "Join restaurant waitlist",
        "operation": "joinRestaurantWaitlist",
        "provenance": "contract fnb.yaml POST /waitlist"
       },
       {
+       "kind": "destructiveButton",
+       "label": "Leave restaurant waitlist",
+       "operation": "leaveRestaurantWaitlist",
+       "notes": "Leaves the guest's own entry (POST /waitlist/{entryId}/leave); the entry returns `cancelled` and the table goes to the next party (decided 28 September, audit R073 (d)).",
+       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/leave"
+      },
+      {
        "kind": "secondaryButton",
-       "label": "Join",
+       "label": "Join waitlist",
        "operation": "joinWaitlist",
        "provenance": "contract catalogue.yaml POST /waitlist-entries"
       },
       {
        "kind": "secondaryButton",
-       "label": "Leave",
+       "label": "Leave waitlist",
        "operation": "leaveWaitlist",
        "provenance": "contract catalogue.yaml DELETE /waitlist-entries/{entryId}"
       }
@@ -1950,9 +2474,9 @@
   "states": {
    "loading": "Content loads.",
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
-   "emptyFirstRun": "**Nothing reserved.** Availability shows regardless; a guest looking at an empty list should still see what is bookable.",
+   "emptyFirstRun": "**Nothing reserved.** The booking form is the screen: pick the restaurant, party size and time, and `createTableReservation` says if that time is full.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025). A guest who is not signed in is offered sign-in and brought back here.",
    "offline": "**The offline banner shows.** Availability already loaded stays with its age. **Booking is not offered** — a table held offline is a table two people think they have."
   },
   "apis": [
@@ -1969,23 +2493,17 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "bookResource",
-    "contract": "resources",
-    "purpose": "Reserve a specific resource for a window",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "getResourceAvailability",
-    "contract": "resources",
-    "purpose": "When it is free, with conflicts already resolved",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "joinRestaurantWaitlist",
     "contract": "fnb",
     "purpose": "Add a party to an outlet's waitlist",
     "trigger": "onAction",
     "offline": false
+   },
+   {
+    "operationId": "leaveRestaurantWaitlist",
+    "contract": "fnb",
+    "purpose": "Leave the restaurant waitlist; the entry returns cancelled (decided 28 September, audit R073 (d))",
+    "trigger": "onAction"
    },
    {
     "operationId": "joinWaitlist",
@@ -1997,6 +2515,12 @@
     "operationId": "leaveWaitlist",
     "contract": "catalogue",
     "purpose": "Stop waiting",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add the table deposit to the cart when the venue requires one",
     "trigger": "onAction"
    }
   ],
@@ -2011,22 +2535,158 @@
      "from": "deepLink"
     },
     {
-     "name": "resourceId",
-     "from": "deepLink"
-    },
-    {
      "name": "subjectId",
      "from": "session"
+    },
+    {
+     "name": "cartId",
+     "from": "session",
+     "optional": true
     }
    ],
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-070"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-070",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Account → All screens → Wave 2 → Reserve a table or cabana; Rev 3 feedback → Book a table (fixed)",
+    "differences": "The YAML covers tables only (cabanas are staff-booked, R073c) and has no deposit (R077a). The prototype also reserves cabanas and shows a deposit on the reservation, and the Rev 3 web flow has a deposit-hold variant at AED 100 per guest."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateTableReservation",
+    "component": "modal",
+    "trigger": "Create table reservation",
+    "body": "**Collects what `createTableReservation` sends before it is called.** Required: `outletId`, `partySize`, `startsAt`. Optional: `id`, `subjectId`, `guestName`, `contactPoint`, `durationMinutes`, `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. The form says **no card is needed** unless the venue enabled a dining deposit; then it shows the deposit amount and basis, when it stops being refundable and the late-cancel and no-show terms (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a)). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "TableReservation",
+    "confirm": {
+     "label": "Create table reservation",
+     "operation": "createTableReservation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "outletId",
+      "partySize",
+      "startsAt",
+      "id",
+      "subjectId",
+      "guestName",
+      "contactPoint",
+      "durationMinutes",
+      "tables",
+      "status",
+      "groupId",
+      "notes",
+      "actualPartySize",
+      "tableVisitId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formUpdateTableReservation",
+    "component": "modal",
+    "trigger": "Save table reservation",
+    "body": "**Collects what `updateTableReservation` sends before it is called.** Required: `outletId`, `partySize`, `startsAt`. Optional: `id`, `subjectId`, `guestName`, `contactPoint`, `durationMinutes`, `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. Cancelling says **it is free** where no deposit was taken; where one was, whether it is returned or kept under the venue's terms (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a)). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "TableReservation",
+    "confirm": {
+     "label": "Save table reservation",
+     "operation": "updateTableReservation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "outletId",
+      "partySize",
+      "startsAt",
+      "id",
+      "subjectId",
+      "guestName",
+      "contactPoint",
+      "durationMinutes",
+      "tables",
+      "status",
+      "groupId",
+      "notes",
+      "actualPartySize",
+      "tableVisitId"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formJoinRestaurantWaitlist",
+    "component": "modal",
+    "trigger": "Join restaurant waitlist",
+    "body": "**Collects what `joinRestaurantWaitlist` sends before it is called.** Required: `id`, `outletId`, `partySize`, `status`, `recordedAt`. Optional: `subjectId`, `quotedWaitMinutes`, `seatingPreference`, `notifiedAt`, `syncedAt`, `holdExpiresAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RestaurantWaitlist",
+    "confirm": {
+     "label": "Join restaurant waitlist",
+     "operation": "joinRestaurantWaitlist"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outletId",
+      "partySize",
+      "status",
+      "recordedAt",
+      "subjectId",
+      "quotedWaitMinutes",
+      "seatingPreference",
+      "notifiedAt",
+      "syncedAt",
+      "holdExpiresAt"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formJoinWaitlist",
+    "component": "modal",
+    "trigger": "Join waitlist",
+    "body": "**Collects what `joinWaitlist` sends before it is called.** Required: `performanceId`, `partySize`. Optional: `id`, `variantId`, `subjectId`, `contactPoint`, `status`, `position`, `offeredAt`, `offerExpiresAt`, `joinedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "WaitlistEntry",
+    "confirm": {
+     "label": "Join waitlist",
+     "operation": "joinWaitlist"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "performanceId",
+      "partySize",
+      "id",
+      "variantId",
+      "subjectId",
+      "contactPoint",
+      "status",
+      "position",
+      "offeredAt",
+      "offerExpiresAt",
+      "joinedAt"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "confirmLeaveRestaurantWaitlist",
+    "component": "confirmDialog",
+    "trigger": "Leave restaurant waitlist",
+    "body": "**Says the place is given up and the next party moves up**, naming the restaurant and the party size. Leaving cannot be undone; joining again goes to the back (audit R073 (d)).",
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",

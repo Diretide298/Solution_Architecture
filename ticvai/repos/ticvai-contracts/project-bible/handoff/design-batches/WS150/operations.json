@@ -1,0 +1,211 @@
+{
+ "createPaymentLink": {
+  "method": "POST",
+  "path": "/payment-links",
+  "contract": "orders",
+  "summary": "Send a guest a link to pay later",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentLink"
+ },
+ "getPaymentLink": {
+  "method": "GET",
+  "path": "/payment-links/{token}",
+  "contract": "orders",
+  "summary": "What a guest holding a link is being asked to pay for",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getPaymentPerformance": {
+  "method": "GET",
+  "path": "/payment-performance",
+  "contract": "payments",
+  "summary": "Authorisation rate, conversion and where payments are lost",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentPerformanceRow"
+ },
+ "inquirePaymentStatus": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/inquiry",
+  "contract": "orders",
+  "summary": "Ask the provider what actually happened",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
+ },
+ "listPaymentMethods": {
+  "method": "GET",
+  "path": "/payment-methods",
+  "contract": "payments",
+  "summary": "The methods this tenant can offer, and where",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentMethod"
+ },
+ "resendPaymentLink": {
+  "method": "POST",
+  "path": "/payment-links/{linkId}/resend",
+  "contract": "orders",
+  "summary": "Send it again, and retire the old one",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentLink"
+ },
+ "setHostedCheckoutConfiguration": {
+  "method": "PUT",
+  "path": "/hosted-checkout-config",
+  "contract": "payments",
+  "summary": "Redirect, return and the journey back",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HostedCheckoutConfig",
+  "responds": "HostedCheckoutConfig"
+ },
+ "setPaymentAuthenticationPolicy": {
+  "method": "PUT",
+  "path": "/payment-authentication-policy",
+  "contract": "payments",
+  "summary": "3-D Secure, tokenisation and recurring mandates",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PaymentAuthenticationPolicy",
+  "responds": "PaymentAuthenticationPolicy"
+ },
+ "simulatePaymentConfiguration": {
+  "method": "POST",
+  "path": "/payment-configuration/simulate",
+  "contract": "payments",
+  "summary": "What a guest would be offered, and what it would cost",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RoutingContext",
+  "responds": "PaymentConfigurationSimulation"
+ },
+ "updatePaymentMethod": {
+  "method": "PUT",
+  "path": "/payment-methods/{methodId}",
+  "contract": "payments",
+  "summary": "Change availability, fees and eligibility",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PaymentMethod",
+  "responds": "PaymentMethod"
+ }
+}

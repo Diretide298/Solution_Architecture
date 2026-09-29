@@ -17,11 +17,34 @@
    "component": "apps/venue-management-web/src/routes/analytics/LiveOperationsDashboard.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-020",
+     "trigger": "Back to Multi-Site & Performance Comparison",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-012 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Authorized operations users can identify the live status of each site and immediately drill into abnormal conditions.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide a real-time view of what is happening across all operating locations.",
-  "purposeNote": "Authorized operations users can identify the live status of each site and immediately drill into abnormal conditions.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -110,7 +133,22 @@
    "emptyNoResults": "The filter narrowed it and the live operations are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Live operational KPIs",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAlerts",
+    "contract": "reporting",
+    "purpose": "What needs attention",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Visitors currently on-site",
@@ -123,38 +161,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-012"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-012",
+   "workshopBoard": "wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-012"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 4. 0 of 0 labels bound to a contract property; 14 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "exitTo": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-020",
-     "trigger": "Back to Multi-Site & Performance Comparison",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026",
-     "back": true
-    },
-    {
-     "to": "ANL-001",
-     "trigger": "Executive Command Center",
-     "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -196,11 +206,34 @@
    "component": "apps/venue-management-web/src/routes/analytics/RevenuePulse.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-020",
+     "trigger": "Back to Multi-Site & Performance Comparison",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-013 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Management can identify revenue performance and drill down from consolidated revenue to site → business unit → channel → product → transaction level, subject to permissions.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide real-time visibility into revenue generation across TICVAI.",
-  "purposeNote": "Management can identify revenue performance and drill down from consolidated revenue to site → business unit → channel → product → transaction level, subject to permissions.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -279,7 +312,15 @@
    "emptyNoResults": "The filter narrowed it and the revenue pulse are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Revenue against target",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Revenue Today",
@@ -292,38 +333,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-013"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-013",
+   "workshopBoard": "wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-013"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 12 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "exitTo": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-020",
-     "trigger": "Back to Multi-Site & Performance Comparison",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026",
-     "back": true
-    },
-    {
-     "to": "ANL-001",
-     "trigger": "Executive Command Center",
-     "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -365,11 +378,34 @@
    "component": "apps/venue-management-web/src/routes/analytics/AttendanceFootfallIntelligence.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-020",
+     "trigger": "Back to Multi-Site & Performance Comparison",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-014 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Users can understand historical, current and forecast visitor volumes and drill into the underlying attendance data.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Monitor visitor movement and attendance across venues.",
-  "purposeNote": "Users can understand historical, current and forecast visitor volumes and drill into the underlying attendance data.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -463,7 +499,15 @@
    "emptyNoResults": "The filter narrowed it and the attendance footfall intelligence are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Attendance and footfall",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Total Visitors",
@@ -476,38 +520,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-014"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-014",
+   "workshopBoard": "wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-014"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 15 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "exitTo": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-020",
-     "trigger": "Back to Multi-Site & Performance Comparison",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026",
-     "back": true
-    },
-    {
-     "to": "ANL-001",
-     "trigger": "Executive Command Center",
-     "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -549,11 +565,34 @@
    "component": "apps/venue-management-web/src/routes/analytics/CapacityUtilizationMonitor.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-020",
+     "trigger": "Back to Multi-Site & Performance Comparison",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-015 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Users can identify underutilized, approaching-capacity and fully utilized locations/resources in real time.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide centralized monitoring of available and consumed capacity.",
-  "purposeNote": "Users can identify underutilized, approaching-capacity and fully utilized locations/resources in real time.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -612,7 +651,15 @@
    "emptyNoResults": "The filter narrowed it and the capacity utilization are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Capacity and utilisation",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Available Capacity",
@@ -625,38 +672,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-015"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-015",
+   "workshopBoard": "wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-015"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "exitTo": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-020",
-     "trigger": "Back to Multi-Site & Performance Comparison",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026",
-     "back": true
-    },
-    {
-     "to": "ANL-001",
-     "trigger": "Executive Command Center",
-     "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -698,11 +717,34 @@
    "component": "apps/venue-management-web/src/routes/analytics/SalesChannelPerformance.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-020",
+     "trigger": "Back to Multi-Site & Performance Comparison",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-016 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Management can compare channel profitability and sales performance from one dashboard.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide management with consolidated commercial performance across every sales channel.",
-  "purposeNote": "Management can compare channel profitability and sales performance from one dashboard.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -781,7 +823,15 @@
    "emptyNoResults": "The filter narrowed it and the sales channel performance are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Sales by channel",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Gross Sales",
@@ -794,38 +844,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-016"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-016",
+   "workshopBoard": "wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-016"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "exitTo": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-020",
-     "trigger": "Back to Multi-Site & Performance Comparison",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026",
-     "back": true
-    },
-    {
-     "to": "ANL-001",
-     "trigger": "Executive Command Center",
-     "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -867,11 +889,38 @@
    "component": "apps/venue-management-web/src/routes/analytics/CustomerMembershipLoyaltyPulse.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-020",
+     "trigger": "Back to Multi-Site & Performance Comparison",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ],
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-017 holds dashboardId, reportId, so an edge into it carries them"
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Authorized users can understand customer acquisition, engagement, retention, membership and loyalty performance without accessing separate CRM dashboards.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a consolidated view of customer health and engagement.",
-  "purposeNote": "Authorized users can understand customer acquisition, engagement, retention, membership and loyalty performance without accessing separate CRM dashboards.",
   "gaps": [
    {
     "operation": null,
@@ -977,7 +1026,22 @@
    "emptyNoResults": "The filter narrowed it and the customer membership loyalty are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Membership and loyalty",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Loyalty dashboard (active members, tiers, liability, breakage, retention)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Unique Customers",
@@ -986,42 +1050,20 @@
     "Repeat Visit %",
     "Average Customer Spend",
     "Customer Lifetime Value"
+   ],
+   "params": [
+    {
+     "name": "dashboardId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-017"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-017",
+   "workshopBoard": "wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-017"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 8. 0 of 22 labels bound to a contract property; 22 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "exitTo": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-020",
-     "trigger": "Back to Multi-Site & Performance Comparison",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026",
-     "back": true
-    },
-    {
-     "to": "ANL-001",
-     "trigger": "Executive Command Center",
-     "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1063,11 +1105,34 @@
    "component": "apps/venue-management-web/src/routes/analytics/AlertsExceptionCenter.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-020"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-020",
+     "trigger": "Back to Multi-Site & Performance Comparison",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-018 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Management can identify and manage important business exceptions from a centralized queue.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Each Alert Shall Display) and no metric row",
   "purpose": "Create one centralized location for management-level KPI and operational exceptions.",
-  "purposeNote": "Management can identify and manage important business exceptions from a centralized queue.",
   "gaps": [
    {
     "operation": null,
@@ -1139,7 +1204,14 @@
    "emptyNoResults": "The filter narrowed it and the alerts exception are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listPromotionAlertException",
+    "contract": "promotions",
+    "purpose": "Promotion Alerts & Exception Center",
+    "trigger": "onLoad"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Severity",
@@ -1152,38 +1224,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-018"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-018",
+   "workshopBoard": "wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-018"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 9. 0 of 11 labels bound to a contract property; 11 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "exitTo": [
-    "ANL-001",
-    "ANL-020"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-020",
-     "trigger": "Back to Multi-Site & Performance Comparison",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026",
-     "back": true
-    },
-    {
-     "to": "ANL-001",
-     "trigger": "Executive Command Center",
-     "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1225,40 +1269,6 @@
    "component": "apps/venue-management-web/src/routes/analytics/AiManagementInsights.tsx",
    "status": "notStarted"
   },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide management with proactive AI-generated business intelligence rather than requiring users to manually analyze every dashboard.",
-  "purposeNote": "Users receive explainable, traceable AI insights linked to the underlying supporting data.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": []
-  },
-  "states": {
-   "loading": "The insights list.",
-   "error": "Could not load. Names which read failed and leaves the insights untouched.",
-   "emptyFirstRun": "No insights yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the insights are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-019"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
     "ANL-001",
@@ -1278,13 +1288,111 @@
     {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
-     "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-019 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+    }
+   ]
+  },
+  "density": "compact",
+  "purposeNote": "Users receive explainable, traceable AI insights linked to the underlying supporting data.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide management with proactive AI-generated business intelligence rather than requiring users to manually analyze every dashboard.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "askReportingQuestion",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAnalyticsAnomalies",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "askReportingQuestion"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The insights list.",
+   "error": "Could not load. Names which read failed and leaves the insights untouched.",
+   "emptyFirstRun": "No insights yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the insights are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "askReportingQuestion",
+    "contract": "reporting",
+    "purpose": "Ask about what moved",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAnalyticsAnomalies",
+    "contract": "reporting",
+    "purpose": "What moved unexpectedly",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAiInsights",
+    "contract": "ai",
+    "purpose": "Insights and anomalies",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideAiInsight",
+    "contract": "ai",
+    "purpose": "Review, accept, reject or mark an insight actioned",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "explainMetricChange",
+    "contract": "ai",
+    "purpose": "Why did this metric change",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-019",
+   "workshopBoard": "wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-019"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "insightId",
+     "from": "navigation"
     }
    ]
   },
@@ -1329,11 +1437,75 @@
    "component": "apps/venue-management-web/src/routes/analytics/MultiSitePerformanceComparison.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-012",
+    "ANL-013",
+    "ANL-014",
+    "ANL-015",
+    "ANL-016",
+    "ANL-017",
+    "ANL-018",
+    "ANL-019"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-001",
+     "trigger": "Back to Executive Command Center",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ANL-012",
+     "trigger": "Live Operations Dashboard",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-013",
+     "trigger": "Revenue Pulse",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-014",
+     "trigger": "Attendance & Footfall Intelligence",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-015",
+     "trigger": "Capacity & Utilization Monitor",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-016",
+     "trigger": "Sales & Channel Performance",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-017",
+     "trigger": "Customer, Membership & Loyalty Pulse",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-018",
+     "trigger": "Alerts & Exception Center",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-019",
+     "trigger": "AI Management Insights",
+     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Management can benchmark operating entities using normalized KPIs and drill into the causes of performance differences.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Comparison KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Allow enterprise management to compare sites, venues, attractions and business units.",
-  "purposeNote": "Management can benchmark operating entities using normalized KPIs and drill into the causes of performance differences.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1410,6 +1582,44 @@
        "kind": "metricTile",
        "label": "Operational Exceptions",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison KPIs"
+      },
+      {
+       "kind": "textField",
+       "label": "Scope path",
+       "operation": "listSiteNormalisationBases",
+       "notes": "Sends `?scopePath=` to `listSiteNormalisationBases`.",
+       "provenance": "contract reporting.yaml GET /site-normalisation-bases"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Period from",
+       "operation": "listSiteNormalisationBases",
+       "notes": "Sends `?periodFrom=` to `listSiteNormalisationBases`.",
+       "provenance": "contract reporting.yaml GET /site-normalisation-bases"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Period to",
+       "operation": "listSiteNormalisationBases",
+       "notes": "Sends `?periodTo=` to `listSiteNormalisationBases`.",
+       "provenance": "contract reporting.yaml GET /site-normalisation-bases"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every site normalisation basis",
+       "bindsTo": "SiteNormalisationBasis",
+       "columns": [
+        "SiteNormalisationBasis.id",
+        "SiteNormalisationBasis.scopePath",
+        "SiteNormalisationBasis.periodStart",
+        "SiteNormalisationBasis.periodEnd",
+        "SiteNormalisationBasis.visitors",
+        "SiteNormalisationBasis.operatingHours",
+        "SiteNormalisationBasis.staffedPositions",
+        "SiteNormalisationBasis.areaSquareMetres"
+       ],
+       "operation": "listSiteNormalisationBases",
+       "provenance": "contract reporting.yaml GET /site-normalisation-bases"
       }
      ]
     }
@@ -1422,7 +1632,21 @@
    "emptyNoResults": "The filter narrowed it and the multi-site performance comparison are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getAnalyticsBenchmark",
+    "contract": "reporting",
+    "purpose": "Site against site, normalised",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listSiteNormalisationBases",
+    "contract": "reporting",
+    "purpose": "The denominators each site is benchmarked by",
+    "trigger": "onLoad"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Revenue",
@@ -1435,73 +1659,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-020"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-020",
+   "workshopBoard": "wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-020"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 14 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-001"
-   ],
-   "exitTo": [
-    "ANL-001",
-    "ANL-012",
-    "ANL-013",
-    "ANL-014",
-    "ANL-015",
-    "ANL-016",
-    "ANL-017",
-    "ANL-018",
-    "ANL-019"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-001",
-     "trigger": "Back to Executive Command Center",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026",
-     "back": true
-    },
-    {
-     "to": "ANL-012",
-     "trigger": "Live Operations Dashboard",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-013",
-     "trigger": "Revenue Pulse",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-014",
-     "trigger": "Attendance & Footfall Intelligence",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-015",
-     "trigger": "Capacity & Utilization Monitor",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-016",
-     "trigger": "Sales & Channel Performance",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-017",
-     "trigger": "Customer, Membership & Loyalty Pulse",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-018",
-     "trigger": "Alerts & Exception Center",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-019",
-     "trigger": "AI Management Insights",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",

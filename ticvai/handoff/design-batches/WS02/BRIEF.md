@@ -1,6 +1,6 @@
 # WS02 — Access Control board 2
 
-**10 screens · 18 operations · 17 schemas · 4 permissions**
+**10 screens · 18 operations · 19 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

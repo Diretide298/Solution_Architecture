@@ -1,4 +1,81 @@
 {
+ "ActiveSession": {
+  "x-ticvai-persistence": "none — Redis session registry",
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "status",
+   "startedAt",
+   "lastSeenAt"
+  ],
+  "properties": {
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/SessionStatus"
+     }
+    ],
+    "description": "**A registry that only holds live sessions cannot answer why one ended.** Kept on the record so a supervisor asking *what happened to till 4* gets `terminated` or `expired` rather than an absence.\n"
+   },
+   "sessionId": {
+    "type": "string"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalName": {
+    "type": "string"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roleName": {
+    "type": "string",
+    "nullable": true
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "workstationName": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ipAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "deviceInfo": {
+    "type": "string",
+    "nullable": true
+   },
+   "hasOpenShift": {
+    "type": "boolean",
+    "description": "Revoking this session leaves cash unreconciled."
+   },
+   "mfaSatisfied": {
+    "type": "boolean"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastSeenAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "ApiClient": {
   "type": "object",
   "x-ticvai-persistence": "control.api_client",
@@ -14,7 +91,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "developerId": {
     "type": "string",
@@ -37,10 +115,41 @@
    },
    "scopes": {
     "type": "array",
-    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing.\n",
+    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing. **Module scopes** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, one of `listApiScopes`.\n",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[a-zA-Z]+\\.(read|write)$"
     }
+   },
+   "issuedBy": {
+    "type": "string",
+    "enum": [
+     "partner",
+     "ticvai"
+    ],
+    "readOnly": true,
+    "description": "Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved `requestProductionAccess`.\n"
+   },
+   "certificationListingId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "control.integration_listing",
+    "description": "For a production client, the certified integration it was issued against."
+   },
+   "credentialTtlDays": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 730,
+    "nullable": true,
+    "description": "Key lifetime. Default 365 for production, 90 for sandbox (M17-06, configurable expiry)."
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the key stops working unless rotated. No token is issued after it."
    },
    "allowedTenantIds": {
     "type": "array",
@@ -52,7 +161,7 @@
    },
    "ipAllowList": {
     "type": "array",
-    "description": "13.1.38. Optional, and the strongest control available where an integrator has fixed egress.",
+    "description": "13.1.38. **Required on a production client** (17 September minutes, M17-07: endpoints are protected by IP allow-listing, not left open to the internet); optional in the sandbox. CIDR ranges. Checked at token issue and on every call.\n",
     "items": {
      "type": "string"
     }
@@ -63,13 +172,62 @@
      "active",
      "suspended",
      "revoked"
-    ]
+    ],
+    "readOnly": true
    },
    "lastUsedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true,
+    "readOnly": true,
     "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   }
+  }
+ },
+ "ApiScope": {
+  "type": "object",
+  "x-ticvai-persistence": "none — generated at release from x-ticvai-api-scope on each partner-callable operation",
+  "description": "**One module scope** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, and the operations it opens.\n**A write scope never opens a catalogue write** (M17-04): `ticketing.write` opens carts, orders and holds for a partner or developer client, and no product, price list, price, channel capacity, lifecycle or alternative-code write, since those operations are not partner-callable and carry no `x-ticvai-api-scope`. Only a platform-staff `ApiLicence.catalogueWriteException` opens one, for one named client.\n",
+  "required": [
+   "scope",
+   "module",
+   "access"
+  ],
+  "properties": {
+   "scope": {
+    "type": "string",
+    "description": "e.g. `ticketing.read`."
+   },
+   "module": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+   },
+   "access": {
+    "type": "string",
+    "enum": [
+     "read",
+     "write"
+    ]
+   },
+   "description": {
+    "type": "string"
+   },
+   "operations": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "contract": {
+       "type": "string"
+      },
+      "operationId": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "licensed": {
+    "type": "boolean",
+    "description": "Whether the caller's tenant licenses the module (`ApiLicence.licensedModules`)."
    }
   }
  },
@@ -129,7 +287,8 @@
    },
    "initialCredential": {
     "type": "string",
-    "maxLength": 512
+    "maxLength": 512,
+    "writeOnly": true
    },
    "mustChangeCredential": {
     "type": "boolean",
@@ -204,7 +363,8 @@
      "type": "object",
      "properties": {
       "orderId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       },
       "amount": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -309,6 +469,19 @@
      "DENY"
     ]
    },
+   "permissionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Taken from `identity.user_access`, 20 September, when that table was collapsed into this one.** `permission` above is free text; this names a row in `identity.permission`, the catalogue wired the same day. A grant that names a catalogue row can be checked against the keys the contracts actually enforce — which is the whole point of a catalogue that reported *154 on operations, 35 in roles.yaml, 0 shared*.\nNullable because a role grant carries no permission at all.\n"
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Taken from `identity.user_access`. This table recorded `revokedBy` and not when, so it could say who revoked a grant and not whether it was before or after the thing somebody is asking about.\n"
+   },
    "validFrom": {
     "type": "string",
     "format": "date-time",
@@ -329,65 +502,6 @@
    }
   }
  },
- "GuestSession": {
-  "x-ticvai-persistence": "none — Redis session registry",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "tokens",
-   "isVerified",
-   "expiresAt"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   "isVerified": {
-    "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
-   },
-   "identityProviders": {
-    "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
-    "items": {
-     "type": "string",
-     "enum": [
-      "password",
-      "otp",
-      "apple",
-      "google",
-      "uaePass"
-     ]
-    }
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells (ADR-0010)."
-   },
-   "homeCellName": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
-   }
-  }
- },
  "LoginRequest": {
   "type": "object",
   "required": [
@@ -403,7 +517,8 @@
    "credential": {
     "type": "string",
     "description": "Password, PIN, card token or RFID token depending on `method`.\n",
-    "maxLength": 512
+    "maxLength": 512,
+    "writeOnly": true
    },
    "method": {
     "type": "string",
@@ -437,11 +552,27 @@
    {
     "type": "object",
     "required": [
-     "requiresRoleSelection"
+     "requiresRoleSelection",
+     "requiresMfa"
     ],
     "properties": {
      "requiresRoleSelection": {
       "type": "boolean"
+     },
+     "requiresMfa": {
+      "type": "boolean",
+      "description": "True when the principal holds any permission listed in `PasswordPolicy.mfaRequiredForPermissions` (decided 28 September, audit R135). The session is not usable until `verifyMfaChallenge` succeeds on a `signIn` challenge."
+     },
+     "hasMfaMethod": {
+      "type": "boolean",
+      "description": "Whether the principal has an active MFA method. With `requiresMfa` true and this false, the client must enrol one first (audit R135, R126 (5))."
+     },
+     "mfaMethods": {
+      "type": "array",
+      "description": "The principal's active methods, so the client can offer the right one for the `signIn` challenge. Empty when `requiresMfa` is false.",
+      "items": {
+       "$ref": "#/components/schemas/MfaMethod"
+      }
      },
      "availableRoles": {
       "type": "array",
@@ -497,6 +628,25 @@
     "type": "string",
     "format": "uuid"
    },
+   "messageTriggerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `MessageTrigger` that fired it, and through its `event` the `BusinessEvent` and source module; null for a campaign or a direct send. Attempts are in `MessageDispatchAttempt`. (decided 29 September, data model for the agreed operations)"
+   },
+   "campaignVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "marketing.campaign_variant",
+    "description": "The A/B variant sent (22.1.17; 29 September, build pass, group G2). Null for a single-content campaign or a triggered message."
+   },
+   "plannedSendAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The per-recipient hour chosen by `sendTimeMode` `optimised` (22.3.19, 22.9.16); null when sent at the scheduled time."
+   },
    "status": {
     "type": "string",
     "enum": [
@@ -523,6 +673,32 @@
     "format": "date-time"
    },
    "deliveredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isTest": {
+    "type": "boolean",
+    "default": false,
+    "description": "A `testSendCampaign` message. Excluded from `CampaignPerformance` and `Campaign.sentCount`."
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "From the provider's engagement events. `CampaignPerformance.opened` counts these."
+   },
+   "clickedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "complainedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "unsubscribedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
@@ -582,6 +758,35 @@
    }
   }
  },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -604,6 +809,9 @@
  "PartnerAgreement": {
   "type": "object",
   "x-ticvai-persistence": "control.partner_agreement",
+  "x-ticvai-retired-columns": [
+   "partner_name"
+  ],
   "required": [
    "partnerId",
    "rateMode",
@@ -616,12 +824,16 @@
     "readOnly": true
    },
    "partnerId": {
+    "x-ticvai-references": "control.partner",
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The partner (control.partner) this agreement is with. The agreement carries the terms; control.partner carries who the partner is and whether it may trade. **Resolves to control.partner**, not to platform.tenant as the naming convention guessed before the partner master existed (decided 29 September, writers pass; DM4)"
    },
    "partnerName": {
     "type": "string",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The partner's trading name, **read from control.partner.trading_name** (Partner.tradingName) when the agreement is returned and never stored on the agreement, so a renamed partner cannot show two names (decided 29 September, writers pass; DM4)"
    },
    "version": {
     "type": "integer",
@@ -640,7 +852,9 @@
    },
    "volumeTiers": {
     "type": "array",
-    "description": "2.7.57. **A tier that changes at a threshold needs the sale to look back at cumulative volume, and nothing did.** Flat net rates and per-channel price lists cover the simple case and stop there.\n**The window is the argument, not the tier.** A partner who sells 400 in January and 400 in February is either a 400-tier partner twice or an 800-tier partner once, and the two are different money. `volumeWindow` says which.\n",
+    "deprecated": true,
+    "x-ticvai-persisted": false,
+    "description": "**Retired: the tiers are rows of control.partner_rate_volume_band** (`PartnerRate.volumeBands`, written by setPartnerRateNet), one set per rate row, so a tier can differ by product, venue or channel. Accepted and ignored on write; not returned once the bands exist. `volumeWindow` below still says over which window the bands count (decided 29 September, writers pass; DM4).\n\n2.7.57. **A tier that changes at a threshold needs the sale to look back at cumulative volume, and nothing did.** Flat net rates and per-channel price lists cover the simple case and stop there.\n**The window is the argument, not the tier.** A partner who sells 400 in January and 400 in February is either a 400-tier partner twice or an 800-tier partner once, and the two are different money. `volumeWindow` says which.\n",
     "items": {
      "type": "object",
      "required": [
@@ -675,7 +889,9 @@
    },
    "seasonalRates": {
     "type": "array",
-    "description": "Rates that change by date range. **Separate from the volume tier because they compound** — a peak-season rate at a high volume tier is both, and a single rate table cannot say so.\n",
+    "deprecated": true,
+    "x-ticvai-persisted": false,
+    "description": "**Retired: a seasonal rate is a control.partner_rate row** with `seasonalRate: true` and its own `effectiveFrom`/`effectiveTo` (`PartnerRate`, written by setPartnerRateNet); the most specific row in force wins. Accepted and ignored on write (decided 29 September, writers pass; DM4).\n\nRates that change by date range. **Separate from the volume tier because they compound** — a peak-season rate at a high volume tier is both, and a single rate table cannot say so.\n",
     "items": {
      "type": "object",
      "properties": {
@@ -754,7 +970,9 @@
    },
    "netRates": {
     "type": "array",
-    "description": "Per product or category. Absent means the commission applies across the catalogue.",
+    "deprecated": true,
+    "x-ticvai-persisted": false,
+    "description": "**Retired: net rates are rows of control.partner_rate** (`PartnerRate` with `pricingModel: netRate`, `netRate` and the `maxDiscountPercent` guardrail), written by setPartnerRateNet. Per product or category; absent means the commission applies across the catalogue. Accepted and ignored on write (decided 29 September, writers pass; DM4)",
     "items": {
      "type": "object",
      "properties": {
@@ -804,7 +1022,9 @@
    },
    "corporateAllocations": {
     "type": "array",
-    "description": "BL-035. **`PartnerAgreement` covered commercial terms and not allocations.** A corporate account with fifty places for its staff is the same structure as a reseller with fifty to sell, and **the difference is that a corporate member does not pay.**\n",
+    "deprecated": true,
+    "x-ticvai-persisted": false,
+    "description": "**Retired: allocations are rows of control.partner_allocation** (`PartnerAllocation`, written by setPartnerAllocations and read by listCommercialAllocationQuota); used quantity is counted from orders against the row, not stored. Accepted and ignored on write (decided 29 September, writers pass; DM4).\n\nBL-035. **`PartnerAgreement` covered commercial terms and not allocations.** A corporate account with fifty places for its staff is the same structure as a reseller with fifty to sell, and **the difference is that a corporate member does not pay.**\n",
     "items": {
      "type": "object",
      "properties": {
@@ -897,6 +1117,159 @@
    },
    "notes": {
     "type": "string"
+   },
+   "agreementName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Agreement name (decided 29 September, data model DM4)"
+   },
+   "agreementType": {
+    "type": "string",
+    "nullable": true,
+    "description": "Agreement type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) (decided 29 September, data model DM4)"
+   },
+   "contractReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "Contract reference (decided 29 September, data model DM4)"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The contracting legal entity (ledger.legal_entity) (decided 29 September, data model DM4)"
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Brand the agreement covers; empty for every brand of the tenant (decided 29 September, data model DM4)"
+   },
+   "territory": {
+    "type": "string",
+    "nullable": true,
+    "description": "Territory (decided 29 September, data model DM4)"
+   },
+   "commercialOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Commercial owner, a staff principal (decided 29 September, data model DM4)"
+   },
+   "financeOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Finance owner, a staff principal (decided 29 September, data model DM4)"
+   },
+   "pricingBasis": {
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "nullable": true,
+    "description": "Pricing basis (pack p.27 pricing models); the rows are `control.partner_rate` (decided 29 September, data model DM4)"
+   },
+   "paymentModel": {
+    "type": "string",
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "nullable": true,
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale). Held here once; the billing screen reads and sets this column (decided 29 September, data model DM4)"
+   },
+   "renewalType": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "auto"
+    ],
+    "nullable": true,
+    "description": "Renewal type (decided 29 September, data model DM4)"
+   },
+   "renewalNoticeDays": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Renewal notice period in days (decided 29 September, data model DM4)"
+   },
+   "renegotiationRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "Renegotiation required before renewal (decided 29 September, data model DM4)"
+   },
+   "renewalRequiresApproval": {
+    "type": "boolean",
+    "description": "Renewal needs approval (decided 29 September, data model DM4)"
+   },
+   "minimumCommitment": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Minimum commitment: tickets over the agreement term (decided 29 September, data model DM4)"
+   },
+   "salesTarget": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Sales target over the agreement term (decided 29 September, data model DM4)"
+   },
+   "agreementValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Agreement value (MoM 31 Aug 4.4: each agreement captures term/value) (decided 29 September, data model DM4)"
+   },
+   "commissionTerms": {
+    "type": "string",
+    "nullable": true,
+    "description": "Commission terms as written in the contract; the rules that compute it are `control.partner_commission_rule` (decided 29 September, data model DM4)"
+   },
+   "creditTerms": {
+    "type": "string",
+    "nullable": true,
+    "description": "Credit terms as written in the contract (decided 29 September, data model DM4)"
+   },
+   "allocationTerms": {
+    "type": "string",
+    "nullable": true,
+    "description": "Allocation terms as written in the contract; the allocations are `control.partner_allocation` (decided 29 September, data model DM4)"
+   },
+   "cancellationConditions": {
+    "type": "string",
+    "nullable": true,
+    "description": "Cancellation conditions (decided 29 September, data model DM4)"
+   },
+   "refundConditions": {
+    "type": "string",
+    "nullable": true,
+    "description": "Refund conditions (pack p.26) (decided 29 September, data model DM4)"
+   },
+   "bookingRestrictions": {
+    "type": "string",
+    "nullable": true,
+    "description": "Booking restrictions as written in the contract; the enforced limits are `control.partner_booking_limit` (decided 29 September, data model DM4)"
+   },
+   "settlementTerms": {
+    "type": "string",
+    "nullable": true,
+    "description": "Settlement terms (decided 29 September, data model DM4)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope, as every control.partner_* row carries it, so row-level security scopes the agreement the same way (decided 29 September, writers pass; DM4)"
    }
   }
  },
@@ -969,6 +1342,104 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "ProductionAccessRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "control.production_access_request",
+  "description": "**A developer's request for production keys** (17 September minutes, M17-06): sandbox, then certification, then production.\n",
+  "required": [
+   "id",
+   "developerId",
+   "sandboxClientId",
+   "listingId",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "developerId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "sandboxClientId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "control.api_client"
+   },
+   "listingId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "control.integration_listing"
+   },
+   "scopes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "ipAllowList": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "approved",
+     "rejected",
+     "withdrawn"
+    ],
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "productionClientId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "control.api_client"
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -1062,6 +1533,16 @@
    }
   }
  },
+ "SessionStatus": {
+  "type": "string",
+  "description": "**The life of one signed-in session, which is not the life of a shift.** A shift holds the float and survives a break; a session holds the person and does not. `ShiftStatus.suspended` is where a break lives — *break cover; float intact, workstation released* — and the release of the workstation is exactly why the session ends rather than pausing: the next person opens their own.\n**One principal, one active session per workstation.** Enforced by the `ActiveSession` registry rather than by a state, because it is a fact about the set of sessions and not about any one of them.\n",
+  "enum": [
+   "active",
+   "signedOut",
+   "terminated",
+   "expired"
+  ]
+ },
  "SsoProtocol": {
   "type": "string",
   "enum": [
@@ -1098,7 +1579,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope**; the server sets it and ignores it in a request."
    }
   }
  },

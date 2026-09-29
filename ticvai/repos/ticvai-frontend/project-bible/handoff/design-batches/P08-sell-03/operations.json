@@ -94,6 +94,25 @@
   "requestBody": "UpsellRule",
   "responds": "UpsellRule"
  },
+ "decideRecommendations": {
+  "method": "POST",
+  "path": "/recommendations/decide",
+  "contract": "ai",
+  "summary": "Fill a recommendation slot",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRecommendationResult"
+ },
  "deleteUpsellRule": {
   "method": "DELETE",
   "path": "/upsell-rules/{ruleId}",
@@ -132,44 +151,6 @@
   "requestBody": null,
   "responds": "GeneratedConfiguration"
  },
- "getRecommendations": {
-  "method": "POST",
-  "path": "/recommendations",
-  "contract": "promotions",
-  "summary": "What else this guest might want",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "getUpsellSuggestions": {
-  "method": "POST",
-  "path": "/upsell-suggestions",
-  "contract": "promotions",
-  "summary": "Suggestions for a cart",
-  "permission": "PRODUCT_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "importProductCatalogue": {
   "method": "POST",
   "path": "/products/import",
@@ -188,6 +169,35 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "listBookingFlows": {
+  "method": "GET",
+  "path": "/venues/{venueId}/booking-flows",
+  "contract": "white-label",
+  "summary": "A venue's booking flows, in the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "flowTypeKey",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listCampaigns": {
   "method": "GET",

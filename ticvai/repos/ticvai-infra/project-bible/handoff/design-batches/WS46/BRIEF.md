@@ -1,6 +1,6 @@
 # WS46 — Promotions   Bundles Management board 2
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 11 operations · 14 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-148` | Promotion Rule Builder | listDetail | 1 | 0 | — |
+| `ADM-148` | Promotion Rule Builder | listDetail | 2 | 0 | — |
 | `ADM-149` | Percentage & Fixed Discount Configurator | configEditor | 1 | 0 | — |
 | `ADM-150` | Cart & Transaction Threshold Rules | listDetail | 1 | 0 | — |
 | `ADM-151` | Volume, Bulk & Tier Discount Configurator | listDetail | 1 | 0 | — |
@@ -74,4 +73,4 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**ADM-148, ADM-150, ADM-151, ADM-152, ADM-153, ADM-157 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-148, ADM-150, ADM-151, ADM-152, ADM-153 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

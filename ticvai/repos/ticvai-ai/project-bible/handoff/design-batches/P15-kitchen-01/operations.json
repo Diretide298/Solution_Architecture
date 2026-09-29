@@ -147,7 +147,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Page"
  },
  "listFnbOrders": {
   "method": "GET",
@@ -199,6 +199,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -210,7 +215,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "KitchenStation"
+  "responds": "Page"
  },
  "listKitchenTickets": {
   "method": "GET",
@@ -233,6 +238,11 @@
     "required": null
    },
    {
+    "name": "course",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -244,7 +254,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "KitchenTicket"
+  "responds": "Page"
  },
  "logKitchenException": {
   "method": "POST",
@@ -263,7 +273,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "KitchenException"
  },
  "markOrderCollected": {
   "method": "POST",
@@ -282,7 +292,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "FnbOrder"
  },
  "notifyServer": {
   "method": "POST",
@@ -320,7 +330,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "OrderLabel"
  },
  "prioritiseKitchenTicket": {
   "method": "POST",
@@ -341,6 +351,25 @@
   "requestBody": null,
   "responds": "KitchenTicket"
  },
+ "rebalanceStationLoad": {
+  "method": "POST",
+  "path": "/kitchen-stations/rebalance",
+  "contract": "fnb",
+  "summary": "Move work between stations mid-service",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "StationRebalance",
+  "responds": "StationRebalance"
+ },
  "recallKitchenTicket": {
   "method": "POST",
   "path": "/kitchen-tickets/{ticketId}/recall",
@@ -359,6 +388,25 @@
   ],
   "requestBody": null,
   "responds": "KitchenTicket"
+ },
+ "recordDashboardView": {
+  "method": "POST",
+  "path": "/dashboards/{dashboardId}/views",
+  "contract": "reporting",
+  "summary": "Record that a dashboard was opened",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "recordOrderHandover": {
   "method": "POST",
@@ -386,7 +434,7 @@
   "summary": "Make it again",
   "permission": "ORDER_MODIFY",
   "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -412,10 +460,15 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
-  "requestBody": null,
-  "responds": null
+  "requestBody": "CourseRules",
+  "responds": "CourseRules"
  },
  "setItemAvailability": {
   "method": "PUT",
@@ -431,10 +484,39 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
   "responds": "MenuItem"
+ },
+ "setKitchenSla": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/kitchen-sla",
+  "contract": "fnb",
+  "summary": "How long a ticket may sit before it is late",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "KitchenSla",
+  "responds": "KitchenSla"
  },
  "setKitchenStations": {
   "method": "PUT",
@@ -446,6 +528,16 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

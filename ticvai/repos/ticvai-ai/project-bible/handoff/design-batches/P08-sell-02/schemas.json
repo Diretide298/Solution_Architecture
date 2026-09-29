@@ -1,4 +1,253 @@
 {
+ "AccessAccreditationCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "access.accreditation_credential",
+  "x-ticvai-agreed": "29 September: build pass (group OWN, from group RA's handoff; BL-181); the events accreditation.credentialIssued and accreditation.holderStatusChanged name access as their critical consumer",
+  "description": "**What a gate needs to admit an accredited person, kept by `access`** (29 September, build). Written only by the consumers of `accreditation.credentialIssued` (a row per credential; a replacement sets the replaced row's `admits` false) and `accreditation.holderStatusChanged` (every credential of the holder: `admits` false unless the holder is `active`, validity taken from the event). Read by `validateAccess` and shipped in the offline package. The record of truth stays in `accreditation`; this is a copy shaped for the gate, never edited by a person.",
+  "required": [
+   "id",
+   "holderId",
+   "encodedIdentifier",
+   "admits",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The accreditation credential's id (`credentialId` on the events)."
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "description": "printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued."
+   },
+   "encodedIdentifier": {
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "What the gate reads from the credential. Never sent to webhook subscribers."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "zoneIds": {
+    "type": "array",
+    "description": "The holder's effective zones, from the event (`effectiveZones`).",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "holderStatus": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "archived"
+    ],
+    "description": "The holder's status as last published; only `active` admits."
+   },
+   "admits": {
+    "type": "boolean",
+    "description": "False once the credential is replaced or the holder is not active."
+   },
+   "sourceChangedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The `issuedAt` or `changedAt` of the event last applied; an older event arriving late is ignored."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005), the accreditation programme's scope."
+   }
+  }
+ },
+ "AccessDynamicPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.dynamic_policy",
+  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.",
+  "required": [
+   "id",
+   "scopePath",
+   "name",
+   "policyType",
+   "conditionExpression",
+   "result",
+   "status",
+   "currentVersion"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The policyId"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node; where it applies further is access.policy_scope_assignment"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "policyType": {
+    "type": "string",
+    "enum": [
+     "guestAttribute",
+     "accreditation",
+     "occupancy",
+     "employee",
+     "risk",
+     "membership",
+     "timeEvent"
+    ]
+   },
+   "contextType": {
+    "type": "string",
+    "enum": [
+     "date",
+     "day",
+     "time",
+     "season",
+     "event",
+     "performance",
+     "specialEvent",
+     "holiday",
+     "operatingCalendar",
+     "occupancy",
+     "attractionStatus"
+    ],
+    "nullable": true,
+    "description": "Context/time/event policies (setContextTimeEvent)"
+   },
+   "identityType": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "member",
+     "annualPassHolder",
+     "employee",
+     "contractor",
+     "vendor",
+     "performer",
+     "media",
+     "vip",
+     "security",
+     "emergencyServices",
+     "eventStaff"
+    ],
+    "nullable": true,
+    "description": "Identity-based policies (listIdentityMembershipAccreditation)"
+   },
+   "conditionExpression": {
+    "type": "string",
+    "description": "Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN"
+   },
+   "result": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ]
+   },
+   "priority": {
+    "type": "integer",
+    "nullable": true
+   },
+   "allowedZoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "deniedZoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "monitorThresholdPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Occupancy policies. Percent at which the band becomes Monitor"
+   },
+   "restrictThresholdPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Occupancy policies. Percent at which the band becomes Restrict"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The grant expires automatically at validTo"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "inactive",
+     "expired"
+    ],
+    "default": "draft"
+   },
+   "currentVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "The version in force (access.dynamic_policy_version)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AcquireLeaseRequest": {
   "type": "object",
   "description": "The body of `acquireInventoryHold`. **Named before the 26 August rename** (lease to `InventoryHold`); the name stays because generated code is keyed on it.",
@@ -9,6 +258,15 @@
    "ttlSeconds"
   ],
   "properties": {
+   "holderKind": {
+    "$ref": "#/components/schemas/InventoryHoldHolderKind"
+   },
+   "cartId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required when `holderKind` is `cart`, else `400`. Sent by the order service from `orders.addCartLine` (SD-023, 29 September)."
+   },
    "channel": {
     "allOf": [
      {
@@ -36,6 +294,155 @@
     "maximum": 3600,
     "default": 900,
     "description": "Short TTLs limit stranding when a terminal dies; long TTLs survive longer outages. The venue's default balances the two: **15 minutes (900 seconds), from the venue setting `cartLeaseSeconds`** with a tenant default (decided 28 September, audit R169; proposed, client to correct under audit R094).\n"
+   }
+  }
+ },
+ "AiRecommendationItem": {
+  "type": "object",
+  "x-ticvai-persistence": "none — held in jsonb on ai.rec_decision.items, through AiRecommendationItemList",
+  "description": "One recommended item. **Carries a Pricing price reference, never a computed price** (AIR-029).",
+  "required": [
+   "trackingId",
+   "rank"
+  ],
+  "properties": {
+   "trackingId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Echoed on every `recordRecommendationEvents` event and as `orders.addCartLine.recommendationId`, so attribution never guesses."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The product recommended. **Exactly one of `productId`, `promotionId` or `couponRef`, `rewardId` or `challengeId` is set, by `kind`** (29 September, build): `offer` carries a promotion or coupon, `reward` a loyalty reward, `challenge` a challenge, every other kind a product."
+   },
+   "promotionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For `offer`, a published promotion the guest is eligible for. Promotions computes the discount at the basket, never the engine."
+   },
+   "couponRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "For `offer`, a coupon campaign; a code is assigned only when the guest takes it (`promotions.assignCoupon`)."
+   },
+   "rewardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For `reward`, a marketing-crm loyalty reward the guest can redeem."
+   },
+   "challengeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For `challenge`, a marketing-crm challenge the guest can join."
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "upsell",
+     "crossSell",
+     "upgrade",
+     "bundle",
+     "addOn",
+     "membership",
+     "nextBestOffer",
+     "offer",
+     "reward",
+     "challenge"
+    ]
+   },
+   "rank": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "priceRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The Pricing reference the channel resolves to a price. AI never computes a price."
+   },
+   "reasonTemplateKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The template reason (decided 29 September, decision 9): no model writes guest-visible reasons."
+   },
+   "reasonText": {
+    "type": "string",
+    "nullable": true,
+    "description": "The rendered template in the session locale, where the channel shows reasons."
+   },
+   "confidenceBand": {
+    "type": "string",
+    "enum": [
+     "high",
+     "medium",
+     "low"
+    ],
+    "description": "Design 5.6: a band, never a bare percentage."
+   },
+   "score": {
+    "type": "number",
+    "nullable": true,
+    "description": "Normalised score. **Returned to staff callers only**; a guest response omits it."
+   }
+  }
+ },
+ "AiRecommendationResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — written as ai.rec_decision after the response",
+  "description": "The recommendation slot's content (design 2.2 A). Empty `items` is a valid answer: the slot stays empty.",
+  "required": [
+   "decisionId",
+   "mode",
+   "items",
+   "expiresAt"
+  ],
+  "properties": {
+   "decisionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "placement": {
+    "type": "string",
+    "enum": [
+     "productPage",
+     "cart",
+     "checkout",
+     "postPurchase",
+     "preVisit",
+     "inVenue",
+     "posBasket",
+     "kioskBasket",
+     "fnbMenu",
+     "retailBasket",
+     "seatUpgrade",
+     "membership",
+     "email",
+     "homepage",
+     "loyalty"
+    ]
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "personalised",
+     "contextual",
+     "rulesOnly",
+     "fallback"
+    ]
+   },
+   "items": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiRecommendationItem"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -249,6 +656,39 @@
    }
   }
  },
+ "CatalogueState": {
+  "x-ticvai-persistence": "none — computed from workstation bundle_version",
+  "type": "object",
+  "description": "The workstation's local catalogue position. A terminal beyond `staleAfter` must refuse to trade rather than transact against stale prices.\n",
+  "required": [
+   "appliedBundleVersion",
+   "appliedAt",
+   "staleAfter",
+   "isStale"
+  ],
+  "properties": {
+   "appliedBundleVersion": {
+    "type": "string"
+   },
+   "appliedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "staleAfter": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Beyond this the terminal refuses to trade."
+   },
+   "isStale": {
+    "type": "boolean"
+   },
+   "pendingBundleVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "Published but not yet applied."
+   }
+  }
+ },
  "Channel": {
   "type": "string",
   "enum": [
@@ -286,6 +726,133 @@
    "parentEventId": {
     "type": "string",
     "format": "uuid"
+   }
+  }
+ },
+ "CreateOrderRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "channel",
+   "lines",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/Channel"
+   },
+   "shiftId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null for an anonymous sale. Identity and entitlement are separate."
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells."
+   },
+   "catalogueBundleVersion": {
+    "type": "string",
+    "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/CreateOrderLine"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreatePaymentRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
+   },
+   "orderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
+   },
+   "walletAuthorisationId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
+   },
+   "returnUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -346,6 +913,42 @@
       }
      }
     }
+   }
+  }
+ },
+ "DeploymentProfile": {
+  "type": "string",
+  "description": "How this workstation obtains catalogue and inventory (ADR-0013).\n- `terminalLocal` — own SQLite, leases direct from the cell. Small venues, 4G sites - `venueEdge` — own SQLite, distributed via the venue edge node which holds the\n  venue lease and sub-leases to terminals. Mid and large venues, stadium gates\n- `thin` — no local catalogue, server reads. Non-transactional surfaces only\n",
+  "enum": [
+   "terminalLocal",
+   "venueEdge",
+   "thin"
+  ]
+ },
+ "DeviceBinding": {
+  "x-ticvai-persistence": "platform.device",
+  "type": "object",
+  "required": [
+   "kind",
+   "driver"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/DeviceKind"
+   },
+   "driver": {
+    "type": "string",
+    "description": "Driver identifier. Adding a vendor is a driver plus configuration, never a core change — every venue arrives with hardware not previously seen.\n"
+   },
+   "identifier": {
+    "type": "string",
+    "description": "Serial",
+    "port or network address.": null
+   },
+   "isRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "When true, the workstation refuses to open a shift if the device is absent.\n"
    }
   }
  },
@@ -451,7 +1054,7 @@
   "required": [
    "id",
    "channelCapacityId",
-   "holderWorkstationId",
+   "holderKind",
    "grantedUnits",
    "consumedUnits",
    "status",
@@ -466,9 +1069,33 @@
     "type": "string",
     "format": "uuid"
    },
+   "holderKind": {
+    "$ref": "#/components/schemas/InventoryHoldHolderKind"
+   },
    "holderWorkstationId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The holding workstation when `holderKind` is `workstation`; null on a cart hold, because a browser has none (SD-023, 29 September)."
+   },
+   "holderCartId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The holding cart (`orders.cart`) when `holderKind` is `cart` (SD-023, 29 September)."
+   },
+   "convertedOrderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The paid order the hold was converted for, set by `convertInventoryHold`."
+   },
+   "convertedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    },
    "parentLeaseId": {
     "type": "string",
@@ -520,14 +1147,24 @@
    }
   }
  },
+ "InventoryHoldHolderKind": {
+  "type": "string",
+  "enum": [
+   "workstation",
+   "cart"
+  ],
+  "default": "workstation",
+  "description": "**Who holds the units** (decided 29 September, SD-023). A till, kiosk or edge node holds as a `workstation`; a guest's web or app cart holds as a `cart`, acquired by the order service. A browser has no workstation, so a cart hold carries `cartId` and no `holderWorkstationId`.\n"
+ },
  "LeaseStatus": {
   "type": "string",
-  "description": "`states/lease.yaml`. **`expired` is set by that model's timer transition when `expiresAt` passes without a renewal**, not by any operation in this contract. The job that runs the timer is the sweeper ADR-0037 defers until it is designed.\n",
+  "description": "`states/lease.yaml`. **`expired` is set by that model's timer transition when `expiresAt` passes without a renewal**, not by any operation in this contract. The job that runs the timer is the sweeper ADR-0037 deferred: it returns an expired hold's unconsumed units to `remaining` in the same guarded statement as a release (SD-023, 29 September), and **writes `inventoryHold.expired` to the outbox in the same transaction** (SD-023/SD-033, applied 30 September; `events/inventoryHold-expired.yaml`), so the cart that held the units hears of it before checkout. A `converted` hold is never swept.\n**`converted` is set by `convertInventoryHold`** when the order that holds the units is paid (decided 29 September, SD-023); its units are `sold` and the sweeper never touches it.\n",
   "enum": [
    "active",
    "expired",
    "released",
-   "forceReleased"
+   "forceReleased",
+   "converted"
   ]
  },
  "Menu": {
@@ -620,6 +1257,88 @@
    }
   }
  },
+ "MenuItem": {
+  "x-ticvai-persistence": "fnb.menu_item",
+  "type": "object",
+  "required": [
+   "id",
+   "productVariantId",
+   "name",
+   "price",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "modifierGroupIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "stationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "menuSectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."
+   },
+   "isStockTracked": {
+    "type": "boolean",
+    "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "unavailableReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "restoreAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."
+   },
+   "preparationMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "allergens": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AllergenCode"
+    }
+   }
+  }
+ },
  "MenuSection": {
   "x-ticvai-persistence": "fnb.menu_section",
   "type": "object",
@@ -652,6 +1371,34 @@
    }
   }
  },
+ "OfflineOrder": {
+  "x-ticvai-persistence": "none — client-side journal, not server storage",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateOrderRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "sequence",
+     "payments"
+    ],
+    "properties": {
+     "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per device. Processed in this order."
+     },
+     "payments": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CreatePaymentRequest"
+      }
+     }
+    }
+   }
+  ]
+ },
  "OfflinePackage": {
   "x-ticvai-persistence": "none — generated artefact in object storage",
   "type": "object",
@@ -683,8 +1430,20 @@
     "type": "string",
     "format": "uuid"
    },
+   "entitlementsVersion": {
+    "type": "integer",
+    "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
+   },
+   "dynamicPolicies": {
+    "type": "array",
+    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one.",
+    "items": {
+     "$ref": "#/components/schemas/AccessDynamicPolicy"
+    }
+   },
    "entitlements": {
     "type": "array",
+    "description": "Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device removes them.",
     "items": {
      "type": "object",
      "required": [
@@ -832,6 +1591,13 @@
       }
      }
     }
+   },
+   "accreditationCredentials": {
+    "type": "array",
+    "description": "Accreditation credentials that admit at this access point, from access.accreditation_credential (29 September, build; BL-181). Only rows that admit are included; a credential dropped from one package to the next no longer admits.",
+    "items": {
+     "$ref": "#/components/schemas/AccessAccreditationCredential"
+    }
    }
   }
  },
@@ -958,7 +1724,7 @@
    "stoppedAtSequence": {
     "type": "integer",
     "nullable": true,
-    "description": "First entry that could not be processed. Null when the batch succeeded. The client retries from here and never past it.\n"
+    "description": "First entry that hit a **transient** failure (SD-028, 29 September): a refusal on the merits no longer stops the batch. Null when every entry was accepted, duplicate or quarantined. The client retries from here and never past it.\n"
    },
    "results": {
     "type": "array",
@@ -983,8 +1749,10 @@
        "enum": [
         "accepted",
         "duplicate",
-        "rejected"
-       ]
+        "rejected",
+        "blockedByRejection"
+       ],
+       "description": "`rejected`: refused on its merits and quarantined in `sync.rejection`; the batch continues. `blockedByRejection`: depends on a rejected entry for the same order (a void, a refund, a later payment) and is quarantined with it (SD-028, 29 September)."
       },
       "orderNumber": {
        "type": "string",
@@ -1001,6 +1769,11 @@
       "varianceExceedsThreshold": {
        "type": "boolean",
        "description": "True when review is required per the venue's variance threshold."
+      },
+      "rejectionId": {
+       "type": "string",
+       "nullable": true,
+       "description": "For a `rejected` or `blockedByRejection` entry, the `sync.rejection` row it was quarantined into (SD-028). The batch carried on past it."
       },
       "error": {
        "$ref": "../shared/common.yaml#/components/schemas/Problem"
@@ -1628,6 +2401,48 @@
    }
   }
  },
+ "SeatRecommendation": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "seatIds",
+   "totalPrice",
+   "isContiguous",
+   "rank"
+  ],
+  "properties": {
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "displayLabels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "totalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isContiguous": {
+    "type": "boolean"
+   },
+   "rank": {
+    "type": "integer",
+    "description": "Best first."
+   },
+   "rationale": {
+    "type": "string",
+    "description": "Why this option was chosen — closest to stage, best value in category, only contiguous block remaining. Shown to a call-centre agent, not the guest.\n"
+   }
+  }
+ },
  "SeatRecommendationRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -1782,6 +2597,190 @@
    }
   }
  },
+ "SupervisorStepUp": {
+  "type": "object",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "required": [
+   "principalId",
+   "credential"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The supervisor signing. Recorded against the act."
+   },
+   "credential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
+   }
+  }
+ },
+ "SyncRejection": {
+  "x-ticvai-persistence": "sync.rejection",
+  "type": "object",
+  "required": [
+   "id",
+   "workstationId",
+   "kind",
+   "rejectedAt",
+   "problem"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "order",
+     "payment",
+     "refund",
+     "void",
+     "scan"
+    ]
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "rejectedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "problem": {
+    "$ref": "../shared/common.yaml#/components/schemas/Problem"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**Deliberately open: the journal entry exactly as the till sent it.** Its shape is the request schema for `kind` — an `OfflineOrder` for `order`, a `CreatePaymentRequest` for `payment` — kept verbatim so the supervisor resolves what was actually recorded, not a re-typed copy.\n"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolution": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "posted",
+     "voided",
+     "refunded"
+    ],
+    "description": "What `resolveSyncRejection` recorded. Null while the rejection waits."
+   },
+   "resolvedRecordId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The order, void or refund the resolution produced — what stops the entry being posted twice."
+   }
+  }
+ },
+ "UpsellPlacement": {
+  "type": "string",
+  "enum": [
+   "productDetail",
+   "cart",
+   "checkout",
+   "postPurchase",
+   "atGate",
+   "inVenue"
+  ]
+ },
+ "UpsellRule": {
+  "x-ticvai-persistence": "promotions.upsell_rule",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "placement",
+   "triggerVariantIds",
+   "suggestedVariantIds"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The region that owns the rule. Upsell rules are owned at region and read at venue (decided 28 September, audit R183); set from the caller's region scope on create.\n"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "placement": {
+    "$ref": "#/components/schemas/UpsellPlacement"
+   },
+   "triggerVariantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "triggerCategoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "suggestedVariantIds": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "suggestedBundleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channels": {
+    "type": "array",
+    "description": "Empty applies to every channel. Restriction is opt-in — a rule that fires on the website but not at a counter is a guest experience inconsistency.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "priority": {
+    "type": "integer",
+    "default": 0
+   },
+   "maxSuggestions": {
+    "type": "integer",
+    "default": 3
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
  "VenuePath": {
   "type": "object",
   "x-ticvai-persistence": "venuemap.path",
@@ -1862,6 +2861,14 @@
     "format": "uuid",
     "readOnly": true,
     "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
    "currencyCode": {
     "type": "string",
@@ -2404,6 +3411,133 @@
       }
      }
     }
+   }
+  }
+ },
+ "Workstation": {
+  "x-ticvai-persistence": "platform.workstation",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "regionId",
+   "scopePath",
+   "saleBoard",
+   "currency",
+   "currencyScale",
+   "timeZone"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "saleBoard": {
+    "type": "object",
+    "description": "Determines which front end loads. Bound to the workstation, not the role — the F&B terminal opens the F&B board. What the operator may then DO within it is governed by their permissions.\n",
+    "required": [
+     "id",
+     "kind"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "kind": {
+      "$ref": "#/components/schemas/SaleBoardKind"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Inherited from the workstation, never selected by the operator. Null where the workstation is not at an access point.\n"
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/DeviceBinding"
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "timeZone": {
+    "type": "string"
+   },
+   "deploymentProfile": {
+    "$ref": "#/components/schemas/DeploymentProfile"
+   },
+   "edgeNodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Present when `deploymentProfile` is `venueEdge`."
+   },
+   "healthScore": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "readOnly": true,
+    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.**\n"
+   },
+   "configurationProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Which profile this workstation runs, and at which version. **The client's board shows a fleet split four ways — 72% latest, 18.8% one behind, 6.1% outdated** — and the package had a firmware version field and no profile.\n**A profile is what a venue changes; a version is what it deploys.** Conflating them means a venue cannot say *roll the ticketing counters back and leave the kiosks*.\n"
+   },
+   "catalogueState": {
+    "$ref": "#/components/schemas/CatalogueState"
+   },
+   "offlineCapable": {
+    "type": "boolean",
+    "description": "Derived from `deploymentProfile`. False only for `thin`. Under local-first, catalogue READS are always local on transactional surfaces; this flag governs whether WRITES can be queued.\n"
+   },
+   "isActive": {
+    "type": "boolean"
    }
   }
  }

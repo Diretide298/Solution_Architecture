@@ -1,0 +1,1867 @@
+{
+ "AiActionPlan": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_plan",
+  "description": "**A plan: plan, validate, simulate, approve, execute, with rollback** (design 2.2 D, 3.8; AIC-086..107). Independent of any conversation (AIC-102). Its steps are `ai.action_step`; the change set is hashed so what was approved is what runs (AIC-181).",
+  "required": [
+   "origin",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "origin": {
+    "type": "string",
+    "enum": [
+     "configurationSession",
+     "generateConfiguration",
+     "assistant",
+     "riskCase",
+     "operationalRequirement",
+     "rollback"
+    ]
+   },
+   "originRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "validated",
+     "simulated",
+     "awaitingApproval",
+     "approved",
+     "executing",
+     "paused",
+     "completed",
+     "partiallyCompleted",
+     "failed",
+     "compensated",
+     "cancelled",
+     "rolledBack"
+    ],
+    "readOnly": true
+   },
+   "autonomyLevel": {
+    "$ref": "#/components/schemas/AiAutonomyLevel"
+   },
+   "approvalTier": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). Not an autonomy level."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request, where tier 2 or the matrix caught the plan."
+   },
+   "proposedActionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.proposed_action",
+    "description": "The `ai.proposed_action` the plan is presented as for a decision."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "governanceOutcome": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiGovernanceOutcome"
+     }
+    ],
+    "readOnly": true
+   },
+   "policyVersionRef": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The governance policy version that decided it."
+   },
+   "simulation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4)."
+   },
+   "partialCompletionAllowed": {
+    "type": "boolean",
+    "default": false,
+    "description": "Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134)."
+   },
+   "rollbackOfPlanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiActionPlanDetail": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.action_plan with its ai.action_step rows",
+  "description": "A plan with its steps in DAG order.",
+  "required": [
+   "plan",
+   "steps"
+  ],
+  "properties": {
+   "plan": {
+    "$ref": "#/components/schemas/AiActionPlan"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiActionStep"
+    }
+   }
+  }
+ },
+ "AiActionStep": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_step",
+  "description": "One step of a plan: a registered tool against `targetContract.targetOperation` at a contract version (AIC-095), with payload, provenance, compensation and the idempotency key `plan:{id}:step:{n}`. **Scoped through its plan** (`platform.apply_parent_rls`). Each step records its target object's version; drift pauses the plan (AIC-182).",
+  "required": [
+   "planId",
+   "stepNumber",
+   "toolKey",
+   "targetContract",
+   "targetOperation",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "stepNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "dependsOn": {
+    "type": "array",
+    "items": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "description": "Step numbers that must succeed first. The plan is a DAG."
+   },
+   "toolKey": {
+    "type": "string"
+   },
+   "targetContract": {
+    "type": "string"
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "contractVersion": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body of `targetOperation`, validated against it before the plan is approved."
+   },
+   "provenance": {
+    "$ref": "#/components/schemas/AiProvenance"
+   },
+   "idempotencyKey": {
+    "type": "string",
+    "readOnly": true
+   },
+   "targetObjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "targetObjectVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The version the step was planned against. A different version at execution is drift."
+   },
+   "reversible": {
+    "type": "boolean"
+   },
+   "compensation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "validated",
+     "running",
+     "succeeded",
+     "failed",
+     "compensated",
+     "skipped",
+     "paused"
+    ],
+    "readOnly": true
+   },
+   "attempts": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 3,
+    "readOnly": true,
+    "description": "Bounded at 3 (AIC-135)."
+   },
+   "lastError": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resultRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The owning service's response: success is its answer, not a model's judgement (AIC-097)."
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "AiAutonomyLevel": {
+  "type": "integer",
+  "minimum": 0,
+  "maximum": 4,
+  "description": "**One autonomy scale for every capability** (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). 0 disabled; 1 advisory (explains and recommends, nothing is drafted to run); 2 prepare (drafts a proposal a person applies in the owning screen); 3 execute with approval (the plan runs after approval, through owning APIs); 4 controlled auto (runs without approval, only for listed low-risk reversible actions inside pre-approved ranges). **Not the approval tier**: `ProposedAction.approvalLevel` is the tier."
+ },
+ "AiBlueprintDecision": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.blueprint_decision",
+  "description": "One decision in a blueprint and what the administrator did with it. **Scoped through its blueprint** (`platform.apply_parent_rls`).",
+  "required": [
+   "blueprintId",
+   "decisionKey",
+   "decisionClass",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "blueprintId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.blueprint"
+   },
+   "decisionKey": {
+    "type": "string"
+   },
+   "module": {
+    "type": "string"
+   },
+   "decisionClass": {
+    "type": "string",
+    "enum": [
+     "required",
+     "recommended",
+     "optional"
+    ]
+   },
+   "question": {
+    "type": "string",
+    "nullable": true
+   },
+   "value": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "provenance": {
+    "$ref": "#/components/schemas/AiProvenance"
+   },
+   "sourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.config_source",
+    "description": "The attached document the value was extracted from (29 September, build; `attachConfigurationSource`)."
+   },
+   "sourceCitation": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 200,
+    "description": "Where in it, e.g. `page 4`, `sheet Prices!B7`, `logo region`."
+   },
+   "recommendation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "What the assistant recommends and why (ADM-491): mandatory configuration and best practice kept apart."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "accepted",
+     "modified",
+     "rejected",
+     "deferred"
+    ]
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "AiBlueprintView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.blueprint with its ai.blueprint_decision rows",
+  "description": "A blueprint with its decisions.",
+  "required": [
+   "blueprint",
+   "decisions"
+  ],
+  "properties": {
+   "blueprint": {
+    "$ref": "#/components/schemas/AiConfigurationBlueprint"
+   },
+   "decisions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiBlueprintDecision"
+    }
+   }
+  }
+ },
+ "AiConfigurationBlueprint": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.blueprint",
+  "description": "**The blueprint** (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. **Never `ready` while a required decision is deferred** (AIC-115).",
+  "required": [
+   "sessionId",
+   "version",
+   "readiness"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "sessionId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.config_session"
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "readiness": {
+    "type": "string",
+    "enum": [
+     "notReady",
+     "readyWithWarnings",
+     "ready"
+    ],
+    "readOnly": true
+   },
+   "requiredOpen": {
+    "type": "integer",
+    "minimum": 0,
+    "readOnly": true,
+    "description": "Required decisions not yet accepted or modified."
+   },
+   "issues": {
+    "$ref": "#/components/schemas/AiBlueprintIssueList"
+   },
+   "dependencyMap": {
+    "type": "object",
+    "additionalProperties": true,
+    "readOnly": true,
+    "description": "Configuration objects and the order they depend on each other, by module."
+   },
+   "summary": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiConfigurationQuestion": {
+  "type": "object",
+  "x-ticvai-persistence": "none — chosen per turn from the configuration knowledge model",
+  "description": "**The next question, chosen by the configuration knowledge model, not by the language model** (design 2.2 D, AIC-111). The model only extracts a structured answer against `answerSchema`.",
+  "required": [
+   "questionKey",
+   "text",
+   "decisionClass"
+  ],
+  "properties": {
+   "questionKey": {
+    "type": "string"
+   },
+   "text": {
+    "type": "string"
+   },
+   "module": {
+    "type": "string",
+    "nullable": true
+   },
+   "decisionClass": {
+    "type": "string",
+    "enum": [
+     "required",
+     "recommended",
+     "optional"
+    ]
+   },
+   "answerType": {
+    "type": "string",
+    "enum": [
+     "freeText",
+     "singleChoice",
+     "multiChoice",
+     "number",
+     "date",
+     "confirm"
+    ]
+   },
+   "options": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "why": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why it is asked: which configuration branch it opens or closes."
+   },
+   "answerSchema": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "JSON Schema the extracted answer must satisfy."
+   }
+  }
+ },
+ "AiConfigurationSession": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.config_session",
+  "description": "**A configuration-assistant session** (design 2.2 D steps 1-2, C7; ADM-469..478). Discovery runs from the configuration knowledge model; every value carries provenance.",
+  "required": [
+   "intent",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "intent": {
+    "type": "string",
+    "enum": [
+     "create",
+     "modify",
+     "extend",
+     "clone"
+    ]
+   },
+   "venueType": {
+    "type": "string",
+    "nullable": true,
+    "description": "Museum, theme park, water park, zoo, aquarium, theatre, stadium, festival, conference..."
+   },
+   "sourceScopePath": {
+    "type": "string",
+    "nullable": true,
+    "description": "The setup being cloned or extended."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "discovering",
+     "blueprintReady",
+     "planned",
+     "executing",
+     "completed",
+     "abandoned"
+    ],
+    "readOnly": true
+   },
+   "progressPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "readOnly": true
+   },
+   "nextQuestion": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiConfigurationQuestion"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true
+   },
+   "conversationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.conversation"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "lastActivityAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiConfigurationTurn": {
+  "type": "object",
+  "x-ticvai-persistence": "none — the answer is written to ai.blueprint_decision and the session",
+  "description": "The result of one answer: what was extracted with its provenance, the next question and progress.",
+  "required": [
+   "session"
+  ],
+  "properties": {
+   "session": {
+    "$ref": "#/components/schemas/AiConfigurationSession"
+   },
+   "extracted": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "decisionKey": {
+       "type": "string"
+      },
+      "value": {
+       "type": "object",
+       "additionalProperties": true,
+       "nullable": true
+      },
+      "provenance": {
+       "$ref": "#/components/schemas/AiProvenance"
+      }
+     }
+    }
+   },
+   "nextQuestion": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiConfigurationQuestion"
+     }
+    ],
+    "nullable": true
+   },
+   "clarificationsNeeded": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "AiDecisionRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.decision_record",
+  "description": "**The standard record for every governed decision** (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast publication, a plan step, an assistant answer at significant depth, a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
+  "required": [
+   "traceId",
+   "capabilityKey",
+   "outcome",
+   "recordHash"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "traceId": {
+    "type": "string"
+   },
+   "capabilityKey": {
+    "type": "string"
+   },
+   "task": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectKind": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "inputsRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself."
+   },
+   "evidence": {
+    "$ref": "#/components/schemas/AiEvidenceItemList"
+   },
+   "producer": {
+    "type": "string",
+    "nullable": true
+   },
+   "modelVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "promptTemplateVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "featureSetVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "knowledgeVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "ruleVersions": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "governanceOutcome": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiGovernanceOutcome"
+     }
+    ],
+    "nullable": true
+   },
+   "policyVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "approvals": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Approval requests and their decisions."
+   },
+   "humanDecision": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Override or intervention, where a person changed the outcome."
+   },
+   "executionResult": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "outcomeRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The business outcome it links to (an order, a published version, a closed case)."
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "answered",
+     "refused",
+     "allowed",
+     "blocked",
+     "executed",
+     "failed",
+     "approvedThenFailed",
+     "published",
+     "suggested"
+    ],
+    "description": "`approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit)."
+   },
+   "annotations": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "byPrincipalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "note": {
+       "type": "string"
+      }
+     }
+    },
+    "readOnly": true,
+    "description": "Corrections, appended; the original fields are never edited."
+   },
+   "previousHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "recordHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiDecisionTrace": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.decision_record with the rows it references",
+  "description": "**The full trace of one decision** (ADM-540..546): record, evidence, candidates and rules, model and runtime, governance and approvals, execution and business outcome. Depth is gated by permission (AIC-195).",
+  "required": [
+   "record"
+  ],
+  "properties": {
+   "record": {
+    "$ref": "#/components/schemas/AiDecisionRecord"
+   },
+   "depth": {
+    "type": "string",
+    "enum": [
+     "business",
+     "governance",
+     "technical"
+    ]
+   },
+   "explanation": {
+    "type": "string",
+    "description": "Built from structured evidence, never a model's chain of thought (AIC-192)."
+   },
+   "activity": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiInteraction"
+    },
+    "description": "The model calls behind it (`technical` depth)."
+   },
+   "plan": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiActionPlanDetail"
+     }
+    ],
+    "nullable": true
+   },
+   "interventions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiIntervention"
+    }
+   },
+   "chainVerified": {
+    "type": "boolean",
+    "description": "The hash chain around this record verifies."
+   }
+  }
+ },
+ "AiEffectivePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "none — resolved from published policy versions, exceptions and ai.policy",
+  "description": "**The policy in force for a capability at a scope** (AIC-153, AIC-165; ADM-525, ADM-528): the intersection of the capability, governance policy and the tenant or venue AI policy, with where each part came from.",
+  "required": [
+   "capabilityKey",
+   "autonomyLevel",
+   "rules"
+  ],
+  "properties": {
+   "capabilityKey": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "autonomyLevel": {
+    "$ref": "#/components/schemas/AiAutonomyLevel"
+   },
+   "autonomyCeiling": {
+    "$ref": "#/components/schemas/AiAutonomyLevel"
+   },
+   "rules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "rule": {
+       "$ref": "#/components/schemas/AiGovernanceRule"
+      },
+      "policyKey": {
+       "type": "string"
+      },
+      "version": {
+       "type": "integer"
+      },
+      "scopePath": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "exceptions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiPolicyException"
+    }
+   },
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "description": {
+       "type": "string"
+      },
+      "resolvedTo": {
+       "$ref": "#/components/schemas/AiGovernanceOutcome"
+      }
+     }
+    },
+    "description": "Conflicting rules and the more restrictive result they resolved to (AIC-161)."
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AiEvidenceItemList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "The evidence of one decision record, stored with it.",
+  "items": {
+   "$ref": "#/components/schemas/AiEvidenceItem"
+  }
+ },
+ "AiGovernanceOutcome": {
+  "type": "string",
+  "enum": [
+   "allow",
+   "allowWithConditions",
+   "prepareOnly",
+   "approvalRequired",
+   "escalate",
+   "block"
+  ],
+  "description": "What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). `block` is an answer, not an error, and is logged as outcome `refused`."
+ },
+ "AiGovernanceRule": {
+  "type": "object",
+  "x-ticvai-persistence": "none — held in the jsonb rules column of ai.governance_policy_version, through AiGovernanceRuleList",
+  "description": "One rule of a governance policy version: which actions on which data, under which conditions, get which outcome (AIC-147..160).",
+  "required": [
+   "effect"
+  ],
+  "properties": {
+   "effect": {
+    "$ref": "#/components/schemas/AiGovernanceOutcome"
+   },
+   "capabilityKeys": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Registered capabilities it applies to. Empty means every capability the policy names."
+   },
+   "actions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "read",
+      "analyze",
+      "recommend",
+      "generate",
+      "prepare",
+      "create",
+      "modify",
+      "publish",
+      "execute",
+      "delete"
+     ]
+    },
+    "description": "ADM-523: what AI may do, from reading to executing."
+   },
+   "dataCategories": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Data categories (ADM-524), e.g. `customerContact`, `payment`, `financial`, `operational`."
+   },
+   "purposes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Permitted purposes for those categories (AIC-156, AIR-182)."
+   },
+   "maxAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Above this value the effect escalates one step (for example to `approvalRequired`)."
+   },
+   "roleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Roles the rule applies to; empty means every role."
+   },
+   "environments": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "development",
+      "sandbox",
+      "staging",
+      "production"
+     ]
+    },
+    "description": "ADM-525. Empty means every environment. **`sandbox`** (18 September minutes, M18-01): the developer sandbox and a tenant's trial environment, governed apart from staging so a rule can allow in sandbox what it blocks in production."
+   },
+   "conditions": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Conditions attached to an `allowWithConditions` effect, for example `maskFields` or `requireCitation`."
+   }
+  }
+ },
+ "AiInteraction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.activity",
+  "required": [
+   "id",
+   "principalId",
+   "capability",
+   "outcome",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "conversationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "audience": {
+    "type": "string",
+    "enum": [
+     "staff",
+     "guest"
+    ],
+    "description": "**Billing divides on this.** Staff usage is bounded by headcount; guest usage is bounded by footfall and curiosity, and a venue cannot stop guests asking questions.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest, where the audience is `guest`. `principalId` is null in that case — **a guest is not a principal**, and attributing their tokens to a staff member would be wrong twice.\n"
+   },
+   "billableToTenantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Resolved from `scopePath` at write time, not derived later. **Billing must not depend on walking a scope tree that has since been reorganised.**\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "capability": {
+    "type": "string"
+   },
+   "prompt": {
+    "type": "string"
+   },
+   "response": {
+    "type": "string"
+   },
+   "sources": {
+    "$ref": "#/components/schemas/AiSourceList"
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "answered",
+     "refused",
+     "applied",
+     "rejected",
+     "failed"
+    ]
+   },
+   "refusalReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "provider": {
+    "$ref": "#/components/schemas/AiProviderKind"
+   },
+   "model": {
+    "type": "string"
+   },
+   "promptTokens": {
+    "type": "integer"
+   },
+   "completionTokens": {
+    "type": "integer"
+   },
+   "cost": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "x-ticvai-column": "cost_amount",
+    "description": "What the call cost at the provider. **Money like every other amount** (naming-and-style 5.1) — it replaces an integer `costMinor` that carried no currency or scale, which AED and OMR read differently.\n"
+   },
+   "latencyMs": {
+    "type": "integer"
+   },
+   "maskedFieldCount": {
+    "type": "integer",
+    "description": "How many fields were redacted. Zero on a prompt touching guest data is a defect."
+   },
+   "traceId": {
+    "type": "string"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ai.decision_record` this call belongs to, where it was part of a governed decision (AI design 2.3, 3.9). Null for a call audited by this row alone."
+   },
+   "cacheLayer": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "guardrail",
+     "semantic",
+     "exact",
+     "negative",
+     "analytics"
+    ],
+    "description": "Which cache answered, where one did (AI design 3.6). Null for a model call."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AiIntervention": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.intervention",
+  "description": "**A person stepping in** (AIC-187, ADM-535, ADM-536): an override, pause, resume, stop, retry or rollback, with the original AI decision and the human one side by side.",
+  "required": [
+   "kind",
+   "targetKind",
+   "targetRef"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "override",
+     "pause",
+     "resume",
+     "cancel",
+     "retry",
+     "rollback",
+     "capabilityPause",
+     "capabilityResume"
+    ]
+   },
+   "targetKind": {
+    "type": "string",
+    "enum": [
+     "plan",
+     "step",
+     "decision",
+     "capability"
+    ]
+   },
+   "targetRef": {
+    "type": "string"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "originalDecision": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "humanDecision": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 2000
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiPolicyException": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.policy_exception",
+  "description": "**A temporary, recorded exception to a governance policy** (AIC-162, ADM-526): an expiry, an approver and compensating controls. Governance is never bypassed silently.",
+  "required": [
+   "policyId",
+   "reason",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "policyId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.governance_policy"
+   },
+   "capabilityKey": {
+    "type": "string",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 2000
+   },
+   "compensatingControls": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Required. An exception with no end is a policy change, and goes through publication."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "expired",
+     "revoked"
+    ],
+    "readOnly": true
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "revokedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "revokeReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiProvenance": {
+  "type": "string",
+  "enum": [
+   "confirmed",
+   "aiRecommended",
+   "inferred",
+   "unknown"
+  ],
+  "description": "**Where a configuration value came from** (design 2.2 D, AIC-111): said by the administrator, recommended by the assistant, inferred from other answers, or not known yet. Shown beside every value; no confidence number is shown for configuration (design 5.6)."
+ },
+ "AiVenueSettings": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.venue_settings",
+  "description": "**The venue AI profile** (29 September, AI functions review): the figures a venue gives at onboarding so every data-driven answer is useful before it has history. One row per venue; configuration, not history. Defaults come from the starting pattern for `venueType`, which TICVAI writes from published sources and made-up example curves, **never from another tenant's data** (AI-D01, AIP-149).",
+  "required": [
+   "venueId",
+   "venueType"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueType": {
+    "type": "string",
+    "enum": [
+     "waterPark",
+     "themePark",
+     "familyEntertainmentCentre",
+     "museum",
+     "arena",
+     "zooAquarium",
+     "other"
+    ]
+   },
+   "isOutdoor": {
+    "type": "boolean",
+    "default": true,
+    "description": "Outdoor venues take the summer-heat and weather effects."
+   },
+   "capacity": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "openingHours": {
+    "type": "array",
+    "description": "The usual week. Exceptions come from the venue calendar.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dayOfWeek": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 7
+      },
+      "opensAt": {
+       "type": "string"
+      },
+      "closesAt": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "typicalWeekdayAttendance": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "typicalWeekendAttendance": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "peakMonths": {
+    "type": "array",
+    "items": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 12
+    }
+   },
+   "averageSpend": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "fnbAttachRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
+   },
+   "staffProductivity": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "number"
+    },
+    "description": "Per role, units per staff hour, e.g. `{\"cashier\": 40, \"gate\": 300}`. Defaults from the pattern."
+   },
+   "startingPatternKey": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The pattern and version in use, e.g. `waterPark@3`."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "ApprovalWorkflowDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Approval Workflow Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "workflowName": {
+    "type": "string",
+    "description": "Workflow name"
+   },
+   "applicableProductTypes": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ProductKind"
+    },
+    "description": "Applicable product types; empty = all"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue id; empty = all venues",
+    "nullable": true
+   },
+   "department": {
+    "type": "string",
+    "description": "Department",
+    "nullable": true
+   },
+   "changeTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "newProduct",
+      "description",
+      "price",
+      "validity",
+      "capacity",
+      "entitlement",
+      "eligibility",
+      "tax",
+      "channel",
+      "media",
+      "policy",
+      "relationship",
+      "retirement"
+     ]
+    },
+    "description": "Change types routed to this workflow (Conditional Approval: e.g. price -> Commercial + Finance)"
+   },
+   "approvalStages": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "order": {
+       "type": "integer",
+       "description": "Stage order; stages sharing an order run in parallel, otherwise sequential"
+      },
+      "name": {
+       "type": "string"
+      },
+      "approverRole": {
+       "type": "string",
+       "nullable": true
+      },
+      "specificApproverId": {
+       "type": "string",
+       "nullable": true
+      },
+      "approvalGroupId": {
+       "type": "string",
+       "nullable": true
+      },
+      "mandatory": {
+       "type": "boolean"
+      },
+      "slaHours": {
+       "type": "integer",
+       "description": "SLA in hours"
+      },
+      "escalateToRole": {
+       "type": "string",
+       "nullable": true,
+       "description": "Escalation when the SLA is missed"
+      },
+      "delegationAllowed": {
+       "type": "boolean"
+      },
+      "reminderEveryHours": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Reminder frequency"
+      }
+     }
+    },
+    "description": "Approval stages, e.g. Product Manager -> Commercial Manager -> Operations -> Finance -> Final Approval; each stage names a role, a specific approver or a group"
+   },
+   "rejectionBehavior": {
+    "type": "string",
+    "enum": [
+     "returnToDraft",
+     "returnToPreviousStage",
+     "closeRequest"
+    ],
+    "description": "What happens on rejection; default returnToDraft (decided 29 September, readiness close-out)"
+   },
+   "resubmissionBehavior": {
+    "type": "string",
+    "enum": [
+     "restartFromFirstStage",
+     "resumeAtRejectingStage"
+    ],
+    "description": "Where a resubmitted request re-enters; default restartFromFirstStage (decided 29 September, readiness close-out)"
+   },
+   "workflowId": {
+    "type": "string",
+    "description": "Existing workflow to change; empty to create",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "ApprovalWorkflowDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Approval Workflow Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflowName": {
+    "type": "string",
+    "description": "Workflow name"
+   },
+   "applicableProductTypes": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ProductKind"
+    },
+    "description": "Applicable product types; empty = all"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue id; empty = all venues",
+    "nullable": true
+   },
+   "department": {
+    "type": "string",
+    "description": "Department",
+    "nullable": true
+   },
+   "changeTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "newProduct",
+      "description",
+      "price",
+      "validity",
+      "capacity",
+      "entitlement",
+      "eligibility",
+      "tax",
+      "channel",
+      "media",
+      "policy",
+      "relationship",
+      "retirement"
+     ]
+    },
+    "description": "Change types routed to this workflow (Conditional Approval: e.g. price -> Commercial + Finance)"
+   },
+   "approvalStages": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "order": {
+       "type": "integer",
+       "description": "Stage order; stages sharing an order run in parallel, otherwise sequential"
+      },
+      "name": {
+       "type": "string"
+      },
+      "approverRole": {
+       "type": "string",
+       "nullable": true
+      },
+      "specificApproverId": {
+       "type": "string",
+       "nullable": true
+      },
+      "approvalGroupId": {
+       "type": "string",
+       "nullable": true
+      },
+      "mandatory": {
+       "type": "boolean"
+      },
+      "slaHours": {
+       "type": "integer",
+       "description": "SLA in hours"
+      },
+      "escalateToRole": {
+       "type": "string",
+       "nullable": true,
+       "description": "Escalation when the SLA is missed"
+      },
+      "delegationAllowed": {
+       "type": "boolean"
+      },
+      "reminderEveryHours": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Reminder frequency"
+      }
+     }
+    },
+    "description": "Approval stages, e.g. Product Manager -> Commercial Manager -> Operations -> Finance -> Final Approval; each stage names a role, a specific approver or a group"
+   },
+   "rejectionBehavior": {
+    "type": "string",
+    "enum": [
+     "returnToDraft",
+     "returnToPreviousStage",
+     "closeRequest"
+    ],
+    "description": "What happens on rejection; default returnToDraft (decided 29 September, readiness close-out)"
+   },
+   "resubmissionBehavior": {
+    "type": "string",
+    "enum": [
+     "restartFromFirstStage",
+     "resumeAtRejectingStage"
+    ],
+    "description": "Where a resubmitted request re-enters; default restartFromFirstStage (decided 29 September, readiness close-out)"
+   },
+   "workflowId": {
+    "type": "string",
+    "description": "Workflow id",
+    "format": "uuid"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ProductKind": {
+  "type": "string",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n",
+  "enum": [
+   "admission",
+   "timedAdmission",
+   "datedAdmission",
+   "openDated",
+   "seated",
+   "membership",
+   "bundle",
+   "fnb",
+   "retail",
+   "rental",
+   "addOn",
+   "giftCard"
+  ]
+ },
+ "ProposedAction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.proposed_action",
+  "required": [
+   "id",
+   "kind",
+   "targetContract",
+   "targetOperation",
+   "payload",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "interactionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "pricing",
+     "promotion",
+     "operational",
+     "financial",
+     "configuration",
+     "content",
+     "audience"
+    ],
+    "description": "`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."
+   },
+   "targetContract": {
+    "type": "string",
+    "description": "Which contract would perform it. The assistant never performs it itself."
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "description": "**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n",
+    "enum": [
+     "proposed",
+     "approved",
+     "rejected",
+     "applied",
+     "expired"
+    ]
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."
+   },
+   "approvalLevel": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"
+   },
+   "proposedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.action_plan",
+    "description": "The plan this action presents for a decision (AI design 2.2 D, 3.8)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
+   }
+  }
+ }
+}

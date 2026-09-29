@@ -1,6 +1,6 @@
 # WS02 — Access Control board 2
 
-**10 screens · 18 operations · 17 schemas · 4 permissions**
+**10 screens · 18 operations · 19 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -2323,6 +2323,101 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "AccessRuleCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Rule Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ruleId": {
+    "type": "string"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "Rule, e.g. Standard Park Entry"
+   },
+   "appliesTo": {
+    "type": "string",
+    "description": "Products or credentials the rule applies to"
+   },
+   "location": {
+    "type": "string",
+    "description": "Where the rule applies"
+   },
+   "validity": {
+    "type": "string",
+    "description": "When the rule applies"
+   },
+   "ruleType": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "scheduled",
+     "active",
+     "inactive"
+    ]
+   }
+  }
+ },
+ "AccessRuleCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "activeAccessRules": {
+    "type": "integer",
+    "description": "Active Access Rules"
+   },
+   "draftRules": {
+    "type": "integer",
+    "description": "Draft Rules"
+   },
+   "scheduledRules": {
+    "type": "integer",
+    "description": "Scheduled Rules"
+   },
+   "rulesPendingApproval": {
+    "type": "integer",
+    "description": "Rules Pending Approval"
+   },
+   "venuesCovered": {
+    "type": "integer",
+    "description": "Venues Covered"
+   },
+   "productsTicketsCovered": {
+    "type": "integer",
+    "description": "Products/Tickets Covered"
+   },
+   "rulesWithConflicts": {
+    "type": "integer",
+    "description": "Rules with Conflicts"
+   },
+   "rulesUsingBiometrics": {
+    "type": "integer",
+    "description": "Rules Using Biometrics"
+   },
+   "rulesAllowingOverride": {
+    "type": "integer",
+    "description": "Rules Allowing Override"
+   },
+   "offlineCompatibleRules": {
+    "type": "integer",
+    "description": "Offline-Compatible Rules"
+   },
+   "recentlyModifiedRules": {
+    "type": "integer",
+    "description": "Recently Modified Rules"
+   },
+   "upcomingRuleChanges": {
+    "type": "integer",
+    "description": "Upcoming Rule Changes"
+   }
+  }
+ },
  "AccessValidityTimeRulesView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -3298,6 +3393,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "refundableIfIneligibleAtGate": {
     "type": "boolean",
     "default": false
+   },
+   "requiredCertificationCode": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 60,
+    "description": "**A certification the participant must hold** (decided 29 September, W4; added 30 September), e.g. `padiOpenWater` for a dive. Null means none. Help me choose reads it: an answer whose `filter.certificationCode` names it with `holdsCertification: false` leaves the product out, and with `holdsCertification: true` (or no flag) keeps only products needing that certification or none. Proof, where the venue asks for it, is a consent question on the product (REV3-26), not this field."
    },
    "scopePath": {
     "type": "string",

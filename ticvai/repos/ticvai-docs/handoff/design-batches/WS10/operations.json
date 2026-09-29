@@ -104,6 +104,55 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listDynamicPolicyEffectiveness": {
+  "method": "GET",
+  "path": "/dynamic-policy-effectiveness",
+  "contract": "access",
+  "summary": "How each gate admission policy has behaved over a period",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "policyId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "policyType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listIdentityMembershipAccreditation": {
   "method": "GET",
   "path": "/identity-membership-accreditation",
@@ -230,7 +279,7 @@
   "summary": "Define which zones, on which dates, at which times",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

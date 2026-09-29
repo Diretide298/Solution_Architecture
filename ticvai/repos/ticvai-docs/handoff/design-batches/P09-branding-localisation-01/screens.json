@@ -20,34 +20,18 @@
    "inferred": true,
    "exitTo": [
     "ADM-001",
-    "ADM-002",
-    "ADM-003"
+    "ADM-002"
    ],
    "transitions": [
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-016 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-016 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     }
    ]
   },
@@ -56,13 +40,6 @@
   "pattern": "listDetail",
   "patternReason": "`listConfigVersions` reads the population and `getAppIcons` reads one of them — list, select, act",
   "purpose": "See white-label branding management for this venue.",
-  "gaps": [
-   {
-    "operation": "getBrandIdentity",
-    "why": "**2 declared operations reach no component on this screen**: getBrandIdentity, getTheme. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -71,8 +48,46 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (decided 28 September, audit R098). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.id",
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "openPlatformStaffGrant",
+       "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every white-label branding",
+       "label": "Every config version",
        "bindsTo": "ConfigVersion",
        "columns": [
         "ConfigVersion.publishedAt",
@@ -87,6 +102,12 @@
        ],
        "operation": "listConfigVersions",
        "provenance": "contract white-label.yaml GET /tenant-config/versions"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishTenantConfig",
+       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -96,7 +117,59 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected white-label branding",
+       "label": "The selected config version",
+       "bindsTo": "ConfigVersion",
+       "columns": [
+        "ConfigVersion.publishedAt",
+        "ConfigVersion.publishedByPrincipalId",
+        "ConfigVersion.publishedByName",
+        "ConfigVersion.note",
+        "ConfigVersion.isCurrent",
+        "ConfigVersion.scheduledFor",
+        "ConfigVersion.contentHash",
+        "ConfigVersion.pendingBuildTimeChanges",
+        "ConfigVersion.snapshot",
+        "ConfigVersion.scopePath"
+       ],
+       "operation": "listConfigVersions",
+       "provenance": "contract white-label.yaml GET /tenant-config/versions"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The brand identity",
+       "bindsTo": "BrandIdentity",
+       "columns": [
+        "BrandIdentity.logoAssetRef",
+        "BrandIdentity.logoDarkAssetRef",
+        "BrandIdentity.faviconAssetRef",
+        "BrandIdentity.splashImageAssetRefs",
+        "BrandIdentity.splashDurationSeconds",
+        "BrandIdentity.splashBackgroundColour",
+        "BrandIdentity.showLoadingIndicator",
+        "BrandIdentity.splashChangeScope"
+       ],
+       "operation": "getBrandIdentity",
+       "provenance": "contract white-label.yaml GET /tenant-config/brand"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The theme",
+       "bindsTo": "Theme",
+       "columns": [
+        "Theme.primaryColour",
+        "Theme.secondaryColour",
+        "Theme.accentColour",
+        "Theme.backgroundColour",
+        "Theme.textColour",
+        "Theme.darkMode",
+        "Theme.cornerRadius"
+       ],
+       "operation": "getTheme",
+       "provenance": "contract white-label.yaml GET /tenant-config/theme"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The app icons",
        "bindsTo": "AppIcons",
        "columns": [
         "AppIcons.sourceAssetRef",
@@ -116,43 +189,43 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create preview",
        "operation": "createPreview",
        "provenance": "contract white-label.yaml POST /tenant-config/preview"
       },
       {
        "kind": "secondaryButton",
-       "label": "Diff",
+       "label": "Diff config version",
        "operation": "diffConfigVersion",
        "provenance": "contract white-label.yaml GET /tenant-config/versions/{version}/diff"
       },
       {
        "kind": "secondaryButton",
-       "label": "Publish",
+       "label": "Publish tenant config",
        "operation": "publishTenantConfig",
        "provenance": "contract white-label.yaml POST /tenant-config/publish"
       },
       {
        "kind": "secondaryButton",
-       "label": "Restore",
+       "label": "Restore config version",
        "operation": "restoreConfigVersion",
        "provenance": "contract white-label.yaml POST /tenant-config/versions/{version}/restore"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save app icons",
        "operation": "setAppIcons",
        "provenance": "contract white-label.yaml PUT /tenant-config/app-icons"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save brand identity",
        "operation": "setBrandIdentity",
        "provenance": "contract white-label.yaml PUT /tenant-config/brand"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save theme",
        "operation": "setTheme",
        "provenance": "contract white-label.yaml PUT /tenant-config/theme"
       },
@@ -163,29 +236,30 @@
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishTenantConfig",
-       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The white-label branding list.",
    "error": "Could not load. Names which read failed and leaves the white-label branding untouched.",
-   "emptyFirstRun": "No white-label branding yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the white-label branding are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No white-label branding yet. Offers Create preview (`createPreview`).",
+   "emptyNoResults": "Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getAppIcons` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker — the operator picks a tenant before acting in its cell (audit R098)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "createPreview",
     "contract": "white-label",
@@ -199,7 +273,7 @@
     "operationId": "diffConfigVersion",
     "contract": "white-label",
     "purpose": "Compare a version against the working draft",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getAppIcons",
@@ -292,11 +366,11 @@
    ],
    "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`, `policyKind`.",
    "preloaded": [
-    "AppIcons.sourceAssetRef",
-    "AppIcons.derived",
-    "AppIcons.changeScope",
-    "AppIcons.liveVersion",
-    "AppIcons.requiresRebuild"
+    "ConfigVersion.publishedAt",
+    "ConfigVersion.publishedByPrincipalId",
+    "ConfigVersion.publishedByName",
+    "ConfigVersion.note",
+    "ConfigVersion.isCurrent"
    ]
   },
   "wireframe": {
@@ -305,6 +379,132 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-016"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
+    "id": "formCreatePreview",
+    "component": "modal",
+    "trigger": "Create preview",
+    "body": "**Collects what `createPreview` sends before it is called.** Nothing in the body is required. Optional: `platform`, `theme`, `language`, `expiresInHours`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Create preview",
+     "operation": "createPreview"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "platform",
+      "theme",
+      "language",
+      "expiresInHours"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /tenant-config/preview"
+   },
+   {
+    "id": "formPublishTenantConfig",
+    "component": "modal",
+    "trigger": "Publish tenant config",
+    "body": "**Collects what `publishTenantConfig` sends before it is called.** Required: `note`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Publish tenant config",
+     "operation": "publishTenantConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note",
+      "scheduledFor"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /tenant-config/publish"
+   },
+   {
+    "id": "formSetAppIcons",
+    "component": "modal",
+    "trigger": "Save app icons",
+    "body": "**Collects what `setAppIcons` sends before it is called.** Required: `sourceAssetRef`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save app icons",
+     "operation": "setAppIcons"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sourceAssetRef"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/app-icons"
+   },
+   {
+    "id": "formSetBrandIdentity",
+    "component": "modal",
+    "trigger": "Save brand identity",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "BrandIdentity",
+    "confirm": {
+     "label": "Save brand identity",
+     "operation": "setBrandIdentity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "logoAssetRef",
+      "logoDarkAssetRef",
+      "faviconAssetRef",
+      "splashImageAssetRefs",
+      "splashDurationSeconds",
+      "splashBackgroundColour",
+      "showLoadingIndicator",
+      "splashChangeScope"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/brand"
+   },
+   {
+    "id": "formSetTheme",
+    "component": "modal",
+    "trigger": "Save theme",
+    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Theme",
+    "confirm": {
+     "label": "Save theme",
+     "operation": "setTheme"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "primaryColour",
+      "secondaryColour",
+      "backgroundColour",
+      "textColour",
+      "accentColour",
+      "darkMode",
+      "cornerRadius"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/theme"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -350,39 +550,29 @@
    "exitTo": [
     "ADM-001",
     "ADM-002",
-    "ADM-003",
     "ADM-016"
    ],
    "transitions": [
     {
-     "to": "ADM-016",
-     "trigger": "White-Label Branding Management",
-     "provenance": "flow F103 step 1→2"
-    },
-    {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-017 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-017 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
+     "to": "ADM-016",
+     "trigger": "White-Label Branding Management",
+     "provenance": "flow F103 step 1→2",
      "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+      "bannerId",
+      "pageId",
+      "policyKind",
+      "version"
+     ]
     }
    ]
   },
@@ -402,8 +592,46 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (decided 28 September, audit R098). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.id",
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "openPlatformStaffGrant",
+       "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every domain certificate",
+       "label": "Every custom domain",
        "bindsTo": "CustomDomain",
        "columns": [
         "CustomDomain.id",
@@ -427,7 +655,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected domain certificate",
+       "label": "The selected custom domain",
        "bindsTo": "CustomDomain",
        "columns": [
         "CustomDomain.id",
@@ -451,19 +679,19 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Claim",
+       "label": "Claim custom domain",
        "operation": "claimCustomDomain",
        "provenance": "contract white-label.yaml POST /tenant-domains"
       },
       {
        "kind": "secondaryButton",
-       "label": "Verify",
+       "label": "Verify custom domain",
        "operation": "verifyCustomDomain",
        "provenance": "contract white-label.yaml POST /tenant-domains/{domainId}/verify"
       },
       {
        "kind": "secondaryButton",
-       "label": "Release hold",
+       "label": "Release custom domain",
        "operation": "relinquishCustomDomain",
        "provenance": "contract white-label.yaml DELETE /tenant-domains/{domainId}"
       }
@@ -474,11 +702,24 @@
   "states": {
    "loading": "The domain certificate list.",
    "error": "Could not load. Names which read failed and leaves the domain certificate untouched.",
-   "emptyFirstRun": "No domain certificate yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the domain certificate are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No domain certificate yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker — the operator picks a tenant before acting in its cell (audit R098)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "listCustomDomains",
     "contract": "white-label",
@@ -552,6 +793,47 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-017"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
+    "id": "formClaimCustomDomain",
+    "component": "modal",
+    "trigger": "Claim custom domain",
+    "body": "**Collects what `claimCustomDomain` sends before it is called.** Required: `hostname`, `kind`. Optional: `verificationMethod`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Claim custom domain",
+     "operation": "claimCustomDomain"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "hostname",
+      "kind",
+      "verificationMethod"
+     ]
+    },
+    "provenance": "contract white-label.yaml POST /tenant-domains"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -596,34 +878,18 @@
    "inferred": true,
    "exitTo": [
     "ADM-001",
-    "ADM-002",
-    "ADM-003"
+    "ADM-002"
    ],
    "transitions": [
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-018 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-018 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     }
    ]
   },
@@ -632,13 +898,6 @@
   "pattern": "listDetail",
   "patternReason": "`listFaqs` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Configure localisation & language pack for this venue.",
-  "gaps": [
-   {
-    "operation": "listPolicies",
-    "why": "**1 declared operation reach no component on this screen**: listPolicies. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -647,8 +906,46 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (decided 28 September, audit R098). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.id",
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "openPlatformStaffGrant",
+       "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every localisation language pack",
+       "label": "Every faq category",
        "bindsTo": "FaqCategory",
        "columns": [
         "FaqCategory.code",
@@ -659,6 +956,23 @@
        ],
        "operation": "listFaqs",
        "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every policy",
+       "bindsTo": "Policy",
+       "columns": [
+        "Policy.kind",
+        "Policy.title",
+        "Policy.body",
+        "Policy.requiresReconsent",
+        "Policy.effectiveFrom",
+        "Policy.publishedByPrincipalId",
+        "Policy.publishedAt",
+        "Policy.scopePath"
+       ],
+       "operation": "listPolicies",
+       "provenance": "contract white-label.yaml GET /tenant-config/policies"
       }
      ]
     },
@@ -668,7 +982,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected localisation language pack",
+       "label": "The selected faq category",
        "bindsTo": "FaqCategory",
        "columns": [
         "FaqCategory.code",
@@ -688,49 +1002,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save languages",
        "operation": "setLanguages",
        "provenance": "contract white-label.yaml PUT /tenant-config/languages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save faqs",
        "operation": "setFaqs",
        "provenance": "contract white-label.yaml PUT /tenant-config/faqs"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save policy",
        "operation": "setPolicy",
        "provenance": "contract white-label.yaml PUT /tenant-config/policies/{policyKind}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setLanguages",
-       "label": "Save languages",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listFaqs",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setLanguages",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -739,16 +1025,29 @@
   "states": {
    "loading": "The localisation language pack list.",
    "error": "Could not load. Names which read failed and leaves the localisation language pack untouched.",
-   "emptyFirstRun": "No localisation language pack yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the localisation language pack are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No localisation language pack yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker — the operator picks a tenant before acting in its cell (audit R098)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "setLanguages",
     "contract": "white-label",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listFaqs",
@@ -815,6 +1114,82 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-018"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
+    "id": "formSetLanguages",
+    "component": "modal",
+    "trigger": "Save languages",
+    "body": "**Collects what `setLanguages` sends before it is called.** Required: `languages`, `defaultLanguage`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save languages",
+     "operation": "setLanguages"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "languages",
+      "defaultLanguage"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/languages"
+   },
+   {
+    "id": "formSetFaqs",
+    "component": "modal",
+    "trigger": "Save faqs",
+    "body": "**Collects what `setFaqs` sends before it is called.** Required: `categories`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save faqs",
+     "operation": "setFaqs"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "categories"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/faqs"
+   },
+   {
+    "id": "formSetPolicy",
+    "component": "modal",
+    "trigger": "Save policy",
+    "body": "**Collects what `setPolicy` sends before it is called.** Required: `body`, `requiresReconsent`. Optional: `effectiveFrom`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save policy",
+     "operation": "setPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "body",
+      "requiresReconsent",
+      "effectiveFrom"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/policies/{policyKind}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -859,38 +1234,22 @@
    "inferred": true,
    "exitTo": [
     "ADM-001",
-    "ADM-002",
-    "ADM-003"
+    "ADM-002"
    ],
    "transitions": [
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-019 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-019 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Holds the tenant-level venue defaults (decided 28 September, audit R094).** `getVenueSettingsDefaults` and `setVenueSettingsDefaults` are the tenant row every venue inherits where its own value is null; a venue's own values are set on its venue settings screen. They run in the tenant's cell, so the operator picks a tenant and opens a platform-staff grant first (audit R098).",
   "openQuestions": [
    "No contract — platform defaults not specified"
   ],
@@ -906,8 +1265,46 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (decided 28 September, audit R098). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.id",
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "openPlatformStaffGrant",
+       "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every global defaults",
+       "label": "Every plan",
        "bindsTo": "Plan",
        "columns": [
         "Plan.code",
@@ -934,7 +1331,27 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected global defaults",
+       "label": "Tenant defaults for every venue",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.cartLeaseSeconds",
+        "VenueSettings.cartHoldExtensionMinutes",
+        "VenueSettings.cartMaxExtensions",
+        "VenueSettings.resaleCutoffHours",
+        "VenueSettings.exchangeCutoffHours",
+        "VenueSettings.rescheduleCutoffHours",
+        "VenueSettings.reservationMaxExtensions",
+        "VenueSettings.shiftVarianceThreshold",
+        "VenueSettings.quietHours",
+        "VenueSettings.displayCurrencies"
+       ],
+       "operation": "getVenueSettingsDefaults",
+       "notes": "**The tenant-level default each venue inherits** (decided 28 September, audit R094). A venue whose own value is null uses the value here; where the tenant has saved nothing these are the proposed defaults, client to correct. The venue facts on the schema (support hours, biometrics, segregated access) are not defaulted here.",
+       "provenance": "contract tenancy.yaml GET /venue-settings-defaults"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The selected plan",
        "bindsTo": "Plan",
        "columns": [
         "Plan.code",
@@ -962,14 +1379,20 @@
      "slot": "rowActions",
      "components": [
       {
+       "kind": "secondaryButton",
+       "label": "Save venue defaults",
+       "operation": "setVenueSettingsDefaults",
+       "provenance": "contract tenancy.yaml PUT /venue-settings-defaults"
+      },
+      {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create plan",
        "operation": "createPlan",
        "provenance": "contract subscription.yaml POST /plans"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create plan version",
        "operation": "createPlanVersion",
        "provenance": "contract subscription.yaml POST /plans/{planId}"
       }
@@ -980,11 +1403,39 @@
   "states": {
    "loading": "The global defaults list.",
    "error": "Could not load. Names which read failed and leaves the global defaults untouched.",
-   "emptyFirstRun": "No global defaults yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the global defaults are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No global defaults yet. Offers Create plan (`createPlan`).",
+   "emptyNoResults": "Never shown: `listPlans` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
+   {
+    "operationId": "getVenueSettingsDefaults",
+    "contract": "tenancy",
+    "purpose": "The tenant-level default each venue inherits (decided 28 September, audit R094)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setVenueSettingsDefaults",
+    "contract": "tenancy",
+    "purpose": "Set the tenant-level venue defaults; venues with their own values are untouched (audit R094)",
+    "trigger": "onAction",
+    "invalidates": [
+     "getVenueSettingsDefaults"
+    ]
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker — the operator picks a tenant before acting in its cell (audit R098)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "listPlans",
     "contract": "subscription",
@@ -1013,7 +1464,7 @@
     "operationId": "getPlan",
     "contract": "subscription",
     "purpose": "Read a plan",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1038,6 +1489,109 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-019"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
+    "id": "formSetVenueSettingsDefaults",
+    "component": "modal",
+    "trigger": "Save venue defaults",
+    "body": "**Collects what `setVenueSettingsDefaults` sends before it is called** (decided 28 September, audit R094). The whole row is replaced: an omitted limit returns to its proposed default. Each value must sit within its field's minimum and maximum, or the request is refused 400 naming the field. A venue's own values are untouched; a venue with none follows the new default at once. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "VenueSettings",
+    "confirm": {
+     "label": "Save venue defaults",
+     "operation": "setVenueSettingsDefaults"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "cartLeaseSeconds",
+      "cartHoldExtensionMinutes",
+      "cartMaxExtensions",
+      "resaleCutoffHours",
+      "exchangeCutoffHours",
+      "rescheduleCutoffHours",
+      "reservationMaxExtensions",
+      "shiftVarianceThreshold",
+      "quietHours",
+      "displayCurrencies"
+     ]
+    },
+    "provenance": "contract tenancy.yaml PUT /venue-settings-defaults"
+   },
+   {
+    "id": "formCreatePlan",
+    "component": "modal",
+    "trigger": "Create plan",
+    "body": "**Collects what `createPlan` sends before it is called.** Required: `code`, `name`, `cellTier`, `licensedModules`, `limits`, `basePrice`. Optional: `description`, `billingPeriod`, `includesBrandedApp`, `includedAiTokens`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePlanRequest",
+    "confirm": {
+     "label": "Create plan",
+     "operation": "createPlan"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "cellTier",
+      "licensedModules",
+      "limits",
+      "basePrice",
+      "description",
+      "billingPeriod",
+      "includesBrandedApp",
+      "includedAiTokens"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /plans"
+   },
+   {
+    "id": "formCreatePlanVersion",
+    "component": "modal",
+    "trigger": "Create plan version",
+    "body": "**Collects what `createPlanVersion` sends before it is called.** Required: `code`, `name`, `cellTier`, `licensedModules`, `limits`, `basePrice`. Optional: `description`, `billingPeriod`, `includesBrandedApp`, `includedAiTokens`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePlanRequest",
+    "confirm": {
+     "label": "Create plan version",
+     "operation": "createPlanVersion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "cellTier",
+      "licensedModules",
+      "limits",
+      "basePrice",
+      "description",
+      "billingPeriod",
+      "includesBrandedApp",
+      "includedAiTokens"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /plans/{planId}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

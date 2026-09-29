@@ -138,21 +138,15 @@
     "type": "string",
     "description": "Inventory requirement"
    },
-   "canCombine": {
-    "type": "boolean",
-    "description": "Can combine"
-   },
-   "cannotCombine": {
+   "combinationBehavior": {
     "type": "string",
-    "description": "Cannot combine"
-   },
-   "exclusive": {
-    "type": "string",
-    "description": "Exclusive"
-   },
-   "deferToCentralStackingEngine": {
-    "type": "string",
-    "description": "Defer to central stacking engine"
+    "enum": [
+     "canCombine",
+     "cannotCombine",
+     "exclusive",
+     "deferToCentralStackingEngine"
+    ],
+    "description": "Preliminary combination behaviour; the central stacking engine has the final say."
    }
   }
  },
@@ -300,14 +294,6 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Cheapest / Lowest-Value Item Promotion displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "e100": {
-    "type": "string",
-    "description": "e 100"
-   },
-   "buy4CheapestFree": {
-    "type": "string",
-    "description": "Buy 4 → Cheapest Free"
-   },
    "eligibleProducts": {
     "type": "string",
     "description": "Eligible products"
@@ -339,10 +325,6 @@
    "cheapestItemFree": {
     "type": "string",
     "description": "Cheapest item free"
-   },
-   "cheapestItem50Off": {
-    "type": "number",
-    "description": "Cheapest item 50% off"
    },
    "nCheapestItemsFree": {
     "type": "string",
@@ -483,30 +465,6 @@
    "minimumMaximumProductValues": {
     "type": "string",
     "description": "Minimum/maximum product values"
-   },
-   "for": {
-    "type": "string",
-    "description": "for"
-   },
-   "refunds": {
-    "type": "string",
-    "description": "Refunds"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "revenueRecognition": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue recognition"
-   },
-   "partnerSettlement": {
-    "type": "string",
-    "description": "Partner settlement"
-   },
-   "reporting": {
-    "type": "string",
-    "description": "Reporting"
    }
   }
  },
@@ -547,30 +505,6 @@
    "minimumMaximumProductValues": {
     "type": "string",
     "description": "Minimum/maximum product values"
-   },
-   "for": {
-    "type": "string",
-    "description": "for"
-   },
-   "refunds": {
-    "type": "string",
-    "description": "Refunds"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "revenueRecognition": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue recognition"
-   },
-   "partnerSettlement": {
-    "type": "string",
-    "description": "Partner settlement"
-   },
-   "reporting": {
-    "type": "string",
-    "description": "Reporting"
    }
   }
  },
@@ -790,133 +724,45 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Offer Simulation, Basket Trace & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "yPrice": {
+   "basketLines": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Basket lines evaluated"
+   },
+   "qualifiers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Qualifier conditions met"
+   },
+   "rewards": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Rewards granted"
+   },
+   "guardrailsPassed": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Guardrails checked and passed"
+   },
+   "originalTotal": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "y Price"
+    "description": "Original total"
    },
-   "adult": {
-    "type": "string",
-    "description": "Adult (the pack shows 2 AED 200)"
-   },
-   "child": {
-    "type": "string",
-    "description": "Child (the pack shows 2 AED 150)"
-   },
-   "subtotalAed750": {
+   "promotionAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Subtotal: AED 750"
+    "description": "Promotion amount"
    },
-   "originalTotalAed750": {
-    "type": "string",
-    "description": "Original Total: AED 750"
-   },
-   "promotionAed150": {
-    "type": "string",
-    "description": "Promotion: −AED 150"
-   },
-   "finalTotalAed600": {
-    "type": "string",
-    "description": "Final Total: AED 600"
-   },
-   "eligibleVenue": {
-    "type": "string",
-    "description": "Eligible venue ✓"
-   },
-   "eligibleChannel": {
-    "type": "string",
-    "description": "Eligible channel ✓"
-   },
-   "cheapestAdmissionSelected": {
-    "type": "string",
-    "description": "Cheapest admission selected ✓"
-   },
-   "childTicketAed150": {
-    "type": "string",
-    "description": "Child Ticket AED 150 ✓"
-   },
-   "maximumRewardAed200": {
-    "type": "string",
-    "description": "Maximum reward AED 200 ✓"
-   },
-   "marginFloorMaintained": {
-    "type": "number",
-    "description": "Margin floor maintained ✓"
-   },
-   "singleTransaction": {
-    "type": "string",
-    "description": "Single transaction"
-   },
-   "historicalTransactionReplay": {
-    "type": "string",
-    "description": "Historical transaction replay"
-   },
-   "sampleCustomerSegment": {
-    "type": "string",
-    "description": "Sample customer segment"
-   },
-   "forecastSimulation": {
-    "type": "string",
-    "description": "Forecast simulation"
-   },
-   "bulkScenarioTesting": {
-    "type": "string",
-    "description": "Bulk scenario testing"
-   },
-   "qualifierAndRewardTicketProducts": {
-    "type": "string",
-    "description": "Qualifier and reward ticket products"
-   },
-   "couponEngineBoard3": {
-    "type": "string",
-    "description": "Coupon Engine — Board 3"
-   },
-   "codeTriggeredAdvancedOffers": {
-    "type": "string",
-    "description": "Code-triggered advanced offers"
-   },
-   "menuProductsPricesAndInventory": {
-    "type": "string",
-    "description": "Menu products, prices and inventory"
-   },
-   "retailProductsAndStockAvailability": {
-    "type": "string",
-    "description": "Retail products and stock availability"
-   },
-   "freeProductAvailabilityAndSubstitution": {
-    "type": "string",
-    "description": "Free-product availability and substitution"
-   },
-   "memberEligibilityAndBenefits": {
-    "type": "string",
-    "description": "Member eligibility and benefits"
-   },
-   "customerSegmentationAndPersonalization": {
-    "type": "string",
-    "description": "Customer segmentation and personalization"
-   },
-   "priceBasisAndMarginProtection": {
-    "type": "number",
-    "description": "Price basis and margin protection"
-   },
-   "revenueAllocationAndPromotionalCost": {
+   "finalTotal": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue allocation and promotional cost"
-   },
-   "finalTransactionAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Final transaction amount"
-   },
-   "board4AdvancedMechanics": {
-    "type": "string",
-    "description": "Board 4 — Advanced Mechanics"
-   },
-   "whatProductToProductRewardRelationshipOccurs": {
-    "type": "string",
-    "description": "What product-to-product reward relationship occurs?"
-   },
-   "matrixCoverageBoard4": {
-    "type": "string",
-    "description": "Matrix Coverage — Board 4"
+    "description": "Final total"
    }
   }
  },
@@ -926,13 +772,37 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Reward Selection, Substitution & Customer Choice displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "guestSelectsFromConfiguredOptions": {
+   "offerId": {
     "type": "string",
-    "description": "Guest selects from configured options"
+    "description": "Offer ID"
    },
-   "posCallCenterOperatorSelects": {
+   "rewardOptions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Rewards the guest may choose ONE of"
+   },
+   "selectionModel": {
     "type": "string",
-    "description": "POS/call-center operator selects"
+    "enum": [
+     "automatic",
+     "customerChoice",
+     "operatorChoice",
+     "aiRecommended"
+    ],
+    "description": "Who picks the reward: the system, the guest from configured options, the POS or call-centre operator, or an AI recommendation"
+   },
+   "substitutes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Ordered substitutes when a reward is unavailable"
+   },
+   "maximumSubstituteValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Value protection: the most a substitute may be worth"
    }
   }
  }

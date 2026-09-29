@@ -20,20 +20,36 @@
     "PTR-003",
     "PTR-004",
     "PTR-005",
-    "PTR-022"
+    "PTR-006",
+    "PTR-007",
+    "PTR-008",
+    "PTR-009",
+    "PTR-010",
+    "PTR-011",
+    "PTR-012",
+    "PTR-013",
+    "PTR-014",
+    "PTR-015",
+    "PTR-016",
+    "PTR-017",
+    "PTR-018",
+    "PTR-019",
+    "PTR-020",
+    "PTR-021",
+    "PTR-022",
+    "PTR-032",
+    "PTR-042"
    ],
    "fromFlows": true,
    "transitions": [
     {
-     "to": "PTR-005",
-     "trigger": "Books against the allocation",
-     "provenance": "flow F10 step 1→2",
-     "operation": "getB2bCredit"
-    },
-    {
      "to": "PTR-002",
      "trigger": "Partner Dashboard",
-     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher",
+     "carries": [
+      "accountId",
+      "orderId"
+     ]
     },
     {
      "to": "PTR-003",
@@ -46,16 +62,130 @@
      "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
     },
     {
-     "to": "SUP-001",
-     "trigger": "Agent Login",
-     "provenance": "flow F104 step 2→3",
-     "crossesDevice": true,
-     "back": false
-    },
-    {
      "to": "PTR-022",
      "trigger": "Opens the partner command centre",
      "provenance": "flow F110 step 1→2"
+    },
+    {
+     "to": "PTR-006",
+     "trigger": "Product Catalog (B2B Pricing)",
+     "provenance": "derived — PTR-006 declares entryState.params priceListId, productId and PTR-001 holds none of them, so the edge carries nothing and PTR-006 opens cold"
+    },
+    {
+     "to": "PTR-008",
+     "trigger": "Booking Creation",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — PTR-008 declares entryState.params orderId and PTR-001 holds orderId, so an edge into it carries them"
+    },
+    {
+     "to": "PTR-009",
+     "trigger": "Group / Bulk Booking",
+     "provenance": "derived — PTR-009 declares entryState.params blockId and PTR-001 holds none of them, so the edge carries nothing and PTR-009 opens cold"
+    },
+    {
+     "to": "PTR-010",
+     "trigger": "Cart & Quote",
+     "provenance": "derived — PTR-010 declares entryState.params lineId, promotionId and PTR-001 holds none of them, so the edge carries nothing and PTR-010 opens cold"
+    },
+    {
+     "to": "PTR-011",
+     "trigger": "Quote Management",
+     "provenance": "derived — PTR-011 declares entryState.params agreementId and PTR-001 holds none of them, so the edge carries nothing and PTR-011 opens cold"
+    },
+    {
+     "to": "PTR-012",
+     "trigger": "Checkout / Credit Purchase",
+     "provenance": "derived — PTR-012 declares entryState.params paymentId and PTR-001 holds none of them, so the edge carries nothing and PTR-012 opens cold"
+    },
+    {
+     "to": "PTR-013",
+     "trigger": "Credit Limit & Balance",
+     "carries": [
+      "accountId"
+     ],
+     "provenance": "derived — PTR-013 declares entryState.params accountId and PTR-001 holds accountId, so an edge into it carries them"
+    },
+    {
+     "to": "PTR-014",
+     "trigger": "Settlement & Payment History",
+     "provenance": "derived — PTR-014 declares entryState.params settlementId and PTR-001 holds none of them, so the edge carries nothing and PTR-014 opens cold"
+    },
+    {
+     "to": "PTR-015",
+     "trigger": "Order History",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — PTR-015 declares entryState.params orderId and PTR-001 holds orderId, so an edge into it carries them"
+    },
+    {
+     "to": "PTR-016",
+     "trigger": "Voucher / Ticket Download",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — PTR-016 declares entryState.params orderId and PTR-001 holds orderId, so an edge into it carries them"
+    },
+    {
+     "to": "PTR-017",
+     "trigger": "Commission Statement",
+     "provenance": "derived — PTR-017 declares entryState.params agreementId and PTR-001 holds none of them, so the edge carries nothing and PTR-017 opens cold"
+    },
+    {
+     "to": "PTR-018",
+     "trigger": "Reports & Sales Performance",
+     "provenance": "derived — PTR-018 declares entryState.params conversationId, reportId and PTR-001 holds none of them, so the edge carries nothing and PTR-018 opens cold"
+    },
+    {
+     "to": "PTR-019",
+     "trigger": "API Credentials & Integration",
+     "provenance": "derived — PTR-019 declares entryState.params clientId and PTR-001 holds none of them, so the edge carries nothing and PTR-019 opens cold"
+    },
+    {
+     "to": "PTR-020",
+     "trigger": "Sub-Agent Management",
+     "provenance": "derived — PTR-020 declares entryState.params delegatedAccessId and PTR-001 holds none of them, so the edge carries nothing and PTR-020 opens cold"
+    },
+    {
+     "to": "PTR-021",
+     "trigger": "Support & Contact",
+     "provenance": "derived — PTR-021 declares entryState.params caseId and PTR-001 holds none of them, so the edge carries nothing and PTR-021 opens cold"
+    },
+    {
+     "to": "PTR-007",
+     "trigger": "Availability Search",
+     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+    },
+    {
+     "to": "PTR-032",
+     "trigger": "Commercial Agreement Command Center",
+     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+    },
+    {
+     "to": "PTR-042",
+     "trigger": "Partner Operations Command Center",
+     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+    },
+    {
+     "to": "PTR-005",
+     "trigger": "Books against the allocation",
+     "provenance": "flow F10 step 1→2",
+     "operation": "getB2bCredit",
+     "carries": [
+      "orderId"
+     ]
+    },
+    {
+     "to": "SUP-001",
+     "trigger": "A back-office user signs in through the same door",
+     "provenance": "flow F104 step 4→5",
+     "crossesDevice": true,
+     "back": false,
+     "carries": [
+      "challengeId"
+     ]
     }
    ]
   },
@@ -64,13 +194,6 @@
   "pattern": "listDetail",
   "patternReason": "`listActiveSessions` reads the population and `getB2bCredit` reads one of them — list, select, act",
   "purpose": "Get someone into the app, fast, on a device that may be shared.",
-  "gaps": [
-   {
-    "operation": "getCurrentSession",
-    "why": "**5 declared operations reach no component on this screen**: getCurrentSession, getGuestSession, listMfaMethods, listSsoProviders, listPartnerAgreements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -79,8 +202,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listActiveSessions",
+       "notes": "Sends `?venueId=` to `listActiveSessions`.",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listActiveSessions",
+       "notes": "Sends `?principalId=` to `listActiveSessions`.",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listActiveSessions",
+       "notes": "Sends `?workstationId=` to `listActiveSessions`.",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every partner login mfa",
+       "label": "Every active session",
        "bindsTo": "ActiveSession",
        "columns": [
         "ActiveSession.sessionId",
@@ -98,6 +242,59 @@
        ],
        "operation": "listActiveSessions",
        "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every MFA method",
+       "bindsTo": "MfaMethod",
+       "columns": [
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
+       ],
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every SSO provider",
+       "bindsTo": "SsoProvider",
+       "columns": [
+        "SsoProvider.id",
+        "SsoProvider.displayName",
+        "SsoProvider.protocol",
+        "SsoProvider.iconAssetRef",
+        "SsoProvider.isEnforced",
+        "SsoProvider.scopePath"
+       ],
+       "operation": "listSsoProviders",
+       "provenance": "contract identity.yaml GET /auth/sso/providers"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every partner agreement",
+       "bindsTo": "PartnerAgreement",
+       "columns": [
+        "PartnerAgreement.id",
+        "PartnerAgreement.partnerId",
+        "PartnerAgreement.partnerName",
+        "PartnerAgreement.status",
+        "PartnerAgreement.rateMode",
+        "PartnerAgreement.commissionPercent",
+        "PartnerAgreement.volumeTiers",
+        "PartnerAgreement.volumeWindow",
+        "PartnerAgreement.seasonalRates",
+        "PartnerAgreement.segmentTier",
+        "PartnerAgreement.brandingAssetId",
+        "PartnerAgreement.storefrontSubdomain"
+       ],
+       "operation": "listPartnerAgreements",
+       "provenance": "contract subscription.yaml GET /partner-agreements"
       }
      ]
     },
@@ -107,7 +304,51 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected partner login mfa",
+       "label": "The selected active session",
+       "bindsTo": "ActiveSession",
+       "columns": [
+        "ActiveSession.status",
+        "ActiveSession.sessionId",
+        "ActiveSession.principalId",
+        "ActiveSession.principalName",
+        "ActiveSession.roleId",
+        "ActiveSession.roleName",
+        "ActiveSession.workstationId",
+        "ActiveSession.workstationName",
+        "ActiveSession.venueId",
+        "ActiveSession.ipAddress",
+        "ActiveSession.deviceInfo",
+        "ActiveSession.hasOpenShift",
+        "ActiveSession.mfaSatisfied",
+        "ActiveSession.startedAt",
+        "ActiveSession.lastSeenAt"
+       ],
+       "operation": "listActiveSessions",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The session",
+       "bindsTo": "Session",
+       "columns": [
+        "Session.sessionId",
+        "Session.principalId",
+        "Session.roleId",
+        "Session.displayName",
+        "Session.scope",
+        "Session.effectivePermissions",
+        "Session.permissionsByScope",
+        "Session.saleBoardId",
+        "Session.workstation",
+        "Session.openedAt",
+        "Session.expiresAt"
+       ],
+       "operation": "getCurrentSession",
+       "provenance": "contract identity.yaml GET /auth/session"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The credit position",
        "bindsTo": "CreditPosition",
        "columns": [
         "CreditPosition.id",
@@ -140,26 +381,47 @@
        "provenance": "contract identity.yaml POST /auth/login"
       },
       {
+       "kind": "textField",
+       "label": "Authentication code",
+       "operation": "verifyMfaChallenge",
+       "notes": "Shown only in the mfaRequired state, after `login`, for the authenticator-app code or the emailed code (decided 28 September, audit R135, R126 (5)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "notes": "Completes sign-in; the session is usable only after it. Five wrong codes lock step-up (429 step-up-locked, audit R126 (6)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Email me a code instead",
+       "operation": "createMfaChallenge",
+       "notes": "The fallback: a new challenge with the email method (`emailOtp`) instead of the authenticator app (decided 28 September, audit R126 (5)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
+      },
+      {
        "kind": "destructiveButton",
-       "label": "Force",
+       "label": "Force logout",
        "operation": "forceLogout",
        "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
       },
       {
        "kind": "destructiveButton",
-       "label": "Override",
+       "label": "Override credit limit",
        "operation": "overrideCreditLimit",
        "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
       },
       {
        "kind": "destructiveButton",
-       "label": "Revoke",
+       "label": "Revoke all sessions",
        "operation": "revokeAllSessions",
        "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save b2b credit limit",
        "operation": "setB2bCreditLimit",
        "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
       }
@@ -171,38 +433,93 @@
    {
     "id": "confirmForceLogout",
     "component": "confirmDialog",
-    "trigger": "Force",
-    "body": "**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted.",
+    "trigger": "Force logout",
+    "body": "**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted. **Collects what `forceLogout` sends before it is called.** Required: `reason`.",
     "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
    },
    {
     "id": "confirmOverrideCreditLimit",
     "component": "confirmDialog",
-    "trigger": "Override",
-    "body": "**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted.",
+    "trigger": "Override credit limit",
+    "body": "**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted. **Collects what `overrideCreditLimit` sends before it is called.** Required: `orderId`, `amount`, `reason`. Optional: `expiresAt`.",
     "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
    },
    {
     "id": "confirmRevokeAllSessions",
     "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted.",
+    "trigger": "Revoke all sessions",
+    "body": "**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted. **Collects what `revokeAllSessions` sends before it is called.** Required: `reason`, `stepUpToken`. Optional: `venueId`, `excludeSelf`.",
     "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+   },
+   {
+    "id": "formLogin",
+    "component": "modal",
+    "trigger": "Login",
+    "body": "**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`. Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "LoginRequest",
+    "confirm": {
+     "label": "Login",
+     "operation": "login"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "username",
+      "credential",
+      "workstationId",
+      "method",
+      "deviceFingerprint"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /auth/login"
+   },
+   {
+    "id": "formSetB2bCreditLimit",
+    "component": "modal",
+    "trigger": "Save b2b credit limit",
+    "body": "**Collects what `setB2bCreditLimit` sends before it is called.** Required: `creditLimit`, `reason`. Optional: `paymentTermsDays`, `isSuspended`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save b2b credit limit",
+     "operation": "setB2bCreditLimit"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "creditLimit",
+      "reason",
+      "paymentTermsDays",
+      "isSuspended"
+     ]
+    },
+    "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
    }
   ],
   "states": {
    "loading": "The partner login mfa list.",
    "error": "Could not load. Names which read failed and leaves the partner login mfa untouched.",
-   "emptyFirstRun": "No partner login mfa yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the partner login mfa are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No partner login mfa yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, workstationId and the partner login mfa are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getB2bCredit` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "mfaRequired": "**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first (decided 28 September, audit R135, R126)."
   },
   "apis": [
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor after login when the principal holds a permission in mfaRequiredForPermissions; action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided 28 September, audit R135, R126 (5))",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Completes sign-in with the code; the session is usable only after it. Five wrong codes lock step-up (audit R126 (6))",
+    "trigger": "onAction"
+   },
    {
     "operationId": "login",
     "contract": "identity",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getB2bCredit",
@@ -223,12 +540,6 @@
     "operationId": "getCurrentSession",
     "contract": "identity",
     "purpose": "Current session and effective permissions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getGuestSession",
-    "contract": "identity",
-    "purpose": "Read the current guest session",
     "trigger": "onLoad"
    },
    {
@@ -288,15 +599,19 @@
     {
      "name": "accountId",
      "from": "deepLink"
+    },
+    {
+     "name": "challengeId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `accountId`.",
    "preloaded": [
-    "CreditPosition.id",
-    "CreditPosition.accountId",
-    "CreditPosition.accountName",
-    "CreditPosition.creditLimit",
-    "CreditPosition.used"
+    "ActiveSession.status",
+    "ActiveSession.sessionId",
+    "ActiveSession.principalId",
+    "ActiveSession.principalName",
+    "ActiveSession.roleId"
    ]
   },
   "wireframe": {
@@ -349,35 +664,18 @@
    "inferred": true,
    "exitTo": [
     "PTR-001",
-    "PTR-002",
     "PTR-004"
    ],
    "transitions": [
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-003 holds none of them, so the edge carries nothing and PTR-001 opens cold"
     },
     {
      "to": "PTR-004",
      "trigger": "Notifications",
-     "carries": [
-      "messageId"
-     ],
-     "provenance": "derived — PTR-004 declares entryState.params messageId, so an edge into it must carry them"
+     "provenance": "derived — PTR-004 declares entryState.params messageId and PTR-003 holds none of them, so the edge carries nothing and PTR-004 opens cold"
     }
    ]
   },
@@ -394,8 +692,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Scope path",
+       "operation": "listPrincipals",
+       "notes": "Sends `?scopePath=` to `listPrincipals`.",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listPrincipals",
+       "notes": "Sends `?isActive=` to `listPrincipals`.",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every profile company",
+       "label": "Every principal",
        "bindsTo": "Principal",
        "columns": [
         "Principal.id",
@@ -419,7 +731,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected profile company",
+       "label": "The selected principal",
        "bindsTo": "Principal",
        "columns": [
         "Principal.id",
@@ -443,43 +755,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create principal",
        "operation": "createPrincipal",
        "provenance": "contract identity.yaml POST /principals"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save principal",
        "operation": "updatePrincipal",
        "provenance": "contract identity.yaml PATCH /principals/{principalId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createPrincipal",
-       "label": "Create principal",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPrincipals",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPrincipal",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -488,9 +772,9 @@
   "states": {
    "loading": "The profile company list.",
    "error": "Could not load. Names which read failed and leaves the profile company untouched.",
-   "emptyFirstRun": "No profile company yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the profile company are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No profile company yet. Offers Create principal (`createPrincipal`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on scopePath, isActive and the profile company are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `USER_MANAGE`, which `getPrincipal` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -546,6 +830,51 @@
    "board": "wireframes/P10 Partner Web.dc.html#ptr-003"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreatePrincipal",
+    "component": "modal",
+    "trigger": "Create principal",
+    "body": "**Collects what `createPrincipal` sends before it is called.** Required: `username`, `displayName`. Optional: `initialCredential`, `mustChangeCredential`, `validTo`, `roleIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePrincipalRequest",
+    "confirm": {
+     "label": "Create principal",
+     "operation": "createPrincipal"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "username",
+      "displayName",
+      "initialCredential",
+      "mustChangeCredential",
+      "validTo",
+      "roleIds"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /principals"
+   },
+   {
+    "id": "formUpdatePrincipal",
+    "component": "modal",
+    "trigger": "Save principal",
+    "body": "**Collects what `updatePrincipal` sends before it is called.** Nothing in the body is required. Optional: `displayName`, `isActive`, `validTo`, `primaryRoleId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save principal",
+     "operation": "updatePrincipal"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "displayName",
+      "isActive",
+      "validTo",
+      "primaryRoleId"
+     ]
+    },
+    "provenance": "contract identity.yaml PATCH /principals/{principalId}"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -590,35 +919,18 @@
    "inferred": true,
    "exitTo": [
     "PTR-001",
-    "PTR-002",
     "PTR-003"
    ],
    "transitions": [
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-004 holds none of them, so the edge carries nothing and PTR-001 opens cold"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-004 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -636,7 +948,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected notifications",
+       "label": "The message dispatch",
        "bindsTo": "MessageDispatch",
        "columns": [
         "MessageDispatch.id",
@@ -661,48 +973,26 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Send",
+       "label": "Send transactional message",
        "operation": "sendTransactionalMessage",
        "provenance": "contract marketing-crm.yaml POST /messages"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "sendTransactionalMessage",
-       "label": "Send transactional message",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "sendTransactionalMessage",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The notifications list.",
+   "loading": "The notifications, read by `getMessageStatus`.",
    "error": "Could not load. Names which read failed and leaves the notifications untouched.",
-   "emptyFirstRun": "No notifications yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the notifications are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No notifications yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getMessageStatus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "sendTransactionalMessage",
     "contract": "marketing-crm",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getMessageStatus",
@@ -726,6 +1016,28 @@
    "board": "wireframes/P10 Partner Web.dc.html#ptr-004"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSendTransactionalMessage",
+    "component": "modal",
+    "trigger": "Send transactional message",
+    "body": "**Collects what `sendTransactionalMessage` sends before it is called.** Required: `subjectId`, `templateId`, `channel`. Optional: `mergeValues`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Send transactional message",
+     "operation": "sendTransactionalMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "templateId",
+      "channel",
+      "mergeValues"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /messages"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -769,35 +1081,18 @@
    "inferred": true,
    "exitTo": [
     "PTR-001",
-    "PTR-002",
     "PTR-003"
    ],
    "transitions": [
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-019 holds none of them, so the edge carries nothing and PTR-001 opens cold"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-019 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -817,8 +1112,24 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "multiSelect",
+       "label": "Scopes, by module",
+       "bindsTo": "ApiScope",
+       "operation": "listApiScopes",
+       "notes": "**A scope picker grouped by module** (M17-05): `{module}.read` and `{module}.write`, with unlicensed modules shown and disabled rather than hidden. No scope opens a catalogue write (M17-04).",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+      },
+      {
+       "kind": "banner",
+       "label": "Production access",
+       "bindsTo": "ProductionAccessRequest",
+       "operation": "listProductionAccessRequests",
+       "notes": "**Where production access stands** (M17-06): sandbox only, requested (pending), approved (a production client issued by TICVAI) or rejected with the reason. Production keys only after certification; a sandbox key is never promoted.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every api credentials integration",
+       "label": "Every API client",
        "bindsTo": "ApiClient",
        "columns": [
         "ApiClient.id",
@@ -843,7 +1154,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected api credentials integration",
+       "label": "The selected API client",
        "bindsTo": "ApiClient",
        "columns": [
         "ApiClient.id",
@@ -867,20 +1178,27 @@
      "slot": "rowActions",
      "components": [
       {
+       "kind": "secondaryButton",
+       "label": "Request production access",
+       "operation": "requestProductionAccess",
+       "notes": "**Production keys only after certification** (M17-06). Enabled on a sandbox client whose integration is certified; asks for the tenants, the scopes and the IP allow-list. TICVAI issues the production client.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+      },
+      {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create API client",
        "operation": "createApiClient",
        "provenance": "contract public-api.yaml POST /api-clients"
       },
       {
        "kind": "secondaryButton",
-       "label": "Rotate",
+       "label": "Rotate API credential",
        "operation": "rotateApiCredential",
        "provenance": "contract public-api.yaml POST /api-clients/{clientId}/credentials"
       },
       {
        "kind": "destructiveButton",
-       "label": "Revoke",
+       "label": "Revoke API credential",
        "operation": "revokeApiCredential",
        "provenance": "contract public-api.yaml DELETE /api-clients/{clientId}/credentials"
       }
@@ -890,21 +1208,107 @@
   },
   "overlays": [
    {
+    "id": "formRequestProductionAccess",
+    "component": "modal",
+    "trigger": "Request production access",
+    "body": "**Collects what `requestProductionAccess` sends before it is called.** Required: `listingId` (a certified integration), `scopes`, `allowedTenantIds`, `ipAllowList` (at least one address, M17-07). Optional: `note`. The form says that a new production key is issued and the sandbox key stays a sandbox key.",
+    "confirm": {
+     "label": "Request production access",
+     "operation": "requestProductionAccess"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "listingId",
+      "scopes",
+      "allowedTenantIds",
+      "ipAllowList",
+      "note"
+     ]
+    },
+    "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+   },
+   {
     "id": "confirmRevokeApiCredential",
     "component": "confirmDialog",
-    "trigger": "Revoke",
+    "trigger": "Revoke API credential",
     "body": "**Names what `revokeApiCredential` changes and what it leaves alone**, in the consequence rather than the verb. A api credentials integration this affects should be identified in the dialog, not just counted.",
     "provenance": "contract public-api.yaml DELETE /api-clients/{clientId}/credentials"
+   },
+   {
+    "id": "formCreateApiClient",
+    "component": "modal",
+    "trigger": "Create API client",
+    "body": "**Collects what `createApiClient` sends before it is called.** Required: `id`, `developerId`, `name`, `environment`, `scopes`, `status`. Optional: `clientId`, `allowedTenantIds`, `ipAllowList`, `lastUsedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ApiClient",
+    "confirm": {
+     "label": "Create API client",
+     "operation": "createApiClient"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "developerId",
+      "name",
+      "environment",
+      "scopes",
+      "status",
+      "clientId",
+      "allowedTenantIds",
+      "ipAllowList",
+      "lastUsedAt"
+     ]
+    },
+    "provenance": "contract public-api.yaml POST /api-clients"
+   },
+   {
+    "id": "formRotateApiCredential",
+    "component": "modal",
+    "trigger": "Rotate API credential",
+    "body": "**Collects what `rotateApiCredential` sends before it is called.** Nothing in the body is required. Optional: `overlapHours`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Rotate API credential",
+     "operation": "rotateApiCredential"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "overlapHours"
+     ]
+    },
+    "provenance": "contract public-api.yaml POST /api-clients/{clientId}/credentials"
    }
   ],
   "states": {
    "loading": "Detail loads",
    "error": "Could not load",
    "emptyFirstRun": "Not found — it may have been deleted or moved out of scope",
-   "emptyNoResults": "The filter narrowed it and the api credentials integration are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoResults": "Never shown: `listApiClients` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiClients` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listApiScopes",
+    "contract": "public-api",
+    "purpose": "Scopes to choose from, by module",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+   },
+   {
+    "operationId": "listProductionAccessRequests",
+    "contract": "public-api",
+    "purpose": "Where production access stands for these clients",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+   },
+   {
+    "operationId": "requestProductionAccess",
+    "contract": "public-api",
+    "purpose": "Ask for production keys for a certified integration",
+    "trigger": "onAction",
+    "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+   },
    {
     "operationId": "listApiClients",
     "contract": "public-api",
@@ -1005,35 +1409,18 @@
    "inferred": true,
    "exitTo": [
     "PTR-001",
-    "PTR-002",
     "PTR-003"
    ],
    "transitions": [
     {
      "to": "PTR-001",
      "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "PTR-002",
-     "trigger": "Partner Dashboard",
-     "carries": [
-      "accountId",
-      "orderId"
-     ],
-     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+     "provenance": "derived — PTR-001 declares entryState.params accountId, challengeId and PTR-020 holds none of them, so the edge carries nothing and PTR-001 opens cold"
     },
     {
      "to": "PTR-003",
      "trigger": "Profile & Company Details",
-     "carries": [
-      "principalId"
-     ],
-     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+     "provenance": "derived — PTR-003 declares entryState.params  and PTR-020 holds none of them, so the edge carries nothing and PTR-003 opens cold"
     }
    ]
   },
@@ -1050,8 +1437,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listDelegatedAccess",
+       "notes": "Sends `?principalId=` to `listDelegatedAccess`.",
+       "provenance": "contract identity.yaml GET /delegated-access"
+      },
+      {
+       "kind": "textField",
+       "label": "Role id",
+       "operation": "listDelegatedAccess",
+       "notes": "Sends `?roleId=` to `listDelegatedAccess`.",
+       "provenance": "contract identity.yaml GET /delegated-access"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every sub-agent",
+       "label": "Every delegated access",
        "bindsTo": "DelegatedAccess",
        "columns": [
         "DelegatedAccess.id",
@@ -1078,7 +1479,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected sub-agent",
+       "label": "The selected delegated access",
        "bindsTo": "DelegatedAccess",
        "columns": [
         "DelegatedAccess.id",
@@ -1108,13 +1509,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create delegated access",
        "operation": "createDelegatedAccess",
        "provenance": "contract identity.yaml POST /delegated-access"
       },
       {
        "kind": "destructiveButton",
-       "label": "Delete",
+       "label": "Delete delegated access",
        "operation": "deleteDelegatedAccess",
        "provenance": "contract identity.yaml DELETE /delegated-access/{delegatedAccessId}"
       }
@@ -1126,24 +1527,48 @@
    {
     "id": "confirmDeleteDelegatedAccess",
     "component": "confirmDialog",
-    "trigger": "Delete",
+    "trigger": "Delete delegated access",
     "body": "**Names what `deleteDelegatedAccess` changes and what it leaves alone**, in the consequence rather than the verb. A sub-agent this affects should be identified in the dialog, not just counted.",
     "provenance": "contract identity.yaml DELETE /delegated-access/{delegatedAccessId}"
+   },
+   {
+    "id": "formCreateDelegatedAccess",
+    "component": "modal",
+    "trigger": "Create delegated access",
+    "body": "**Collects what `createDelegatedAccess` sends before it is called.** Required: `permission`, `scopePath`, `effect`. Optional: `principalId`, `roleId`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateGrantRequest",
+    "confirm": {
+     "label": "Create delegated access",
+     "operation": "createDelegatedAccess"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permission",
+      "scopePath",
+      "effect",
+      "principalId",
+      "roleId",
+      "validFrom",
+      "validTo"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /delegated-access"
    }
   ],
   "states": {
    "loading": "The sub-agent list.",
    "error": "Could not load. Names which read failed and leaves the sub-agent untouched.",
-   "emptyFirstRun": "No sub-agent yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the sub-agent are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No sub-agent yet. Offers Create delegated access (`createDelegatedAccess`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on principalId, roleId and the sub-agent are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PERMISSION_VIEW`, which `listDelegatedAccess` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "createDelegatedAccess",
     "contract": "identity",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "deleteDelegatedAccess",

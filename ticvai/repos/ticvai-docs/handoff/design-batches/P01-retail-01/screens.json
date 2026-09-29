@@ -26,13 +26,12 @@
      "to": "GST-062",
      "trigger": "On the way out they find their collection point",
      "provenance": "flow F51 step 2→3",
-     "operation": "reserveMerchandise",
      "crossesDevice": true,
      "back": false
     }
    ]
   },
-  "notes": "Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.",
+  "notes": "Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93. **Buy-and-collect is paid online** (decided 28 September, audit R236): the cart is checked out and paid here (`checkoutCart`, `createPayment`) and payment creates the shop-and-drop; `reserveMerchandise` was removed from the web. The app's GST-026 still reserves in the venue, where the reservation expiry runs 15 minutes ahead to the close of the operating day (audit R215 (2)).",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -45,8 +44,36 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?outletId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?categoryId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "toggle",
+       "label": "In stock only",
+       "operation": "listMerchandise",
+       "notes": "Sends `?inStockOnly=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listMerchandise",
+       "notes": "Sends `?search=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every shop",
+       "label": "Every merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -64,6 +91,14 @@
        ],
        "operation": "listMerchandise",
        "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupMerchandise",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -73,7 +108,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected shop",
+       "label": "The selected merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -103,43 +138,29 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Lookup",
+       "label": "Lookup merchandise",
        "operation": "lookupMerchandise",
+       "notes": "Sends `?outletId=` — the outlet the guest is browsing — because a web caller has no workstation; price and stock are that outlet's, and an inactive item is not found (decided 28 September, audit R215 (1)).",
        "provenance": "contract retail.yaml GET /merchandise/lookup"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reserve",
-       "operation": "reserveMerchandise",
-       "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+       "label": "Check out to collect on the way out",
+       "operation": "checkoutCart",
+       "notes": "**Paid online at checkout** (decided 28 September, audit R236): merchandise marked for collection goes in the cart with `addCartLine`, the cart is checked out and paid here, and **payment creates the shop-and-drop** for collection on the way out. Nothing is reserved unpaid on the web; `reserveMerchandise` is not the web path.",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Pay",
+       "operation": "createPayment",
+       "provenance": "contract orders.yaml POST /payments"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "searchField",
-       "derived": true,
-       "impliedBy": "lookupMerchandise",
-       "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "reserveMerchandise",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -148,9 +169,9 @@
   "states": {
    "loading": "The shop list.",
    "error": "Could not load. Names which read failed and leaves the shop untouched.",
-   "emptyFirstRun": "No shop yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the shop are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No shop yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on outletId, categoryId, inStockOnly, search and the shop are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -163,17 +184,20 @@
    {
     "operationId": "lookupMerchandise",
     "contract": "retail",
-    "purpose": "Price and stock check by barcode",
-    "trigger": "onLoad"
+    "purpose": "Price and stock check by barcode, at the outlet named by `outletId` (audit R215 (1))",
+    "trigger": "onAction"
    },
    {
-    "operationId": "reserveMerchandise",
-    "contract": "retail",
-    "purpose": "Reserve an item for collection",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMerchandise"
-    ]
+    "operationId": "checkoutCart",
+    "contract": "orders",
+    "purpose": "Turn the cart into an order; merchandise for collection is paid online (audit R236)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createPayment",
+    "contract": "orders",
+    "purpose": "Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit R236)",
+    "trigger": "onAction"
    },
    {
     "operationId": "addCartLine",
@@ -206,11 +230,44 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-033"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-033",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "No pre-arrival shop page; retail items appear as add-ons in the Extras step (images/shop product squares) and in At the venue → 'Shop & drop'",
+    "differences": "No browsable merchandise catalogue before arrival; the nearest is in-venue Shop & drop (WEB-042)."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -262,7 +319,7 @@
     "WEB-001"
    ]
   },
-  "notes": "**The web could sell merchandise and could not arrange collection.** `lookupShopAndDrop` was app-only, which made the service half-available on the surface most guests use.",
+  "notes": "**The web could sell merchandise and could not arrange collection.** `lookupShopAndDrop` was app-only, which made the service half-available on the surface most guests use. **Paid online at checkout** (decided 28 September, audit R236): the guest adds the item to the cart for collection, checks out and pays (`addCartLine`, `checkoutCart`, `createPayment`), and payment creates the shop-and-drop that `lookupShopAndDrop` then finds; `reserveMerchandise` (\"reserved at purchase\") is no longer wired here.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -275,8 +332,36 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?outletId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?categoryId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "toggle",
+       "label": "In stock only",
+       "operation": "listMerchandise",
+       "notes": "Sends `?inStockOnly=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listMerchandise",
+       "notes": "Sends `?search=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every retail shop and",
+       "label": "Every merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -294,6 +379,16 @@
        ],
        "operation": "listMerchandise",
        "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "cardList",
+       "label": "Retail & Shop and Drop",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -303,7 +398,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected retail shop and",
+       "label": "The selected merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -333,37 +428,35 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Lookup",
+       "label": "Lookup merchandise",
        "operation": "lookupMerchandise",
+       "notes": "Sends `?outletId=` — the outlet the guest is browsing — because a web caller has no workstation; price and stock are that outlet's, and an inactive item is not found (decided 28 September, audit R215 (1)).",
        "provenance": "contract retail.yaml GET /merchandise/lookup"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reserve",
-       "operation": "reserveMerchandise",
-       "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+       "label": "Add to cart for collection",
+       "operation": "addCartLine",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       },
       {
        "kind": "secondaryButton",
-       "label": "Lookup",
-       "operation": "lookupShopAndDrop",
-       "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "cardList",
-       "label": "Retail & Shop and Drop",
-       "provenance": "carried from the previous definition"
+       "label": "Check out to collect on the way out",
+       "operation": "checkoutCart",
+       "notes": "**Paid online at checkout** (decided 28 September, audit R236): merchandise marked for collection goes in the cart with `addCartLine`, the cart is checked out and paid here, and **payment creates the shop-and-drop** for collection on the way out. Nothing is reserved unpaid on the web; `reserveMerchandise` is not the web path.",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
       },
       {
-       "kind": "detailPanel",
-       "label": "Detail",
-       "provenance": "carried from the previous definition"
+       "kind": "primaryButton",
+       "label": "Pay",
+       "operation": "createPayment",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Lookup shop and drop",
+       "operation": "lookupShopAndDrop",
+       "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
       }
      ]
     }
@@ -387,23 +480,35 @@
    {
     "operationId": "lookupMerchandise",
     "contract": "retail",
-    "purpose": "Price and stock check by barcode",
-    "trigger": "onLoad"
+    "purpose": "Price and stock check by barcode, at the outlet named by `outletId` (audit R215 (1))",
+    "trigger": "onAction"
    },
    {
-    "operationId": "reserveMerchandise",
-    "contract": "retail",
-    "purpose": "Reserve an item for collection",
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Put the item in the cart, marked for collection on the way out (audit R236)",
     "trigger": "onAction",
     "invalidates": [
      "listMerchandise"
     ]
    },
    {
+    "operationId": "checkoutCart",
+    "contract": "orders",
+    "purpose": "Turn the cart into an order; merchandise for collection is paid online (audit R236)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createPayment",
+    "contract": "orders",
+    "purpose": "Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit R236)",
+    "trigger": "onAction"
+   },
+   {
     "operationId": "lookupShopAndDrop",
     "contract": "retail",
     "purpose": "Find a guest's dropped goods",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -411,6 +516,10 @@
     {
      "name": "outletId",
      "from": "deepLink"
+    },
+    {
+     "name": "cartId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `outletId`.",
@@ -423,11 +532,44 @@
    ]
   },
   "wireframe": {
-   "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P01 Guest Web.dc.html#web-042"
+   "status": "review",
+   "provenance": "client-verified",
+   "board": "wireframes/P01 Guest Web.dc.html#web-042",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "At the venue → 'Shop & drop'",
+    "differences": "Pays in one tap on the page, not through the cart and checkout (YAML R236)."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add to cart for collection",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",

@@ -1,0 +1,268 @@
+{
+ "getPaymentProviderEconomics": {
+  "method": "GET",
+  "path": "/payment-providers/economics",
+  "contract": "payments",
+  "summary": "What each provider actually costs",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProviderEconomics"
+ },
+ "getUnifiedReconciliation": {
+  "method": "GET",
+  "path": "/reconciliation/unified",
+  "contract": "finance",
+  "summary": "Every money source against the ledger, in one view",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "UnifiedReconciliation"
+ },
+ "ingestSettlementFile": {
+  "method": "POST",
+  "path": "/settlements",
+  "contract": "finance",
+  "summary": "Ingest a provider settlement file",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listMerchantAccounts": {
+  "method": "GET",
+  "path": "/merchant-accounts",
+  "contract": "payments",
+  "summary": "Merchant accounts, settlement calendars and payout routing",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MerchantAccount"
+ },
+ "listReconciliationSources": {
+  "method": "GET",
+  "path": "/reconciliation-sources",
+  "contract": "payments",
+  "summary": "The files and feeds reconciliation is run against",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReconciliationSource"
+ },
+ "listSettlementExceptions": {
+  "method": "GET",
+  "path": "/settlements/{settlementId}/exceptions",
+  "contract": "finance",
+  "summary": "Unmatched or mismatched settlement lines",
+  "permission": "SETTLEMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSettlements": {
+  "method": "GET",
+  "path": "/settlements",
+  "contract": "finance",
+  "summary": "List settlement batches",
+  "permission": "SETTLEMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "providerName",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "recordSettlement": {
+  "method": "POST",
+  "path": "/inter-entity-obligations/{obligationId}/settle",
+  "contract": "finance",
+  "summary": "One entity paid another",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "InterEntityObligation"
+ },
+ "resolveSettlementException": {
+  "method": "POST",
+  "path": "/settlements/{settlementId}/exceptions",
+  "contract": "finance",
+  "summary": "Resolve a settlement exception",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SettlementException"
+ },
+ "setMerchantAccount": {
+  "method": "PUT",
+  "path": "/merchant-accounts",
+  "contract": "payments",
+  "summary": "Bind a merchant account to entities, venues and a calendar",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MerchantAccount",
+  "responds": "MerchantAccount"
+ },
+ "setReconciliationMatchingRules": {
+  "method": "PUT",
+  "path": "/reconciliation-rules",
+  "contract": "payments",
+  "summary": "How a platform transaction is matched to a settled one",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ReconciliationMatchingRules",
+  "responds": "ReconciliationMatchingRules"
+ },
+ "setReconciliationSource": {
+  "method": "PUT",
+  "path": "/reconciliation-sources",
+  "contract": "payments",
+  "summary": "Define a settlement or statement feed",
+  "permission": "PAYMENT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ReconciliationSource",
+  "responds": "ReconciliationSource"
+ }
+}

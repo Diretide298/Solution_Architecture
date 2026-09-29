@@ -56,6 +56,25 @@
   "requestBody": null,
   "responds": "Wishlist"
  },
+ "applyCartPromoCode": {
+  "method": "POST",
+  "path": "/carts/{cartId}/promo-codes",
+  "contract": "orders",
+  "summary": "Apply a promo code to the cart",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApplyCartPromoCodeRequest",
+  "responds": "Cart"
+ },
  "checkoutCart": {
   "method": "POST",
   "path": "/carts/{cartId}/checkout",
@@ -74,6 +93,25 @@
   ],
   "requestBody": null,
   "responds": "Order"
+ },
+ "createCart": {
+  "method": "POST",
+  "path": "/carts",
+  "contract": "orders",
+  "summary": "Start a cart",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
  },
  "createOrder": {
   "method": "POST",
@@ -160,7 +198,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Cart"
  },
@@ -199,7 +243,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
  },
@@ -215,6 +265,61 @@
   "parameters": [],
   "requestBody": null,
   "responds": null
+ },
+ "getPerformance": {
+  "method": "GET",
+  "path": "/performances/{performanceId}",
+  "contract": "catalogue",
+  "summary": "Read a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Performance"
+ },
+ "getPublishedBookingFlow": {
+  "method": "GET",
+  "path": "/venues/{venueId}/booking-flow",
+  "contract": "white-label",
+  "summary": "The published booking flow a product or category books through",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productCategoryId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "flowTypeKey",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookingFlow"
+ },
+ "getResourceHold": {
+  "method": "GET",
+  "path": "/resource-holds/{holdId}",
+  "contract": "resources",
+  "summary": "Read a resource hold",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResourceHold"
  },
  "getWishlist": {
   "method": "GET",
@@ -270,7 +375,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "ConsentPurposeConfig"
+  "responds": "Page"
  },
  "listGuestDevices": {
   "method": "GET",
@@ -294,7 +399,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "GuestDevice"
+  "responds": "Page"
  },
  "payByLink": {
   "method": "POST",
@@ -333,6 +438,25 @@
   ],
   "requestBody": "RecordConsentRequest",
   "responds": "ConsentState"
+ },
+ "recordConsentAnswers": {
+  "method": "POST",
+  "path": "/consent-answers",
+  "contract": "marketing-crm",
+  "summary": "Answer the consent questions a booking asks",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentAnswersRequest",
+  "responds": null
  },
  "registerGuestDevice": {
   "method": "POST",
@@ -458,6 +582,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

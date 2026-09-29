@@ -2845,6 +2845,20 @@
     "invalidates": [
      "listInventoryItems"
     ]
+   },
+   {
+    "operationId": "getInventoryKitDefinition",
+    "contract": "inventory",
+    "purpose": "Show kit components",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setInventoryKitDefinition",
+    "contract": "inventory",
+    "purpose": "Edit kit components",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -3484,6 +3498,27 @@
     "contract": "reporting",
     "purpose": "getSupplierPerformance",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listSupplierContracts",
+    "contract": "inventory",
+    "purpose": "Supplier contracts list",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createSupplierContract",
+    "contract": "inventory",
+    "purpose": "Add a supplier contract",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "updateSupplierContract",
+    "contract": "inventory",
+    "purpose": "Edit, activate or end a supplier contract",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -3491,6 +3526,10 @@
     {
      "name": "supplierId",
      "from": "deepLink"
+    },
+    {
+     "name": "contractId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `supplierId`."

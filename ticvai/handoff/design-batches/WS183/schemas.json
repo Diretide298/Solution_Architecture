@@ -1,0 +1,316 @@
+{
+ "AiRecommendationExplanation": {
+  "type": "object",
+  "x-ticvai-persistence": "none — built from ai.rec_decision and its decision record",
+  "description": "Why these items (AIR-193..202), at three depths each gated by permission (AIC-195): business, governance, technical.",
+  "required": [
+   "decisionId",
+   "depth"
+  ],
+  "properties": {
+   "decisionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "depth": {
+    "type": "string",
+    "enum": [
+     "business",
+     "governance",
+     "technical"
+    ]
+   },
+   "funnel": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "exclusions": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "items": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "trackingId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "productId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "reasons": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "scoreBreakdown": {
+       "type": "object",
+       "additionalProperties": true,
+       "nullable": true
+      }
+     }
+    }
+   },
+   "versions": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Strategy, model and feature-set versions. `technical` depth only."
+   }
+  }
+ },
+ "RecommendationPerformance": {
+  "type": "object",
+  "description": "Board 6.5. **Attributed and incremental reported apart** — the first flatters.",
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "impressions": {
+    "type": "integer"
+   },
+   "clicks": {
+    "type": "integer"
+   },
+   "accepted": {
+    "type": "integer"
+   },
+   "acceptanceRate": {
+    "type": "number"
+   },
+   "attributedRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "incrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "holdoutAcceptanceRate": {
+    "type": "number",
+    "nullable": true
+   },
+   "lift": {
+    "type": "number",
+    "nullable": true
+   }
+  }
+ },
+ "RecommendationStrategy": {
+  "type": "object",
+  "x-ticvai-persistence": "promotions.recommendation_strategy",
+  "description": "Upsell board 1. **Objective, placement, ranking and guardrail in one record**, because any one of them alone produces a recommender that is either aimless or dangerous.\n",
+  "required": [
+   "code",
+   "name",
+   "objective"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "objective": {
+    "type": "string",
+    "enum": [
+     "attachRevenue",
+     "averageOrderValue",
+     "upgradeRate",
+     "visitFrequency",
+     "inventoryBalance",
+     "guestSatisfaction"
+    ]
+   },
+   "kinds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "upsell",
+      "upgrade",
+      "crossSell",
+      "bundle",
+      "nextBestOffer",
+      "reactivation"
+     ]
+    }
+   },
+   "itemKinds": {
+    "type": "array",
+    "description": "What the strategy may put in a slot (29 September, build pass, group G2, from group G1's handoff; 8.6.30 to 8.6.36, 5.4.21, 22.6.18): `product` (the default and the behaviour before), `offer` (a live promotion marked `recommendable`), `reward` (a marketing-crm loyalty reward the guest can redeem) and `challenge` (a challenge they can join). Mirrors `ai.decideRecommendations` item kinds.",
+    "default": [
+     "product"
+    ],
+    "items": {
+     "type": "string",
+     "enum": [
+      "product",
+      "offer",
+      "reward",
+      "challenge"
+     ]
+    }
+   },
+   "placements": {
+    "type": "array",
+    "description": "`homepage` (8.6.10) and `loyalty` (5.4.21, 22.6.18) added 29 September (build pass, group G2), matching the placements `ai.decideRecommendations` fills.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "productPage",
+      "cart",
+      "checkout",
+      "postPurchase",
+      "preVisitEmail",
+      "inVenueApp",
+      "kiosk",
+      "pos",
+      "signage",
+      "callCentre",
+      "homepage",
+      "loyalty"
+     ]
+    }
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "maxRecommendations": {
+    "type": "integer",
+    "default": 3,
+    "description": "**A guardrail before it is a layout choice.** Nine upsells at checkout is not a denser page, it is an abandoned basket.\n"
+   },
+   "minConfidence": {
+    "type": "number",
+    "nullable": true
+   },
+   "rankingWeights": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "number"
+    },
+    "description": "Propensity, margin, inventory pressure, affinity, recency."
+   },
+   "requireAvailability": {
+    "type": "boolean",
+    "default": true
+   },
+   "excludeInBasket": {
+    "type": "boolean",
+    "default": true
+   },
+   "guardrails": {
+    "type": "object",
+    "properties": {
+     "maxDiscountPercent": {
+      "type": "number",
+      "nullable": true
+     },
+     "minMarginPercent": {
+      "type": "number",
+      "nullable": true
+     },
+     "neverRecommendCategoryIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "requireHumanApproval": {
+      "type": "boolean",
+      "default": false
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "paused",
+     "retired"
+    ]
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RecommendationSuppression": {
+  "type": "object",
+  "x-ticvai-persistence": "promotions.recommendation_suppression",
+  "description": "Boards 1.7 and 5.7. **Fatigue is why a good recommender stops working.**",
+  "properties": {
+   "scopePath": {
+    "type": "string"
+   },
+   "maxImpressionsPerProductPerDay": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maxImpressionsPerGuestPerSession": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cooldownAfterDismissDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "cooldownAfterAcceptDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "hardExclusions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "segmentId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "categoryId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "productId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "reason": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ }
+}

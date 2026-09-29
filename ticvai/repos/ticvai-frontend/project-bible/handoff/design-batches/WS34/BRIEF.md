@@ -1,6 +1,6 @@
 # WS34 — Pricing   Revenue Management board 1
 
-**10 screens · 10 operations · 14 schemas · 2 permissions**
+**10 screens · 16 operations · 25 schemas · 5 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `PLATFORM_TENANT_VIEW, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-048` | Commercial Pricing Command Center | commandCentre | 1 | 1 | — |
+| `ADM-048` | Commercial Pricing Command Center | commandCentre | 4 | 1 | — |
 | `ADM-049` | Price List Master Configuration | configEditor | 1 | 0 | — |
-| `ADM-050` | Price Category & Rate Type Library | listDetail | 1 | 0 | — |
+| `ADM-050` | Price Category & Rate Type Library | listDetail | 2 | 1 | — |
 | `ADM-051` | Rate Structure Builder | listDetail | 1 | 0 | — |
 | `ADM-052` | Product & Service Price Assignment | listDetail | 1 | 0 | — |
-| `ADM-053` | Package, Bundle & Add-On Pricing | configEditor | 1 | 0 | — |
-| `ADM-054` | Market, Venue & Currency Pricing Structure | configEditor | 1 | 0 | — |
+| `ADM-053` | Package, Bundle & Add-On Pricing | configEditor | 2 | 1 | — |
+| `ADM-054` | Market, Venue & Currency Pricing Structure | configEditor | 2 | 1 | — |
 | `ADM-055` | Price Hierarchy & Inheritance Configuration | configEditor | 1 | 0 | — |
-| `ADM-056` | Price List Templates, Clone & Reuse | configEditor | 1 | 0 | — |
+| `ADM-056` | Price List Templates, Clone & Reuse | configEditor | 2 | 1 | — |
 | `ADM-057` | Commercial Pricing Structure Validation | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-050, ADM-052, ADM-057 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-050, ADM-057 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

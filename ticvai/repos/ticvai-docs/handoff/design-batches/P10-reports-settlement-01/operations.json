@@ -84,7 +84,7 @@
   "method": "GET",
   "path": "/reports/financial",
   "contract": "finance",
-  "summary": "P&L, balance sheet or cash flow",
+  "summary": "Financial statements, revenue and tax summaries",
   "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -258,6 +258,11 @@
   "parameters": [
    {
     "name": "providerName",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
     "in": "query",
     "required": null
    },

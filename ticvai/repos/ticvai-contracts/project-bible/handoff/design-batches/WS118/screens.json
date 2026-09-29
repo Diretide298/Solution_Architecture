@@ -1,0 +1,1961 @@
+[
+ {
+  "id": "ADM-489",
+  "name": "AI Configuration Readiness Center",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Configuration_Assistant_Reference.pdf",
+   "board": "3",
+   "number": "1",
+   "page": 44
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-configuration-readiness-center-adm-489",
+   "component": "apps/ticvai-web/src/routes/platform/AiConfigurationReadinessCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-490",
+    "ADM-491",
+    "ADM-492",
+    "ADM-493",
+    "ADM-494",
+    "ADM-495",
+    "ADM-496",
+    "ADM-497",
+    "ADM-498"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to Platform Dashboard",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "ADM-490",
+     "trigger": "Configuration Validation Results",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "carries": [
+      "planId"
+     ]
+    },
+    {
+     "to": "ADM-491",
+     "trigger": "AI Recommendations & Best-Practice Review",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-492",
+     "trigger": "Configuration Approval Workflow",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "carries": [
+      "planId"
+     ]
+    },
+    {
+     "to": "ADM-493",
+     "trigger": "AI Configuration Execution Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "carries": [
+      "planId"
+     ]
+    },
+    {
+     "to": "ADM-494",
+     "trigger": "Execution Progress & Dependency Monitor",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "carries": [
+      "planId",
+      "stepNumber"
+     ]
+    },
+    {
+     "to": "ADM-495",
+     "trigger": "Configuration Results & Object Mapping",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "carries": [
+      "planId"
+     ]
+    },
+    {
+     "to": "ADM-496",
+     "trigger": "Configuration Change & Modification Assistant",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-497",
+     "trigger": "Configuration History, Versions & Rollback",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "carries": [
+      "planId"
+     ]
+    },
+    {
+     "to": "ADM-498",
+     "trigger": "AI Configuration Audit & Governance",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide a final readiness assessment before the proposed Configuration Plan can enter approval or execution. This is the first governance gate.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Configuration Objects",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Ready",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Warnings",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Blocking Issues",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Approval Requirements",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "AI Recommendations",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Modules Affected",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Production Impact",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 44 §Header KPIs"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Venue AI profile",
+       "bindsTo": "AiVenueSettings",
+       "columns": [
+        "AiVenueSettings.venueType",
+        "AiVenueSettings.capacity",
+        "AiVenueSettings.openingHours",
+        "AiVenueSettings.typicalWeekdayAttendance",
+        "AiVenueSettings.typicalWeekendAttendance",
+        "AiVenueSettings.peakMonths",
+        "AiVenueSettings.averageSpend",
+        "AiVenueSettings.fnbAttachRate"
+       ],
+       "operation": "getAiVenueSettings",
+       "notes": "**What every AI answer stands on before the venue has history** (29 September, AI functions review). Collected at onboarding, here or by the configuration assistant in conversation.",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save venue AI profile",
+       "operation": "setAiVenueSettings",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The readiness list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the readiness untouched.",
+   "emptyFirstRun": "No readiness yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the readiness are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getEffectiveAiPolicy",
+    "contract": "ai",
+    "purpose": "The policy in force for a capability at a scope",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAiVenueSettings",
+    "contract": "ai",
+    "purpose": "The venue AI profile the baselines use",
+    "trigger": "onLoad",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "setAiVenueSettings",
+    "contract": "ai",
+    "purpose": "Set it at onboarding",
+    "trigger": "onAction",
+    "invalidates": [
+     "getAiVenueSettings"
+    ],
+    "provenance": "29 September pass (P29 group A)"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-489",
+   "workshopBoard": "wireframes/WS11 AI Configuration Assistant Board 3.dc.html#adm-489"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Configuration_Assistant_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 8 of 56 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formSetAiVenueSettings",
+    "component": "modal",
+    "trigger": "Save venue AI profile",
+    "body": "**Collects what `setAiVenueSettings` sends before it is called.** Required: `venueId`, `venueType`. Every other figure is optional and defaults to the starting pattern for the venue type, so a venue that knows only its type still gets answers.",
+    "bindsTo": "AiVenueSettings",
+    "confirm": {
+     "label": "Save venue AI profile",
+     "operation": "setAiVenueSettings"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueType",
+      "isOutdoor",
+      "capacity",
+      "openingHours",
+      "typicalWeekdayAttendance",
+      "typicalWeekendAttendance",
+      "peakMonths",
+      "averageSpend",
+      "fnbAttachRate",
+      "staffProductivity"
+     ]
+    },
+    "provenance": "29 September pass (P29 group A)"
+   }
+  ],
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-490",
+  "name": "Configuration Validation Results",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Configuration_Assistant_Reference.pdf",
+   "board": "3",
+   "number": "2",
+   "page": 45
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/configuration-validation-results-adm-490",
+   "component": "apps/ticvai-web/src/routes/platform/ConfigurationValidationResults.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-489"
+   ],
+   "exitTo": [
+    "ADM-489"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-489",
+     "trigger": "Back to AI Configuration Readiness Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide detailed evidence that the proposed configuration has passed all required TICVAI validation layers. Screen 1 provides the summary; Screen 2 provides the technical and business evidence.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 45"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 45"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getActionPlan",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "simulateActionPlan",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "simulateActionPlan"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The validation results list.",
+   "error": "Could not load. Names which read failed and leaves the validation results untouched.",
+   "emptyFirstRun": "No validation results yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the validation results are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "simulateActionPlan",
+    "contract": "ai",
+    "purpose": "Validate and simulate a plan without changing anything",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-490",
+   "workshopBoard": "wireframes/WS11 AI Configuration Assistant Board 3.dc.html#adm-490"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Configuration_Assistant_Reference.pdf page 45. 0 of 0 labels bound to a contract property; 0 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-491",
+  "name": "AI Recommendations & Best-Practice Review",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Configuration_Assistant_Reference.pdf",
+   "board": "3",
+   "number": "3",
+   "page": 47
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-recommendations-best-practice-review-adm-491",
+   "component": "apps/ticvai-web/src/routes/platform/AiRecommendationsBestPracticeReview.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-489"
+   ],
+   "exitTo": [
+    "ADM-489"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-489",
+     "trigger": "Back to AI Configuration Readiness Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
+  "purpose": "Separate mandatory configuration from AI recommendations so the administrator understands what This is important for trust and governance.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 47 §Track"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every recommendations best-practice review",
+       "columns": [
+        "Recommendation",
+        "Family Package",
+        "Decision",
+        "Rejected",
+        "By",
+        "Administrator",
+        "Reason"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 47 §Track"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected recommendations best-practice review",
+       "bindsTo": null,
+       "columns": [
+        "Recommendation",
+        "Family Package",
+        "Decision",
+        "Rejected",
+        "By",
+        "Administrator",
+        "Reason"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Where available”.",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 47 §Track"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The recommendations best-practice review list.",
+   "error": "Could not load. Names which read failed and leaves the recommendations best-practice review untouched.",
+   "emptyFirstRun": "No recommendations best-practice review yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the recommendations best-practice review are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getConfigurationBlueprint",
+    "contract": "ai",
+    "purpose": "The blueprint so far",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideBlueprintRecommendation",
+    "contract": "ai",
+    "purpose": "Accept, modify, reject or defer a blueprint decision",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Recommendation",
+    "Family Package",
+    "Decision",
+    "Rejected",
+    "By",
+    "Administrator"
+   ],
+   "params": [
+    {
+     "name": "decisionKey",
+     "from": "navigation"
+    },
+    {
+     "name": "sessionId",
+     "from": "session"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-491",
+   "workshopBoard": "wireframes/WS11 AI Configuration Assistant Board 3.dc.html#adm-491"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Configuration_Assistant_Reference.pdf page 47. 0 of 7 labels bound to a contract property; 16 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-492",
+  "name": "Configuration Approval Workflow",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Configuration_Assistant_Reference.pdf",
+   "board": "3",
+   "number": "4",
+   "page": 48
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/configuration-approval-workflow-adm-492",
+   "component": "apps/ticvai-web/src/routes/platform/ConfigurationApprovalWorkflow.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-489"
+   ],
+   "exitTo": [
+    "ADM-489"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-489",
+     "trigger": "Back to AI Configuration Readiness Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Route the proposed AI configuration through TICVAI's existing RBAC/PBAC and approval governance before execution. The AI Assistant should reuse the central TICVAI approval engine, not create an independent approval system.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 48"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 48"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "approveWorkflow",
+       "label": "Approve workflow",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "approveWorkflow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval workflow list.",
+   "error": "Could not load. Names which read failed and leaves the approval workflow untouched.",
+   "emptyFirstRun": "No approval workflow yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval workflow are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "approveWorkflow",
+    "contract": "catalogue",
+    "purpose": "Approval Workflow Designer",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listProposedActions",
+    "contract": "ai",
+    "purpose": "What the assistant has proposed and nobody has decided",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-492",
+   "workshopBoard": "wireframes/WS11 AI Configuration Assistant Board 3.dc.html#adm-492"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Configuration_Assistant_Reference.pdf page 48. 0 of 0 labels bound to a contract property; 0 of 61 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "actionId",
+     "from": "navigation"
+    },
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-493",
+  "name": "AI Configuration Execution Center",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Configuration_Assistant_Reference.pdf",
+   "board": "3",
+   "number": "5",
+   "page": 50
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-configuration-execution-center-adm-493",
+   "component": "apps/ticvai-web/src/routes/platform/AiConfigurationExecutionCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-489"
+   ],
+   "exitTo": [
+    "ADM-489"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-489",
+     "trigger": "Back to AI Configuration Readiness Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Execute the approved Configuration Plan against the appropriate TICVAI modules in a controlled and traceable sequence. This is where proposed configuration becomes real TICVAI configuration.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 50"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 50"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getActionPlan",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "pauseActionPlan",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "cancelActionPlan",
+       "label": "Cancel action plan",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — which action plan is affected and what goes with it, in the screen's own words; *are you sure* is not a confirmation."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "pauseActionPlan"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The execution list.",
+   "error": "Could not load. Names which read failed and leaves the execution untouched.",
+   "emptyFirstRun": "No execution yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the execution are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "pauseActionPlan",
+    "contract": "ai",
+    "purpose": "Pause an executing plan",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "cancelActionPlan",
+    "contract": "ai",
+    "purpose": "Cancel a plan",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-493",
+   "workshopBoard": "wireframes/WS11 AI Configuration Assistant Board 3.dc.html#adm-493"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Configuration_Assistant_Reference.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-494",
+  "name": "Execution Progress & Dependency Monitor",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Configuration_Assistant_Reference.pdf",
+   "board": "3",
+   "number": "6",
+   "page": 51
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/execution-progress-dependency-monitor-adm-494",
+   "component": "apps/ticvai-web/src/routes/platform/ExecutionProgressDependencyMonitor.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-489"
+   ],
+   "exitTo": [
+    "ADM-489"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-489",
+     "trigger": "Back to AI Configuration Readiness Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Provide a detailed real-time view of execution dependencies, failures, retries, and downstream configuration status.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 51 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every execution progress dependency",
+       "columns": [
+        "Venue ✓",
+        "↓",
+        "Operating Calendar ✓",
+        "Products ✓",
+        "Timeslots ✓",
+        "Capacity ●",
+        "Pricing ○",
+        "Channels ○",
+        "Media ○",
+        "Access ○",
+        "Status",
+        "Waiting",
+        "Executing",
+        "Success",
+        "Warning",
+        "Failed",
+        "Skipped",
+        "Rolled Back",
+        "Failure Example",
+        "🔴 Pricing Profile Creation Failed",
+        "Weekend Adult Pricing"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 51 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected execution progress dependency",
+       "bindsTo": null,
+       "columns": [
+        "Venue ✓",
+        "↓",
+        "Operating Calendar ✓",
+        "Products ✓",
+        "Timeslots ✓",
+        "Capacity ●",
+        "Pricing ○",
+        "Channels ○",
+        "Media ○",
+        "Access ○",
+        "Status",
+        "Waiting",
+        "Executing",
+        "Success",
+        "Warning",
+        "Failed",
+        "Skipped",
+        "Rolled Back",
+        "Failure Example",
+        "🔴 Pricing Profile Creation Failed",
+        "Weekend Adult Pricing"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Blocked”, “Retry History”, “Resolution Applied”.",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 51 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The execution progress dependency list.",
+   "error": "Could not load. Names which read failed and leaves the execution progress dependency untouched.",
+   "emptyFirstRun": "No execution progress dependency yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the execution progress dependency are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "pauseActionPlan",
+    "contract": "ai",
+    "purpose": "Pause an executing plan",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "resumeActionPlan",
+    "contract": "ai",
+    "purpose": "Resume a paused plan",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "retryActionStep",
+    "contract": "ai",
+    "purpose": "Retry a failed step",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Venue ✓",
+    "↓",
+    "Operating Calendar ✓",
+    "Products ✓",
+    "Timeslots ✓",
+    "Capacity ●"
+   ],
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    },
+    {
+     "name": "stepNumber",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-494",
+   "workshopBoard": "wireframes/WS11 AI Configuration Assistant Board 3.dc.html#adm-494"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Configuration_Assistant_Reference.pdf page 51. 0 of 21 labels bound to a contract property; 21 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-495",
+  "name": "Configuration Results & Object Mapping",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Configuration_Assistant_Reference.pdf",
+   "board": "3",
+   "number": "7",
+   "page": 53
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/configuration-results-object-mapping-adm-495",
+   "component": "apps/ticvai-web/src/routes/platform/ConfigurationResultsObjectMapping.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-489"
+   ],
+   "exitTo": [
+    "ADM-489"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-489",
+     "trigger": "Back to AI Configuration Readiness Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Show exactly what TICVAI objects were created or changed after successful execution.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 53 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every results object mapping",
+       "columns": [
+        "VEN-1028",
+        "↓",
+        "TKT-4012",
+        "SCH-0291",
+        "CAP-0218",
+        "PRC-3002",
+        "MED-0082",
+        "ACC-0142"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 53 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected results object mapping",
+       "bindsTo": null,
+       "columns": [
+        "VEN-1028",
+        "↓",
+        "TKT-4012",
+        "SCH-0291",
+        "CAP-0218",
+        "PRC-3002",
+        "MED-0082",
+        "ACC-0142"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Object Mapping”, “Created does not necessarily mean”, “Pending”.",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 53 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The results object mapping list.",
+   "error": "Could not load. Names which read failed and leaves the results object mapping untouched.",
+   "emptyFirstRun": "No results object mapping yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the results object mapping are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "rollbackActionPlan",
+    "contract": "ai",
+    "purpose": "Plan a rollback",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "VEN-1028",
+    "↓",
+    "TKT-4012",
+    "SCH-0291",
+    "CAP-0218",
+    "PRC-3002"
+   ],
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-495",
+   "workshopBoard": "wireframes/WS11 AI Configuration Assistant Board 3.dc.html#adm-495"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Configuration_Assistant_Reference.pdf page 53. 0 of 8 labels bound to a contract property; 12 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-496",
+  "name": "Configuration Change & Modification Assistant",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Configuration_Assistant_Reference.pdf",
+   "board": "3",
+   "number": "8",
+   "page": 54
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/configuration-change-modification-assistant-adm-496",
+   "component": "apps/ticvai-web/src/routes/platform/ConfigurationChangeModificationAssistant.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-489"
+   ],
+   "exitTo": [
+    "ADM-489"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-489",
+     "trigger": "Back to AI Configuration Readiness Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow administrators to return later and modify existing TICVAI configuration through natural-language AI. This is what transforms the feature from an onboarding wizard into a permanent AI configuration capability.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Prepare Change | Ask More | Cancel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 54 §Actions"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 54"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 54"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Prepare Change | Ask More | Cancel",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 54 §Actions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "startConfigurationSession"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The change modification assistant list.",
+   "error": "Could not load. Names which read failed and leaves the change modification assistant untouched.",
+   "emptyFirstRun": "No change modification assistant yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the change modification assistant are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "startConfigurationSession",
+    "contract": "ai",
+    "purpose": "Start the configuration assistant",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "answerConfigurationQuestion",
+    "contract": "ai",
+    "purpose": "Answer the current question",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "buildConfigurationPlan",
+    "contract": "ai",
+    "purpose": "Compile the blueprint into a plan",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-496",
+   "workshopBoard": "wireframes/WS11 AI Configuration Assistant Board 3.dc.html#adm-496"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Configuration_Assistant_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 1 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "sessionId",
+     "from": "session"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-497",
+  "name": "Configuration History, Versions & Rollback",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Configuration_Assistant_Reference.pdf",
+   "board": "3",
+   "number": "9",
+   "page": 55
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/configuration-history-versions-rollback-adm-497",
+   "component": "apps/ticvai-web/src/routes/platform/ConfigurationHistoryVersionsRollback.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-489"
+   ],
+   "exitTo": [
+    "ADM-489"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-489",
+     "trigger": "Back to AI Configuration Readiness Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Maintain complete version history for AI-created and AI-modified configuration and provide governed rollback capability where technically possible.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 55"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 55"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getActionPlan",
+       "notes": "One record, read-only."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "rollbackActionPlan",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConfigurationSessions",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "rollbackActionPlan"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The history versions rollback list.",
+   "error": "Could not load. Names which read failed and leaves the history versions rollback untouched.",
+   "emptyFirstRun": "No history versions rollback yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the history versions rollback are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "rollbackActionPlan",
+    "contract": "ai",
+    "purpose": "Plan a rollback",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listConfigurationSessions",
+    "contract": "ai",
+    "purpose": "Configuration-assistant sessions",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-497",
+   "workshopBoard": "wireframes/WS11 AI Configuration Assistant Board 3.dc.html#adm-497"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Configuration_Assistant_Reference.pdf page 55. 0 of 0 labels bound to a contract property; 0 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-498",
+  "name": "AI Configuration Audit & Governance",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Configuration_Assistant_Reference.pdf",
+   "board": "3",
+   "number": "10",
+   "page": 57
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-configuration-audit-governance-adm-498",
+   "component": "apps/ticvai-web/src/routes/platform/AiConfigurationAuditGovernance.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-489"
+   ],
+   "exitTo": [
+    "ADM-489"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-489",
+     "trigger": "Back to AI Configuration Readiness Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Header KPIs; Show) and a per-row directory (§For each configuration value show) — counts over a population, then the population",
+  "purpose": "Provide an immutable governance record showing how AI participated in every configuration decision and execution. This is essential for an enterprise AI system.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §For each configuration value show"
+   }
+  ],
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search audit governance",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Tenant",
+        "Venue",
+        "User",
+        "Date",
+        "Session",
+        "Configuration Plan",
+        "Object",
+        "Module",
+        "AI Action",
+        "Approval",
+        "Execution Status",
+        "Audit Record",
+        "Timestamp",
+        "12 Sep 2026 — 14:32",
+        "Platform Administrator",
+        "Action",
+        "Approved AI Configuration Plan",
+        "Plan",
+        "CFG-PLAN-000128"
+       ],
+       "notes": "The pack filters this screen by tenant, venue, user, date, session, configuration plan and 13 more — which are present is a decision the pack already made.",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "AI Configuration Sessions",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "AI Recommendations",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Accepted",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Rejected",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Executed Changes",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Rollbacks",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Approval Overrides",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Executions",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "User Request",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "↓",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "AI Interpretation",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Blueprint Decision",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Configuration Object",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Validation",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Approval",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Execution",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Audit Requirements",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Original User Intent",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "AI Recommendation",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "User Decision",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Configuration Plan",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Before / After",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Validation Results",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failure / Retry",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Rollback",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Timestamp",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Actor",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Correlation / Trace ID",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every audit governance",
+       "columns": [
+        "Source",
+        "👤 User Provided",
+        "🤖 AI Recommended",
+        "⚙ System Derived",
+        "📋 Existing Configuration"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §For each configuration value show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected audit governance",
+       "bindsTo": null,
+       "columns": [
+        "Source",
+        "👤 User Provided",
+        "🤖 AI Recommended",
+        "⚙ System Derived",
+        "📋 Existing Configuration"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Objects”, “Timeslots 24 System Derived Operations”, “Critical Execution Architecture”, “The architecture should be”, “Owning TICVAI Modules”, “Execution Dependency Engine”.",
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 57 §For each configuration value show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The audit governance list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the audit governance untouched.",
+   "emptyFirstRun": "No audit governance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the audit governance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "searchAiDecisions",
+    "contract": "ai",
+    "purpose": "Find AI decisions",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-498",
+   "workshopBoard": "wireframes/WS11 AI Configuration Assistant Board 3.dc.html#adm-498"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Configuration_Assistant_Reference.pdf page 57. 0 of 24 labels bound to a contract property; 61 of 192 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

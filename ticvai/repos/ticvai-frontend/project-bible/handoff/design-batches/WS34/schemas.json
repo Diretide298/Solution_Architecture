@@ -1,9 +1,83 @@
 {
- "CommercialPricingCommandCenterView": {
+ "BundlePricingCommercialModelView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Commercial Pricing Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle Pricing & Commercial Model displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Base price"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "discount": {
+    "type": "number",
+    "description": "Discount %"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount amount"
+   },
+   "minimumPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Minimum price"
+   },
+   "maximumPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Maximum price"
+   },
+   "priceFloor": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price floor"
+   },
+   "marginFloor": {
+    "type": "number",
+    "description": "Margin floor"
+   },
+   "guestSpecificPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Guest-specific price"
+   },
+   "channelSpecificPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Channel-specific price"
+   },
+   "pricingModel": {
+    "type": "string",
+    "enum": [
+     "fixedBundlePrice",
+     "sumMinusDiscount",
+     "componentPricing",
+     "startingFrom",
+     "tieredBundlePrice",
+     "dynamicBundlePrice"
+    ],
+    "description": "How the bundle is priced; a dynamic bundle price is calculated by the pricing engine"
+   },
+   "upgradeCharge": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Surcharge when the guest picks a premium option"
+   }
+  }
+ },
+ "CatalogueConfigStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "active",
+   "inactive",
+   "retired"
+  ],
+  "description": "**The status of a catalogue configuration record** (29 September, data model DM3): price lists, rates, fees and fee rules, tax profiles and rules, calculation and rounding profiles, package pricing and templates. `draft` is being prepared and is never used by a calculation; `active` is in use from its effective date; `inactive` is switched off and may be switched back; `retired` is kept for history only. A record already used by a live price becomes `active` through a published change request, not by an edit."
+ },
+ "CommercialPricingCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Commercial Pricing Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "totalPriceLists": {
     "type": "integer",
@@ -26,12 +100,12 @@
     "description": "Configured Rates"
    },
    "productsWithPricing": {
-    "type": "string",
-    "description": "Products with Pricing"
+    "type": "integer",
+    "description": "Products with Pricing: sellable products that reference at least one active price list rate"
    },
    "productsMissingPricing": {
-    "type": "string",
-    "description": "Products Missing Pricing"
+    "type": "integer",
+    "description": "Products Missing Pricing: active sellable products with no price list rate"
    },
    "markets": {
     "type": "integer",
@@ -46,13 +120,28 @@
     "description": "Pricing Validation Issues"
    },
    "recentlyModifiedPriceLists": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Recently Modified Price Lists"
+    "type": "integer",
+    "description": "Recently Modified Price Lists: price lists changed in the last 7 days (decided 29 September, readiness close-out)"
    },
    "upcomingPriceStructures": {
     "type": "integer",
-    "description": "Upcoming Price Structures"
+    "description": "Upcoming Price Structures: price lists whose effective-from date is in the future"
    },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI observations for this screen; advisory only, never applied automatically"
+   }
+  }
+ },
+ "CommercialPricingCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Commercial Pricing Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "priceListId": {
     "type": "string",
     "description": "Price List ID"
@@ -67,11 +156,26 @@
    },
    "type": {
     "type": "string",
-    "description": "Type"
+    "enum": [
+     "standardRetail",
+     "venue",
+     "attraction",
+     "event",
+     "membership",
+     "group",
+     "corporate",
+     "b2b",
+     "reseller",
+     "ota",
+     "internal",
+     "specialMarket"
+    ],
+    "description": "Price List Type (the pack's Price List Types, pp.6-7)"
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "description": "Currency: ISO 4217 code of the default currency",
+    "pattern": "^[A-Z]{3}$"
    },
    "market": {
     "type": "string",
@@ -93,26 +197,28 @@
     "type": "integer",
     "description": "Rate Count"
    },
-   "effectivePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Effective Period"
-   },
    "version": {
     "type": "string",
     "description": "Version"
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
+    "type": "string",
+    "description": "Status: draft, configured, validated, active, inactive, expired or archived (p.7); approval and publication are Board 4's"
    },
    "owner": {
     "type": "string",
     "description": "Owner"
    },
-   "modifyPricingStructure": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "Modify Pricing Structure"
+    "format": "date",
+    "description": "Effective From (the first half of the pack's Effective Period)"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    }
   }
  },
@@ -122,78 +228,199 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Commercial Pricing Structure Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "requiredFieldsComplete": {
+   "findingId": {
     "type": "string",
-    "description": "Required fields complete"
+    "description": "Finding ID"
    },
-   "currencyDefined": {
+   "category": {
     "type": "string",
-    "description": "Currency defined"
+    "enum": [
+     "priceList",
+     "rateStructure",
+     "productMapping",
+     "package",
+     "market",
+     "hierarchy"
+    ],
+    "description": "Validation Category (pp.19-20)"
    },
-   "ownershipAssigned": {
+   "check": {
     "type": "string",
-    "description": "Ownership assigned"
+    "enum": [
+     "requiredFieldsComplete",
+     "currencyDefined",
+     "ownershipAssigned",
+     "categoriesConfigured",
+     "monetaryValuesValid",
+     "derivedRelationshipsValid",
+     "requiredProductsPriced",
+     "noOrphanAssignments",
+     "componentPricingValid",
+     "currencyAndVenueConfigurationValid",
+     "noConflictingSourcePriority",
+     "fallbackConfigured"
+    ],
+    "description": "The check that failed"
    },
-   "categoriesConfigured": {
+   "severity": {
     "type": "string",
-    "description": "Categories configured"
+    "enum": [
+     "critical",
+     "warning",
+     "information"
+    ],
+    "description": "Validation Results: critical (sale cannot proceed), warning (review), information (optimization suggestion)"
    },
-   "monetaryValuesValid": {
+   "message": {
     "type": "string",
-    "description": "Monetary values valid"
+    "description": "What was found, e.g. \"7 active ticket products have no Adult rate\""
    },
-   "derivedRelationshipsValid": {
+   "subjectType": {
     "type": "string",
-    "description": "Derived relationships valid"
+    "enum": [
+     "priceList",
+     "rate",
+     "priceCategory",
+     "product",
+     "package",
+     "venue",
+     "market",
+     "hierarchy"
+    ],
+    "description": "What the finding is about"
    },
-   "requiredProductsPriced": {
+   "subjectId": {
     "type": "string",
-    "description": "Required products priced"
+    "description": "ID of that record"
    },
-   "noOrphanAssignments": {
-    "type": "string",
-    "description": "No orphan assignments"
-   },
-   "componentPricingValid": {
-    "type": "string",
-    "description": "Component pricing valid"
-   },
-   "currencyAndVenueConfigurationValid": {
-    "type": "string",
-    "description": "Currency and venue configuration valid"
-   },
-   "noConflictingSourcePriority": {
-    "type": "string",
-    "description": "No conflicting source priority"
-   },
-   "fallbackConfigured": {
-    "type": "string",
-    "description": "Fallback configured"
-   },
-   "saleCannotProceed": {
-    "type": "string",
-    "description": "Sale cannot proceed"
-   },
-   "optimizationSuggestion": {
-    "type": "string",
-    "description": "Optimization suggestion"
-   },
-   "calculation": {
-    "type": "string",
-    "description": "calculation"
-   },
-   "revenueOptimization": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "revenue optimization"
-   },
-   "calculationEngine": {
-    "type": "string",
-    "description": "calculation engine"
-   },
-   "doesNotPerformDynamicPricing": {
-    "type": "string",
-    "description": "does not perform dynamic pricing"
+   "aiGenerated": {
+    "type": "boolean",
+    "description": "Raised by AI QA rather than a rule; advisory"
    }
+  }
+ },
+ "ConfigurationTemplate": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.configuration_template",
+  "description": "**A reusable starting point for a product or a price list** (29 September, data model DM3). Merges the product duplication and template library (ADM-126) and price list templates (ADM-063). `subject` says which; a template copies the listed components and marks `reviewFields` for the operator to confirm.",
+  "required": [
+   "id",
+   "scopePath",
+   "subject",
+   "name",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "subject": {
+    "type": "string",
+    "enum": [
+     "product",
+     "priceList"
+    ]
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "templateKind": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "Product: `ProductDuplicationTemplateLibraryView.templateKind`; price list: its `templateType`."
+   },
+   "productKind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductKind"
+     }
+    ],
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourceProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sourcePriceListId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "includedComponents": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Product or price-list component names, per `subject`."
+   },
+   "reviewFields": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dates",
+      "prices",
+      "venue",
+      "capacity",
+      "event",
+      "tax",
+      "channels"
+     ]
+    }
+   },
+   "isAiDrafted": {
+    "type": "boolean",
+    "default": false
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CatalogueConfigStatus"
+     }
+    ],
+    "default": "draft"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
   }
  },
  "MarketVenueCurrencyPricingStructureView": {
@@ -226,37 +453,191 @@
     "type": "string",
     "description": "Legal Entity"
    },
-   "currency": {
-    "type": "string",
-    "description": "Currency"
-   },
    "baseCurrency": {
     "type": "string",
-    "description": "Base Currency"
+    "description": "Base Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
    },
    "sellingCurrency": {
     "type": "string",
-    "description": "Selling Currency"
+    "description": "Selling Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
    },
    "currencyPrecision": {
-    "type": "string",
-    "description": "Currency Precision"
+    "type": "integer",
+    "description": "Currency Precision: decimal places, 0 to 3",
+    "minimum": 0,
+    "maximum": 3
    },
    "rounding": {
     "type": "string",
-    "description": "Rounding"
+    "description": "Rounding: code of the currency rounding rule (ADM-075)"
    },
    "displayFormat": {
     "type": "string",
-    "description": "Display Format"
+    "description": "Display Format: e.g. \"AED 1,250.00\" or \"1.250,00 EUR\""
    },
-   "conversions": {
+   "structureId": {
     "type": "string",
-    "description": "conversions"
+    "description": "Pricing structure node ID"
    },
-   "aed250Sar255": {
+   "hierarchyLevel": {
     "type": "string",
-    "description": "AED 250 ≈ SAR 255"
+    "enum": [
+     "global",
+     "country",
+     "region",
+     "market",
+     "venue"
+    ],
+    "description": "Level of this node in the Market Hierarchy (p.15)"
+   },
+   "parentStructureId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Parent node; empty for Global"
+   },
+   "priceListId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Price list governing this node; empty when it inherits"
+   },
+   "inheritsFromParent": {
+    "type": "boolean",
+    "description": "Venue Overrides (p.16): true when the node uses its parent's prices (Abu Dhabi Venue -> inherit AED 250)"
+   },
+   "fxReferenceRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "FX-Assisted Setup: reference rate base -> selling currency shown during setup; advisory"
+   }
+  }
+ },
+ "MembershipCommercialPricingChannelAssociationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Commercial, Pricing & Channel Association displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "basePricingProfile": {
+    "type": "string",
+    "description": "Base Pricing Profile id"
+   },
+   "membershipTierPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Membership Tier Price, as calculated by the linked pricing profile (read-only)"
+   },
+   "renewalPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Renewal Price, as calculated by the linked renewal pricing (read-only)"
+   },
+   "promotionalPricingEligibility": {
+    "type": "boolean",
+    "description": "Promotional Pricing Eligibility: promotions may apply to this membership"
+   },
+   "taxProfile": {
+    "type": "string",
+    "description": "Tax Profile id"
+   },
+   "feeProfile": {
+    "type": "string",
+    "description": "Fee Profile id",
+    "nullable": true
+   },
+   "salesCapacity": {
+    "type": "integer",
+    "description": "Capacity limit for a capacityLimited sales period",
+    "nullable": true
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership code"
+   },
+   "upgradePricePolicy": {
+    "type": "string",
+    "description": "Upgrade Price Policy id (pack p.14); pro-rata credit on upgrade per MoM 1 Sep §4.9",
+    "nullable": true
+   },
+   "availableChannels": {
+    "type": "array",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+    },
+    "description": "Channel Availability (pack p.14): B2C -> guestWeb, Mobile App -> guestApp, POS and Box Office -> pos, Call Center -> callCentre, Kiosk -> kiosk, B2B and Corporate -> b2b, Reseller -> partner, API -> api"
+   },
+   "paymentTerms": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fullPayment",
+      "installments",
+      "corporateCredit",
+      "autoRenewPayment"
+     ]
+    },
+    "description": "Payment Eligibility (pp.14-15); installments only where the payments module supports them"
+   },
+   "salesPeriod": {
+    "type": "string",
+    "enum": [
+     "alwaysAvailable",
+     "fixedSalesWindow",
+     "seasonalSale",
+     "invitationOnly",
+     "capacityLimited"
+    ],
+    "description": "Sales Period (pack p.15)"
+   },
+   "billingFrequency": {
+    "type": "string",
+    "enum": [
+     "upFront",
+     "monthly",
+     "quarterly",
+     "semiAnnual",
+     "annual",
+     "custom"
+    ],
+    "default": "upFront",
+    "description": "2.14.19 (29 September, build). **How often the member is charged, independent of the validity term**: an annual membership may be billed monthly or quarterly. `upFront` charges the whole term at sale. A recurring frequency needs `autoRenewPayment` or `installments` in `paymentTerms` and a card on file under a recurring mandate; each cycle is an instalment of the plan payments `createInstalmentPlan` schedules at sale, charged to the stored card on its due date."
+   },
+   "billingIntervalMonths": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 24,
+    "nullable": true,
+    "description": "For `custom`, every how many months. Null otherwise."
+   },
+   "billingAnchor": {
+    "type": "string",
+    "enum": [
+     "purchaseDate",
+     "calendarMonthStart"
+    ],
+    "default": "purchaseDate",
+    "description": "`purchaseDate` bills on the purchase day each cycle; `calendarMonthStart` on the 1st of the month, the first cycle prorated. A cycle longer than the term is refused (422)."
+   },
+   "salesWindowFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Sales window start, for fixedSalesWindow or seasonalSale",
+    "nullable": true
+   },
+   "salesWindowTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Sales window end",
+    "nullable": true
    }
   }
  },
@@ -266,73 +647,356 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Package, Bundle & Add-On Pricing displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "fixedPackagePrice": {
+   "packagePrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed Package Price"
+    "description": "Package Price: the fixed or derived price charged for the package (AED 850 in the example)"
    },
-   "sumOfComponents": {
+   "pricingId": {
     "type": "string",
-    "description": "Sum of Components"
+    "description": "Package / add-on pricing ID"
    },
-   "discountedComponentSum": {
+   "recordKind": {
     "type": "string",
-    "description": "Discounted Component Sum"
+    "enum": [
+     "package",
+     "bundle",
+     "addOn"
+    ],
+    "description": "What is priced"
    },
-   "componentOverride": {
+   "productId": {
     "type": "string",
-    "description": "Component Override"
+    "description": "The catalogue package, bundle or add-on product"
    },
-   "includedComponent": {
+   "name": {
     "type": "string",
-    "description": "Included Component"
+    "description": "Name"
    },
-   "optionalPaidComponent": {
+   "priceListId": {
     "type": "string",
-    "description": "Optional Paid Component"
+    "description": "Price list the pricing belongs to"
    },
-   "fastTrack": {
+   "pricingModel": {
     "type": "string",
-    "description": "Fast Track"
+    "enum": [
+     "fixedPackagePrice",
+     "sumOfComponents",
+     "discountedComponentSum",
+     "componentOverride"
+    ],
+    "description": "Package Pricing Model (p.14)",
+    "nullable": true
    },
-   "parking": {
+   "addOnType": {
     "type": "string",
-    "description": "Parking"
+    "enum": [
+     "fastTrack",
+     "parking",
+     "meal",
+     "photo",
+     "equipment",
+     "upgrade",
+     "additionalPerformance",
+     "premiumAccess",
+     "other"
+    ],
+    "description": "Add-On Pricing kind (p.15); additionalPerformance is the design's \"additional session\"; empty for a package",
+    "nullable": true
    },
-   "meal": {
-    "type": "string",
-    "description": "Meal"
+   "components": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "productId": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "role": {
+       "type": "string",
+       "enum": [
+        "included",
+        "requiredPaid",
+        "optionalPaid"
+       ]
+      },
+      "componentPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    },
+    "description": "Components with their role (Required vs Optional, p.15) and the price each contributes"
    },
-   "photo": {
-    "type": "string",
-    "description": "Photo"
-   },
-   "equipment": {
-    "type": "string",
-    "description": "Equipment"
-   },
-   "additionalSession": {
-    "type": "string",
-    "description": "Additional Session"
-   },
-   "premiumAccess": {
-    "type": "string",
-    "description": "Premium Access"
-   },
-   "packageTotalOnly": {
-    "type": "string",
-    "description": "Package Total Only"
-   },
-   "individualComponents": {
-    "type": "string",
-    "description": "Individual Components"
-   },
-   "componentPackageSaving": {
-    "type": "string",
-    "description": "Component + Package Saving"
-   },
-   "derivedPackagePrice": {
+   "normalTotal": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "derived package price"
+    "description": "Normal Total: sum of the components at their own rates; read-only"
+   },
+   "packageSaving": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commercial package saving: normal total less package price; read-only"
+   },
+   "componentPriceVisibility": {
+    "type": "string",
+    "enum": [
+     "packageTotalOnly",
+     "individualComponents",
+     "componentAndSaving"
+    ],
+    "description": "Component Price Visibility (p.15): what the customer sees"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Bundle Price Integrity (p.15)",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "componentPriceChanged",
+        "missingComponentRate",
+        "packageAboveNormalTotal"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "PackagePricing": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.package_pricing",
+  "description": "**How a package, bundle or add-on is priced from its components** (29 September, data model DM3). ADM-062. The bundle's composition for sale stays `catalogue.published_bundle`; this row is its pricing model. `normalTotal` and `packageSaving` are computed on read from the component rates.",
+  "required": [
+   "id",
+   "scopePath",
+   "productId",
+   "recordKind",
+   "pricingModel",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordKind": {
+    "type": "string",
+    "enum": [
+     "package",
+     "bundle",
+     "addOn"
+    ]
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "priceListId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "pricingModel": {
+    "type": "string",
+    "enum": [
+     "fixedPackagePrice",
+     "sumOfComponents",
+     "discountedComponentSum",
+     "componentOverride"
+    ]
+   },
+   "addOnType": {
+    "type": "string",
+    "enum": [
+     "fastTrack",
+     "parking",
+     "meal",
+     "photo",
+     "equipment",
+     "upgrade",
+     "additionalPerformance",
+     "premiumAccess",
+     "other",
+     null
+    ],
+    "nullable": true
+   },
+   "packagePrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "components": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "`[{productId, quantity, role, componentPrice}]`; `componentPrice` only for `componentOverride`."
+   },
+   "componentPriceVisibility": {
+    "type": "string",
+    "enum": [
+     "packageTotalOnly",
+     "individualComponents",
+     "componentAndSaving"
+    ],
+    "default": "packageTotalOnly"
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CatalogueConfigStatus"
+     }
+    ],
+    "default": "draft"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PriceCategory": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.price_category",
+  "description": "**The library of price categories and rate types** (29 September, data model DM3). ADM-059. A price category is who or what is priced (Adult, Child, Resident ...); a rate type is how (Standard, Peak, Member ...). Both are rows here, `entryKind` says which. Distinct from `catalogue.product_category`, which groups merchandise.",
+  "required": [
+   "id",
+   "scopePath",
+   "entryKind",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `tenant` scope."
+   },
+   "entryKind": {
+    "type": "string",
+    "enum": [
+     "priceCategory",
+     "rateType"
+    ]
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 40,
+    "description": "Unique per `entryKind` within the tenant."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "categoryFamily": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "displayName": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "localizedDisplayNames": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   },
+   "iconLabel": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A parent `catalogue.price_category` of the same `entryKind`."
+   },
+   "isStandard": {
+    "type": "boolean",
+    "default": false,
+    "description": "Shipped with the tenant; may be deactivated, not deleted."
+   },
+   "sortOrder": {
+    "type": "integer",
+    "default": 100
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -342,70 +1006,6 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Price Category & Rate Type Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "adult": {
-    "type": "string",
-    "description": "Adult"
-   },
-   "child": {
-    "type": "string",
-    "description": "Child"
-   },
-   "junior": {
-    "type": "string",
-    "description": "Junior"
-   },
-   "senior": {
-    "type": "string",
-    "description": "Senior"
-   },
-   "student": {
-    "type": "string",
-    "description": "Student"
-   },
-   "resident": {
-    "type": "string",
-    "description": "Resident"
-   },
-   "nonResident": {
-    "type": "string",
-    "description": "Non-Resident"
-   },
-   "member": {
-    "type": "string",
-    "description": "Member"
-   },
-   "vip": {
-    "type": "string",
-    "description": "VIP"
-   },
-   "group": {
-    "type": "string",
-    "description": "Group"
-   },
-   "corporate": {
-    "type": "string",
-    "description": "Corporate"
-   },
-   "b2b": {
-    "type": "string",
-    "description": "B2B"
-   },
-   "complimentary": {
-    "type": "string",
-    "description": "Complimentary"
-   },
-   "staff": {
-    "type": "string",
-    "description": "Staff"
-   },
-   "promotional": {
-    "type": "string",
-    "description": "Promotional"
-   },
-   "custom": {
-    "type": "string",
-    "description": "Custom"
-   },
    "categoryId": {
     "type": "string",
     "description": "Category ID"
@@ -424,7 +1024,7 @@
    },
    "categoryFamily": {
     "type": "string",
-    "description": "Category Family"
+    "description": "Category Family: e.g. Visitor or Member (Parent/Child Structure, p.10)"
    },
    "displayName": {
     "type": "string",
@@ -434,9 +1034,44 @@
     "type": "string",
     "description": "Icon/Label"
    },
-   "activeInactive": {
+   "active": {
+    "type": "boolean",
+    "description": "Active/Inactive: true when the category can be used on new rates"
+   },
+   "entryKind": {
+    "type": "string",
+    "enum": [
+     "priceCategory",
+     "rateType"
+    ],
+    "description": "Whether the row is a price category (who the price represents) or a rate type (how the rate behaves: standard, reduced, contract, negotiated, complimentary, fixed, derived, package, add-on), p.10"
+   },
+   "standard": {
+    "type": "boolean",
+    "description": "A TICVAI standard category (Adult, Child, Junior, Senior, Student, Resident, Non-Resident, Member, VIP, Group, Corporate, B2B, Complimentary, Staff, Promotional) rather than a custom one"
+   },
+   "sortOrder": {
     "type": "integer",
-    "description": "Active/Inactive"
+    "description": "Sort Order"
+   },
+   "parentCategoryId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Parent category (Parent/Child Structure: Visitor -> Adult, Member -> Gold); empty for a top-level category"
+   },
+   "localizedDisplayNames": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    },
+    "description": "Display name per language code, at least en and ar (Localization, p.11)"
+   },
+   "possibleDuplicateOf": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Standardization: ids of categories that appear to mean the same thing (Kids / Child / Children Rate); advisory"
    }
   }
  },
@@ -446,29 +1081,73 @@
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.price_list at 17%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Price Hierarchy & Inheritance Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "hierarchyLevel": {
+   "hierarchyId": {
     "type": "string",
-    "description": "Hierarchy Level"
+    "description": "Price hierarchy ID; empty on create"
    },
-   "priority": {
+   "name": {
     "type": "string",
-    "description": "Priority"
+    "description": "Hierarchy name"
    },
-   "inheritance": {
-    "type": "string",
-    "description": "Inheritance"
-   },
-   "fallbackBehavior": {
-    "type": "string",
-    "description": "Fallback Behavior"
-   },
-   "maximumOverrideRange": {
-    "type": "string",
-    "description": "Maximum Override Range"
-   },
-   "returnToParentPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Return to Parent Price"
+   "levels": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "hierarchyLevel": {
+       "type": "string",
+       "enum": [
+        "globalMaster",
+        "country",
+        "market",
+        "venue",
+        "product",
+        "approvedOverride"
+       ],
+       "description": "Hierarchy Level (Example Hierarchy, p.17)"
+      },
+      "priority": {
+       "type": "integer",
+       "description": "Priority; the lower number is the more general level, the most specific existing price wins"
+      },
+      "inheritance": {
+       "type": "boolean",
+       "description": "Inheritance: the level takes its parent's price when it has none of its own"
+      },
+      "overrideAllowed": {
+       "type": "boolean",
+       "description": "Override Permission / Override Allowed"
+      },
+      "overrideRequiresReason": {
+       "type": "boolean",
+       "description": "Override Requires Reason"
+      },
+      "maximumOverrideRangePercent": {
+       "type": "number",
+       "nullable": true,
+       "description": "Maximum Override Range: largest allowed deviation from the parent price, in percent; empty for no limit"
+      },
+      "overrideExpiryDays": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Override Expiry: days an override stays in force; empty for no expiry (decided 29 September, readiness close-out)"
+      },
+      "returnToParentPrice": {
+       "type": "boolean",
+       "description": "Return to Parent Price when an override expires"
+      },
+      "fallbackBehavior": {
+       "type": "string",
+       "enum": [
+        "useParent",
+        "useDefault",
+        "blockSale"
+       ],
+       "description": "Fallback (p.18): what happens when a child rate does not exist"
+      }
+     }
+    },
+    "description": "Hierarchy Builder (p.17): the ordered levels; saved as a whole so two sources can never be left at equal priority"
    }
   }
  },
@@ -478,29 +1157,93 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Price Hierarchy & Inheritance Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "hierarchyLevel": {
+   "hierarchyId": {
     "type": "string",
-    "description": "Hierarchy Level"
+    "description": "Price hierarchy ID; empty on create"
    },
-   "priority": {
+   "name": {
     "type": "string",
-    "description": "Priority"
+    "description": "Hierarchy name"
    },
-   "inheritance": {
-    "type": "string",
-    "description": "Inheritance"
+   "levels": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "hierarchyLevel": {
+       "type": "string",
+       "enum": [
+        "globalMaster",
+        "country",
+        "market",
+        "venue",
+        "product",
+        "approvedOverride"
+       ],
+       "description": "Hierarchy Level (Example Hierarchy, p.17)"
+      },
+      "priority": {
+       "type": "integer",
+       "description": "Priority; the lower number is the more general level, the most specific existing price wins"
+      },
+      "inheritance": {
+       "type": "boolean",
+       "description": "Inheritance: the level takes its parent's price when it has none of its own"
+      },
+      "overrideAllowed": {
+       "type": "boolean",
+       "description": "Override Permission / Override Allowed"
+      },
+      "overrideRequiresReason": {
+       "type": "boolean",
+       "description": "Override Requires Reason"
+      },
+      "maximumOverrideRangePercent": {
+       "type": "number",
+       "nullable": true,
+       "description": "Maximum Override Range: largest allowed deviation from the parent price, in percent; empty for no limit"
+      },
+      "overrideExpiryDays": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Override Expiry: days an override stays in force; empty for no expiry (decided 29 September, readiness close-out)"
+      },
+      "returnToParentPrice": {
+       "type": "boolean",
+       "description": "Return to Parent Price when an override expires"
+      },
+      "fallbackBehavior": {
+       "type": "string",
+       "enum": [
+        "useParent",
+        "useDefault",
+        "blockSale"
+       ],
+       "description": "Fallback (p.18): what happens when a child rate does not exist"
+      }
+     }
+    },
+    "description": "Hierarchy Builder (p.17): the ordered levels; saved as a whole so two sources can never be left at equal priority"
    },
-   "fallbackBehavior": {
-    "type": "string",
-    "description": "Fallback Behavior"
-   },
-   "maximumOverrideRange": {
-    "type": "string",
-    "description": "Maximum Override Range"
-   },
-   "returnToParentPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Return to Parent Price"
+   "validationIssues": {
+    "type": "array",
+    "description": "Conflict Detection (p.18); read-only",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "equalPriority",
+        "missingFallback",
+        "circularInheritance"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
@@ -511,20 +1254,34 @@
   "description": "**What Price List Master Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "priceListName": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "type": "string",
     "description": "Price List Name"
    },
    "priceListCode": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List Code"
+    "type": "string",
+    "description": "Price List Code; unique within the tenant"
    },
    "description": {
     "type": "string",
     "description": "Description"
    },
    "priceListType": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List Type"
+    "type": "string",
+    "enum": [
+     "standardRetail",
+     "venue",
+     "attraction",
+     "event",
+     "membership",
+     "group",
+     "corporate",
+     "b2b",
+     "reseller",
+     "ota",
+     "internal",
+     "specialMarket"
+    ],
+    "description": "Price List Type (Commercial Types, pp.8-9, and the directory's Price List Types)"
    },
    "legalEntity": {
     "type": "string",
@@ -552,31 +1309,35 @@
    },
    "defaultCurrency": {
     "type": "string",
-    "description": "Default Currency"
+    "description": "Default Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
    },
    "owner": {
     "type": "string",
     "description": "Owner"
    },
    "tags": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Tags"
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: draft, configured, inactive or archived are set here; validated is set by structure validation (ADM-057) and active / expired by Board 4 publication"
    },
    "defaultRateCategory": {
-    "type": "number",
-    "description": "Default Rate Category"
+    "type": "string",
+    "description": "Default Rate Category: code of a price category from the library (ADM-050)"
    },
    "defaultRoundingProfile": {
     "type": "string",
-    "description": "Default Rounding Profile"
+    "description": "Default Rounding Profile: code of a currency rounding rule (ADM-075)"
    },
    "defaultPriceHierarchy": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Default Price Hierarchy"
+    "type": "string",
+    "description": "Default Price Hierarchy: id of the price hierarchy (ADM-055) this list resolves against"
    },
    "allowOverrides": {
     "type": "boolean",
@@ -594,17 +1355,27 @@
     "type": "boolean",
     "description": "Allow Product-Specific Rates"
    },
-   "global": {
+   "priceListId": {
     "type": "string",
-    "description": "Global"
+    "description": "Price List ID; empty on create, the list to update otherwise"
    },
-   "event": {
+   "scope": {
     "type": "string",
-    "description": "Event"
+    "enum": [
+     "global",
+     "country",
+     "market",
+     "brand",
+     "venue",
+     "event",
+     "businessUnit"
+    ],
+    "description": "Scope: where the price list can apply (p.8)"
    },
-   "into": {
+   "clonedFromPriceListId": {
     "type": "string",
-    "description": "into"
+    "nullable": true,
+    "description": "The price list this one was duplicated from (Duplicate, p.9: UAE Standard 2026 into UAE Standard 2027); empty when built from scratch"
    }
   }
  },
@@ -615,20 +1386,34 @@
   "description": "**What Price List Master Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "priceListName": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "type": "string",
     "description": "Price List Name"
    },
    "priceListCode": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List Code"
+    "type": "string",
+    "description": "Price List Code; unique within the tenant"
    },
    "description": {
     "type": "string",
     "description": "Description"
    },
    "priceListType": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List Type"
+    "type": "string",
+    "enum": [
+     "standardRetail",
+     "venue",
+     "attraction",
+     "event",
+     "membership",
+     "group",
+     "corporate",
+     "b2b",
+     "reseller",
+     "ota",
+     "internal",
+     "specialMarket"
+    ],
+    "description": "Price List Type (Commercial Types, pp.8-9, and the directory's Price List Types)"
    },
    "legalEntity": {
     "type": "string",
@@ -656,31 +1441,35 @@
    },
    "defaultCurrency": {
     "type": "string",
-    "description": "Default Currency"
+    "description": "Default Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
    },
    "owner": {
     "type": "string",
     "description": "Owner"
    },
    "tags": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Tags"
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: draft, configured, inactive or archived are set here; validated is set by structure validation (ADM-057) and active / expired by Board 4 publication"
    },
    "defaultRateCategory": {
-    "type": "number",
-    "description": "Default Rate Category"
+    "type": "string",
+    "description": "Default Rate Category: code of a price category from the library (ADM-050)"
    },
    "defaultRoundingProfile": {
     "type": "string",
-    "description": "Default Rounding Profile"
+    "description": "Default Rounding Profile: code of a currency rounding rule (ADM-075)"
    },
    "defaultPriceHierarchy": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Default Price Hierarchy"
+    "type": "string",
+    "description": "Default Price Hierarchy: id of the price hierarchy (ADM-055) this list resolves against"
    },
    "allowOverrides": {
     "type": "boolean",
@@ -698,17 +1487,46 @@
     "type": "boolean",
     "description": "Allow Product-Specific Rates"
    },
-   "global": {
+   "priceListId": {
     "type": "string",
-    "description": "Global"
+    "description": "Price List ID; empty on create, the list to update otherwise"
    },
-   "event": {
+   "scope": {
     "type": "string",
-    "description": "Event"
+    "enum": [
+     "global",
+     "country",
+     "market",
+     "brand",
+     "venue",
+     "event",
+     "businessUnit"
+    ],
+    "description": "Scope: where the price list can apply (p.8)"
    },
-   "into": {
+   "clonedFromPriceListId": {
     "type": "string",
-    "description": "into"
+    "nullable": true,
+    "description": "The price list this one was duplicated from (Duplicate, p.9: UAE Standard 2026 into UAE Standard 2027); empty when built from scratch"
+   },
+   "consumingModules": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticketing",
+      "b2c",
+      "pos",
+      "kiosk",
+      "b2b",
+      "groupSales",
+      "membership",
+      "fnb",
+      "retail",
+      "rental"
+     ]
+    },
+    "description": "Dependencies: the modules that consume this list (p.9); read-only"
    }
   }
  },
@@ -718,82 +1536,189 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Price List Templates, Clone & Reuse displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "priceCategories": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Categories"
-   },
-   "rateTypes": {
-    "type": "number",
-    "description": "Rate Types"
-   },
-   "rateMatrixStructure": {
-    "type": "number",
-    "description": "Rate Matrix Structure"
-   },
-   "currencyStructure": {
+   "templateId": {
     "type": "string",
-    "description": "Currency Structure"
+    "description": "Template ID"
    },
-   "hierarchy": {
+   "name": {
     "type": "string",
-    "description": "Hierarchy"
+    "description": "Template name, e.g. Theme Park Pricing"
    },
-   "productMappingPattern": {
+   "templateType": {
     "type": "string",
-    "description": "Product Mapping Pattern"
+    "description": "Template Library type: standardAttraction, themePark, museum, concert, sports, membership, group, corporate, b2b, rental or custom (p.18)"
    },
-   "packagePricingPattern": {
+   "description": {
     "type": "string",
-    "description": "Package Pricing Pattern"
+    "description": "Description"
    },
-   "completePriceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Complete Price List"
+   "components": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "priceCategories",
+      "rateTypes",
+      "rateMatrixStructure",
+      "currencyStructure",
+      "hierarchy",
+      "productMappingPattern",
+      "packagePricingPattern"
+     ]
+    },
+    "description": "Template Components the template carries (p.18)"
    },
-   "rateStructureOnly": {
-    "type": "number",
-    "description": "Rate Structure Only"
-   },
-   "selectedCategories": {
+   "sourcePriceListId": {
     "type": "string",
-    "description": "Selected Categories"
+    "nullable": true,
+    "description": "Price list the template was taken from; empty when built directly"
    },
-   "productAssignments": {
-    "type": "string",
-    "description": "Product Assignments"
+   "aiDrafted": {
+    "type": "boolean",
+    "description": "Drafted by AI-assisted template generation and awaiting administrator review"
    },
-   "marketStructure": {
+   "status": {
     "type": "string",
-    "description": "Market Structure"
+    "description": "Status: draft, active or archived"
    },
-   "optionsType": {
+   "owner": {
     "type": "string",
-    "enum": [
-     "copyCategories",
-     "copyRateStructure",
-     "copyProductMapping",
-     "copyMonetaryValues",
-     "increaseValuesBy5"
-    ],
-    "description": "Vocabulary listed under Options."
-   },
-   "venueType": {
-    "type": "string",
-    "description": "Venue Type"
-   },
-   "productPortfolio": {
-    "type": "string",
-    "description": "Product Portfolio"
-   },
-   "similarVenues": {
-    "type": "string",
-    "description": "Similar Venues"
-   },
-   "existingTicvaiConfiguration": {
-    "type": "string",
-    "description": "Existing TICVAI Configuration"
+    "description": "Owner"
    }
   }
+ },
+ "PricingMarket": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.pricing_market",
+  "description": "**A node of the market pricing structure: global, country, region, market or venue** (29 September, data model DM3). ADM-064. Says which price list and rounding a market uses and whether it inherits from its parent. **At venue level the selling currency is the venue's trading currency** and cannot differ from it (ADR-0018, frozen once the venue has traded); above venue level the currencies are reporting and base currencies.",
+  "required": [
+   "id",
+   "scopePath",
+   "hierarchyLevel"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `tenant` scope."
+   },
+   "hierarchyLevel": {
+    "type": "string",
+    "enum": [
+     "global",
+     "country",
+     "region",
+     "market",
+     "venue"
+    ]
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The parent `catalogue.pricing_market`."
+   },
+   "countryCode": {
+    "type": "string",
+    "maxLength": 2,
+    "nullable": true,
+    "pattern": "^[A-Z]{2}$"
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "region": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "brand": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "baseCurrency": {
+    "type": "string",
+    "maxLength": 3,
+    "nullable": true,
+    "pattern": "^[A-Z]{3}$"
+   },
+   "sellingCurrency": {
+    "type": "string",
+    "maxLength": 3,
+    "nullable": true,
+    "pattern": "^[A-Z]{3}$"
+   },
+   "roundingProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "displayFormat": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "priceListId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "inheritsFromParent": {
+    "type": "boolean",
+    "default": true
+   },
+   "fxReferenceRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "Reference only; FX supplies inputs, it never decides a price."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "ProductKind": {
+  "type": "string",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n",
+  "enum": [
+   "admission",
+   "timedAdmission",
+   "datedAdmission",
+   "openDated",
+   "seated",
+   "membership",
+   "bundle",
+   "fnb",
+   "retail",
+   "rental",
+   "addOn",
+   "giftCard"
+  ]
  },
  "ProductServicePriceAssignmentInput": {
   "type": "object",
@@ -801,85 +1726,73 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Product & Service Price Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "ticketProduct": {
+   "assignmentId": {
     "type": "string",
-    "description": "Ticket Product"
+    "description": "Assignment ID; empty on create"
    },
-   "ticketType": {
+   "objectType": {
     "type": "string",
-    "description": "Ticket Type"
+    "enum": [
+     "ticketProduct",
+     "ticketType",
+     "admission",
+     "event",
+     "performance",
+     "membership",
+     "annualPass",
+     "addOn",
+     "fnbItem",
+     "retailProduct",
+     "rentalItem",
+     "resource",
+     "reservationService",
+     "experience",
+     "otherSellableService"
+    ],
+    "description": "Supported Commercial Objects (p.13): the kind of sellable object being priced"
    },
-   "admission": {
+   "objectIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "The objects assigned; more than one is a Bulk Assignment (25 attraction products -> one price list)"
+   },
+   "assignmentScope": {
     "type": "string",
-    "description": "Admission"
+    "enum": [
+     "productLevel",
+     "productVariant",
+     "ticketType",
+     "event",
+     "performance",
+     "venue"
+    ],
+    "description": "Assignment Scope (p.14): the level at which the assignment holds"
    },
-   "event": {
+   "scopeRefId": {
     "type": "string",
-    "description": "Event"
+    "nullable": true,
+    "description": "The variant, ticket type, event, performance or venue the assignment is limited to; empty at product level"
    },
-   "performance": {
+   "priceListId": {
     "type": "string",
-    "description": "Performance"
+    "description": "The price list assigned"
    },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "annualPass": {
-    "type": "string",
-    "description": "Annual Pass"
-   },
-   "addOn": {
-    "type": "string",
-    "description": "Add-On"
-   },
-   "fBItem": {
-    "type": "string",
-    "description": "F&B Item"
-   },
-   "retailProduct": {
-    "type": "string",
-    "description": "Retail Product"
-   },
-   "rentalItem": {
-    "type": "string",
-    "description": "Rental Item"
-   },
-   "resource": {
-    "type": "string",
-    "description": "Resource"
-   },
-   "reservationService": {
-    "type": "string",
-    "description": "Reservation Service"
-   },
-   "experience": {
-    "type": "string",
-    "description": "Experience"
-   },
-   "otherSellableService": {
-    "type": "string",
-    "description": "Other Sellable Service"
-   },
-   "andAssign": {
-    "type": "string",
-    "description": "and assign"
-   },
-   "uaeStandardAdmissionPriceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "UAE Standard Admission Price List"
-   },
-   "productLevel": {
-    "type": "string",
-    "description": "Product Level"
-   },
-   "productVariant": {
-    "type": "string",
-    "description": "Product Variant"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+   "categoryRates": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "priceCategory": {
+       "type": "string"
+      },
+      "rateId": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Product -> Price List -> Category -> Rate (Assignment Workspace, p.13): which rate of the list serves each category; empty uses every active rate of the list"
    }
   }
  },
@@ -889,85 +1802,77 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Product & Service Price Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "ticketProduct": {
+   "assignmentId": {
     "type": "string",
-    "description": "Ticket Product"
+    "description": "Assignment ID; empty on create"
    },
-   "ticketType": {
+   "objectType": {
     "type": "string",
-    "description": "Ticket Type"
+    "enum": [
+     "ticketProduct",
+     "ticketType",
+     "admission",
+     "event",
+     "performance",
+     "membership",
+     "annualPass",
+     "addOn",
+     "fnbItem",
+     "retailProduct",
+     "rentalItem",
+     "resource",
+     "reservationService",
+     "experience",
+     "otherSellableService"
+    ],
+    "description": "Supported Commercial Objects (p.13): the kind of sellable object being priced"
    },
-   "admission": {
+   "objectIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "The objects assigned; more than one is a Bulk Assignment (25 attraction products -> one price list)"
+   },
+   "assignmentScope": {
     "type": "string",
-    "description": "Admission"
+    "enum": [
+     "productLevel",
+     "productVariant",
+     "ticketType",
+     "event",
+     "performance",
+     "venue"
+    ],
+    "description": "Assignment Scope (p.14): the level at which the assignment holds"
    },
-   "event": {
+   "scopeRefId": {
     "type": "string",
-    "description": "Event"
+    "nullable": true,
+    "description": "The variant, ticket type, event, performance or venue the assignment is limited to; empty at product level"
    },
-   "performance": {
+   "priceListId": {
     "type": "string",
-    "description": "Performance"
+    "description": "The price list assigned"
    },
-   "membership": {
+   "categoryRates": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "priceCategory": {
+       "type": "string"
+      },
+      "rateId": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Product -> Price List -> Category -> Rate (Assignment Workspace, p.13): which rate of the list serves each category; empty uses every active rate of the list"
+   },
+   "pricingSource": {
     "type": "string",
-    "description": "Membership"
-   },
-   "annualPass": {
-    "type": "string",
-    "description": "Annual Pass"
-   },
-   "addOn": {
-    "type": "string",
-    "description": "Add-On"
-   },
-   "fBItem": {
-    "type": "string",
-    "description": "F&B Item"
-   },
-   "retailProduct": {
-    "type": "string",
-    "description": "Retail Product"
-   },
-   "rentalItem": {
-    "type": "string",
-    "description": "Rental Item"
-   },
-   "resource": {
-    "type": "string",
-    "description": "Resource"
-   },
-   "reservationService": {
-    "type": "string",
-    "description": "Reservation Service"
-   },
-   "experience": {
-    "type": "string",
-    "description": "Experience"
-   },
-   "otherSellableService": {
-    "type": "string",
-    "description": "Other Sellable Service"
-   },
-   "andAssign": {
-    "type": "string",
-    "description": "and assign"
-   },
-   "uaeStandardAdmissionPriceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "UAE Standard Admission Price List"
-   },
-   "productLevel": {
-    "type": "string",
-    "description": "Product Level"
-   },
-   "productVariant": {
-    "type": "string",
-    "description": "Product Variant"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+    "description": "Price Source Visibility (p.14): the name shown on the product, e.g. UAE Standard Admission 2027; read-only"
    }
   }
  },
@@ -977,106 +1882,88 @@
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.price at 4%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Rate Structure Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Each rate should contain* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
-   "d250": {
-    "type": "string",
-    "description": "d 250"
-   },
    "rateId": {
     "type": "string",
     "description": "Rate ID"
    },
    "rateName": {
-    "type": "number",
+    "type": "string",
     "description": "Rate Name"
    },
    "rateCode": {
-    "type": "number",
+    "type": "string",
     "description": "Rate Code"
    },
    "priceCategory": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Category"
+    "type": "string",
+    "description": "Price Category: code of a category from the library (ADM-050)"
    },
    "rateType": {
-    "type": "number",
-    "description": "Rate Type"
+    "type": "string",
+    "description": "Rate Type: code of a rate type from the library (ADM-050), e.g. standard, reduced, derived"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Amount"
+    "description": "Amount; ignored when derivedFrom is set"
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
    },
    "unitBasis": {
     "type": "string",
-    "description": "Unit Basis"
+    "enum": [
+     "perTicket",
+     "perPerson",
+     "perUnit",
+     "perHour",
+     "perDay",
+     "perPerformance",
+     "perResource",
+     "perPackage",
+     "perMembershipPeriod"
+    ],
+    "description": "Unit Basis (p.12); perPerformance is the pack's \"Per Session\" (a session is a Performance)"
    },
    "precision": {
-    "type": "string",
-    "description": "Precision"
+    "type": "integer",
+    "description": "Precision: decimal places, 0 to 3 (MoM 1 Sep §4.5 requires up to three)",
+    "minimum": 0,
+    "maximum": 3
    },
    "roundingProfile": {
     "type": "string",
-    "description": "Rounding Profile"
+    "description": "Rounding Profile: code of a currency rounding rule (ADM-075)"
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: draft, active or disabled"
    },
-   "perTicket": {
+   "priceListId": {
     "type": "string",
-    "description": "Per Ticket"
+    "description": "The price list the rate belongs to"
    },
-   "perPerson": {
-    "type": "string",
-    "description": "Per Person"
-   },
-   "perUnit": {
-    "type": "string",
-    "description": "Per Unit"
-   },
-   "perHour": {
-    "type": "string",
-    "description": "Per Hour"
-   },
-   "perDay": {
-    "type": "string",
-    "description": "Per Day"
-   },
-   "perSession": {
-    "type": "string",
-    "description": "Per Session"
-   },
-   "perResource": {
-    "type": "string",
-    "description": "Per Resource"
-   },
-   "perPackage": {
-    "type": "string",
-    "description": "Per Package"
-   },
-   "perMembershipPeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Per Membership Period"
-   },
-   "missingAmounts": {
-    "type": "string",
-    "description": "Missing Amounts"
-   },
-   "unsupportedCurrency": {
-    "type": "string",
-    "description": "Unsupported Currency"
-   },
-   "invalidDerivedRate": {
-    "type": "number",
-    "description": "Invalid Derived Rate"
-   },
-   "circularRateRelationship": {
-    "type": "number",
-    "description": "Circular Rate Relationship"
+   "derivedFrom": {
+    "type": "object",
+    "nullable": true,
+    "description": "Derived Rates (p.12): this rate is another rate adjusted (Child = Adult - 25%, VIP = Standard + AED 200); a commercial relationship, not dynamic pricing. Empty for an entered amount",
+    "properties": {
+     "baseRateId": {
+      "type": "string"
+     },
+     "adjustmentType": {
+      "type": "string",
+      "enum": [
+       "percentage",
+       "fixedAmount"
+      ]
+     },
+     "adjustmentValue": {
+      "type": "number",
+      "description": "Percent or amount in the rate currency; negative reduces"
+     }
+    }
    }
   },
   "x-ticvai-record-definition": "Each rate should contain"
@@ -1087,122 +1974,110 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Rate Structure Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "d250": {
-    "type": "string",
-    "description": "d 250"
-   },
-   "childReduced": {
-    "type": "string",
-    "description": "Child Reduced (the pack shows 180)"
-   },
-   "seniorReduced": {
-    "type": "string",
-    "description": "Senior Reduced (the pack shows 190)"
-   },
-   "residentReduced": {
-    "type": "string",
-    "description": "Resident Reduced (the pack shows 210)"
-   },
-   "groupGroup": {
-    "type": "string",
-    "description": "Group Group (the pack shows 195)"
-   },
    "rateId": {
     "type": "string",
     "description": "Rate ID"
    },
    "rateName": {
-    "type": "number",
+    "type": "string",
     "description": "Rate Name"
    },
    "rateCode": {
-    "type": "number",
+    "type": "string",
     "description": "Rate Code"
    },
    "priceCategory": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Category"
+    "type": "string",
+    "description": "Price Category: code of a category from the library (ADM-050)"
    },
    "rateType": {
-    "type": "number",
-    "description": "Rate Type"
+    "type": "string",
+    "description": "Rate Type: code of a rate type from the library (ADM-050), e.g. standard, reduced, derived"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Amount"
+    "description": "Amount; for a derived rate this is the computed value, read-only"
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
    },
    "unitBasis": {
     "type": "string",
-    "description": "Unit Basis"
+    "enum": [
+     "perTicket",
+     "perPerson",
+     "perUnit",
+     "perHour",
+     "perDay",
+     "perPerformance",
+     "perResource",
+     "perPackage",
+     "perMembershipPeriod"
+    ],
+    "description": "Unit Basis (p.12); perPerformance is the pack's \"Per Session\" (a session is a Performance)"
    },
    "precision": {
-    "type": "string",
-    "description": "Precision"
+    "type": "integer",
+    "description": "Precision: decimal places, 0 to 3 (MoM 1 Sep §4.5 requires up to three)",
+    "minimum": 0,
+    "maximum": 3
    },
    "roundingProfile": {
     "type": "string",
-    "description": "Rounding Profile"
+    "description": "Rounding Profile: code of a currency rounding rule (ADM-075)"
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: draft, active or disabled"
    },
-   "perTicket": {
+   "priceListId": {
     "type": "string",
-    "description": "Per Ticket"
+    "description": "The price list the rate belongs to"
    },
-   "perPerson": {
-    "type": "string",
-    "description": "Per Person"
+   "derivedFrom": {
+    "type": "object",
+    "nullable": true,
+    "description": "Derived Rates (p.12): this rate is another rate adjusted (Child = Adult - 25%, VIP = Standard + AED 200); a commercial relationship, not dynamic pricing. Empty for an entered amount",
+    "properties": {
+     "baseRateId": {
+      "type": "string"
+     },
+     "adjustmentType": {
+      "type": "string",
+      "enum": [
+       "percentage",
+       "fixedAmount"
+      ]
+     },
+     "adjustmentValue": {
+      "type": "number",
+      "description": "Percent or amount in the rate currency; negative reduces"
+     }
+    }
    },
-   "perUnit": {
-    "type": "string",
-    "description": "Per Unit"
-   },
-   "perHour": {
-    "type": "string",
-    "description": "Per Hour"
-   },
-   "perDay": {
-    "type": "string",
-    "description": "Per Day"
-   },
-   "perSession": {
-    "type": "string",
-    "description": "Per Session"
-   },
-   "perResource": {
-    "type": "string",
-    "description": "Per Resource"
-   },
-   "perPackage": {
-    "type": "string",
-    "description": "Per Package"
-   },
-   "perMembershipPeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Per Membership Period"
-   },
-   "missingAmounts": {
-    "type": "string",
-    "description": "Missing Amounts"
-   },
-   "unsupportedCurrency": {
-    "type": "string",
-    "description": "Unsupported Currency"
-   },
-   "invalidDerivedRate": {
-    "type": "number",
-    "description": "Invalid Derived Rate"
-   },
-   "circularRateRelationship": {
-    "type": "number",
-    "description": "Circular Rate Relationship"
+   "validationIssues": {
+    "type": "array",
+    "description": "Validation (pp.12-13): problems found on this rate; read-only",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "duplicateRate",
+        "missingAmount",
+        "unsupportedCurrency",
+        "invalidDerivedRate",
+        "circularRateRelationship"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  }

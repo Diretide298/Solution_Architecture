@@ -19,34 +19,14 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "fromFlows": true,
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
-    },
-    {
-     "to": "BO-048",
-     "trigger": "Collected on the way out",
-     "provenance": "flow F17 step 4→5",
-     "operation": "listMerchandise",
-     "crossesDevice": true,
-     "back": false
+     "provenance": "derived — GST-001 declares entryState.params  and GST-026 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
      "to": "BO-069",
@@ -55,13 +35,21 @@
      "operation": "getGameCard",
      "crossesDevice": true,
      "back": false
+    },
+    {
+     "to": "BO-048",
+     "trigger": "Collected on the way out",
+     "provenance": "flow F17 step 4→5",
+     "operation": "listMerchandise",
+     "crossesDevice": true,
+     "back": false,
+     "carries": [
+      "merchandiseId"
+     ]
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation removed 24 August**: BO-048, BO-069. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
-  "openQuestions": [
-   "Inventory cites `GET /products?kind=retail` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation removed 24 August**: BO-048, BO-069. **Buying to collect goes through the cart** (decided 28 September, audit R236) — `addCartLine`, `checkoutCart`, `createPayment`, and payment creates the shop-and-drop, as on the web's WEB-033; `reserveMerchandise` stays only as an unpaid hold to pay at the shop. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listMerchandise` reads the population and `getGameCard` reads one of them — list, select, act",
@@ -74,8 +62,36 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?outletId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?categoryId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "toggle",
+       "label": "In stock only",
+       "operation": "listMerchandise",
+       "notes": "Sends `?inStockOnly=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listMerchandise",
+       "notes": "Sends `?search=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every retail merchandise",
+       "label": "Every merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -102,7 +118,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected retail merchandise",
+       "label": "The selected merchandise",
+       "bindsTo": "MerchandiseItem",
+       "columns": [
+        "MerchandiseItem.description",
+        "MerchandiseItem.id",
+        "MerchandiseItem.sku",
+        "MerchandiseItem.barcode",
+        "MerchandiseItem.name",
+        "MerchandiseItem.outletId",
+        "MerchandiseItem.categoryId",
+        "MerchandiseItem.variantId",
+        "MerchandiseItem.inventoryItemId",
+        "MerchandiseItem.price",
+        "MerchandiseItem.onHand",
+        "MerchandiseItem.isReturnable",
+        "MerchandiseItem.returnWindowDays",
+        "MerchandiseItem.requiresSerialNumber",
+        "MerchandiseItem.imageAssetRef",
+        "MerchandiseItem.isActive"
+       ],
+       "operation": "listMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The game card",
        "bindsTo": "GameCard",
        "columns": [
         "GameCard.cardCode",
@@ -123,15 +164,54 @@
        "provenance": "contract games.yaml GET /game-cards/{cardCode}"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lookup merchandise",
+       "operation": "lookupMerchandise",
+       "notes": "Sends `?outletId=` — the outlet the guest is browsing — because the app has no workstation; price and stock are that outlet's, and an inactive item is not found (decided 28 September, audit R215 (1)).",
+       "provenance": "contract retail.yaml GET /merchandise/lookup"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add to cart for collection",
+       "operation": "addCartLine",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Check out to collect on the way out",
+       "operation": "checkoutCart",
+       "notes": "**Paid online at checkout** (decided 28 September, audit R236): merchandise marked for collection goes in the cart with `addCartLine`, the cart is checked out and paid here, and **payment creates the shop-and-drop** for collection on the way out. Nothing is reserved unpaid in the app either; `reserveMerchandise` below only holds unpaid stock to pay for at the shop.",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Pay",
+       "operation": "createPayment",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Hold to pay at the shop",
+       "operation": "reserveMerchandise",
+       "notes": "An unpaid hold, not a purchase — the item is allocated and paid for at the outlet; buying to collect is the cart above (decided 28 September, audit R236).",
+       "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The retail merchandise list.",
    "error": "Could not load. Names which read failed and leaves the retail merchandise untouched.",
-   "emptyFirstRun": "No retail merchandise yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the retail merchandise are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No retail merchandise yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on outletId, categoryId, inStockOnly, search and the retail merchandise are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -139,7 +219,7 @@
     "operationId": "getGameCard",
     "contract": "games",
     "purpose": "Read a card's balances",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listMerchandise",
@@ -151,7 +231,28 @@
     "operationId": "lookupMerchandise",
     "contract": "retail",
     "purpose": "Find an item by code or scan",
-    "trigger": "onLoad"
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Put the item in the cart, marked for collection on the way out (audit R236)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMerchandise"
+    ]
+   },
+   {
+    "operationId": "checkoutCart",
+    "contract": "orders",
+    "purpose": "Turn the cart into an order; merchandise for collection is paid online (audit R236)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createPayment",
+    "contract": "orders",
+    "purpose": "Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit R236)",
+    "trigger": "onAction"
    },
    {
     "operationId": "reserveMerchandise",
@@ -163,6 +264,10 @@
   "entryState": {
    "params": [
     {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
      "name": "cardCode",
      "from": "deepLink"
     },
@@ -173,19 +278,73 @@
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `cardCode`.",
    "preloaded": [
-    "GameCard.cardCode",
-    "GameCard.kind",
-    "GameCard.venueId",
-    "GameCard.subjectId",
-    "GameCard.credits"
+    "MerchandiseItem.description",
+    "MerchandiseItem.id",
+    "MerchandiseItem.sku",
+    "MerchandiseItem.barcode",
+    "MerchandiseItem.name"
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-026"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-026",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "partial",
+    "view": "Account → All screens → Wave 2 → Retail / merchandise",
+    "differences": "Prototype only reserves for collection (reserveMerchandise). The YAML also declares addCartLine/checkoutCart/createPayment and getGameCard, and the prototype shows neither a buy-now path nor a game card."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formReserveMerchandise",
+    "component": "modal",
+    "trigger": "Reserve merchandise",
+    "body": "**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`, `expiresAt`. Optional: `subjectId`, `collectionNote`. **Expiry** (`expiresAt`) is picked from 15 minutes ahead up to the close of the venue's operating day, and the picker offers nothing outside that window (decided 28 September, audit R215 (2)). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reserve merchandise",
+     "operation": "reserveMerchandise"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "expiresAt",
+      "subjectId",
+      "collectionNote"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add to cart for collection",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",

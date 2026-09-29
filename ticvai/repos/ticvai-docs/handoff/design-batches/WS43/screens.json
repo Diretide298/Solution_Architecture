@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-118 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-119",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An authorized administrator can locate any product, identify its exact lifecycle state and determine the next required operational action from one screen.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide administrators with a centralized operational view of every product and its current lifecycle state.",
-  "purposeNote": "An authorized administrator can locate any product, identify its exact lifecycle state and determine the next required operational action from one screen.",
   "gaps": [
    {
     "operation": null,
@@ -150,17 +147,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "ProductLifecycleCommandCenterView.showCurrentLifecycleStatus",
-    "ProductLifecycleCommandCenterView.oDraft",
-    "ProductLifecycleCommandCenterView.oInConfiguration",
-    "ProductLifecycleCommandCenterView.oPendingApproval",
-    "ProductLifecycleCommandCenterView.oApproved"
+    "ProductLifecycleCommandCenterView.lifecycleState"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-118"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-118",
+   "workshopBoard": "wireframes/WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-118"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 3. 0 of 0 labels bound to a contract property; 0 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -224,10 +218,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "A new product can be created and saved in Draft without becoming commercially available until all required configuration and governance conditions are satisfied.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide a governed starting point for creating a new ticketing product.",
-  "purposeNote": "A new product can be created and saved in Draft without becoming commercially available until all required configuration and governance conditions are satisfied.",
   "gaps": [
    {
     "operation": null,
@@ -280,16 +274,14 @@
     "operationId": "createProduct",
     "contract": "catalogue",
     "purpose": "Create a product",
-    "trigger": "onAction",
-    "invalidates": [
-     "createProduct"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-119"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-119",
+   "workshopBoard": "wireframes/WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-119"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 4. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -353,10 +345,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can configure a controlled product lifecycle without development or database changes.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure how products move between lifecycle states.",
-  "purposeNote": "Administrators can configure a controlled product lifecycle without development or database changes.",
   "gaps": [
    {
     "operation": null,
@@ -409,16 +401,14 @@
     "operationId": "setLifecycleStatuWorkflow",
     "contract": "catalogue",
     "purpose": "Lifecycle Status & Workflow Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setLifecycleStatuWorkflow"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-120"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-120",
+   "workshopBoard": "wireframes/WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-120"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -482,10 +472,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An administrator can convert a large existing catalogue into draft TICVAI products through a controlled import and validation process.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow large catalogues to be created efficiently rather than configuring every product manually. This directly addresses the matrix requirement for catalogue creation through bulk-file upload.",
-  "purposeNote": "An administrator can convert a large existing catalogue into draft TICVAI products through a controlled import and validation process.",
   "gaps": [
    {
     "operation": null,
@@ -538,16 +528,14 @@
     "operationId": "createBulkProductCatalogue",
     "contract": "catalogue",
     "purpose": "Bulk Product Creation & Catalogue Import",
-    "trigger": "onAction",
-    "invalidates": [
-     "createBulkProductCatalogue"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-121"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-121",
+   "workshopBoard": "wireframes/WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-121"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 0 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -611,10 +599,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Products can be moved between authorized environments without manually recreating their configuration and without silently overwriting incompatible production settings.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow controlled movement of product configurations between TICVAI environments. This covers the matrix requirement for importing/exporting catalogue products between different environments.",
-  "purposeNote": "Products can be moved between authorized environments without manually recreating their configuration and without silently overwriting incompatible production settings.",
   "gaps": [
    {
     "operation": null,
@@ -660,17 +648,16 @@
   ],
   "entryState": {
    "preloaded": [
-    "ProductImportExportEnvironmentTransferView.mapVenueLocationReferences",
-    "ProductImportExportEnvironmentTransferView.mapDependencies",
-    "ProductImportExportEnvironmentTransferView.detectMissingReferences",
-    "ProductImportExportEnvironmentTransferView.previewChanges",
-    "ProductImportExportEnvironmentTransferView.executeTransfer"
+    "ProductImportExportEnvironmentTransferView.referenceMappings",
+    "ProductImportExportEnvironmentTransferView.missingReferences",
+    "ProductImportExportEnvironmentTransferView.changePreview"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-122"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-122",
+   "workshopBoard": "wireframes/WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-122"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -734,10 +721,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every governed product has clearly defined ownership, organizational context and operational/commercial assignment.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define where the product belongs and who is responsible for it.",
-  "purposeNote": "Every governed product has clearly defined ownership, organizational context and operational/commercial assignment.",
   "gaps": [
    {
     "operation": null,
@@ -790,16 +777,14 @@
     "operationId": "setProductContextOwnership",
     "contract": "catalogue",
     "purpose": "Product Context, Ownership & Assignment",
-    "trigger": "onAction",
-    "invalidates": [
-     "setProductContextOwnership"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-123"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-123",
+   "workshopBoard": "wireframes/WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-123"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -863,10 +848,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An authorized user can control precisely which approved channels expose a product while previously issued valid entitlements remain unaffected unless a separate governed action explicitly changes them.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control where a product may be exposed for sale.",
-  "purposeNote": "An authorized user can control precisely which approved channels expose a product while previously issued valid entitlements remain unaffected unless a separate governed action explicitly changes them.",
   "gaps": [
    {
     "operation": null,
@@ -917,16 +902,14 @@
     "operationId": "publishChannelAvailability",
     "contract": "catalogue",
     "purpose": "Channel Publication & Availability",
-    "trigger": "onAction",
-    "invalidates": [
-     "publishChannelAvailability"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-124"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-124",
+   "workshopBoard": "wireframes/WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-124"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -990,16 +973,11 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Products can automatically enter or leave defined commercial lifecycle states at configured times without manual intervention.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Automate future product lifecycle actions.",
-  "purposeNote": "Products can automatically enter or leave defined commercial lifecycle states at configured times without manual intervention.",
   "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 10"
-   },
    {
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
@@ -1016,6 +994,7 @@
       {
        "kind": "primaryButton",
        "label": "Publish",
+       "operation": "publishActivationScheduler",
        "provenance": "contract operation publishActivationScheduler"
       },
       {
@@ -1028,7 +1007,16 @@
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "timeline",
+       "label": "Calendar",
+       "bindsTo": "PublicationActivationSchedulerView",
+       "operation": "listScheduledLifecycleActions",
+       "notes": "**Every scheduled lifecycle action in the range, on a calendar**: upcoming as scheduled, done as executed, failed with its reason, so failed jobs and conflicts show where they happened. Without a range, the next 31 days (decided 29 September, readiness close-out).",
+       "provenance": "contract catalogue.yaml GET /activation-scheduler"
+      }
+     ]
     }
    ]
   },
@@ -1044,16 +1032,20 @@
     "operationId": "publishActivationScheduler",
     "contract": "catalogue",
     "purpose": "Publication & Activation Scheduler",
-    "trigger": "onAction",
-    "invalidates": [
-     "publishActivationScheduler"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listScheduledLifecycleActions",
+    "contract": "catalogue",
+    "purpose": "Scheduled lifecycle actions, for the scheduler calendar",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-125"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-125",
+   "workshopBoard": "wireframes/WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-125"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1117,10 +1109,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Users can create a new Draft product from an existing product/template while preventing accidental reuse of inappropriate dates, venues, prices or other context-sensitive values.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Duplication Options) and no display directory — it is settings, not a population",
   "purpose": "Accelerate product configuration by allowing administrators to reuse proven configurations. The source matrix explicitly requires duplication of products together with associated configuration, rules, pricing and entitlements.",
-  "purposeNote": "Users can create a new Draft product from an existing product/template while preventing accidental reuse of inappropriate dates, venues, prices or other context-sensitive values.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1194,6 +1186,20 @@
        "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save configuration template",
+       "operation": "setConfigurationTemplate",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**One template library for products and price lists** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /configuration-templates"
+      }
+     ]
     }
    ]
   },
@@ -1209,14 +1215,58 @@
     "contract": "catalogue",
     "purpose": "Product Duplication & Template Library",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setConfigurationTemplate",
+    "contract": "catalogue",
+    "purpose": "Create or update a product or price-list template",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductDuplicationTemplate"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-126"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-126",
+   "workshopBoard": "wireframes/WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-126"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 13 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetConfigurationTemplate",
+    "component": "modal",
+    "trigger": "Save configuration template",
+    "body": "**Collects what `setConfigurationTemplate` sends before it is called.** Required: `id`, `scopePath`, `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ConfigurationTemplate",
+    "confirm": {
+     "label": "Save configuration template",
+     "operation": "setConfigurationTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "subject",
+      "name",
+      "status",
+      "description",
+      "templateKind",
+      "productKind",
+      "venueId",
+      "sourceProductId",
+      "sourcePriceListId",
+      "includedComponents",
+      "reviewFields",
+      "isAiDrafted",
+      "ownerPrincipalId"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /configuration-templates"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1270,10 +1320,10 @@
    "notes": "**Reached from ADM-118, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "An administrator can transform unstructured or semi-structured commercial information into a structured Draft product configuration, review every AI-generated recommendation and approve or modify it before the normal lifecycle workflow begins. Board 1 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide TICVAI's AI-first interface for accelerating product creation and configuration. This directly supports the matrix requirement allowing administrators to upload spreadsheets, brochures, PDFs or existing catalogues and use AI to generate product structures, pricing, rules, entitlements and configurations. Board 2 governs what happens after a product has been created or while an existing product is being changed.",
-  "purposeNote": "An administrator can transform unstructured or semi-structured commercial information into a structured Draft product configuration, review every AI-generated recommendation and approve or modify it before the normal lifecycle workflow begins. Board 1 — Final Screen Register",
   "gaps": [
    {
     "operation": null,
@@ -1326,16 +1376,14 @@
     "operationId": "setCatalogueReview",
     "contract": "catalogue",
     "purpose": "AI Catalogue Builder & Configuration Review",
-    "trigger": "onAction",
-    "invalidates": [
-     "setCatalogueReview"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-127"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-127",
+   "workshopBoard": "wireframes/WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-127"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 68 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

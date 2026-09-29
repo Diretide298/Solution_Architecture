@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-048 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-049",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can view and manage TICVAI's complete commercial pricing portfolio from one centralized workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each price list should show) — counts over a population, then the population",
   "purpose": "Provide the central administrative workspace for all commercial pricing structures across This is the first page a Revenue/Pricing Administrator sees when entering the module.",
-  "purposeNote": "Authorized administrators can view and manage TICVAI's complete commercial pricing portfolio from one centralized workspace.",
   "gaps": [
    {
     "operation": null,
@@ -151,73 +148,73 @@
        "kind": "metricTile",
        "label": "Total Price Lists",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.totalPriceLists"
+       "bindsTo": "CommercialPricingCommandCenterSummary.totalPriceLists"
       },
       {
        "kind": "metricTile",
        "label": "Active Price Lists",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.activePriceLists"
+       "bindsTo": "CommercialPricingCommandCenterSummary.activePriceLists"
       },
       {
        "kind": "metricTile",
        "label": "Draft Price Lists",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.draftPriceLists"
+       "bindsTo": "CommercialPricingCommandCenterSummary.draftPriceLists"
       },
       {
        "kind": "metricTile",
        "label": "Price Categories",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.priceCategories"
+       "bindsTo": "CommercialPricingCommandCenterSummary.priceCategories"
       },
       {
        "kind": "metricTile",
        "label": "Configured Rates",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.configuredRates"
+       "bindsTo": "CommercialPricingCommandCenterSummary.configuredRates"
       },
       {
        "kind": "metricTile",
        "label": "Products with Pricing",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.productsWithPricing"
+       "bindsTo": "CommercialPricingCommandCenterSummary.productsWithPricing"
       },
       {
        "kind": "metricTile",
        "label": "Products Missing Pricing",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.productsMissingPricing"
+       "bindsTo": "CommercialPricingCommandCenterSummary.productsMissingPricing"
       },
       {
        "kind": "metricTile",
        "label": "Markets",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.markets"
+       "bindsTo": "CommercialPricingCommandCenterSummary.markets"
       },
       {
        "kind": "metricTile",
        "label": "Currencies",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.currencies"
+       "bindsTo": "CommercialPricingCommandCenterSummary.currencies"
       },
       {
        "kind": "metricTile",
        "label": "Pricing Validation Issues",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.pricingValidationIssues"
+       "bindsTo": "CommercialPricingCommandCenterSummary.pricingValidationIssues"
       },
       {
        "kind": "metricTile",
        "label": "Recently Modified Price Lists",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.recentlyModifiedPriceLists"
+       "bindsTo": "CommercialPricingCommandCenterSummary.recentlyModifiedPriceLists"
       },
       {
        "kind": "metricTile",
        "label": "Upcoming Price Structures",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
-       "bindsTo": "CommercialPricingCommandCenterView.upcomingPriceStructures"
+       "bindsTo": "CommercialPricingCommandCenterSummary.upcomingPriceStructures"
       }
      ]
     },
@@ -239,7 +236,6 @@
         "CommercialPricingCommandCenterView.brand",
         "CommercialPricingCommandCenterView.productCount",
         "CommercialPricingCommandCenterView.rateCount",
-        "CommercialPricingCommandCenterView.effectivePeriod",
         "CommercialPricingCommandCenterView.version",
         "CommercialPricingCommandCenterView.status",
         "CommercialPricingCommandCenterView.owner"
@@ -269,7 +265,6 @@
         "CommercialPricingCommandCenterView.brand",
         "CommercialPricingCommandCenterView.productCount",
         "CommercialPricingCommandCenterView.rateCount",
-        "CommercialPricingCommandCenterView.effectivePeriod",
         "CommercialPricingCommandCenterView.version",
         "CommercialPricingCommandCenterView.status",
         "CommercialPricingCommandCenterView.owner"
@@ -359,12 +354,31 @@
     "contract": "catalogue",
     "purpose": "Commercial Pricing Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMembershipCommercialPricing",
+    "contract": "subscription",
+    "purpose": "Membership Commercial, Pricing & Channel Association",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCommercialPricingStructure",
+    "contract": "catalogue",
+    "purpose": "Commercial Pricing Structure Validation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listBundlePricingCommercial",
+    "contract": "promotions",
+    "purpose": "Bundle Pricing & Commercial Model",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-048"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-048",
+   "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-048"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 6. 32 of 35 labels bound to a contract property; 49 of 71 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -428,10 +442,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can create reusable commercial price-list masters with clearly defined ownership, scope, currency, market, and business applicability.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Create the master container that holds commercial rates. A Price List should be reusable across products and channels.",
-  "purposeNote": "Administrators can create reusable commercial price-list masters with clearly defined ownership, scope, currency, market, and business applicability.",
   "layout": {
    "template": "form",
    "regions": [
@@ -570,16 +584,14 @@
     "operationId": "setPriceListMaster",
     "contract": "catalogue",
     "purpose": "Price List Master Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPriceListMaster"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-049"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-049",
+   "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-049"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 21 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -643,10 +655,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "types across all tenants, venues, and products.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define standardized commercial rate categories used across TICVAI. This avoids different venues independently creating categories such as: “Adult,” “Adult Standard,” “Normal Adult,” and “Full Adult.”",
-  "purposeNote": "types across all tenants, venues, and products.",
   "gaps": [
    {
     "operation": null,
@@ -672,6 +684,20 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save price category rate type",
+       "operation": "setPriceCategoryRateType",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The tenant's library of price categories and rate types** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /price-categories"
+      }
+     ]
     }
    ]
   },
@@ -688,23 +714,60 @@
     "contract": "catalogue",
     "purpose": "Price Category & Rate Type Library",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPriceCategoryRateType",
+    "contract": "catalogue",
+    "purpose": "Create or update a price category or rate type",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPriceCategoryRate"
+    ]
    }
   ],
   "entryState": {
-   "preloaded": [
-    "PriceCategoryRateTypeLibraryView.adult",
-    "PriceCategoryRateTypeLibraryView.child",
-    "PriceCategoryRateTypeLibraryView.junior",
-    "PriceCategoryRateTypeLibraryView.senior",
-    "PriceCategoryRateTypeLibraryView.student"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-050"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-050",
+   "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-050"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPriceCategoryRateType",
+    "component": "modal",
+    "trigger": "Save price category rate type",
+    "body": "**Collects what `setPriceCategoryRateType` sends before it is called.** Required: `id`, `scopePath`, `entryKind`, `code`, `name`, `isActive`. Optional: `description`, `categoryFamily`, `displayName`, `localizedDisplayNames`, `iconLabel`, `parentId`, `isStandard`, `sortOrder`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PriceCategory",
+    "confirm": {
+     "label": "Save price category rate type",
+     "operation": "setPriceCategoryRateType"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "entryKind",
+      "code",
+      "name",
+      "isActive",
+      "description",
+      "categoryFamily",
+      "displayName",
+      "localizedDisplayNames",
+      "iconLabel",
+      "parentId",
+      "isStandard",
+      "sortOrder"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /price-categories"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -766,14 +829,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can define monetary rate structures for all TICVAI commercial product types through configurable rate matrices.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
   "purpose": "Define the actual monetary rates contained within a price list. This is the core commercial configuration screen.",
-  "purposeNote": "Administrators can define monetary rate structures for all TICVAI commercial product types through configurable rate matrices.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Per Ticket, Per Membership Period. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Per Ticket, Per Resource, Per Package, Per Membership Period. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Support"
    }
   ],
@@ -789,10 +852,7 @@
        "label": "Every rate structure",
        "columns": [
         "Duplicate Rates",
-        "RateStructureBuilderView.missingAmounts",
-        "RateStructureBuilderView.unsupportedCurrency",
-        "RateStructureBuilderView.invalidDerivedRate",
-        "RateStructureBuilderView.circularRateRelationship"
+        "RateStructureBuilderView.validationIssues"
        ],
        "bindsTo": "RateStructureBuilderView",
        "operation": "setRateStructure",
@@ -810,10 +870,7 @@
        "bindsTo": "RateStructureBuilderView",
        "columns": [
         "Duplicate Rates",
-        "RateStructureBuilderView.missingAmounts",
-        "RateStructureBuilderView.unsupportedCurrency",
-        "RateStructureBuilderView.invalidDerivedRate",
-        "RateStructureBuilderView.circularRateRelationship"
+        "RateStructureBuilderView.validationIssues"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Adult”, “Child Reduced”, “Senior Reduced”, “Resident Reduced”, “Group Group”, “Each rate should contain”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Detect"
@@ -827,6 +884,16 @@
       {
        "kind": "primaryButton",
        "label": "Per Ticket",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Per Resource",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Per Package",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Support"
       },
       {
@@ -850,27 +917,22 @@
     "operationId": "setRateStructure",
     "contract": "catalogue",
     "purpose": "Rate Structure Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRateStructure"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
     "Duplicate Rates",
-    "RateStructureBuilderView.missingAmounts",
-    "RateStructureBuilderView.unsupportedCurrency",
-    "RateStructureBuilderView.invalidDerivedRate",
-    "RateStructureBuilderView.circularRateRelationship"
+    "RateStructureBuilderView.validationIssues"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-051"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-051",
+   "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-051"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 11. 4 of 5 labels bound to a contract property; 7 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 11. 4 of 5 labels bound to a contract property; 9 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -932,14 +994,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "All sellable TICVAI objects can reference centrally managed price lists and rates without maintaining duplicate price definitions inside business modules.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Product configuration should display) and no metric row",
   "purpose": "Connect commercial rates to the actual products and services being sold.",
-  "purposeNote": "All sellable TICVAI objects can reference centrally managed price lists and rates without maintaining duplicate price definitions inside business modules.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type, Event, Venue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Allow"
    }
   ],
@@ -984,7 +1046,27 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Product Level",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Product Variant",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Ticket Type",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Allow"
       }
      ]
@@ -1003,10 +1085,7 @@
     "operationId": "setProductServicePrice",
     "contract": "catalogue",
     "purpose": "Product & Service Price Assignment",
-    "trigger": "onAction",
-    "invalidates": [
-     "setProductServicePrice"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1017,9 +1096,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-052"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-052",
+   "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-052"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 13. 0 of 1 labels bound to a contract property; 3 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 13. 0 of 1 labels bound to a contract property; 7 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1081,17 +1161,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Packages, bundles, and add-ons can use centralized commercial pricing while their product composition remains owned by the Product Catalogue.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure pricing for; Configure whether the customer sees) and no display directory — it is settings, not a population",
   "purpose": "Provide dedicated commercial structures for products containing multiple components. This is separate from the Product Relationship/Bundle module. Product Catalogue defines what the bundle contains. Pricing defines how that bundle is priced.",
-  "purposeNote": "Packages, bundles, and add-ons can use centralized commercial pricing while their product composition remains owned by the Product Catalogue.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Component Override. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Support"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1162,8 +1235,21 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Fixed Package Price",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Component Override",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save package pricing definition",
+       "operation": "setPackagePricingDefinition",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The pricing model of a package, bundle or add-on** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /package-pricing"
       }
      ]
     }
@@ -1181,14 +1267,55 @@
     "contract": "catalogue",
     "purpose": "Package, Bundle & Add-On Pricing",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPackagePricingDefinition",
+    "contract": "catalogue",
+    "purpose": "Set how a package, bundle or add-on is priced",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPackageBundleAdd"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-053"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-053",
+   "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-053"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 13 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPackagePricingDefinition",
+    "component": "modal",
+    "trigger": "Save package pricing definition",
+    "body": "**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `id`, `scopePath`, `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PackagePricing",
+    "confirm": {
+     "label": "Save package pricing definition",
+     "operation": "setPackagePricingDefinition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "productId",
+      "recordKind",
+      "pricingModel",
+      "status",
+      "name",
+      "priceListId",
+      "addOnType",
+      "packagePrice",
+      "components",
+      "componentPriceVisibility"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /package-pricing"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1250,10 +1377,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "entities, and currencies.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; FX-Assisted Setup) and no display directory — it is settings, not a population",
   "purpose": "Support TICVAI's multi-country, multi-market, multi-venue and multi-currency commercial model.",
-  "purposeNote": "entities, and currencies.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1302,6 +1429,20 @@
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §FX-Assisted Setup"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save market pricing configuration",
+       "operation": "setMarketPricingConfiguration",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**Global, country, region, market or venue** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /pricing-markets"
+      }
+     ]
     }
    ]
   },
@@ -1317,14 +1458,60 @@
     "contract": "catalogue",
     "purpose": "Market, Venue & Currency Pricing Structure",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMarketPricingConfiguration",
+    "contract": "catalogue",
+    "purpose": "Create or update a node of the market pricing structure",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMarketVenueCurrency"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-054"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-054",
+   "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-054"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 8 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetMarketPricingConfiguration",
+    "component": "modal",
+    "trigger": "Save market pricing configuration",
+    "body": "**Collects what `setMarketPricingConfiguration` sends before it is called.** Required: `id`, `scopePath`, `hierarchyLevel`. Optional: `parentId`, `countryCode`, `marketCode`, `region`, `venueId`, `brand`, `legalEntityId`, `baseCurrency`, `sellingCurrency`, `roundingProfileId`, `displayFormat`, `priceListId` and 2 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PricingMarket",
+    "confirm": {
+     "label": "Save market pricing configuration",
+     "operation": "setMarketPricingConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "hierarchyLevel",
+      "parentId",
+      "countryCode",
+      "marketCode",
+      "region",
+      "venueId",
+      "brand",
+      "legalEntityId",
+      "baseCurrency",
+      "sellingCurrency",
+      "roundingProfileId",
+      "displayFormat",
+      "priceListId",
+      "inheritsFromParent",
+      "fxReferenceRate"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /pricing-markets"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1386,10 +1573,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "The platform deterministically resolves the correct commercial price source across global, market, venue, and product hierarchies.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Administrators configure; Configure) and no display directory — it is settings, not a population",
   "purpose": "Define where TICVAI should obtain a price when multiple commercial pricing layers exist. This is essential to prevent conflicting prices.",
-  "purposeNote": "The platform deterministically resolves the correct commercial price source across global, market, venue, and product hierarchies.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1473,16 +1660,14 @@
     "operationId": "setPriceHierarchyInheritance",
     "contract": "catalogue",
     "purpose": "Price Hierarchy & Inheritance Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPriceHierarchyInheritance"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-055"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-055",
+   "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-055"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 10 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1546,14 +1731,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can rapidly create consistent commercial pricing structures by cloning and reusing approved templates instead of rebuilding pricing manually.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Options) and no display directory — it is settings, not a population",
   "purpose": "Accelerate commercial setup across new venues, events, seasons and markets.",
-  "purposeNote": "Administrators can rapidly create consistent commercial pricing structures by cloning and reusing approved templates instead of rebuilding pricing manually.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Complete Price List. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Complete Price List, Rate Structure Only, Selected Categories, Product Assignments, Market Structure. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning"
    }
   ],
@@ -1599,6 +1784,34 @@
        "kind": "primaryButton",
        "label": "Complete Price List",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Rate Structure Only",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Categories",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Product Assignments",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Market Structure",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save configuration template",
+       "operation": "setConfigurationTemplate",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**One template library for products and price lists** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /configuration-templates"
       }
      ]
     }
@@ -1616,14 +1829,58 @@
     "contract": "catalogue",
     "purpose": "Price List Templates, Clone & Reuse",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setConfigurationTemplate",
+    "contract": "catalogue",
+    "purpose": "Create or update a product or price-list template",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPriceListTemplate"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-056"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-056",
+   "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-056"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 6 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 10 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetConfigurationTemplate",
+    "component": "modal",
+    "trigger": "Save configuration template",
+    "body": "**Collects what `setConfigurationTemplate` sends before it is called.** Required: `id`, `scopePath`, `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ConfigurationTemplate",
+    "confirm": {
+     "label": "Save configuration template",
+     "operation": "setConfigurationTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "subject",
+      "name",
+      "status",
+      "description",
+      "templateKind",
+      "productKind",
+      "venueId",
+      "sourceProductId",
+      "sourcePriceListId",
+      "includedComponents",
+      "reviewFields",
+      "isAiDrafted",
+      "ownerPrincipalId"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /configuration-templates"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1677,10 +1934,10 @@
    "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "from progressing downstream without clearly identifying the issue. Board 1 — Final Screen Register # Screen Responsibility 10.1. Commercial Pricing Command",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Validate that the commercial pricing foundation is structurally complete before it proceeds to rule configuration, governance, or publication. This is not the final publication screen. Board 4 owns approval and publication. Board 1 defined what the commercial prices are and how they are structured.",
-  "purposeNote": "from progressing downstream without clearly identifying the issue. Board 1 — Final Screen Register # Screen Responsibility 10.1. Commercial Pricing Command",
   "gaps": [
    {
     "operation": null,
@@ -1726,17 +1983,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "CommercialPricingStructureValidationView.requiredFieldsComplete",
-    "CommercialPricingStructureValidationView.currencyDefined",
-    "CommercialPricingStructureValidationView.ownershipAssigned",
-    "CommercialPricingStructureValidationView.categoriesConfigured",
-    "CommercialPricingStructureValidationView.monetaryValuesValid"
+    "CommercialPricingStructureValidationView.check"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-057"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-057",
+   "workshopBoard": "wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-057"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 0 of 83 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

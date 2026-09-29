@@ -1,6 +1,6 @@
-# P13-white-label-01 — P13 · White Label (1 of 2)
+# P13-white-label-01 — P13 · White Label (1 of 3)
 
-**10 screens · 54 operations · 54 schemas · 8 permissions**
+**10 screens · 58 operations · 59 schemas · 9 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 8 permissions apply here:
-  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ORDER_CREATE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 9 permissions apply here:
+  `AI_USE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ORDER_CREATE, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, TENANT_CONFIGURE, TENANT_PUBLISH`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -66,10 +66,10 @@ convincingly. It is never a caption.
 | `CMS-004` | Logo & Assets | statusTracker | 4 | 2 | — |
 | `CMS-005` | Theme Editor | statusTracker | 2 | 1 | — |
 | `CMS-006` | Component Preview | listDetail | 5 | 2 | — |
-| `CMS-007` | Page Builder | statusTracker | 9 | 4 | — |
-| `CMS-008` | Content Blocks | listDetail | 8 | 5 | — |
-| `CMS-009` | Navigation & Menus | listDetail | 6 | 3 | — |
-| `CMS-010` | Media Library | listDetail | 12 | 9 | — |
+| `CMS-007` | Page Builder | statusTracker | 11 | 4 | — |
+| `CMS-008` | Content Blocks | listDetail | 10 | 5 | — |
+| `CMS-009` | Navigation & Menus | listDetail | 7 | 4 | — |
+| `CMS-010` | Media Library | listDetail | 13 | 9 | — |
 
 ## Thin screens in this batch
 
@@ -115,11 +115,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "CMS-061",
     "CMS-071",
     "CMS-081",
-    "CMS-091"
+    "CMS-091",
+    "CMS-102"
    ],
    "inferred": true,
    "isEntryPoint": true,
    "transitions": [
+    {
+     "to": "CMS-102",
+     "trigger": "Site Builder",
+     "provenance": "authored 29 September, W12 and M24-05 (the step-based builder starts from the workspace)"
+    },
     {
      "to": "CMS-002",
      "trigger": "Brand Kit",
@@ -153,7 +159,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "CMS-008",
      "trigger": "Content Blocks",
-     "provenance": "derived — CMS-008 declares entryState.params bannerId, promoBlockId and CMS-001 holds none of them, so the edge carries nothing and CMS-008 opens cold"
+     "provenance": "derived — CMS-008 declares entryState.params actionId, bannerId, promoBlockId and CMS-001 holds none of them, so the edge carries nothing and CMS-008 opens cold"
     },
     {
      "to": "CMS-009",
@@ -225,7 +231,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Land a tenant somewhere that shows what is live and what is not.",
+  "purpose": "Land a tenant somewhere that shows what is live and what is not, and hold step 1 of the Site Builder (venue and modules).",
+  "purposeNote": "**Step 1 of CMS-102 Site Builder (decided 29 September, W12).** The modules and feature toggles here, including `guestCheckout` (which fields its pop-up asks is `guestContactFields` on CMS-016, W1) and the new `visitPlanner` module, which shows or hides the mobile Plan tab and WEB-050 (MOB-1). A Site Builder card leads new tenants into the seven steps.",
   "states": {
    "loading": "The tenant, read by `getTenantAppStatus`.",
    "error": "Could not load. Names which read failed and leaves the tenant untouched.",
@@ -1013,7 +1020,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getBrandIdentity` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Hold the marks every surface needs, at the sizes it needs them.",
+  "purpose": "Hold the marks every surface needs, at the sizes it needs them, and the mobile app's intro video (Site Builder steps 5 and 6).",
   "states": {
    "loading": "The logo assets, read by `getBrandIdentity`.",
    "error": "Could not load. Names which read failed and leaves the logo assets untouched.",
@@ -1072,9 +1079,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "BrandIdentity.splashDurationSeconds",
         "BrandIdentity.splashBackgroundColour",
         "BrandIdentity.showLoadingIndicator",
-        "BrandIdentity.splashChangeScope"
+        "BrandIdentity.splashChangeScope",
+        "BrandIdentity.introVideoAssetRef",
+        "BrandIdentity.introVideoMode"
        ],
        "operation": "getBrandIdentity",
+       "notes": "**Intro video (decided 29 September, MOB-5).** Picked from the media library (CMS-010); plays off, on first launch or on every launch, always with Skip introduction. Streamed, so it needs no app build, unlike the splash and icons.",
        "provenance": "contract white-label.yaml GET /tenant-config/brand"
       },
       {
@@ -1135,7 +1145,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formSetBrandIdentity",
     "component": "modal",
     "trigger": "Save brand identity",
-    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `splashChangeScope`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoVariant` (light, dark or duotone: which lockup sits in the nav bar and which colour reading of it drives the theme, decided 29 September, rev 3 CFG-4), `logoDarkAssetRef`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `splashChangeScope`, `introVideoAssetRef` and `introVideoMode` (off, first launch or every launch; MOB-5). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "BrandIdentity",
     "confirm": {
      "label": "Save brand identity",
@@ -1152,7 +1162,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "splashDurationSeconds",
       "splashBackgroundColour",
       "showLoadingIndicator",
-      "splashChangeScope"
+      "splashChangeScope",
+      "introVideoAssetRef",
+      "introVideoMode"
      ]
     },
     "provenance": "contract white-label.yaml PUT /tenant-config/brand"
@@ -1257,9 +1269,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "Theme.darkMode",
         "Theme.cornerRadius",
         "Theme.surfaceStyle",
-        "Theme.buttonStyle"
+        "Theme.buttonStyle",
+        "Theme.componentColours"
        ],
        "operation": "getTheme",
+       "notes": "**Per-element colours (decided 17 September, M17-11).** Pickers for the main call to action, the pay button, add to cart, the Buy tickets button, links and badges, each with a live contrast warning; left empty they follow the theme. The guest flow itself stays standard.",
        "provenance": "contract white-label.yaml GET /tenant-config/theme"
       }
      ]
@@ -1320,7 +1334,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formSetTheme",
     "component": "modal",
     "trigger": "Save theme",
-    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle` (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided 29 September, rev 3 CFG-3). **A colour pair that fails contrast is refused** (`400 ContrastProblem`, decided 28 September, audit R139 (a)): the modal stays open with the failing pairs marked. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setTheme` sends before it is called.** Required: `primaryColour`, `secondaryColour`, `backgroundColour`, `textColour`. Optional: `accentColour`, `darkMode`, `cornerRadius`, `surfaceStyle` (glass or solid, default glass) and `buttonStyle` (solid, outline or pill, default solid; decided 29 September, rev 3 CFG-3) and `componentColours` (M17-11). **A colour pair that fails contrast is refused** (`400 ContrastProblem`, decided 28 September, audit R139 (a)): the modal stays open with the failing pairs marked. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "Theme",
     "confirm": {
      "label": "Save theme",
@@ -1337,7 +1351,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "darkMode",
       "cornerRadius",
       "surfaceStyle",
-      "buttonStyle"
+      "buttonStyle",
+      "componentColours"
      ]
     },
     "provenance": "contract white-label.yaml PUT /tenant-config/theme"
@@ -1742,6 +1757,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "HomepageLayout.sections"
        ],
        "operation": "getHomepageLayout",
+       "notes": "**Also the mobile Home editor (decided 29 September, MOB-3; Site Builder steps 5 and 6).** The `venueOverview` section (description, opening hours, type tiles), the hero's style (carousel, video, poster or split) and 1 or 2 highlights for attractions, dining, what's on and shop (`maxItems`). The header and footer are set here too (`setHeader`, `setFooter`).",
        "provenance": "contract white-label.yaml GET /tenant-config/homepage"
       },
       {
@@ -1889,6 +1905,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "getHomepageLayout",
      "getModuleEnablement"
     ]
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Record which AI draft or proposal was used, or why it was refused",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1901,6 +1931,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "params": [
     {
      "name": "pageId",
+     "from": "navigation"
+    },
+    {
+     "name": "actionId",
      "from": "navigation"
     }
    ]
@@ -2074,7 +2108,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPromoBlocks` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Define what a block can and cannot contain.",
+  "purpose": "Define what a block can and cannot contain, and set the banners (Site Builder step 5).",
   "layout": {
    "template": "split",
    "regions": [
@@ -2263,6 +2297,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "listPromoBlocks",
      "listBanners"
     ]
+   },
+   {
+    "operationId": "proposeMarketingContent",
+    "contract": "ai",
+    "purpose": "Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Record which AI draft or proposal was used, or why it was refused",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2280,6 +2328,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     },
     {
      "name": "promoBlockId",
+     "from": "navigation"
+    },
+    {
+     "name": "actionId",
      "from": "navigation"
     }
    ]
@@ -2473,7 +2525,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMenus` reads the population and `getMenu` reads one of them — list, select, act",
-  "purpose": "Decide what appears in the header and the footer.",
+  "purpose": "Decide what appears in the header, the footer and the mobile tab bar, with the Buy tickets button (Site Builder steps 5 and 6).",
   "layout": {
    "template": "split",
    "regions": [
@@ -2536,9 +2588,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      ]
     },
     {
+     "name": "navigationEditor",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Navigation and mobile tabs",
+       "bindsTo": "NavigationConfig",
+       "columns": [
+        "NavigationConfig.kind",
+        "NavigationConfig.items",
+        "NavigationConfig.buyButton"
+       ],
+       "operation": "getNavigation",
+       "notes": "**The mobile tab editor (decided 29 September, MOB-1 and MOB-2).** Which tabs, their order, labels and icons; each tab is an `appSection` link. The default is Home, Explore, Plan and Tickets; Map is optional; Plan needs the `visitPlanner` module. The Buy tickets button: raised in the centre (default), floating, flat or hidden, and its label. At most five tabs are visible.",
+       "provenance": "contract white-label.yaml GET /tenant-config/navigation"
+      }
+     ]
+    },
+    {
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Save navigation and tabs",
+       "operation": "setNavigation",
+       "provenance": "contract white-label.yaml PUT /tenant-config/navigation"
+      },
       {
        "kind": "primaryButton",
        "label": "Create menu",
@@ -2569,6 +2646,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getNavigation",
+    "contract": "white-label",
+    "purpose": "The navigation and the mobile tab set (MOB-1)",
+    "trigger": "onLoad"
+   },
    {
     "operationId": "listMenus",
     "contract": "fnb",
@@ -2611,8 +2694,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "setNavigation",
     "contract": "white-label",
-    "purpose": "Set main and overflow navigation",
+    "purpose": "Save the navigation, the mobile tabs and the Buy tickets button (MOB-1, MOB-2)",
     "trigger": "onAction",
+    "invalidates": [
+     "getNavigation"
+    ],
     "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
@@ -2639,6 +2725,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
+   {
+    "id": "formSetNavigation",
+    "component": "modal",
+    "trigger": "Save navigation and tabs",
+    "body": "**Collects what `setNavigation` sends.** Required: `kind`, `items` (label, icon, target, visible, order; a mobile tab targets an `appSection`). Optional: `buyButton` (`style`, `label`). Refused `400` when a tab targets a disabled module or more than five are visible. Dismissing sends nothing.",
+    "bindsTo": "NavigationConfig",
+    "confirm": {
+     "label": "Save navigation",
+     "operation": "setNavigation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "items",
+      "buyButton"
+     ]
+    },
+    "provenance": "contract white-label.yaml PUT /tenant-config/navigation"
+   },
    {
     "id": "formCreateMenu",
     "component": "modal",
@@ -3281,6 +3387,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "searchMedia"
     ]
+   },
+   {
+    "operationId": "semanticSearch",
+    "contract": "ai",
+    "purpose": "Natural-language search of the media library (kind media)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -3435,6 +3548,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "ContentPage",
@@ -3515,6 +3633,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "UploadTicket"
+ },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
  },
  "deleteBanner": {
   "method": "DELETE",
@@ -3747,6 +3884,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "ModuleEnablement"
  },
+ "getNavigation": {
+  "method": "GET",
+  "path": "/tenant-config/navigation",
+  "contract": "white-label",
+  "summary": "Read navigation",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "NavigationConfig"
+ },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",
@@ -3944,6 +4094,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "PromoBlock"
  },
+ "proposeMarketingContent": {
+  "method": "POST",
+  "path": "/ai/content-drafts",
+  "contract": "ai",
+  "summary": "Draft marketing content for a person to edit and apply",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "publishTenantConfig": {
   "method": "POST",
   "path": "/tenant-config/publish",
@@ -4060,6 +4229,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "semanticSearch": {
+  "method": "POST",
+  "path": "/search",
+  "contract": "ai",
+  "summary": "Search meaning, not words",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SearchResult"
+ },
  "setAppIcons": {
   "method": "PUT",
   "path": "/tenant-config/app-icons",
@@ -4131,6 +4319,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "FontConfig",
@@ -4169,6 +4362,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "HeaderConfig",
@@ -4184,6 +4382,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -4226,6 +4429,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -4264,6 +4472,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "NavigationConfig",
@@ -4279,6 +4492,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -4355,6 +4573,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -4654,6 +4877,73 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "BookingFlow": {
+  "x-ticvai-persistence": "whitelabel.booking_flow",
+  "type": "object",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "required": [
+   "flowTypeKey",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `createBookingFlowDefinition`."
+   },
+   "flowTypeKey": {
+    "$ref": "#/components/schemas/BookingFlowTypeKey"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
+   },
+   "isDefaultForType": {
+    "type": "boolean",
+    "default": false,
+    "description": "At most one per venue and type; setting it takes it from the previous default."
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
+   },
+   "steps": {
+    "type": "array",
+    "maxItems": 30,
+    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlowStep"
+    }
+   },
+   "settings": {
+    "$ref": "#/components/schemas/BookingFlowLevelSettings"
+   },
+   "isValid": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "BookingFlowConfig": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "description": "**Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** One tenant with several venues (the Kids Club branches, Coastal Aqua beside Union Arena) needs them to differ. The settings in force at a venue are the tenant's, with that venue's entry in `venueOverrides` laid over them field by field. The guest app resolves them for the venue the guest picked (audit R267); `effectiveForVenueId` on `getBookingFlowConfig` returns them resolved.\n",
@@ -4742,6 +5032,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "readOnly": true,
     "description": "Always `buildTime` for native apps. The guest web app takes a splash change at the publish, with no build (audit R163)."
+   },
+   "introVideoAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The optional intro video (decided 29 September, MOB-5).** A video `MediaAsset` from the media library (CMS-010). Streamed, so a change reaches guests with the publish and needs no app build.\n"
+   },
+   "introVideoMode": {
+    "type": "string",
+    "enum": [
+     "off",
+     "firstLaunch",
+     "everyLaunch"
+    ],
+    "default": "off",
+    "description": "When GST-001 plays it full screen. \"Skip introduction\" is always shown. Anything but `off` needs `introVideoAssetRef`, or 400."
    }
   }
  },
@@ -5353,7 +5659,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "maxItems": {
        "type": "integer",
-       "nullable": true
+       "nullable": true,
+       "description": "How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3)."
+      },
+      "heroStyle": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "carousel",
+        "video",
+        "poster",
+        "split",
+        null
+       ],
+       "description": "For `heroBanner` only (decided 29 September, MOB-3)."
       }
      }
     }
@@ -5362,7 +5681,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "HomepageSectionKind": {
   "type": "string",
-  "description": "**Which module each section needs, proposed, client to correct (decided 28 September, audit R163).** `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events`; `attractions` needs `attractions`; `membership` needs `membership`; `dining` needs `diningAndFnb`; `shop` needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent` and `spacer` need no module. `setHomepageLayout` refuses a visible section whose module is not enabled, and `setModuleEnablement` refuses to disable a module a section still needs.\n",
+  "description": "**Which module each section needs, proposed, client to correct (decided 28 September, audit R163).** `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events`; `attractions` needs `attractions`; `membership` needs `membership`; `dining` needs `diningAndFnb`; `shop` needs `shop`; `map` needs `map`. `heroBanner`, `quickActions`, `promotions`, `customContent`, `venueOverview` and `spacer` need no module. `venueOverview` (decided 29 September, MOB-3) is the mobile Home's description, opening hours (from `getTenantAppStatus`) and type tiles. `setHomepageLayout` refuses a visible section whose module is not enabled, and `setModuleEnablement` refuses to disable a module a section still needs.\n",
   "enum": [
    "heroBanner",
    "quickActions",
@@ -5375,6 +5694,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "promotions",
    "map",
    "customContent",
+   "venueOverview",
    "spacer"
   ]
  },
@@ -5446,11 +5766,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "product",
      "event",
      "externalUrl",
+     "appSection",
      "none"
-    ]
+    ],
+    "description": "`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets."
    },
    "moduleKey": {
     "$ref": "#/components/schemas/ModuleKey"
+   },
+   "appSection": {
+    "type": "string",
+    "enum": [
+     "home",
+     "explore",
+     "plan",
+     "tickets",
+     "map",
+     "account",
+     "buyTickets"
+    ],
+    "description": "Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it."
    },
    "contentPageId": {
     "type": "string",
@@ -6059,6 +6394,88 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "MenuItem": {
+  "x-ticvai-persistence": "fnb.menu_item",
+  "type": "object",
+  "required": [
+   "id",
+   "productVariantId",
+   "name",
+   "price",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "modifierGroupIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "stationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "menuSectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."
+   },
+   "isStockTracked": {
+    "type": "boolean",
+    "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "unavailableReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "restoreAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."
+   },
+   "preparationMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "allergens": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AllergenCode"
+    }
+   }
+  }
+ },
  "MenuSection": {
   "x-ticvai-persistence": "fnb.menu_section",
   "type": "object",
@@ -6148,6 +6565,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_item",
   "type": "object",
+  "description": "**The mobile tab set is venue configuration (decided 29 September, MOB-1; 29 September brief decision 6).** Before a tenant saves its own, `bottomNavigation` is Home, Explore, Plan and Tickets (each an `appSection` link), with the Buy tickets button beside them; Map is an optional tab. Plan is left out while `visitPlanner` is off.\n",
   "required": [
    "kind",
    "items"
@@ -6201,6 +6619,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "sortOrder": {
        "type": "integer"
       }
+     }
+    }
+   },
+   "buyButton": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The persistent Buy tickets button (decided 29 September, MOB-2).** On every screen of the mobile app except the booking and checkout steps; it opens GST-003. Read with `bottomNavigation`.\n",
+    "properties": {
+     "style": {
+      "type": "string",
+      "enum": [
+       "raised",
+       "floating",
+       "flat",
+       "hidden"
+      ],
+      "default": "raised",
+      "description": "`raised` sits in the centre of the tab bar, as the v4 prototype shows; `hidden` turns it off."
+     },
+     "label": {
+      "$ref": "#/components/schemas/LocalisedText"
      }
     }
    }
@@ -6496,6 +6935,126 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ProposedAction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.proposed_action",
+  "required": [
+   "id",
+   "kind",
+   "targetContract",
+   "targetOperation",
+   "payload",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "interactionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "pricing",
+     "promotion",
+     "operational",
+     "financial",
+     "configuration",
+     "content",
+     "audience"
+    ],
+    "description": "`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."
+   },
+   "targetContract": {
+    "type": "string",
+    "description": "Which contract would perform it. The assistant never performs it itself."
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "description": "**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n",
+    "enum": [
+     "proposed",
+     "approved",
+     "rejected",
+     "applied",
+     "expired"
+    ]
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."
+   },
+   "approvalLevel": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"
+   },
+   "proposedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.action_plan",
+    "description": "The plan this action presents for a decision (AI design 2.2 D, 3.8)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
+   }
+  }
+ },
  "ScheduleState": {
   "type": "string",
   "enum": [
@@ -6504,6 +7063,62 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "active",
    "expired"
   ]
+ },
+ "SearchResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed",
+  "properties": {
+   "kind": {
+    "type": "string"
+   },
+   "id": {
+    "type": "string"
+   },
+   "title": {
+    "type": "string"
+   },
+   "excerpt": {
+    "type": "string"
+   },
+   "relevance": {
+    "type": "number"
+   },
+   "collectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For kind `media`, the asset (29 September, build; 23.1.6)."
+   },
+   "mediaType": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "image",
+     "video",
+     "audio",
+     "document"
+    ]
+   },
+   "matchedOn": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "title",
+     "description",
+     "tags",
+     "aiDescription"
+    ],
+    "description": "Which text the match came from, so a wrong hit can be traced to a wrong tag."
+   }
+  }
  },
  "TenantAppStatus": {
   "x-ticvai-persistence": "none — computed",
@@ -6715,6 +7330,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "bookingFlow": {
     "$ref": "#/components/schemas/BookingFlowConfig"
+   },
+   "bookingFlows": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Every venue's booking flows in the draft (`whitelabel.booking_flow`), so a publish snapshots them with the rest (decided 29 September, W12).",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlow"
+    }
    },
    "theme": {
     "$ref": "#/components/schemas/Theme"
@@ -6951,6 +7575,44 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "default": "solid",
     "description": "Button shape (decided 29 September, rev 3 CFG-3)."
+   },
+   "componentColours": {
+    "type": "object",
+    "description": "**Colours for single interactive elements (decided 17 September, M17-11).** Each is optional and falls back to the theme colours. Every pair passes the same contrast check as the theme (`ContrastProblem`), or `setTheme` refuses it with 400. The guest flow stays the standard one; only the colours change.\n",
+    "properties": {
+     "primaryCta": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "payButton": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "addToCart": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "buyTicketsButton": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "link": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "badge": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     }
+    }
+   }
+  }
+ },
+ "ThemeComponentColour": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "properties": {
+   "background": {
+    "type": "string",
+    "pattern": "^#[0-9A-Fa-f]{6}$"
+   },
+   "text": {
+    "type": "string",
+    "pattern": "^#[0-9A-Fa-f]{6}$"
    }
   }
  },

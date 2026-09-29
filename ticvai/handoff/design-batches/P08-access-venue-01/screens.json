@@ -3021,6 +3021,13 @@
     "invalidates": [
      "listQueueEntries"
     ]
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {

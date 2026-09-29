@@ -25,10 +25,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-037 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "BO-091",
@@ -39,11 +36,11 @@
     }
    ]
   },
-  "notes": "Added 17 August. **The key is entered once and never returned** — the screen shows a reference, a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe board.**",
+  "notes": "Added 17 August. **The key is entered once and never returned** — the screen shows a reference, a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe board.**\n\n**Per tenant, not per region (decided 28 September, audit R203).** Platform staff pick a tenant, open a platform-staff grant into it (audit R098), and set that tenant's provider with `setAiProvider` (`PLATFORM_TENANT_MANAGE`, read from the operator's own token; the open grant ties the change to the tenant's audit); the region only restricts the choice. The screen shows the tenant's region's residency restriction before the form, and a provider whose `residency` is outside it is refused `409 residency-refused`, which the form shows against the residency field.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listAiProviders` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Configure which model a tenant uses, hold the key, and prove it works before anyone relies on it.",
+  "purpose": "Configure which model a tenant uses, within what its region allows, hold the key, and prove it works before anyone relies on it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -52,8 +49,58 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "publishGate",
+       "impliedBy": "publishPromptTemplate",
+       "notes": "Declares `publishPromptTemplate`. **The gate names what the publish will affect before it happens**: which tenants, venues or capabilities take the new version, and that the previous one stays available to roll back to.",
+       "provenance": "check-screens publish rule, 29 September 2026"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.regionId"
+       ],
+       "operation": "listTenants",
+       "notes": "The provider is set per tenant (decided 28 September, audit R203); the list below is the picked tenant's providers.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.id",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "listOwnPlatformStaffGrants",
+       "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098, R203). `setAiProvider` is checked against the operator's own `PLATFORM_TENANT_MANAGE`, and in addition needs a grant into the tenant open, so the change is audited against it; reading the providers and the region needs the grant to carry `AI_CONFIGURE` and `SCOPE_VIEW`. Found after a reload with `listOwnPlatformStaffGrants`.",
+       "provenance": "contract identity.yaml GET /platform-staff-grants/mine"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "banner",
+       "label": "Region residency restriction",
+       "bindsTo": "RegionSettings.allowedAiResidencies",
+       "operation": "getRegionSettings",
+       "notes": "Names the residencies the picked tenant's home region allows for AI processing (`RegionSettings.allowedAiResidencies`; empty means no restriction), and says that `setAiProvider` refuses any other residency with 409 `residency-refused` (decided 28 September, audit R203). The region is `Tenant.regionId`, read with `getRegionSettings`; a tenant with no region yet shows the 409 rule only.",
+       "provenance": "contract tenancy.yaml GET /regions/{regionId}/settings"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every provider credentials",
+       "label": "Every AI provider",
        "bindsTo": "AiProvider",
        "columns": [
         "AiProvider.id",
@@ -80,7 +127,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected provider credentials",
+       "label": "The selected AI provider",
        "bindsTo": "AiProvider",
        "columns": [
         "AiProvider.id",
@@ -102,6 +149,27 @@
        ],
        "operation": "listAiProviders",
        "provenance": "contract ai.yaml GET /providers"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Tasks and model fit",
+       "bindsTo": "AiProvider",
+       "columns": [
+        "AiProvider.taskKeys",
+        "AiProvider.fitnessWarnings",
+        "AiProvider.managedBy",
+        "AiProvider.modelId"
+       ],
+       "operation": "listAiProviders",
+       "notes": "**One managed provider by default (AI-D02)**, with a small and a stronger model per agent task; a second provider or a tenant key only where TICVAI enabled it (AI-D14). `taskKeys` binds a provider to named agent tasks (M21-03). **Fitness warnings are shown, never blocking** (M21-09): a model below a task's floor is underpowered, one far above its ceiling is overpowered.",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "banner",
+       "label": "Model fit warning",
+       "operation": "setAiProvider",
+       "notes": "Shown after `setAiProvider` returns `fitnessWarnings`: names the task, the score and the band.",
+       "provenance": "29 September pass (P29 group A)"
       }
      ]
     },
@@ -111,49 +179,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save AI provider",
        "operation": "setAiProvider",
        "provenance": "contract ai.yaml PUT /providers"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save AI credential",
        "operation": "setAiCredential",
        "provenance": "contract ai.yaml PUT /ai-providers/{providerId}/credential"
       },
       {
        "kind": "secondaryButton",
-       "label": "Test",
+       "label": "Test AI provider",
        "operation": "testAiProvider",
        "provenance": "contract ai.yaml POST /ai-providers/{providerId}/test"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAiProviders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setAiProvider",
-       "label": "Save ai provider",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setAiProvider",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -162,9 +202,10 @@
   "states": {
    "loading": "The provider credentials list.",
    "error": "Could not load. Names which read failed and leaves the provider credentials untouched.",
-   "emptyFirstRun": "No provider credentials yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the provider credentials are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No provider credentials yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listAiProviders` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so the provider list and every action are disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098, R203)."
   },
   "apis": [
    {
@@ -174,9 +215,36 @@
     "trigger": "onLoad"
    },
    {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker — the provider is a per-tenant setting (audit R203)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getRegionSettings",
+    "contract": "tenancy",
+    "purpose": "The picked tenant's region's allowed AI residencies, for the restriction banner (audit R203)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listOwnPlatformStaffGrants",
+    "contract": "identity",
+    "purpose": "Find a grant into the picked tenant already open, after a reload (audit R098)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before setting its provider; the tenant sees it (decided 28 September, audit R098, R203)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOwnPlatformStaffGrants"
+    ]
+   },
+   {
     "operationId": "setAiProvider",
     "contract": "ai",
-    "purpose": "Configure a provider",
+    "purpose": "Configure the picked tenant's provider, per tenant with the region's compliance gate — 409 residency-refused (decided 28 September, audit R203)",
     "trigger": "onAction",
     "invalidates": [
      "listAiProviders"
@@ -199,6 +267,48 @@
     "invalidates": [
      "listAiProviders"
     ]
+   },
+   {
+    "operationId": "listAiModels",
+    "contract": "ai",
+    "purpose": "The model catalogue",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setAiModel",
+    "contract": "ai",
+    "purpose": "Add or change a platform model (platform)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listPromptTemplates",
+    "contract": "ai",
+    "purpose": "The prompt registry",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "publishPromptTemplate",
+    "contract": "ai",
+    "purpose": "Publish a prompt template version",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setAiByokEnablement",
+    "contract": "ai",
+    "purpose": "Enable or disable bring-your-own-key for a tenant (platform)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAiByokEnablement",
+    "contract": "ai",
+    "purpose": "Whether a tenant may bring its own key",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -206,9 +316,26 @@
     {
      "name": "providerId",
      "from": "deepLink"
+    },
+    {
+     "name": "regionId",
+     "from": "navigation",
+     "optional": true
+    },
+    {
+     "name": "modelId",
+     "from": "navigation"
+    },
+    {
+     "name": "templateKey",
+     "from": "navigation"
+    },
+    {
+     "name": "tenantId",
+     "from": "session"
     }
    ],
-   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `providerId`.",
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `providerId`. `regionId` is not carried in: it is the picked tenant's `Tenant.regionId`, read from `listTenants` once a tenant is chosen, and feeds `getRegionSettings` for the residency banner (audit R203).",
    "preloaded": [
     "AiProvider.id",
     "AiProvider.kind",
@@ -223,6 +350,81 @@
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-037"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only; `AI_CONFIGURE` and `SCOPE_VIEW` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   },
+   {
+    "id": "formSetAiProvider",
+    "component": "modal",
+    "trigger": "Save AI provider",
+    "body": "**Collects what `setAiProvider` sends before it is called.** Required: `kind`, `capability`, `priority`, `isActive`. Optional: `id`, `model`, `failoverProviderId`, `degradeGracefully`, `scopeLevel`, `scopePath`, `credentialRef`, `credentialRotatedAt`, `credentialExpiresAt`, `lastVerifiedAt`, `endpoint`, `residency` and 1 more. **Set for the picked tenant**; a `residency` outside what the tenant's region allows is refused `409 residency-refused` and shown against that field (decided 28 September, audit R203). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AiProvider",
+    "confirm": {
+     "label": "Save AI provider",
+     "operation": "setAiProvider"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "capability",
+      "priority",
+      "isActive",
+      "id",
+      "model",
+      "failoverProviderId",
+      "degradeGracefully",
+      "scopeLevel",
+      "scopePath",
+      "credentialRef",
+      "credentialRotatedAt",
+      "credentialExpiresAt",
+      "lastVerifiedAt",
+      "endpoint",
+      "residency",
+      "maxTokens"
+     ]
+    },
+    "provenance": "contract ai.yaml PUT /providers"
+   },
+   {
+    "id": "formSetAiCredential",
+    "component": "modal",
+    "trigger": "Save AI credential",
+    "body": "**Collects what `setAiCredential` sends before it is called.** Required: `secret`. Optional: `expiresAt`, `graceMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save AI credential",
+     "operation": "setAiCredential"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "secret",
+      "expiresAt",
+      "graceMinutes"
+     ]
+    },
+    "provenance": "contract ai.yaml PUT /ai-providers/{providerId}/credential"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

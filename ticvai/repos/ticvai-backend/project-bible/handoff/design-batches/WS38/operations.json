@@ -8,9 +8,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "dimension",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "strategyId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "locationLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelCustomerSegmentLocationDynamicRulesView"
+  "responds": "Page"
  },
  "listDynamicPriceBand": {
   "method": "GET",
@@ -21,9 +57,30 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "strategyId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "adjustmentModel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DynamicPriceBandsLaddersAdjustmentMatrixView"
+  "responds": "Page"
  },
  "listDynamicPricingAutomation": {
   "method": "GET",
@@ -34,9 +91,30 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "scopeLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "automationMode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DynamicPricingAutomationPolicyControlView"
+  "responds": "Page"
  },
  "listDynamicPricingGuardrail": {
   "method": "GET",
@@ -47,9 +125,30 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "scopeLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "scopeId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DynamicPricingGuardrailsCommercialProtectionView"
+  "responds": "Page"
  },
  "listDynamicPricingStrategy": {
   "method": "GET",
@@ -60,9 +159,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "strategyType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "automationMode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DynamicPricingStrategyCommandCenterView"
+  "responds": "Page"
  },
  "listRulePriorityConflict": {
   "method": "GET",
@@ -73,9 +208,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "caseType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "conflictCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "strategyId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RulePriorityConflictResolutionDynamicPricingTestConsView"
+  "responds": "Page"
  },
  "listSeasonalCalendarDay": {
   "method": "GET",
@@ -86,9 +247,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "dimension",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "strategyId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "season",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "SeasonalCalendarDayTimeslotDynamicRulesView"
+  "responds": "Page"
  },
  "setBookingVelocityTime": {
   "method": "PUT",
@@ -99,7 +296,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BookingVelocityTimeToEventRuleBuilderInput",
   "responds": "BookingVelocityTimeToEventRuleBuilderView"
  },
@@ -112,9 +315,53 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DemandOccupancyAvailabilityRuleBuilderInput",
   "responds": "DemandOccupancyAvailabilityRuleBuilderView"
+ },
+ "setDemandSignalConfiguration": {
+  "method": "PUT",
+  "path": "/demand-signals/{signalId}",
+  "contract": "catalogue",
+  "summary": "Enter a calendar signal or configure how a demand signal is used",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DemandSignal",
+  "responds": "DemandSignal"
+ },
+ "setDynamicPricingGuardrailPolicy": {
+  "method": "PUT",
+  "path": "/dynamic-pricing-controls",
+  "contract": "catalogue",
+  "summary": "Set the guardrails and automation level of dynamic pricing at one scope",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DynamicPricingControl",
+  "responds": "DynamicPricingControl"
  },
  "setDynamicPricingStrategy": {
   "method": "PUT",
@@ -125,8 +372,71 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "DynamicPricingStrategyBuilderInput",
   "responds": "DynamicPricingStrategyBuilderView"
+ },
+ "setPriceLadderMatrix": {
+  "method": "PUT",
+  "path": "/dynamic-pricing-strategies/{strategyId}/price-ladder",
+  "contract": "catalogue",
+  "summary": "Set a strategy's price ladder",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PriceLadder",
+  "responds": "PriceLadder"
+ },
+ "setRulePriorityConflict": {
+  "method": "PUT",
+  "path": "/rule-priority-conflict",
+  "contract": "catalogue",
+  "summary": "Reorder, validate, test or save the pricing rule priority",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RulePriorityConflictInput",
+  "responds": "RulePriorityConflictView"
+ },
+ "transitionDynamicPricingStrategy": {
+  "method": "POST",
+  "path": "/dynamic-pricing-strategies/{strategyId}/lifecycle",
+  "contract": "catalogue",
+  "summary": "Activate, pause, resume or retire a dynamic pricing strategy",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DynamicPricingStrategy"
  }
 }

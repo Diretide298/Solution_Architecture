@@ -1,6 +1,6 @@
 # WS137 — Marketing CRM Configuration Reference v1.0 board 3
 
-**10 screens · 9 operations · 10 schemas · 3 permissions**
+**10 screens · 11 operations · 13 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `MARKETING_MANAGE, MARKETING_VIEW, PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_USE, MARKETING_MANAGE, MARKETING_VIEW, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -67,8 +67,8 @@ convincingly. It is never a caption.
 | `BO-758` | Membership & Loyalty Segments | listDetail | 1 | 0 | — |
 | `BO-759` | Demographic & Geographic | listDetail | 1 | 0 | — |
 | `BO-760` | Revenue & Engagement Segments | listDetail | 1 | 0 | — |
-| `BO-761` | AI Audience Discovery | listDetail | 1 | 0 | — |
-| `BO-762` | Predictive Audiences | listDetail | 2 | 0 | — |
+| `BO-761` | AI Audience Discovery | listDetail | 2 | 0 | — |
+| `BO-762` | Predictive Audiences | listDetail | 4 | 0 | — |
 | `BO-763` | Activation & Governance | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
@@ -1093,6 +1093,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "derived": true,
        "impliedBy": "listAudienceDiscoveryTargeting",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "proposeLookalikeSegment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "proposeLookalikeSegment"
       }
      ]
     }
@@ -1111,6 +1124,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "promotions",
     "purpose": "AI Audience Discovery & Targeting Optimization",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "proposeLookalikeSegment",
+    "contract": "ai",
+    "purpose": "Propose a lookalike segment from a seed segment or list, as rules to save",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1241,6 +1261,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Threshold simulation",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Record which AI draft or proposal was used, or why it was refused",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "proposeLookalikeSegment",
+    "contract": "ai",
+    "purpose": "Propose a lookalike segment from a seed segment or list, as rules to save",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1253,6 +1287,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "params": [
     {
      "name": "segmentId",
+     "from": "navigation"
+    },
+    {
+     "name": "actionId",
      "from": "navigation"
     }
    ]
@@ -1467,6 +1505,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "CreateSegmentRequest",
   "responds": "Segment"
  },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
  "getAudienceOverlap": {
   "method": "GET",
   "path": "/audience-overlap",
@@ -1624,6 +1681,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "SegmentPreview"
+ },
+ "proposeLookalikeSegment": {
+  "method": "POST",
+  "path": "/ai/segment-suggestions",
+  "contract": "ai",
+  "summary": "Propose a lookalike segment from a seed, for a person to save",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiLookalikeSegmentProposal"
  }
 }
 ```
@@ -1703,6 +1779,92 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "rationale": {
     "type": "string",
     "description": "Why this audience (explainable factors)"
+   }
+  }
+ },
+ "AiLookalikeSegmentProposal": {
+  "type": "object",
+  "x-ticvai-persistence": "none — the draft is an ai.proposed_action row (kind audience); the evidence is its decision record",
+  "description": "A lookalike segment as rules a person can read, edit and save (22.14.12). The criteria are shaped as `marketing-crm` `SegmentCriterion` (attribute, operator, value) and restated here because a satellite cannot reference another satellite.",
+  "required": [
+   "proposedActionId",
+   "criteria",
+   "estimatedReach"
+  ],
+  "properties": {
+   "proposedActionId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `ai.proposed_action` row whose payload is the `marketing-crm.createSegment` body."
+   },
+   "name": {
+    "type": "string",
+    "nullable": true
+   },
+   "criteria": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "attribute",
+      "operator"
+     ],
+     "properties": {
+      "attribute": {
+       "type": "string"
+      },
+      "operator": {
+       "type": "string"
+      },
+      "value": {
+       "description": "As `SegmentCriterion.value` in marketing-crm (any type)."
+      },
+      "weight": {
+       "type": "number",
+       "nullable": true,
+       "description": "How much this attribute separated the seed from everyone else."
+      }
+     }
+    }
+   },
+   "similarityBasis": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "attribute": {
+       "type": "string"
+      },
+      "seedShare": {
+       "type": "number",
+       "description": "Share of the seed holding the value."
+      },
+      "populationShare": {
+       "type": "number",
+       "description": "Share of the tenant's consented guests holding it."
+      }
+     }
+    }
+   },
+   "estimatedReach": {
+    "type": "integer",
+    "description": "Consented guests the criteria select, excluding the seed where `excludeSeed`."
+   },
+   "seedSize": {
+    "type": "integer"
+   },
+   "overlapWithSeed": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "Share of the seed the criteria would also select; a check that the rules describe the seed."
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid"
    }
   }
  },
@@ -2039,6 +2201,126 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ProposedAction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.proposed_action",
+  "required": [
+   "id",
+   "kind",
+   "targetContract",
+   "targetOperation",
+   "payload",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "interactionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "pricing",
+     "promotion",
+     "operational",
+     "financial",
+     "configuration",
+     "content",
+     "audience"
+    ],
+    "description": "`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."
+   },
+   "targetContract": {
+    "type": "string",
+    "description": "Which contract would perform it. The assistant never performs it itself."
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "description": "**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n",
+    "enum": [
+     "proposed",
+     "approved",
+     "rejected",
+     "applied",
+     "expired"
+    ]
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."
+   },
+   "approvalLevel": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"
+   },
+   "proposedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.action_plan",
+    "description": "The plan this action presents for a decision (AI design 2.2 D, 3.8)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
+   }
+  }
+ },
  "Segment": {
   "x-ticvai-persistence": "marketing.segment + marketing.segment_criterion",
   "allOf": [
@@ -2083,7 +2365,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "attribute": {
     "type": "string",
-    "description": "Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language.\n**Free-form rather than an enum, which is why 22.14.8, 5.3.19 and 5.5.17b were readable as gaps and are not.** `walletBalance`, `engagementTier` and `portfolioScope` are expressible today; what was missing was anybody saying so.\n**Three that need saying, because the naive reading is wrong:**\n`walletBalance` should segment on **`cash` credit only**. A guest with 200 dirhams of promotional credit expiring Friday is a different campaign from one with 200 of their own money, and treating them alike sends a spend-it-now message to somebody who was given it.\n`walletBalance.expiringWithinDays` is the segment that earns the attribute — **credit about to expire unspent is a guest about to be disappointed and a venue about to book breakage**, and only one of those is worth a message.\n`portfolioScope` aggregates across a `DelegatedAccess` delegation (CF-132) and **must not message every member about a household total** — that is how a venue tells a teenager what their parent spends.\n"
+    "description": "Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language.\n**Free-form rather than an enum, which is why 22.14.8, 5.3.19 and 5.5.17b were readable as gaps and are not.** `walletBalance`, `engagementTier` and `portfolioScope` are expressible today; what was missing was anybody saying so.\n**Three that need saying, because the naive reading is wrong:**\n`walletBalance` should segment on **`cash` credit only**. A guest with 200 dirhams of promotional credit expiring Friday is a different campaign from one with 200 of their own money, and treating them alike sends a spend-it-now message to somebody who was given it.\n`walletBalance.expiringWithinDays` is the segment that earns the attribute — **credit about to expire unspent is a guest about to be disappointed and a venue about to book breakage**, and only one of those is worth a message.\n`portfolioScope` aggregates across a `DelegatedAccess` delegation (CF-132) and **must not message every member about a household total** — that is how a venue tells a teenager what their parent spends.\n`entitlementExpiringWithinDays` (29 September, build pass, group G2; 5.5.30): the guest holds a ticket or pass in `issued` or `partiallyConsumed` whose `validTo` is within that many days, kept current from `entitlement.expiringSoon` and the entitlement read model. **Unused passes about to lapse** are this attribute with `entitlementRemainingUses` greater than zero.\n"
    },
    "operator": {
     "type": "string",
@@ -2152,6 +2434,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time"
    }
   }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
  }
 }
 ```

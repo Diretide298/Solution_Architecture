@@ -1,4 +1,17 @@
 {
+ "getTenantAppStatus": {
+  "method": "GET",
+  "path": "/tenant-config/status",
+  "contract": "white-label",
+  "summary": "App status and recent changes",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TenantAppStatus"
+ },
  "listContentPages": {
   "method": "GET",
   "path": "/tenant-config/pages",
@@ -11,6 +24,16 @@
   "parameters": [
    {
     "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "slug",
     "in": "query",
     "required": null
    },
@@ -63,7 +86,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Case"
+  "responds": "Page"
  },
  "raiseMyCase": {
   "method": "POST",
@@ -71,8 +94,8 @@
   "contract": "marketing-crm",
   "summary": "Report something — lost property, a complaint, a question",
   "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -91,7 +114,7 @@
   "summary": "Reply on a case the guest raised",
   "permission": null,
   "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
+  "conflictPolicy": "append",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -101,6 +124,6 @@
    }
   ],
   "requestBody": null,
-  "responds": "Case"
+  "responds": "CaseDetail"
  }
 }

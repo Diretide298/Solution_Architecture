@@ -1,5 +1,7 @@
 # The overnight queue
 
+> **Replaced on 30 September by `README.md` in this folder**, which puts Block A first (the CMS flow builder, Mobile v4, WEB-050, the kitchen display, the Venue Management set-up screens), then the B2B options and the demo site. This list is from before the 29 September pass and does not have the new batches.
+
 191 batches, in order. Do them top to bottom. Never skip, never reorder, never choose your own.
 
 Each line is a folder under `handoff/design-batches/`. Open its `BUNDLE.md`, build every screen

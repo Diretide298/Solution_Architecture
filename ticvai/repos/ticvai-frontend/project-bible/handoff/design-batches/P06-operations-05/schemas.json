@@ -49,6 +49,21 @@
    "requiresAcknowledgement": {
     "type": "boolean"
    },
+   "deliveryChannels": {
+    "type": "array",
+    "description": "How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). `emergency` is sent by both whatever is set here.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "inApp",
+      "push"
+     ]
+    },
+    "default": [
+     "inApp",
+     "push"
+    ]
+   },
    "expiresAt": {
     "type": "string",
     "format": "date-time",
@@ -118,6 +133,40 @@
    }
   }
  },
+ "DenyReason": {
+  "type": "string",
+  "description": "Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n",
+  "enum": [
+   "notFound",
+   "notYetValid",
+   "expired",
+   "alreadyUsed",
+   "reentryLimitReached",
+   "exitRequiredBeforeReentry",
+   "wrongAccessPoint",
+   "wrongPerformance",
+   "outsideAdmissionWindow",
+   "entitlementSuspended",
+   "blacklisted",
+   "capacityReached",
+   "waiverRequired",
+   "accompanimentRequired",
+   "mediaDeactivated",
+   "unpaid",
+   "delegatedRightExhausted",
+   "delegatedRightRevoked",
+   "journeyNotCovered"
+  ]
+ },
+ "Direction": {
+  "type": "string",
+  "enum": [
+   "entry",
+   "exit",
+   "reentry",
+   "crossover"
+  ]
+ },
  "Incident": {
   "x-ticvai-persistence": "maintenance.incident",
   "type": "object",
@@ -133,10 +182,13 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "incidentNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
    },
    "kind": {
     "$ref": "#/components/schemas/IncidentKind"
@@ -172,7 +224,10 @@
    "notifiedAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"
    },
    "assignedToPrincipalId": {
     "type": "string",
@@ -185,6 +240,7 @@
    },
    "correctiveWorkOrderId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "occurredAt": {
@@ -207,6 +263,54 @@
    }
   }
  },
+ "IncidentAuthorityNotification": {
+  "x-ticvai-persistence": "maintenance.incident_authority_notification",
+  "type": "object",
+  "description": "**One notification to an external authority, appended by `recordAuthorityNotification`.** An incident may be reported to more than one authority, or to the same one twice, and each is the evidence that an obligation was met — so each is a row, not an overwrite of `maintenance.incident.notified_at`.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "authority",
+   "notifiedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "authority": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "reference": {
+    "type": "string",
+    "maxLength": 128,
+    "nullable": true
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "notifiedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "IncidentDetail": {
   "x-ticvai-persistence": "maintenance.incident",
   "allOf": [
@@ -222,7 +326,17 @@
      },
      "investigationNote": {
       "type": "string",
-      "nullable": true
+      "nullable": true,
+      "readOnly": true,
+      "description": "The latest entry of `investigationNotes`, kept for readers that show one line."
+     },
+     "investigationNotes": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**Every investigation note, oldest first** (decided 28 September, audit R106 (5)). Read from `maintenance.incident_investigation_note`; appended by `updateIncident`.\n",
+      "items": {
+       "$ref": "#/components/schemas/IncidentInvestigationNote"
+      }
      },
      "rootCause": {
       "type": "string",
@@ -247,32 +361,95 @@
        "type": "string"
       }
      },
+     "involvedParties": {
+      "type": "array",
+      "description": "Who was involved, as given in `ReportIncidentRequest.involvedSubjectIds` and `involvedStaffPrincipalIds`. Read from `maintenance.incident_involved_party`.\n",
+      "items": {
+       "$ref": "#/components/schemas/IncidentInvolvedParty"
+      }
+     },
      "authorityNotifications": {
       "type": "array",
+      "description": "Read from `maintenance.incident_authority_notification`, oldest first.",
       "items": {
-       "type": "object",
-       "properties": {
-        "authority": {
-         "type": "string"
-        },
-        "reference": {
-         "type": "string",
-         "nullable": true
-        },
-        "notifiedAt": {
-         "type": "string",
-         "format": "date-time"
-        },
-        "notifiedByPrincipalId": {
-         "type": "string",
-         "format": "uuid"
-        }
-       }
+       "$ref": "#/components/schemas/IncidentAuthorityNotification"
       }
      }
     }
    }
   ]
+ },
+ "IncidentInvestigationNote": {
+  "x-ticvai-persistence": "maintenance.incident_investigation_note",
+  "type": "object",
+  "description": "**One investigation note, appended by `updateIncident`** (decided 28 September, audit R106 (5)). A history rather than a field, so what an investigator thought on Tuesday survives what they found on Thursday.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "note",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 10000
+   },
+   "writtenByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "IncidentInvolvedParty": {
+  "x-ticvai-persistence": "maintenance.incident_involved_party",
+  "type": "object",
+  "description": "**One person involved in an incident, by opaque reference.** A guest or member of the public is a `pii.subject` id — personal details live there, the erasable store of ADR-0023, so the incident record survives an erasure request intact. A member of staff is a principal id. Exactly one of the two is set, as `kind` says.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "subject",
+     "staff"
+    ]
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `pii.subject` id where `kind` is `subject`."
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff principal where `kind` is `staff`."
+   }
+  }
  },
  "IncidentKind": {
   "type": "string",
@@ -309,7 +486,7 @@
   ]
  },
  "Inspection": {
-  "x-ticvai-persistence": "maintenance.inspection + maintenance.inspection_response",
+  "x-ticvai-persistence": "maintenance.inspection",
   "type": "object",
   "required": [
    "id",
@@ -321,7 +498,8 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "templateId": {
     "type": "string",
@@ -373,6 +551,73 @@
    }
   }
  },
+ "InspectionItem": {
+  "x-ticvai-persistence": "maintenance.inspection_item",
+  "type": "object",
+  "description": "**One answer to one question, which the API has always accepted and never stored.** `SubmitInspectionRequest.responses[]` takes a key, a value, a pass flag, a note and attachments; the only persistence ever claimed for them was `maintenance.inspection_response`, a table that does not exist.\nSo `maintenance.inspection_template_item` held the questions, `maintenance.inspection` held `failedItemCount` and `failedSafetyCriticalCount`, and **which check failed was accepted over the wire and dropped** — on a record that takes an asset out of service.\nReturned on `InspectionResult`, not on `Inspection`: `listInspections` returns the latter in a list, and twenty item rows per inspection on a list screen is the wrong trade. The counts stay for exactly that reason.\n",
+  "required": [
+   "id",
+   "inspectionId",
+   "itemKey"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "inspectionId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "templateItemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Nullable because a template changes and an inspection does not.** An answer recorded against an item that was later removed still has to be readable, so the key below is the durable record and this is the live link.\n"
+   },
+   "itemKey": {
+    "type": "string",
+    "maxLength": 120,
+    "description": "The template item's `key`, copied at submission and never updated."
+   },
+   "label": {
+    "type": "string",
+    "nullable": true,
+    "description": "The question as it was asked, copied at submission. **A template reworded next season must not silently reword last season's inspection.**\n"
+   },
+   "value": {
+    "nullable": true,
+    "description": "Whatever the item's `kind` calls for — a boolean, a number, a string."
+   },
+   "passed": {
+    "type": "boolean",
+    "nullable": true,
+    "description": "Null where the item is informational rather than pass or fail."
+   },
+   "isSafetyCritical": {
+    "type": "boolean",
+    "default": false,
+    "description": "Copied from the template item at submission, for the same reason as `label`: it is what makes `failedSafetyCriticalCount` reproducible, and the template can change.\n"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "attachmentAssetIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**A deliberate array, and the same exception as `workforce.sync_conflict.affectedAssignmentIds`**: evidence attached to this answer at the moment it was recorded. It is never queried from the other end — nobody asks which inspection items reference a photograph — and it must not change when an asset library is reorganised.\n"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "InspectionItemKind": {
   "type": "string",
   "enum": [
@@ -382,6 +627,14 @@
    "text",
    "photo",
    "signature"
+  ]
+ },
+ "InspectionOutcome": {
+  "type": "string",
+  "enum": [
+   "passed",
+   "passedWithObservations",
+   "failed"
   ]
  },
  "InspectionResult": {
@@ -395,6 +648,13 @@
    "inspection": {
     "$ref": "#/components/schemas/Inspection"
    },
+   "items": {
+    "type": "array",
+    "description": "**The answers, which had nowhere to live until 20 September.** A failed safety-critical item takes an asset out of service and `consequences` below says it happened; this says which check caused it.\n",
+    "items": {
+     "$ref": "#/components/schemas/InspectionItem"
+    }
+   },
    "consequences": {
     "type": "object",
     "description": "What the submission triggered. A failed safety-critical item takes the asset out of service without waiting for anyone to decide.\n",
@@ -405,7 +665,8 @@
      "workOrdersRaised": {
       "type": "array",
       "items": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       }
      },
      "productsSuspended": {
@@ -434,6 +695,10 @@
    "items"
   ],
   "properties": {
+   "instructions": {
+    "type": "string",
+    "description": "**The procedure itself.** A technician asking how to isolate a chiller is asking a safety question, and the answer has to come from the template rather than from its title.\n"
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -526,6 +791,48 @@
    }
   }
  },
+ "OfflineScan": {
+  "x-ticvai-persistence": "none — client-side journal",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/ValidateRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "sequence",
+     "localOutcome"
+    ],
+    "properties": {
+     "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per device. The server processes in this order."
+     },
+     "localOutcome": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/ScanOutcome"
+       }
+      ],
+      "description": "What the device decided offline. The server is authoritative and may disagree; disagreements are returned for reconciliation, not discarded.\n"
+     },
+     "localDenyReason": {
+      "$ref": "#/components/schemas/DenyReason"
+     },
+     "overriddenByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "overrideReason": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -542,6 +849,128 @@
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "ScanEvent": {
+  "x-ticvai-persistence": "access.scan_event",
+  "type": "object",
+  "required": [
+   "id",
+   "accessPointId",
+   "venueId",
+   "outcome",
+   "direction",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The scan's client-generated ULID, the key offline replay deduplicates on."
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "ticketId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "The `Entitlement.id` scanned; null where the media resolved to nothing."
+   },
+   "mediaCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "outcome": {
+    "$ref": "#/components/schemas/ScanOutcome"
+   },
+   "denyReason": {
+    "$ref": "#/components/schemas/DenyReason"
+   },
+   "direction": {
+    "$ref": "#/components/schemas/Direction"
+   },
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "overridesScanId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "description": "**Set only on an override row**, naming the denied scan it admits against (decided 28 September, audit R228). The denied scan itself is never updated: the denial and the override are two rows, and at most one override row names any scan. Null on every other scan.\n"
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supervisor's justification, on the override row only. The overriding principal is that row's `operatorPrincipalId`."
+   },
+   "dynamicPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The dynamic access policy (`access.dynamic_policy`) whose result decided this scan; null when no dynamic policy matched and the entitlement alone decided (added 29 September, build pass, 3.3.48). `listDynamicPolicyEffectiveness` counts from it."
+   },
+   "dynamicPolicyVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "The version of that policy in force at the scan, so a report spanning a change counts each version apart."
+   },
+   "dynamicPolicyResult": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ],
+    "nullable": true,
+    "description": "What the policy decided, which for a step-up is not the same as the scan's outcome."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "description": "Admissions this scan counted. More than one only for a group wave (`validateGroupAccess`) or a quantity entitlement consumed in one pass (added 29 September, data-model close-out DM1)."
+   },
+   "localSequence": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "packageVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The offline package (`access.edge_package`) the device validated against; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Null while pending. Differs from recordedAt for offline scans."
    }
   }
  },
@@ -612,7 +1041,7 @@
   }
  },
  "SubmitInspectionRequest": {
-  "x-ticvai-persistence": "none — request only",
+  "x-ticvai-persistence": "maintenance.inspection + maintenance.inspection_item",
   "type": "object",
   "required": [
    "id",
@@ -676,6 +1105,48 @@
    "recordedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "ValidateRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "mediaCode",
+   "mediaKind",
+   "direction",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID. Also the idempotency key and dedupe key."
+   },
+   "mediaCode": {
+    "type": "string",
+    "maxLength": 256,
+    "description": "What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life.\n"
+   },
+   "mediaKind": {
+    "$ref": "#/components/schemas/MediaKind"
+   },
+   "direction": {
+    "$ref": "#/components/schemas/Direction"
+   },
+   "groupSize": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "For group media admitting several holders on one read."
+   },
+   "proximityToken": {
+    "type": "string",
+    "description": "BLE proximity assertion where the venue requires the operator to be physically at the gate. Absent where not configured.\n"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time of the read. Authoritative for ordering, not for validity."
    }
   }
  }

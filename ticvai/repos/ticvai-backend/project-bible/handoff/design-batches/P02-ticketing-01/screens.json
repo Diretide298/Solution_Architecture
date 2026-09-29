@@ -19,32 +19,17 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-014 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity, 31 August**: added listOrders. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
-  "openQuestions": [
-   "Inventory cites `POST /tickets/{id}/transfer` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity, 31 August**: added listOrders. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.\n\n**Rev 3 (decided 29 September).** GST-014 and GST-045 (and the old GST-008 transfer reading) are one implementation with several screen ids; the ids are kept (GAP-D3).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -57,8 +42,50 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every ticket transfer",
+       "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -80,7 +107,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected ticket transfer",
+       "label": "The selected order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -102,13 +129,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       },
       {
        "kind": "secondaryButton",
-       "label": "Claim",
+       "label": "Claim ticket transfer",
        "operation": "claimTicketTransfer",
        "provenance": "contract orders.yaml POST /ticket-transfers/{transferId}/claim"
       }
@@ -120,8 +147,8 @@
    "loading": "Availability is live, never cached",
    "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
-   "emptyNoResults": "The filter narrowed it and the ticket transfer are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket transfer are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible."
   },
   "apis": [
@@ -172,10 +199,55 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-014"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-014",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Ticket transfer (also Account → Ticket transfer)"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formTransferOrderTickets",
+    "component": "modal",
+    "trigger": "Transfer order tickets",
+    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer order tickets",
+     "operation": "transferOrderTickets"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "ticketIds",
+      "recipient",
+      "message"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formClaimTicketTransfer",
+    "component": "modal",
+    "trigger": "Claim ticket transfer",
+    "body": "**Collects what `claimTicketTransfer` sends before it is called.** Required: `claimToken`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Claim ticket transfer",
+     "operation": "claimTicketTransfer"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "claimToken"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -223,36 +295,28 @@
   "navigation": {
    "entryFrom": [
     "GST-001",
-    "GST-050"
+    "GST-050",
+    "GST-074"
    ],
    "inferred": true,
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003",
     "GST-017"
    ],
    "transitions": [
     {
-     "to": "GST-017",
-     "trigger": "On the day, they arrive",
-     "provenance": "flow F52 step 3→4"
-    },
-    {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-016 holds none of them, so the edge carries nothing and GST-001 opens cold"
     },
     {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
+     "to": "GST-017",
+     "trigger": "On the day, they arrive",
+     "provenance": "flow F52 step 3→4",
      "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+      "reservationId"
+     ]
     }
    ]
   },
@@ -269,8 +333,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Status",
+       "operation": "listReservations",
+       "notes": "Sends `?status=` to `listReservations`.",
+       "provenance": "contract orders.yaml GET /reservations"
+      },
+      {
+       "kind": "numberField",
+       "label": "Expiring within minutes",
+       "operation": "listReservations",
+       "notes": "Sends `?expiringWithinMinutes=` to `listReservations`.",
+       "provenance": "contract orders.yaml GET /reservations"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every reservations",
+       "label": "Every reservation",
        "bindsTo": "Reservation",
        "columns": [
         "Reservation.id",
@@ -291,7 +369,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected reservations",
+       "label": "The selected reservation",
        "bindsTo": "Reservation",
        "columns": [
         "Reservation.id",
@@ -312,7 +390,7 @@
      "components": [
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel reservation",
        "operation": "cancelReservation",
        "provenance": "contract orders.yaml DELETE /reservations/{reservationId}"
       }
@@ -324,17 +402,17 @@
    {
     "id": "confirmCancelReservation",
     "component": "confirmDialog",
-    "trigger": "Cancel",
+    "trigger": "Cancel reservation",
     "body": "**Names what `cancelReservation` changes and what it leaves alone**, in the consequence rather than the verb. A reservations this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract orders.yaml DELETE /reservations/{reservationId}"
+    "provenance": "client-verified"
    }
   ],
   "states": {
    "loading": "The reservations list.",
    "error": "Could not load. Names which read failed and leaves the reservations untouched.",
-   "emptyFirstRun": "No reservations yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reservations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No reservations yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on status, expiringWithinMinutes and the reservations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have."
   },
   "apis": [
@@ -348,7 +426,7 @@
     "operationId": "getReservation",
     "contract": "orders",
     "purpose": "Read a reservation",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "cancelReservation",
@@ -378,8 +456,16 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-016"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-016",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → My reservations (also Account → Reservations)",
+    "differences": "Prototype lists cabana reservations and \"Book a table or cabana\"; YAML GST-070 says cabanas are booked by staff."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -434,29 +520,17 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-017 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Rev 3 (decided 29 September).** **Table deposit (REV3-8b, superseding audit R077 (a)):** a reservation holding a deposit shows its amount, when it stops being refundable (`refundableUntil`) and the late-cancel and no-show terms of the venue's `DepositPolicy.dining`; a venue option, off by default.",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getReservation` reads one record and nothing reads a population — the screen is about that one thing",
@@ -470,7 +544,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected reservation",
+       "label": "The reservation",
        "bindsTo": "Reservation",
        "columns": [
         "Reservation.id",
@@ -491,7 +565,7 @@
      "components": [
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel reservation",
        "operation": "cancelReservation",
        "provenance": "contract orders.yaml DELETE /reservations/{reservationId}"
       }
@@ -503,17 +577,16 @@
    {
     "id": "confirmCancelReservation",
     "component": "confirmDialog",
-    "trigger": "Cancel",
+    "trigger": "Cancel reservation",
     "body": "**Names what `cancelReservation` changes and what it leaves alone**, in the consequence rather than the verb. A reservation this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract orders.yaml DELETE /reservations/{reservationId}"
+    "provenance": "client-verified"
    }
   ],
   "states": {
-   "loading": "The reservation list.",
+   "loading": "The reservation, read by `getReservation`.",
    "error": "Could not load. Names which read failed and leaves the reservation untouched.",
-   "emptyFirstRun": "No reservation yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reservation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No reservation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getReservation` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have."
   },
   "apis": [
@@ -541,8 +614,16 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-017"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-017",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Reservation details",
+    "differences": "Prototype shows a deposit that is kept on late cancellation; the YAML (audit R077a) says no deposit and no no-show fee."
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -596,43 +677,21 @@
    "inferred": true,
    "exitTo": [
     "GST-001",
-    "GST-002",
-    "GST-003"
+    "GST-002"
    ],
    "transitions": [
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
-    },
-    {
-     "to": "GST-003",
-     "trigger": "Event & Attraction Listing",
-     "carries": [
-      "eventId"
-     ],
-     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-044 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
-  "notes": "Drawn in guest storyboard board 7 panel 4 — a selector across AED, USD, EUR, GBP and SAR with *\"payment will be processed in AED\"* — and board 8 carries an AED selector in its header. **Confirmed for both surfaces on 18 August (CF-111).** The matrix names the website (2.6.33, 2.9.1) and the storyboard draws the app; both are client documents and the answer is both, which is what CF-93 concluded for every other guest capability. **Display only — the sale settles in base currency** (CF-37), and that is stated on the screen rather than in a footnote. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer.",
-  "openQuestions": [
-   "Inventory cites `GET /currencies` — no matching operation. Written before the contracts existed."
-  ],
+  "notes": "Drawn in guest storyboard board 7 panel 4 — a selector across AED, USD, EUR, GBP and SAR with *\"payment will be processed in AED\"* — and board 8 carries an AED selector in its header. **Confirmed for both surfaces on 18 August (CF-111).** The matrix names the website (2.6.33, 2.9.1) and the storyboard draws the app; both are client documents and the answer is both, which is what CF-93 concluded for every other guest capability. **Display only — the sale settles in base currency** (CF-37), and that is stated on the screen rather than in a footnote. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer.\n\n**Rev 3 (decided 29 September).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (GAP-D2, open).",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listFxRates` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "See prices in your own currency, in the app, before and during the visit.",
-  "gaps": [
-   {
-    "operation": "listProducts",
-    "why": "**1 declared operation reach no component on this screen**: listProducts. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -641,8 +700,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "selectField",
+       "label": "Venue",
+       "operation": "listFxRates",
+       "notes": "Sends `?venueId=` to `listFxRates`, from the venue the guest picked (see the home screen), so the list is the region's rates narrowed to the currencies this venue shows. Rates are set per region and each venue picks which currencies it shows (decided 28 September, audit R120 (a)).",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
+       "kind": "datePicker",
+       "label": "As at",
+       "operation": "listFxRates",
+       "notes": "Sends `?asAt=` to `listFxRates`.",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
+       "kind": "textField",
+       "label": "Purpose",
+       "operation": "listFxRates",
+       "notes": "Sends `?purpose=` to `listFxRates`.",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every multi-currency pricing",
+       "label": "Every FX rate",
        "bindsTo": "FxRate",
        "columns": [
         "FxRate.id",
@@ -659,6 +739,27 @@
        ],
        "operation": "listFxRates",
        "provenance": "contract finance.yaml GET /fx-rates"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
       }
      ]
     },
@@ -668,7 +769,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected multi-currency pricing",
+       "label": "The selected FX rate",
        "bindsTo": "FxRate",
        "columns": [
         "FxRate.id",
@@ -693,16 +794,16 @@
   "states": {
    "loading": "The multi-currency pricing list.",
    "error": "Could not load. Names which read failed and leaves the multi-currency pricing untouched.",
-   "emptyFirstRun": "No multi-currency pricing yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the multi-currency pricing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No multi-currency pricing yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on asAt, purpose and the multi-currency pricing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows. Last known rates stay, with their age.** A rate is a number a guest may act on, and an undated one they cannot judge."
   },
   "apis": [
    {
     "operationId": "listFxRates",
     "contract": "finance",
-    "purpose": "The rates in force",
+    "purpose": "The rates in force for the venue's shown currencies — always called with `venueId` (decided 28 September, audit R120 (a))",
     "trigger": "onLoad"
    },
    {
@@ -723,8 +824,15 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-044"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-044",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 2 → Multi-currency & pricing"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {

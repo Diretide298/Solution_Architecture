@@ -1,6 +1,6 @@
 # P01-system-states-01 — P01 · System States
 
-**1 screens · 1 operations · 2 schemas · 0 permissions**
+**1 screens · 1 operations · 5 schemas · 0 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·

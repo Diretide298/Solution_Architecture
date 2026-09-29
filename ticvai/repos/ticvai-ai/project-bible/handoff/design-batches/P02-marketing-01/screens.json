@@ -25,10 +25,7 @@
     {
      "to": "GST-001",
      "trigger": "Home – Default",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+     "provenance": "derived — GST-001 declares entryState.params  and GST-065 holds none of them, so the edge carries nothing and GST-001 opens cold"
     }
    ]
   },
@@ -46,7 +43,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every newsletter preferences",
+       "label": "Every consent purpose config",
        "bindsTo": "ConsentPurposeConfig",
        "columns": [
         "ConsentPurposeConfig.purpose",
@@ -68,7 +65,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected newsletter preferences",
+       "label": "The selected consent purpose config",
        "bindsTo": "ConsentPurposeConfig",
        "columns": [
         "ConsentPurposeConfig.purpose",
@@ -81,6 +78,22 @@
        ],
        "operation": "listConsentPurposes",
        "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The marketing subscription",
+       "bindsTo": "MarketingSubscription",
+       "columns": [
+        "MarketingSubscription.id",
+        "MarketingSubscription.subjectId",
+        "MarketingSubscription.channel",
+        "MarketingSubscription.listName",
+        "MarketingSubscription.isSubscribed",
+        "MarketingSubscription.source",
+        "MarketingSubscription.unsubscribeToken"
+       ],
+       "operation": "getMarketingSubscription",
+       "provenance": "contract marketing-crm.yaml GET /marketing-subscriptions"
       }
      ]
     },
@@ -90,23 +103,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Record",
+       "label": "Record consent",
        "operation": "recordConsent",
        "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "recordConsent",
-       "provenance": "carried from the previous definition"
+       "label": "Save marketing subscription",
+       "operation": "setMarketingSubscription",
+       "provenance": "contract marketing-crm.yaml PUT /marketing-subscriptions"
       }
      ]
     }
@@ -115,9 +120,9 @@
   "states": {
    "loading": "The newsletter preferences list.",
    "error": "Could not load. Names which read failed and leaves the newsletter preferences untouched.",
-   "emptyFirstRun": "No newsletter preferences yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the newsletter preferences are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No newsletter preferences yet. Offers Record consent (`recordConsent`).",
+   "emptyNoResults": "Never shown: `listConsentPurposes` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `listConsentPurposes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** A consent change must reach the server to mean anything."
   },
   "apis": [
@@ -167,10 +172,66 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "generated",
-   "board": "wireframes/P02 Guest App.dc.html#gst-065"
+   "provenance": "client-verified",
+   "board": "wireframes/P02 Guest App.dc.html#gst-065",
+   "prototype": {
+    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
+    "rev": "rev 3",
+    "verified": "2026-09-28",
+    "match": "exact",
+    "view": "Account → All screens → Wave 3 → Newsletter & preferences"
+   }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetMarketingSubscription",
+    "component": "modal",
+    "trigger": "Save marketing subscription",
+    "body": "**Collects what `setMarketingSubscription` sends before it is called.** Required: `id`, `subjectId`, `channel`, `listName`, `isSubscribed`. Optional: `source`, `unsubscribeToken`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "MarketingSubscription",
+    "confirm": {
+     "label": "Save marketing subscription",
+     "operation": "setMarketingSubscription"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subjectId",
+      "channel",
+      "listName",
+      "isSubscribed",
+      "source",
+      "unsubscribeToken"
+     ]
+    },
+    "provenance": "client-verified"
+   },
+   {
+    "id": "formRecordConsent",
+    "component": "modal",
+    "trigger": "Record consent",
+    "body": "**Collects what `recordConsent` sends before it is called.** Required: `purpose`, `decision`, `noticeVersion`, `source`, `recordedAt`. Optional: `channels`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RecordConsentRequest",
+    "confirm": {
+     "label": "Record consent",
+     "operation": "recordConsent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "purpose",
+      "decision",
+      "noticeVersion",
+      "source",
+      "recordedAt",
+      "channels"
+     ]
+    },
+    "provenance": "client-verified"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",

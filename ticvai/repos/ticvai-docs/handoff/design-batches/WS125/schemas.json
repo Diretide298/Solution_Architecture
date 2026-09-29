@@ -1,4 +1,48 @@
 {
+ "Event": {
+  "x-ticvai-persistence": "catalogue.event",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "parentEventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For grouped events."
+   },
+   "performanceCount": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "How many performances the event has. Counted by the server; never sent by a client."
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
  "EventType": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.event_type",

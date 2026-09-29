@@ -1,0 +1,1677 @@
+[
+ {
+  "id": "ADM-609",
+  "name": "Refund & Payment Adjustment Command Center\\t116",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "6",
+   "number": "1",
+   "page": 115
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/refund-payment-adjustment-command-center-t116-adm-609",
+   "component": "apps/ticvai-web/src/routes/commercial/RefundPaymentAdjustmentCommandCenterT116.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-610",
+    "ADM-611",
+    "ADM-612",
+    "ADM-613",
+    "ADM-614",
+    "ADM-615",
+    "ADM-616",
+    "ADM-617",
+    "ADM-618"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to Platform Dashboard",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "ADM-610",
+     "trigger": "Refund Request & Eligibility Workspace\\t117",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-611",
+     "trigger": "Refund Policy & Rule Configuration\\t118",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-612",
+     "trigger": "Refund Allocation & Original Tender Manager\\t119",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-613",
+     "trigger": "Void, Reversal & Cancellation Manager\\t120",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-614",
+     "trigger": "Refund Approval & Exception Workflow\\t121",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "refundId"
+     ]
+    },
+    {
+     "to": "ADM-615",
+     "trigger": "Refund Processing, Provider Status & Recovery Center\\t122",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-616",
+     "trigger": "Payment Adjustment & Financial Correction Manager\\t123",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "orderId"
+     ]
+    },
+    {
+     "to": "ADM-617",
+     "trigger": "Refund Transaction Trace & Audit Investigation\\t124",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-618",
+     "trigger": "Refund Simulator, Risk Analysis & AI Advisor\\t126",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide centralized visibility across refund, reversal, void and adjustment operations.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Refund Requests",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Refund Value",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Full Refunds",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Partial Refunds",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Refund Rate",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Refunds",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Refunds",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Voids",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Reversals",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Manual Adjustments",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Approval Pending",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Refund Exceptions",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 115 §KPI Cards"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The refund payment adjustment list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the refund payment adjustment untouched.",
+   "emptyFirstRun": "No refund payment adjustment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the refund payment adjustment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOrderRefunds",
+    "contract": "orders",
+    "purpose": "Refunds in flight",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-609",
+   "workshopBoard": "wireframes/WS92 Payment Payment Orchestration Board 6.dc.html#adm-609"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 115. 0 of 0 labels bound to a contract property; 12 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-610",
+  "name": "Refund Request & Eligibility Workspace\\t117",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "6",
+   "number": "2",
+   "page": 116
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/refund-request-eligibility-workspace-t117-adm-610",
+   "component": "apps/ticvai-web/src/routes/commercial/RefundRequestEligibilityWorkspaceT117.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-609"
+   ],
+   "exitTo": [
+    "ADM-609"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-609",
+     "trigger": "Back to Refund & Payment Adjustment Command Center\\t116",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide the operational workspace for creating and validating a refund request.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 5 actions on this screen and the screen declares 0 operations.** Unserved: Entire transaction, Selected items, Selected tickets, Selected quantities, Specific monetary amount. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 116 §Allow"
+   },
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 116 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every refund request eligibility",
+       "columns": [
+        "Order: ORD-847291",
+        "Original Amount: AED 1,250",
+        "Paid: AED 1,250",
+        "Previously Refunded: AED 200",
+        "Maximum Remaining Refundable: AED 1,050"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 116 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected refund request eligibility",
+       "bindsTo": null,
+       "columns": [
+        "Order: ORD-847291",
+        "Original Amount: AED 1,250",
+        "Paid: AED 1,250",
+        "Previously Refunded: AED 200",
+        "Maximum Remaining Refundable: AED 1,050"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Find original transaction using”, “Before allowing the refund”, “Eligible for Refund”, “Refund Restricted”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 116 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Entire transaction",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 116 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected items",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 116 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected tickets",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 116 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected quantities",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 116 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Specific monetary amount",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 116 §Allow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The refund request eligibility list.",
+   "error": "Could not load. Names which read failed and leaves the refund request eligibility untouched.",
+   "emptyFirstRun": "No refund request eligibility yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the refund request eligibility are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Raise a refund",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getRefundPolicy",
+    "contract": "orders",
+    "purpose": "What is eligible",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Order: ORD-847291",
+    "Original Amount: AED 1,250",
+    "Paid: AED 1,250",
+    "Previously Refunded: AED 200",
+    "Maximum Remaining Refundable: AED 1,050"
+   ],
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-610",
+   "workshopBoard": "wireframes/WS92 Payment Payment Orchestration Board 6.dc.html#adm-610"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 116. 0 of 5 labels bound to a contract property; 10 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-611",
+  "name": "Refund Policy & Rule Configuration\\t118",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "6",
+   "number": "3",
+   "page": 117
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/refund-policy-rule-configuration-t118-adm-611",
+   "component": "apps/ticvai-web/src/routes/commercial/RefundPolicyRuleConfigurationT118.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-609"
+   ],
+   "exitTo": [
+    "ADM-609"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-609",
+     "trigger": "Back to Refund & Payment Adjustment Command Center\\t116",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Define the payment execution rules governing refunds without duplicating Ticket Service Policy. This boundary is important.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Full refund allowed",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 117 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Partial refund allowed",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 117 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Multiple partial refunds allowed",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 117 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Refund to original tender required",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 117 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Alternative tender permitted",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 117 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum refund amount",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 117 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refund approval threshold",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 117 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refund expiry/window",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 117 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Automatic vs manual processing",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 117 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The refund policy rule configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the refund policy rule untouched.",
+   "emptyFirstRun": "No refund policy rule configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "setRefundPolicy",
+    "contract": "orders",
+    "purpose": "Set a venue's refund policy",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-611",
+   "workshopBoard": "wireframes/WS92 Payment Payment Orchestration Board 6.dc.html#adm-611"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 117. 0 of 0 labels bound to a contract property; 9 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-612",
+  "name": "Refund Allocation & Original Tender Manager\\t119",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "6",
+   "number": "4",
+   "page": 118
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/refund-allocation-original-tender-manager-t119-adm-612",
+   "component": "apps/ticvai-web/src/routes/commercial/RefundAllocationOriginalTenderManagerT119.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-609"
+   ],
+   "exitTo": [
+    "ADM-609"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-609",
+     "trigger": "Back to Refund & Payment Adjustment Command Center\\t116",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Determine where the refunded value must be returned. This screen becomes particularly important for Board 5 mixed-tender transactions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Manual allocation with approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 118 §Support configurable approaches such as"
+   },
+   {
+    "operation": null,
+    "why": "**Refund Allocation & Original Tender Manager\\t119 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 118"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 118"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Manual allocation with approval",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 118 §Support configurable approaches such as"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setWalletRefundPolicy"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The refund allocation original list.",
+   "error": "Could not load. Names which read failed and leaves the refund allocation original untouched.",
+   "emptyFirstRun": "No refund allocation original yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the refund allocation original are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setWalletRefundPolicy",
+    "contract": "wallet",
+    "purpose": "Refund to wallet or original tender",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-612",
+   "workshopBoard": "wireframes/WS92 Payment Payment Orchestration Board 6.dc.html#adm-612"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 118. 0 of 0 labels bound to a contract property; 1 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-613",
+  "name": "Void, Reversal & Cancellation Manager\\t120",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "6",
+   "number": "5",
+   "page": 119
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/void-reversal-cancellation-manager-t120-adm-613",
+   "component": "apps/ticvai-web/src/routes/commercial/VoidReversalCancellationManagerT120.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-609"
+   ],
+   "exitTo": [
+    "ADM-609"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-609",
+     "trigger": "Back to Refund & Payment Adjustment Command Center\\t116",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "orderId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Clearly distinguish voids and reversals from refunds. These should not all be called “refund”.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Refund ✓, Void ✕, Reversal ✕. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 119 §Available Actions"
+   },
+   {
+    "operation": null,
+    "why": "**Void, Reversal & Cancellation Manager\\t120 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 119"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 119"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Refund ✓",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 119 §Available Actions"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Void ✕",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 119 §Available Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reversal ✕",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 119 §Available Actions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmVoid",
+    "component": "confirmDialog",
+    "trigger": "Void ✕",
+    "body": "**Void ✕ on a void reversal cancellation is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Payment_Payment_Orchestration.pdf, page 119 §Available Actions"
+   }
+  ],
+  "states": {
+   "loading": "The void reversal cancellation list.",
+   "error": "Could not load. Names which read failed and leaves the void reversal cancellation untouched.",
+   "emptyFirstRun": "No void reversal cancellation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the void reversal cancellation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "voidPayment",
+    "contract": "orders",
+    "purpose": "Void or reverse",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-613",
+   "workshopBoard": "wireframes/WS92 Payment Payment Orchestration Board 6.dc.html#adm-613"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 119. 0 of 0 labels bound to a contract property; 3 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "paymentId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-614",
+  "name": "Refund Approval & Exception Workflow\\t121",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "6",
+   "number": "6",
+   "page": 120
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/refund-approval-exception-workflow-t121-adm-614",
+   "component": "apps/ticvai-web/src/routes/commercial/RefundApprovalExceptionWorkflowT121.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-609"
+   ],
+   "exitTo": [
+    "ADM-609"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-609",
+     "trigger": "Back to Refund & Payment Adjustment Command Center\\t116",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "orderId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Provide governed approval for financially sensitive refund actions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 120 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every refund approval exception",
+       "columns": [
+        "Request",
+        "Order",
+        "Customer",
+        "Amount",
+        "Reason",
+        "Original payment",
+        "Requested refund method",
+        "Risk indicator",
+        "Requester",
+        "Age"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 120 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected refund approval exception",
+       "bindsTo": null,
+       "columns": [
+        "Request",
+        "Order",
+        "Customer",
+        "Amount",
+        "Reason",
+        "Original payment",
+        "Requested refund method",
+        "Risk indicator",
+        "Requester",
+        "Age"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Approval can depend on”, “AED 5,000”, “Requested”, “Approval Required”, “Approver”, “Approved / Rejected”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 120 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The refund approval exception list.",
+   "error": "Could not load. Names which read failed and leaves the refund approval exception untouched.",
+   "emptyFirstRun": "No refund approval exception yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the refund approval exception are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "approveRefund",
+    "contract": "orders",
+    "purpose": "Approve above threshold",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listFraudRules",
+    "contract": "orders",
+    "purpose": "Show refund-abuse and charge fraud rules",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setFraudRules",
+    "contract": "orders",
+    "purpose": "Edit refund-abuse and charge fraud rules",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Request",
+    "Order",
+    "Customer",
+    "Amount",
+    "Reason",
+    "Original payment"
+   ],
+   "params": [
+    {
+     "name": "refundId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-614",
+   "workshopBoard": "wireframes/WS92 Payment Payment Orchestration Board 6.dc.html#adm-614"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 120. 0 of 10 labels bound to a contract property; 10 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-615",
+  "name": "Refund Processing, Provider Status & Recovery Center\\t122",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "6",
+   "number": "7",
+   "page": 121
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/refund-processing-provider-status-recovery-center-t122-adm-615",
+   "component": "apps/ticvai-web/src/routes/commercial/RefundProcessingProviderStatusRecoveryCenterT122.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-609"
+   ],
+   "exitTo": [
+    "ADM-609"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-609",
+     "trigger": "Back to Refund & Payment Adjustment Command Center\\t116",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "orderId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Track refund execution through the appropriate provider and recover failed or uncertain operations.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 121 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every refund processing provider",
+       "columns": [
+        "Provider",
+        "Merchant account",
+        "Original provider transaction",
+        "Refund transaction ID",
+        "Refund amount",
+        "Currency",
+        "Submitted timestamp",
+        "Provider status",
+        "Provider response",
+        "Expected completion"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 121 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected refund processing provider",
+       "bindsTo": null,
+       "columns": [
+        "Provider",
+        "Merchant account",
+        "Original provider transaction",
+        "Refund transaction ID",
+        "Refund amount",
+        "Currency",
+        "Submitted timestamp",
+        "Provider status",
+        "Provider response",
+        "Expected completion"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Refund Processing States”, “Verify Provider Status”, “Recovery Actions”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 121 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The refund processing provider list.",
+   "error": "Could not load. Names which read failed and leaves the refund processing provider untouched.",
+   "emptyFirstRun": "No refund processing provider yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the refund processing provider are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "inquirePaymentStatus",
+    "contract": "orders",
+    "purpose": "Provider status and recovery",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Provider",
+    "Merchant account",
+    "Original provider transaction",
+    "Refund transaction ID",
+    "Refund amount",
+    "Currency"
+   ],
+   "params": [
+    {
+     "name": "paymentId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-615",
+   "workshopBoard": "wireframes/WS92 Payment Payment Orchestration Board 6.dc.html#adm-615"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 121. 0 of 10 labels bound to a contract property; 10 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-616",
+  "name": "Payment Adjustment & Financial Correction Manager\\t123",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "6",
+   "number": "8",
+   "page": 122
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/payment-adjustment-financial-correction-manager-t123-adm-616",
+   "component": "apps/ticvai-web/src/routes/commercial/PaymentAdjustmentFinancialCorrectionManagerT123.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-609"
+   ],
+   "exitTo": [
+    "ADM-609"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-609",
+     "trigger": "Back to Refund & Payment Adjustment Command Center\\t116",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "orderId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Handle governed payment corrections that are not normal customer refunds. This must be tightly controlled.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Payment Adjustment & Financial Correction Manager\\t123 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 122"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 122"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createRefund",
+       "label": "Create refund",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createRefund"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The payment adjustment financial list.",
+   "error": "Could not load. Names which read failed and leaves the payment adjustment financial untouched.",
+   "emptyFirstRun": "No payment adjustment financial yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the payment adjustment financial are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createRefund",
+    "contract": "orders",
+    "purpose": "Adjustment and correction",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-616",
+   "workshopBoard": "wireframes/WS92 Payment Payment Orchestration Board 6.dc.html#adm-616"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 122. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-617",
+  "name": "Refund Transaction Trace & Audit Investigation\\t124",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "6",
+   "number": "9",
+   "page": 123
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/refund-transaction-trace-audit-investigation-t124-adm-617",
+   "component": "apps/ticvai-web/src/routes/commercial/RefundTransactionTraceAuditInvestigationT124.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-609"
+   ],
+   "exitTo": [
+    "ADM-609"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-609",
+     "trigger": "Back to Refund & Payment Adjustment Command Center\\t116",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Card AED 800; Card AED 100; Show) and no metric row",
+  "purpose": "Provide complete traceability from original sale through refund/reversal/adjustment.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 123 §Card AED 800"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every refund transaction trace",
+       "columns": [
+        "↓",
+        "Who requested",
+        "Why",
+        "Policy applied",
+        "Calculated amount",
+        "Manual changes",
+        "Approval",
+        "Provider submission",
+        "Provider result",
+        "Wallet restoration",
+        "Finance posting",
+        "Final status"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 123 §Card AED 800"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected refund transaction trace",
+       "bindsTo": null,
+       "columns": [
+        "↓",
+        "Who requested",
+        "Why",
+        "Policy applied",
+        "Calculated amount",
+        "Manual changes",
+        "Approval",
+        "Provider submission",
+        "Provider result",
+        "Wallet restoration",
+        "Finance posting",
+        "Final status"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Search”, “AED 1,000”, “AED 300”, “Passed”, “Supervisor Approved”, “Execution”.",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 123 §Card AED 800"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The refund transaction trace list.",
+   "error": "Could not load. Names which read failed and leaves the refund transaction trace untouched.",
+   "emptyFirstRun": "No refund transaction trace yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the refund transaction trace are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOrderPaymentDetail",
+    "contract": "orders",
+    "purpose": "Trace and investigate",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "↓",
+    "Who requested",
+    "Why",
+    "Policy applied",
+    "Calculated amount",
+    "Manual changes"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-617",
+   "workshopBoard": "wireframes/WS92 Payment Payment Orchestration Board 6.dc.html#adm-617"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 123. 0 of 12 labels bound to a contract property; 12 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-618",
+  "name": "Refund Simulator, Risk Analysis & AI Advisor\\t126",
+  "module": "Commercial",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Payment_Payment_Orchestration.pdf",
+   "board": "6",
+   "number": "10",
+   "page": 125
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/refund-simulator-risk-analysis-ai-advisor-t126-adm-618",
+   "component": "apps/ticvai-web/src/routes/commercial/RefundSimulatorRiskAnalysisAiAdvisorT126.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-609"
+   ],
+   "exitTo": [
+    "ADM-609"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-609",
+     "trigger": "Back to Refund & Payment Adjustment Command Center\\t116",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Select; Original Captured Amount; Configured rule) and no display directory — it is settings, not a population",
+  "purpose": "Allow administrators to simulate refund outcomes before execution or rule publication.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Maximum refund amount, Supervisor approval, Cash balance impact. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Payment_Payment_Orchestration.pdf, page 125 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Order",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Payment",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refund amount",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Selected items",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refund reason",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Original tender",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Provider",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refund date",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "− Completed Refunds",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Original Captured Amount"
+      },
+      {
+       "kind": "selectField",
+       "label": "− Reserved/Pending Refunds",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Original Captured Amount"
+      },
+      {
+       "kind": "textField",
+       "label": "= Available Refundable Balance",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Original Captured Amount"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Maximum refund amount",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Supervisor approval",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cash balance impact",
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 125 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The refund simulator risk configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the refund simulator risk untouched.",
+   "emptyFirstRun": "No refund simulator risk configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-618",
+   "workshopBoard": "wireframes/WS92 Payment Payment Orchestration Board 6.dc.html#adm-618"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 125. 0 of 0 labels bound to a contract property; 16 of 145 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

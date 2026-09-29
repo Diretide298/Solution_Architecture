@@ -1,4 +1,76 @@
 {
+ "AllergenCode": {
+  "type": "string",
+  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
+  "enum": [
+   "gluten",
+   "crustaceans",
+   "eggs",
+   "fish",
+   "peanuts",
+   "soybeans",
+   "milk",
+   "nuts",
+   "celery",
+   "mustard",
+   "sesame",
+   "sulphites",
+   "lupin",
+   "molluscs"
+  ]
+ },
+ "CourseRules": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.course_rule",
+  "description": "**An outlet's coursing default.** It was written to the resolution cache only, which the service model calls losable without consequence — an outlet's default vanished on a cache flush. One row per outlet.\n",
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The outlet in the path."
+   },
+   "defaultCoursing": {
+    "$ref": "#/components/schemas/CoursingPolicy"
+   },
+   "courseNames": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "autoFireMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "serviceModeOverrides": {
+    "type": "object",
+    "description": "A different default per service mode.",
+    "propertyNames": {
+     "$ref": "#/components/schemas/ServiceMode"
+    },
+    "additionalProperties": {
+     "$ref": "#/components/schemas/CoursingPolicy"
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `outlet` scope."
+   }
+  }
+ },
+ "CoursingPolicy": {
+  "type": "string",
+  "description": "How a ticket's courses are fired. `fireAndForget` sends every course at once, which is no coursing; `holdAndFire` waits for a server to call each course; `timed` fires on a clock; `phased` staggers by course. **One vocabulary for the ticket (`KitchenTicket.coursing`) and the outlet default (`CourseRules.defaultCoursing`)** — the default said `none` for `fireAndForget` and had no `delayed` until 26 September, so a default could not be copied onto the field it defaults.\n",
+  "enum": [
+   "fireAndForget",
+   "holdAndFire",
+   "phased",
+   "timed",
+   "delayed"
+  ]
+ },
  "CreateFnbOrderLine": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -41,6 +113,12 @@
     "type": "integer",
     "nullable": true,
     "description": "Course grouping, so the kitchen fires in sequence."
+   },
+   "redeemEntitlementId": {
+    "type": "string",
+    "nullable": true,
+    "x-ticvai-references": "access.entitlement",
+    "description": "**A meal combo redeemed at the till or by a scan** (29 September, MOB-4; applied 30 September). The entitlement a bundle's `fnbMenuItem` component issued (promotions `BundleComponent.componentKind: fnbMenuItem`, `menuItemId`, `redeemAtOutletIds`). The line is priced at zero against it, `menuItemId` must be the component's menu item and the outlet one of `redeemAtOutletIds` (or any outlet with the item on a live menu when that list is empty), and the entitlement is marked used in the same step through access `validateAccess` at the outlet. An entitlement already used, for another item or outlet, or not yet valid is refused 409 `entitlementNotRedeemable`; a till that is offline queues the redemption like any sale and the replay is refused the same way if it was used meanwhile."
    }
   }
  },
@@ -75,6 +153,13 @@
        "high"
       ],
       "description": "Combined refresh load of every tile."
+     },
+     "archivedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"
      },
      "createdAt": {
       "type": "string",
@@ -119,48 +204,68 @@
    }
   ]
  },
- "DataSource": {
-  "type": "string",
-  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n",
-  "enum": [
-   "orders",
-   "orderLines",
-   "payments",
-   "refunds",
-   "shifts",
-   "scanEvents",
-   "entitlements",
-   "products",
-   "inventory",
-   "stockMovements",
-   "stockCounts",
-   "waste",
-   "workstations",
-   "devices",
-   "principals",
-   "loyalty",
-   "reviews",
-   "queueEntries",
-   "guests",
-   "campaigns",
-   "cases",
-   "ledgerEntries",
-   "workOrders",
-   "approvals",
-   "purchaseOrders",
-   "receipts",
-   "requisitions",
-   "stockBatches",
-   "resourceBookings",
-   "delegations",
-   "forms",
-   "challenges",
-   "wallets",
-   "resaleListings"
-  ]
+ "EightySixEvent": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.sold_out_item",
+  "description": "Board 5J. **`setItemAvailability` recorded the current state and not the history.** An item 86'd at 7pm on a Saturday is a lost-sales figure and a prep-planning signal, and the package kept only the flag.\n**`refusedOrderCount` is what makes it worth keeping.** *Off for ninety minutes* is a note; *off for ninety minutes and eleven guests asked for it* is a purchasing decision.\n",
+  "required": [
+   "id",
+   "menuItemId",
+   "offAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "menuItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "offAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "backAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "ranOut",
+     "qualityIssue",
+     "equipmentDown",
+     "supplierFailure",
+     "seasonal",
+     "other"
+    ],
+    "description": "`other` always carries a `note` (audit R222)."
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "The note given with the 86. Required where the reason is `other` (audit R222)."
+   },
+   "calledByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "refusedOrderCount": {
+    "type": "integer",
+    "default": 0,
+    "readOnly": true
+   }
+  }
  },
  "FnbOrder": {
-  "x-ticvai-persistence": "fnb.fnb_order + fnb.fnb_order_line",
+  "x-ticvai-persistence": "fnb.service_order + fnb.service_order_line",
   "type": "object",
   "required": [
    "id",
@@ -174,7 +279,8 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderNumber": {
     "type": "string"
@@ -188,6 +294,7 @@
    },
    "tableVisitId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
    },
    "status": {
@@ -217,6 +324,19 @@
      ]
     }
    },
+   "salesOrderId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true,
+    "x-ticvai-references": "orders.sales_order",
+    "description": "**Retyped 29 September (SD-046)**: `orders.sales_order.id` is a ULID, so a uuid here could never join. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Taken from their `fnb.order`. Ours had `recordedAt` and `syncedAt`, which are both offline-sync fields, and no plain updated timestamp.\n"
+   },
    "grossAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
@@ -225,7 +345,17 @@
    },
    "kitchenTicketId": {
     "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
     "nullable": true
+   },
+   "kitchenTickets": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The kitchen tickets this order created, one per station (SD-046). Returned, not stored here; they are `fnb.kitchen_ticket` rows.",
+    "items": {
+     "$ref": "#/components/schemas/KitchenTicket"
+    }
    },
    "estimatedReadyAt": {
     "type": "string",
@@ -261,6 +391,39 @@
    "cancelled",
    "refunded"
   ]
+ },
+ "GeneratedQuery": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "The structured query a natural-language question produced — data source, columns, filters, grouping. Named on 26 September so the answer and the kept copy are one shape.\n",
+  "properties": {
+   "dataSource": {
+    "$ref": "#/components/schemas/DataSource"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportColumn"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportFilter"
+    }
+   },
+   "groupBy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "compiledSql": {
+    "type": "string",
+    "nullable": true,
+    "description": "The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"
+   }
+  }
  },
  "GuestOrderStatus": {
   "type": "object",
@@ -308,6 +471,118 @@
    }
   }
  },
+ "KitchenException": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.kitchen_exception",
+  "description": "Board 3, 24 August. **Something that cost the kitchen a service and left no other trace** — equipment down, an item run out mid-ticket, a late delivery, a station short.\n`refireItem` covers a dish. **This covers the reasons a venue looking at a bad Saturday needs**, and which currently live in somebody's memory.\n",
+  "required": [
+   "id",
+   "kind",
+   "raisedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "stationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ticketId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "equipmentDown",
+     "itemRanOut",
+     "lateDelivery",
+     "staffShort",
+     "powerLoss",
+     "spillage",
+     "chased",
+     "other"
+    ],
+    "description": "`other` always carries a `note` (audit R222)."
+   },
+   "durationMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "KitchenSla": {
+  "type": "object",
+  "description": "**How long a ticket may sit, per service mode, and what pushes it up the rail** (`setKitchenSla`). The priority weights are the ones `listKitchenTickets` orders the rail by.\n",
+  "properties": {
+   "targets": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "serviceMode",
+      "targetMinutes"
+     ],
+     "properties": {
+      "serviceMode": {
+       "$ref": "#/components/schemas/ServiceMode"
+      },
+      "targetMinutes": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "warnAtPercent": {
+       "type": "integer",
+       "default": 80
+      }
+     }
+    }
+   },
+   "priorityWeights": {
+    "type": "object",
+    "description": "The weight of each signal the board names — age, promise time, table stage, a VIP marker.",
+    "properties": {
+     "age": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "targetReadyAt": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Promise time."
+     },
+     "tableStage": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "vip": {
+      "type": "integer",
+      "minimum": 0
+     }
+    }
+   }
+  }
+ },
  "KitchenStation": {
   "x-ticvai-persistence": "fnb.kitchen_station",
   "type": "object",
@@ -339,10 +614,18 @@
     },
     "description": "Items routed to this station."
    },
+   "displayWorkstationIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The kitchen displays assigned to this station** (decided 28 September, audit R277), as tenancy `Workstation` ids, primary first and fallbacks after it. Set with `setKitchenStations`. A display reads the rail for the station it is assigned to (`listKitchenTickets`). A workstation is assigned to at most one station; a second assignment is refused `400`.\n"
+   },
    "displayEndpoint": {
     "type": "string",
     "nullable": true,
-    "description": "Where the venue's KDS listens. Absent where a fallback screen is used instead.\n"
+    "description": "The P15 Kitchen Display device this station's tickets go to (19 Sep: the display is TICVAI software on commodity hardware, per station, with a fallback device where the primary is down — 18 Aug minute). Absent where the station has no display assigned.\n"
    },
    "isActive": {
     "type": "boolean"
@@ -362,10 +645,13 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "The F&B order the ticket was created from on acceptance (`FnbOrder.id`)."
    },
    "orderNumber": {
     "type": "string"
@@ -382,15 +668,12 @@
     "$ref": "#/components/schemas/ServiceMode"
    },
    "coursing": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "fireAndForget",
-     "holdAndFire",
-     "phased",
-     "timed",
-     "delayed"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CoursingPolicy"
+     }
     ],
+    "nullable": true,
     "description": "BL-131. **Starters before mains is the entire job of a kitchen pass**, and the model fired everything at once.\n`holdAndFire` waits for a server to call it; `timed` fires on a clock; `phased` staggers by course. **Without this a table gets its dessert while eating its starter.**\n"
    },
    "buzzerCode": {
@@ -426,7 +709,8 @@
      ],
      "properties": {
       "lineId": {
-       "type": "string"
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
       },
       "name": {
        "type": "string"
@@ -447,8 +731,30 @@
       "allergens": {
        "type": "array",
        "items": {
-        "type": "string"
+        "$ref": "#/components/schemas/AllergenCode"
        }
+      },
+      "refireOfLineId": {
+       "type": "string",
+       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "nullable": true,
+       "readOnly": true,
+       "description": "**Set on a refire.** The line it remakes, which stays — food cost counts both, the bill counts one (`refireItem`)."
+      },
+      "refireReason": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/RefireReason"
+        }
+       ],
+       "nullable": true,
+       "readOnly": true
+      },
+      "isChargeable": {
+       "type": "boolean",
+       "nullable": true,
+       "readOnly": true,
+       "description": "A refire's `chargeable` flag. Null on a line that is not a refire."
       },
       "course": {
        "type": "integer",
@@ -518,6 +824,7 @@
     "nullable": true
    },
    "price": {
+    "x-ticvai-column": "list_price",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "sortOrder": {
@@ -535,6 +842,13 @@
     "format": "uuid",
     "nullable": true
    },
+   "menuSectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."
+   },
    "isStockTracked": {
     "type": "boolean",
     "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
@@ -546,6 +860,12 @@
     "type": "string",
     "nullable": true
    },
+   "restoreAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When an unavailable item comes back on its own (`setItemAvailability`). Null means by hand."
+   },
    "preparationMinutes": {
     "type": "integer",
     "nullable": true
@@ -553,7 +873,7 @@
    "allergens": {
     "type": "array",
     "items": {
-     "type": "string"
+     "$ref": "#/components/schemas/AllergenCode"
     }
    }
   }
@@ -566,7 +886,7 @@
    "question",
    "interpretation",
    "result",
-   "confidence"
+   "reliability"
   ],
   "properties": {
    "conversationId": {
@@ -577,42 +897,59 @@
    },
    "interpretation": {
     "type": "string",
-    "description": "What the question was understood to mean, in plain language."
+    "description": "What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."
+   },
+   "semanticSpec": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingSemanticQuerySpec"
+     }
+    ],
+    "nullable": true,
+    "description": "What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"
    },
    "generatedQuery": {
-    "type": "object",
-    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer.\n",
-    "properties": {
-     "dataSource": {
-      "$ref": "#/components/schemas/DataSource"
-     },
-     "columns": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/ReportColumn"
-      }
-     },
-     "filters": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/ReportFilter"
-      }
-     },
-     "groupBy": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/GeneratedQuery"
      }
-    }
+    ],
+    "nullable": true,
+    "description": "The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"
    },
    "result": {
-    "$ref": "#/components/schemas/ReportResult"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportResult"
+     }
+    ],
+    "nullable": true,
+    "description": "Null when the question is outside the semantic model."
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."
+   },
+   "reliability": {
+    "$ref": "#/components/schemas/ReportingAnswerReliability"
+   },
+   "unavailableReason": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingUnavailableReason"
+     }
+    ],
+    "nullable": true,
+    "description": "Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."
    },
    "confidence": {
     "type": "number",
     "minimum": 0,
-    "maximum": 1
+    "maximum": 1,
+    "deprecated": true,
+    "description": "Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."
    },
    "suggestedFollowUps": {
     "type": "array",
@@ -625,6 +962,79 @@
    },
    "tokensUsed": {
     "type": "integer"
+   }
+  }
+ },
+ "OrderLabel": {
+  "type": "object",
+  "x-ticvai-persistence": "none — rendered from the kitchen ticket and its order",
+  "description": "**What goes on the bag** (`printOrderLabel`). Order number, guest name, items and **the allergen flags, which are the reason the label is rendered by the server** from the same source as the order rather than printed from whatever the client has.\n",
+  "required": [
+   "ticketId",
+   "orderNumber",
+   "lines",
+   "allergens"
+  ],
+  "properties": {
+   "ticketId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "guestName": {
+    "type": "string",
+    "nullable": true
+   },
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
+   },
+   "deliveryLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where it is going, as a runner would read it."
+   },
+   "buzzerCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "name",
+      "quantity"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "modifiers": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "allergens": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/AllergenCode"
+       }
+      }
+     }
+    }
+   },
+   "allergens": {
+    "type": "array",
+    "description": "Every allergen on the order, together. Present and possibly empty — never omitted.",
+    "items": {
+     "$ref": "#/components/schemas/AllergenCode"
+    }
    }
   }
  },
@@ -647,92 +1057,19 @@
    }
   }
  },
- "ReportColumn": {
-  "x-ticvai-persistence": "reporting.report_column",
-  "type": "object",
-  "required": [
-   "field"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "field": {
-    "type": "string"
-   },
-   "label": {
-    "type": "string"
-   },
-   "aggregation": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/Aggregation"
-     }
-    ],
-    "default": "none"
-   },
-   "sortOrder": {
-    "type": "integer"
-   },
-   "sortDirection": {
-    "type": "string",
-    "enum": [
-     "asc",
-     "desc"
-    ]
-   },
-   "format": {
-    "type": "string",
-    "nullable": true
-   }
-  }
- },
- "ReportFilter": {
-  "x-ticvai-persistence": "reporting.report_filter",
-  "type": "object",
-  "required": [
-   "field",
-   "operator"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "field": {
-    "type": "string"
-   },
-   "operator": {
-    "type": "string",
-    "enum": [
-     "equals",
-     "notEquals",
-     "greaterThan",
-     "lessThan",
-     "between",
-     "in",
-     "notIn",
-     "contains",
-     "isNull",
-     "isNotNull"
-    ]
-   },
-   "value": {},
-   "values": {
-    "type": "array",
-    "items": {}
-   },
-   "isParameter": {
-    "type": "boolean",
-    "default": false,
-    "description": "Prompted at run time rather than fixed. Parameters narrow the result; they never widen scope.\n"
-   }
-  }
+ "RefireReason": {
+  "type": "string",
+  "description": "Why a line was made again (`refireItem`). The reasons are the data.",
+  "enum": [
+   "overcooked",
+   "undercooked",
+   "wrongItem",
+   "dropped",
+   "cold",
+   "allergyRisk",
+   "guestChangedMind",
+   "lateAdd"
+  ]
  },
  "ReportResult": {
   "x-ticvai-persistence": "none — result set, cached in object storage",
@@ -765,6 +1102,7 @@
    },
    "rows": {
     "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
     "items": {
      "type": "object",
      "additionalProperties": true
@@ -772,7 +1110,8 @@
    },
    "totals": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
    },
    "rowCount": {
     "type": "integer"
@@ -792,6 +1131,105 @@
    }
   }
  },
+ "ReportingAnswerReliability": {
+  "type": "string",
+  "description": "**How far an analytics answer can be relied on** (decided 29 September, AI system design 5.6): a category, never a bare percentage. `grounded`: every figure comes from a result of the compiled spec. `partial`: part of the question was answered and the rest was not modelled. `conflictingSources`: the result and a cited source disagree. `insufficientEvidence`: the question could not be answered, including \"not available yet\" outside the semantic model. The same four values as `ai.yaml`'s assistant answers.\n",
+  "enum": [
+   "grounded",
+   "partial",
+   "conflictingSources",
+   "insufficientEvidence"
+  ]
+ },
+ "ReportingSemanticQuerySpec": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "**A question in the semantic model's own vocabulary** (decided 29 September, AI system design 2.2 E and 5.7). What the model returns for a live-number question instead of SQL, and what `runSemanticQuery` takes. Every code is a `SemanticModel` field code or a KPI code; Reporting validates the spec against the published model and compiles it deterministically, so the same spec compiles to the same SQL for the same model version.\n",
+  "required": [
+   "metric",
+   "period"
+  ],
+  "properties": {
+   "metric": {
+    "type": "string",
+    "description": "A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The governed definition the dashboards use, so the number matches them."
+   },
+   "dimensions": {
+    "type": "array",
+    "maxItems": 5,
+    "description": "Field codes to group by. Each must be reachable from the metric's dataset through a relationship the semantic model declares.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "operator"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "description": "A `SemanticModel` field code."
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "equals",
+        "notEquals",
+        "greaterThan",
+        "lessThan",
+        "between",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+       ]
+      },
+      "values": {
+       "type": "array",
+       "description": "**Open on purpose; typed by the field.** One value for the comparison operators, exactly two (from, to) for `between`, any number for `in` and `notIn`, none for `isNull` and `isNotNull`.\n",
+       "items": {}
+      }
+     }
+    }
+   },
+   "period": {
+    "type": "string",
+    "description": "ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the form `explainMetricChange` takes."
+   },
+   "comparison": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `getKpiValues` `compareTo`. With one, each row carries the metric for the comparison beside the current value.",
+    "enum": [
+     "previousPeriod",
+     "samePeriodLastYear",
+     "target",
+     "benchmark"
+    ]
+   },
+   "semanticModelVersion": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "The `SemanticModel.version` the spec was validated and compiled against. Set by Reporting."
+   }
+  }
+ },
+ "ReportingUnavailableReason": {
+  "type": "string",
+  "description": "Which part of a question is outside the semantic model, so the answer is \"not available yet\" (design 5.7). A metric or field the caller may not see is reported as not modelled, so the reason does not reveal that it exists.",
+  "enum": [
+   "metricNotModelled",
+   "dimensionNotModelled",
+   "filterNotModelled",
+   "comparisonNotAvailable",
+   "periodOutsideHistory"
+  ]
+ },
  "ServiceMode": {
   "type": "string",
   "enum": [
@@ -802,10 +1240,51 @@
    "delivery"
   ]
  },
+ "StationRebalance": {
+  "type": "object",
+  "description": "**A temporary move of work between stations** (`rebalanceStationLoad`). Reverts at `revertAt`, or at close where that is null — a permanent change is `setKitchenStations`.\n",
+  "required": [
+   "moves"
+  ],
+  "properties": {
+   "moves": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "fromStationId",
+      "toStationId"
+     ],
+     "properties": {
+      "fromStationId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "toStationId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "categoryIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      }
+     }
+    }
+   },
+   "revertAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "VenueSettings": {
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
-  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
+  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
   "properties": {
    "id": {
     "type": "string",
@@ -815,7 +1294,32 @@
    },
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
+   },
+   "currencyCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**`readOnly` is the freeze.** `setVenueSettings` takes this whole schema as its request body, so without it any settings save could rewrite the currency of a venue that had already traded — which is the one thing ADR-0018's amendment forbids. It is set when the venue is provisioned, defaulted from the region, and changed only by an operation whose precondition is that the venue has not yet traded.\n**The venue's trading currency, defaulted from its region and frozen once the venue has traded** (ADR-0018, amended 20 September). Currency was a region-only fact, grouped with tax rates on the reasoning that *\"a venue cannot choose its VAT\"* -- true of tax and over-applied to currency, because a free-zone unit, a duty-free shop and a cruise terminal genuinely trade in a currency their region does not.\n**This column exists because the freeze needs somewhere to live.** A venue that resolved purely from its region would silently follow a region currency change after it had already traded, and every dated artefact beneath it -- a price list is a `validFrom`/`validTo` range -- would render retrospectively wrong. Null means \"resolve from the region\", which is the answer for every venue that has not overridden.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Scale travels with currency** (ADR-0008), and so does the freeze. OMR is three decimal places because Oman says so; overriding the currency without the scale gets rounding wrong. Set together or not at all.\n"
    },
    "supportHours": {
     "type": "object",
@@ -831,7 +1335,8 @@
       ]
      },
      "timezone": {
-      "type": "string"
+      "type": "string",
+      "description": "IANA zone the `windows` are read in. Absent, they are read in the region's `timeZone`, like every other wall-clock time in this contract.\n"
      },
      "windows": {
       "type": "array",
@@ -851,10 +1356,12 @@
          ]
         },
         "from": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time the desk opens."
         },
         "to": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time the desk closes."
         }
        }
       }
@@ -871,10 +1378,51 @@
     "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
     "properties": {
      "from": {
-      "type": "string"
+      "type": "string",
+      "description": "Wall-clock time sending stops",
+      "in the region's time zone.": null
      },
      "to": {
-      "type": "string"
+      "type": "string",
+      "description": "Wall-clock time sending resumes",
+      "in the region's time zone.": null
+     }
+    }
+   },
+   "biometrics": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-35, BL-096, BL-105, BL-106. **The venue-level master switch, and the one place a person is asked whether the paperwork exists.** Biometric data is sensitive under PDPL (Federal Decree-Law 45/2021) — heightened protection, explicit consent, and an Article 21 assessment before the processing rather than after it.\n**Nothing below this switch operates while it is off.** `AdmissionRules` may carry a `biometricPolicy` per ticket type and those rules are inert until a venue enables biometrics here, which means a profile copied between venues cannot start capturing faces at the destination.\n**Venue level because that is where the assessment is filed.** Region owns tax and currency; the DPIA, the consent notice and the hardware are a venue's.\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "**Off by default, and turning it on is refused without the two fields below.** `setVenueSettings` answers 422 rather than accepting an enable it cannot evidence — **a DPIA nobody can name is a DPIA nobody did**, and the point of the refusal is that the person switching this on is asked at the moment they switch it on rather than by an auditor a year later.\n"
+     },
+     "dpiaReference": {
+      "type": "string",
+      "nullable": true,
+      "maxLength": 200,
+      "description": "**The venue's own reference for its Article 21 assessment.** The platform does not hold the document and does not judge it; it records that one was named, by whom, and when — which is what an audit asks for and what the venue can produce.\n"
+     },
+     "consentNoticeAcknowledgedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "description": "**When somebody confirmed the consent forms are in place at the point of capture.** A guest consenting in an app is a record; a guest consenting at a ticket counter is a notice somebody has to have printed and a question somebody has to have asked.\n"
+     },
+     "acknowledgedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "readOnly": true,
+      "description": "**Who confirmed it.** An acknowledgement with no name behind it cannot be followed up, and this is the field that makes the switch an act rather than a setting. Recorded by the server as the caller whose save carried the acknowledgement, so it cannot name somebody else.\n"
+     },
+     "faceTagPurgeMinutesAfterClose": {
+      "type": "integer",
+      "nullable": true,
+      "default": 0,
+      "description": "BL-106. **How long a same-visit Face Tag survives past the close of the operating day**, and zero is the default because that is what 3.2.44 describes. A non-zero value is an operational allowance for a late reconciliation, not a retention period — **`facePass` ignores this entirely** and is bounded by its entitlement.\n"
      }
     }
    },
@@ -900,13 +1448,26 @@
        "type": "object",
        "properties": {
         "day": {
-         "type": "string"
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
         },
         "from": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time",
+         "in the region's time zone.": null
         },
         "to": {
-         "type": "string"
+         "type": "string",
+         "description": "Wall-clock time",
+         "in the region's time zone.": null
         },
         "admits": {
          "type": "string",
@@ -930,11 +1491,11 @@
      "genderVerification": {
       "type": "string",
       "enum": [
-       false,
+       "off",
        "staffAssisted",
        "deviceAssisted"
       ],
-      "default": false,
+      "default": "off",
       "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
      },
      "overrideRateAlertThreshold": {
@@ -964,6 +1525,326 @@
      "escalateAfterMinutes": {
       "type": "integer",
       "nullable": true
+     }
+    }
+   },
+   "displayCurrencies": {
+    "type": "array",
+    "nullable": true,
+    "description": "**Which currencies this venue shows guests** (decided 28 September, audit R120 (a)). ISO 4217 codes, each one its region holds an `FxRate` for; the rate itself stays per region and is never set here. `finance.listFxRates` with `venueId` narrows the region's rates to these. Null or empty shows the trading currency only. A code the region has no rate for is refused `400`.\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{3}$"
+    }
+   },
+   "cartLeaseSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 30,
+    "maximum": 3600,
+    "default": 900,
+    "description": "**How long a cart holds capacity** (decided 28 September, audit R169): 15 minutes, the default `catalogue.acquireInventoryHold` takes for `ttlSeconds`. Proposed, client to correct (audit R094).\n"
+   },
+   "cartHoldExtensionMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "maximum": 30,
+    "default": 5,
+    "description": "How long one `orders.extendCart` extension adds. Proposed, client to correct (audit R094)."
+   },
+   "cartMaxExtensions": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 5,
+    "default": 1,
+    "description": "How many extensions a cart may take before `extensionCapReached` (`Cart.maxExtensions`). Proposed, client to correct (audit R094)."
+   },
+   "resaleCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 168,
+    "default": 24,
+    "description": "Hours before the performance after which a ticket can no longer be listed for resale (`orders.createResaleListing`). Proposed, client to correct (audit R094)."
+   },
+   "exchangeCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 720,
+    "default": 24,
+    "description": "Hours before the original performance after which lines can no longer be exchanged (`orders.exchangeOrderLines`, `outsideExchangeWindow`). Proposed, client to correct (audit R094)."
+   },
+   "rescheduleCutoffHours": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 720,
+    "default": 24,
+    "description": "Hours before the original performance after which an order can no longer be rescheduled (`orders.rescheduleOrder`, `outsideRescheduleWindow`). Proposed, client to correct (audit R094)."
+   },
+   "reservationMaxExtensions": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 5,
+    "default": 1,
+    "description": "How many times `orders.extendReservation` may extend one reservation. Proposed, client to correct (audit R094)."
+   },
+   "shiftVarianceThreshold": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Over or short at shift close beyond which the shift waits in `pendingVariance` for `shift.acceptShiftVariance`. **Proposed tenant default AED 20.00, bounds 0 to 1,000 in the venue currency; client finance to correct (audit R094).**\n"
+   },
+   "catalogue": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "maxVariantsPerProduct": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 2000,
+      "default": 200,
+      "description": "Variants one product may generate from its attributes (`setProductAttributes` refuses above it). Proposed, client to correct (audit R094)."
+     },
+     "waitlistOfferHoldMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 1440,
+      "default": 30,
+      "description": "How long a waitlist offer holds the released capacity for the guest it was offered to. Proposed, client to correct (audit R094)."
+     },
+     "bulkPriceChangeEscalationPercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 100,
+      "default": 10,
+      "description": "A `bulkChangePrices` run changing any price by more than this percentage needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."
+     },
+     "bulkPriceChangeEscalationCount": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "default": 50,
+      "description": "A `bulkChangePrices` run touching more prices than this needs `PRICE_CONFIGURE` (audit R197). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "inventory": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "overReceiptTolerancePercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 25,
+      "default": 5,
+      "description": "Percent above the outstanding ordered quantity a goods receipt line may record (`createGoodsReceipt`). Proposed, client to correct (audit R094)."
+     },
+     "countVarianceTolerancePercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 25,
+      "default": 2,
+      "description": "Percent difference between counted and expected quantity before a count line is an exception (`getCountVariance`). Proposed, client to correct (audit R094)."
+     },
+     "countVarianceApprovalAmount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Total variance value of a count above which posting it needs approval (`postStockCount`). **Proposed tenant default 1,000.00 in the venue currency, client finance to correct (audit R094).**\n"
+     }
+    }
+   },
+   "seating": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "seatHoldExtensionSeconds": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 60,
+      "maximum": 1800,
+      "default": 300,
+      "description": "What one `extendSeatHold` adds. No hold outlives 30 minutes in all (audit R169). Proposed, client to correct (audit R094)."
+     },
+     "seatHoldMaxExtensions": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 5,
+      "default": 2,
+      "description": "How many times a seat hold may be extended. Proposed, client to correct (audit R094). A resource hold on a venue map (`resources.extendResourceHold`) uses the same two bounds (decided 29 September, rev 3 REV3-15)."
+     },
+     "maxSeatsPerGuestOrder": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 50,
+      "default": 10,
+      "description": "**Seats one guest may take in one booking on a guest channel** (Guest Web, Guest App), decided 29 September, rev 3 REV3-7. `seating.createSeatHold` counts the seats in the request plus the seats the same guest already holds on the same performance, and refuses above this with `422` `seat-limit-exceeded`, naming the limit. Default 10, bounds 1 to 50; a venue sets its own in Venue Management. Staff and POS sales keep 10 per sale (audit R080 (c)) and do not read this field.\n"
+     }
+    }
+   },
+   "promotions": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "maxDiscountPercent": {
+      "type": "number",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 100,
+      "default": 30,
+      "description": "The largest discount one promotion may give (`createPromotion` refuses above it). Proposed, client to correct (audit R094)."
+     },
+     "nearZeroLinePrice": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Net line price below which a stacked combination is flagged near-zero in `analysePromotionConflicts` (audit R096 (5)); a warning, not a refusal. **Proposed tenant default AED 1.00, client to correct (audit R094).**\n"
+     }
+    }
+   },
+   "fnb": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "recallWindowMinutes": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 0,
+      "maximum": 60,
+      "default": 10,
+      "description": "Minutes after a bump during which `recallKitchenTicket` still recalls; after it the act is a refire. Proposed, client to correct (audit R094)."
+     },
+     "compEscalationAmount": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true,
+      "description": "Line value above which `compItem` needs `ORDER_DISCOUNT` (audit R197). **Proposed tenant default AED 100.00, client to correct (audit R094).**\n"
+     },
+     "foodSafetyLeadPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "**The venue's food-safety lead**, to whom `escalateCorrectiveAction` sends every escalation (decided 28 September, audit R096 (9)). A venue fact, so it has no tenant default; while it is null an escalation is refused `409 no-food-safety-lead`.\n"
+     }
+    }
+   },
+   "queue": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "crossQueueLimit": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 10,
+      "default": 2,
+      "description": "Virtual queues one guest party may wait in at once (`joinQueue`, `crossQueueLimitReached`). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "reporting": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "inlineRunRowLimit": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1000,
+      "maximum": 100000,
+      "default": 5000,
+      "description": "Estimated rows above which `runReport` answers `202` and runs in the background. Proposed, client to correct (audit R094)."
+     },
+     "dashboardRefreshBudgetPerMinute": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "default": 24,
+      "description": "Tile refreshes per minute, summed over a dashboard's tiles, that `createDashboard` allows. Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "marketing": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "attributionWindowDays": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 1,
+      "maximum": 30,
+      "default": 7,
+      "description": "Days after a campaign touch within which a booking is attributed to it (`getCampaignPerformance`). Proposed, client to correct (audit R094)."
+     }
+    }
+   },
+   "identity": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "guestOtpMaxAttempts": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 3,
+      "maximum": 10,
+      "default": 5,
+      "description": "Wrong entries allowed per guest one-time code before `verifyGuestOtp` invalidates it. A guest code is tenant-scoped, so the tenant default is the value used. Proposed, client to correct (audit R094).\n"
+     },
+     "guestTwoStep": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Guest two-step verification: a venue option, off unless the venue enables it in Venue Management** (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, \"no guest MFA\"; an earlier draft of the same day put it on the tenant's `PasswordPolicy`, which no longer carries it). **The guest's enrolment stays tenant-wide**: one guest account across the tenant's venues, so a method enrolled once is used in every venue that has this on, and is never asked in a venue that has it off. Identity learns the venue from `venueId` on the guest sign-in (`verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin`) and on `createMfaChallenge`: the venue the guest app or booking is in; with no venue given, an enrolled guest is asked when any venue of the tenant has it on. Guests may enrol `totp` with `emailOtp` as the fallback, as staff do (audit R126 (5)); it is never forced. Guests still never use enterprise SSO (R167, first part). A null inherits the tenant default set with `setVenueSettingsDefaults`.\n",
+      "properties": {
+       "enabled": {
+        "type": "boolean",
+        "default": false,
+        "description": "Off unless the venue enables it. While no venue of the tenant has it on, guests cannot enrol (`enrolMfaMethod` answers 403 `guest-two-step-disabled`)."
+       },
+       "stepUpActions": {
+        "type": "array",
+        "uniqueItems": true,
+        "description": "The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. The service performing the action passes this venue to `createMfaChallenge`. Proposed, client to correct (rev 3 GAP-B1).\n",
+        "items": {
+         "type": "string",
+         "enum": [
+          "changeContactDetails",
+          "changePassword",
+          "managePaymentMethods",
+          "transferTickets",
+          "deleteAccount"
+         ]
+        },
+        "default": [
+         "changeContactDetails",
+         "changePassword",
+         "managePaymentMethods",
+         "deleteAccount"
+        ]
+       }
+      }
      }
     }
    }

@@ -1,0 +1,1731 @@
+{
+ "completeUpload": {
+  "method": "POST",
+  "path": "/media/uploads/{uploadId}/complete",
+  "contract": "assets",
+  "summary": "Confirm an upload and create the asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ },
+ "createAiConversation": {
+  "method": "POST",
+  "path": "/conversations",
+  "contract": "ai",
+  "summary": "Open a conversation",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiConversation"
+ },
+ "createBanner": {
+  "method": "POST",
+  "path": "/tenant-config/banners",
+  "contract": "white-label",
+  "summary": "Create a banner",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Banner",
+  "responds": "Banner"
+ },
+ "createBookingFlowDefinition": {
+  "method": "POST",
+  "path": "/venues/{venueId}/booking-flows",
+  "contract": "white-label",
+  "summary": "Pick a booking flow for a venue",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BookingFlow",
+  "responds": "BookingFlow"
+ },
+ "createContentPage": {
+  "method": "POST",
+  "path": "/tenant-config/pages",
+  "contract": "white-label",
+  "summary": "Create a content page",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ContentPage",
+  "responds": "ContentPage"
+ },
+ "createGuidedChoice": {
+  "method": "POST",
+  "path": "/venues/{venueId}/guided-choices",
+  "contract": "white-label",
+  "summary": "Set up Help me choose for a venue",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuidedChoice",
+  "responds": "GuidedChoice"
+ },
+ "createMenu": {
+  "method": "POST",
+  "path": "/menus",
+  "contract": "fnb",
+  "summary": "Create a menu",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateMenuRequest",
+  "responds": "Menu"
+ },
+ "createPreview": {
+  "method": "POST",
+  "path": "/tenant-config/preview",
+  "contract": "white-label",
+  "summary": "Generate a preview link",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Preview"
+ },
+ "createPromoBlock": {
+  "method": "POST",
+  "path": "/tenant-config/promo-blocks",
+  "contract": "white-label",
+  "summary": "Create a promotional block",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PromoBlock",
+  "responds": "PromoBlock"
+ },
+ "createUpload": {
+  "method": "POST",
+  "path": "/media/uploads",
+  "contract": "assets",
+  "summary": "Request a signed upload URL",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UploadTicket"
+ },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
+ "deleteBanner": {
+  "method": "DELETE",
+  "path": "/tenant-config/banners/{bannerId}",
+  "contract": "white-label",
+  "summary": "Delete a banner",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "deleteBookingFlow": {
+  "method": "DELETE",
+  "path": "/booking-flows/{bookingFlowId}",
+  "contract": "white-label",
+  "summary": "Remove a booking flow from a venue",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "deleteContentPage": {
+  "method": "DELETE",
+  "path": "/tenant-config/pages/{pageId}",
+  "contract": "white-label",
+  "summary": "Delete a content page",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "deleteGuidedChoice": {
+  "method": "DELETE",
+  "path": "/guided-choices/{guidedChoiceId}",
+  "contract": "white-label",
+  "summary": "Delete a Help me choose set-up, or dismiss a suggestion",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "deletePromoBlock": {
+  "method": "DELETE",
+  "path": "/tenant-config/promo-blocks/{promoBlockId}",
+  "contract": "white-label",
+  "summary": "Delete a promotional block",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "diffConfigVersion": {
+  "method": "GET",
+  "path": "/tenant-config/versions/{version}/diff",
+  "contract": "white-label",
+  "summary": "Compare a version against the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "against",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigDiff"
+ },
+ "getAppBuild": {
+  "method": "GET",
+  "path": "/tenant-config/app-builds/{appBuildId}",
+  "contract": "white-label",
+  "summary": "One app build, with its package and store status",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AppBuild"
+ },
+ "getAppIcons": {
+  "method": "GET",
+  "path": "/tenant-config/app-icons",
+  "contract": "white-label",
+  "summary": "Read app icon set",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AppIcons"
+ },
+ "getBookingFlow": {
+  "method": "GET",
+  "path": "/booking-flows/{bookingFlowId}",
+  "contract": "white-label",
+  "summary": "Read one of a venue's booking flows, every step included",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BookingFlow"
+ },
+ "getBookingFlowConfig": {
+  "method": "GET",
+  "path": "/tenant-config/booking-flow",
+  "contract": "white-label",
+  "summary": "How the guest booking flow looks and steps",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "effectiveForVenueId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookingFlowConfig"
+ },
+ "getBrandIdentity": {
+  "method": "GET",
+  "path": "/tenant-config/brand",
+  "contract": "white-label",
+  "summary": "Read brand identity",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BrandIdentity"
+ },
+ "getFeatureToggles": {
+  "method": "GET",
+  "path": "/tenant-config/features",
+  "contract": "white-label",
+  "summary": "Read tenant feature toggles",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FeatureToggle"
+ },
+ "getFonts": {
+  "method": "GET",
+  "path": "/tenant-config/fonts",
+  "contract": "white-label",
+  "summary": "Read font configuration",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FontConfig"
+ },
+ "getGuidedChoiceSuggestion": {
+  "method": "GET",
+  "path": "/guided-choice-suggestions/{suggestionId}",
+  "contract": "ai",
+  "summary": "The reasons behind a Help me choose suggestion",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiGuidedChoiceSuggestion"
+ },
+ "getHomepageLayout": {
+  "method": "GET",
+  "path": "/tenant-config/homepage",
+  "contract": "white-label",
+  "summary": "Read homepage layout",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "HomepageLayout"
+ },
+ "getMenu": {
+  "method": "GET",
+  "path": "/menus/{menuId}",
+  "contract": "fnb",
+  "summary": "Read a menu with sections and items",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Menu"
+ },
+ "getModuleEnablement": {
+  "method": "GET",
+  "path": "/tenant-config/modules",
+  "contract": "white-label",
+  "summary": "Read module enablement",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ModuleEnablement"
+ },
+ "getNavigation": {
+  "method": "GET",
+  "path": "/tenant-config/navigation",
+  "contract": "white-label",
+  "summary": "Read navigation",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "NavigationConfig"
+ },
+ "getPublishedBookingFlow": {
+  "method": "GET",
+  "path": "/venues/{venueId}/booking-flow",
+  "contract": "white-label",
+  "summary": "The published booking flow a product or category books through",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productCategoryId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "flowTypeKey",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookingFlow"
+ },
+ "getSiteSetupProgress": {
+  "method": "GET",
+  "path": "/tenant-config/site-setup",
+  "contract": "white-label",
+  "summary": "Where the tenant is in the Site Builder",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SiteSetupProgress"
+ },
+ "getStoreAccounts": {
+  "method": "GET",
+  "path": "/tenant-config/store-accounts",
+  "contract": "white-label",
+  "summary": "The client's store accounts and the publishing checklist",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "StorePublishingChecklist"
+ },
+ "getTenantAppStatus": {
+  "method": "GET",
+  "path": "/tenant-config/status",
+  "contract": "white-label",
+  "summary": "App status and recent changes",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TenantAppStatus"
+ },
+ "getTenantConfig": {
+  "method": "GET",
+  "path": "/tenant-config",
+  "contract": "white-label",
+  "summary": "Full working configuration",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantConfig"
+ },
+ "getTheme": {
+  "method": "GET",
+  "path": "/tenant-config/theme",
+  "contract": "white-label",
+  "summary": "Read colour theme",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Theme"
+ },
+ "listAnalyticsProviders": {
+  "method": "GET",
+  "path": "/tenant-config/analytics-providers",
+  "contract": "white-label",
+  "summary": "The analytics platforms the storefront and app report to",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAppBuilds": {
+  "method": "GET",
+  "path": "/tenant-config/app-builds",
+  "contract": "white-label",
+  "summary": "The tenant's app builds, newest first",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "platform",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listBanners": {
+  "method": "GET",
+  "path": "/tenant-config/banners",
+  "contract": "white-label",
+  "summary": "List banners",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listBookingFlowTypes": {
+  "method": "GET",
+  "path": "/booking-flow-types",
+  "contract": "white-label",
+  "summary": "The booking flow types a venue can pick from, with their steps",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "productKind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listBookingFlows": {
+  "method": "GET",
+  "path": "/venues/{venueId}/booking-flows",
+  "contract": "white-label",
+  "summary": "A venue's booking flows, in the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "flowTypeKey",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listConfigVersions": {
+  "method": "GET",
+  "path": "/tenant-config/versions",
+  "contract": "white-label",
+  "summary": "Version history",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listConsentQuestions": {
+  "method": "GET",
+  "path": "/consent-questions",
+  "contract": "marketing-crm",
+  "summary": "The consent questions a venue asks at booking",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listContentPages": {
+  "method": "GET",
+  "path": "/tenant-config/pages",
+  "contract": "white-label",
+  "summary": "List custom content pages",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "slug",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listEvents": {
+  "method": "GET",
+  "path": "/events",
+  "contract": "catalogue",
+  "summary": "List events",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listGuidedChoices": {
+  "method": "GET",
+  "path": "/venues/{venueId}/guided-choices",
+  "contract": "white-label",
+  "summary": "List a venue's Help me choose set-ups",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "source",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMenus": {
+  "method": "GET",
+  "path": "/menus",
+  "contract": "fnb",
+  "summary": "List menus",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOrgUnits": {
+  "method": "GET",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "List scope nodes visible to the session",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "under",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "level",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProductCategories": {
+  "method": "GET",
+  "path": "/product-categories",
+  "contract": "catalogue",
+  "summary": "The merchandise hierarchy — categories, brands, collections",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductCategoryNode"
+ },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPromoBlocks": {
+  "method": "GET",
+  "path": "/tenant-config/promo-blocks",
+  "contract": "white-label",
+  "summary": "List promotional blocks",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromoBlock"
+ },
+ "proposeMarketingContent": {
+  "method": "POST",
+  "path": "/ai/content-drafts",
+  "contract": "ai",
+  "summary": "Draft marketing content for a person to edit and apply",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "publishGuidedChoice": {
+  "method": "POST",
+  "path": "/guided-choices/{guidedChoiceId}/publish",
+  "contract": "white-label",
+  "summary": "Publish a Help me choose set-up to guests",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuidedChoice"
+ },
+ "publishTenantConfig": {
+  "method": "POST",
+  "path": "/tenant-config/publish",
+  "contract": "white-label",
+  "summary": "Publish the working draft",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigVersion"
+ },
+ "requestAppBuild": {
+  "method": "POST",
+  "path": "/tenant-config/app-builds",
+  "contract": "white-label",
+  "summary": "Build the branded app for a store",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "restoreConfigVersion": {
+  "method": "POST",
+  "path": "/tenant-config/versions/{version}/restore",
+  "contract": "white-label",
+  "summary": "Restore a previous version",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantConfig"
+ },
+ "sendAiMessage": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/messages",
+  "contract": "ai",
+  "summary": "Ask",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiMessage"
+ },
+ "setAnalyticsProvider": {
+  "method": "PUT",
+  "path": "/tenant-config/analytics-providers",
+  "contract": "white-label",
+  "summary": "Connect the storefront and app to an analytics platform",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "StorefrontAnalyticsProvider",
+  "responds": "StorefrontAnalyticsProvider"
+ },
+ "setAppIcons": {
+  "method": "PUT",
+  "path": "/tenant-config/app-icons",
+  "contract": "white-label",
+  "summary": "Set app icons",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AppIcons"
+ },
+ "setBookingFlowConfig": {
+  "method": "PUT",
+  "path": "/tenant-config/booking-flow",
+  "contract": "white-label",
+  "summary": "Set how the guest booking flow looks and steps",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BookingFlowConfig",
+  "responds": "BookingFlowConfig"
+ },
+ "setBrandIdentity": {
+  "method": "PUT",
+  "path": "/tenant-config/brand",
+  "contract": "white-label",
+  "summary": "Set logo, favicon and splash",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BrandIdentity",
+  "responds": "BrandIdentity"
+ },
+ "setFeatureToggles": {
+  "method": "PUT",
+  "path": "/tenant-config/features",
+  "contract": "white-label",
+  "summary": "Set feature toggles",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FeatureToggle"
+ },
+ "setFonts": {
+  "method": "PUT",
+  "path": "/tenant-config/fonts",
+  "contract": "white-label",
+  "summary": "Set fonts",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FontConfig",
+  "responds": "FontConfig"
+ },
+ "setFooter": {
+  "method": "PUT",
+  "path": "/footer",
+  "contract": "white-label",
+  "summary": "Footer columns, legal links and social",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FooterConfig",
+  "responds": "FooterConfig"
+ },
+ "setHeader": {
+  "method": "PUT",
+  "path": "/tenant-config/header",
+  "contract": "white-label",
+  "summary": "Configure the header",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HeaderConfig",
+  "responds": "HeaderConfig"
+ },
+ "setHomepageLayout": {
+  "method": "PUT",
+  "path": "/tenant-config/homepage",
+  "contract": "white-label",
+  "summary": "Set homepage section order",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HomepageLayout",
+  "responds": "HomepageLayout"
+ },
+ "setMaintenanceMode": {
+  "method": "PUT",
+  "path": "/tenant-config/status",
+  "contract": "white-label",
+  "summary": "Enable or clear maintenance mode, and set the live app status",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantAppStatus"
+ },
+ "setMenuSections": {
+  "method": "PUT",
+  "path": "/menus/{menuId}/sections",
+  "contract": "fnb",
+  "summary": "Set menu sections and their item ordering",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Menu"
+ },
+ "setModuleEnablement": {
+  "method": "PUT",
+  "path": "/tenant-config/modules",
+  "contract": "white-label",
+  "summary": "Enable or disable modules",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ModuleEnablement"
+ },
+ "setNavigation": {
+  "method": "PUT",
+  "path": "/tenant-config/navigation",
+  "contract": "white-label",
+  "summary": "Set main and overflow navigation",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "NavigationConfig",
+  "responds": "NavigationConfig"
+ },
+ "setProductCategories": {
+  "method": "PUT",
+  "path": "/product-categories",
+  "contract": "catalogue",
+  "summary": "Define the hierarchy, in the order a guest sees it",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductCategory"
+ },
+ "setSiteSetupProgress": {
+  "method": "PUT",
+  "path": "/tenant-config/site-setup",
+  "contract": "white-label",
+  "summary": "Save the Site Builder's progress",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SiteSetupProgress",
+  "responds": "SiteSetupProgress"
+ },
+ "setStoreAccounts": {
+  "method": "PUT",
+  "path": "/tenant-config/store-accounts",
+  "contract": "white-label",
+  "summary": "Record the client's own Apple and Google store accounts and listings",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StorePublishingChecklist"
+ },
+ "setTheme": {
+  "method": "PUT",
+  "path": "/tenant-config/theme",
+  "contract": "white-label",
+  "summary": "Set colour theme",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Theme",
+  "responds": "Theme"
+ },
+ "suggestGuidedChoice": {
+  "method": "POST",
+  "path": "/venues/{venueId}/guided-choice-suggestions",
+  "contract": "ai",
+  "summary": "Suggest a Help me choose set-up from the venue's catalogue",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "unpublishGuidedChoice": {
+  "method": "POST",
+  "path": "/guided-choices/{guidedChoiceId}/unpublish",
+  "contract": "white-label",
+  "summary": "Take a Help me choose set-up off the guest app",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuidedChoice"
+ },
+ "updateBanner": {
+  "method": "PATCH",
+  "path": "/tenant-config/banners/{bannerId}",
+  "contract": "white-label",
+  "summary": "Amend or activate a banner",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Banner"
+ },
+ "updateBookingFlowDefinition": {
+  "method": "PATCH",
+  "path": "/booking-flows/{bookingFlowId}",
+  "contract": "white-label",
+  "summary": "Reorder a flow's steps, switch optional steps, change its settings",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookingFlow"
+ },
+ "updateContentPage": {
+  "method": "PUT",
+  "path": "/tenant-config/pages/{pageId}",
+  "contract": "white-label",
+  "summary": "Amend a content page",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpdateContentPageRequest",
+  "responds": "ContentPage"
+ },
+ "updateGuidedChoice": {
+  "method": "PATCH",
+  "path": "/guided-choices/{guidedChoiceId}",
+  "contract": "white-label",
+  "summary": "Edit a Help me choose set-up, or review a suggestion",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuidedChoice"
+ },
+ "updateMenu": {
+  "method": "PATCH",
+  "path": "/menus/{menuId}",
+  "contract": "fnb",
+  "summary": "Amend a menu",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Menu"
+ },
+ "updateProduct": {
+  "method": "PATCH",
+  "path": "/products/{productId}",
+  "contract": "catalogue",
+  "summary": "Update a product",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpdateProductRequest",
+  "responds": "Product"
+ },
+ "updatePromoBlock": {
+  "method": "PATCH",
+  "path": "/tenant-config/promo-blocks/{promoBlockId}",
+  "contract": "white-label",
+  "summary": "Amend a promotional block",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PromoBlock"
+ },
+ "validateBookingFlow": {
+  "method": "POST",
+  "path": "/booking-flows/{bookingFlowId}/validate",
+  "contract": "white-label",
+  "summary": "Check a flow against its type",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "BookingFlowValidation"
+ },
+ "validateTenantConfig": {
+  "method": "POST",
+  "path": "/tenant-config/validate",
+  "contract": "white-label",
+  "summary": "Validate the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigValidationReport"
+ }
+}

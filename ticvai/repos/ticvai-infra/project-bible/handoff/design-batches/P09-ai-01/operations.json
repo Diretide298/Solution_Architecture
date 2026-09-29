@@ -1,4 +1,64 @@
 {
+ "getAiByokEnablement": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/byok",
+  "contract": "ai",
+  "summary": "Whether a tenant may bring its own key",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiByokEnablement"
+ },
+ "getRegionSettings": {
+  "method": "GET",
+  "path": "/regions/{regionId}/settings",
+  "contract": "tenancy",
+  "summary": "Read region settings",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RegionSettings"
+ },
+ "listAiModels": {
+  "method": "GET",
+  "path": "/models",
+  "contract": "ai",
+  "summary": "The model catalogue",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "layer",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "producerType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listAiProviders": {
   "method": "GET",
   "path": "/providers",
@@ -7,10 +67,169 @@
   "permission": "AI_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
   "responds": "AiProvider"
+ },
+ "listOwnPlatformStaffGrants": {
+  "method": "GET",
+  "path": "/platform-staff-grants/mine",
+  "contract": "identity",
+  "summary": "The calling platform operator's own grants into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "activeOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPromptTemplates": {
+  "method": "GET",
+  "path": "/prompt-templates",
+  "contract": "ai",
+  "summary": "The prompt registry",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "task",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "layer",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTenants": {
+  "method": "GET",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "List tenants",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "planId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "openPlatformStaffGrant": {
+  "method": "POST",
+  "path": "/platform-staff-grants",
+  "contract": "identity",
+  "summary": "A platform operator opens a time-boxed grant into this tenant",
+  "permission": "PLATFORM_TENANT_ACCESS",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PlatformStaffGrant"
+ },
+ "publishPromptTemplate": {
+  "method": "POST",
+  "path": "/prompt-templates/{templateKey}/versions",
+  "contract": "ai",
+  "summary": "Publish a prompt template version",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiPromptTemplate"
+ },
+ "setAiByokEnablement": {
+  "method": "PUT",
+  "path": "/tenants/{tenantId}/byok",
+  "contract": "ai",
+  "summary": "Enable or disable bring-your-own-key for a tenant (platform)",
+  "permission": "PLATFORM_AI_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiByokEnablement",
+  "responds": "AiByokEnablement"
  },
  "setAiCredential": {
   "method": "PUT",
@@ -31,15 +250,34 @@
   "requestBody": null,
   "responds": "AiProvider"
  },
+ "setAiModel": {
+  "method": "PUT",
+  "path": "/models/{modelId}",
+  "contract": "ai",
+  "summary": "Add or change a platform model (platform)",
+  "permission": "PLATFORM_AI_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiModel",
+  "responds": "AiModel"
+ },
  "setAiProvider": {
   "method": "PUT",
   "path": "/providers",
   "contract": "ai",
   "summary": "Configure a provider",
-  "permission": "AI_CONFIGURE",
+  "permission": "PLATFORM_TENANT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "region",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,

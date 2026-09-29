@@ -1,0 +1,168 @@
+{
+ "concludeRecommendationExperiment": {
+  "method": "POST",
+  "path": "/recommendation-experiments/{experimentId}/conclude",
+  "contract": "promotions",
+  "summary": "Declare a winner and roll it out",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationExperiment"
+ },
+ "createRecommendationExperiment": {
+  "method": "POST",
+  "path": "/recommendation-experiments",
+  "contract": "promotions",
+  "summary": "Split traffic between strategies",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecommendationExperiment",
+  "responds": "RecommendationExperiment"
+ },
+ "explainRecommendationDecision": {
+  "method": "GET",
+  "path": "/recommendations/decisions/{decisionId}/explanation",
+  "contract": "ai",
+  "summary": "Why these recommendations",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "depth",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRecommendationExplanation"
+ },
+ "getRecommendationPerformance": {
+  "method": "GET",
+  "path": "/recommendation-performance",
+  "contract": "promotions",
+  "summary": "Impressions, acceptance, revenue and incremental lift",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationPerformance"
+ },
+ "listRecommendationExperiments": {
+  "method": "GET",
+  "path": "/recommendation-experiments",
+  "contract": "promotions",
+  "summary": "A/B tests on placements and strategies",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RecommendationExperiment"
+ },
+ "listRecommendationStrategies": {
+  "method": "GET",
+  "path": "/recommendation-strategies",
+  "contract": "promotions",
+  "summary": "The strategies deciding what gets offered where",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "placement",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationStrategy"
+ },
+ "simulateRecommendationStrategy": {
+  "method": "POST",
+  "path": "/recommendation-simulations",
+  "contract": "promotions",
+  "summary": "Replay a strategy against history before it goes live",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RecommendationPerformance"
+ },
+ "updateRecommendationStrategy": {
+  "method": "PUT",
+  "path": "/recommendation-strategies/{strategyId}",
+  "contract": "promotions",
+  "summary": "Change a strategy",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecommendationStrategy",
+  "responds": "RecommendationStrategy"
+ }
+}

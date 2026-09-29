@@ -1,4 +1,61 @@
 {
+ "bookVisitPlan": {
+  "method": "POST",
+  "path": "/visit-plans/{planId}/booking",
+  "contract": "venue-map",
+  "summary": "Book this plan — turn it into cart lines",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VisitPlanBooking"
+ },
+ "decideRecommendations": {
+  "method": "POST",
+  "path": "/recommendations/decide",
+  "contract": "ai",
+  "summary": "Fill a recommendation slot",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRecommendationResult"
+ },
+ "generateVisitPlan": {
+  "method": "POST",
+  "path": "/visit-plans",
+  "contract": "venue-map",
+  "summary": "Build a visit plan from the party, the dates and what they like",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VisitPlanRequest",
+  "responds": "VisitPlan"
+ },
  "getAvailability": {
   "method": "GET",
   "path": "/availability",
@@ -18,10 +75,69 @@
     "name": "channelCapacityId",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PerformanceAvailabilityPage"
+ },
+ "getCookieConsentRuntime": {
+  "method": "GET",
+  "path": "/storefront/cookie-consent",
+  "contract": "marketing-crm",
+  "summary": "What the page must show and what it may load",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "X-Consent-Key",
+    "in": "header",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "CookieConsentRuntime"
  },
  "getProduct": {
   "method": "GET",
@@ -35,6 +151,38 @@
   "parameters": [],
   "requestBody": null,
   "responds": "Product"
+ },
+ "getProductEligibilityRule": {
+  "method": "GET",
+  "path": "/products/{productId}/eligibility-rule",
+  "contract": "catalogue",
+  "summary": "Who may take part: age, height, supervision",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductEligibilityRule"
+ },
+ "getPublishedGuidedChoice": {
+  "method": "GET",
+  "path": "/venues/{venueId}/guided-choice",
+  "contract": "white-label",
+  "summary": "The venue's published Help me choose",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuidedChoice"
  },
  "getTenantAppStatus": {
   "method": "GET",
@@ -68,6 +216,25 @@
   "requestBody": null,
   "responds": "TenantConfig"
  },
+ "getVisitPlan": {
+  "method": "GET",
+  "path": "/visit-plans/{planId}",
+  "contract": "venue-map",
+  "summary": "A visit plan, at its current version or an earlier one",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VisitPlan"
+ },
  "getWaitTimes": {
   "method": "GET",
   "path": "/queues/wait-times",
@@ -92,6 +259,74 @@
   "requestBody": null,
   "responds": "WaitTime"
  },
+ "listAnalyticsProviders": {
+  "method": "GET",
+  "path": "/tenant-config/analytics-providers",
+  "contract": "white-label",
+  "summary": "The analytics platforms the storefront and app report to",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMyEntitlements": {
+  "method": "GET",
+  "path": "/guests/me/entitlements",
+  "contract": "access",
+  "summary": "Every ticket, pass and membership this guest holds",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeShared",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listPerformances": {
   "method": "GET",
   "path": "/events/{eventId}/performances",
@@ -113,6 +348,16 @@
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -125,6 +370,19 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listProductCategories": {
+  "method": "GET",
+  "path": "/product-categories",
+  "contract": "catalogue",
+  "summary": "The merchandise hierarchy — categories, brands, collections",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductCategoryNode"
  },
  "listProducts": {
   "method": "GET",
@@ -152,6 +410,21 @@
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -164,6 +437,92 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listVisitPlanAlternatives": {
+  "method": "GET",
+  "path": "/visit-plans/{planId}/items/{itemId}/alternatives",
+  "contract": "venue-map",
+  "summary": "What could take this item's place",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "recordDeviceConsent": {
+  "method": "POST",
+  "path": "/consent/device",
+  "contract": "marketing-crm",
+  "summary": "Record a visitor's cookie decision, before anyone is known",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordDeviceConsentRequest",
+  "responds": "DeviceConsent"
+ },
+ "recordRecommendationEvents": {
+  "method": "POST",
+  "path": "/recommendations/events",
+  "contract": "ai",
+  "summary": "Report what happened to recommended items",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "recordStorefrontSessionEvents": {
+  "method": "POST",
+  "path": "/storefront/session-events",
+  "contract": "white-label",
+  "summary": "Report a batch of browsing behaviour for fraud prevention, hashed and without personal data",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WhiteLabelStorefrontSessionBatch",
+  "responds": null
  },
  "searchCatalogue": {
   "method": "GET",
@@ -191,6 +550,11 @@
     "required": null
    },
    {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -198,5 +562,24 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "updateVisitPlan": {
+  "method": "PUT",
+  "path": "/visit-plans/{planId}",
+  "contract": "venue-map",
+  "summary": "Swap, remove, add, move or undo, as a new version",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VisitPlanUpdate",
+  "responds": "VisitPlan"
  }
 }

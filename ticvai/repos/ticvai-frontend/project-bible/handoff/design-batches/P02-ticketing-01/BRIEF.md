@@ -1,6 +1,6 @@
 # P02-ticketing-01 — P02 · Ticketing
 
-**4 screens · 8 operations · 7 schemas · 4 permissions**
+**4 screens · 8 operations · 20 schemas · 4 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -62,11 +62,11 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-014` | Ticket Transfer | listDetail | 3 | 0 | — |
+| `GST-014` | Ticket Transfer | listDetail | 3 | 2 | — |
 | `GST-016` | My Reservations | listDetail | 3 | 1 | — |
 | `GST-017` | Reservation Details | statusTracker | 2 | 1 | — |
 | `GST-044` | Multi-Currency & Pricing | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
-**GST-016, GST-017, GST-044 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-017 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

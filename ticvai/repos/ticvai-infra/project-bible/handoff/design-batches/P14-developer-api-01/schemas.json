@@ -1,4 +1,125 @@
 {
+ "ApiAnomaly": {
+  "type": "object",
+  "x-ticvai-persistence": "control.api_anomaly",
+  "description": "One flagged breach of an anomaly rule (M17-07).",
+  "required": [
+   "id",
+   "ruleKey",
+   "clientId",
+   "detectedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "ruleKey": {
+    "type": "string"
+   },
+   "clientId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "control.api_client"
+   },
+   "measure": {
+    "type": "string"
+   },
+   "observed": {
+    "type": "number"
+   },
+   "baseline": {
+    "type": "number",
+    "nullable": true
+   },
+   "actionTaken": {
+    "type": "string",
+    "enum": [
+     "flag",
+     "throttle",
+     "suspend"
+    ]
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ApiAnomalyRule": {
+  "type": "object",
+  "x-ticvai-persistence": "control.api_anomaly_rule",
+  "description": "**When API traffic is abnormal** (17 September minutes, M17-07). Platform defaults ship for every tenant; TICVAI tightens them per tenant or per client.\n",
+  "required": [
+   "ruleKey",
+   "measure",
+   "comparison",
+   "threshold",
+   "action"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "ruleKey": {
+    "type": "string"
+   },
+   "clientId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "control.api_client",
+    "description": "Null applies to every client of the tenant."
+   },
+   "measure": {
+    "type": "string",
+    "enum": [
+     "callsPerMinute",
+     "clientErrorShare",
+     "allowListRefusals",
+     "unusualOperations",
+     "authFailures"
+    ]
+   },
+   "comparison": {
+    "type": "string",
+    "enum": [
+     "aboveBaselineMultiple",
+     "aboveFixed"
+    ],
+    "description": "`aboveBaselineMultiple`: above `threshold` x the same hour over the last four weeks."
+   },
+   "threshold": {
+    "type": "number"
+   },
+   "windowMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 5
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "flag",
+     "throttle",
+     "suspend"
+    ],
+    "default": "flag"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
  "ApiClient": {
   "type": "object",
   "x-ticvai-persistence": "control.api_client",
@@ -14,7 +135,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "developerId": {
     "type": "string",
@@ -37,10 +159,41 @@
    },
    "scopes": {
     "type": "array",
-    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing.\n",
+    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing. **Module scopes** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, one of `listApiScopes`.\n",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[a-zA-Z]+\\.(read|write)$"
     }
+   },
+   "issuedBy": {
+    "type": "string",
+    "enum": [
+     "partner",
+     "ticvai"
+    ],
+    "readOnly": true,
+    "description": "Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved `requestProductionAccess`.\n"
+   },
+   "certificationListingId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "control.integration_listing",
+    "description": "For a production client, the certified integration it was issued against."
+   },
+   "credentialTtlDays": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 730,
+    "nullable": true,
+    "description": "Key lifetime. Default 365 for production, 90 for sandbox (M17-06, configurable expiry)."
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the key stops working unless rotated. No token is issued after it."
    },
    "allowedTenantIds": {
     "type": "array",
@@ -52,7 +205,7 @@
    },
    "ipAllowList": {
     "type": "array",
-    "description": "13.1.38. Optional, and the strongest control available where an integrator has fixed egress.",
+    "description": "13.1.38. **Required on a production client** (17 September minutes, M17-07: endpoints are protected by IP allow-listing, not left open to the internet); optional in the sandbox. CIDR ranges. Checked at token issue and on every call.\n",
     "items": {
      "type": "string"
     }
@@ -63,12 +216,14 @@
      "active",
      "suspended",
      "revoked"
-    ]
+    ],
+    "readOnly": true
    },
    "lastUsedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true,
+    "readOnly": true,
     "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
    }
   }
@@ -94,14 +249,66 @@
    },
    "licensedModules": {
     "type": "array",
-    "description": "**The example in the requirement is the shape**: a venue licensing the ticketing API and not the F&B one.\n",
+    "description": "**The example in the requirement is the shape**: a venue licensing the ticketing API and not the F&B one. **The platform module list** (17 September minutes, M17-05), so the licence, the scope catalogue and the modules a tenant buys are one vocabulary.\n",
     "items": {
-     "type": "string"
+     "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
     }
    },
    "callAllowancePerMonth": {
     "type": "integer",
     "nullable": true
+   },
+   "catalogueWriteException": {
+    "type": "object",
+    "nullable": true,
+    "description": "**M17-04: the one way a client reaches a catalogue write**, set by TICVAI platform staff only (`setApiLicensing` refuses anyone else 403 `platform-staff-only`). Null, the default, means no partner or developer client of this tenant can create or change products, price lists, prices, channel capacity, lifecycle or alternative codes.\n",
+    "required": [
+     "clientId",
+     "operationIds",
+     "reason",
+     "grantedUntil"
+    ],
+    "properties": {
+     "clientId": {
+      "type": "string",
+      "format": "uuid",
+      "x-ticvai-references": "control.api_client"
+     },
+     "operationIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+       "type": "string",
+       "enum": [
+        "createProduct",
+        "updateProduct",
+        "setProductAttributes",
+        "createPriceList",
+        "updatePriceList",
+        "copyPriceList",
+        "setPrices",
+        "createChannelCapacity",
+        "updateChannelCapacity",
+        "setChannelAllocations",
+        "transitionProductLifecycle",
+        "setAlternativeCodes"
+       ]
+      }
+     },
+     "reason": {
+      "type": "string",
+      "maxLength": 500
+     },
+     "grantedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true
+     },
+     "grantedUntil": {
+      "type": "string",
+      "format": "date"
+     }
+    }
    },
    "overageRatePerThousand": {
     "type": "number",
@@ -124,7 +331,7 @@
  },
  "ApiQuota": {
   "type": "object",
-  "x-ticvai-persistence": "control.api_quota",
+  "x-ticvai-persistence": "control.api_limit",
   "description": "13.1.36 and 13.1.37. **A quota protects the venue, not the developer.**\n",
   "required": [
    "clientId",
@@ -167,6 +374,53 @@
      "queue"
     ],
     "default": "throttle"
+   }
+  }
+ },
+ "ApiScope": {
+  "type": "object",
+  "x-ticvai-persistence": "none — generated at release from x-ticvai-api-scope on each partner-callable operation",
+  "description": "**One module scope** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, and the operations it opens.\n**A write scope never opens a catalogue write** (M17-04): `ticketing.write` opens carts, orders and holds for a partner or developer client, and no product, price list, price, channel capacity, lifecycle or alternative-code write, since those operations are not partner-callable and carry no `x-ticvai-api-scope`. Only a platform-staff `ApiLicence.catalogueWriteException` opens one, for one named client.\n",
+  "required": [
+   "scope",
+   "module",
+   "access"
+  ],
+  "properties": {
+   "scope": {
+    "type": "string",
+    "description": "e.g. `ticketing.read`."
+   },
+   "module": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+   },
+   "access": {
+    "type": "string",
+    "enum": [
+     "read",
+     "write"
+    ]
+   },
+   "description": {
+    "type": "string"
+   },
+   "operations": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "contract": {
+       "type": "string"
+      },
+      "operationId": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "licensed": {
+    "type": "boolean",
+    "description": "Whether the caller's tenant licenses the module (`ApiLicence.licensedModules`)."
    }
   }
  },
@@ -266,6 +520,41 @@
    "activeClientCount": {
     "type": "integer",
     "readOnly": true
+   },
+   "changes": {
+    "type": "array",
+    "description": "**The developer changelog for this version** (17 September minutes, M17-14): every operation added, changed, deprecated or removed, and whether the change is breaking under ADR-0026. Generated at release from the contract diff; shown on DEV-001.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "operationId",
+      "kind"
+     ],
+     "properties": {
+      "operationId": {
+       "type": "string"
+      },
+      "contract": {
+       "type": "string"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "added",
+        "changed",
+        "deprecated",
+        "removed"
+       ]
+      },
+      "breaking": {
+       "type": "boolean",
+       "default": false
+      },
+      "summary": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
@@ -282,7 +571,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "organisationName": {
     "type": "string"
@@ -311,12 +601,14 @@
      "verified",
      "suspended",
      "closed"
-    ]
+    ],
+    "readOnly": true
    },
    "verifiedAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -334,7 +626,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "developerId": {
     "type": "string",
@@ -378,17 +671,20 @@
      "rejected",
      "revoked",
      "delisted"
-    ]
+    ],
+    "readOnly": true
    },
    "certifiedUntil": {
     "type": "string",
     "format": "date",
     "nullable": true,
+    "readOnly": true,
     "description": "**Certification expires.** An integration certified against v1 and still listed after v3 is TICVAI vouching for something it has not looked at in two years.\n"
    },
    "certifiedAgainstVersion": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true
    },
    "listingFeeModel": {
     "type": "string",
@@ -398,6 +694,132 @@
      "revenueShare"
     ],
     "nullable": true
+   },
+   "visibility": {
+    "type": "string",
+    "enum": [
+     "public",
+     "private"
+    ],
+    "default": "public",
+    "description": "`private`: certified for production access and never shown in the marketplace (17 September minutes, M17-06). `public`: also listed once certified.\n"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ProductionAccessRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "control.production_access_request",
+  "description": "**A developer's request for production keys** (17 September minutes, M17-06): sandbox, then certification, then production.\n",
+  "required": [
+   "id",
+   "developerId",
+   "sandboxClientId",
+   "listingId",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "developerId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "sandboxClientId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "control.api_client"
+   },
+   "listingId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "control.integration_listing"
+   },
+   "scopes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "ipAllowList": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "approved",
+     "rejected",
+     "withdrawn"
+    ],
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "productionClientId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "control.api_client"
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -414,7 +836,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "name": {
     "type": "string"
@@ -431,7 +854,8 @@
      "resetting",
      "expired",
      "deleted"
-    ]
+    ],
+    "readOnly": true
    },
    "dataProfile": {
     "$ref": "#/components/schemas/SyntheticDataProfile"
@@ -444,12 +868,14 @@
    },
    "expiresAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "readOnly": true
    },
    "lastResetAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -544,12 +970,135 @@
     "type": "boolean",
     "default": false
    },
+   "isTest": {
+    "type": "boolean",
+    "default": false,
+    "description": "Sent by `testWebhookSubscription` (VM close-out, 29 September). Marked in the payload so a receiver never books it, and never counted towards `consecutiveFailures`.\n"
+   },
    "deliveredAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
    }
   }
+ },
+ "WebhookEventCatalogueEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "none — read from the event catalogue (events/*.yaml) shipped with the release",
+  "description": "One event a webhook may subscribe to, as the event catalogue declares it. What a receiver needs to write a handler: the name, the version in the payload, who publishes it, what it is about and when, and the payload fields.\n",
+  "required": [
+   "name",
+   "version",
+   "publisher"
+  ],
+  "properties": {
+   "name": {
+    "$ref": "#/components/schemas/WebhookEventType"
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "publisher": {
+    "type": "string",
+    "description": "The one context that publishes it."
+   },
+   "aggregate": {
+    "type": "string",
+    "description": "What the event is about. Delivery is ordered within one instance of it."
+   },
+   "description": {
+    "type": "string"
+   },
+   "emittedWhen": {
+    "type": "string",
+    "nullable": true
+   },
+   "payload": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "type"
+     ],
+     "properties": {
+      "field": {
+       "type": "string"
+      },
+      "type": {
+       "type": "string"
+      },
+      "required": {
+       "type": "boolean",
+       "default": true
+      },
+      "notes": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "WebhookEventType": {
+  "type": "string",
+  "description": "**The webhook event catalogue: every event a subscription may name** (29 September, build pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`, published through `platform.outbox` by exactly one context. A name is added here in the same change that adds its event file, and never before.\n**Added 29 September**, each closing a requirement that had the webhook mechanism and nothing to subscribe to:\n| Events | Publisher | Requirement | |---|---|---| | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 | | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 | | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 | | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 | | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 | | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) | | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) | | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |\n**Published and deliberately not offered** (29 September, build pass, group G2): `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is high-volume fraud telemetry, not a business fact a receiver acts on.\n",
+  "enum": [
+   "access.validated",
+   "accreditation.applicationDecided",
+   "accreditation.credentialIssued",
+   "accreditation.holderStatusChanged",
+   "accreditation.renewalDue",
+   "ai.ceilingApproaching",
+   "apiClient.anomalyDetected",
+   "approval.escalated",
+   "approval.expired",
+   "approval.granted",
+   "approval.rejected",
+   "approval.requested",
+   "approval.stepCompleted",
+   "assets.documentIndexed",
+   "cart.abandoned",
+   "catalogue.productPublished",
+   "consent.deviceConsentClaimed",
+   "consent.deviceConsentRecorded",
+   "conversation.handedOver",
+   "device.enrolmentChanged",
+   "device.firmwareReleased",
+   "device.firmwareRolloutCompleted",
+   "device.statusChanged",
+   "device.tamperDetected",
+   "entitlement.expiringSoon",
+   "entitlement.issued",
+   "entitlement.statusChanged",
+   "fnb.menuPublished",
+   "fnb.orderReady",
+   "inventory.purchaseOrderReceived",
+   "ledger.journalPosted",
+   "ledger.periodClosed",
+   "maintenance.assetReturnedToService",
+   "maintenance.templatePublished",
+   "maintenance.workOrderCompleted",
+   "marketing.caseClosed",
+   "order.chargebackRecorded",
+   "order.completed",
+   "order.paid",
+   "order.refunded",
+   "performance.cancelled",
+   "reporting.definitionPublished",
+   "retail.merchandisePublished",
+   "seat.blocked",
+   "seat.held",
+   "seat.released",
+   "seat.sold",
+   "seatMap.published",
+   "shift.closed",
+   "stock.depleted",
+   "tenant.suspended",
+   "whitelabel.contentPublished"
+  ]
  },
  "WebhookSubscription": {
   "type": "object",
@@ -565,7 +1114,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "clientId": {
     "type": "string",
@@ -576,9 +1126,9 @@
    },
    "eventTypes": {
     "type": "array",
-    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to.\n",
+    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to. Each entry is a name from the webhook event catalogue (`WebhookEventType`).\n",
     "items": {
-     "type": "string"
+     "$ref": "#/components/schemas/WebhookEventType"
     }
    },
    "filters": {
@@ -590,7 +1140,8 @@
    "signingSecret": {
     "type": "string",
     "format": "password",
-    "description": "**How the receiver knows it was TICVAI.** Without a signature an endpoint accepts a ticket-sale event from anybody who learns the URL.\n"
+    "writeOnly": true,
+    "description": "**How the receiver knows it was TICVAI.** Without a signature an endpoint accepts a ticket-sale event from anybody who learns the URL.\n**Write-only: accepted on create, never returned.** The same rule as `clientSecret` — a system that can show you a secret later is a system that hands it to whoever reads the subscription.\n"
    },
    "status": {
     "type": "string",
@@ -600,7 +1151,8 @@
      "paused",
      "failing",
      "disabled"
-    ]
+    ],
+    "readOnly": true
    },
    "consecutiveFailures": {
     "type": "integer",
@@ -609,6 +1161,7 @@
    "disabledReason": {
     "type": "string",
     "nullable": true,
+    "readOnly": true,
     "description": "13.1.29. **An endpoint failing for days is disabled rather than retried forever**, and the developer is told — a queue growing against a dead endpoint is a cost the platform carries silently.\n"
    }
   }

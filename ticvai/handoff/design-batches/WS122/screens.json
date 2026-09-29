@@ -1,0 +1,1916 @@
+[
+ {
+  "id": "ADM-529",
+  "name": "AI Human Oversight Command Center",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "2",
+   "number": "1",
+   "page": 30
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-human-oversight-command-center-adm-529",
+   "component": "apps/ticvai-web/src/routes/platform/AiHumanOversightCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-530",
+    "ADM-531",
+    "ADM-532",
+    "ADM-533",
+    "ADM-534",
+    "ADM-535",
+    "ADM-536",
+    "ADM-537",
+    "ADM-538"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to Platform Dashboard",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    },
+    {
+     "to": "ADM-530",
+     "trigger": "AI Approval Requirement & Routing Configuration",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-531",
+     "trigger": "AI Approval Review Workspace",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "planId"
+     ]
+    },
+    {
+     "to": "ADM-532",
+     "trigger": "Conditional Approval & Approval Conditions",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "planId"
+     ]
+    },
+    {
+     "to": "ADM-533",
+     "trigger": "Human Review, Challenge & AI Clarification Workspace",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-534",
+     "trigger": "Escalation, Delegation & Approval SLA Management",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "planId"
+     ]
+    },
+    {
+     "to": "ADM-535",
+     "trigger": "Live AI Execution Oversight & Human Intervention",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "planId"
+     ]
+    },
+    {
+     "to": "ADM-536",
+     "trigger": "Human Override & Manual Control Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "planId"
+     ]
+    },
+    {
+     "to": "ADM-537",
+     "trigger": "Approval & Intervention History / Decision Timeline",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-538",
+     "trigger": "Human Oversight Workflow Simulator & Readiness Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide one central operational view of all AI activities requiring human oversight across TICVAI. This should become the control room for AI actions waiting for human intervention.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search human oversight",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Filters"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Tenant",
+        "Venue",
+        "AI Capability",
+        "Module",
+        "Risk",
+        "Approver",
+        "Status",
+        "Environment",
+        "Date",
+        "SLA"
+       ],
+       "notes": "The pack filters this screen by tenant, venue, ai capability, module, risk, approver and 4 more — which are present is a decision the pack already made.",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Filters"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Pending AI Approvals",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "High-Risk Reviews",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Critical Reviews",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Awaiting Additional Approver",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Conditional Approvals",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Requested Changes",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Escalated Cases",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Overdue Reviews",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active AI Executions Under Oversight",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Human Interventions Today",
+       "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The human oversight list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the human oversight untouched.",
+   "emptyFirstRun": "No human oversight yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the human oversight are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listProposedActions",
+    "contract": "ai",
+    "purpose": "What the assistant has proposed and nobody has decided",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-529",
+   "workshopBoard": "wireframes/WS15 AI Governance Board 2.dc.html#adm-529"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 30. 0 of 10 labels bound to a contract property; 20 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-530",
+  "name": "AI Approval Requirement & Routing Configuration",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "2",
+   "number": "2",
+   "page": 31
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-approval-requirement-routing-configuration-adm-530",
+   "component": "apps/ticvai-web/src/routes/platform/AiApprovalRequirementRoutingConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-529"
+   ],
+   "exitTo": [
+    "ADM-529"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-529",
+     "trigger": "Back to AI Human Oversight Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Translate Board 1 governance decisions into the correct human approval workflow.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 11 actions on this screen and the screen declares 0 operations.** Unserved: Single Approval, Sequential Approval, Parallel Approval, Conditional Approval, Risk-Based Approval, → Commercial Manager, → Commercial Manager + General Manager, → Commercial Director + General Manager …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack AI_Governance_Reference.pdf, page 31 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 31"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 31"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Single Approval",
+       "provenance": "pack AI_Governance_Reference.pdf, page 31 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Sequential Approval",
+       "provenance": "pack AI_Governance_Reference.pdf, page 31 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Parallel Approval",
+       "provenance": "pack AI_Governance_Reference.pdf, page 31 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Conditional Approval",
+       "provenance": "pack AI_Governance_Reference.pdf, page 31 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Risk-Based Approval",
+       "provenance": "pack AI_Governance_Reference.pdf, page 31 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "→ Commercial Manager",
+       "provenance": "pack AI_Governance_Reference.pdf, page 31 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "→ Commercial Manager + General Manager",
+       "provenance": "pack AI_Governance_Reference.pdf, page 31 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "→ Commercial Director + General Manager",
+       "provenance": "pack AI_Governance_Reference.pdf, page 31 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save approval matrix",
+       "operation": "setApprovalMatrix",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test a routing",
+       "operation": "evaluateApprovalRequirement",
+       "notes": "Evaluates a sample AI action (kind `aiRecommendation`, amount, scope) against the matrix and shows who would approve it.",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Approval matrix for AI actions",
+       "operation": "listApprovalMatrices",
+       "notes": "**AI actions route through the shared approval matrix** (18 September minutes, M18-02), kind `aiRecommendation`: an approver is authorised up to a limit and anything above it escalates.",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval requirement routing list.",
+   "error": "Could not load. Names which read failed and leaves the approval requirement routing untouched.",
+   "emptyFirstRun": "No approval requirement routing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval requirement routing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createAiGovernancePolicyDraft",
+    "contract": "ai",
+    "purpose": "Draft a governance policy, or a new version of one",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAiGovernancePolicyVersions",
+    "contract": "ai",
+    "purpose": "Governance policies and their versions",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAiTools",
+    "contract": "ai",
+    "purpose": "The tool registry",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "The matrices AI actions route through",
+    "trigger": "onLoad",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "setApprovalMatrix",
+    "contract": "approvals",
+    "purpose": "Thresholds and levels for AI actions",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalMatrices"
+    ],
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "evaluateApprovalRequirement",
+    "contract": "approvals",
+    "purpose": "Who would approve this AI action",
+    "trigger": "onAction",
+    "provenance": "29 September pass (P29 group A)"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-530",
+   "workshopBoard": "wireframes/WS15 AI Governance Board 2.dc.html#adm-530"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 11 of 60 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetApprovalMatrix",
+    "component": "modal",
+    "trigger": "Save approval matrix",
+    "body": "**Collects the matrix for kind `aiRecommendation`** before `setApprovalMatrix` is called: levels, the value range each approver may approve, and the escalation above it. Dismissing sends nothing.",
+    "confirm": {
+     "label": "Save approval matrix",
+     "operation": "setApprovalMatrix"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "levels",
+      "thresholds"
+     ]
+    },
+    "provenance": "29 September pass (P29 group A)"
+   }
+  ],
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-531",
+  "name": "AI Approval Review Workspace",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "2",
+   "number": "3",
+   "page": 33
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-approval-review-workspace-adm-531",
+   "component": "apps/ticvai-web/src/routes/platform/AiApprovalReviewWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-529"
+   ],
+   "exitTo": [
+    "ADM-529"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-529",
+     "trigger": "Back to AI Human Oversight Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configuration Current Proposed) and no display directory — it is settings, not a population",
+  "purpose": "Give the human approver enough information to make an informed decision without having to navigate across many TICVAI modules. This should be one of the strongest screens in the board.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Adult Weekend Price AED 140 AED 150",
+       "provenance": "pack AI_Governance_Reference.pdf, page 33 §Configuration Current Proposed"
+      },
+      {
+       "kind": "textField",
+       "label": "Effective Date Current 1 Oct 2026",
+       "provenance": "pack AI_Governance_Reference.pdf, page 33 §Configuration Current Proposed"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval review configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the approval review untouched.",
+   "emptyFirstRun": "No approval review configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "simulateActionPlan",
+    "contract": "ai",
+    "purpose": "Validate and simulate a plan without changing anything",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-531",
+   "workshopBoard": "wireframes/WS15 AI Governance Board 2.dc.html#adm-531"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 33. 0 of 0 labels bound to a contract property; 2 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "actionId",
+     "from": "navigation"
+    },
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-532",
+  "name": "Conditional Approval & Approval Conditions",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "2",
+   "number": "4",
+   "page": 35
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/conditional-approval-approval-conditions-adm-532",
+   "component": "apps/ticvai-web/src/routes/platform/ConditionalApprovalApprovalConditions.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-529"
+   ],
+   "exitTo": [
+    "ADM-529"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-529",
+     "trigger": "Back to AI Human Oversight Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow humans to approve an AI action subject to explicit conditions rather than treating approval as simply Yes/No.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 35"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 35"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getActionPlan",
+       "notes": "One record, read-only.",
+       "operation": "getActionPlan"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "decideProposedAction",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "decideProposedAction"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Approval condition for this action",
+       "operation": "evaluateApprovalRequirement",
+       "notes": "**Conditional authority** (M18-02): the approver's limit for this kind and amount, and whether the action is within it or must escalate.",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Threshold ranges",
+       "operation": "listApprovalMatrices",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The conditional approval approval list.",
+   "error": "Could not load. Names which read failed and leaves the conditional approval approval untouched.",
+   "emptyFirstRun": "No conditional approval approval yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the conditional approval approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "evaluateApprovalRequirement",
+    "contract": "approvals",
+    "purpose": "Whether this action is within the approver's limit",
+    "trigger": "onLoad",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "The threshold ranges",
+    "trigger": "onLoad",
+    "provenance": "29 September pass (P29 group A)"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-532",
+   "workshopBoard": "wireframes/WS15 AI Governance Board 2.dc.html#adm-532"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 35. 0 of 0 labels bound to a contract property; 0 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "actionId",
+     "from": "navigation"
+    },
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-533",
+  "name": "Human Review, Challenge & AI Clarification Workspace",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "2",
+   "number": "5",
+   "page": 36
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/human-review-challenge-ai-clarification-workspace-adm-533",
+   "component": "apps/ticvai-web/src/routes/platform/HumanReviewChallengeAiClarificationWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-529"
+   ],
+   "exitTo": [
+    "ADM-529"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-529",
+     "trigger": "Back to AI Human Oversight Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Allow the approver to question the AI proposal before making a decision. Human oversight should not mean simply clicking Approve.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Governance_Reference.pdf, page 36 §Show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every human review challenge",
+       "columns": [
+        "Proposed Action",
+        "Business Context",
+        "Risk",
+        "Impact",
+        "AI Recommendation",
+        "Validation",
+        "Alternatives",
+        "Ask AI"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack AI_Governance_Reference.pdf, page 36 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected human review challenge",
+       "bindsTo": null,
+       "columns": [
+        "Proposed Action",
+        "Business Context",
+        "Risk",
+        "Impact",
+        "AI Recommendation",
+        "Validation",
+        "Alternatives",
+        "Ask AI"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Other Example Questions”, “Important Requirement”, “If evidence is unavailable”.",
+       "provenance": "pack AI_Governance_Reference.pdf, page 36 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The human review challenge list.",
+   "error": "Could not load. Names which read failed and leaves the human review challenge untouched.",
+   "emptyFirstRun": "No human review challenge yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the human review challenge are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "overrideAiDecision",
+    "contract": "ai",
+    "purpose": "Override an AI decision",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "sendAiMessage",
+    "contract": "ai",
+    "purpose": "Ask the assistant",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Proposed Action",
+    "Business Context",
+    "Risk",
+    "Impact",
+    "AI Recommendation",
+    "Validation"
+   ],
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "navigation"
+    },
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-533",
+   "workshopBoard": "wireframes/WS15 AI Governance Board 2.dc.html#adm-533"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 36. 0 of 8 labels bound to a contract property; 8 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-534",
+  "name": "Escalation, Delegation & Approval SLA Management",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "2",
+   "number": "6",
+   "page": 37
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/escalation-delegation-approval-sla-management-adm-534",
+   "component": "apps/ticvai-web/src/routes/platform/EscalationDelegationApprovalSlaManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-529"
+   ],
+   "exitTo": [
+    "ADM-529"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-529",
+     "trigger": "Back to AI Human Oversight Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Ensure AI approvals do not remain indefinitely pending and provide controlled routing when approvers are unavailable or additional authority is required.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 37"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 37"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getActionPlan",
+       "notes": "One record, read-only.",
+       "operation": "getActionPlan"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listProposedActions",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listProposedActions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Delegations in force",
+       "operation": "listApprovalDelegations",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Escalate",
+       "operation": "escalateApprovalRequest",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Delegate",
+       "operation": "createApprovalDelegation",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save approval SLA",
+       "operation": "setApprovalSlaPolicy",
+       "notes": "Escalation, delegation and SLA apply to AI actions as to any approval (M18-02).",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The escalation delegation approval list.",
+   "error": "Could not load. Names which read failed and leaves the escalation delegation approval untouched.",
+   "emptyFirstRun": "No escalation delegation approval yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the escalation delegation approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listProposedActions",
+    "contract": "ai",
+    "purpose": "What the assistant has proposed and nobody has decided",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listApprovalDelegations",
+    "contract": "approvals",
+    "purpose": "Who is acting for whom",
+    "trigger": "onLoad",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "escalateApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Send an AI action to the next level",
+    "trigger": "onAction",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "createApprovalDelegation",
+    "contract": "approvals",
+    "purpose": "Delegate approval authority",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalDelegations"
+    ],
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "operationId": "setApprovalSlaPolicy",
+    "contract": "approvals",
+    "purpose": "The SLA and its escalation",
+    "trigger": "onAction",
+    "provenance": "29 September pass (P29 group A)"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-534",
+   "workshopBoard": "wireframes/WS15 AI Governance Board 2.dc.html#adm-534"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 0 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    },
+    {
+     "name": "requestId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-535",
+  "name": "Live AI Execution Oversight & Human Intervention",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "2",
+   "number": "7",
+   "page": 39
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/live-ai-execution-oversight-human-intervention-adm-535",
+   "component": "apps/ticvai-web/src/routes/platform/LiveAiExecutionOversightHumanIntervention.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-529"
+   ],
+   "exitTo": [
+    "ADM-529"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-529",
+     "trigger": "Back to AI Human Oversight Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§High-impact intervention should show) and no metric row",
+  "purpose": "Allow authorized humans to monitor and intervene after an AI-driven action has been approved and entered execution. This is different from approval.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack AI_Governance_Reference.pdf, page 39 §High-impact intervention should show"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every live execution oversight",
+       "columns": [
+        "Impact of Pausing",
+        "Completed objects remain",
+        "4 actions will remain pending",
+        "No active transaction affected",
+        "Emergency Stop",
+        "Emergency Stop AI Execution",
+        "Authorized Role",
+        "Reason",
+        "Confirmation",
+        "Audit Record"
+       ],
+       "bindsTo": null,
+       "operation": "getActionPlan",
+       "provenance": "pack AI_Governance_Reference.pdf, page 39 §High-impact intervention should show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected live execution oversight",
+       "bindsTo": null,
+       "columns": [
+        "Impact of Pausing",
+        "Completed objects remain",
+        "4 actions will remain pending",
+        "No active transaction affected",
+        "Emergency Stop",
+        "Emergency Stop AI Execution",
+        "Authorized Role",
+        "Reason",
+        "Confirmation",
+        "Audit Record"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Approval answers”, “Step Action Module Status”, “Administrator notices”.",
+       "provenance": "pack AI_Governance_Reference.pdf, page 39 §High-impact intervention should show",
+       "operation": "getActionPlan"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Pause",
+       "operation": "pauseActionPlan",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeActionPlan",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel plan",
+       "operation": "cancelActionPlan",
+       "provenance": "29 September pass (P29 group A)"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Roll back",
+       "operation": "rollbackActionPlan",
+       "notes": "**Rollback on partial failure** (21 September minutes, M21-12): plans the compensating steps in reverse dependency order, for approval like any plan.",
+       "provenance": "29 September pass (P29 group A)"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The live execution oversight list.",
+   "error": "Could not load. Names which read failed and leaves the live execution oversight untouched.",
+   "emptyFirstRun": "No live execution oversight yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the live execution oversight are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "pauseActionPlan",
+    "contract": "ai",
+    "purpose": "Pause an executing plan",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "resumeActionPlan",
+    "contract": "ai",
+    "purpose": "Resume a paused plan",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "cancelActionPlan",
+    "contract": "ai",
+    "purpose": "Cancel a plan",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "rollbackActionPlan",
+    "contract": "ai",
+    "purpose": "Plan the rollback of a partly executed plan",
+    "trigger": "onAction",
+    "provenance": "29 September pass (P29 group A)"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Impact of Pausing",
+    "Completed objects remain",
+    "4 actions will remain pending",
+    "No active transaction affected",
+    "Emergency Stop",
+    "Emergency Stop AI Execution"
+   ],
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-535",
+   "workshopBoard": "wireframes/WS15 AI Governance Board 2.dc.html#adm-535"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 39. 0 of 10 labels bound to a contract property; 10 of 54 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "confirmCancelActionPlan",
+    "component": "confirmDialog",
+    "trigger": "Cancel plan",
+    "body": "**Names the plan, the steps already executed and what stays applied**: cancelling stops the remaining steps; it does not undo the executed ones (that is Roll back).",
+    "provenance": "29 September pass (P29 group A)"
+   },
+   {
+    "id": "confirmRollbackActionPlan",
+    "component": "confirmDialog",
+    "trigger": "Roll back",
+    "body": "**Names each executed step and its compensation**, and that the rollback plan goes for approval before it runs.",
+    "provenance": "29 September pass (P29 group A)"
+   }
+  ],
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-536",
+  "name": "Human Override & Manual Control Center",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "2",
+   "number": "8",
+   "page": 41
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/human-override-manual-control-center-adm-536",
+   "component": "apps/ticvai-web/src/routes/platform/HumanOverrideManualControlCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-529"
+   ],
+   "exitTo": [
+    "ADM-529"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-529",
+     "trigger": "Back to AI Human Oversight Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide controlled mechanisms for humans to override an AI recommendation or take control when AI output is inappropriate. Human override should always be possible where governance requires it.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 41"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 41"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "pauseAiCapability",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "pauseAiCapability"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The human override manual list.",
+   "error": "Could not load. Names which read failed and leaves the human override manual untouched.",
+   "emptyFirstRun": "No human override manual yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the human override manual are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "pauseAiCapability",
+    "contract": "ai",
+    "purpose": "Stop a capability now",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "resumeAiCapability",
+    "contract": "ai",
+    "purpose": "Resume a paused capability",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "pauseActionPlan",
+    "contract": "ai",
+    "purpose": "Pause an executing plan",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "overrideAiDecision",
+    "contract": "ai",
+    "purpose": "Override an AI decision",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-536",
+   "workshopBoard": "wireframes/WS15 AI Governance Board 2.dc.html#adm-536"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 54 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "capabilityKey",
+     "from": "navigation"
+    },
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    },
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-537",
+  "name": "Approval & Intervention History / Decision Timeline",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "2",
+   "number": "9",
+   "page": 42
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/approval-intervention-history-decision-timeline-adm-537",
+   "component": "apps/ticvai-web/src/routes/platform/ApprovalInterventionHistoryDecisionTimeline.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-529"
+   ],
+   "exitTo": [
+    "ADM-529"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-529",
+     "trigger": "Back to AI Human Oversight Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide complete operational history of human involvement in AI activity. This is the human-oversight timeline; Board 3 will later provide deeper enterprise AI explainability and audit.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack AI_Governance_Reference.pdf, page 42"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search approval intervention history",
+       "provenance": "pack AI_Governance_Reference.pdf, page 42 §Filters"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "AI Capability",
+        "User",
+        "Approver",
+        "Module",
+        "Decision",
+        "Risk",
+        "Venue",
+        "Tenant",
+        "Date"
+       ],
+       "notes": "The pack filters this screen by ai capability, user, approver, module, decision, risk and 3 more — which are present is a decision the pack already made.",
+       "provenance": "pack AI_Governance_Reference.pdf, page 42 §Filters"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval intervention history list.",
+   "error": "Could not load. Names which read failed and leaves the approval intervention history untouched.",
+   "emptyFirstRun": "No approval intervention history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval intervention history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "searchAiDecisions",
+    "contract": "ai",
+    "purpose": "Find AI decisions",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-537",
+   "workshopBoard": "wireframes/WS15 AI Governance Board 2.dc.html#adm-537"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 42. 0 of 9 labels bound to a contract property; 9 of 63 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-538",
+  "name": "Human Oversight Workflow Simulator & Readiness Center",
+  "module": "Platform",
+  "requiresModule": "ai",
+  "wave": 3,
+  "source": {
+   "pack": "AI_Governance_Reference.pdf",
+   "board": "2",
+   "number": "10",
+   "page": 44
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/human-oversight-workflow-simulator-readiness-center-adm-538",
+   "component": "apps/ticvai-web/src/routes/platform/HumanOversightWorkflowSimulatorReadinessCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-529"
+   ],
+   "exitTo": [
+    "ADM-529"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-529",
+     "trigger": "Back to AI Human Oversight Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "back": true,
+     "carries": [
+      "planId"
+     ]
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Board 1 defines) and no display directory — it is settings, not a population",
+  "purpose": "Allow Soft Labs/TICVAI administrators to test the entire human-in-the-loop workflow before activating it in production.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: but Operations Assistant lacks Pricing approval rights,. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack AI_Governance_Reference.pdf, page 44 §Operations Assistant"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Risk",
+       "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "Autonomy",
+       "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "AI permissions",
+       "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "Data usage",
+       "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "Policy",
+       "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "Governance decision",
+       "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
+      },
+      {
+       "kind": "textField",
+       "label": "Important Boundary — Owning Modules",
+       "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "but Operations Assistant lacks Pricing approval rights,",
+       "provenance": "pack AI_Governance_Reference.pdf, page 44 §Operations Assistant"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The human oversight workflow configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the human oversight workflow untouched.",
+   "emptyFirstRun": "No human oversight workflow configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [
+   {
+    "operationId": "simulateAiGovernancePolicy",
+    "contract": "ai",
+    "purpose": "Test a draft policy before it is published",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "simulateActionPlan",
+    "contract": "ai",
+    "purpose": "Validate and simulate a plan without changing anything",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-538",
+   "workshopBoard": "wireframes/WS15 AI Governance Board 2.dc.html#adm-538"
+  },
+  "apisNote": "Regenerated 9 September 2026 from AI_Governance_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 8 of 269 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    },
+    {
+     "name": "versionId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -61,7 +61,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `WEB-015` | Branded Queue / Waiting Room | statusTracker | 3 | 0 | — |
+| `WEB-015` | Branded Queue / Waiting Room | statusTracker | 3 | 1 | — |
 
 ## Thin screens in this batch
 

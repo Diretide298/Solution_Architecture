@@ -1,6 +1,6 @@
 # WS161 — Resource Management Configuration board 7
 
-**10 screens · 11 operations · 16 schemas · 6 permissions**
+**10 screens · 14 operations · 24 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `APPROVAL_REQUEST, EVENT_CONFIGURE, RESOURCE_BOOK, RESOURCE_CONFIGURE, RESOURCE_VIEW, WORKFORCE_MANAGE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `AI_USE, APPROVAL_REQUEST, EVENT_CONFIGURE, RESOURCE_BOOK, RESOURCE_CONFIGURE, RESOURCE_VIEW, WORKFORCE_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -66,7 +66,7 @@ convincingly. It is never a caption.
 | `BO-916` | Equipment & Asset Allocation | listDetail | 1 | 0 | — |
 | `BO-917` | Event Staff & Personnel Allocation | listDetail | 1 | 0 | — |
 | `BO-918` | Event Resource Template Library | configEditor | 2 | 0 | — |
-| `BO-919` | AI Event Resource Forecasting | listDetail | 0 | 0 | — |
+| `BO-919` | AI Event Resource Forecasting | listDetail | 3 | 0 | — |
 | `BO-920` | Event Resource Cost Estimator | listDetail | 2 | 0 | — |
 | `BO-921` | Multi-Event Allocation & Conflict Optimizer | listDetail | 1 | 0 | — |
 | `BO-922` | Event Resource Approval & Readiness Gate | listDetail | 2 | 0 | — |

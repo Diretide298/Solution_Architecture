@@ -1,6 +1,6 @@
 # P08-sell-01 — P08 · Sell (1 of 4)
 
-**10 screens · 88 operations · 80 schemas · 10 permissions**
+**10 screens · 89 operations · 100 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `CAPACITY_CONFIGURE, EVENT_CONFIGURE, PARTNER_MANAGE, PARTNER_VIEW, PERFORMANCE_CONFIGURE, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 11 permissions apply here:
+  `CAPACITY_CONFIGURE, EVENT_CONFIGURE, PARTNER_MANAGE, PARTNER_VIEW, PERFORMANCE_CONFIGURE, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,10 +60,10 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-007` | Product Directory | listDetail | 14 | 7 | — |
+| `BO-007` | Product Directory | listDetail | 15 | 7 | — |
 | `BO-009` | Pricing Rules | listDetail | 11 | 4 | — |
 | `BO-010` | Promotions & Coupons | listDetail | 26 | 10 | — |
-| `BO-011` | Packages & Bundles | listDetail | 12 | 5 | — |
+| `BO-011` | Packages & Bundles | listDetail | 13 | 5 | — |
 | `BO-012` | Membership Products | listDetail | 12 | 6 | — |
 | `BO-013` | Channel & Distribution | listDetail | 10 | 6 | — |
 | `BO-014` | Catalogue Publishing | listDetail | 13 | 7 | — |

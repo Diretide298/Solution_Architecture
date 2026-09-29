@@ -1,6 +1,6 @@
 # P02-in-venue-experience-01 — P02 · In-Venue Experience
 
-**2 screens · 3 operations · 3 schemas · 2 permissions**
+**2 screens · 3 operations · 5 schemas · 2 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `GST-061` | Menu Item Detail | listDetail | 2 | 0 | — |
+| `GST-061` | Menu Item Detail | listDetail | 2 | 1 | — |
 | `GST-062` | Shop & Drop Collection | configEditor | 1 | 0 | — |
 
 ## Thin screens in this batch
