@@ -172,6 +172,9 @@ python3 tools/build-api-list.py
 # workbook (it reads schema-reference.json) and after link-screens-contracts (it reads consumers), so a
 # service that gains an operation has its documentation regenerate rather than go stale.
 python3 tools/build-service-docs.py
+# **The Block A schedule is derived, not patched** (30 September): build order, dependencies and each
+# person's pace give every task a start day. op-descriptions.py reads it when ticket text is written.
+python3 tools/derive-block-a-schedule.py
 # **The client questions, flagged by what the first release needs** (23 September). Reads the
 # slice, so it runs after it; before this it was run by hand and went stale within a day.
 python3 tools/build-client-questions-workbook.py

@@ -155,7 +155,9 @@ def build(schedule, keys):
     rows = {r["key"]: r for r in csv.DictReader((DOCS / "tasks.csv").open(encoding="utf-8"))}
     lineage = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
     sched = json.loads(Path(schedule).read_text(encoding="utf-8"))
-    week = {k: min(int(v // 5), 6) + 1 for k, v in sched["start"].items()}
+    # **Not capped at week 7** (30 September). A back-end owner whose Block A work runs past 20 November is
+    # told so: "week 9" is Block A's tail in B1, and a ticket that said "week 7" would be a promise nobody made.
+    week = {k: int(v // 5) + 1 for k, v in sched["start"].items()}
     who = sched["assign"]
     # Each task's timeframe inside its planned week, without dates (asked for 28 September): the week's five
     # days are shared across that developer's tasks for the week by points, in build order. The schedule keeps
@@ -286,8 +288,10 @@ def build(schedule, keys):
         if wk:
             # Wave is product priority; the week comes from dependency order, so the two can differ
             # without either being wrong (audit R045).
-            out.append(f"- Planned: Block A week {wk}" + (f" (product wave {r['wave']}; the week follows dependency order)"
-                                                          if r.get("wave") else ""))
+            label = (f"Block A week {wk}" if wk <= 7
+                     else f"week {wk}: Block A's tail, running into B1 past 20 November")
+            out.append(f"- Planned: {label}" + (f" (product wave {r['wave']}; the week follows dependency order)"
+                                                if r.get("wave") else ""))
             if base in slot:
                 s0, s1, n = slot[base]
                 d0, d1 = int(s0) + 1, max(int(s0) + 1, -(-int(s1 * 100) // 100))
